@@ -135,7 +135,7 @@ The `IAccountsModule` provides a small interface for a chain's accounts module.
 
 ### Account Type
 
-The abstract `Account` class should be extended by any new chain. This `Account` class is intended to provide a unified interface for interacting with chain addresses containing balances that may or may not correspond with registered users on the Commonwealth backend.
+The abstract `Account` class should be implemented by any new chain. This `Account` class is intended to provide a unified interface for interacting with chain addresses containing balances that may or may not correspond with registered users on the Commonwealth backend.
 
 * The `Account` class is typically implemented alongside the `IAccountsModule` in the file `client/scripts/controllers/chain/<chain-name>/account.ts`.
 * The `Account` class requires a `Coin` type argument.
@@ -146,9 +146,23 @@ The abstract `Account` class should be extended by any new chain. This `Account`
 * The `signMessage` and `isValidSignature` functions should be implemented if key-based signing for transactions or account registration is supported on the chain. Otherwise, they should throw an Error.
 * The `addressFromMnemonic` and `addressFromSeed` functions should be implemented for testing purposes, if accounts correspond to seeds or mnemonics. Otherwise, they should throw an Error.
   * **Commonwealth accounts should never request or store a seed or mnemonic when connecting to a production chain.**
-* If balance transfers are supported on the chain, the `sendBalanceTx` function should implement a balance transfer transaction using the `createITXModalData` function defined in the `IChainModule`. Otherwise, it should throw an Error.
+* If balance transfers are supported on the chain, the `sendBalanceTx` function should implement a balance transfer transaction using the `createITXModalData()` function defined in the `IChainModule`. Otherwise, it should throw an Error.
 
 ### ProposalModule
+
+The abstract `ProposalModule` class should be implemented by any new chain in order to support on-chain governance. If the new chain has several forms of governance, `ProposalModule` may be implemented multiple times, to define controllers for each of the governance forms.
+
+* The `ProposalModule` is typically implemented in the directory `client/scripts/controllers/chain/<chain-name>/`, with a file name corresponding to the chain's variety of proposal. `governance.ts` works as a default name.
+* The `ProposalModule` takes several type arguments:
+  * The `ApiT`, `CT`, `ST`, and `AdapterT` correspond to the `ApiT`, `ConstructionT`, `StateT`, and `ProposalAdapter` defined in the [adapter](#adapters) section.
+  * The `ProposalT` corresponds with the `Proposal` type, defined [below](#proposal-type).
+* The `ProposalModule` defines the following properties, which should be set in the constructor or `init` method.
+  * The `store` property is used for storing and querying `Proposal`s.
+  * The `adapter` property corresponds to the adapter, of type `AdapterT`, used to fetch new Proposals (`CT`s) or state updates (`ST`s).
+  * The `initialized` property is to be set to `true` once the module is initialized.
+  * The `_subscription` property is a local rxjs `Subscription`, often used to store the handle returned from the adapter subscription.
+* The `ProposalModule` should define an `init()` function that defines relevant properties, starts relevant subscriptions, and then sets `initialized` to true. The corresponding `deinit()` function is defined by default, but may be usefully overridden.
+* If a chain supports proposal creation, the `ProposalModule` should define a `createTx()` function, which uses the `createITXModalData()` function defined in the `IChainModule` to perform a proposal submission transaction. Otherwise, it should throw an Error.
 
 ### Proposal Type
 
