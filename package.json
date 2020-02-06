@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-contracts": "./scripts/build-contracts.sh",
+    "docs": "typedoc",
     "stylelint": "stylelint client/styles/*",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
@@ -213,6 +214,8 @@
     "typechain-target-ethers": "^1.0.1",
     "typechain-target-truffle": "^1.0.0",
     "typechain-target-web3-v1": "^1.0.0",
+    "typedoc": "^0.16.9",
+    "typescript": "^3.6.3",
     "webpack-dev-server": "^3.1.14"
   }
 }
