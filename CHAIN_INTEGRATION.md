@@ -39,7 +39,6 @@ Updating the server is the first step for adding a new chain:
   * New chain additions also require a migration, which creates the `Chain` model without resetting the database's contents.
     * An example migration can be found in the file `server/migrations/20191119071445-add-eth-chain.js`.
     * For more information about migration commands, reference the [main README](https://github.com/hicommonwealth/commonwealth/blob/master/README.md#migrations)
-      * TODO: expand information about migrations in general.
 * When the site initializes, all `Chains` and `ChainNodes` are loaded, so no further server changes are needed.
 
 ## 3. Adapters
@@ -115,7 +114,7 @@ The interface `IChainModule` specifies required properties for the general chain
 * This `IChainModule` requires the following implemented methods:
   * `coins()` should be a function that creates a new `Coin` of the specified chain's type, used throughout as `app.chain.chain.coins()` to create the chain-specific currency.
   * `denom` should be a string specifying the currency's token denomination, e.g. "EDG".
-  * `hasWebWallet()` should be a function that returns `true` iff the given chain has a web wallet extension available. (TODO: when was this added?)
+  * `hasWebWallet()` should be a function that returns `true` iff the given chain has a web wallet extension available.
   * `createTXModalData()` is a function for initializing the transaction modal. This is invoked whenever the user makes an action that requires a transaction on the chain.
     * `createTXModalData()` should return an `ITXModalData` object (or promise which resolves to an `ITXModalData`). `ITXModalData` should have the following properties:
       * `author` should be an `Account` of the type specified in the `IChainModule` argument. This is the sender of the transaction.
@@ -238,7 +237,7 @@ The following objects must be updated:
 
 Once identifiers are present, the chain can be initialized. Most initialization takes place in the `client/scripts/app.ts` file.
 
-* The `selectNode` function must create the corresponding `IChainAdapter` class when the corresponding network is selected, as described by the `NodeInfo` in its argument.
+* The `selectNode` function must create the corresponding `IChainAdapter` class when the corresponding network is selected, as described by the `NodeInfo` (known as `ChainNode` on the server) in its argument.
 
 Assuming all API connection is performed in the `IChainAdapter`, this should be sufficient to permit chain initialization.
 
