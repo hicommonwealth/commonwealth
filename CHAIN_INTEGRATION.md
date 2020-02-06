@@ -89,7 +89,7 @@ The controller logic represents the primary interface between chain data and the
 The `IChainAdapter` module is the "main" class of the chain. It represents the entrypoint into each chain's specific logic, and mainly performs module initialization.
 
 * Each chain should have extend `IChainAdapter` defined in a file `client/scripts/controllers/chain/<chain-name>/main.ts` (e.g. the `Cosmos` class). This is typically accessed via `app.chain` when a given chain is active.
-* This `IChainAdapter` class takes as type arguments a `Coin` type (as defined [above](#coin)), and an `Account` type, typically defined alongside the `IAccountsModule` described below).
+* This `IChainAdapter` class takes as type arguments a `Coin` type (as defined [above](#31-coin)), and an `Account` type, typically defined alongside the `IAccountsModule` described below).
 * This `IChainAdapter` class should define the following properties and methods:
   * All chain modules should be defined as properties:
     * `chain` should be an `IChainModule`, described below.
@@ -143,7 +143,7 @@ The `IAccountsModule` provides a small interface for a chain's accounts module.
 
 * The `IAccountsModule` is typically implemented in the file `client/scripts/controllers/chain/<chain-name>/account.ts`.
 * This `IAccountsModule` requires type arguments of a `Coin` type and an `Account` type, same as `IChainModule` and `IChainAdapter`.
-  * Most of the account-related implementation work takes place in the `Account` type passed as an argument. This is described [below](#account-type).
+  * Most of the account-related implementation work takes place in the `Account` type passed as an argument. This is described [below](#44-account-type).
 * This `IAccountsModule` implementation is typically accessed via `app.chain.accounts`.
 * This `IAccountsModule` requires a single implemented method, `get()`, which takes an address and an optional keytype and returns an `Account` of the provided type.
   * The function of `get()` is to provide a chain-agnostic `app.chain.accounts.get()` call, to fetch an account regardless of chain.
@@ -174,8 +174,8 @@ The abstract `ProposalModule` class should be implemented by any new chain in or
 
 * The `ProposalModule` is typically implemented in the directory `client/scripts/controllers/chain/<chain-name>/`, with a file name corresponding to the chain's variety of proposal. `governance.ts` works as a default name.
 * The `ProposalModule` takes several type arguments:
-  * The `ApiT`, `CT`, `ST`, and `AdapterT` correspond to the `ApiT`, `ConstructionT`, `StateT`, and `ProposalAdapter` defined in the [adapter](#adapters) section.
-  * The `ProposalT` corresponds with the `Proposal` type, defined [below](#proposal-type).
+  * The `ApiT`, `CT`, `ST`, and `AdapterT` correspond to the `ApiT`, `ConstructionT`, `StateT`, and `ProposalAdapter` defined in the [adapter](#3-adapters) section.
+  * The `ProposalT` corresponds with the `Proposal` type, defined [below](#46-proposal-type).
 * The `ProposalModule` defines the following properties, which should be set in the constructor or `init` method.
   * The `store` property is used for storing and querying `Proposal`s.
   * The `adapter` property corresponds to the adapter, of type `AdapterT`, used to fetch new Proposals (`CT`s) or state updates (`ST`s).
@@ -191,7 +191,7 @@ The abstract `Proposal` class represents a single proposal of some on-chain gove
 
 * The `Proposal` class is typically implemented alongside the `ProposalAdapter`.
 * The `Proposal` class takes several type arguments:
-  * The `ApiT`, `ConstructorT`, and `UpdateT` correspond to the `ApiT`, `ConstructionT`, and `StateT` defined in the [adapter](#adapters) section.
+  * The `ApiT`, `ConstructorT`, and `UpdateT` correspond to the `ApiT`, `ConstructionT`, and `StateT` defined in the [adapter](#3-adapters) section.
   * `C` should be the chain's `Coin` type.
   * `VoteT` should be an `IVote` type representing a vote on the proposal.
     * `IVote` as interface only requires an `account` property.
