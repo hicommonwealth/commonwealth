@@ -46,6 +46,9 @@
     "one-var": 0,
     "lines-between-class-members": 0,
     "max-classes-per-file": ["error", 5],
-    "max-len": ["error", {"code": 120, "tabWidth": 2}]
+    "max-len": ["error", {"code": 120, "tabWidth": 2}],
+    "no-trailing-spaces": ["error"],
+    "no-useless-constructor": 0,
+    "no-empty-function": 0
   }
 }
