@@ -87,6 +87,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _sudoKey: string;
   public get sudoKey() { return this._sudoKey; }
 
+  private _hasEVM: Boolean;
+  public get hasEVM() { return this._hasEVM; }
+
   private _ss58Format: number;
   public get ss58Format() { return this._ss58Format; }
   public keyring(useEd25519 = false) {
@@ -274,16 +277,18 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             api.query.sudo ? api.query.sudo.key() : of(null),
             api.rpc.system.properties(),
             api.consts.nicks ? of(api.consts.nicks.reservationFee) : of(null),
+            api.query.evm ? of(true) : of(null),
           );
         }),
         first(), // TODO: leave this open?
       ).subscribe(([
         chainname, chainversion, chainruntimename, minimumperiod, blockNumber,
-        totalbalance, existentialdeposit, creationfee, sudokey,
-        chainProps, reservationFee,
+        totalbalance, existentialdeposit, transferfee, creationfee, sudokey,
+        chainProps, reservationFee, hasEVM,
       ]: [
           string, string, string, Moment, BlockNumber,
-          Balance, Balance, Balance, AccountId, ChainProperties, Balance
+          Balance, Balance, Balance, Balance, AccountId,
+          ChainProperties, Balance, Boolean,
       ]) => {
         this.app.chain.name = chainname;
         this.app.chain.version = chainversion;
@@ -307,6 +312,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this._creationfee = this.coins(creationfee);
         this._sudoKey = sudokey ? sudokey.toString() : undefined;
         this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
+        this._hasEVM = !!hasEVM;
         // grab last timestamps from storage and use to compute blocktime
         const TIMESTAMP_LOOKBACK = 5;
         this.api.pipe(

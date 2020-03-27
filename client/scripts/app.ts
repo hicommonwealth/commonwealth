@@ -335,6 +335,7 @@ $(() => {
     '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
     '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal'), true),
     '/:scope/council':           importRoute(import('views/pages/council'), true),
+    '/:scope/evm':               importRoute(import(`views/pages/evm`), true),
     '/:scope/login':             importRoute(import('views/pages/login'), true),
     '/:scope/new/link':          importRoute(import('views/pages/threads/NewLinkPage'), true),
     '/:scope/new/thread':        importRoute(import('views/pages/threads/NewThreadPage'), true),

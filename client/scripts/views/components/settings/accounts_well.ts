@@ -12,13 +12,18 @@ import { AddressInfo, ChainClass } from 'models';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+
 import RagequitModal from 'views/modals/ragequit_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
+import { blake2AsHex } from '@polkadot/util-crypto';
+
 interface IAttrs {
   account: AddressInfo;
+  hasAction?: boolean;
+  isEVM?: boolean;
   onclick?: (e: Event) => any;
 }
 
@@ -29,11 +34,12 @@ interface IState {
 const AccountRow : m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>): m.Vnode => {
     const { account } = vnode.attrs;
-    const isActiveAccount =
-      app.vm.activeAccount &&
-      app.vm.activeAccount.chain.id === account.chain &&
-      app.vm.activeAccount.address === account.address;
-
+    const isActiveAccount = app.vm.activeAccount
+      && app.vm.activeAccount.chain.id === account.chain
+      && app.vm.activeAccount.address === account.address;
+    const address = (!vnode.attrs.isEVM)
+      ? account.address
+      : `0x${blake2AsHex(account.address, 256).substring(26)}`;
     return m('.AccountRow', {
       key: `${account.chain}#${account.address}`,
       onclick: vnode.attrs.onclick,
@@ -58,7 +64,7 @@ const AccountRow : m.Component<IAttrs, IState> = {
           }),
         ]),
         // checking for balance to guarantee that delegate key has loaded
-        m('.address', `${account.address} (${account.chain})`),
+        m('.address', `${address} ${(account.chain['id']) ? account.chain['id'] : ''}`),
         (account instanceof MolochMember && account.isMember && account.delegateKey) ? m('.moloch-delegatekey', [
           'Delegate: ',
           account.isMember
@@ -66,7 +72,7 @@ const AccountRow : m.Component<IAttrs, IState> = {
             : 'N/A',
         ]) : [],
       ]),
-      m('.action-col', [
+      vnode.attrs.hasAction && m('.action-col', [
         // TODO: re-enable this as 'go to chain and account'
         // (app.chain || app.community) && m('button.formular-button-primary', {
         //   class: isActiveAccount ? 'disabled' : '',
@@ -90,17 +96,21 @@ const AccountRow : m.Component<IAttrs, IState> = {
   },
 };
 
-const AccountsWell: m.Component<{}> = {
-  view: () => {
+const AccountsWell: m.Component<{ addresses, hasAction, isEVM }> = {
+  view: (vnode) => {
     return m('.AccountsWell', [
       m('h4', 'Linked Addresses'),
       m('.address-listing-explanation', 'Log into your account using any of these addresses'),
-      app.login.addresses
+      vnode.attrs.addresses
         .sort(orderAccountsByAddress)
-        .map((account) => m(AccountRow, { account })),
-      app.login.addresses.length === 0
-        && m('.no-accounts', `No addresses`),
-      m('button.formular-button-primary.add-account', {
+        .map((account) => m(AccountRow, {
+          account,
+          hasAction: vnode.attrs.hasAction,
+          isEVM: vnode.attrs.isEVM,
+        })),
+      vnode.attrs.addresses.length === 0
+        && m('.no-accounts', 'No addresses'),
+      vnode.attrs.hasAction && m('button.formular-button-primary.add-account', {
         onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
       }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
     ]);

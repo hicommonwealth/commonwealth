@@ -11,7 +11,8 @@ import {
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
-import { mnemonicValidate } from '@polkadot/util-crypto';
+import { DeriveAccountInfo } from '@polkadot/api-derive/types';
+import { mnemonicValidate, blake2AsHex } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
 import { IApp } from 'state';
@@ -180,6 +181,10 @@ export default SubstrateAccounts;
 type Delegation = [ AccountId, Conviction ] & Codec;
 
 export class SubstrateAccount extends Account<SubstrateCoin> {
+  public get evmAddress(): string {
+    return `0x${blake2AsHex(this.address, 256).substring(26)}`;
+  }
+
   // GETTERS AND SETTERS
   // staking
   public get stakedBalance(): Observable<SubstrateCoin> {
@@ -203,6 +208,26 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // TODO: note that this uses `availableBalance` and not `freeBalance` here -- this is because freeBalance
   //   only includes subtracted reserves, and not locks! And we want to see free for usage now.
   public get freeBalance(): Observable<SubstrateCoin> {
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
+      .pipe(map(({ freeBalance }) => this._Chain.coins(freeBalance)));
+  }
+
+  // The amount of balance locked up in reserve
+  public get reservedBalance(): Observable<SubstrateCoin> {
+    // TODO: should this return all coins if a votelock is on the account?
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
+      .pipe(map(({ reservedBalance }) => this._Chain.coins(reservedBalance)));
+  }
+
+  public get miscFrozen(): Observable<SubstrateCoin> {
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
+      .pipe(map(({ frozenMisc }) => this._Chain.coins(frozenMisc)));
+  }
+
+  public get feeFrozen(): Observable<SubstrateCoin> {
     if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
       .pipe(map(({ availableBalance }) => this._Chain.coins(availableBalance)));
@@ -240,7 +265,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public get bonded(): Observable<SubstrateAccount> {
-    if( !this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.staking.bonded(this.address))
       .pipe(map((accountId) => {
         if (accountId && accountId.isSome) {
@@ -312,6 +337,17 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         } else {
           return null;
         }
+      }));
+  }
+
+  public get evmNonce(): Observable<Number> {
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api
+      .query.evm.accounts(this.evmAddress))
+      .pipe(map((account) => {
+        // console.log(account);
+        // console.log(account['nonce'].toNumber());
+        return account['nonce'].toNumber();
       }));
   }
 
@@ -498,6 +534,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
+
   public unlockTx() {
     if (this.chainClass !== ChainClass.Kusama) {
       throw new Error('unlock only supported on Kusama');
@@ -507,6 +544,19 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       (api: ApiRx) => api.tx.democracy.unlock(this.address),
       'unlock',
       `${this.address} attempts to unlock from democracy`,
+    );
+  }
+
+  public async createEVMTx(bytecode, initialBalance, gasLimit, gasPrice) {
+    const nonce = await this.evmNonce.pipe(first()).toPromise();
+    console.log(bytecode, initialBalance, gasLimit, gasPrice, nonce);
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => {
+        return api.tx.evm.create(bytecode, initialBalance, gasLimit, gasPrice, nonce);
+      },
+      'evm.create',
+      `${this.evmAddress} deploys contract`,
     );
   }
 

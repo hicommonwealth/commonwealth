@@ -34,6 +34,7 @@ import ProfileBlock from 'views/components/widgets/profile_block';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import AddressesModal from 'views/modals/addresses_modal';
 import NewProposalModal from 'views/modals/proposals';
+import NewEVMContract from 'views/modals/evm_contract_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
@@ -261,6 +262,11 @@ const Navigation: m.Component<IMenuAttrs> = {
         path: `/${app.activeChainId()}/council`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/council`),
       }, 'Council'),
+      app.chain && app.chain.base === ChainBase.Substrate && m(NavigationItem, {
+        label: 'EVM',
+        path: `/${app.activeChainId()}/evm`,
+        activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
+      }, 'EVM'),
       //
       // Validators page
       //
@@ -488,6 +494,12 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { typeEnum: ProposalType.SubstrateCollectiveProposal }
             })
           }, 'New council motion'),
+          activeAcct instanceof SubstrateAccount && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: NewEVMContract,
+              data: {}
+            }),
+          }, 'New EVM contract'),
           m('li.divider'),
         ],
         //

@@ -27,7 +27,11 @@ const SettingsPage: m.Component<{}> = {
         m('.forum-container', [
           m('h2.page-title', 'Settings'),
           m(SettingsWell),
-          m(AccountsWell),
+          m(AccountsWell, {
+            addresses: app.login.activeAddresses,
+            hasAction: true,
+            isEVM: false,
+          }),
           !app.community && app.vm.activeAccount && app.vm.activeAccount instanceof SubstrateAccount &&
             m(SendEDGWell, { sender: app.vm.activeAccount }),
         ])
