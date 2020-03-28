@@ -6,12 +6,13 @@ import { ApiRx } from '@polkadot/api';
 import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive/types';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
+
 import {
   AccountData, Balance, BalanceLock, BalanceLockTo212,
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
-import { DeriveAccountInfo } from '@polkadot/api-derive/types';
+import { Codec } from '@polkadot/types/types';
 import { mnemonicValidate, blake2AsHex } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
@@ -21,10 +22,7 @@ import { Account, IAccountsModule, ChainClass } from 'models';
 import { AccountsStore } from 'stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import BN from 'bn.js';
-import { constants } from 'ethers';
 import SubstrateChain from './shared';
-import { SubstrateIdentity } from './identity';
 
 function addressFromSeed(seed: string, chain: SubstrateChain): string {
   return `${(chain.keyring()).addFromUri(`\/\/${seed}`).address}`;
@@ -340,14 +338,26 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       }));
   }
 
+  public get evmAccount(): Observable<Codec> {
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api
+      .query.evm.accounts(this.evmAddress))
+      .pipe(map((account) => (account)));
+  }
+
   public get evmNonce(): Observable<Number> {
     if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api
       .query.evm.accounts(this.evmAddress))
+      .pipe(map((account) => (account['nonce'].toNumber())));
+  }
+
+  public get evmBalance(): Observable<Number> {
+    if (!this._Chain?.apiInitialized) return;
+    return this._Chain.query((api: ApiRx) => api
+      .query.evm.accounts(this.evmAddress))
       .pipe(map((account) => {
-        // console.log(account);
-        // console.log(account['nonce'].toNumber());
-        return account['nonce'].toNumber();
+        return account['balance'].toNumber();
       }));
   }
 
@@ -557,6 +567,17 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       },
       'evm.create',
       `${this.evmAddress} deploys contract`,
+    );
+  }
+
+  public async depositEVMBalanceTx(deposit) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => {
+        return api.tx.evm.depositBalance(deposit);
+      },
+      'evm.deposit',
+      `${this.address} deposites ${deposit} EDG to EVM Address ${this.evmAddress}`,
     );
   }
 

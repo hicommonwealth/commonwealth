@@ -2,17 +2,17 @@ import 'modals/new_proposal_modal.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
-import { CompactModalExitButton } from 'views/modal';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { CompactModalExitButton } from 'views/modal';
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
-import ResizableTextarea from '../components/widgets/resizable_textarea';
 import { createTXModal } from './tx_signing_modal';
 
-const NewEVMContractModal = {
+
+
+const DepositeEVMBalanceModal = {
   // confirmExit: confirmationModalWithText('Are you sure you want to exit?'),
   view: (vnode) => {
     const account = vnode.attrs.account;
@@ -24,30 +24,12 @@ const NewEVMContractModal = {
       m('.form', [
         m('.text-input-wrapper', [
           m(CharacterLimitedTextInput, {
-            name: 'initialBalance',
-            placeholder: 'Initial contract balance',
+            name: 'deposit',
+            placeholder: 'Deposit amount',
             oncreate: (vnode) => {
               $(vnode.dom).focus();
             },
             limit: 40,
-          }),
-          m(CharacterLimitedTextInput, {
-            name: 'gasLimit',
-            placeholder: 'Gas limit',
-            oncreate: (vnode) => {},
-            limit: 80,
-          }),
-          m(CharacterLimitedTextInput, {
-            name: 'gasPrice',
-            placeholder: 'Gas price',
-            oncreate: (vnode) => {},
-            limit: 80,
-          }),
-          m(ResizableTextarea, {
-            name: 'bytecode',
-            placeholder: 'EVM contract bytecode ',
-            oncreate: (vnode) => {},
-            // TODO: character limit
           }),
         ]),
         m('.form-bottom', [
@@ -57,20 +39,12 @@ const NewEVMContractModal = {
               onclick: async (e) => {
                 e.preventDefault();
                 const data = {
-                  bytecode: `${$(vnode.dom).find('textarea[name=bytecode]').val()}`,
-                  initialBalance: `${$(vnode.dom).find('input[name=initialBalance]').val()}`,
-                  gasLimit: `${$(vnode.dom).find('input[name=gasLimit]').val()}`,
-                  gasPrice: `${$(vnode.dom).find('input[name=gasPrice]').val()}`,
+                  deposit: `${$(vnode.dom).find('input[name=deposit]').val()}`,
                 };
 
                 try {
                   if ((app.chain as Substrate).chain.hasEVM) {
-                    await createTXModal((account as SubstrateAccount).createEVMTx(
-                      data.bytecode,
-                      data.initialBalance,
-                      data.gasLimit,
-                      data.gasPrice,
-                    ));
+                    await createTXModal((account as SubstrateAccount).depositEVMBalanceTx(data.deposit));
                   }
                 } catch (error) {
                   if (typeof error === 'string') {
@@ -83,7 +57,7 @@ const NewEVMContractModal = {
                 if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
                 vnode.state.saving = false;
               }
-            }, 'Deploy'),
+            }, 'Deposit'),
             m('button', {
               onclick: (e) => {
                 e.preventDefault();
@@ -98,4 +72,4 @@ const NewEVMContractModal = {
   },
 };
 
-export default NewEVMContractModal;
+export default DepositeEVMBalanceModal;

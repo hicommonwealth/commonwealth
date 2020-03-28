@@ -7,30 +7,24 @@ import app, { ApiStatus } from 'state';
 import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 
-interface IEVMAttrs {
+
+interface ISubstrateEVMState {
   bytecode: any;
   initialBalance: Number;
   gasLimit: Number;
   gasPrice: Number;
 }
 
-interface IEVMState {
-  bytecode: any;
-  initialBalance: Number;
-  gasLimit: Number;
-  gasPrice: Number;
-}
-
-const EVMPage: m.Component<IEVMAttrs, IEVMState> = {
+const SubstrateEVMContent: m.Component<{}, ISubstrateEVMState> = {
   oncreate: (vnode) => {
-    vnode.state.bytecode = (vnode.attrs.bytecode) ? vnode.attrs.bytecode : 0x0;
-    vnode.state.initialBalance = (vnode.attrs.initialBalance) ? vnode.attrs.initialBalance : 0;
-    vnode.state.gasLimit = (vnode.attrs.gasLimit) ? vnode.attrs.gasLimit : 0;
-    vnode.state.gasPrice = (vnode.attrs.gasPrice) ? vnode.attrs.gasPrice : 0;
+    vnode.state.bytecode = 0x0;
+    vnode.state.initialBalance = 0;
+    vnode.state.gasLimit = 0;
+    vnode.state.gasPrice = 0;
   },
   view: (vnode) => {
     return [];
   },
 };
 
-export default EVMPage;
+export default SubstrateEVMContent;

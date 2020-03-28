@@ -262,7 +262,7 @@ const Navigation: m.Component<IMenuAttrs> = {
         path: `/${app.activeChainId()}/council`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/council`),
       }, 'Council'),
-      app.chain && app.chain.base === ChainBase.Substrate && m(NavigationItem, {
+      app.chain && app.chain.base === ChainBase.Substrate && (app.chain as Substrate).chain.hasEVM && m(NavigationItem, {
         label: 'EVM',
         path: `/${app.activeChainId()}/evm`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
@@ -418,7 +418,6 @@ const ActionMenu : m.Component<IMenuAttrs> = {
   view: (vnode: m.VnodeDOM<IMenuAttrs>) => {
     const { menusOpen } = vnode.attrs;
     const activeAcct = app.vm.activeAccount;
-
     return m(NavigationMenu, {
       menusOpen,
       class: 'ActionMenu',
@@ -494,7 +493,10 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { typeEnum: ProposalType.SubstrateCollectiveProposal }
             })
           }, 'New council motion'),
-          activeAcct instanceof SubstrateAccount && m('li', {
+          app.chain.base === ChainBase.Substrate
+          && (app.chain as Substrate).chain.hasEVM
+          && activeAcct instanceof SubstrateAccount
+          && m('li', {
             onclick: (e) => app.modals.create({
               modal: NewEVMContract,
               data: {}

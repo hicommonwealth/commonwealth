@@ -1,14 +1,16 @@
 import 'pages/council.scss';
 
-import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
 import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { ChainBase } from '../../../models/models';
+import SubstrateEVMContent from './substrate';
+import SubstrateEVMSidebar from './substrate/sidebar';
 
-import AccountsWell from '../../components/settings/accounts_well';
 
 const EVMPage: m.Component<{}> = {
   oncreate: () => {
@@ -17,23 +19,21 @@ const EVMPage: m.Component<{}> = {
       'Scope': app.activeId(),
     });
   },
-  view: () => {
-    if (!app.chain) return m(PageLoading);
+  view: (vnode) => {
+    if (!app.chain || !app.vm.activeAccount) return m(PageLoading);
+    const account = app.vm.activeAccount;
+    let content, sidebar;
+    if (app.chain.base === ChainBase.Substrate) {
+      content = [ m(SubstrateEVMContent) ];
+      sidebar = [ m(SubstrateEVMSidebar, { account: account as SubstrateAccount }) ];
+    }
+
     return m(ListingPage, {
       class: 'EVMPage',
       title: 'EVM',
       subtitle: 'EVM stuff',
-      content: [
-        // eth stuff
-      ],
-      sidebar: [
-        // stats
-        m(AccountsWell, {
-          addresses: app.login.activeAddresses,
-          hasAction: false,
-          isEVM: true,
-        })
-      ],
+      content,
+      sidebar,
     });
   },
 };
