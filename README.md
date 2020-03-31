@@ -1,8 +1,12 @@
-## Commonwealth: Multi-chain Governance UI
+# Commonwealth
+
+Discussions and governance for blockchain networks.
+
+We're moving our development over to open source over the first half of April 2020; this repo will be updated with PRs, license, and other materials soon. In the meantime, please feel free to file issues here: https://github.com/hicommonwealth/commonwealth-oss/issues
 
 [![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master)
 
-### Quickstart
+## Quickstart
 
 Install dependencies:
 ```
@@ -22,8 +26,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 nvm install
 ```
 
-To get started developing:
-
 - Use the configured version of node: `nvm use`
 - Install packages: `yarn`
 - Run the development server in one terminal: `yarn start`
@@ -32,9 +34,42 @@ To get started developing:
 - Lint your code: `npm install -g eslint`, then `eslint [files]`
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
 
-### Environment Variables
+Now, download a copy of the production database if necessary, and
+set up any environment variables
 
-Environment variables should be set in a `.env` file in the root of the repository.
+## Production Database
+
+To download and restore the production database, and run migrations:
+
+```
+heroku pg:backups:capture
+heroku pg:backups:download
+npx sequelize db:drop   # Reset the database
+npx sequelize db:create # Create a new empty database
+pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
+npx sequelize db:migrate
+```
+
+At this point you should be ready to go!
+
+The app is compiled into a bundle and pushed to Heroku, which
+serves it at commonwealthapp.herokuapp.com. **Migrations are
+automatically executed.** If migrations do not complete successfully,
+the new backend does not get served.
+
+To access the production DB: `heroku pg:psql`
+
+To run the production server locally:
+
+```
+NODE_ENV=production yarn build
+NODE_ENV=production yarn start
+```
+
+## Environment Variables
+
+You should create a `.env` file in the root of the repository
+to store environment variables like session secrets.
 
 Environment variables used for external services include:
 
@@ -47,13 +82,15 @@ Environment variables used for external services include:
 - ROLLBAR_SERVER_TOKEN: for error reporting
 - SENDGRID_API_KEY: for sending emails, email login, etc.
 - NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
+- DATABASE_URL (set by Heroku)
+- JWT_SECRET
+- SESSION_SECRET
 
-Other environment variables include DATABASE_URL (set by Heroku) and JWT_SECRET and SESSION_SECRET (our secrets).
+## Migrations
 
-### Migrations
-
-Any changes to the database models should come with migrations to keep
-the production, staging, and local copies of the database in sync.
+If you are making changes to the database models, you must also write
+migrations to update the production database and keep it in sync with
+the models. Be sure to run and test your migrations before making a PR.
 
 To create a new migration, run: `npx sequelize migration:generate --name=create-new-table`.
 
@@ -61,35 +98,12 @@ To run any pending migrations: `npx sequelize db:migrate`
 
 To roll back the last migration: `npx sequelize db:migrate:undo`
 
-### Production Environment
+## Setting up a new Production Environment
 
-Deploying to production bundles and minifies all JavaScript
-assets. This takes about 20 minutes and produces about ~10 2MB bundle
-files since we have lots of cryptography libraries.
+Deploying to production bundles and minifies all JavaScript assets.
+This takes a while, usually about 15 minutes.
 
-To run the production server locally:
-
-```
-NODE_ENV=production yarn build
-NODE_ENV=production yarn start
-```
-
-### Chat Server
-
-In order to support per-proposal chat, you will also need to check out
-and build the `commonwealth-chat` server and run it in the background.
-
-https://github.com/hicommonwealth/commonwealth-chat
-
-Note that the chat server talks to the same database as the main
-server, and queries it to check that Users are sending messages from
-their own Addresses.
-
-By default it runs on port 3001.
-
-### Deploying
-
-Heroku is used to deploy the server. First, install dependencies for deployment:
+First, install dependencies for deployment:
 
 ```
 brew update
@@ -105,58 +119,48 @@ heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
 yarn deploy
 ```
 
-Download and restore the production database, and run migrations:
+## Chat Server
 
-```
-heroku pg:backups:capture
-heroku pg:backups:download
-npx sequelize db:drop   # Reset the database
-npx sequelize db:create # Create a new empty database
-pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump
-npx sequelize db:migrate
-```
+In order to use chat functionality, you will also need to check out and
+build the `commonwealth-chat` server and run it in the background.
 
-At this point you should be ready to go!
+https://github.com/hicommonwealth/commonwealth-chat
 
-### Notes
+The chat server talks to the same database as the main server. It only
+makes a couple of simple queries, to read/write to message history and
+check that Users are sending messages from valid Addresses.
 
-##### Deployment
+By default it runs on port 3001.
 
-The app is compiled into a bundle and pushed to Heroku, which
-serves it at commonwealthapp.herokuapp.com. **Migrations are
-automatically executed.** If migrations do not complete successfully,
-the new backend does not get served.
+----
 
-To access the production DB: `heroku pg:psql`
+## Development Notes
 
-##### Networks and chains
+### Main app
 
-A `Network` (models.Network) defines which set of modules gets used
-for a chain. For example, Edgeware, Polkadot, and Cosmos are
-networks. Each network has a distinct set of modules in the
+Each `Network` has a distinct set of modules in the
 controllers directory, e.g. identity, governance, treasury.
+For example, Edgeware, Polkadot, and Cosmos are networks.
 
-A `Chain` (models.Chain) defines the exact instance of a blockchain
-for Commonwealth to connect to. Currently, chains are minimally
-differentiated, e.g. we don't store numerical Chain IDs which will be
-differentiate between testnet (42) and Edgeware mainnet (ID to be
-defined).
+Each `Chain` is a specific instance of a blockchain network that 
+Commonwealth may connect to. Currently, chains are only identified
+by the nodes that serve them, and not by genesis block or returned
+chain ID.
 
-A `ChainNode` (models.ChainNode) defines a URL and endpoint associated with a
-chain.
+Each `ChainNode` defines a URL and endpoint where Commonwealth can
+connect to a particular chain.
 
-##### Stats pages
+### Stats pages
 
-A Heroku scheduler job which regularly calls `yarn
-update-events` to populate the DB with new events. Additionally, the
-frontend may use Infura or another DB endpoint to fetch newer events.
+A Heroku scheduler job which regularly calls `yarn update-events` to
+populate the DB with new events. The frontend may use also use Infura
+or another Web3 provider to make another pass and fetch newer events.
 
 To initialize data locally for the stats page, you should call `yarn
-update-events` from the command line. **You may have to do this
-multiple times if you are initializing the database for the first
-time.**
+update-events` from the command line. You may have to do this many
+times if you are initializing the database for the first time.
 
-##### Local testnets
+### Setting up local testnets
 
 Cosmos Hub (Gaia):
 
