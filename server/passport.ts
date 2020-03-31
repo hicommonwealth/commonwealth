@@ -37,7 +37,7 @@ function setupPassport(models) {
 
   // allow user to authenticate with Github
   // create stub user without email
-  passport.use(new GithubStrategy({
+  if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET && GITHUB_OAUTH_CALLBACK) passport.use(new GithubStrategy({
     clientID: GITHUB_CLIENT_ID,
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: GITHUB_OAUTH_CALLBACK,
