@@ -1,0 +1,18 @@
+@import 'client/styles/shared';
+
+.UpgradeMemberModal {
+    .upgrade-member-button {
+        margin: 20px 0;
+    }
+
+    .error-message {
+        margin: 10px 0;
+        font-weight: 700;
+        color: $error-red;
+    }
+    .success-message {
+        margin: 10px 0;
+        font-weight: 700;
+        color: $success-green;
+    }
+}

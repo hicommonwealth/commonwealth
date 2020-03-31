@@ -1,0 +1,40 @@
+@import 'client/styles/shared';
+
+.AccountBalance {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 5px 10px;
+
+    .substrate-liquidity, .cosmos-balance {
+        display: flex;
+        justify-content: space-between;
+        //margin-bottom: 15px;
+    }
+    .balance-type {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding-right: 10px;
+        width: 50%;
+        overflow-wrap: break-word;
+        .label {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .balance {
+            font-family: $monospace-fonts;
+            font-size: 15px;
+        }
+    }
+    .controlling-row {
+        display: none;
+    }
+    a.btn {
+        display: none;
+        background-color: $primary-green;
+        color: white;
+        font-size: 15px;
+        margin: 16px 0 8px;
+    }
+}

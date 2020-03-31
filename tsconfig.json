@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "paths": {
+      "@polkadot/api/augment": ["./node_modules/edgeware-node-types/dist/augment-api.d.ts"],
+      "@polkadot/types/augment": ["./node_modules/edgeware-node-types/dist/augment-types.d.ts"],
+      "*": ["./*", "shared/*", "client/scripts/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": true
+  },
+  "include": [
+    "./client",
+    "./client/scripts",
+    "./shared/adapters",
+    "./test"
+  ],
+  "exclude": [
+    "./node_modules",
+    "client/scripts/controllers/chain/ethereum/contracts/*"
+  ]
+}

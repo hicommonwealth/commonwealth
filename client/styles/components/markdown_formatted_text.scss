@@ -1,0 +1,9 @@
+@import 'client/styles/shared';
+@import 'client/styles/components/quill_formatted_text';
+
+.MarkdownFormattedText {
+    position: relative;
+    line-height: 1.45;
+    @include formatted-text();
+    @include collapsible();
+}

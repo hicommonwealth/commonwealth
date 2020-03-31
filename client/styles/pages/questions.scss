@@ -1,0 +1,140 @@
+@import 'client/styles/shared';
+
+@mixin qa-shared {
+    h4 {
+        font-size: 18px;
+        color: #4aae6a;
+        margin: 0 0 22px;
+        @include xs-max {
+            margin: 6px 0 18px;
+        }
+    }
+}
+
+@mixin qa-new-form {
+    max-width: 680px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 40px;
+    textarea.ResizableTextarea {
+        margin-bottom: 10px;
+        max-height: 80px;
+        font-size: 16px;
+        padding: 12px;
+    }
+    button {
+        float: right;
+        padding: 5px 24px;
+        border-radius: 4px;
+    }
+}
+
+@mixin qa-listings {
+    max-width: 680px;
+    margin-top: 40px;
+    .items {
+        margin-top: 34px;
+    }
+    .item {
+        display: flex;
+        margin: 18px 0;
+        .item-left {
+            flex: 1;
+        }
+        .item-right {
+            width: 80px;
+        }
+    }
+    .item-title {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .CommenterPreview {
+        display: flex;
+
+        .user-avatars {
+            display: flex;
+            margin-right: 10px;
+        }
+    }
+
+    .item-commenters {
+        display: flex;
+        font-size: 14px;
+        color: #aaa;
+        margin: 1px 0;
+        cursor: pointer;
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+        }
+        a.item-commenters-text {
+            display: inline;
+            color: #999;
+            text-decoration: inherit;
+        }
+        .item-carat {
+            font-size: 9px;
+            color: #bbb;
+            margin-left: 6px;
+            position: relative;
+            top: 3px;
+            text-decoration: none;
+        }
+    }
+    .placeholder-reactions {
+        float: right;
+        display: block;
+        width: 70px;
+        height: 30px;
+        border-radius: 3px;
+        border: 2px solid #e7e7e7;
+    }
+    .ReactionButton {
+        margin-right: 8px;
+    }
+    .item-comment, .new-item-comment {
+        padding-left: 24px;
+        border-left: 3px solid #e5e5e5;
+    }
+    .item-comment {
+        margin: 30px 0 30px;
+        .placeholder-icon {
+            position: relative;
+            display: inline-block;
+            background: #08c;
+            width: 12px;
+            height: 12px;
+            top: 1px;
+            margin-right: 6px;
+        }
+        .item-comment-author-name {
+            display: inline-block;
+        }
+        .item-comment-text {
+        }
+    }
+    .new-item-comment {
+        margin-bottom: 30px;
+        .item-comment-author {
+            margin-bottom: 8px;
+        }
+        textarea.ResizableTextarea {
+            margin-bottom: 12px;
+        }
+        button {
+            float: right;
+        }
+    }
+}
+
+.QuestionsPage {
+    @include qa-shared;
+    .NewQuestionForm {
+        @include qa-new-form;
+    }
+    .QuestionsListing {
+        @include qa-listings;
+    }
+}

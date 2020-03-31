@@ -1,0 +1,394 @@
+@import 'client/styles/shared';
+@import 'client/styles/components/proposal_row';
+
+@mixin supports-jump-highlight() {
+    &.highlighted {
+        background-color: #ffd;
+    }
+    &.highlighted.highlightAnimationComplete {
+        background-color: #fff;
+        transition: background-color 1s ease-in-out;
+    }
+}
+
+.ViewProposalPage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    .page-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+.ProposalHeader {
+    margin-top: 21px !important;
+    @include xs-max {
+        margin-top: 10px !important;
+    }
+
+    .proposal-title-row,
+    .discussion-meta,
+    .proposal-meta,
+    .proposal-subtitle-row,
+    .proposal-extra {
+        padding-left: 2px;
+    }
+    .proposal-title-row {
+        display: flex;
+        margin-bottom: 2px;
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            flex: 1;
+            line-height: 1.25;
+        }
+    }
+    .username {
+        color: #bdbdbd;
+    }
+    .proposal-subtitle-row {
+        display: flex;
+        margin-bottom: 2px;
+        padding: 22px 48px 22px 26px;
+
+        margin-top: 21px !important;
+        @include xs-max {
+            margin-top: 10px !important;
+        }
+
+        @include xs-max {
+            padding-right: 22px;
+            padding-left: 22px;
+        }
+        background-color: #f8f8f8;
+        .title {
+            font-size: 22px;
+            font-weight: 500;
+            color: #bdbdbd;
+            flex: 1;
+            line-height: 1.25;
+        }
+
+    }
+    .proposal-meta {
+        color: #bdbdbd;
+        .proposal-display-id {
+            font-weight: 500;
+        }
+        @include proposal-row-metadata();
+    }
+    .proposal-hash {
+        color: #999;
+    }
+    .discussion-meta {
+        display: flex;
+        justify-content: left;
+        font-weight: 700;
+        > * {
+            color: #999;
+            margin-right: 14px;
+        }
+        @include xs-max {
+            position: relative;
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            width: 100%;
+            > * {
+                margin-right: 0;
+                margin-top: 1px;
+            }
+            .reaction {
+                position: absolute;
+                bottom: 4px;
+                right: 0px;
+            }
+        }
+    }
+    a.external-link {
+        display: inline-block;
+        color: $primary-green;
+        text-decoration: none;
+        margin-top: 14px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .Tags a {
+        color: #999;
+        text-decoration: none;
+        margin-right: 10px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .thread-subscription {
+        padding-left: 10px;
+        padding-right: 14px;
+        margin-top: 10px;
+        @include lg-min {
+            margin-top: 0px;
+            margin-right: -20px;
+            float: right;
+        }
+    }
+}
+
+.ProposalHeader,
+.ProposalBody,
+.ProposalComment,
+.CreateComment,
+.CreateCommentPlaceholder {
+    margin: 10px 0 0;
+    background-color: #fff;
+    box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.04);
+    @include xs-max {
+        padding-right: 26px;
+        margin: 8px 0;
+    }
+    .User.avatar-only {
+        // ensure tooltip appears above avatar circle
+        display: block;
+    }
+}
+.ProposalHeader,
+.ProposalBody,
+.ProposalComment {
+    @include supports-jump-highlight();
+}
+.ProposalBody,
+.ProposalComment {
+    padding-bottom: 6px;
+}
+.ProposalHeader,
+.CreateCommentPlaceholder {
+    padding: 22px 48px 22px 26px;
+    @include xs-max {
+        padding-right: 22px;
+        padding-left: 22px;
+    }
+}
+.ProposalComment .right-col {
+    padding-bottom: 20px !important;
+}
+
+.ProposalBody,
+.ProposalComment,
+.CreateComment {
+    display: flex;
+    @include xs-max {
+        justify-content: center;
+        padding: 22px;
+    }
+    .left-col {
+        width: 88px;
+        padding: 22px 26px;
+        @include xs-max {
+            display: none;
+        }
+    }
+    .right-col {
+        flex: 1;
+        padding: 22px 38px 22px 0;
+        max-width: 100%;
+        @include xs-max {
+            padding: 0px;
+        }
+    }
+
+    .upper-meta, .lower-meta {
+        display: flex;
+        justify-content: space-between;
+        .upper-meta-left {
+            flex: 1;
+            margin: 1px 0 12px;
+            .icon-reply {
+                margin-right: 8px;
+            }
+            a.last-edited {
+                padding-left: 12px;
+            }
+        }
+        .upper-meta-right {
+            margin: 1px 0 12px;
+            :last-child {
+                margin-right: 0 !important;
+            }
+            a {
+                margin-right: 16px;
+            }
+        }
+        .comment-timestamp {
+            color: $lighttextgrey;
+            margin-left: 10px;
+        }
+        a, span {
+            color: $lighttextgrey;
+            text-decoration: none;
+        }
+        a {
+            &:hover {
+                text-decoration: underline;
+                color: #555;
+            }
+        }
+    }
+    .lower-meta {
+        margin: 12px 0 0;
+    }
+    .body-text,
+    .proposal-comment-text {
+        margin-bottom: 2px;
+    }
+}
+
+.ProposalComments {
+    .loading-comments {
+        color: #888;
+        margin: 30px 0 47px;
+        .icon-spinner2 {
+            margin-left: 15px;
+        }
+    }
+    .threading-level {
+        margin-left: 36px;
+    }
+    .new-comment-child {
+        margin-left: 36px;
+    }
+    .new-comment-error {
+        @include error-text();
+        margin: 20px 0 10px;
+    }
+    .comments-error {
+        @include error-text();
+        margin: 30px 0;
+    }
+    .proposal-comment-meta {
+        margin-bottom: 10px;
+        .comment-timestamp {
+            color: #aaa;
+            margin-left: 10px;
+        }
+        .comment-timestamp {
+            float: right;
+        }
+        .username {
+            font-weight: 700;
+            font-size: 16px;
+        }
+    }
+    a.proposal-comment-delete {
+        float: right;
+        margin-right: 8px;
+        text-decoration: none;
+        color: #aaa;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .proposal-comment-text {
+        word-break: break-word;
+    }
+    .proposal-comment-attachments {
+        margin: 10px 0 20px;
+        @include attachments;
+    }
+}
+
+// new comment
+.CreateComment {
+    @include supports-jump-highlight();
+    &.proposal-comment {
+        margin-bottom: 20px;
+    }
+    .upper-meta .upper-meta-left {
+        margin-bottom: 0;
+    }
+    .icon-reply {
+        font-size: 10px;
+        position: relative;
+        top: -2px;
+    }
+    .QuillEditor {
+        margin: 14px 0 18px;
+        .ql-toolbar, .ql-editor {
+            background: #fff;
+        }
+        .ql-editor {
+            min-height: 100px;
+            border-radius: 2px;
+        }
+    }
+    .form-bottom, .actions {
+        button + button {
+            margin-left: 8px;
+        }
+    }
+    .empty-profile-notification {
+        @include profile-notice(#fdf3e1, #111);
+    }
+    .new-comment-error {
+        color: $error-red;
+        font-weight: 700;
+    }
+    @include xs-max {
+        .User, .left-col {
+            display: none;
+        }
+        .right-col {
+            width: 100%;
+        }
+    }
+}
+
+.CreateCommentPlaceholder {
+    padding: 22px 32px 18px;
+    p {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0;
+        margin-bottom: 12px;
+    }
+    a.btn {
+        display: inline-block;
+        padding: 5px 12px;
+        margin: 2px 0;
+    }
+    @include xs-max {
+        padding-bottom: 24px;
+        p {
+            margin-bottom: 10px;
+        }
+    }
+    // web3 login button with icon
+    // only used for NEAR right now...
+    a.btn.login-wallet-button.formular-button-black {
+        padding: 7px 14px;
+    }
+    img.login-wallet-icon {
+        width: 17px;
+        display: inline-block;
+        margin: -3px 0;
+        margin-right: 10px;
+    }
+}
+
+.Sidebar {
+    &.ThreadSidebar {
+        .meta {
+            border-bottom: 1px solid $lighttextgrey;
+            margin-bottom: 1em;
+        }
+        .tags {
+            margin-top: 1em;
+        }
+        .meta, .tags {
+            min-height: 45px;
+        }
+    }
+}

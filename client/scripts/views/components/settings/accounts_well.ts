@@ -1,0 +1,99 @@
+import 'components/settings/accounts_well.scss';
+
+import m from 'mithril';
+import app from 'state';
+
+import { formatCoin, Coin } from 'adapters/currency';
+import { orderAccountsByAddress, link } from 'helpers';
+import { selectLogin, unlinkLogin } from 'controllers/app/login';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+
+import { AddressInfo, ChainClass } from 'models/models';
+import User from 'views/components/widgets/user';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+
+interface IAttrs {
+  account: AddressInfo;
+  onclick?: (e: Event) => any;
+}
+
+interface IState {
+  removing: boolean;
+}
+
+const AccountRow : m.Component<IAttrs, IState> = {
+  view: (vnode: m.VnodeDOM<IAttrs, IState>): m.Vnode => {
+    const { account } = vnode.attrs;
+    const isActiveAccount =
+      app.vm.activeAccount &&
+      app.vm.activeAccount.chain.id === account.chain &&
+      app.vm.activeAccount.address === account.address;
+
+    return m('.AccountRow', {
+      key: `${account.chain}#${account.address}`,
+      onclick: vnode.attrs.onclick,
+      class: isActiveAccount ? 'selected' : '',
+    }, [
+      m('.avatar-col', [
+        m(User, {
+          user: [account.address, account.chain],
+          avatarOnly: true,
+          avatarSize: 32,
+          linkify: true,
+          tooltip: true
+        }),
+      ]),
+      m('.info-col', [
+        m('.username', [
+          m(User, {
+            user: [account.address, account.chain],
+            hideAvatar: true,
+            linkify: true,
+            tooltip: true,
+          }),
+        ]),
+        m('.address', `${account.address} (${account.chain})`),
+      ]),
+      m('.action-col', [
+        // TODO: re-enable this as 'go to chain and account'
+        // (app.chain || app.community) && m('button.formular-button-primary', {
+        //   class: isActiveAccount ? 'disabled' : '',
+        //   onclick: () => selectLogin(account),
+        // }, 'Switch account'),
+        m('button.formular-button-negative', {
+          class: vnode.state.removing ? ' disabled' : '',
+          onclick: async () => {
+            const confirmed = await confirmationModalWithText('Are you sure you want to remove this account?')();
+            if (confirmed) {
+              vnode.state.removing = true;
+              unlinkLogin(account).then(() => {
+                vnode.state.removing = false;
+                m.redraw();
+              });
+            }
+          },
+        }, vnode.state.removing ? 'Removing...' : 'Remove'),
+      ]),
+    ]);
+  },
+};
+
+const AccountsWell: m.Component<{}> = {
+  view: () => {
+    return m('.AccountsWell', [
+      m('h4', 'Linked Addresses'),
+      m('.address-listing-explanation', 'Log into your account using any of these addresses'),
+      app.login.addresses
+        .sort(orderAccountsByAddress)
+        .map((account) => m(AccountRow, { account })),
+      app.login.addresses.length === 0
+        && m('.no-accounts', `No addresses`),
+      m('button.formular-button-primary.add-account', {
+        onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+      }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+    ]);
+  },
+};
+
+export default AccountsWell;

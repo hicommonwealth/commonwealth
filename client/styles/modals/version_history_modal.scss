@@ -1,0 +1,37 @@
+@import 'client/styles/shared';
+
+.VersionHistoryModal {
+    .compact-modal-body {
+        width: 640px;
+        @include xs-max {
+            width: initial;
+        }
+        .versions {
+            display: flex;
+            flex-direction: column;
+            .version {
+                padding-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                .timestamp {
+                    flex: 2;
+                    color: $lighttextgrey;
+                    padding-right: 30px;
+                    text-align: right;
+                }
+                .QuillFormattedText, .MarkdownFormattedText {
+                    flex: 5;
+                    color: #4c4c4c;
+                    .deleted {
+                        background: #e8cccc !important;
+                        color: #d32e26 !important;
+                    }
+                    .added {
+                        background: #cce8cc !important;
+                        color: #41a360 !important;
+                    }
+                }
+            }
+        }
+    }
+}

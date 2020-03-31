@@ -1,0 +1,46 @@
+@import 'client/styles/shared';
+
+.FeedbackModal {
+    .header {
+        background-color: #222;
+        color: white;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 32px;
+        font-size: 19px;
+        font-weight: 700;
+    }
+    textarea {
+        padding: 13px 15px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        min-height: 80px;
+    }
+    button {
+        margin-bottom: 5px;
+    }
+    .error-message {
+        margin: 10px 0;
+        font-weight: 700;
+        color: $error-red;
+    }
+    .success-message {
+        margin: 10px 0;
+        font-weight: 700;
+        color: $success-green;
+    }
+    .feedback-explanation {
+        color: #aaa;
+        font-size: 14px;
+        margin: 15px 0 7px;
+        max-width: 324px;
+    }
+    @include sm-min {
+        textarea, .feedback-explanation {
+            min-width: 400px;
+            max-width: 400px;
+            width: 400px;
+        }
+    }
+}

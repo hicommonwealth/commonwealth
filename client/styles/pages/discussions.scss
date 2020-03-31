@@ -1,0 +1,234 @@
+@import 'client/styles/shared';
+
+.DiscussionsPage {
+  padding-bottom: 30px;
+  h4 {
+    font-size: 14px;
+    color: #888;
+    margin: 14px 0;
+  }
+  .discussions-listing {
+    padding-top: 16px;
+  }
+  .discussions-description {
+    padding-top: 16px;
+    @include md-min {
+      padding-left: 20px;
+    }
+    .community-name {
+      margin-top: 6px;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .community-privacy {
+      color: #888;
+      font-size: 14px;
+      .icon-mail {
+        color: #aaa;
+      }
+      .icon-lock {
+        font-size: 15px;
+        position: relative;
+        top: 1px;
+        color: #aaa;
+      }
+    }
+    .community-description {
+      margin-top: 26px;
+    }
+  }
+
+  .OffchainCommunityRoles {
+    margin: 16px 0;
+    h4.sidebar-header {
+      margin-bottom: 12px;
+    }
+    .members {
+      .member-item {
+        margin: 2px 0;
+      }
+    }
+    a {
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    // invite button
+    button {
+      margin-top: 16px;
+    }
+  }
+
+  // content
+  a.back-home {
+    color: #888;
+    font-weight: 400;
+    margin-left: 14px;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
+  }
+  .ProposalsLoadingRow {
+      margin-bottom: 0;
+  }
+  // content: discussion group
+  .WeeklyDiscussionListing, .tag-forum {
+    margin-bottom: 15px;
+    a.weekly-more {
+      display: inline-block;
+      margin: 10px 18px;
+      font-weight: 700;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    .discussion-group-wrap {
+      width: 100%;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+      border-radius: 2px;
+      border: 1px solid #eee;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.04);
+      @include xs-max {
+          margin: 6px 0 0 0;
+          padding: 16px 20px;
+      }
+    }
+    .LastSeenDivider {
+      display: flex;
+      padding: 12px 0 10px;
+      span {
+          color: #ea7a60;
+          font-size: 14px;
+          font-weight: 600;
+          width: max-content;
+          text-align: center;
+          padding: 0 10px;
+          white-space: nowrap;
+      }
+      hr {
+          height: 1px;
+          border: none;
+          border-bottom: 1px solid lighten(#ea7a60, 11%);
+          width: -webkit-fill-available;
+      }
+    }
+  }
+  .WeeklyDiscussionListing .discussion-group-wrap,
+  .tag-listing {
+    padding: 0;
+    margin: 0;
+  }
+  .no-threads {
+    color: #888;
+    margin: 20px 0;
+    &:last-child {
+      margin-bottom: 8px;
+    }
+    @include xs-max {
+      &:last-child {
+          margin-bottom: 12px;
+      }
+    }
+  }
+  a.extra-items {
+    display: block;
+    padding: 8px;
+    color: #444;
+    font-weight: 700;
+  }
+
+  .DiscussionsSubscriptionButton {
+      .icon-bell-on {
+          margin-left: -1px;
+      }
+      .icon-bell-off {
+          margin-left: -2px;
+      }
+  }
+
+  h4.sidebar-header {
+    margin-top: 24px;
+    margin-bottom: 0;
+  }
+  .pinned-container.discussion-group-wrap {
+    margin-top: 10px;
+    padding: 5px 0;
+    a.DiscussionRow {
+      padding: 6px 0;
+    }
+    .discussion-pre,
+    .discussion-after {
+      display: none;
+    }
+    .discussion-content {
+      margin: 0 16px !important;
+    }
+    .discussion-meta .User {
+      display: none;
+    }
+  }
+  .no-sidebar-items {
+    color: #aaa;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+
+  @include xs-max {
+      .discussions-listing {
+          margin: 0 6px;
+      }
+      .discussions-description {
+          display: none;
+      }
+      .TagSelector {
+          display: block;
+          white-space: nowrap;
+          overflow-x: auto;
+          margin-right: -15px;
+      }
+      h4 {
+          margin: 14px 0 12px;
+          text-align: center;
+      }
+      .WeeklyDiscussionListing {
+          margin-bottom: 0;
+      }
+  }
+  h4 {
+    margin: 14px 0 12px;
+    text-align: left;
+  }
+  .WeeklyDiscussionListing {
+    margin-bottom: 0;
+  }
+}
+
+.TagSelector {
+    margin-top: 0;
+    padding: 10px 0;
+    .tag-selector-item {
+        font-size: 13.5px;
+        padding: 2px 0;
+        a.tag-name {
+            color: $lighttextgrey;
+            text-decoration: none;
+            line-height: 1;
+            &:hover {
+                color: rgb(100, 100, 100);
+            }
+        }
+        &.selected a.tag-name {
+            font-weight: 600;
+        }
+    }
+    @include xs-max {
+        padding: 15px 5px 8px;
+    }
+}

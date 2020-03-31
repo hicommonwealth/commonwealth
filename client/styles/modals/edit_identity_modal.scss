@@ -1,0 +1,46 @@
+@import 'client/styles/shared';
+
+.EditIdentityModal {
+    width: 620px;
+    .header {
+        background-color: black;
+        color: white;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 32px;
+        font-size: 19px;
+        font-weight: 700;
+    }
+    .form {
+        padding: 20px 32px 32px;
+        .text-input-wrapper {
+            margin: 6px 0 4px 0;
+            label {
+                font-size: 14px;
+            }
+            input, textarea {
+                padding: 11px 16px 10px;
+                margin: 7px 0 14px;
+            }
+        }
+    }
+    .form-bottom {
+        margin-top: 20px;
+        button {
+            @include clean-button;
+            border: 0px solid transparent !important;
+            margin-right: 12px;
+            color: white !important;
+            &.formular-button-primary {
+                background-color: $electricblue !important;
+            }
+            background-color: darkgray !important;
+        }
+    }
+    .error-message {
+        color: $error-red;
+        font-weight: bold;
+        margin-top: 16px;
+    }
+}

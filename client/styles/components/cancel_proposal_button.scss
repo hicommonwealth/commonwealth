@@ -1,0 +1,15 @@
+.CancelProposalButton {
+    display: inline-block;
+    font-size: 15px;
+    padding: 5px 10px;
+    margin: 12px 0 22px;
+    border: 1px solid #08c;
+    border-radius: 4px;
+    color: #08c;
+    cursor: pointer;
+    line-height: 1.5;
+}
+.CancelProposalButton.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}

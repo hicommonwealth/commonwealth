@@ -1,0 +1,36 @@
+@import 'client/styles/shared';
+
+.Footer {
+    background: #f7f6f6;
+    padding: 20px 4px 18px;
+    .footer-text,
+    a.footer-link {
+        color: #999;
+        display: inline-block;
+        margin-right: 12px;
+        text-decoration: none;
+        &.footer-link-right {
+            float: right;
+            margin-left: 12px;
+            margin-right: 0;
+        }
+        &:hover {
+            color: #666;
+            text-decoration: underline;
+        }
+    }
+    @include xs-max {
+        font-size: 13px;
+        .footer-text,
+        a.footer-link {
+            margin-right: 8px;
+        }
+    }
+    @include xxs-max {
+        text-align: center;
+        a.footer-link.footer-link-right {
+            float: none;
+            margin-top: 2px;
+        }
+    }
+}

@@ -1,0 +1,69 @@
+@import 'client/styles/shared';
+
+.NewSignalingPage {
+    // duplicated in NewThreadPage - to be generalized across all 'New X' forms
+    .new-signaling-left {
+        .User {
+            margin-top: 8px;
+        }
+        @include xs-max {
+            display: none;
+        }
+    }
+    .new-signaling-center {
+        textarea {
+            min-height: 90px;
+        }
+        .FormField .form-group {
+            margin-bottom: 12px;
+        }
+        .actions {
+            margin-top: 18px;
+            button + button {
+                margin-left: 12px;
+            }
+        }
+    }
+    .new-signaling-right {
+        h3 {
+            font-weight: 700;
+            font-size: 13px;
+            color: #aaa;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin: 6px 0 12px 0;
+        }
+        .signaling-options {
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 16px 18px 14px;
+            h4 {
+                margin: 0 0 8px 0;
+                font-weight: 700;
+            }
+            p {
+                margin: 0 0 6px 0;
+            }
+        }
+        @include xs-max {
+            margin-top: 16px;
+        }
+    }
+    .row {
+        margin-bottom: 6px;
+    }
+    .error-message {
+        @include error-text();
+        margin-top: 24px;
+    }
+    .empty-profile-notification {
+        @include profile-notice(#fdf3e1, #111);
+    }
+    @include xs-max {
+        .actions {
+            margin: 10px 0;
+        }
+    }
+}

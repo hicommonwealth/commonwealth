@@ -1,0 +1,107 @@
+@import 'client/styles/shared';
+
+@mixin bareAvatar {
+    position: relative;
+    display: inline-block;
+    margin: -3px 0;
+    margin-right: 8px;
+    line-height: 0; // ensure icon doesn't get misaligned when base font size changes
+    background: #fff;
+    border-radius: 9999px;
+    overflow: hidden;
+    .avatar-image {
+        background: #eee;
+        background-size: cover;
+    }
+}
+
+@mixin circledAvatar {
+    box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin: 0;
+    background: #fff;
+    svg {
+        margin: 2px;
+    }
+    .avatar-image {
+        width: 100% !important;
+        height: 100% !important;
+        background: #eee;
+        background-size: cover;
+    }
+}
+
+@mixin identityIcon {
+    font-size: 80%;
+    position: relative;
+    top: -1px;
+    margin-right: 5px;
+    &.green {
+        color: $primary-green;
+    }
+    &.red {
+        color: $badge-red;
+    }
+    &.gray {
+        color: #aaa;
+    }
+}
+
+.User {
+    display: inline-block;
+    white-space: nowrap;
+    .user-avatar {
+        @include bareAvatar();
+    }
+    .user-avatar-only {
+        @include circledAvatar();
+    }
+    span.identity-icon {
+        @include identityIcon();
+    }
+    a.user-display-name &.anonymous {
+            color: #999;
+    }
+    &.linkified a.user-display-name {
+        cursor: pointer;
+    }
+    &.linkified a.user-display-name:hover {
+        text-decoration: underline;
+    }
+}
+
+.UserTooltip {
+    text-align: center;
+    padding: 6px;
+    padding-bottom: 4px;
+
+    .user-avatar,
+    .user-name {
+        display: block;
+        text-align: center;
+        margin: 0 auto;
+    }
+    .user-avatar {
+        @include circledAvatar();
+        width: 36px;
+        height: 36px;
+        margin: 0 auto 8px;
+    }
+    .user-name {
+        clear: both;
+        a {
+            text-decoration: none;
+            color: #222;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        span.identity-icon {
+            @include identityIcon();
+        }
+    }
+    .user-address {
+        color: #999;
+    }
+}

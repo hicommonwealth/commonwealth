@@ -1,0 +1,21 @@
+@import 'client/styles/shared';
+
+.PreviewModal {
+    .compact-modal-body {
+        width: 640px;
+        @include xs-max {
+            width: initial;
+        }
+    }
+    .compact-modal-attachments {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        padding: 0 25px;
+        @include attachments;
+    }
+    .empty-preview {
+        text-align: center;
+        color: #888;
+        padding: 65px 25px;
+    }
+}

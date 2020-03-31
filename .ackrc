@@ -1,0 +1,1 @@
+--ignore-dir=venv --ignore-dir=target --ignore-dir=build --ignore-dir=dist --ignore=dir=coverage --ignore-dir=\.nyc_output

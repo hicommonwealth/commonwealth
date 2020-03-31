@@ -1,0 +1,14 @@
+{
+  "undef": true,
+  "unused": true,
+  "esnext": true,
+  "globals": {
+    "console": true,
+    "confirm": true,
+    "document": true,
+    "Promise": true,
+    "Intl": true,
+    "setTimeout": true,
+    "setInterval": true
+  }
+}

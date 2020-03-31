@@ -1,0 +1,12 @@
+@import 'client/styles/shared';
+@import 'client/styles/pages/questions';
+
+.RequestsPage {
+    @include qa-shared;
+    .NewRequestForm {
+        @include qa-new-form;
+    }
+    .RequestsListing {
+        @include qa-listings;
+    }
+}

@@ -1,0 +1,195 @@
+@import 'client/styles/shared';
+
+@mixin ui3page() {
+    min-height: calc(100vh - 110px);
+    @include xs-max {
+        min-height: calc(100vh - 150px);
+    }
+    .page-container {
+        background: #f7f7f7;
+    }
+
+    // content specific styles, need to sort out where they go
+    .forum-container {
+        width: 100%;
+        background: #fff;
+        margin: 20px 0;
+        padding: 28px 34px;
+        border-radius: 2px;
+        border: 1px solid #eee;
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.04);
+        @include xs-max {
+            margin: 6px 0 0 0;
+            padding: 16px 20px;
+        }
+    }
+    .forum-container.stats-tile {
+        padding-bottom: 26px;
+        .stats-tile-label {
+            margin: 0 0 4px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+        }
+        .stats-tile-figure-major {
+            font-size: 28px;
+            line-height: 1.25;
+        }
+        .stats-tile-figure-minor {
+            color: #888;
+            margin-top: 2px;
+        }
+        @include xs-max {
+            padding: 15px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+    }
+    .no-proposals {
+        color: #999;
+        padding: 8px 0;
+    }
+    .NewProposalButton {
+        display: block;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+.ListingPage {
+    @include ui3page();
+
+    .page-header {
+        padding: 20px 0 10px;
+        background: $offwhite-dark;
+        color: $offwhite-light;
+    }
+    .page-header.regular-header {
+        .page-title {
+            font-size: 21px;
+            font-weight: 700;
+        }
+        .page-subtitle {
+            margin: 5px 0 10px;
+        }
+        .page-header-left {
+            flex: 1;
+            padding-left: 2px;
+            height: 65px;
+        }
+        .page-header-right {
+            width: 240px;
+        }
+        @include xs-max {
+            padding: 16px 0;
+            .container {
+                display: block;
+            }
+            .page-title {
+                font-size: 16px;
+                font-weight: 700;
+                text-align: center;
+            }
+            .page-subtitle {
+                display: none;
+            }
+            .page-header-left {
+                height: initial;
+                padding: 0;
+            }
+            .page-header-right {
+                display: none;
+            }
+        }
+    }
+    .page-header.supernova-header {
+        .full-width {
+            padding-top: 20px;
+            padding-bottom: 36px;
+            text-align: center;
+            width: 100%;
+        }
+        .page-title {
+            font-size: 25px;
+        }
+        .page-subtitle {
+            font-size: 17px;
+        }
+    }
+    .page-header.logged-out-edgeware-header {
+        > .container {
+            display: flex;
+        }
+        .page-header-left {
+            height: initial;
+        }
+        .page-header-left,
+        .page-header-right {
+            margin-bottom: 15px;
+        }
+        .page-header-left {
+            margin-top: 3px;
+            a {
+                color: #777;
+                text-decoration: none;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+        .page-header-right {
+            width: initial;
+            flex: 1.2;
+            text-align: right;
+        }
+
+        .logged-out-title {
+            font-size: 21px;
+            font-weight: 700;
+            max-width: 440px;
+            line-height: 1.3;
+        }
+        .logged-out-subtitle {
+            margin-top: 5px;
+            font-weight: 700;
+            color: #7d7c7b;
+            line-height: 1.3;
+        }
+        .logged-out-stat {
+            display: inline-block;
+            background: #343231;
+            padding: 10px 12px 12px 12px;
+            margin: 0 6px 6px;
+            width: 184px;
+            .stat-main {
+                font-size: 20px;
+                font-weight: 700;
+            }
+            .stat-sub {
+                font-size: 13px;
+                margin-top: 2px;
+                font-weight: 700;
+                color: #7d7c7b;
+                line-height: 1.3;
+            }
+        }
+        @include xs-max {
+            display: none;
+        }
+    }
+    @include xs-max {
+        .container {
+            display: block;
+        }
+        .page-header-right {
+            padding: 10px 5px 0;
+            input[type="submit"],
+            input[type="button"],
+            button,
+            a.btn {
+                font-size: 14px;
+            }
+        }
+    }
+}

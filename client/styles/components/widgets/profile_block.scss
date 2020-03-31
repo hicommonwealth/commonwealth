@@ -1,0 +1,27 @@
+@import 'client/styles/shared';
+
+.ProfileBlock {
+    display: flex;
+    .profile-block-left {
+        padding-right: 16px;
+        padding-top: 1px;
+    }
+    .profile-block-right {
+        flex: 1;
+    }
+    .User {
+        min-width: 16px;
+    }
+    .User a.user-display-name.username {
+        color: #111;
+        font-weight: 700;
+    }
+    .profile-block-address {
+        display: block;
+        margin-bottom: 2px;
+        color: #999;
+    }
+    p {
+        margin: 0 0 6px;
+    }
+}

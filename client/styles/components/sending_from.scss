@@ -1,0 +1,19 @@
+@import 'client/styles/shared';
+
+.SendingFrom {
+    display: inline;
+    span.sending-from {
+        margin-left: 20px;
+    }
+    span.sending-from-balance {
+        margin-left: 15px;
+        color: #888;
+    }
+    @include xs-max {
+        display: block;
+        margin-top: 15px;
+        span.sending-from {
+            margin-left: 0;
+        }
+    }
+}

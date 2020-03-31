@@ -1,0 +1,14 @@
+@import 'client/styles/shared';
+
+.Tooltip {
+    .tooltip-contents {
+        display: none;
+        &.visible {
+            display: block;
+        }
+        background: #fff;
+        border: 1px solid #f4f4f4;
+        border-radius: 6px;
+        padding: 14px 20px 13px;
+    }
+}

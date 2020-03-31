@@ -1,0 +1,351 @@
+@import 'client/styles/shared';
+
+.LinkNewAddressModal {
+    text-align: center;
+
+    .link-address-step-header {
+        margin: 0 auto;
+        padding: 28px 40px;
+        background: #282625;
+        color: #fff;
+        h3 {
+            margin: 0;
+            font-size: 21px;
+        }
+    }
+    .link-address-step-narrow {
+        padding: 28px 40px;
+        width: 460px;
+        min-height: 420px;
+    }
+
+    // for all steps
+    .page-graphic {
+        display: none;
+        height: 175px;
+        margin-bottom: 20px;
+    }
+    h3 {
+        margin: 8px 0 16px;
+    }
+    p {
+        margin: 4px 0;
+    }
+    .CodeBlock {
+        text-align: left;
+        .no-select {
+            opacity: 0.8;
+            user-select: none;
+        }
+    }
+    .CodeBlock + .CodeBlock {
+        margin-top: -10px;
+    }
+    .error-message {
+        @include error-text();
+        margin: 15px 0;
+    }
+    .mobile-error-message {
+        color: #444;
+        margin: 26px 40px;
+        p {
+            margin: 8px 0;
+        }
+    }
+    a.back-text {
+        color: #888;
+        text-decoration: none;
+        margin-top: 20px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    // for step 0 - chain selection
+    .chains {
+        padding: 18px 22px;
+        max-width: 566px;
+        text-align: center;
+        @include xs-max {
+            width: initial;
+        }
+    }
+    .chain-card {
+        display: inline-block;
+        cursor: pointer;
+        text-align: center;
+        // layout
+        width: 160px;
+        height: 145px;
+        border-radius: 4px;
+        padding: 20px 22px 12px;
+        margin: 7px;
+        border: 1px solid #eee;
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+        @include xs-max {
+            width: 142px;
+            height: 142px;
+            margin: 4px 5px;
+            padding: 18px 12px 12px;
+            &.hidden-mobile {
+                display: none;
+            }
+        }
+    }
+    .chain-info {
+        .ChainIcon {
+        }
+        h3 {
+            font-size: 15px;
+            margin: 6px 0 4px;
+        }
+        p {
+            color: #999;
+            font-size: 13px;
+            line-height: 1.32;
+            margin: 7px 0 4px;
+        }
+    }
+
+    // for step 1
+    .link-address-precopy {
+        display: block;
+        font-size: 15px;
+        color: #444;
+        margin: 26px auto 4px;
+        max-width: 480px;
+        @include xs-max {
+            margin: 20px auto 10px;
+        }
+    }
+    .link-address-combined-warning {
+        display: flex;
+        background: #fafafa;
+        padding: 10px 14px;
+        margin: 0 20px;
+        margin-bottom: 28px;
+        text-align: left;
+        border: 1px solid #e8e8e8;
+        font-size: 14px;
+        .link-address-combined-warning-icon {
+            margin-right: 6px;
+        }
+        @include xs-max {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+    }
+    .link-address-options {
+        text-align: center;
+        padding: 0 20px 10px;
+
+        .link-address-option {
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+            margin: 20px 8px;
+            // card style
+            width: 230px;
+            height: 190px;
+            border-radius: 3px;
+            border: 1px solid #eee;
+            background: #fff;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+            &.selected {
+                border-color: #08c;
+            }
+            @include xs-max {
+                height: initial;
+                margin: 8px 8px;
+            }
+        }
+        .link-address-header {
+            text-align: center;
+            background: #f4f4f4;
+            padding: 15px 0 0;
+            border-radius: 4px 4px 0 0;
+            @include xs-max {
+                padding-top: 12px;
+            }
+        }
+        .link-address-title {
+            font-weight: 700;
+        }
+        .link-address-icon {
+            height: 36px;
+            img {
+                width: 34px;
+            }
+        }
+        .link-address-title {
+            padding: 9px 15px;
+            color: #555;
+        }
+        .link-address-description {
+            font-size: 13px;
+            margin: 16px 20px 10px;
+            color: #555;
+        }
+        .link-address-link {
+            font-size: 13px;
+            margin: 10px 20px 16px;
+            color: #555;
+        }
+        .link-address-link a {
+            color: #999;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    button.link-address-options-continue {
+        margin: 0 0 24px;
+    }
+    .link-address-options-back {
+        margin-bottom: 24px;
+    }
+
+    // for step 2 - command line
+    .link-address-cli-verification {
+        margin-bottom: 20px;
+    }
+    .link-address-cli-explainer {
+        margin-bottom: 20px;
+    }
+    .accounts-list {
+        margin: 26px auto;
+        max-width: 240px;
+        max-height: 420px;
+        overflow-y: scroll;
+        border-radius: 5px;
+    }
+    .accounts-list-unavailable {
+        text-align: center;
+        color: #999;
+        margin: 100px 20px;
+    }
+    .accounts-caption p.small-text {
+        font-size: 13px;
+        color: #aaa;
+    }
+    .account-item {
+        cursor: pointer;
+        padding: 10px 18px;
+        border: 1px solid #ccc;
+        border-bottom: none;
+        .account-waiting {
+            margin: 11px 0;
+        }
+        &:hover {
+            background: #fafafa;
+        }
+        &:first-child {
+            border-top-right-radius: 6px;
+            border-top-left-radius: 6px;
+        }
+        &:last-child {
+            border-bottom: 1px solid #ccc;
+            border-bottom-right-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+    }
+    .CheckboxFormField.FormField {
+        label {
+            color: #555;
+        }
+    }
+
+    // for step 2 - polkadot-js
+    .NewAddressFromWebWallet {
+        .accounts-caption,
+        .accounts-list {
+            margin-top: 20px;
+        }
+        .account-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            &:hover {
+                background: #f8f8f8;
+            }
+            &:first-child {
+                border-top-right-radius: 6px;
+                border-top-left-radius: 6px;
+            }
+            &:last-child {
+                border-bottom: 1px solid #ccc;
+                border-bottom-right-radius: 6px;
+                border-bottom-left-radius: 6px;
+            }
+        }
+        .account-name {
+            margin: 2px 0;
+        }
+        .account-user {
+            margin: 2px 0 10px;
+        }
+    }
+
+    // for step 3
+    .create-profile-instructions {
+        margin-bottom: 26px;
+        p {
+            margin: 8px 0;
+        }
+    }
+    .CharacterLimitedTextInput {
+        margin: 12px 0;
+    }
+
+    // for step 3
+    textarea.ResizableTextarea.new-profile-bio {
+        min-height: 68px;
+        margin-bottom: 18px;
+    }
+
+    // for step 4
+    .profile-block-preview {
+        display: inline-block;
+        text-align: left;
+        padding: 12px 16px 7px 12px;
+        margin: 24px 0 30px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
+    .btn-finished-action {
+        width: 300px;
+        margin: 5px 0;
+    }
+    .avatar-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .AvatarUpload {
+            width: 92px;
+            height: 92px;
+        }
+    }
+    @include xs-max {
+        min-width: 0;
+        .link-address-step-narrow {
+            width: 100%;
+            padding: 20px 24px 28px;
+            min-height: initial;
+        }
+        .btn-finished-action {
+            width: 100%;
+        }
+        .link-address-option {
+            .link-address-description,
+            .link-address-link,
+            .link-address-title {
+            }
+            button {
+                margin-top: 5px;
+            }
+        }
+    }
+
+}

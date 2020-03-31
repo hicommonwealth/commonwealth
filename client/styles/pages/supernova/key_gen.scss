@@ -1,0 +1,34 @@
+@import 'client/styles/pages/supernova/shared';
+
+.SupernovaKeygen {
+    .forum-container.keygen-layout {
+        @include supernovaLockPage();
+    }
+    .keys {
+        display: flex;
+        flex-direction: column;
+        margin-top: 25px;
+        max-width: 400px;
+    }
+    .generator {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        span {
+            margin: 20px 0;
+        }
+        a {
+            width: min-content;
+        }
+    }
+
+    a.btn {
+        display: inline-block;
+        font-size: 16px;
+        font-weight: 500;
+        background: #eee !important;
+        color: #111;
+        padding: 7px 14px;
+        margin: 7px 0;
+    }
+}

@@ -1,0 +1,15 @@
+@import 'client/styles/shared';
+
+.SupernovaPreheader {
+    padding: 37px 30px;
+    background: #222;
+    background: linear-gradient(#333, #222);
+    color: #eee;
+    margin: -30px -35px 30px;
+    div {
+        max-width: 720px;
+    }
+    @include xs-max {
+        margin: -20px -20px 24px;
+    }
+}

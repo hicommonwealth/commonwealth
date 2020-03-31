@@ -1,0 +1,51 @@
+@import 'client/styles/shared';
+
+.VotingActions {
+    margin: 20px 0;
+    .button-row {
+        margin: 0 -5px;
+    }
+    .yes-button,
+    .no-button,
+    .approve-button,
+    .abstain-button,
+    .veto-button {
+        display: inline-block;
+        padding: 0 5px;
+        margin-bottom: 8px;
+        button {
+            display: block;
+            width: 100%;
+        }
+    }
+    .yes-button,
+    .no-button,
+    .abstain-button,
+    .veto-button {
+        width: 50%;
+    }
+    .approve-button {
+        width: 100%;
+    }
+}
+
+.CannotVote {
+    margin: 20px 0;
+    .proposal-voting-box-text {
+    }
+    .proposal-voting-box-action button {
+        display: block;
+        width: 100%;
+    }
+}
+
+.ProposalExtensions {
+    border: 1px solid #eee;
+    padding: 20px 28px 24px;
+    margin: 24px 0;
+    button {
+        display: block;
+        width: 100%;
+        margin-top: 15px;
+    }
+}

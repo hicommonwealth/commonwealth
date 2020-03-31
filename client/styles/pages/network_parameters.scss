@@ -1,0 +1,34 @@
+.NetworkParametersPage {
+}
+
+.ProposalCategoryCurve {
+    float: left;
+    width: 33%;
+    padding-right: 20px;
+}
+.ProposalCategoryCurve .curve-img {
+    display: block;
+    max-width: 100%;
+}
+.ProposalCategoryCurve .category-swatch {
+    margin-left: 5px;
+    margin-right: 7px;
+}
+.ProposalCategoryCurve .curve-name {
+    margin-bottom: 12px;
+}
+.ProposalCategoryCurve .curve-text {
+    margin-left: 45px;
+}
+.ProposalCategoryCurve .curve-text1 {
+    margin-bottom: 6px;
+}
+.ProposalCategoryCurve .curve-text2 {
+    margin-bottom: 12px;
+}
+.ProposalCategoryCurve .curve-update {
+    color: #aaa;
+}
+.ProposalCategoryCurve .curve-update:hover {
+    color: #777;
+}

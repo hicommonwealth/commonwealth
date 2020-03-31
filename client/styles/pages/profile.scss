@@ -1,0 +1,342 @@
+@import 'client/styles/shared';
+
+@mixin profile-module {
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+@mixin profile-listing {
+    h3 {
+        margin: 32px 0 30px;
+    }
+    .no-items {
+        color: #aaa;
+        margin-bottom: 20px;
+    }
+    .QuillFormattedText,
+    .MarkdownFormattedText {
+        margin-top: 6px;
+        &.collapsed {
+            margin-bottom: -6px;
+            &.suppress-fadeout {
+                margin-bottom: 0;
+            }
+        }
+        ul, ol {
+            margin: 6px 0;
+        }
+        p {
+            margin: 6px 0;
+        }
+        > p:first-child {
+            margin-top: 0;
+        }
+        > p:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+@mixin comment-level {
+    margin: 26px 0 32px;
+    a, .username {
+        color: $electricblue !important;
+        text-decoration: none !important;
+    }
+    .proposal-title {
+        color: black !important;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+    .summary {
+        color: $lighttextgrey;
+        margin-bottom: 6px;
+    }
+    .activity {
+    }
+    .proposal {
+        .proposal-body {
+            margin: 10px 0;
+        }
+        .proposal-timestamp, .proposal-author {
+            color: $lighttextgrey;
+        }
+        .proposal-meta {
+            padding-top: 2px;
+            font-size: inherit;
+            .username {
+                color: black !important;
+            }
+        }
+    }
+    .proposal-comment {
+        padding-bottom: 6px;
+        .comment-meta, .comment-timestamp {
+            color: $lighttextgrey;
+        }
+    }
+}
+
+.ProfilePage {
+    .error-message {
+        @include error-text();
+        margin-top: 20px;
+    }
+    .forum-row {
+        margin-top: 14px;
+    }
+    .Tabs {
+        @include profile-module;
+        padding: 12px 26px 6px !important;
+        .tab-bar {
+            margin-bottom: 12px;
+            border-bottom: none;
+        }
+        a.tab-entry {
+            padding: 8px 0 0 0;
+            margin-right: 18px;
+            margin-bottom: 10px;
+            color: #a0a0a0;
+        }
+        a.tab-entry.active {
+            color: #111;
+        }
+    }
+    @include xxs-max {
+        .ProfileHeader, .Tabs {
+            padding: 0 17px 12px 17px !important;
+            .info-row {
+                flex-direction: column;
+            }
+            .tab-bar {
+                display: flex;
+                flex-direction: column;
+                margin-top: 16px;
+            }
+            .bio-actions {
+                padding: 0px
+            }
+        }
+    }
+}
+
+.ProfileBio {
+    @include profile-module;
+    padding: 22px 30px 4px;
+    margin-bottom: 14px;
+    .header {
+        font-size: inherit;
+        font-weight: 700;
+        color: #111;
+    }
+    .no-items {
+        color: #aaa;
+        margin: 8px 0 20px;
+    }
+}
+
+.ProfileBio {
+    margin-right: 15px;
+    .QuillFormattedText,
+    .MarkdownFormattedText {
+        margin-top: -8px;
+        padding-bottom: 8px;
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.ProfileHeader {
+    @include profile-module;
+    padding: 0 0 8px;
+    margin: 12px 0 0;
+    padding: 0 24px !important;
+
+    .cover {
+        width: calc(100% + 24px * 2);
+        height: 96px;
+        background: linear-gradient(180deg, #404040 0%, #111 100%);
+        margin: 0 -24px;
+        @include xs-max {
+            width: calc(100% + 17px * 2);
+            margin: 0 -17px;
+        }
+    }
+
+    .bio-main {
+        display: flex;
+    }
+    .bio-left {
+        width: 94px;
+        .avatar {
+            width: 94px;
+            height: 94px;
+            position: relative;
+            margin-top: -28px;
+            margin-bottom: 18px;
+            background-color: #f8f8f8;
+            border: 2px solid #fff;
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0.5px 0.5px 4px rgba(0,0,0,0.15);
+            .avatar-image {
+                background-size: cover;
+            }
+        }
+    }
+    .bio-right, .bio-actions {
+        padding: 10px 0 0 20px;
+    }
+    .bio-right {
+        flex: 1;
+        margin: 6px 0 0;
+        .User {
+            font-size: 21px;
+            font-weight: 700;
+            .username {
+                color: #111;
+            }
+        }
+    }
+    .bio-actions {
+        text-align: right;
+        margin: 8px 0 0;
+        a.btn, button {
+            @include clean-button;
+            margin-left: 8px;
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
+        @include xs-max {
+            text-align: left;
+            button {
+                margin: 4px 0;
+                width: 100%;
+            }
+        }
+    }
+    .avatar {
+        display: block;
+    }
+    .name-row {
+        margin-bottom: 3px;
+        .name {
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 6px;
+            word-break: break-word;
+            &.anonymous {
+                color: #999;
+            }
+        }
+        .name,
+        .no-verification,
+        .verification {
+            margin-right: 18px;
+        }
+        .no-verification,
+        .verification {
+            position: relative;
+            top: -2px;
+        }
+        .no-verification {
+            display: inline-block;
+            color: #888;
+        }
+        .verification-icon {
+            position: relative;
+            top: 2px;
+            display: inline-block;
+            background: #08c;
+            width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            margin-right: 6px;
+            svg {
+                position: relative;
+                top: -1px;
+                left: 2px;
+            }
+        }
+        .verification-icon.none,
+        .verification-icon.unverified {
+            position: relative;
+            top: 0;
+            color: #fff;
+            background: #a0a0a0;
+            position: relative;
+            line-height: 1.1;
+            padding-left: 4px;
+            font-size: 95%;
+        }
+        .verification-icon.none {
+            background: #a0a0a0;
+        }
+        .verification-icon.unverified {
+            background: #fdc360;
+        }
+    }
+    .info-row {
+        margin-bottom: 16px;
+        display: flex;
+        span, a {
+            padding-right: 15px;
+            font-size: inherit;
+        }
+        a {
+            text-decoration: none;
+            color: $lighttextgrey;
+        }
+    }
+    .profile-headline {
+        .no-headline {
+            color: $lighttextgrey;
+        }
+    }
+    .username, span.copy-done {
+        color: $lighttextgrey;
+    }
+}
+
+.ProfileContent {
+    @include profile-listing;
+    .btn-wrap {
+        margin: 32px 0;
+    }
+    a.btn {
+        background-color: white !important;
+        border: 1px solid $electricblue !important;
+        background-image: none !important;
+        color: $electricblue;
+        border-radius: 4px;
+    }
+}
+
+.ProfileProposal {
+    @include comment-level;
+}
+.ProfileCommentGroup {
+    @include comment-level;
+}
+
+.OffchainProfile {
+    h4 {
+        margin-top: 30px;
+    }
+    input, textarea, button {
+        margin: 10px 0;
+        margin-right: 8px;
+    }
+    button {
+        margin-top: 16px;
+    }
+    .placeholder {
+        color: #999;
+    }
+}

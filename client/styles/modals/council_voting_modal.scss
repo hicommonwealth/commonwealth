@@ -1,0 +1,33 @@
+@import 'client/styles/shared';
+
+.CouncilVotingModal {
+    max-width: 640px;
+    .chooser {
+        p {
+            margin: 10px 0;
+        }
+        .MultipleButtonSelectorFormField button {
+            width: 100%;
+        }
+        .MultipleButtonSelectorFormField a.user-display-name {
+            color: #111;
+        }
+        .MultipleButtonSelectorFormField .active a.user-display-name {
+            color: #fff;
+        }
+    }
+    input[type="text"].phragmen-vote-amount {
+        margin-top: 24px;
+    }
+    .retract-vote {
+        margin-left: 10px;
+    }
+    .no-candidates {
+        margin: 20px 0;
+        font-weight: 700;
+    }
+    .voting-error {
+        @include error-text();
+        margin-bottom: 20px;
+    }
+}

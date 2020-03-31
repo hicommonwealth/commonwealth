@@ -1,0 +1,35 @@
+.ChainStatusIndicator {
+
+    &:hover {
+        border-bottom-color: transparent;
+        background: initial;
+        cursor: initial;
+    }
+    .status {
+        display: inline-block;
+        color: #999;
+        &:before {
+            display: inline-block;
+            content: " ";
+            // sizing
+            background: #bbb;
+            height: 8px;
+            width: 8px;
+            border-radius: 4px;
+            // position
+            margin-right: 2px;
+        }
+        &.connecting:before {
+            background: #ffa200;
+        }
+        &.connected:before {
+            background: #7ed320;
+        }
+        &.disconnected:before {
+            background: #db322d;
+        }
+        &.error:before {
+            background: #db322d;
+        }
+    }
+}

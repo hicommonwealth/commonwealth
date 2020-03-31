@@ -1,0 +1,111 @@
+@import 'client/styles/shared';
+
+.TXSigningModalBody {
+    .compact-modal-body {
+        padding-bottom: 15px;
+    }
+    &.Intro .compact-modal-body {
+        padding: 0;
+    }
+    .error-message {
+        @include error-text();
+        margin-top: 14px;
+    }
+    .no-select {
+        opacity: 0.8;
+        user-select: none;
+    }
+    button {
+        margin-top: 15px;
+    }
+    .instructions {
+        margin-bottom: 15px;
+    }
+    .warn {
+        @include error-text();
+        margin: 6px 0 12px;
+    }
+    .CodeBlock {
+        min-height: 175px;
+    }
+    .gaiacli-codeblock .CodeBlock {
+        min-height: 130px;
+    }
+
+    // signing option selector
+    .HorizontalTabs {
+        border: none;
+        margin-bottom: 0;
+    }
+    .HorizontalTabs .tab-bar {
+        width: 160px;
+    }
+    .HorizontalTabs .tab-content {
+        width: 490px;
+        min-height: 440px;
+    }
+
+    &.Intro {
+        width: 710px;
+    }
+    &.WaitingToConfirmTransaction {
+        .icon-spinner2.animate-spin {
+            margin: 40px auto 10px;
+            text-align: center;
+            display: block;
+            font-size: 18px;
+            color: #999;
+        }
+        button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            font-size: 15px;
+        }
+    }
+    &.SentTransactionSuccess,
+    &.SentTransactionRejected {
+        button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            font-size: 15px;
+        }
+    }
+
+    // reusable components
+    .TXSigningCancelAction {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+        a {
+            color: #aaa;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .TXSigningTransactionBox {
+        border: 1px solid #eee;
+        padding: 24px 28px 12px;
+        border-radius: 4px;
+        text-align: left;
+        width: 360px;
+        margin: 5px 0;
+        .txbox-header {
+            font-weight: 700;
+            margin-bottom: 1px;
+        }
+        .txbox-content {
+            margin-bottom: 14px;
+            word-break: break-word;
+        }
+        .txbox-content.txbox-success {
+            color: $success-green;
+        }
+        .txbox-content.txbox-fail {
+            color: $error-red;
+        }
+    }
+}

@@ -1,0 +1,26 @@
+@import 'client/styles/shared';
+
+.Tabs {
+    .tab-bar {
+        border-bottom: 1px solid #e4e4e4;
+        margin-bottom: 30px;
+    }
+    a.tab-entry {
+        text-decoration: none;
+        color: #111;
+        padding: 8px 10px;
+        margin-right: 4px;
+        display: inline-block;
+        font-weight: 700;
+    }
+    a.tab-entry.active {
+        color: #111;
+        border-bottom: 3px solid #5eaf77;
+        padding-bottom: 6px;
+    }
+    @include xs-max {
+        .tab-bar {
+            margin-bottom: 16px;
+        }
+    }
+}

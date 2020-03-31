@@ -1,0 +1,62 @@
+@import 'client/styles/shared';
+
+@keyframes placeHolderShimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+@mixin placeholder-shimmer {
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: #f6f7f8;
+    background: linear-gradient(to right, #f2f2f2 8%, #e7e7e7 18%, #f2f2f2 33%);
+    background-size: 800px 104px;
+    background-repeat: repeat;
+    position: relative;
+}
+
+.ProposalsLoadingRow {
+    margin: 30px 0;
+    @include xs-max {
+        margin: 15px 0 0 0;
+    }
+    .forum-container > & {
+        margin: 0 0 -7px 0;
+    }
+
+    .row {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .proposal-left {
+        flex: 1;
+    }
+
+    .title-block,
+    .metadata-block,
+    .content-block {
+        display: inline-block;
+        background: #eee;
+        height: 15px;
+        min-width: 100px;
+        @include placeholder-shimmer;
+    }
+    .title-block {
+        height: 28px;
+        width: 240px;
+    }
+    .metadata-block {
+    }
+    .content-block {
+        margin-bottom: 6px;
+        margin-right: 4px;
+    }
+}

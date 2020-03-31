@@ -1,0 +1,7 @@
+@import 'client/styles/pages/supernova/shared';
+
+.SupernovaLockBTCPage {
+    .forum-container.lockBTC-layout {
+        @include supernovaLockPage();
+    }
+}

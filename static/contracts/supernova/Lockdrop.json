@@ -1,0 +1,3486 @@
+{
+  "contractName": "Lockdrop",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "LOCK_START_TIME",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "LOCK_END_TIME",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "LOCK_DROP_PERIOD",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "LOCK_LENGTH_TERM",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "startTime",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "eth",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "lockAddr",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "supernovaAddr",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "name": "time",
+          "type": "uint256"
+        }
+      ],
+      "name": "Locked",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "supernovaAddr",
+          "type": "bytes"
+        }
+      ],
+      "name": "lock",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"LOCK_START_TIME\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"LOCK_END_TIME\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"supernovaAddr\",\"type\":\"bytes\"}],\"name\":\"lock\",\"outputs\":[],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"LOCK_DROP_PERIOD\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"LOCK_LENGTH_TERM\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"startTime\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"eth\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"lockAddr\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"supernovaAddr\",\"type\":\"bytes\"},{\"indexed\":false,\"name\":\"time\",\"type\":\"uint256\"}],\"name\":\"Locked\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"lock(bytes)\":{\"details\":\"Locks up the value sent to contract in a new Lock\",\"params\":{\"supernovaAddr\":\"The bytes representation of the target cosmos key\"}}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/drewstone/code/commonwealth/supernova-lockdrop/eth/contracts/Lockdrop.sol\":\"Lockdrop\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/drewstone/code/commonwealth/supernova-lockdrop/eth/contracts/Lockdrop.sol\":{\"keccak256\":\"0x5ad441bde32b40d0ed18616784fa0694d6723c22c5867bb73ca5f63c912aef1d\",\"urls\":[\"bzzr://16cfbfbedc1e8666c8bc5d39111d141db948f6a48317b4ce2808e88e67ebe579\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516020806105308339810180604052602081101561003057600080fd5b81019080805190602001909291905050508060008190555062eff1008101600181905550506104cc806100646000396000f3fe60806040526004361061004a5760003560e01c806315f2e2f71461004f578063396214661461007a57806381548319146100a55780638cf0cb551461011e578063a632366814610149575b600080fd5b34801561005b57600080fd5b50610064610174565b6040518082815260200191505060405180910390f35b34801561008657600080fd5b5061008f61017a565b6040518082815260200191505060405180910390f35b61011c600480360360208110156100bb57600080fd5b81019080803590602001906401000000008111156100d857600080fd5b8201836020820111156100ea57600080fd5b8035906020019184600183028401116401000000008311171561010c57600080fd5b9091929391929390505050610180565b005b34801561012a57600080fd5b506101336103c5565b6040518082815260200191505060405180910390f35b34801561015557600080fd5b5061015e6103cc565b6040518082815260200191505060405180910390f35b60005481565b60015481565b6000544210156101f8576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f4c6f636b64726f7020686173206e6f742073746172746564000000000000000081525060200191505060405180910390fd5b600154421115610270576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260128152602001807f4c6f636b64726f702068617320656e646564000000000000000000000000000081525060200191505060405180910390fd5b60003433603c4201604051610284906103d1565b808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001828152602001925050506040518091039082f0801580156102dc573d6000803e3d6000fd5b5090509050348173ffffffffffffffffffffffffffffffffffffffff1631101561030257fe5b3373ffffffffffffffffffffffffffffffffffffffff167faa13f399a5eae3896672fe51db1bbb766682525000b48e261633891a5819853e3483868642604051808681526020018573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018381526020018281038252858582818152602001925080828437600081840152601f19601f820116905080830192505050965050505050505060405180910390a2505050565b62eff10081565b603c81565b60c3806103de8339019056fe60806040526040516040806100c383398101806040526040811015602257600080fd5b81019080805190602001909291908051906020019092919050505081600055806001555050606e806100556000396000f3fe6080604052600154421160008114601b5760018114602057603f565b600080fd5b60008060008030316000545af160008114603857603d565b600080fd5b505b5000fea165627a7a72305820b7b073fc7165cbba8a922db2f219a34cd3ab599a50ed32849e583d1b850ad6210029a165627a7a72305820bfda8ae649a1d2188b8afdd1358e4c29c8c66e829400e840a264f970057eff5d0029",
+  "deployedBytecode": "0x60806040526004361061004a5760003560e01c806315f2e2f71461004f578063396214661461007a57806381548319146100a55780638cf0cb551461011e578063a632366814610149575b600080fd5b34801561005b57600080fd5b50610064610174565b6040518082815260200191505060405180910390f35b34801561008657600080fd5b5061008f61017a565b6040518082815260200191505060405180910390f35b61011c600480360360208110156100bb57600080fd5b81019080803590602001906401000000008111156100d857600080fd5b8201836020820111156100ea57600080fd5b8035906020019184600183028401116401000000008311171561010c57600080fd5b9091929391929390505050610180565b005b34801561012a57600080fd5b506101336103c5565b6040518082815260200191505060405180910390f35b34801561015557600080fd5b5061015e6103cc565b6040518082815260200191505060405180910390f35b60005481565b60015481565b6000544210156101f8576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260188152602001807f4c6f636b64726f7020686173206e6f742073746172746564000000000000000081525060200191505060405180910390fd5b600154421115610270576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260128152602001807f4c6f636b64726f702068617320656e646564000000000000000000000000000081525060200191505060405180910390fd5b60003433603c4201604051610284906103d1565b808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001828152602001925050506040518091039082f0801580156102dc573d6000803e3d6000fd5b5090509050348173ffffffffffffffffffffffffffffffffffffffff1631101561030257fe5b3373ffffffffffffffffffffffffffffffffffffffff167faa13f399a5eae3896672fe51db1bbb766682525000b48e261633891a5819853e3483868642604051808681526020018573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018381526020018281038252858582818152602001925080828437600081840152601f19601f820116905080830192505050965050505050505060405180910390a2505050565b62eff10081565b603c81565b60c3806103de8339019056fe60806040526040516040806100c383398101806040526040811015602257600080fd5b81019080805190602001909291908051906020019092919050505081600055806001555050606e806100556000396000f3fe6080604052600154421160008114601b5760018114602057603f565b600080fd5b60008060008030316000545af160008114603857603d565b600080fd5b505b5000fea165627a7a72305820b7b073fc7165cbba8a922db2f219a34cd3ab599a50ed32849e583d1b850ad6210029a165627a7a72305820bfda8ae649a1d2188b8afdd1358e4c29c8c66e829400e840a264f970057eff5d0029",
+  "sourceMap": "739:1577:0:-;;;1204:133;8:9:-1;5:2;;;30:1;27;20:12;5:2;1204:133:0;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1204:133:0;;;;;;;;;;;;;;;;1267:9;1249:15;:27;;;;988:12;1302:9;:28;1286:13;:44;;;;1204:133;739:1577;;;;;;",
+  "deployedSourceMap": "739:1577:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1006:30;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1006:30:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1042:28;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1042:28:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1513:444;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1513:444:0;;;;;;;;;;21:11:-1;8;5:28;2:2;;;46:1;43;36:12;2:2;1513:444:0;;35:9:-1;28:4;12:14;8:25;5:40;2:2;;;58:1;55;48:12;2:2;1513:444:0;;;;;;100:9:-1;95:1;81:12;77:20;67:8;63:35;60:50;39:11;25:12;22:29;11:107;8:2;;;131:1;128;121:12;8:2;1513:444:0;;;;;;;;;;;;:::i;:::-;;945:55;;8:9:-1;5:2;;;30:1;27;20:12;5:2;945:55:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;868:52;;8:9:-1;5:2;;;30:1;27;20:12;5:2;868:52:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;1006:30;;;;:::o;1042:28::-;;;;:::o;1513:444::-;2076:15;;2069:3;:22;;2061:59;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2260:13;;2253:3;:20;;2245:51;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1675:13;1708:9;1719:10;911:9;1731:3;:22;1691:63;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1691:63:0;;;1675:79;;1866:9;1845:8;1837:25;;;:38;;1830:46;;;;1898:10;1891:59;;;1910:9;1921:8;1931:13;;1946:3;1891:59;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;30:3:-1;22:6;14;1:33;99:1;93:3;85:6;81:16;74:27;137:4;133:9;126:4;121:3;117:14;113:30;106:37;;169:3;161:6;157:16;147:26;;1891:59:0;;;;;;;;;;;;;;;;;2306:1;1513:444;;:::o;945:55::-;988:12;945:55;:::o;868:52::-;911:9;868:52;:::o;739:1577::-;;;;;;;;:::o",
+  "source": "pragma solidity >=0.4.21 <0.6.0;\n\ncontract Lock {\n    // address owner; slot #0\n    // address unlockTime; slot #1\n    constructor (address owner, uint256 unlockTime) public payable {\n        assembly {\n            sstore(0x00, owner)\n            sstore(0x01, unlockTime)\n        }\n    }\n\n    /**\n     * @dev        Withdraw function once timestamp has passed unlock time\n     */\n    function () external payable { // payable so solidity doesn't add unnecessary logic\n        assembly {\n            switch gt(timestamp, sload(0x01))\n            case 0 { revert(0, 0) }\n            case 1 {\n                switch call(gas, sload(0x00), balance(address), 0, 0, 0, 0)\n                case 0 { revert(0, 0) }\n            }\n        }\n    }\n}\n\ncontract Lockdrop {\n    // Time constants\n    // uint256 constant public LOCK_LENGTH_TERM = 1 days * 182;  // Mainnet params\n    uint256 constant public LOCK_LENGTH_TERM = 1 minutes;  // Ropsten params\n    uint256 constant public LOCK_DROP_PERIOD = 1 days * 182;\n    uint256 public LOCK_START_TIME;\n    uint256 public LOCK_END_TIME;\n    // ETH locking events\n    event Locked(address indexed owner, uint256 eth, Lock lockAddr, bytes supernovaAddr, uint time);\n\n    constructor(uint startTime) public {\n        LOCK_START_TIME = startTime;\n        LOCK_END_TIME = startTime + LOCK_DROP_PERIOD;\n    }\n\n    /**\n     * @dev        Locks up the value sent to contract in a new Lock\n     * @param      supernovaAddr   The bytes representation of the target cosmos key\n     */\n    function lock(bytes calldata supernovaAddr)\n        external\n        payable\n        didStart\n        didNotEnd\n    {\n        // Create ETH lock contract\n        Lock lockAddr = (new Lock).value(msg.value)(msg.sender, now + LOCK_LENGTH_TERM);\n        // ensure lock contract has at least all the ETH, or fail\n        assert(address(lockAddr).balance >= msg.value);\n        emit Locked(msg.sender, msg.value, lockAddr, supernovaAddr, now);\n    }\n\n    /**\n     * @dev        Ensures the lockdrop has started\n     */\n    modifier didStart() {\n        require(now >= LOCK_START_TIME, 'Lockdrop has not started');\n        _;\n    }\n\n    /**\n     * @dev        Ensures the lockdrop has not ended\n     */\n    modifier didNotEnd() {\n        require(now <= LOCK_END_TIME, 'Lockdrop has ended');\n        _;\n    }\n}",
+  "sourcePath": "/Users/drewstone/code/commonwealth/supernova-lockdrop/eth/contracts/Lockdrop.sol",
+  "ast": {
+    "absolutePath": "/Users/drewstone/code/commonwealth/supernova-lockdrop/eth/contracts/Lockdrop.sol",
+    "exportedSymbols": {
+      "Lock": [
+        16
+      ],
+      "Lockdrop": [
+        125
+      ]
+    },
+    "id": 126,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".21",
+          "<",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:32:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 16,
+        "linearizedBaseContracts": [
+          16
+        ],
+        "name": "Lock",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 9,
+              "nodeType": "Block",
+              "src": "182:105:0",
+              "statements": [
+                {
+                  "externalReferences": [
+                    {
+                      "owner": {
+                        "declaration": 3,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "228:5:0",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "unlockTime": {
+                        "declaration": 5,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "260:10:0",
+                        "valueSize": 1
+                      }
+                    }
+                  ],
+                  "id": 8,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    sstore(0x00, owner)\n    sstore(0x01, unlockTime)\n}",
+                  "src": "192:89:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 10,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "132:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "132:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5,
+                  "name": "unlockTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "147:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 4,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "147:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "131:35:0"
+            },
+            "returnParameters": {
+              "id": 7,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "182:0:0"
+            },
+            "scope": 16,
+            "src": "119:168:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 14,
+              "nodeType": "Block",
+              "src": "413:322:0",
+              "statements": [
+                {
+                  "externalReferences": [],
+                  "id": 13,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    switch gt(timestamp(), sload(0x01))\n    case 0 {\n        revert(0, 0)\n    }\n    case 1 {\n        switch call(gas(), sload(0x00), balance(address()), 0, 0, 0, 0)\n        case 0 {\n            revert(0, 0)\n        }\n    }\n}",
+                  "src": "476:253:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Withdraw function once timestamp has passed unlock time",
+            "id": 15,
+            "implemented": true,
+            "kind": "fallback",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "393:2:0"
+            },
+            "returnParameters": {
+              "id": 12,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "413:0:0"
+            },
+            "scope": 16,
+            "src": "384:351:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 126,
+        "src": "34:703:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [
+          16
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 125,
+        "linearizedBaseContracts": [
+          125
+        ],
+        "name": "Lockdrop",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 19,
+            "name": "LOCK_LENGTH_TERM",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "868:52:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 17,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "868:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "31",
+              "id": 18,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "911:9:0",
+              "subdenomination": "minutes",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_60_by_1",
+                "typeString": "int_const 60"
+              },
+              "value": "1"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 24,
+            "name": "LOCK_DROP_PERIOD",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "945:55:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 20,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "945:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "commonType": {
+                "typeIdentifier": "t_rational_15724800_by_1",
+                "typeString": "int_const 15724800"
+              },
+              "id": 23,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "lValueRequested": false,
+              "leftExpression": {
+                "argumentTypes": null,
+                "hexValue": "31",
+                "id": 21,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "kind": "number",
+                "lValueRequested": false,
+                "nodeType": "Literal",
+                "src": "988:6:0",
+                "subdenomination": "days",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_rational_86400_by_1",
+                  "typeString": "int_const 86400"
+                },
+                "value": "1"
+              },
+              "nodeType": "BinaryOperation",
+              "operator": "*",
+              "rightExpression": {
+                "argumentTypes": null,
+                "hexValue": "313832",
+                "id": 22,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "kind": "number",
+                "lValueRequested": false,
+                "nodeType": "Literal",
+                "src": "997:3:0",
+                "subdenomination": null,
+                "typeDescriptions": {
+                  "typeIdentifier": "t_rational_182_by_1",
+                  "typeString": "int_const 182"
+                },
+                "value": "182"
+              },
+              "src": "988:12:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_15724800_by_1",
+                "typeString": "int_const 15724800"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 26,
+            "name": "LOCK_START_TIME",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "1006:30:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 25,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1006:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 28,
+            "name": "LOCK_END_TIME",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "1042:28:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 27,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1042:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 40,
+            "name": "Locked",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 39,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30,
+                  "indexed": true,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1115:21:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 29,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1115:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32,
+                  "indexed": false,
+                  "name": "eth",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1138:11:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 31,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1138:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34,
+                  "indexed": false,
+                  "name": "lockAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1151:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_Lock_$16",
+                    "typeString": "contract Lock"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 33,
+                    "name": "Lock",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 16,
+                    "src": "1151:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_Lock_$16",
+                      "typeString": "contract Lock"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 36,
+                  "indexed": false,
+                  "name": "supernovaAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1166:19:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 35,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1166:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 38,
+                  "indexed": false,
+                  "name": "time",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1187:9:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 37,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1187:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1114:83:0"
+            },
+            "src": "1102:96:0"
+          },
+          {
+            "body": {
+              "id": 55,
+              "nodeType": "Block",
+              "src": "1239:98:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 47,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 45,
+                      "name": "LOCK_START_TIME",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 26,
+                      "src": "1249:15:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 46,
+                      "name": "startTime",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 42,
+                      "src": "1267:9:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1249:27:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 48,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1249:27:0"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 53,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 49,
+                      "name": "LOCK_END_TIME",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 28,
+                      "src": "1286:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "id": 52,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "id": 50,
+                        "name": "startTime",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 42,
+                        "src": "1302:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "+",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "id": 51,
+                        "name": "LOCK_DROP_PERIOD",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24,
+                        "src": "1314:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "src": "1302:28:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1286:44:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 54,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1286:44:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 56,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 43,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 42,
+                  "name": "startTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "1216:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 41,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1216:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1215:16:0"
+            },
+            "returnParameters": {
+              "id": 44,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1239:0:0"
+            },
+            "scope": 125,
+            "src": "1204:133:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 101,
+              "nodeType": "Block",
+              "src": "1629:328:0",
+              "statements": [
+                {
+                  "assignments": [
+                    66
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 66,
+                      "name": "lockAddr",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 101,
+                      "src": "1675:13:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_Lock_$16",
+                        "typeString": "contract Lock"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 65,
+                        "name": "Lock",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 16,
+                        "src": "1675:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 80,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 74,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1719:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 75,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1719:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 78,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 76,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "1731:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "+",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 77,
+                          "name": "LOCK_LENGTH_TERM",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 19,
+                          "src": "1737:16:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1731:22:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 71,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 197,
+                            "src": "1708:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 72,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "value",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1708:9:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "components": [
+                            {
+                              "argumentTypes": null,
+                              "id": 68,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "nodeType": "NewExpression",
+                              "src": "1692:8:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$",
+                                "typeString": "function (address,uint256) payable returns (contract Lock)"
+                              },
+                              "typeName": {
+                                "contractScope": null,
+                                "id": 67,
+                                "name": "Lock",
+                                "nodeType": "UserDefinedTypeName",
+                                "referencedDeclaration": 16,
+                                "src": "1696:4:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              }
+                            }
+                          ],
+                          "id": 69,
+                          "isConstant": false,
+                          "isInlineArray": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "TupleExpression",
+                          "src": "1691:10:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$",
+                            "typeString": "function (address,uint256) payable returns (contract Lock)"
+                          }
+                        },
+                        "id": 70,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "value",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1691:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_setvalue_nonpayable$_t_uint256_$returns$_t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$value_$",
+                          "typeString": "function (uint256) returns (function (address,uint256) payable returns (contract Lock))"
+                        }
+                      },
+                      "id": 73,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1691:27:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$value",
+                        "typeString": "function (address,uint256) payable returns (contract Lock)"
+                      }
+                    },
+                    "id": 79,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1691:63:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_Lock_$16",
+                      "typeString": "contract Lock"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1675:79:0"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 88,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "id": 83,
+                                "name": "lockAddr",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 66,
+                                "src": "1845:8:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              ],
+                              "id": 82,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "nodeType": "ElementaryTypeNameExpression",
+                              "src": "1837:7:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_address_$",
+                                "typeString": "type(address)"
+                              },
+                              "typeName": "address"
+                            },
+                            "id": 84,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "typeConversion",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "1837:17:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          },
+                          "id": 85,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "balance",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1837:25:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 86,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 197,
+                            "src": "1866:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 87,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "value",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1866:9:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1837:38:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 81,
+                      "name": "assert",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 186,
+                      "src": "1830:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_assert_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 89,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1830:46:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 90,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1830:46:0"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 92,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1898:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 93,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1898:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 94,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1910:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 95,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "value",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1910:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 96,
+                        "name": "lockAddr",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 66,
+                        "src": "1921:8:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 97,
+                        "name": "supernovaAddr",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 58,
+                        "src": "1931:13:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 98,
+                        "name": "now",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 199,
+                        "src": "1946:3:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 91,
+                      "name": "Locked",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 40,
+                      "src": "1891:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$_t_contract$_Lock_$16_$_t_bytes_memory_ptr_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256,contract Lock,bytes memory,uint256)"
+                      }
+                    },
+                    "id": 99,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1891:59:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 100,
+                  "nodeType": "EmitStatement",
+                  "src": "1886:64:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Locks up the value sent to contract in a new Lock\n@param      supernovaAddr   The bytes representation of the target cosmos key",
+            "id": 102,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 61,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 60,
+                  "name": "didStart",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 113,
+                  "src": "1598:8:0",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1598:8:0"
+              },
+              {
+                "arguments": null,
+                "id": 63,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 62,
+                  "name": "didNotEnd",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 124,
+                  "src": "1615:9:0",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1615:9:0"
+              }
+            ],
+            "name": "lock",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 59,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 58,
+                  "name": "supernovaAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 102,
+                  "src": "1527:28:0",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 57,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1527:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1526:30:0"
+            },
+            "returnParameters": {
+              "id": 64,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1629:0:0"
+            },
+            "scope": 125,
+            "src": "1513:444:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 112,
+              "nodeType": "Block",
+              "src": "2051:87:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 107,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 105,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "2069:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 106,
+                          "name": "LOCK_START_TIME",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 26,
+                          "src": "2076:15:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2069:22:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4c6f636b64726f7020686173206e6f742073746172746564",
+                        "id": 108,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2093:26:0",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_4c34cfc4bde35c083d7b15dc5a52a4523f481cd99b999668d22583d86cc8f418",
+                          "typeString": "literal_string \"Lockdrop has not started\""
+                        },
+                        "value": "Lockdrop has not started"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_4c34cfc4bde35c083d7b15dc5a52a4523f481cd99b999668d22583d86cc8f418",
+                          "typeString": "literal_string \"Lockdrop has not started\""
+                        }
+                      ],
+                      "id": 104,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        200,
+                        201
+                      ],
+                      "referencedDeclaration": 201,
+                      "src": "2061:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 109,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2061:59:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 110,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2061:59:0"
+                },
+                {
+                  "id": 111,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2130:1:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Ensures the lockdrop has started",
+            "id": 113,
+            "name": "didStart",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 103,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2048:2:0"
+            },
+            "src": "2031:107:0",
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 123,
+              "nodeType": "Block",
+              "src": "2235:79:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 118,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 116,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "2253:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "<=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 117,
+                          "name": "LOCK_END_TIME",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 28,
+                          "src": "2260:13:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2253:20:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4c6f636b64726f702068617320656e646564",
+                        "id": 119,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2275:20:0",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_952fe1139063e47f66acf835a3538df50aaa4b2035850012040a67168f387625",
+                          "typeString": "literal_string \"Lockdrop has ended\""
+                        },
+                        "value": "Lockdrop has ended"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_952fe1139063e47f66acf835a3538df50aaa4b2035850012040a67168f387625",
+                          "typeString": "literal_string \"Lockdrop has ended\""
+                        }
+                      ],
+                      "id": 115,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        200,
+                        201
+                      ],
+                      "referencedDeclaration": 201,
+                      "src": "2245:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 120,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2245:51:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 121,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2245:51:0"
+                },
+                {
+                  "id": 122,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2306:1:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Ensures the lockdrop has not ended",
+            "id": 124,
+            "name": "didNotEnd",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 114,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2232:2:0"
+            },
+            "src": "2214:100:0",
+            "visibility": "internal"
+          }
+        ],
+        "scope": 126,
+        "src": "739:1577:0"
+      }
+    ],
+    "src": "0:2316:0"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/drewstone/code/commonwealth/supernova-lockdrop/eth/contracts/Lockdrop.sol",
+    "exportedSymbols": {
+      "Lock": [
+        16
+      ],
+      "Lockdrop": [
+        125
+      ]
+    },
+    "id": 126,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".21",
+          "<",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:32:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 16,
+        "linearizedBaseContracts": [
+          16
+        ],
+        "name": "Lock",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 9,
+              "nodeType": "Block",
+              "src": "182:105:0",
+              "statements": [
+                {
+                  "externalReferences": [
+                    {
+                      "owner": {
+                        "declaration": 3,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "228:5:0",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "unlockTime": {
+                        "declaration": 5,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "260:10:0",
+                        "valueSize": 1
+                      }
+                    }
+                  ],
+                  "id": 8,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    sstore(0x00, owner)\n    sstore(0x01, unlockTime)\n}",
+                  "src": "192:89:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 10,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 6,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "132:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "132:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5,
+                  "name": "unlockTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "147:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 4,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "147:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "131:35:0"
+            },
+            "returnParameters": {
+              "id": 7,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "182:0:0"
+            },
+            "scope": 16,
+            "src": "119:168:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 14,
+              "nodeType": "Block",
+              "src": "413:322:0",
+              "statements": [
+                {
+                  "externalReferences": [],
+                  "id": 13,
+                  "nodeType": "InlineAssembly",
+                  "operations": "{\n    switch gt(timestamp(), sload(0x01))\n    case 0 {\n        revert(0, 0)\n    }\n    case 1 {\n        switch call(gas(), sload(0x00), balance(address()), 0, 0, 0, 0)\n        case 0 {\n            revert(0, 0)\n        }\n    }\n}",
+                  "src": "476:253:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Withdraw function once timestamp has passed unlock time",
+            "id": 15,
+            "implemented": true,
+            "kind": "fallback",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "393:2:0"
+            },
+            "returnParameters": {
+              "id": 12,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "413:0:0"
+            },
+            "scope": 16,
+            "src": "384:351:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 126,
+        "src": "34:703:0"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [
+          16
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 125,
+        "linearizedBaseContracts": [
+          125
+        ],
+        "name": "Lockdrop",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 19,
+            "name": "LOCK_LENGTH_TERM",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "868:52:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 17,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "868:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "31",
+              "id": 18,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "911:9:0",
+              "subdenomination": "minutes",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_60_by_1",
+                "typeString": "int_const 60"
+              },
+              "value": "1"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 24,
+            "name": "LOCK_DROP_PERIOD",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "945:55:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 20,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "945:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "commonType": {
+                "typeIdentifier": "t_rational_15724800_by_1",
+                "typeString": "int_const 15724800"
+              },
+              "id": 23,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "lValueRequested": false,
+              "leftExpression": {
+                "argumentTypes": null,
+                "hexValue": "31",
+                "id": 21,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "kind": "number",
+                "lValueRequested": false,
+                "nodeType": "Literal",
+                "src": "988:6:0",
+                "subdenomination": "days",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_rational_86400_by_1",
+                  "typeString": "int_const 86400"
+                },
+                "value": "1"
+              },
+              "nodeType": "BinaryOperation",
+              "operator": "*",
+              "rightExpression": {
+                "argumentTypes": null,
+                "hexValue": "313832",
+                "id": 22,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "kind": "number",
+                "lValueRequested": false,
+                "nodeType": "Literal",
+                "src": "997:3:0",
+                "subdenomination": null,
+                "typeDescriptions": {
+                  "typeIdentifier": "t_rational_182_by_1",
+                  "typeString": "int_const 182"
+                },
+                "value": "182"
+              },
+              "src": "988:12:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_15724800_by_1",
+                "typeString": "int_const 15724800"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 26,
+            "name": "LOCK_START_TIME",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "1006:30:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 25,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1006:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 28,
+            "name": "LOCK_END_TIME",
+            "nodeType": "VariableDeclaration",
+            "scope": 125,
+            "src": "1042:28:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 27,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1042:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 40,
+            "name": "Locked",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 39,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30,
+                  "indexed": true,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1115:21:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 29,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1115:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32,
+                  "indexed": false,
+                  "name": "eth",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1138:11:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 31,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1138:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34,
+                  "indexed": false,
+                  "name": "lockAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1151:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_Lock_$16",
+                    "typeString": "contract Lock"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 33,
+                    "name": "Lock",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 16,
+                    "src": "1151:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_Lock_$16",
+                      "typeString": "contract Lock"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 36,
+                  "indexed": false,
+                  "name": "supernovaAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1166:19:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 35,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1166:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 38,
+                  "indexed": false,
+                  "name": "time",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 40,
+                  "src": "1187:9:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 37,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1187:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1114:83:0"
+            },
+            "src": "1102:96:0"
+          },
+          {
+            "body": {
+              "id": 55,
+              "nodeType": "Block",
+              "src": "1239:98:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 47,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 45,
+                      "name": "LOCK_START_TIME",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 26,
+                      "src": "1249:15:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 46,
+                      "name": "startTime",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 42,
+                      "src": "1267:9:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1249:27:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 48,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1249:27:0"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 53,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 49,
+                      "name": "LOCK_END_TIME",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 28,
+                      "src": "1286:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "commonType": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "id": 52,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "argumentTypes": null,
+                        "id": 50,
+                        "name": "startTime",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 42,
+                        "src": "1302:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "+",
+                      "rightExpression": {
+                        "argumentTypes": null,
+                        "id": 51,
+                        "name": "LOCK_DROP_PERIOD",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24,
+                        "src": "1314:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "src": "1302:28:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1286:44:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 54,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1286:44:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 56,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 43,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 42,
+                  "name": "startTime",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 56,
+                  "src": "1216:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 41,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1216:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1215:16:0"
+            },
+            "returnParameters": {
+              "id": 44,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1239:0:0"
+            },
+            "scope": 125,
+            "src": "1204:133:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 101,
+              "nodeType": "Block",
+              "src": "1629:328:0",
+              "statements": [
+                {
+                  "assignments": [
+                    66
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 66,
+                      "name": "lockAddr",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 101,
+                      "src": "1675:13:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_Lock_$16",
+                        "typeString": "contract Lock"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 65,
+                        "name": "Lock",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 16,
+                        "src": "1675:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 80,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 74,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1719:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 75,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1719:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 78,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 76,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "1731:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "+",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 77,
+                          "name": "LOCK_LENGTH_TERM",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 19,
+                          "src": "1737:16:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1731:22:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 71,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 197,
+                            "src": "1708:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 72,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "value",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1708:9:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "components": [
+                            {
+                              "argumentTypes": null,
+                              "id": 68,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "nodeType": "NewExpression",
+                              "src": "1692:8:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$",
+                                "typeString": "function (address,uint256) payable returns (contract Lock)"
+                              },
+                              "typeName": {
+                                "contractScope": null,
+                                "id": 67,
+                                "name": "Lock",
+                                "nodeType": "UserDefinedTypeName",
+                                "referencedDeclaration": 16,
+                                "src": "1696:4:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              }
+                            }
+                          ],
+                          "id": 69,
+                          "isConstant": false,
+                          "isInlineArray": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "TupleExpression",
+                          "src": "1691:10:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$",
+                            "typeString": "function (address,uint256) payable returns (contract Lock)"
+                          }
+                        },
+                        "id": 70,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "value",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1691:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_setvalue_nonpayable$_t_uint256_$returns$_t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$value_$",
+                          "typeString": "function (uint256) returns (function (address,uint256) payable returns (contract Lock))"
+                        }
+                      },
+                      "id": 73,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1691:27:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_creation_payable$_t_address_$_t_uint256_$returns$_t_contract$_Lock_$16_$value",
+                        "typeString": "function (address,uint256) payable returns (contract Lock)"
+                      }
+                    },
+                    "id": 79,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1691:63:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_Lock_$16",
+                      "typeString": "contract Lock"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1675:79:0"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 88,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "id": 83,
+                                "name": "lockAddr",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 66,
+                                "src": "1845:8:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_contract$_Lock_$16",
+                                  "typeString": "contract Lock"
+                                }
+                              ],
+                              "id": 82,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "nodeType": "ElementaryTypeNameExpression",
+                              "src": "1837:7:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_address_$",
+                                "typeString": "type(address)"
+                              },
+                              "typeName": "address"
+                            },
+                            "id": 84,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "typeConversion",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "1837:17:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address_payable",
+                              "typeString": "address payable"
+                            }
+                          },
+                          "id": 85,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "balance",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1837:25:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 86,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 197,
+                            "src": "1866:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 87,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "value",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "1866:9:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "1837:38:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 81,
+                      "name": "assert",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 186,
+                      "src": "1830:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_assert_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 89,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1830:46:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 90,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1830:46:0"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 92,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1898:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 93,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1898:10:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 94,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 197,
+                          "src": "1910:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 95,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "value",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1910:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 96,
+                        "name": "lockAddr",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 66,
+                        "src": "1921:8:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 97,
+                        "name": "supernovaAddr",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 58,
+                        "src": "1931:13:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 98,
+                        "name": "now",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 199,
+                        "src": "1946:3:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_Lock_$16",
+                          "typeString": "contract Lock"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 91,
+                      "name": "Locked",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 40,
+                      "src": "1891:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$_t_contract$_Lock_$16_$_t_bytes_memory_ptr_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256,contract Lock,bytes memory,uint256)"
+                      }
+                    },
+                    "id": 99,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1891:59:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 100,
+                  "nodeType": "EmitStatement",
+                  "src": "1886:64:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Locks up the value sent to contract in a new Lock\n@param      supernovaAddr   The bytes representation of the target cosmos key",
+            "id": 102,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 61,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 60,
+                  "name": "didStart",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 113,
+                  "src": "1598:8:0",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1598:8:0"
+              },
+              {
+                "arguments": null,
+                "id": 63,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 62,
+                  "name": "didNotEnd",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 124,
+                  "src": "1615:9:0",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1615:9:0"
+              }
+            ],
+            "name": "lock",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 59,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 58,
+                  "name": "supernovaAddr",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 102,
+                  "src": "1527:28:0",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 57,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1527:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1526:30:0"
+            },
+            "returnParameters": {
+              "id": 64,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1629:0:0"
+            },
+            "scope": 125,
+            "src": "1513:444:0",
+            "stateMutability": "payable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 112,
+              "nodeType": "Block",
+              "src": "2051:87:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 107,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 105,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "2069:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 106,
+                          "name": "LOCK_START_TIME",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 26,
+                          "src": "2076:15:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2069:22:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4c6f636b64726f7020686173206e6f742073746172746564",
+                        "id": 108,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2093:26:0",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_4c34cfc4bde35c083d7b15dc5a52a4523f481cd99b999668d22583d86cc8f418",
+                          "typeString": "literal_string \"Lockdrop has not started\""
+                        },
+                        "value": "Lockdrop has not started"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_4c34cfc4bde35c083d7b15dc5a52a4523f481cd99b999668d22583d86cc8f418",
+                          "typeString": "literal_string \"Lockdrop has not started\""
+                        }
+                      ],
+                      "id": 104,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        200,
+                        201
+                      ],
+                      "referencedDeclaration": 201,
+                      "src": "2061:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 109,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2061:59:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 110,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2061:59:0"
+                },
+                {
+                  "id": 111,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2130:1:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Ensures the lockdrop has started",
+            "id": 113,
+            "name": "didStart",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 103,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2048:2:0"
+            },
+            "src": "2031:107:0",
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 123,
+              "nodeType": "Block",
+              "src": "2235:79:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 118,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "id": 116,
+                          "name": "now",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 199,
+                          "src": "2253:3:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "<=",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 117,
+                          "name": "LOCK_END_TIME",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 28,
+                          "src": "2260:13:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "2253:20:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "4c6f636b64726f702068617320656e646564",
+                        "id": 119,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2275:20:0",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_952fe1139063e47f66acf835a3538df50aaa4b2035850012040a67168f387625",
+                          "typeString": "literal_string \"Lockdrop has ended\""
+                        },
+                        "value": "Lockdrop has ended"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_952fe1139063e47f66acf835a3538df50aaa4b2035850012040a67168f387625",
+                          "typeString": "literal_string \"Lockdrop has ended\""
+                        }
+                      ],
+                      "id": 115,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        200,
+                        201
+                      ],
+                      "referencedDeclaration": 201,
+                      "src": "2245:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 120,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2245:51:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 121,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2245:51:0"
+                },
+                {
+                  "id": 122,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2306:1:0"
+                }
+              ]
+            },
+            "documentation": "@dev        Ensures the lockdrop has not ended",
+            "id": 124,
+            "name": "didNotEnd",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 114,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2232:2:0"
+            },
+            "src": "2214:100:0",
+            "visibility": "internal"
+          }
+        ],
+        "scope": 126,
+        "src": "739:1577:0"
+      }
+    ],
+    "src": "0:2316:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xA83A20C149728EBba1764F4e6654Aac02155fd12",
+      "transactionHash": "0xebf6a72f6794fb22c32d0edb5b08c77ab5f8e11c35485c43d97623ae458d3f9e"
+    },
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0x00d5d6dC402f270Dbb3d341c7be43135b8B46a1B",
+      "transactionHash": "0x8a53ef726c94b9489e265a6e9af4c76a167b500a14f0f32a0a92985989316712"
+    }
+  },
+  "schemaVersion": "3.0.10",
+  "updatedAt": "2019-10-24T18:45:01.475Z",
+  "devdoc": {
+    "methods": {
+      "lock(bytes)": {
+        "details": "Locks up the value sent to contract in a new Lock",
+        "params": {
+          "supernovaAddr": "The bytes representation of the target cosmos key"
+        }
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

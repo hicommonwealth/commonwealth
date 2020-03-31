@@ -1,0 +1,37 @@
+@import 'client/styles/shared';
+
+.MessageSigningModal {
+    width: 710px;
+    .compact-modal-body {
+        padding-bottom: 22px;
+    }
+    .error-message {
+        @include error-text();
+        margin-top: 14px;
+    }
+    .no-select {
+        opacity: 0.8;
+        user-select: none;
+    }
+    // signing option selector
+    .HorizontalTabs .tab-bar {
+        width: 160px;
+    }
+    .HorizontalTabs .tab-content {
+        width: 490px;
+        min-height: 380px;
+    }
+}
+
+.MessageSigningSeedOrMnemonicOption {
+    .instructions {
+        margin-bottom: 6px;
+    }
+    .warn {
+        @include error-text();
+        margin: 6px 0 12px;
+    }
+    textarea.mnemonic {
+        margin-bottom: 15px;
+    }
+}

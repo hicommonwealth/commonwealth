@@ -1,0 +1,331 @@
+$fonts: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$monospace-fonts: 'iA Writer Duospace', monospace;
+
+$offwhite-extralight: #fcfbfa;
+$offwhite-light: #f9f8f6;
+$offwhite-dark: #282625;
+$badge-red: #de243b;      // radish red for badges
+$badge-lightred: #fa3e3e; // salmon red for weak sauce badges
+$error-red: #d32e26;      // fleshy red for error messages
+$success-green: green;
+
+$primary-green: #41a360;
+
+$form-border-radius: 4px;
+$form-border-color: #e4e4e4;
+$form-active-color: #08c;
+
+$lighttextgrey: #999;
+$electricblue: #229bd6;
+
+@mixin popout {
+    animation: popout 0.05s ease;
+    -webkit-animation: popout 0.05s ease;
+}
+@keyframes popout {
+    from { transform: scale(0.975); }
+    80% { transform: scale(1); }
+    to { transform: scale(1); }
+}
+@-webkit-keyframes popout {
+    from { -webkit-transform: scale(0.975); }
+    80% { -webkit-transform: scale(1); }
+    to { -webkit-transform: scale(1); }
+}
+
+@mixin hoverFloat {
+    transition: transform 50ms ease-in-out;
+    &:hover {
+        transform: translate(0, -1px);
+    }
+}
+
+@mixin error-text {
+    font-weight: 700;
+    color: $error-red;
+}
+@mixin success-text {
+    font-weight: 700;
+    color: $success-green;
+}
+@mixin profile-notice($background, $text-color) {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: $background;
+    color: $text-color;
+    // text
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    a {
+        color: $text-color;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    @include xs-max {
+        padding: 8px 12px;
+    }
+}
+@mixin category-icon {
+    display: inline-block;
+    background: #ccc;
+    width: 10px;
+    height: 10px;
+    margin-top: 2px;
+    margin-right: 8px;
+    border-radius: 2px;
+}
+@mixin attachments {
+    p {
+        font-weight: 700;
+        color: #999;
+    }
+    a.attachment-item {
+        display: inline-block;
+        max-width: 100px;
+        max-height: 100px;
+        background: #f1efef;
+        margin-right: 10px;
+        text-align: center;
+        text-decoration: none;
+        &:hover {
+            background: darken(#f1efef, 1%);
+        }
+        img {
+            width: 50%;
+            margin: 10px 0 4px;
+        }
+    }
+}
+
+@mixin clearfix {
+    *zoom: 1;
+    &:before,
+    &:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+@mixin xxs-max {
+    @media only screen and (max-width: 42em) { @content; }
+}
+@mixin xs-max {
+    @media only screen and (max-width: 48em) { @content; }
+}
+@mixin sm-max {
+    @media only screen and (max-width: 62em) { @content; }
+}
+@mixin md-max {
+    @media only screen and (max-width: 75em) { @content; }
+}
+@mixin sm-min {
+    @media only screen and (min-width: 48em) { @content; }
+}
+@mixin md-min {
+    @media only screen and (min-width: 62em) { @content; }
+}
+@mixin lg-min {
+    @media only screen and (min-width: 75em) { @content; }
+}
+
+@mixin well {
+    padding: 24px 30px 28px;
+    background: #f9f8f6;
+    border-radius: 4px;
+    margin: 20px 0;
+    h4 {
+        margin-top: 0;
+        margin-bottom: 6px;
+    }
+    @include xs-max {
+        padding: 20px 22px 22px;
+    }
+}
+
+@mixin formfield-base {
+    display: block;
+    width: 100%;
+    border: 1px solid $form-border-color;
+    border-radius: $form-border-radius;
+    outline: none;
+    box-shadow: none;
+    &:focus {
+        border-color: $form-active-color;
+    }
+}
+
+@mixin formfield-text {
+    @include formfield-base;
+    padding: 10px 10px;
+    &::placeholder {
+        color: #aaa;
+    }
+}
+
+@mixin dark-menu-styles {
+    color: #fff;
+    z-index: 9999;
+    background: #343434;
+    border-radius: 0 0 2px 2px;
+    ul {
+        padding: 4px 0;
+        margin: 0;
+    }
+    ul a {
+        text-decoration: none;
+        color: #fff;
+    }
+    ul li {
+        margin: 0;
+        padding: 6px 16px;
+        list-style: none;
+        cursor: pointer;
+    }
+    ul li:last-child {
+        border-bottom: none;
+    }
+    ul li:hover {
+        background: #454545;
+        color: #fff;
+    }
+    ul a li:hover {
+        color: #fff;
+    }
+    ul li.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+    ul li.divider {
+        height: 1px;
+        padding: 0;
+        margin: 6px 0;
+        border-bottom: 1px solid #474747;
+    }
+}
+
+@mixin menu-styles {
+    color: #111;
+    z-index: 9999;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.04);
+    ul {
+        padding: 2px 0;
+        margin: 0;
+    }
+    ul a {
+        text-decoration: none;
+        color: $offwhite-dark;
+    }
+    ul li {
+        margin: 0;
+        padding: 6px 16px;
+        list-style: none;
+        cursor: pointer;
+    }
+    ul li:last-child {
+        border-bottom: none;
+    }
+    ul li:hover {
+        background: #08c;
+        color: $offwhite-extralight;
+    }
+    ul a li:hover {
+        color: $offwhite-extralight;;
+    }
+    ul li.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+    ul li.divider {
+        height: 1px;
+        padding: 0;
+        margin: 2px 0;
+        border-bottom: 1px solid #ececec;
+    }
+    ul li .alert-badge {
+        float: right;
+        margin-top: 2px;
+        padding: 3px 3px 2px;
+        border-radius: 2px;
+        color: $offwhite-extralight;;
+        background: $badge-lightred;
+        font-size: 12px;
+        line-height: 1;
+    }
+}
+
+@mixin login {
+    h4 {
+        text-align: left;
+        color: #eee;
+        margin: 24px 0 20px;
+    }
+    input[type="text"] {
+        @include formfield-text;
+        margin: 10px 0;
+    }
+    button, a.btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 6px;
+    }
+    .login-option {
+        margin: 10px auto 20px;
+    }
+    .login-message {
+        text-align: center;
+        margin: 10px 0 22px;
+        &.error {
+            color: #d32e26;
+        }
+    }
+
+    @include xxs-max {
+        .Login {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+    }
+}
+
+@mixin clean-button {
+    background-color: white !important;
+    border: 1px solid $electricblue !important;
+    background-image: none !important;
+    color: $electricblue;
+    border-radius: $form-border-radius;
+    padding: 8px 20px;
+}
+
+@mixin clean-button-2 {
+    background-color: $electricblue !important;
+    background-image: none !important;
+    border: 0px solid transparent !important;
+    color: white !important;
+    font-weight: 700;
+    border-radius: $form-border-radius;
+    padding: 8px 20px;
+}
+
+@mixin clean-button-2 {
+    background-color: $electricblue !important;
+    background-image: none !important;
+    border: 0px solid transparent !important;
+    color: white !important;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 8px 20px;
+}

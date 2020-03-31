@@ -1,0 +1,30 @@
+.HorizontalTabs {
+    display: flex;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+
+    .tab-bar {
+        width: 200px;
+        border-right: 1px solid #eee;
+        a.tab-entry {
+            display: block;
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            color: #111;
+            cursor: pointer;
+            &.active, &:hover, &:focus {
+                background: #f7f6f6;
+            }
+            &.disabled {
+                opacity: 0.4;
+                user-select: none;
+                pointer-events: none;
+            }
+        }
+    }
+    .tab-content {
+        flex: 1;
+        padding: 24px 28px;
+    }
+}

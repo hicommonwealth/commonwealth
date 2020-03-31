@@ -1,0 +1,26 @@
+.ProposalVotingResults {
+    .vote {
+        display: flex;
+        margin: 4px 0;
+        .vote-voter {
+            flex: 1;
+        }
+        .vote-choice {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #eee;
+            border-radius: 9999px;
+            margin-left: 4px;
+        }
+        .vote-weight {
+            margin-left: 4px;
+        }
+        .vote-deposit {
+            margin-left: 4px;
+        }
+    }
+    .no-votes {
+        color: #aaa;
+        margin: 10px 0;
+    }
+}

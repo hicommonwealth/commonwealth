@@ -1,0 +1,247 @@
+@import 'client/styles/shared';
+
+@mixin formatted-text {
+    // 1. block styles
+    // 2. list styles
+    // 3. inline styles
+
+    word-break: break-word;
+
+    // block styles
+    .between-paragraphs {
+        margin-bottom: 14px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: $fonts;
+        font-weight: 700;
+        margin: 1.5em 0 0.47em;
+    }
+    > :first-child > h1,
+    > :first-child > h2,
+    > :first-child > h3,
+    > :first-child > h4,
+    > :first-child > h5,
+    > :first-child > h6 {
+        margin-top: 0.35em;
+    }
+    > :last-child > h1,
+    > :last-child > h2,
+    > :last-child > h3,
+    > :last-child > h4,
+    > :last-child > h5,
+    > :last-child > h6 {
+        margin-bottom: 0;
+    }
+    h1 {
+        font-size: 1.6em;
+    }
+    h2, h3, h4, h5, h6 {
+        font-size: 1.23em;
+    }
+    img {
+        min-width: 60px;
+        max-width: 100%;
+        margin: 8px 0;
+        min-height: 40px;
+        background-color: #f2f2f2;
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+    pre, code {
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+    pre {
+        font-family: $monospace-fonts;
+        font-size: 0.925em;
+        white-space: pre-wrap;
+        margin: 22px 0;
+        padding: 10px 12px 12px;
+        background: #f4f4f4;
+        border-radius: 3px;
+    }
+    blockquote {
+        border-left: 4px solid #ccc;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-left: 16px;
+        margin-left: 0;
+    }
+
+    // list styles
+    ul, ol {
+        li {
+            margin: 6px 0;
+        }
+    }
+    p:first-child {
+        padding-top: 0;
+        margin-top: 0;
+    }
+    p:last-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    ul:first-child,
+    ol:first-child {
+        padding-top: 0;
+        margin-top: 0;
+        li:first-child {
+            margin-top: 0;
+        }
+    }
+    ul:last-child,
+    ol:last-child {
+        padding-bottom: 0;
+        margin-bottom: 0;
+        li:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // inline styles
+    a {
+        background-color: transparent;
+    }
+    b, strong {
+        font-weight: 700;
+    }
+    code,
+    kbd,
+    samp {
+        font-family: $monospace-fonts;
+        font-size: 0.85em;
+        padding-bottom: 2px;
+        padding-top: 2px;
+        background: #eee;
+        border-radius: 3px;
+    }
+    code:before,
+    code:after {
+        content: "\A0";
+        letter-spacing: -2px;
+    }
+    small {
+        font-size: 80%;
+    }
+    sub,
+    sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+    sup {
+        top: -0.5em;
+    }
+
+}
+
+// mixin for collapsing large text blocks to <200px in height
+@mixin collapsible {
+    &.collapsed {
+        max-height: 180px;
+        overflow: hidden;
+        h1, h2, h3, h4, h5, h6 {
+            font-size: 1em;
+            margin: 0;
+        }
+        blockquote {
+            padding: 0 0 0 15px;
+            margin: 0;
+            border: none;
+            border-left: 2px solid #e8e8e8;
+        }
+        &:after {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            bottom: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: linear-gradient(
+                to bottom,
+                hsla(0, 0%, 100%, 0) 0%,
+                hsla(0, 0%, 100%, 0.013) 9.4%,
+                hsla(0, 0%, 100%, 0.049) 17.5%,
+                hsla(0, 0%, 100%, 0.104) 24.7%,
+                hsla(0, 0%, 100%, 0.175) 31.1%,
+                hsla(0, 0%, 100%, 0.259) 36.8%,
+                hsla(0, 0%, 100%, 0.352) 42.1%,
+                hsla(0, 0%, 100%, 0.45) 47.1%,
+                hsla(0, 0%, 100%, 0.55) 52.1%,
+                hsla(0, 0%, 100%, 0.648) 57.2%,
+                hsla(0, 0%, 100%, 0.741) 62.5%,
+                hsla(0, 0%, 100%, 0.825) 68.3%,
+                hsla(0, 0%, 100%, 0.896) 74.8%,
+                hsla(0, 0%, 100%, 0.951) 82.1%,
+                hsla(0, 0%, 100%, 0.987) 90.5%,
+                hsl(0, 0%, 100%) 100%
+            );
+            width: 100%;
+            height: 4em;
+        }
+        &.suppress-fadeout:after {
+            display: none;
+        }
+    }
+}
+
+// mixin for collapsing large text blocks to <200px in height
+@mixin collapsible {
+    &.collapsed {
+        max-height: 180px;
+        overflow: hidden;
+        h1, h2, h3, h4, h5, h6 {
+            font-size: 1em;
+            margin: 0;
+        }
+        blockquote {
+            padding: 0 0 0 15px;
+            margin: 0;
+            border: none;
+            border-left: 2px solid #e8e8e8;
+        }
+        &:after {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            bottom: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: linear-gradient(
+                to bottom,
+                hsla(0, 0%, 100%, 0) 0%,
+                hsla(0, 0%, 100%, 0.013) 9.4%,
+                hsla(0, 0%, 100%, 0.049) 17.5%,
+                hsla(0, 0%, 100%, 0.104) 24.7%,
+                hsla(0, 0%, 100%, 0.175) 31.1%,
+                hsla(0, 0%, 100%, 0.259) 36.8%,
+                hsla(0, 0%, 100%, 0.352) 42.1%,
+                hsla(0, 0%, 100%, 0.45) 47.1%,
+                hsla(0, 0%, 100%, 0.55) 52.1%,
+                hsla(0, 0%, 100%, 0.648) 57.2%,
+                hsla(0, 0%, 100%, 0.741) 62.5%,
+                hsla(0, 0%, 100%, 0.825) 68.3%,
+                hsla(0, 0%, 100%, 0.896) 74.8%,
+                hsla(0, 0%, 100%, 0.951) 82.1%,
+                hsla(0, 0%, 100%, 0.987) 90.5%,
+                hsl(0, 0%, 100%) 100%
+            );
+            width: 100%;
+            height: 4em;
+        }
+        &.suppress-fadeout:after {
+            display: none;
+        }
+    }
+}
+
+.QuillFormattedText {
+    position: relative;
+    line-height: 1.45;
+    @include formatted-text();
+    @include collapsible();
+}

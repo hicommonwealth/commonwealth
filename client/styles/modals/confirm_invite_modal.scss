@@ -1,0 +1,118 @@
+@import 'client/styles/shared';
+
+.ConfirmInviteModal {
+    display: inline-block;
+    @include sm-min {
+        // width: 675px;
+    }
+    .compact-modal-title {
+        h3 {
+            font-size: 17px;
+        }
+    }
+    .compact-modal-body {
+        width: auto;
+        max-width: 475px;
+        padding: 14px 28px 26px !important;
+        @include sm-min {
+            float: right;
+        }
+    }
+    a.add-account {
+        display: block;
+        margin-top: 18px;
+    }
+    button.submit {
+        display: block;
+        margin-top: 22px;
+        max-width: 170px;
+        margin-bottom: 40px;
+    }
+    button.reject {
+        display: block;
+        margin-top: 22px;
+        max-width: 150px;
+    }
+
+    .SwitchAddress + .SwitchAddress {
+        border-top: none;
+    }
+
+    // TODO: refactor into its own component
+    .CommunityBlock {
+        border: 1px solid #eee;
+        padding: 18px;
+        margin-bottom: 40px;
+
+        .community-block-top {
+            font-weight: bold;
+            display: inline;
+        }
+        .community-block-bottom {
+            color: rgb(153, 153, 153);
+            display: block;
+        }
+    }
+
+    // TODO: refactor into its own component
+    .SwitchAddress {
+        display: block;
+        padding: 15px 20px 10px;
+        border: 1px solid #eee;
+        @include sm-min {
+            width: 420px;
+        }
+        &:hover {
+            background: #fafafa;
+            cursor: pointer;
+        }
+        .ProfileBlock span.balance {
+            display: block;
+            float: right;
+            color: #aaa;
+        }
+    }
+    .SwitchAddress.selected {
+      background-color: darken($color: #fafafa, $amount: 5%);
+      &:hover {
+        background-color: darken($color: #fafafa, $amount: 5%);
+      }
+    }
+
+    // TODO: refactor into its own component
+    .SideMenu {
+        display: inline-flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        @include sm-min {
+            border-right: 1px darken($color: #fafafa, $amount: 5%) solid;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            width: 200px;
+        }
+
+        @include xs-max {
+            margin: 0 20px;
+        }
+        .inviteTitle {
+            cursor: pointer;
+            font-weight: bold;
+            padding: 24px 0 4px;
+            margin: 0 10px;
+            @include sm-min {
+                margin: 0;
+                padding: 14px 21px 12px;
+                border-bottom:  1px darken($color: #fafafa, $amount: 5%) solid;
+            }
+            &.selected {
+                border-bottom: 3px rgb(95, 195, 136) solid;
+                @include sm-min {
+                    border-left: 8px rgb(95, 195, 136) solid;
+                    border-bottom:  1px darken($color: #fafafa, $amount: 5%) solid;
+                    padding-left: 13px;
+                    background-color: darken($color: #fafafa, $amount: 3%);
+                }
+            }
+        }
+    }
+}

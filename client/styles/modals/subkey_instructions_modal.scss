@@ -1,0 +1,23 @@
+.SubkeyInstructionsModal {
+    max-width: 560px;
+    padding-bottom: 20px;
+    pre {
+        padding: 12px 16px 11px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        background: #222;
+        color: #fff;
+        font-family: SF Mono, Roboto, Menlo, monospace;
+        font-size: 13px;
+        white-space: pre;
+        &.click-to-select {
+            cursor: pointer;
+        }
+        &.click-to-select:active {
+            opacity: 0.9;
+        }
+        &::selection {
+            background: #ffdd00;
+        }
+    }
+}

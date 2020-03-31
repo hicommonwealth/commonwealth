@@ -1,0 +1,28 @@
+.AdminPage {
+    .forum-container > .Tabs {
+        margin-top: -10px;
+        .tab-content {
+            padding: 8px;
+        }
+    }
+}
+
+.CreateInviteLink {
+    .invite-link-parameters {
+        select {
+            margin: 10px 0 20px;
+        }
+        .invite-link-pastebin {
+            margin-left: 20px;
+            padding: 10px;
+            width: 300px;
+        }
+    }
+}
+
+.InviteLinkTable {
+    margin: 40px 0;
+    td {
+        text-align: center;
+    }
+}

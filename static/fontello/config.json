@@ -1,0 +1,496 @@
+{
+  "name": "",
+  "css_prefix_text": "icon-",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "id8wp0cygl9trzbhlbd9o0fygiesi629",
+      "css": "search",
+      "code": 59442,
+      "src": "modernpics"
+    },
+    {
+      "uid": "ae3so8q0b0n2h8esv9flua2nmwswa8fd",
+      "css": "mail",
+      "code": 59393,
+      "src": "modernpics"
+    },
+    {
+      "uid": "pt5lb2orj9ms0n4yyxjavefdukcv1scl",
+      "css": "heart",
+      "code": 59394,
+      "src": "modernpics"
+    },
+    {
+      "uid": "kfzodo12ciruwganzy6h1bee2bpyz24d",
+      "css": "star",
+      "code": 59395,
+      "src": "modernpics"
+    },
+    {
+      "uid": "cy7vw87w1slwyalc4vd8cdhrb50asud3",
+      "css": "th-list",
+      "code": 59398,
+      "src": "modernpics"
+    },
+    {
+      "uid": "in76hg99crrkpcbz2rjnmgbiw74s72y0",
+      "css": "ok",
+      "code": 59399,
+      "src": "modernpics"
+    },
+    {
+      "uid": "rrhco7mfj6ro9yzhe4a1rbln9flw47re",
+      "css": "cancel",
+      "code": 59400,
+      "src": "modernpics"
+    },
+    {
+      "uid": "wcb87qh0k9smu6zukdhbn5zip98zofkh",
+      "css": "cancel-circle",
+      "code": 59401,
+      "src": "modernpics"
+    },
+    {
+      "uid": "hbvhbnoivp3qj8xpyqrxa7dvq9ntnci3",
+      "css": "plus",
+      "code": 59402,
+      "src": "modernpics"
+    },
+    {
+      "uid": "frauy9fser6zk9n5ih3rdpz7zzfjbrvu",
+      "css": "eye",
+      "code": 59406,
+      "src": "modernpics"
+    },
+    {
+      "uid": "jwebw8rhtovm6adljbdixtj9ltdrzkvb",
+      "css": "thumbs-up",
+      "code": 59408,
+      "src": "modernpics"
+    },
+    {
+      "uid": "h9yii6q602rt4dxjmy9k9wc3jkwzk8d0",
+      "css": "thumbs-down",
+      "code": 59409,
+      "src": "modernpics"
+    },
+    {
+      "uid": "fojo3y3ju5f4vge0bepcxl1mgmzgit9k",
+      "css": "export",
+      "code": 59411,
+      "src": "modernpics"
+    },
+    {
+      "uid": "97var6sq7rzo72ktzg1c6ph46u9pftbr",
+      "css": "pencil",
+      "code": 59413,
+      "src": "modernpics"
+    },
+    {
+      "uid": "242giivkgr3e6le7b2xqi2pkdruf85mu",
+      "css": "edit",
+      "code": 59412,
+      "src": "modernpics"
+    },
+    {
+      "uid": "7ssl5z5jrhu13tb13cd3gb4bdfkzbfzw",
+      "css": "print",
+      "code": 59416,
+      "src": "modernpics"
+    },
+    {
+      "uid": "f47srtt9pew19q6kg9jniwtzsb8q1rhy",
+      "css": "attention",
+      "code": 59417,
+      "src": "modernpics"
+    },
+    {
+      "uid": "a66a6e088038a1881d532b6675bf8412",
+      "css": "info",
+      "code": 59418,
+      "src": "modernpics"
+    },
+    {
+      "uid": "23d1c53bc15ca452df9453450e94a19c",
+      "css": "question",
+      "code": 59419,
+      "src": "modernpics"
+    },
+    {
+      "uid": "too2rspp5e6z6m0y6lconmv23uw3qlqo",
+      "css": "location",
+      "code": 59420,
+      "src": "modernpics"
+    },
+    {
+      "uid": "t7uz7sms69yuckjmkp1zqggwr4jkw0o9",
+      "css": "doc",
+      "code": 59422,
+      "src": "modernpics"
+    },
+    {
+      "uid": "573lc53801tfc96xt7fubn59tb0o5s4y",
+      "css": "article",
+      "code": 59423,
+      "src": "modernpics"
+    },
+    {
+      "uid": "pzy4lq1ak4datbxpdfj3ya74vjfhwxg1",
+      "css": "article-alt",
+      "code": 59424,
+      "src": "modernpics"
+    },
+    {
+      "uid": "33iuue66u2628uv4kz3vnmh8uee8o7rw",
+      "css": "rss",
+      "code": 59425,
+      "src": "modernpics"
+    },
+    {
+      "uid": "9avusbdkm7q4vcmevr0x88zxewys65wr",
+      "css": "clock-alt",
+      "code": 59426,
+      "src": "modernpics"
+    },
+    {
+      "uid": "dsfybb9l0x5fyd7e3o5kyisqppifztfu",
+      "css": "resize-full",
+      "code": 59427,
+      "src": "modernpics"
+    },
+    {
+      "uid": "yc4vm9xepijcjyfdp6mgkvju8engb212",
+      "css": "zoom-in",
+      "code": 59429,
+      "src": "modernpics"
+    },
+    {
+      "uid": "itjusjx5w85jr0udgi40mz7x2kmj1360",
+      "css": "zoom-out",
+      "code": 59430,
+      "src": "modernpics"
+    },
+    {
+      "uid": "b2i5x0ka1m6pskm3puj9jppl672knd5c",
+      "css": "popup",
+      "code": 59431,
+      "src": "modernpics"
+    },
+    {
+      "uid": "8ax1xqcbzz1hobyd4i7f0unwib1bztip",
+      "css": "down-dir",
+      "code": 59432,
+      "src": "modernpics"
+    },
+    {
+      "uid": "am79573ydakwiicuct1odx7f2e9zv8lv",
+      "css": "left-dir",
+      "code": 59433,
+      "src": "modernpics"
+    },
+    {
+      "uid": "3iwbntpxmp0kvbvzaxrh8h30xw1l6zvn",
+      "css": "down",
+      "code": 59436,
+      "src": "modernpics"
+    },
+    {
+      "uid": "giaskl13npzvuuz2ovy3vw8s0bewik08",
+      "css": "up",
+      "code": 59437,
+      "src": "modernpics"
+    },
+    {
+      "uid": "v4mhug5rzlh2qzlo09kfx03e6e2alqql",
+      "css": "cw",
+      "code": 59438,
+      "src": "modernpics"
+    },
+    {
+      "uid": "ogmm8kz4f7y6ji50gzajnwed8h6ck2u7",
+      "css": "chart-bar",
+      "code": 59439,
+      "src": "modernpics"
+    },
+    {
+      "uid": "crns7fze53tnmwvi0wyfhq8whxfmmroz",
+      "css": "chart-pie",
+      "code": 59440,
+      "src": "modernpics"
+    },
+    {
+      "uid": "6ipws8y9gej6vbloufvhi5qux7rluf64",
+      "css": "up-dir",
+      "code": 59435,
+      "src": "modernpics"
+    },
+    {
+      "uid": "gypcofts1tkouwkxbv8d33eanqpreyy9",
+      "css": "right-dir",
+      "code": 59434,
+      "src": "modernpics"
+    },
+    {
+      "uid": "7yekfd0qlkgp6emwfbo10sjdmf8pewli",
+      "css": "download",
+      "code": 59403,
+      "src": "typicons"
+    },
+    {
+      "uid": "6fe95ffc3c807e62647d4f814a96e0d7",
+      "css": "sitemap",
+      "code": 61672,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "5f0f183e241d15cbe486bff88b188dff",
+      "css": "puzzle",
+      "code": 61742,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "44a0e2660ac966cdfaa04deb6aac51df",
+      "css": "shield",
+      "code": 61746,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e6ad31134a018fdeb64efe72d39edd65",
+      "css": "tag",
+      "code": 59445,
+      "src": "websymbols"
+    },
+    {
+      "uid": "a1be363d4de9be39857893d4134f6215",
+      "css": "picture",
+      "code": 59444,
+      "src": "elusive"
+    },
+    {
+      "uid": "3def559c3c39b8500882e02892b7daa8",
+      "css": "picture-1",
+      "code": 59448,
+      "src": "entypo"
+    },
+    {
+      "uid": "559647a6f430b3aeadbecd67194451dd",
+      "css": "menu",
+      "code": 61641,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "616b755d0f4c7d2dc7a1dcc2e5427039",
+      "css": "down-open",
+      "code": 59449,
+      "src": "elusive"
+    },
+    {
+      "uid": "b91c0e6aaab5e3146732b69dd418e120",
+      "css": "up-open",
+      "code": 59451,
+      "src": "elusive"
+    },
+    {
+      "uid": "c0a07aca383ff2a164a4d691fa46e35c",
+      "css": "left-open",
+      "code": 59452,
+      "src": "elusive"
+    },
+    {
+      "uid": "57776e51a50e3b4d92701bdbbba01588",
+      "css": "resize-full-1",
+      "code": 59458,
+      "src": "elusive"
+    },
+    {
+      "uid": "64abb7c56aefca89046bb69f7251d2e2",
+      "css": "calendar",
+      "code": 59459,
+      "src": "elusive"
+    },
+    {
+      "uid": "1e32e1f8787cf3cb9f52f8850822dcb6",
+      "css": "cogs",
+      "code": 59460,
+      "src": "elusive"
+    },
+    {
+      "uid": "cde79a37774e5817bc68fff2464aee28",
+      "css": "wrench",
+      "code": 59461,
+      "src": "elusive"
+    },
+    {
+      "uid": "6083c8aa5e3345476a24a28ac1afaa61",
+      "css": "cog",
+      "code": 59462,
+      "src": "elusive"
+    },
+    {
+      "uid": "657ab647f6248a6b57a5b893beaf35a9",
+      "css": "lock-open",
+      "code": 59404,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "05376be04a27d5a46e855a233d6e8508",
+      "css": "lock-open-alt",
+      "code": 61758,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "c1f1975c885aa9f3dad7810c53b82074",
+      "css": "lock",
+      "code": 59405,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "b035c28eba2b35c6ffe92aee8b0df507",
+      "css": "attention-circled",
+      "code": 59443,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "7f6916533c0842b6cec699fd773693d3",
+      "css": "hourglass",
+      "code": 59464,
+      "src": "entypo"
+    },
+    {
+      "uid": "9b0229b620364d8704940e408dde73fb",
+      "css": "spinner2",
+      "code": 62761,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "17ebadd1e3f274ff0205601eef7b9cc4",
+      "css": "help-circled",
+      "code": 59465,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "fccd3ea0efb711b849045bee686b1ceb",
+      "css": "spinner1",
+      "code": 62760,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "ccf7ed45e7f05a89376f38abaa9d7d13",
+      "css": "twitter-circled",
+      "code": 61527,
+      "src": "mfglabs"
+    },
+    {
+      "uid": "0f6a2573a7b6df911ed199bb63717e27",
+      "css": "github-circled",
+      "code": 61595,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "33cea6d7bd699348c0d593e105361a51",
+      "css": "facebook-circled",
+      "code": 59441,
+      "src": "typicons"
+    },
+    {
+      "uid": "28r0xthd180mg0wnfh8ek3mtn761hs11",
+      "css": "reply",
+      "code": 59392,
+      "src": "typicons"
+    },
+    {
+      "uid": "399ef63b1e23ab1b761dfbb5591fa4da",
+      "css": "right-open",
+      "code": 59466,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "16890362e811b4cb8de36282b071fe30",
+      "css": "comment-dark",
+      "code": 59396,
+      "src": "entypo"
+    },
+    {
+      "uid": "679d36f8485f05180a2719c91b3f621e",
+      "css": "comment",
+      "code": 59397,
+      "src": "iconic"
+    },
+    {
+      "uid": "197375a3cea8cb90b02d06e4ddf1433d",
+      "css": "globe",
+      "code": 59407,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6a12c2b74456ea21cc984e11dec227a1",
+      "css": "globe-1",
+      "code": 59410,
+      "src": "entypo"
+    },
+    {
+      "uid": "fd32deda7b2f5b8cad46d13897c19ae8",
+      "css": "cancel-circled",
+      "code": 59421,
+      "src": "elusive"
+    },
+    {
+      "uid": "67a9d2e5512b8aa812eff7da6d36bffc",
+      "css": "ok-circled",
+      "code": 59428,
+      "src": "elusive"
+    },
+    {
+      "uid": "b35d6abdf5632eafeeb91377b0b6e9a1",
+      "css": "minus-circled",
+      "code": 59414,
+      "src": "elusive"
+    },
+    {
+      "uid": "ad194658d0e68d781eb334d9c1099d6e",
+      "css": "lock-circled",
+      "code": 59446,
+      "src": "elusive"
+    },
+    {
+      "uid": "6ad86a953a5a76086c5568366863bbca",
+      "css": "torso",
+      "code": 59447,
+      "src": "elusive"
+    },
+    {
+      "uid": "414fe97e4af5215a06d29be0f2cecdf5",
+      "css": "network",
+      "code": 59450,
+      "src": "entypo"
+    },
+    {
+      "uid": "cd21cbfb28ad4d903cede582157f65dc",
+      "css": "bell",
+      "code": 59415,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "8a074400a056c59d389f2d0517281bd5",
+      "css": "bell-off",
+      "code": 61943,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "671f29fa10dda08074a4c6a341bb4f39",
+      "css": "bell-alt",
+      "code": 61683,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "563683020e0bf9f22f3f055a69b5c57a",
+      "css": "bell-alt-off",
+      "code": 61942,
+      "src": "fontawesome"
+    }
+  ]
+}

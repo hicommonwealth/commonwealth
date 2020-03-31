@@ -1,0 +1,21 @@
+.HedgehogLoginForm {
+    .hedgehog-note {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 24px;
+        text-align: left;
+        p {
+            margin: 6px 0;
+        }
+    }
+    input {
+        margin-bottom: 10px;
+    }
+    input[type="password"] {
+        margin-bottom: 20px;
+    }
+    .login-with-web3 {
+        display: block;
+        margin: 10px 0;
+    }
+}

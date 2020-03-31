@@ -1,0 +1,29 @@
+.DS_Store
+*.pyc
+/venv
+/build
+node_modules/
+jsconfig.json
+.vscode
+psql.sh
+yarn-error.log
+.nyc_output/
+coverage/
+*.sw*
+.env
+
+# Database downloads
+latest.dump
+latest.dump.*
+
+# Cosmos TX
+tx.json
+
+# Ethereum contracts
+contractbase/eth/build
+
+# Webpack profiling
+stats.json
+
+# Test account artefacts
+test_accounts.txt

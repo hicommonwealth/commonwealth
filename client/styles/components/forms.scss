@@ -1,0 +1,49 @@
+@import 'client/styles/shared';
+
+.FormField {
+    .form-group {
+        margin-bottom: 22px;
+    }
+    .form-group .form-title {
+        display: inline-block;
+        line-height: 1.3;
+    }
+    .form-group .form-subtitle {
+        display: inline-block;
+        margin-left: 6px;
+        line-height: 1.3;
+        font-size: 85%;
+        color: #aaa;
+    }
+    .form-group .form-field {
+        margin-top: 8px;
+    }
+    .form-group .radio-buttons {
+        padding-top: 2px;
+    }
+    .form-group .radio-buttons.form-field input[type="radio"] {
+        margin-right: 10px;
+    }
+    .form-group .radio-buttons.form-field label {
+        margin-right: 20px;
+        position: relative;
+        top: 1px;
+    }
+}
+.ButtonSelectorFormField,
+.MultipleButtonSelectorFormField {
+    .form-group {
+        margin-bottom: 19px;
+    }
+    .form-field.buttons button {
+        display: inline-block;
+        margin: 3px;
+    }
+    .form-field.buttons button.active {
+        color: #fff;
+        background-color: #08c;
+        border-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
+}

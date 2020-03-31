@@ -1,0 +1,27 @@
+@import 'client/styles/shared';
+
+.ProposalsPage {
+    // TODO: duplicated
+    h4.proposals-subheader {
+        text-transform: uppercase;
+        color: #999;
+        letter-spacing: 0.4px;
+        margin-top: 26px;
+        font-weight: 500;
+    }
+    a.proposals-action {
+        float: right;
+        margin-left: 10px;
+        color: #999;
+        cursor: pointer;
+        &:hover {
+            color: #555;
+        }
+        @include xs-max {
+            float: none;
+        }
+    }
+    .proposals {
+        padding-top: 10px;
+    }
+}

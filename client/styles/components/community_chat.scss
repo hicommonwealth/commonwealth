@@ -1,0 +1,106 @@
+@import 'client/styles/shared';
+
+.CommunityChat {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    $chat-width: 315px;
+    $chat-messages-height: 220px;
+    $chat-vpadding: 12px;
+    $chat-hpadding: 22px;
+    $border-radius: 3px 3px 0 0;
+
+    .chat-popup {
+        position: absolute;
+        right: 16px;
+        bottom: 0;
+        width: $chat-width;
+        background: #fff;
+        box-shadow: 0 0 4px rgba(0,0,0,0.07);
+        border-radius: $border-radius;
+
+        @include md-max {
+            right: 24px;
+        }
+    }
+    .chat-popup.collapsed {
+        .chat-messages,
+        .chat-composer,
+        .chat-composer-unavailable {
+            display: none;
+        }
+    }
+    .chat-header {
+        border-radius: $border-radius;
+        background: lighten(#282625, 6%);
+        color: #fff;
+        font-weight: 600;
+        padding: $chat-vpadding $chat-hpadding ($chat-vpadding - 1px);
+        line-height: 1.1;
+        cursor: pointer;
+        user-select: none;
+        &:active {
+            background: lighten(#282625, 8%);
+        }
+        .typing-indicator {
+            font-weight: 400;
+            color: #999;
+            margin-left: 6px;
+        }
+    }
+    .chat-messages {
+        max-height: 50vh;
+        min-height: $chat-messages-height;
+        overflow-y: scroll;
+        padding: 0 $chat-hpadding;
+        .chat-message-placeholder {
+            margin: 16px 0;
+            color: #999;
+        }
+        .chat-message-group {
+            margin: 18px 0;
+        }
+        .chat-message-group + .chat-message-group {
+            margin-top: 20px;
+        }
+        .chat-message-group-timestamp {
+            float: right;
+            color: #aaa;
+        }
+        .chat-message-text {
+            margin: 2px 0;
+        }
+        .User {
+            margin-bottom: 4px;
+            a {
+                color: #999;
+                text-decoration: none;
+            }
+        }
+        .chat-messages-typing {
+            color: #aaa;
+            margin: 8px 0;
+        }
+    }
+    .chat-composer-unavailable {
+        border-top: 1px solid #eee;
+        padding: $chat-vpadding $chat-hpadding;
+        font-size: 98%;
+        color: #aaa;
+    }
+    .chat-composer {
+        padding: 0;
+        border-top: 1px solid #eee;
+        textarea.ResizableTextarea {
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            padding: $chat-vpadding $chat-hpadding;
+            resize: none;
+            min-height: 0;
+            max-height: 110px;
+        }
+    }
+}

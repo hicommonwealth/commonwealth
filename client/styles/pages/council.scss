@@ -1,0 +1,45 @@
+@import 'client/styles/shared';
+
+a.CollectiveMember, a.CouncilCandidate, a.CouncilElectionVoter {
+    display: flex;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+    background: #fff;
+    border-radius: 3px;
+    margin: 10px 0;
+    padding: 15px 20px 13px;
+    cursor: pointer;
+    // link styling
+    text-decoration: none;
+    color: #111;
+    @include hoverFloat;
+    .col-member {
+        width: 200px;
+    }
+    .col-info {
+        flex: 1;
+    }
+}
+
+.CouncilPage {
+    // TODO: duplicated
+    h4.proposals-subheader {
+        text-transform: uppercase;
+        color: #999;
+        letter-spacing: 0.4px;
+        margin-top: 26px;
+        font-weight: 500;
+    }
+    a.proposals-action {
+        float: right;
+        margin-left: 10px;
+        color: #999;
+        cursor: pointer;
+        &:hover {
+            color: #555;
+        }
+        @include xs-max {
+            float: none;
+        }
+    }
+}

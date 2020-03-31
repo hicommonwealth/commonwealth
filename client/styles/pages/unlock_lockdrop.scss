@@ -1,0 +1,103 @@
+.UnlockPage {
+    .content {
+        background: #fff;
+        border: 1px solid #eee;
+        margin: 20px 0;
+        padding: 20px 34px 0;
+    }
+    .error-message,
+    .success-message {
+        margin: 20px 0;
+        font-weight: 700;
+    }
+    .error-message {
+        color: #d32e26;
+    }
+    .success-message {
+        color: green;
+    }
+
+    // shared styles
+    .form-field {
+        display: flex;
+        margin: 34px 0;
+        input[type="text"] + input[type="text"] {
+            margin: 10px 0;
+        }
+        .form-left {
+            flex: 1;
+            width: 59%;
+            padding-right: 35px;
+        }
+        .explanation {
+            width: 41%;
+        }
+        .caption {
+            margin-bottom: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 4px;
+        }
+        label input[type="radio"] {
+            position: relative;
+            top: -3px;
+            margin-right: 12px;
+        }
+        input[type="text"] {
+            display: block;
+            width: 100%;
+        }
+        input[type="text"][readonly] {
+            background: #f8f8f8;
+        }
+        .buttons {
+            margin: 14px 0 16px;
+        }
+        button {
+            display: block;
+            margin-bottom: 8px;
+        }
+        .explanation {
+            display: block;
+            color: #aaa;
+            padding-top: 30px;
+        }
+        .explanation p {
+            margin: 10px 0;
+        }
+        .explanation a {
+            color: #aaa;
+        }
+        .explanation a:hover {
+            color: #555;
+        }
+        .network-selector {
+            margin-top: 12px;
+        }
+        .network-selector label {
+            display: inline-block;
+            margin-right: 20px;
+        }
+    }
+    @media (max-width: 880px) {
+        .form-field {
+            display: block;
+        }
+        .form-field .form-left,
+        .form-field .explanation {
+            width: 100%;
+            margin: 10px 0;
+            padding: 0;
+        }
+        .buttons button {
+            width: 100%;
+        }
+    }
+}
+
+.LockContractComponent {
+}
+
+.ContractOption {
+}
