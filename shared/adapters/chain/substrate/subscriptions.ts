@@ -231,12 +231,12 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
         })
       ),
       api.query.democracy.dispatchQueue().pipe(
-        map((queue) => {
+        flatMap((queue) => {
           const data = queue.find(([executionBlock, hash, idx]) => +idx === proposal.index);
           if (data) {
             const [ executionBlock ] = data;
             state.executionBlock = +executionBlock;
-            return state;
+            return of(state);
           } else {
             return never();
           }
