@@ -14,7 +14,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
-
+import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 
@@ -27,6 +27,7 @@ import addTestChainObjectQueries from './server/scripts/addTestChainObjectQuerie
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 
@@ -118,6 +119,7 @@ const setupMiddleware = () => {
   app.use(sessionParser);
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
 
   // store wss into request obj
   app.use((req: UserRequest, res, next) => {
@@ -134,6 +136,7 @@ const templateFile = (() => {
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
+setupPrerenderServer();
 setupMiddleware();
 setupPassport(models);
 setupAPI(app, models, viewCountCache);

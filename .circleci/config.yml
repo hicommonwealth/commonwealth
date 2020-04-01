@@ -44,6 +44,9 @@ jobs:
           name: wait for mock provider server
           command: dockerize -wait tcp://localhost:4000 -timeout 1m
       - run:
+          name: install headless chrome
+          command: ./scripts/install_headless_chrome.sh
+      - run:
           name: start main server
           command: yarn start-ci
           background: true
