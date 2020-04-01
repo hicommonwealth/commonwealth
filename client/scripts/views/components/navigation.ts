@@ -1,4 +1,5 @@
 import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading } from 'construct-ui';
+import Infinite from "mithril-infinite"
 import { selectLogin } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
 
@@ -206,10 +207,15 @@ const Navigation: m.Component<{}, {}> = {
                 align: 'left',
               },
               class: 'notification-menu',
-              style: 'max-height: 500px; overflow-y: scroll;',
-              content: notifications.length > 0
-                ? notifications.map((notification) => m(NotificationRow, { notification }))
-                : m('li.no-notifications', 'No Notifications'),
+              content: m('.notification-list', [
+                notifications.length > 0
+                  ? m(Infinite, {
+                    maxPages: 8,
+                    pageData: () => notifications,
+                    item: (data, opts, index) => m(NotificationRow, { notification: data }),
+                  })
+                  : m('li.no-notifications', 'No Notifications'),
+              ]),
             }),
             // invites menu
             app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
