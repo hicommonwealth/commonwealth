@@ -1,22 +1,15 @@
-import { default as toastr } from 'toastr';
+// TODO: Remove this file; we can just use app.toasts instead of notifyError now
 
-toastr.options.positionClass = 'toast-bottom-left';
-toastr.options.hideDuration = 500;
-toastr.options.timeOut = 4000;
-toastr.options.escapeHtml = true;
+import app from 'state';
 
 export function notifyError(message: string) {
-  toastr.error(message);
+  app.toasts.createError(message);
 }
 
 export function notifySuccess(message: string) {
-  toastr.success(message);
-}
-
-export function notifyWarning(message: string) {
-  toastr.warning(message);
+  app.toasts.createSuccess(message);
 }
 
 export function notifyInfo(message: string) {
-  toastr.info(message);
+  app.toasts.createInfo(message);
 }

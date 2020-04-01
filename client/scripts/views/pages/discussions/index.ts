@@ -1,3 +1,5 @@
+import { Button, Icons } from 'construct-ui';
+
 /* eslint-disable no-unused-expressions */
 import 'pages/discussions.scss';
 
@@ -57,9 +59,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         : (activeEntity.meta as NodeInfo).chain);
     }
 
-    const pinnedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-      .filter((proposal) => proposal.pinned)
-      .map((proposal) => m(DiscussionRow, { proposal }));
     // comparator
     const orderDiscussionsbyLastComment = (a, b) => {
       // tslint:disable-next-line
@@ -229,43 +228,10 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         ]),
         m('.col-sm-4.col-md-3', [
           m('.discussions-description', [
-            m('h4', 'About this community'),
-            m('h2.community-name', [
-              (app.chain && app.chain.meta && app.chain.meta.chain)
-                ? app.chain.meta.chain.name
-                : (!app.chain && app.community && app.community.meta)
-                  ? app.community.meta.name
-                  : 'Community',
-            ]),
-            !app.chain && app.community && app.community.meta.privacyEnabled && m('.community-privacy', [
-              'Private community',
-              m('span.icon-lock'),
-              app.community.meta.invitesEnabled && m('span.icon-mail', {
-                title: 'Members may invite new members'
-              }),
-            ]),
-            !app.chain && app.community && !app.community.meta.privacyEnabled && m('.community-privacy', [
-              'Public community ',
-              m('span.icon-globe'),
-            ]),
-            m('p.community-description', [
-              (app.chain && app.chain.meta && app.chain.meta.chain) ? app.chain.meta.chain.description
-                : (!app.chain && app.community && app.community.meta) ? app.community.meta.description
-                  : 'A new Commonwealth community',
-            ]),
             app.isLoggedIn() && [
-              (app.activeCommunityId() && app.community?.meta.privacyEnabled) ?
-                m('a.btn.btn-block.disabled.MembershipButton', 'Joined ✓') :
-                m(MembershipButton, { chain: app.activeChainId(), community: app.activeCommunityId() }),
               m(DiscussionsSubscriptionButton),
             ],
-            m('h4.sidebar-header', 'Tags'),
             m(TagSelector, { activeTag: vnode.attrs.tag }),
-            pinnedThreads.length > 0
-            && [
-              m('h4.sidebar-header', 'Pinned'),
-              m('.pinned-container.discussion-group-wrap', pinnedThreads),
-            ],
             m(ChainOrCommunityRoles),
           ]),
         ]),

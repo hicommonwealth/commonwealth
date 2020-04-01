@@ -1,16 +1,17 @@
 import 'layout.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 
 import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
-import { default as app } from 'state';
+import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import Header from 'views/components/header';
-import Footer from 'views/components/footer';
+import Navigation from 'views/components/navigation';
+import Sidebar from 'views/components/sidebar';
 import CommunityChat from 'views/components/community_chat';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
+import { AppToasts } from 'views/toast';
 import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
@@ -22,9 +23,15 @@ interface ILayoutAttrs {
 export const LoadingLayout: m.Component<{}> = {
   view: (vnode) => {
     return m('.mithril-app', [
-      m(Header),
-      m('.LoadingLayout'),
+      app.isLoggedIn() && m(Sidebar),
+      m(Navigation),
+      m('.layout-content', {
+        class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
+      }, [
+        m('.LoadingLayout'),
+      ]),
       m(AppModals),
+      m(AppToasts),
     ]);
   }
 };
@@ -41,11 +48,17 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.mithril-app', [
-        m(Header),
-        m('.clear'),
-        m(PageNotFound),
-        m(Footer),
+        app.isLoggedIn() && m(Sidebar),
+        m(Navigation),
+        m('.layout-content', {
+          class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
+        }, [
+          m('.clear'),
+          m(PageNotFound),
+        ]),
+        //m(CommunityChat),
         m(AppModals),
+        m(AppToasts),
       ]);
     } else if (vnode.attrs.scope &&
                vnode.attrs.scope !== app.activeId() &&
@@ -71,12 +84,17 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
     }
 
     return m('.mithril-app', [
-      m(Header),
-      m('.clear'),
-      vnode.children,
-      m(Footer),
+      app.isLoggedIn() && m(Sidebar),
+      m(Navigation),
+      m('.layout-content', {
+        class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
+      }, [
+        m('.clear'),
+        vnode.children,
+      ]),
       //m(CommunityChat),
       m(AppModals),
+      m(AppToasts),
     ]);
   }
 };

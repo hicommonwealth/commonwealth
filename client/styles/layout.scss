@@ -4,22 +4,11 @@
     box-sizing: border-box;
 }
 html, body {
-    position: relative;
+    position: fixed;
     height: 100%;
-}
-@include xs-max {
-    html, body {
-        position: fixed;
-        overflow: hidden;
-        box-sizing: border-box;
-        width: 100%;
-        .mithril-app {
-            height: 100%;
-            width: 100%;
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
-        }
-    }
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -29,6 +18,13 @@ html {
     -webkit-font-smoothing: antialiased;
     background: #f7f7f7;
 }
+.mithril-app {
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
 }
@@ -246,16 +242,6 @@ body.modal-open {
     }
 }
 
-.mithril-app.app-error {
-    padding: 40px;
-    margin: 0 auto;
-    max-width: 720px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 1.35;
-    color: #555;
-}
-
 .container {
     position: relative;
     max-width: 1180px;
@@ -267,8 +253,23 @@ body.modal-open {
     }
 }
 
+.layout-content {
+    padding-left: 310px;
+    padding-top: 20px;
+    &.logged-out {
+        padding-left: 310px - 80px;
+    }
+}
+
 @media (max-width: 680px) {
     .hidden-on-mobile {
         display: none;
     }
+}
+
+// The declarative construct-ui toaster doesn't allow
+// position to be set by default, so we just override it here
+.cui-toaster.cui-toaster-top {
+    top: auto;
+    bottom: 0;
 }

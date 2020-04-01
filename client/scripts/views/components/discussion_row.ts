@@ -7,7 +7,6 @@ import { default as moment } from 'moment-twitter';
 import app from 'state';
 import { pluralize, slugify, link, externalLink } from 'helpers';
 
-import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind } from 'models/models';
 
@@ -18,8 +17,7 @@ interface IAttrs {
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
-  if (timestamp.isBefore(moment().subtract(7, 'days'))) return timestamp.fromNow(true).replace(' days', 'd');
-  else return timestamp.twitterShort(true);
+  return timestamp.fromNow();
 };
 
 const DiscussionRow: m.Component<IAttrs> = {
@@ -64,29 +62,29 @@ const DiscussionRow: m.Component<IAttrs> = {
           }),
         ]),
         m('.discussion-content', [
+          m('.discussion-content-top', [
+            getContent(proposal),
+          ]),
           m('.discussion-meta', [
             m(User, {
               user: [proposal.author, proposal.authorChain],
               linkify: true,
               tooltip: true,
             }),
+            app.comments.nComments(proposal) > 0 && [
+              m.trust(' &mdash; '),
+              link('a.discussion-replies',
+                   `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
+                     pluralize(app.comments.nComments(proposal), 'comment'),
+                   ]),
+            ],
+            //formatLastUpdated(lastUpdated),
+          ]),
+        ]),
+        m('.discussion-after', [
             proposal.tags.map((tag) => {
               return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
             }),
-          ]),
-          m('.discussion-content-top', getContent(proposal)),
-        ]),
-        m('.discussion-date', [
-          m('a.discussion-updated', formatLastUpdated(lastUpdated)),
-        ]),
-        m('.discussion-after', [
-            app.comments.nComments(proposal) > 0 &&
-            link('a.discussion-replies',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                app.comments.nComments(proposal) + ' ',
-                m('span.icon-comment'),
-              ]),
-          m(ReactionButton, { proposal, type: ReactionType.Like, displayAsLink: true }),
         ]),
       ]),
       m('.discussion-content-mobile', getContent(proposal)),

@@ -1,0 +1,65 @@
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 72px;
+    bottom: 0;
+    background: #e4e4e6;
+    padding: 2px 0;
+    z-index: 10;
+
+    $size: 42px;
+
+    a.SidebarChainIcon,
+    a.SidebarCommunityIcon,
+    .SidebarManageIcon,
+    .SidebarSettingsMenu .trigger {
+        display: block;
+        width: $size;
+        height: $size;
+        border-radius: 8px;
+        margin: 15px;
+        text-align: center;
+        text-decoration: none;
+        color: #eee;
+        font-weight: 500;
+        .ChainIcon img {
+            width: $size;
+            height: $size;
+        }
+        opacity: 0.3;
+        &:hover, &.active {
+            opacity: 1;
+        }
+        .name {
+            position: relative;
+            top: 11px;
+        }
+    }
+    .SidebarSettingsMenu {
+        position: absolute;
+        bottom: 0;
+        margin: 16px;
+    }
+    a.SidebarCommunityIcon,
+    .SidebarManageIcon {
+        background: #36393f;
+        &:hover, &.active {
+            background: darken(#36393f, 7%);
+        }
+    }
+    .SidebarManageIcon {
+        color: #fff;
+        cursor: pointer;
+        .cui-icon {
+            position: relative;
+            top: 9px;
+        }
+    }
+}
+
+.SidebarTooltip {
+    font-weight: 500;
+    margin: 1px 4px 0;
+    line-height: 1.1;
+}

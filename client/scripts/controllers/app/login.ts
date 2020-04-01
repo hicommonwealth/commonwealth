@@ -31,41 +31,19 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
   }
 }
 
-export function updateActiveAddresses(newChain?: ChainInfo) {
-  // if newChain is set, then update addresses for a chain (filter to addresses matching that chain)
-  // if newChain is unset, then update addresses for an offchain community (add all saved addresses)
-  try {
-    app.login.activeAddresses = newChain
-      ? app.login.addresses
-        .filter((a) => a.chain === newChain.id)
-        .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
-        .map((addr) => app.chain.accounts.get(addr.address, addr.keytype))
-      : app.login.addresses
-        .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
-        .map((addr) => app.community.accounts.get(addr.address, addr.chain));
-  } catch (e) {
-    app.login.activeAddresses = [];
-  }
-  // set active account if there isn't one yet
-  if (app.login.activeAddresses.length > 0) {
-    app.vm.activeAccount = app.login.activeAddresses[0];
-  } else {
-    app.vm.activeAccount = null;
-  }
+export function updateActiveAddresses(chain?: ChainInfo) {
+  // update addresses for a chain (if provided) or for an offchain community
+  app.login.activeAddresses = chain
+    ? app.login.addresses
+      .filter((a) => a.chain === chain.id)
+      .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
+      .map((addr) => app.chain.accounts.get(addr.address, addr.keytype))
+    : app.login.addresses
+      .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
+      .map((addr) => app.community.accounts.get(addr.address, addr.chain));
 
-  // populate dev seed addresses
-  if (newChain && newChain.network === 'edgeware') {
-    app.login.activeAddresses.map((acct) => {
-      ['Alice', 'Bob', 'Charlie', 'Dave', 'Eve', 'Ferdie',
-       'Alice//stash', 'Bob//stash', 'Charlie//stash',
-       'Dave//stash', 'Eve//stash', 'Ferdie//stash'].map((seed) => {
-         const newAcct = (app.chain.accounts as SubstrateAccounts).fromSeed(seed);
-         if (acct instanceof SubstrateAccount && !acct.getSeed() && acct.address === newAcct.address) {
-           acct.setSeed(seed);
-         }
-      });
-    });
-  }
+  // TODO: select the default active account for the chain/community
+  app.vm.activeAccount = null;
 }
 
 // called from the server, which returns public keys

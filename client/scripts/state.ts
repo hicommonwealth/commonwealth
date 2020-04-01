@@ -1,6 +1,7 @@
 import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'models/stores';
 import { NodeInfo, AddressInfo, MembershipInfo, SocialAccount, OffchainTag, ContractCategory, Account,
          IChainAdapter, ICommunityAdapter, NotificationCategory } from 'models/models';
+import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { Subject, ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
@@ -41,6 +42,7 @@ interface IApp {
   activeId(): string;
   defaultScope(): string;
 
+  toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
   login: {
@@ -92,6 +94,7 @@ const app: IApp = {
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 
+  toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   login: {

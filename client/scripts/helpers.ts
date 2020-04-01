@@ -3,6 +3,10 @@ import { default as moment } from 'moment-twitter';
 
 import app from 'state';
 
+export async function sleep(msec) {
+  return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
 /*
  * mithril link helper
  */

@@ -15,24 +15,16 @@ import PageLoading from 'views/pages/loading';
 // import { OffchainComment, Proposal, AnyProposal } from 'models/models';
 // import { default as CommentsController } from 'controllers/server/comments';
 // import { default as AdminController } from 'controllers/server/comments';
+import { DropdownFormField } from '../components/forms';
+import Substrate from 'controllers/chain/substrate/main';
+import { switchMap } from 'rxjs/operators';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { ISubmittableResult } from '@polkadot/types/types';
+import EdgewareFunctionPicker from '../components/edgeware_function_picker';
+import CreateCommunityModal from 'views/modals/create_community_modal';
+import User from 'views/components/widgets/user';
 
 import ListingPage from 'views/pages/_listing_page';
-
-// for styleguide: models
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-// for styleguide: widgets
-import DropdownButton from 'views/components/widgets/dropdown_button';
-import User from 'views/components/widgets/user';
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
-import PopopenTruncatedText from 'views/components/widgets/popopen_truncated_text';
-import EdgewareFunctionPicker from '../components/edgeware_function_picker';
-import { switchMap } from 'rxjs/operators';
-import Substrate from 'controllers/chain/substrate/main';
-import { ISubmittableResult } from '@polkadot/types/types';
-import { DropdownFormField } from '../components/forms';
-import CreateCommunityModal from 'views/modals/create_community_modal';
-import CreateInviteModal from 'views/modals/create_invite_modal';
-
 
 interface IChainManagerAttrs {
   success?: string;
@@ -251,144 +243,6 @@ const ChainStats: m.Component<{}> = {
       stat('Candidacy bond',      formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)),
       m('br'),
     ]);
-  }
-};
-
-const ComponentLibrary: m.Component<{}> = {
-  view: (vnode) => {
-    const accts = (app.chain) ? (app.chain as Substrate).accounts.store.getAll() :
-      app.community.accounts.store.getAll();
-    const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.`;
-    const preformatted =
-      `$ hs-airdrop ~/.gnupg/secring.gpg 0x12345678 ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5
-$ hs-airdrop ~/.ssh/id_rsa ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5
-$ hs-airdrop ~/.ssh/id_rsa ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5 --bare
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 5000
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 2 # shares
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 1000000 --sponsor`;
-    const placeholder = 'Placeholder...';
-
-    return [
-      // type
-      m('h4', 'Typography'),
-      m('.well', [
-        m('h1', 'Header 1'),
-        m('h2', 'Header 2'),
-        m('h3', 'Header 3'),
-        m('h4', 'Header 4'),
-        m('p', lorem),
-        m('blockquote', lorem),
-        m('pre', preformatted),
-        m('ul', [
-          m('li', 'First, unlock your wallet'),
-          m('li', 'Second, sign a message'),
-          m('li', 'Third, send a transaction'),
-        ]),
-        m('ol', [
-          m('li', 'First, unlock your wallet'),
-          m('li', 'Second, sign a message'),
-          m('li', 'Third, send a transaction'),
-        ]),
-      ]),
-
-      // inputs
-      m('h4', 'Inputs'),
-      m('.well', [
-        m('.form-group', [
-          m('input[type="text"]', { placeholder: placeholder }),
-          m('input[type="submit"]', { value: 'Submit Button' }),
-          m('input[type="button"]', { value: 'Cancel Button' }),
-          m('textarea', { placeholder: placeholder }),
-        ]),
-        m('.form-group', [
-          m('input[type="checkbox"]', { id: 'check1' }),
-          m('label', { for: 'check1' }, 'Option One'),
-          m('input[type="checkbox"]', { id: 'check2' }),
-          m('label', { for: 'check2' }, 'Option Two'),
-          m('input[type="checkbox"]', { id: 'check3' }),
-          m('label', { for: 'check3' }, 'Option Three'),
-        ]),
-        m('.form-group', [
-          m('input[type="radio"]', { id: 'radio1', name: 'group1' }),
-          m('label', { for: 'radio1' }, 'Option One'),
-          m('input[type="radio"]', { id: 'radio2', name: 'group1' }),
-          m('label', { for: 'radio2' }, 'Option Two'),
-          m('input[type="radio"]', { id: 'radio3', name: 'group1' }),
-          m('label', { for: 'radio3' }, 'Option Three'),
-        ]),
-        m('select', [
-          m('option', { value: 'eth', }, 'Ethereum'),
-          m('option', { value: 'atom', }, 'Cosmos'),
-          m('option', { value: 'dot', }, 'Polkadot'),
-          m('option', { value: 'edg', }, 'Edgeware'),
-        ]),
-      ]),
-
-      // buttons
-      m('h4', 'Buttons'),
-      m('.well', [
-        m('button', 'HTML Button'),
-        m('br'),
-        m('button', { type: 'submit', }, 'HTML Button'),
-        m('br'),
-        m('button.disabled', 'HTML Button'),
-        m('br'),
-        m('button.disabled', { type: 'submit', }, 'HTML Button'),
-      ]),
-
-      m('h4', 'Formular Buttons'),
-      m('.well', [
-        m('button.formular-button-positive', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-negative', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-secondary', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-tertiary', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-black', 'HTML Button'),
-      ]),
-
-      // Dropdown Button
-      m('h4', 'Dropdown Button'),
-      m('.well', [
-        m(DropdownButton, [
-          m('li', 'Option one'),
-          m('li', 'Option two'),
-        ])
-      ]),
-
-      // User
-      m('h4', 'User Widgets'),
-      m('section', [
-        accts.length > 0 ? [
-          m(User, { user: accts[0] }),
-          m(User, { user: accts[0] }),
-          m(User, { user: accts[0], linkify: true }),
-        ] : 'No user',
-      ]),
-
-      // PopopenTruncatedText
-      m('h4', 'Popopen Text'),
-      m('section', [
-        m(PopopenTruncatedText, { text: lorem, limit: 200 }),
-      ]),
-
-      // ResizableTextarea
-      m('h4', 'Auto-resize Textarea'),
-      m('section', [
-        m(ResizableTextarea, { placeholder }),
-        m('br'),
-        m(ResizableTextarea, { placeholder, rows: 1 }),
-      ]),
-    ];
   }
 };
 
@@ -736,9 +590,6 @@ const AdminPage: m.Component<{}> = {
         }, {
           name: 'Manage Chains and Nodes',
           content: m(ChainManager),
-        }, {
-          name: 'Component Library',
-          content: m(ComponentLibrary),
         }, {
           name: 'Generic Invite Links',
           content: m(GenericInviteLinks),

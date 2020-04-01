@@ -12,13 +12,10 @@
         font-weight: 700;
     }
     textarea {
-        padding: 13px 15px;
-        margin-top: 5px;
-        margin-bottom: 15px;
-        min-height: 80px;
+        min-height: 90px;
     }
     button {
-        margin-bottom: 5px;
+        margin-bottom: 4px;
     }
     .error-message {
         margin: 10px 0;
@@ -29,18 +26,5 @@
         margin: 10px 0;
         font-weight: 700;
         color: $success-green;
-    }
-    .feedback-explanation {
-        color: #aaa;
-        font-size: 14px;
-        margin: 15px 0 7px;
-        max-width: 324px;
-    }
-    @include sm-min {
-        textarea, .feedback-explanation {
-            min-width: 400px;
-            max-width: 400px;
-            width: 400px;
-        }
     }
 }

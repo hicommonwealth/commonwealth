@@ -3,8 +3,12 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 
+import 'construct-ui/src/utils/focus-manager/index.scss';
+import 'construct-ui/src/components/index.scss';
+
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
+import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
 
@@ -144,7 +148,9 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 
   // Reset the available addresses, unless we were already on an
   // offchain community in which case no change is needed
-  if (!oldCommunity) updateActiveAddresses();
+  if (!oldCommunity) {
+    updateActiveAddresses();
+  }
 
   // Redraw with community fully loaded
   m.redraw();
@@ -243,7 +249,8 @@ m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
   updateRoute.apply(this, args);
-  window.scrollTo(0, 0);
+  const container = document.getElementsByClassName('layout-content');
+  if (container.length > 0) container[0]?.scrollTo(0, 0);
 };
 
 // set up ontouchmove blocker
@@ -333,8 +340,7 @@ $(() => {
     '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal'), true),
     '/:scope/council':           importRoute(import('views/pages/council'), true),
     '/:scope/login':             importRoute(import('views/pages/login'), true),
-    '/:scope/new/link':          importRoute(import('views/pages/threads/NewLinkPage'), true),
-    '/:scope/new/thread':        importRoute(import('views/pages/threads/NewThreadPage'), true),
+    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),
     '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
@@ -354,6 +360,9 @@ $(() => {
     // NEAR login
     '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),
   });
+
+  // initialize construct-ui focus manager
+  FocusManager.showFocusOnlyOnTab();
 
   // initialize mixpanel, before adding an alias or tracking identity
   try {

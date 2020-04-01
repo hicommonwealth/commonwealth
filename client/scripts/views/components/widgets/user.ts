@@ -19,6 +19,7 @@ interface IAttrs {
   avatarSize?: number;
   avatarOnly?: boolean; // avatarOnly overrides most other properties
   hideAvatar?: boolean;
+  hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
   onclick?: any;
   tooltip?: boolean;
@@ -28,6 +29,7 @@ export interface ISubstrateIdentityAttrs {
   account: Account<any>;
   linkify: boolean;
   profile: Profile;
+  hideIdentityIcon: boolean; // only applies to substrate identities
 }
 
 export interface ISubstrateIdentityState {
@@ -38,11 +40,13 @@ export interface ISubstrateIdentityState {
 
 const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
+    // TODO: the identity observable does not update correctly when groupKey is changed.
+    // observe by switching from an edgeware address with on-chain identity to one without
     groupKey: attrs.account.address,
     identity: (attrs.account instanceof SubstrateAccount) ? attrs.account.identity : null,
   }),
   view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
+    const { profile, linkify, account, hideIdentityIcon } = vnode.attrs;
 
     // return polkadot identity if possible
     const displayNameHex = vnode.state.dynamic.identity?.info?.display;
@@ -54,9 +58,12 @@ const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstra
       const isGood = _.some(judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable')
       const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality')
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
-      const name = [ m('span.identity-icon' +
-                       (isGood ? '.icon-ok-circled' : '.icon-minus-circled') +
-                       (isGood ? '.green' : isBad ? '.red' : '.gray')), d2s(displayNameHex) ];
+      const name = [
+        !hideIdentityIcon && m('span.identity-icon' +
+                                           (isGood ? '.icon-ok-circled' : '.icon-minus-circled') +
+                                           (isGood ? '.green' : isBad ? '.red' : '.gray')),
+        d2s(displayNameHex)
+      ];
 
       return linkify ?
         link(
@@ -80,7 +87,7 @@ const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstra
 
 const User : m.Component<IAttrs> = {
   view: (vnode) => {
-    const { avatarOnly, hideAvatar, user, linkify, tooltip } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
@@ -123,7 +130,7 @@ const User : m.Component<IAttrs> = {
         }, profile && profile.getAvatar(avatarSize)),
         (account instanceof SubstrateAccount && account.identity) ?
           // substrate name
-          m(SubstrateIdentity, { account, linkify, profile }) : [
+          m(SubstrateIdentity, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify ?
               link('a.user-display-name' +
@@ -148,7 +155,7 @@ const User : m.Component<IAttrs> = {
       ]),
       m('.user-name', [
         (account instanceof SubstrateAccount && account.identity) ?
-          m(SubstrateIdentity, { account, linkify: true, profile }) :
+          m(SubstrateIdentity, { account, linkify: true, profile, hideIdentityIcon }) :
           link('a.user-display-name' +
                ((profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'),
                profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',

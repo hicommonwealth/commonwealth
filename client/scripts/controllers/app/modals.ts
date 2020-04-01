@@ -1,8 +1,5 @@
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { uuidv4 } from 'lib/util';
-
-// This file is part of the Mithril modal system. See views/modal.ts
-// for more information.
 
 export class ModalStore {
   private _modals: any[];
