@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('Users', 'login_token_id')
+    return queryInterface.removeColumn('Users', 'login_token_id');
   },
 
   down: (queryInterface, Sequelize) => {

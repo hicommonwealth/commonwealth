@@ -1,5 +1,5 @@
-import ViewCountCache from '../util/viewCountCache';
 import { Response, NextFunction } from 'express';
+import ViewCountCache from '../util/viewCountCache';
 import { UserRequest } from '../types';
 
 const viewCount = async (models, cache: ViewCountCache, req: UserRequest, res: Response, next: NextFunction) => {

@@ -153,7 +153,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // Demonstrate adding an event handler
     this.addEventHandler(
       'newBlockHeaders',
-      (data) => console.log('EthereumChain.eventHandlers.newBlockHeaders', data.number),
+      (data) => data,
       (err) => { throw new Error('EthereumChain.eventHandlers.newBlockHeaders err' + err ); },
     );
   }

@@ -51,8 +51,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
   public get initialized() { return this._initialized; }
 
   // STORAGE
-  private _store: AccountsStore<SubstrateCoin, SubstrateAccount> = new AccountsStore();
-
+  private _store: AccountsStore<SubstrateAccount> = new AccountsStore();
   public get store() { return this._store; }
 
   private _Chain: SubstrateChain;

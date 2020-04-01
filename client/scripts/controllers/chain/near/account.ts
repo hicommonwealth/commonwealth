@@ -27,7 +27,7 @@ export interface INearValidators {
 
 export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
   private _Chain: NearChain;
-  private _store: AccountsStore<NearToken, NearAccount> = new AccountsStore();
+  private _store: AccountsStore<NearAccount> = new AccountsStore();
   public get store() { return this._store; }
   public readonly keyStore: BrowserLocalStorageKeyStore;
 

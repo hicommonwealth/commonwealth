@@ -8,11 +8,20 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
     where: {
       id: params.chain,
     },
-    include: {
-      model: models.OffchainTag,
-      as: 'tags',
-      attributes: ['id', 'name', 'community_id', 'chain_id'],
-    },
+    include: [
+      {
+        model: models.OffchainTag,
+        as: 'tags',
+        required: false,
+        attributes: ['id', 'name', 'community_id', 'chain_id'],
+      },
+      {
+        model: models.ChainObjectVersion,
+        as: 'ChainObjectVersion',
+        required: false,
+        attributes: ['id'],
+      }
+    ],
   });
   const community = await models.OffchainCommunity.findOne({
     where: {

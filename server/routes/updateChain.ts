@@ -34,6 +34,10 @@ const updateChain = async (models, req: UserRequest, res: Response, next: NextFu
   if (req.body.active !== undefined) {
     chain.setActive(req.body.active);
   }
+  if (req.body.type) {
+    chain.setActive(req.body.type);
+  }
+
   await chain.save();
 
   return res.json({ status: 'Success', result: chain.toJSON() });

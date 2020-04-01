@@ -89,7 +89,11 @@ export class ProposalStore<ProposalT extends IIdentifiable> extends Store<Propos
   }
 }
 
-export class AccountsStore<C extends Coin, T extends Account<C>> extends Store<T> {
+interface IHasAddress {
+  address: string;
+}
+
+export class AccountsStore<T extends IHasAddress> extends Store<T> {
   private _storeAddress: { [address: string]: T } = {};
 
   public add(account: T) {

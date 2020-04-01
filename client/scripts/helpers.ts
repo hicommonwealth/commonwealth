@@ -117,6 +117,8 @@ export function formatNumberLong(num : number) {
 
 export function formatPercentShort(num : number) {
   if (num === 0) return '0%';
+  if (num === 1) return '100%';
+  if (num > 1) return '100%+';
   return (num * 100).toFixed(1) + '%';
 }
 

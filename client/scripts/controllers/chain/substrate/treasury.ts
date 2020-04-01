@@ -140,9 +140,6 @@ extends Proposal<ApiRx, SubstrateCoin, ISubstrateTreasuryProposal, ISubstrateTre
   public get votingUnit() {
     return VotingUnit.None;
   }
-  public canCreateFrom(account: Account<any>) {
-    return account.chainBase === ChainBase.Substrate;
-  }
   public canVoteFrom(account) {
     return false;
   }

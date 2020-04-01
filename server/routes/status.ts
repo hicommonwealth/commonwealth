@@ -17,12 +17,20 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
     notificationCategories
   ] = await Promise.all([
     models.Chain.findAll({
-      include: {
-        model: models.OffchainTag,
-        as: 'tags',
-        required: false,
-        attributes: ['id', 'name', 'community_id', 'chain_id'],
-      }
+      include: [
+        {
+          model: models.OffchainTag,
+          as: 'tags',
+          required: false,
+          attributes: ['id', 'name', 'community_id', 'chain_id'],
+        },
+        {
+          model: models.ChainObjectVersion,
+          as: 'ChainObjectVersion',
+          required: false,
+          attributes: ['id'],
+        }
+      ]
     }),
     models.ChainNode.findAll(),
     models.OffchainCommunity.findAll({

@@ -31,6 +31,7 @@ import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
+import ProfileBlock from 'views/components/widgets/profile_block';
 import ViewCountBlock from 'views/components/widgets/view_count_block';
 import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';

@@ -14,6 +14,7 @@ import { NotificationCategories } from 'types';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -35,6 +36,12 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import { OffchainCommunitiesStore } from 'client/scripts/models/stores';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
+
+// Moloch specific
+import UpdateDelegateModal from 'views/modals/update_delegate_modal';
+import RagequitModal from 'views/modals/ragequit_modal';
+import TokenApprovalModal from 'views/modals/token_approval_modal';
+
 
 interface INavigationMenuAttrs {
   menusOpen: any;
@@ -226,9 +233,9 @@ const Navigation: m.Component<IMenuAttrs> = {
       //     p.startsWith(`/${app.activeId()}/proposal/requests`) ||
       //     p.startsWith(`/${app.activeId()}/request`)
       // }),
-      app.chain && !app.community && [
+      (app.chain && !app.community && [
         ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
+      ].indexOf(app.chain.base) !== -1 || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
         label: [
           'Proposals',
           allSubstrateGovernanceProposals > 0 && m('.header-count', allSubstrateGovernanceProposals),
@@ -327,7 +334,9 @@ const AccountMenu : m.Component<IMenuAttrs> = {
             ]),
             (activeAcct instanceof SubstrateAccount
               || activeAcct instanceof CosmosAccount
-              || activeAcct instanceof NearAccount)
+              || activeAcct instanceof NearAccount
+              || activeAcct instanceof MolochMember
+            )
             && m('li.account-balance-item', [
               m(AccountBalance, { account: activeAcct }),
             ]),
@@ -430,6 +439,29 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { typeEnum: ProposalType.CosmosProposal }
             })
           }, 'New proposal'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: NewProposalModal,
+              data: { typeEnum: ProposalType.MolochProposal }
+            })
+          }, 'New proposal'),
+          (activeAcct instanceof MolochMember) && m('li.divider'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: UpdateDelegateModal,
+            })
+          }, 'Update delegate key'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: RagequitModal,
+            })
+          }, 'Rage quit'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: TokenApprovalModal,
+            })
+          }, 'Approve tokens'),
+          // TODO: add a "reserve tokens" option here, in case you want to apply to DAO?
           activeAcct instanceof SubstrateAccount && activeAcct.chainClass === ChainClass.Edgeware && m('li', {
             onclick: () => { m.route.set(`/${activeAcct.chain.id}/new/signaling`); }
           }, 'New signaling proposal'),

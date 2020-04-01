@@ -4,26 +4,27 @@ import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
-import fs from 'fs';
-import cheerio from 'cheerio';
 import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, DEFAULT_PORT, NO_ARCHIVE } from './server/config';
+import { SESSION_SECRET, QUERY_URL_OVERRIDE } from './server/config';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
+import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import ViewCountCache from './server/util/viewCountCache';
 
 require('express-async-errors');
 
+const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
+
 const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
-
+const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS, QUERY_URL_OVERRIDE);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
@@ -60,7 +61,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const setupErrorHandlers = (app) => {
+const setupErrorHandlers = () => {
   // catch 404 and forward to error handler
   app.use((req, res, next) => {
     const err : any = new Error('Not Found');
@@ -74,14 +75,14 @@ const setupErrorHandlers = (app) => {
   });
 };
 
-const resetServer = (app, models): Promise<void> => {
+const resetServer = (): Promise<void> => {
   console.log('Resetting database...');
 
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
       console.log('Initializing default models...');
 
-      const drew = await models.User.create({
+      const drew = await models['User'].create({
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
@@ -89,35 +90,37 @@ const resetServer = (app, models): Promise<void> => {
       });
 
       // For all smart contract support chains
-      await models.ContractCategory.create({
+      await models['ContractCategory'].create({
         name: 'Tokens',
         description: 'Token related contracts',
         color: '#4a90e2',
       });
-      await models.ContractCategory.create({
+      await models['ContractCategory'].create({
         name: 'DAOs',
         description: 'DAO related contracts',
         color: '#9013fe',
       });
       // Initialize different chain + node URLs
-      const edgMain = await models.Chain.create({
+      const edgMain = await models['Chain'].create({
         id: 'edgeware',
         network: 'edgeware',
         symbol: 'EDG',
         name: 'Edgeware Mainnet',
         icon_url: '/static/img/protocols/edg.png',
         active: true,
+        type: 'chain',
       });
-      const eth = await models.Chain.create({
+      const eth = await models['Chain'].create({
         id: 'ethereum',
         network: 'ethereum',
         symbol: 'ETH',
         name: 'Ethereum',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
+        type: 'chain',
       });
 
-      await models.Address.create({
+      await models['Address'].create({
         user_id: 1,
         address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
         chain: 'ethereum',
@@ -128,25 +131,25 @@ const resetServer = (app, models): Promise<void> => {
       });
 
       // Notification Categories
-      await models.NotificationCategory.create({
+      await models['NotificationCategory'].create({
         name: NotificationCategories.NewCommunity,
         description: 'someone makes a new community'
       });
-      await models.NotificationCategory.create({
+      await models['NotificationCategory'].create({
         name: NotificationCategories.NewThread,
         description: 'someone makes a new thread'
       });
-      await models.NotificationCategory.create({
+      await models['NotificationCategory'].create({
         name: NotificationCategories.NewComment,
         description: 'someone makes a new comment',
       });
-      await models.NotificationCategory.create({
+      await models['NotificationCategory'].create({
         name: NotificationCategories.NewMention,
         description: 'someone @ mentions a user',
       });
 
       // Admins need to be subscribed to mentions
-      await models.Subscription.create({
+      await models['Subscription'].create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
         object_id: `user-${drew.id}`,
@@ -154,7 +157,7 @@ const resetServer = (app, models): Promise<void> => {
       });
 
       // Communities
-      await models.OffchainCommunity.create({
+      await models['OffchainCommunity'].create({
         id: 'staking',
         name: 'Staking',
         creator_id: 1,
@@ -166,19 +169,14 @@ const resetServer = (app, models): Promise<void> => {
         [ 'mainnet1.edgewa.re', 'edgeware' ],
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
       ];
-      await Promise.all(nodes.map(([ url, chain ]) =>
-        models.ChainNode.create({
-          chain: chain,
-          url: url,
-        })
-      ));
+      await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
       console.log('Database reset!');
       resolve();
     });
   });
 };
 
-const setupServer = (app, models) => {
+const setupServer = () => {
   const port = 8081;
   app.set('port', port);
   server = http.createServer(app);
@@ -217,11 +215,11 @@ const setupServer = (app, models) => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache);
-setupErrorHandlers(app);
-setupServer(app, models);
+setupAPI(app, models, fetcher, viewCountCache);
+setupErrorHandlers();
+setupServer();
 
-export const resetDatabase = () => resetServer(app, models);
+export const resetDatabase = () => resetServer();
 export const closeServer = async () => {
   console.log('shutting down server');
   viewCountCache.close();

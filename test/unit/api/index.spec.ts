@@ -6,6 +6,7 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
+import moment from 'moment';
 import app, { resetDatabase, closeServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -17,6 +18,10 @@ const { expect } = chai;
 describe('API Tests', () => {
   before('reset database', async () => {
     await resetDatabase();
+  });
+
+  after('teardown', async () => {
+    await closeServer();
   });
 
   describe('address tests', () => {

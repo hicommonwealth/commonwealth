@@ -197,9 +197,6 @@ extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, IEdgewareSign
   public canVoteFrom(account : Account<any>) {
     return account.chainClass === ChainClass.Edgeware;
   }
-  public canCreateFrom(account : Account<any>) {
-    return account.chainClass === ChainClass.Edgeware;
-  }
   get isPassing() {
     return ProposalStatus.None;
   }

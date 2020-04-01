@@ -17,13 +17,12 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
+import WebsocketController from './controllers/server/socket/index';
 import Edgeware from './controllers/chain/edgeware/main';
 import Substrate from './controllers/chain/substrate/main';
 import Cosmos from './controllers/chain/cosmos/main';
 import Ethereum from './controllers/chain/ethereum/main';
 import Near from './controllers/chain/near/main';
-import { default as WebsocketController } from './controllers/server/socket/index';
-import { create } from './lib/quill';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -111,24 +110,6 @@ export function handleInviteLinkRedirect() {
   }
 }
 
-// export function handleInviteLinkRedirectFailure() {
-//   if (m.route.param('invitemessage')) {
-//     if (m.route.param('invitemessage') === 'failure') {
-//       const message = m.route.param('message');
-//       notifyError(message);
-//     }
-//   }
-// }
-
-// const InviteLinkRedirectHome = () => {
-//   if (m.route.param('invitemessage')) {
-//     if (m.route.param('invitemessage') === 'failure') {
-//       const message = m.route.param('message');
-//       notifyError(message);
-//     }
-//   }
-// };
-
 export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   // Check for valid community selection, and that we need to switch
   if (app.community && c === app.community.meta) return;
@@ -193,6 +174,9 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   } else if (n.chain.network === ChainNetwork.NEAR) {
     const Near = (await import('./controllers/chain/near/main')).default;
     app.chain = new Near(n);
+  } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    app.chain = new Moloch(n);
   } else {
     throw new Error('Invalid chain');
   }

@@ -1,10 +1,13 @@
-import { default as chai } from 'chai';
-import superagent from 'superagent';
-import sleep from 'sleep-promise';
 
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import superagent from 'superagent';
+import 'chai/register-should';
+import sleep from 'sleep-promise';
+import app from '../../../server-test';
+chai.use(chaiHttp);
 const { assert } = chai;
 
-const SERVER_URL = 'http://127.0.0.1:8080/api';
 const MOCK_URL = 'http://127.0.0.1:4000';
 
 /**
@@ -32,7 +35,8 @@ const verifyRow = (row) => {
 // makes a GET request against the mock provider
 // TODO XXX: Address these (resp as any) typings
 const getMock = async (path) => {
-  const resp = await superagent.get(`${MOCK_URL}${path}`);
+  const resp = await superagent.get(`${MOCK_URL}${path}`)
+    .set('Accept', 'application/json');
   assert.isTrue(resp.body.success, 'mock request failed');
   return resp.body;
 };
@@ -43,7 +47,9 @@ const viewChainObjects = async (argObj) => {
   for (const [k, v] of Object.entries(argObj)) {
     argString += `${k}=${v}&`;
   }
-  const resp = await superagent.get(`${SERVER_URL}/viewChainObjects?${argString}`);
+  const resp = await chai.request.agent(app)
+    .get(`/api/viewChainObjects?${argString}`)
+    .set('Accept', 'application/json');
   assert.equal(resp.body.status, 'Success', 'viewChainObjects failed');
   for (const row of resp.body.result) {
     verifyRow(row);
@@ -58,7 +64,7 @@ const NEW_DESCRIPTION = 'hello world';
 
 // eslint-disable-next-line no-undef
 describe('chainObjectFetcher', () => {
-  it.skip('fetch metadata from mock provider', async () => {
+  it('fetch metadata from mock provider', async () => {
     const mockData = await getMock('/info');
     OBJECT_TYPE = mockData.version.id;
     IDENTIFIER_FIELD = mockData.version.unique_identifier;
@@ -68,10 +74,11 @@ describe('chainObjectFetcher', () => {
 
   it.skip('should fetch expected chain objects from db', async () => {
     const objectRows = await viewChainObjects({});
+    console.log(objectRows);
     assert.lengthOf(objectRows, N_INITIAL_PROPOSALS, 'fetched wrong number of rows');
   });
 
-  it.skip('add item to mock provider', async () => {
+  it('add item to mock provider', async () => {
     const update = await getMock('/add');
     assert.lengthOf(update.added_ids, 1, 'invalid # of mocks added');
     NEW_OBJECT_ID = update.added_ids[0];
@@ -85,7 +92,7 @@ describe('chainObjectFetcher', () => {
     objectRows.forEach((row) => assert.isFalse(row.completed, 'row should not be false'));
   });
 
-  it.skip('update new object description on mock provider', async () => {
+  it('update new object description on mock provider', async () => {
     assert.isDefined(NEW_OBJECT_ID, 'test object is undefined');
     await getMock(`/description?id=${NEW_OBJECT_ID}&description=${encodeURIComponent(NEW_DESCRIPTION)}`);
     return sleep(1000);
@@ -94,14 +101,14 @@ describe('chainObjectFetcher', () => {
   it.skip('should update the description of new object in db', async () => {
     const objectRows = await viewChainObjects({ object_id: NEW_OBJECT_ID });
     assert.lengthOf(objectRows, 1, 'should only recieve one object');
-    const [row] = objectRows;
+    const [ row ] = objectRows;
     assert.isFalse(row.completed, 'row should not be completed');
     assert.equal(+row.object_id, NEW_OBJECT_ID, 'row has wrong object_id');
     const proposal = JSON.parse(row.object_data);
     assert.equal(proposal.description, NEW_DESCRIPTION, 'row has wrong description');
   });
 
-  it.skip('complete new object on mock provider', async () => {
+  it('complete new object on mock provider', async () => {
     assert.isDefined(NEW_OBJECT_ID, 'test object is undefined');
     await getMock(`/complete?id=${NEW_OBJECT_ID}`);
     return sleep(1000);
@@ -110,7 +117,7 @@ describe('chainObjectFetcher', () => {
   it.skip('should complete the new object in db', async () => {
     const objectRows = await viewChainObjects({ object_id: NEW_OBJECT_ID });
     assert.lengthOf(objectRows, 1, 'should only recieve one object');
-    const [row] = objectRows;
+    const [ row ] = objectRows;
     assert.equal(+row.object_id, NEW_OBJECT_ID, 'row has wrong object_id');
     assert.isTrue(row.completed, 'row should be completed');
   });

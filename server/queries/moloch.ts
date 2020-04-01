@@ -4,6 +4,7 @@ export default {
     chain: 'moloch',
     unique_identifier: 'id',
     completion_field: 'processed',
+    type: 'dao',
   },
   queries: [
     {
@@ -12,16 +13,34 @@ export default {
       active: true,
       description: 'fetches all moloch proposals, run only once',
       query_url: 'https://api.thegraph.com/subgraphs/name/molochventures/moloch',
+      //query_url: 'http://localhost:8000/subgraphs/name/moloch',
+      has_pagination: true,
       query: `{
-        proposals {
+        proposals(first: %d, skip: %d) {
           id
-          details
           timestamp
           proposalIndex
           startingPeriod
+          delegateKey
+          applicantAddress
+          tokenTribute
+          sharesRequested
+          yesVotes
+          noVotes
           processed
-          didPass
-          aborted
+          status
+          votes {
+            timestamp
+            uintVote
+            member {
+              id
+              delegateKey
+              shares
+              highestIndexYesVote
+              tokenTribute
+            }
+          }
+          details
         }
       }`,
     },
@@ -31,16 +50,34 @@ export default {
       active: true,
       description: 'fetches all unprocessed moloch proposals, used to update active proposal state',
       query_url: 'https://api.thegraph.com/subgraphs/name/molochventures/moloch',
+      //query_url: 'http://localhost:8000/subgraphs/name/moloch',
+      has_pagination: true,
       query: `{
-        proposals(where: { processed: false }) {
+        proposals(first: %d, skip: %d, where: { processed: false }) {
           id
-          details
           timestamp
           proposalIndex
           startingPeriod
+          delegateKey
+          applicantAddress
+          tokenTribute
+          sharesRequested
+          yesVotes
+          noVotes
           processed
-          didPass
-          aborted
+          status
+          votes {
+            timestamp
+            uintVote
+            member {
+              id
+              delegateKey
+              shares
+              highestIndexYesVote
+              tokenTribute
+            }
+          }
+          details
         }
       }`,
     },
@@ -50,16 +87,37 @@ export default {
       active: true,
       description: 'fetches all processed moloch proposals that we still have marked active',
       query_url: 'https://api.thegraph.com/subgraphs/name/molochventures/moloch',
+      //query_url: 'http://localhost:8000/subgraphs/name/moloch',
+      has_pagination: true,
+
+      // NOTE: query here has a "%s" for id_in, which allows us to control which proposals
+      //   are "asking for updates" based on which haven't yet been marked processed.
       query: `{
-        proposals(where: { id_in: %s, processed: true }) {
+        proposals(first: %d, skip: %d, where: { id_in: %s, processed: true }) {
           id
-          details
           timestamp
           proposalIndex
           startingPeriod
+          delegateKey
+          applicantAddress
+          tokenTribute
+          sharesRequested
+          yesVotes
+          noVotes
           processed
-          didPass
-          aborted
+          status
+          votes {
+            timestamp
+            uintVote
+            member {
+              id
+              delegateKey
+              shares
+              highestIndexYesVote
+              tokenTribute
+            }
+          }
+          details
         }
       }`,
     },

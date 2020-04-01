@@ -162,6 +162,39 @@ times if you are initializing the database for the first time.
 
 ### Setting up local testnets
 
+Moloch (Eth):
+
+Install the latest for truffle and ganache-cli. Otherwise Moloch 
+contract compilation may be affected.
+```
+npm install -g truffle@latest
+npm install -g ethereumjs-testrpc@latest
+npm install -g ganache-cli@latest
+```
+
+- You may need to create a Moloch endpoint in Metamask using the `127.0.0.1:9545` url. You can then add the summoner account to Metamask for testing using private key `0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d` (corresponding public key `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1`). It should display "100 ETH" in the Metamask window. 
+  - If you make any transactions and then reset the chain, you will need to reset the Metamask transaction history via "Settings -> Advanced -> Reset Account".
+- The other accounts available for testing can be found in the `contractbase/eth/migrations/3_moloch_v1.js`. They are the 2nd through 6th accounts printed at the top of the `ganache-cli` output. They all have 100 ETH and 5 tokens that can be used as tribute. These private keys can also be added to Metamask. 
+- You may need to transfer extra tokens (TKN) from `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1` (the summoner) to other accounts if you wish to test delegate or creating proposals on behalf of other participants. If you do this, you'll need to go to the Commonwealth Moloch settings page and authorize additional token.
+- The "moloch-local" chain is always configured to fetch data from the chain directly.
+  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `contractbase/eth/`.
+  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `contractbase/eth/`.
+  - Initialize the app using the `NO_ARCHIVE=true yarn start` flag to avoid fetching chain data on the backend.
+- On production, the chain data is fetched from thegraph. Testing the production setup requires configuring a local graph endpoint. This is a more involved process, performed as follows:
+  - Follow this guide to set up a local subgraph for a local moloch contract:
+    https://github.com/MolochVentures/moloch-monorepo/blob/master/README.md
+    with the following modifications:
+    - Thegraph requires a postgres database and attempts to expose ports that will conflict with your local (commonwealth)
+      postgres installation. In the `docker-compose.yml`, you should change the ports for postgres to "5433:5432" to avoid
+      this overlap.
+    - Your ethereum port in the `docker-compose.yml` file should be 9545 instead of 8545.
+    - Your `ganache-cli` invocation should instead be `ganache-cli -p 9545 -h 0.0.0.0 -d --allowUnlimitedContractSize -l 100000000`
+    - Instead of running the truffle tests, you will run `truffle deploy` in `contractbase/eth/` in the commonwealth directory.
+      - Ensure that under `Deploying 'Moloch1'`, the contract address is `0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7`.
+        You will use this contract address to populate the `subgraph.yml` file.
+  - Initialize the app with `QUERY_URL_OVERRIDE=http://localhost:8000/subgraphs/name/moloch yarn start` to point the server at the correct graphql endpoint.
+  - To restart the test setup: delete the `docker/data` directory in the moloch monorepo.
+
 Cosmos Hub (Gaia):
 
 - Install [gaia](https://github.com/cosmos/gaia/blob/master/docs/installation.md) by cloning

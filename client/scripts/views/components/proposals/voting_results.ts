@@ -7,14 +7,13 @@ import { u8aToString } from '@polkadot/util';
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
-import { Proposal, VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models/models';
+import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models/models';
 import { SignalingVote } from 'controllers/chain/edgeware/signaling';
 import { EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling';
 import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
-import SubstrateChain from 'controllers/chain/substrate/shared';
-import app from 'state';
+import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
   return u8aToString(v.toU8a());
@@ -59,6 +58,11 @@ const ProposalVotingResults = {
             m('.vote-choice', vote.choice.toString()),
             //balanceWeighted && balance && m('.vote-balance', balanceStr),
           ]) :
+          vote instanceof MolochProposalVote ? m('.vote', [
+            m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+            m('.vote-choice', vote.choice.toString()),
+            balance && m('.vote-balance', balanceStr),
+          ]) :
           m('.vote', [
             m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
           ]);
@@ -89,6 +93,19 @@ const ProposalVotingResults = {
           }, {
             name: 'No',
             content: showVotes(votes.filter((v) => v.choice === false)),
+          }]),
+      ]);
+    } else if (proposal.votingType === VotingType.MolochYesNo) { // TODO: merge with above
+      return m('.ProposalVotingResults', [
+          m(Tabs, [{
+            name: 'Voters',
+            content: showVotes(votes)
+          }, {
+            name: 'Yes',
+            content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
+          }, {
+            name: 'No',
+            content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
           }]),
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {

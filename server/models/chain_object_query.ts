@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
 
     description: { type: DataTypes.TEXT, allowNull: false },
     query_url: { type: DataTypes.STRING, allowNull: false },
+    has_pagination: { type: DataTypes.BOOLEAN, allowNull: false },
     // raw text of graphql query to be executed by fetcher
     query: { type: DataTypes.TEXT, allowNull: false },
   }, {

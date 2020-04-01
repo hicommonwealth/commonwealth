@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./GuildBank.sol";
 
-contract Moloch {
+contract Moloch2 {
     using SafeMath for uint256;
 
     // ****************
@@ -20,7 +20,7 @@ contract Moloch {
     uint256 public summoningTime; // needed to determine the current period
 
     IERC20 public depositToken; // reference to the deposit token
-    GuildBank public guildBank; // guild bank contract reference
+    GuildBank2 public guildBank; // guild bank contract reference
 
     // HARD-CODED LIMITS
     // These numbers are quite arbitrary; they are small enough to avoid overflows when doing calculations
@@ -148,7 +148,7 @@ contract Moloch {
             approvedTokens.push(IERC20(_approvedTokens[i]));
         }
 
-        guildBank = new GuildBank();
+        guildBank = new GuildBank2();
 
         periodDuration = _periodDuration;
         votingPeriodLength = _votingPeriodLength;

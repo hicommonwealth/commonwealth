@@ -12,6 +12,10 @@ import { AddressInfo, ChainClass } from 'models/models';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import RagequitModal from 'views/modals/ragequit_modal';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import UpdateDelegateModal from 'views/modals/update_delegate_modal';
+import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 interface IAttrs {
   account: AddressInfo;
@@ -53,7 +57,14 @@ const AccountRow : m.Component<IAttrs, IState> = {
             tooltip: true,
           }),
         ]),
+        // checking for balance to guarantee that delegate key has loaded
         m('.address', `${account.address} (${account.chain})`),
+        (account instanceof MolochMember && account.isMember && account.delegateKey) ? m('.moloch-delegatekey', [
+          'Delegate: ',
+          account.isMember
+            ? link('a', `/${account.chain.id}/account/${account.delegateKey}`, account.delegateKey)
+            : 'N/A',
+        ]) : [],
       ]),
       m('.action-col', [
         // TODO: re-enable this as 'go to chain and account'
