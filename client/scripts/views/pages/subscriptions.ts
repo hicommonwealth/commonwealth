@@ -193,7 +193,7 @@ const PauseButtons: m.Component = {
       }),
       m(PauseToggle, {
         pause: false,
-        text: 'Unpause Cummunity Subscriptions',
+        text: 'Unpause Community Subscriptions',
         communities: app.config.communities.getAll(),
       }),
     ]);

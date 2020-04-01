@@ -50,7 +50,6 @@ $border-radius: 16px;
             }
             .autocomplete-wrap {
                 display: flex;
-                position: relative;
                 border: 1px solid #e4e4e4;
                 border-radius: $border-radius;
                 &.displaying-results {

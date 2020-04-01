@@ -213,3 +213,18 @@ export class BlocktimeHelper {
     }
   }
 }
+
+// loads remote scripts from a URI, e.g. Twitter widgets
+export const loadScript = (scriptURI) => {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = scriptURI;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      reject();
+    };
+    document.head.appendChild(script);
+  });
+};
