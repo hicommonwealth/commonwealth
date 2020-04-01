@@ -361,9 +361,9 @@ const AccountMenu : m.Component<IMenuAttrs> = {
         m('li', {
           onclick: () => app.activeId() ? m.route.set(`/${app.activeId()}/settings`) : m.route.set('/settings')
         }, 'Settings'),
-        m('li', {
-          onclick: () => m.route.set('/subscriptions'),
-        }, 'Subscriptions'),
+        // app.isLoggedIn() && m('li', {
+        //   onclick: () => m.route.set('/subscriptions'),
+        // }, 'Subscriptions'),
         app.login.isSiteAdmin && m('li', {
           onclick: () => {
             m.route.set(`/${
