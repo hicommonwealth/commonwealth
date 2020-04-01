@@ -361,6 +361,9 @@ const AccountMenu : m.Component<IMenuAttrs> = {
         m('li', {
           onclick: () => app.activeId() ? m.route.set(`/${app.activeId()}/settings`) : m.route.set(`/settings`)
         }, 'Settings'),
+        m('li', {
+          onclick: () => m.route.set('/subscriptions'),
+        }, 'Subscriptions'),
         app.login.isSiteAdmin && m('li', {
           onclick: () => {
             m.route.set('/' +
@@ -675,6 +678,27 @@ const Notifications: m.Component<{ notifications }> = {
   },
 };
 
+const NotificationButtons: m.Component<{ notifications }> = {
+  view: (vnode) => {
+    const { notifications } = vnode.attrs;
+    return m('.NotificationButtons', [
+      m('.button', {
+        onclick: (e) => {
+          e.preventDefault();
+          if (notifications.length < 1) return;
+          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+        }
+      }, 'Mark All Read'),
+      m('.button', {
+        onclick: (e) => {
+          e.preventDefault();
+          app.login.notifications.clearAllRead().then(() => m.redraw());
+        }
+      }, 'Clear All Read'),
+    ]);
+  }
+};
+
 const NotificationMenu : m.Component<{ menusOpen }> = {
   view: (vnode) => {
     const { menusOpen } = vnode.attrs;
@@ -691,6 +715,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
       }, unreadMessage),
     }, [
       m(Notifications, { notifications }),
+      notifications.length > 0 &&
+        m(NotificationButtons, { notifications }),
     ]);
   }
 };

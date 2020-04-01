@@ -611,6 +611,22 @@ a.NavigationItem {
     position: relative;
     user-select: none;
 
+    .NotificationButtons {
+        display: flex;
+        flex-direction: row;
+        text-align: center;
+        padding: 5px;
+    
+        .button {
+            width: 50%;
+            cursor: pointer;
+            
+            &:first-of-type {
+                border-right: 1px #555 solid;
+            }
+        }
+    }
+
     .notification-count {
         padding: 0 10px 1px 9px;
         text-align: center;
