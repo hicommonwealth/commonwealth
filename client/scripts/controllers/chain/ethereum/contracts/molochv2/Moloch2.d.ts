@@ -10,7 +10,7 @@ import {
   TypedFunctionDescription
 } from ".";
 
-interface MolochInterface extends Interface {
+interface Moloch2Interface extends Interface {
   functions: {
     proposals: TypedFunctionDescription<{ encode([]: [BigNumberish]): string }>;
 
@@ -210,18 +210,18 @@ interface MolochInterface extends Interface {
   };
 }
 
-export class Moloch extends Contract {
-  connect(signerOrProvider: Signer | Provider | string): Moloch;
-  attach(addressOrName: string): Moloch;
-  deployed(): Promise<Moloch>;
+export class Moloch2 extends Contract {
+  connect(signerOrProvider: Signer | Provider | string): Moloch2;
+  attach(addressOrName: string): Moloch2;
+  deployed(): Promise<Moloch2>;
 
-  on(event: EventFilter | string, listener: Listener): Moloch;
-  once(event: EventFilter | string, listener: Listener): Moloch;
-  addListener(eventName: EventFilter | string, listener: Listener): Moloch;
-  removeAllListeners(eventName: EventFilter | string): Moloch;
-  removeListener(eventName: any, listener: Listener): Moloch;
+  on(event: EventFilter | string, listener: Listener): Moloch2;
+  once(event: EventFilter | string, listener: Listener): Moloch2;
+  addListener(eventName: EventFilter | string, listener: Listener): Moloch2;
+  removeAllListeners(eventName: EventFilter | string): Moloch2;
+  removeListener(eventName: any, listener: Listener): Moloch2;
 
-  interface: MolochInterface;
+  interface: Moloch2Interface;
 
   functions: {
     proposals(

@@ -13,22 +13,24 @@ import { switchMap, flatMap, map } from 'rxjs/operators';
 import { ProposalStore } from './stores';
 import ProposalArchiveController from '../controllers/server/proposals';
 
-enum ChainBase {
+export enum ChainBase {
   CosmosSDK = 'cosmos',
   Substrate = 'substrate',
   Ethereum = 'ethereum',
   NEAR = 'near',
 }
 
-enum ChainNetwork {
+export enum ChainNetwork {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
   Cosmos = 'cosmos',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  Moloch = 'moloch',
+  Metacartel = 'metacartel',
 }
 
-enum ChainClass {
+export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
   Supernova = 'supernova',
@@ -36,13 +38,14 @@ enum ChainClass {
   Gaia13k = 'gaia-13k',
   Ethereum = 'ethereum',
   Near = 'near',
+  Moloch = 'moloch',
 }
 
-abstract class StorageModule {
+export abstract class StorageModule {
   public abstract get store();
 }
 
-interface IBlockInfo {
+export interface IBlockInfo {
   height: number;
   duration: number;
   lastTime: moment.Moment;
@@ -51,7 +54,7 @@ interface IBlockInfo {
 
 // Implemented by a chain's top-level module. Responsible for high-level
 // metadata, API, and event-handling functionality.
-interface IChainModule<C extends Coin, A extends Account<C>> {
+export interface IChainModule<C extends Coin, A extends Account<C>> {
   coins(n: number | BN, inDollars?: boolean): C;
   denom: string;
 
@@ -67,14 +70,14 @@ interface IChainModule<C extends Coin, A extends Account<C>> {
 }
 
 // Implemented by a chain's account module. Store for account objects.
-interface IAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string): A;
 }
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
-abstract class ProposalModule<
+export abstract class ProposalModule<
   ApiT,
   CT extends IIdentifiable,
   ST extends ICompletable,
@@ -127,7 +130,7 @@ abstract class ProposalModule<
 }
 
 // Offchain stores and management for discussion features.
-interface IOffchainAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IOffchainAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
   get(address: string, chain?: string): A;
 }
 
@@ -136,7 +139,7 @@ interface IServerControllers {
 }
 
 // TODO create some generic class for ICommunity and IChainAdapter
-abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
+export abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
 
   public abstract serverLoaded: boolean;
@@ -167,7 +170,7 @@ abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
-abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
+export abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
   public abstract serverLoaded: boolean;
   public abstract chain: IChainModule<C, A>;
@@ -211,21 +214,21 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   }
 }
 
-enum OffchainThreadKind {
+export enum OffchainThreadKind {
   Forum = 'forum',
   Link = 'link',
   Question = 'question',
   Request = 'request',
 }
 
-enum TransactionStatus {
+export enum TransactionStatus {
   'Ready',
   'Success',
   'Failed',
   'Error',
 }
 
-interface ITransactionResult {
+export interface ITransactionResult {
   status: TransactionStatus;
   hash?: string;
   err?: string;
@@ -234,12 +237,12 @@ interface ITransactionResult {
 }
 
 // TODO: abstract this for edgeware? Maybe replace with "command string"?
-interface ITXData {
+export interface ITXData {
   call: string;
 }
 
 // TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
-interface ITXModalData {
+export interface ITXModalData {
   author: Account<any>;
   txType: string;
   txData: {
@@ -254,11 +257,11 @@ interface ITXModalData {
   cb?: (success: boolean) => void;
 }
 
-interface IVote<C extends Coin> {
+export interface IVote<C extends Coin> {
   account: Account<C>;
 }
 
-class DepositVote<C extends Coin> implements IVote<C> {
+export class DepositVote<C extends Coin> implements IVote<C> {
   public readonly account: Account<C>;
   public readonly deposit: C;
   constructor(account: Account<C>, deposit: C) {
@@ -267,7 +270,7 @@ class DepositVote<C extends Coin> implements IVote<C> {
   }
 }
 
-class BinaryVote<C extends Coin> implements IVote<C> {
+export class BinaryVote<C extends Coin> implements IVote<C> {
   public readonly account: Account<C>;
   public readonly choice: boolean;
   public readonly weight: number;
@@ -278,7 +281,7 @@ class BinaryVote<C extends Coin> implements IVote<C> {
   }
 }
 
-class Profile {
+export class Profile {
   private _name: string;
   private _headline: string;
   private _bio: string;
@@ -343,7 +346,7 @@ class Profile {
   }
 }
 
-abstract class Account<C extends Coin> {
+export abstract class Account<C extends Coin> {
   public readonly address: string;
   public readonly chain: ChainInfo;
 
@@ -453,7 +456,7 @@ export interface IUniqueId extends IIdentifiable {
   readonly slug: string;
 }
 
-abstract class Identity<C extends Coin> implements IIdentifiable {
+export abstract class Identity<C extends Coin> implements IIdentifiable {
   public readonly account: Account<C>;
   public readonly identifier: string;
   public readonly username: string;
@@ -507,6 +510,7 @@ export enum VotingType {
   RankedChoiceVoting = 'rankedchoice',
   MultiOptionVoting = 'multioption',
   None = 'none',
+  MolochYesNo = 'moloch',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
@@ -515,14 +519,15 @@ export enum VotingUnit {
   None = 'none',
 }
 
-abstract class Proposal<
+export abstract class Proposal<
 ApiT,
 C extends Coin,
 ConstructorT extends IIdentifiable,
 UpdateT extends ICompletable,
 VoteT extends IVote<C>> implements IUniqueId {
   // basic info
-  public readonly data: ConstructorT;
+  protected _data: ConstructorT;
+  public get data(): ConstructorT { return this._data; }
   public readonly identifier: string;
   public readonly slug: string;
   public abstract get shortIdentifier(): string;
@@ -538,7 +543,6 @@ VoteT extends IVote<C>> implements IUniqueId {
   public abstract get votingType(): VotingType;
   public abstract get votingUnit(): VotingUnit;
   public abstract canVoteFrom(account: Account<C>): boolean;
-  public abstract canCreateFrom(account: Account<C>): boolean;
 
   protected votes: BehaviorSubject<{ [account: string] : VoteT }> = new BehaviorSubject({});
   // TODO: these can be observables
@@ -566,7 +570,7 @@ VoteT extends IVote<C>> implements IUniqueId {
 
   constructor(slug: string, data: ConstructorT) {
     this.slug = slug;
-    this.data = data;
+    this._data = data;
     this.identifier = data.identifier;
   }
 
@@ -637,7 +641,7 @@ VoteT extends IVote<C>> implements IUniqueId {
 
 export type AnyProposal = Proposal<any, any, any, any, any>;
 
-class AddressInfo {
+export class AddressInfo {
   public readonly address: string;
   public readonly chain: string;
   public selected: boolean;
@@ -651,7 +655,7 @@ class AddressInfo {
   }
 }
 
-class MembershipInfo {
+export class MembershipInfo {
   public readonly user_id: number;
   public readonly chain: string;
   public readonly community: string;
@@ -665,7 +669,7 @@ class MembershipInfo {
   }
 }
 
-class ChainInfo {
+export class ChainInfo {
   public readonly id: string;
   public readonly symbol: string;
   public readonly name: string;
@@ -673,8 +677,9 @@ class ChainInfo {
   public readonly iconUrl: string;
   public readonly description: string;
   public readonly tags: OffchainTag[];
+  public readonly chainObjectId: string;
 
-  constructor(id, network, symbol, name, iconUrl, description, tags?) {
+  constructor(id, network, symbol, name, iconUrl, description, tags?, chainObjectVersion?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -682,25 +687,28 @@ class ChainInfo {
     this.iconUrl = iconUrl;
     this.description = description;
     this.tags = tags || [];
+    this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
   }
   public static fromJSON(json) {
     return new ChainInfo(json.id, json.network, json.symbol, json.name,
-      json.icon_url,json.description, json.tags);
+      json.icon_url,json.description, json.tags, json.ChainObjectVersion);
   }
 }
 
-class NodeInfo {
+export class NodeInfo {
   public readonly id: number;
   public readonly chain: ChainInfo;
   public readonly url: string;
+  public readonly address: string;
 
-  constructor(id, chain, url) {
+  constructor(id, chain, url, address?) {
     this.id = id;
     this.chain = app.config.chains.getById(chain);
     this.url = url;
+    this.address = address;
   }
   public static fromJSON(json) {
-    return new NodeInfo(json.id, json.chain, json.url);
+    return new NodeInfo(json.id, json.chain, json.url, json.address);
   }
 
   public get tags() {
@@ -708,7 +716,7 @@ class NodeInfo {
   }
 }
 
-class CommunityInfo {
+export class CommunityInfo {
   public readonly id: string;
   public readonly name: string;
   public readonly description: string;
@@ -732,7 +740,7 @@ class CommunityInfo {
   }
 }
 
-class SocialAccount {
+export class SocialAccount {
   public readonly provider: string;
   public readonly username: string;
 
@@ -742,7 +750,7 @@ class SocialAccount {
   }
 }
 
-class OffchainAttachment {
+export class OffchainAttachment {
   public readonly url: string;
   public readonly description: string;
 
@@ -752,7 +760,7 @@ class OffchainAttachment {
   }
 }
 
-class OffchainComment<T extends IUniqueId> {
+export class OffchainComment<T extends IUniqueId> {
   [x: string]: any;
   public readonly chain: string;
   public readonly author: string;
@@ -786,7 +794,7 @@ class OffchainComment<T extends IUniqueId> {
   }
 }
 
-class OffchainReaction<T extends IUniqueId> {
+export class OffchainReaction<T extends IUniqueId> {
   public readonly chain: string;
   public readonly author: string;
   public readonly reaction: string;
@@ -804,7 +812,7 @@ class OffchainReaction<T extends IUniqueId> {
   }
 }
 
-class OffchainThread implements IUniqueId {
+export class OffchainThread implements IUniqueId {
   public readonly author: string;
   public readonly authorChain: string;
   public readonly title: string;
@@ -982,37 +990,61 @@ export class ContractItem {
   }
 }
 
-export {
-  IVote,
-  DepositVote,
-  BinaryVote,
-  Account,
-  Profile,
-  Identity,
-  Proposal,
-  AddressInfo,
-  MembershipInfo,
-  ChainInfo,
-  CommunityInfo,
-  NodeInfo,
-  SocialAccount,
-  OffchainAttachment,
-  OffchainComment,
-  OffchainReaction,
-  OffchainThread,
-  ITXModalData,
-  ITXData,
-  ITransactionResult,
-  TransactionStatus,
-  IChainAdapter,
-  ICommunityAdapter,
-  IAccountsModule,
-  IChainModule,
-  IOffchainAccountsModule,
-  StorageModule,
-  ChainBase,
-  ChainNetwork,
-  ChainClass,
-  ProposalModule,
-  OffchainThreadKind
-};
+export class ChainObjectVersion {
+  constructor(
+    public readonly id: string,
+    public readonly chain: string,
+    public readonly uniqueIdentifier: string,
+    public readonly completionField: string,
+  ) { }
+  public static fromJSON(json) {
+    return new ChainObjectVersion(
+      json.id,
+      json.chain,
+      json.unique_identifier,
+      json.completion_field,
+    );
+  }
+}
+
+export class ChainObjectQuery {
+  constructor(
+    public readonly id: number,
+    public readonly objectType: string,
+    public readonly queryType: string,
+    public readonly active: boolean,
+    public readonly description: string,
+    public readonly queryUrl: string,
+    public readonly query: string,
+  ) { }
+  public static fromJSON(json) {
+    return new ChainObjectQuery(
+      json.id,
+      json.object_type,
+      json.query_type,
+      json.active,
+      json.description,
+      json.query_url,
+      json.query
+    );
+  }
+}
+
+export class ChainObject<T> {
+  constructor(
+    public readonly id: string,
+    public readonly objectType: string,
+    public readonly objectId: string,
+    public readonly completed: boolean,
+    public readonly objectData: T,
+  ) { }
+  public static fromJSON(json) {
+    return new ChainObject(
+      json.id,
+      json.object_type,
+      json.object_id,
+      json.completed,
+      JSON.parse(json.object_data)
+    );
+  }
+}

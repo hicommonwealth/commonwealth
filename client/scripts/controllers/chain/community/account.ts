@@ -55,7 +55,7 @@ class OffchainAccounts implements IOffchainAccountsModule<Coin, OffchainAccount>
   private _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
-  private _store: AccountsStore<Coin, OffchainAccount> = new AccountsStore();
+  private _store: AccountsStore<OffchainAccount> = new AccountsStore();
 
   public get store() { return this._store; }
 

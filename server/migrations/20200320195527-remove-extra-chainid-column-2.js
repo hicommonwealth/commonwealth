@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('Addresses', 'chain_id')
+    return queryInterface.removeColumn('Addresses', 'chain_id');
   },
 
   down: (queryInterface, Sequelize) => {

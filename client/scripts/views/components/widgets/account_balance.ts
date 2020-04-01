@@ -9,6 +9,7 @@ import { Account } from 'models/models';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { NearAccount } from 'controllers/chain/near/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 
 interface IProfileSummaryAttrs {
   account: Account<any>;
@@ -35,13 +36,27 @@ const AccountBalance = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummar
     const isSubstrate = (vnode.attrs.account instanceof SubstrateAccount);
     const isCosmos = (vnode.attrs.account instanceof CosmosAccount);
     const isNear = (vnode.attrs.account instanceof NearAccount);
+    const isMoloch = (vnode.attrs.account instanceof MolochMember);
     const dynamic = vnode.state.dynamic;
+
     return m('.AccountBalance', [
       isNear && m('div.near-balance', [
         m('div.balance-type', [
           m('div.label', 'BALANCE'),
           m('div.balance', dynamic.balance !== undefined ?
             formatCoin(dynamic.balance) : '--')
+        ]),
+      ]),
+      isMoloch && m('div.moloch-balance', [
+        m('div.balance-type', [
+          m('div.label', 'IS MEMBER'),
+          m('div.balance', (vnode.attrs.account as MolochMember).isMember ? 'YES' : 'NO'),
+        ]),
+        m('div.balance-type', [
+          m('div.label', 'SHARES'),
+          // don't use denom label for share holdings -- should always be round number
+          m('div.balance', dynamic.balance !== undefined ?
+            `${dynamic.balance.toNumber()}` : '--')
         ]),
       ]),
       isSubstrate && [

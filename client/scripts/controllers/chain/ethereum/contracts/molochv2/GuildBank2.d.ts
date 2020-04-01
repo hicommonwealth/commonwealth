@@ -10,7 +10,7 @@ import {
   TypedFunctionDescription
 } from ".";
 
-interface GuildBankInterface extends Interface {
+interface GuildBank2Interface extends Interface {
   functions: {
     renounceOwnership: TypedFunctionDescription<{ encode([]: []): string }>;
 
@@ -54,18 +54,18 @@ interface GuildBankInterface extends Interface {
   };
 }
 
-export class GuildBank extends Contract {
-  connect(signerOrProvider: Signer | Provider | string): GuildBank;
-  attach(addressOrName: string): GuildBank;
-  deployed(): Promise<GuildBank>;
+export class GuildBank2 extends Contract {
+  connect(signerOrProvider: Signer | Provider | string): GuildBank2;
+  attach(addressOrName: string): GuildBank2;
+  deployed(): Promise<GuildBank2>;
 
-  on(event: EventFilter | string, listener: Listener): GuildBank;
-  once(event: EventFilter | string, listener: Listener): GuildBank;
-  addListener(eventName: EventFilter | string, listener: Listener): GuildBank;
-  removeAllListeners(eventName: EventFilter | string): GuildBank;
-  removeListener(eventName: any, listener: Listener): GuildBank;
+  on(event: EventFilter | string, listener: Listener): GuildBank2;
+  once(event: EventFilter | string, listener: Listener): GuildBank2;
+  addListener(eventName: EventFilter | string, listener: Listener): GuildBank2;
+  removeAllListeners(eventName: EventFilter | string): GuildBank2;
+  removeListener(eventName: any, listener: Listener): GuildBank2;
 
-  interface: GuildBankInterface;
+  interface: GuildBank2Interface;
 
   functions: {
     renounceOwnership(

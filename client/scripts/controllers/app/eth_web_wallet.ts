@@ -14,7 +14,11 @@ class EthWebWalletController {
   private _accounts: any[]; // TodoTypecasting...
   private _injectedAddress: string;
   private _provider: any;
-  private web3: any;
+  private _web3: any;
+
+  public get web3() {
+    return this._web3;
+  }
 
   public get available() {
     return (window.ethereum) ? true : false;
@@ -31,7 +35,7 @@ class EthWebWalletController {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this.web3.eth.personal.sign(message, this.accounts[0]);
+    const signature = await this._web3.eth.personal.sign(message, this.accounts[0]);
     return signature;
   }
 
@@ -39,14 +43,14 @@ class EthWebWalletController {
   public async enable() {
     console.log('Attempting to enable ETH web wallet');
     // (this needs to be called first, before other requests)
-    this.web3 = (app.chain.id === 'ethereum-local')
+    this._web3 = (app.chain.id === 'ethereum-local')
       ? new (window as any).Web3((window as any).ethereum)
       : (app.chain as Ethereum).chain.api;
-    await this.web3.givenProvider.enable();
+    await this._web3.givenProvider.enable();
 
-    this._accounts = await this.web3.eth.getAccounts();
-    this._provider = this.web3.currentProvider;
-    const balance = await this.web3.eth.getBalance(this._accounts[0]);
+    this._accounts = await this._web3.eth.getAccounts();
+    this._provider = this._web3.currentProvider;
+    const balance = await this._web3.eth.getBalance(this._accounts[0]);
 
     this._enabled = true;
   }

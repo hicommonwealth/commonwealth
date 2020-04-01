@@ -8,6 +8,5 @@ module.exports = {
   down: async (queryInterface, DataTypes) => {
     await queryInterface.bulkDelete('Roles', { offchain_community_id: null });
     await queryInterface.changeColumn('Roles', 'offchain_community_id', { type: DataTypes.STRING, allowNull: false });
-    return;
   }
 };

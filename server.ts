@@ -18,21 +18,20 @@ import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 
-import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_ARCHIVE } from './server/config';
+import ViewCountCache from './server/util/viewCountCache';
+import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_ARCHIVE, QUERY_URL_OVERRIDE } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
 import { updateSupernovaStats } from './server/lockdrops/supernova';
 import resetServer from './server/scripts/resetServer';
-import addTestChainObjectQueries from './server/scripts/addTestChainObjectQueries';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
-
+import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
-import ViewCountCache from './server/util/viewCountCache';
 import { UserRequest } from './server/types.js';
 
 // set up express async error handling hack
@@ -61,7 +60,7 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler, {
   publicPath: '/build',
 }) : null;
-const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS);
+const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS, QUERY_URL_OVERRIDE);
 const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
@@ -139,7 +138,7 @@ const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 setupPrerenderServer();
 setupMiddleware();
 setupPassport(models);
-setupAPI(app, models, viewCountCache);
+setupAPI(app, models, fetcher, viewCountCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 
@@ -158,7 +157,14 @@ if (SHOULD_RESET_DB) {
   const cosmosChainType = 'gaia13k1';
   updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
 } else if (SHOULD_ADD_TEST_QUERIES) {
-  addTestChainObjectQueries(app, models, closeMiddleware);
+  import('./server/test/chainObjectQueries')
+    .then((object) => addChainObjectQueries(object.default, app, models))
+    .then(() => (models.sequelize.close()))
+    .then(() => (closeMiddleware()))
+    .then(() => {
+      console.log('Finished adding test queries to db.');
+      process.exit(0);
+    });
 } else if (!NO_ARCHIVE && SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY) {
   fetcher.fetch()
     .then(() => {

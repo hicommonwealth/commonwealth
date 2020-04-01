@@ -542,8 +542,10 @@ const LinkNewAddressModal = {
                 const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
 
                 signerAccount.validate(webWalletSignature).then(() => {
-                  accountVerifiedCallback(signerAccount, vnode);
-                }, (err) => {
+                  return accountVerifiedCallback(signerAccount, vnode);
+                })
+                .then(() => m.redraw())
+                .catch((err) => {
                   vnode.state.error = 'Verification failed. There was an inconsistency error; ' +
                   'please report this to the developers.';
                   m.redraw();

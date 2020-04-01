@@ -155,9 +155,6 @@ export class SubstratePhragmenElection extends Proposal<
   public canVoteFrom(account: Account<any>) {
     return account.chainBase === ChainBase.Substrate;
   }
-  public canCreateFrom(account: Account<any>) {
-    return account.chainBase === ChainBase.Substrate;
-  }
   get isPassing() {
     return ProposalStatus.None;
   }

@@ -8,6 +8,7 @@ import app from './state';
 import Substrate from './controllers/chain/substrate/main';
 import Edgeware from './controllers/chain/edgeware/main';
 import Cosmos from './controllers/chain/cosmos/main';
+import Moloch from './controllers/chain/ethereum/moloch/adapter';
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -18,6 +19,7 @@ export enum ProposalType {
   SubstrateTreasuryProposal = 'treasuryproposal',
   OffchainThread = 'discussion',
   CosmosProposal = 'cosmosproposal',
+  MolochProposal = 'molochproposal',
 }
 
 export const proposalSlugToClass = () => {
@@ -45,6 +47,9 @@ export const proposalSlugToClass = () => {
   if (app.chain.class === ChainClass.Edgeware) {
     map.set('signalingproposal', (app.chain as Edgeware).signaling);
   }
+  if (app.chain.class === ChainClass.Moloch) {
+    map.set('molochproposal', (app.chain as Moloch).governance);
+  }
   return map;
 };
 
@@ -67,6 +72,8 @@ export const proposalSlugsFromChain = (chain) => {
     results.push('phragmenelection');
   } else if (chain.base === ChainBase.CosmosSDK) {
     results.push('cosmosproposal');
+  } else if (chain.class === ChainClass.Moloch) {
+    results.push('molochproposal');
   }
   if (chain.class === ChainClass.Kusama) {
     results.push('technicalcommitteemotion');
@@ -89,6 +96,7 @@ export const proposalSlugToFriendlyName =
     ['treasuryproposal', 'Treasury Proposal'],
     ['discussion', 'Discussion Thread'],
     ['cosmosproposal', 'Cosmos Proposal'],
+    ['molochproposal', 'Moloch Proposal']
 ]);
 
 /// This observable provides access to the stream of created Proposals

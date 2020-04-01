@@ -37,9 +37,14 @@ const addChainNode = async (models, req: UserRequest, res: Response, next: NextF
     });
   }
 
+  if (chain.type === 'dao' && !req.body.address) {
+    return next(new Error('This is a contract, you must specify a contract address'));
+  }
+
   const node = await models.ChainNode.create({
     chain: chain.id,
     url: req.body.node_url,
+    address: (req.body.address) ? req.body.address : '',
   });
 
   return res.json({ status: 'Success', result: node.toJSON() });

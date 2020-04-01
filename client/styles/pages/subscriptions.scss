@@ -1,0 +1,41 @@
+@import 'client/styles/shared';
+
+.SubscriptionsPage {
+  .SubscriptionRow {
+    border-left: 1px darken(#fafafa, 20) solid;
+    border-bottom: 1px darken(#fafafa, 20) solid;
+    border-bottom-left-radius: 8px;
+    margin: 40px 0;
+    padding: 10px 20px 20px;
+    
+    h3 {
+      margin: 0;
+    }
+
+    button {
+      margin: 0 8px 0 0;
+    }
+  }
+
+  .NotificationButtons {
+    button {
+      margin: 8px 8px 0 0;
+    }
+  }
+
+  .PauseButtons {
+    .PauseToggle {
+      margin: 8px 8px 0 0;
+    }
+  }
+
+  .ChainSubscriptionRow, .CommunitySubscriptionRow {
+    display: flex;
+    flex-direction: row;
+
+    .ChainOrCommunitySubscriptionButton {
+      height: 34px;
+      margin: auto 20px;
+    }
+  }
+}

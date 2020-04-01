@@ -1,0 +1,17 @@
+@import 'client/styles/shared';
+
+.TokenApprovalModal {
+    .header {
+        background-color: #222;
+        color: white;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 32px;
+        font-size: 19px;
+        font-weight: 700;
+    }
+    button {
+        margin-bottom: 5px;
+    }
+}

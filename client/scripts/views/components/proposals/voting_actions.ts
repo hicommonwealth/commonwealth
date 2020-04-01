@@ -22,6 +22,9 @@ import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_elections';
 import { hexToUtf8 } from 'web3-utils';
+import MolochProposal, { MolochProposalVote, MolochVote, MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
+import { EthereumAccount } from 'controllers/chain/ethereum/account';
+import { notifyError } from 'controllers/app/notifications';
 
 const CannotVote: m.Component<{ text?, action? }> = {
   view: (vnode) => {
@@ -126,6 +129,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       user = app.vm.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.vm.activeAccount as CosmosAccount;
+    } else if (proposal instanceof MolochProposal) {
+      user = app.vm.activeAccount as EthereumAccount;
     } else {
       return m(CannotVote, { text: 'Unrecognized proposal type' });
     }
@@ -153,6 +158,10 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, true)));
       } else if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.YES)));
+      } else if (proposal instanceof MolochProposal) {
+        proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
+        .then(() => m.redraw())
+        .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         throw new Error('Unimplemented proposal type - use election voting modal');
       } else {
@@ -184,6 +193,67 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false)));
       } else if (proposal instanceof CosmosProposal) {
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.NO)));
+      } else if (proposal instanceof MolochProposal) {
+        proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO)).then(() => m.redraw());
+      } else {
+        throw new Error('Invalid proposal type');
+      }
+    };
+    const cancelProposal = (e) => {
+      e.preventDefault();
+      mixpanel.track('Proposal Funnel', {
+        'Step No': 3,
+        'Step': 'Cancel Proposal',
+        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
+        'Scope': app.activeId() ,
+      });
+      mixpanel.people.increment('Votes');
+      mixpanel.people.set({
+        'Last Thread Created': new Date().toISOString()
+      });
+      if (proposal instanceof MolochProposal) {
+        proposal.abortTx()
+        .then(() => m.redraw())
+        .catch((err) => notifyError(err.toString()));
+      } else {
+        throw new Error('Invalid proposal type');
+      }
+    };
+    // V2 only
+    // const sponsorProposal = (e) => {
+    //   e.preventDefault();
+    //   mixpanel.track('Proposal Funnel', {
+    //     'Step No': 3,
+    //     'Step': 'Cancel Proposal',
+    //     'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
+    //     'Scope': app.activeId() ,
+    //   });
+    //   mixpanel.people.increment('Votes');
+    //   mixpanel.people.set({
+    //     'Last Thread Created': new Date().toISOString()
+    //   });
+    //   if (proposal instanceof MolochProposal) {
+    //     proposal.sponsorTx(proposal, user);
+    //   } else {
+    //     throw new Error('Invalid proposal type');
+    //   }
+    // };
+    const processProposal = (e) => {
+      e.preventDefault();
+      mixpanel.track('Proposal Funnel', {
+        'Step No': 3,
+        'Step': 'Cancel Proposal',
+        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
+        'Scope': app.activeId() ,
+      });
+      mixpanel.people.increment('Votes');
+      mixpanel.people.set({
+        'Last Thread Created': new Date().toISOString()
+      });
+      if (proposal instanceof MolochProposal) {
+        proposal.processTx()
+        .then(() => m.redraw())
+        .catch((err) => notifyError(err.toString()));
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -280,17 +350,32 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         .filter((vote) => vote.choice === CosmosVoteChoice.ABSTAIN && vote.account.address === user.address).length > 0;
       hasVotedVeto = user && proposal.getVotes()
         .filter((vote) => vote.choice === CosmosVoteChoice.VETO && vote.account.address === user.address).length > 0;
+    } else if (proposal instanceof MolochProposal) {
+      hasVotedYes = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MolochVote.YES && vote.account.address === user.address).length > 0;
+      hasVotedNo = user && proposal.getVotes()
+        .filter((vote) => vote.choice === MolochVote.NO && vote.account.address === user.address).length > 0;
     }
 
-    const canVote = proposal.completed !== true
-      && proposal.isPassing !== ProposalStatus.Passed
-      && proposal.isPassing !== ProposalStatus.Failed
-      && !hasVotedForAnyChoice
-        && (!(proposal instanceof EdgewareSignalingProposal && proposal.stage !== SignalingProposalStage.Voting)
-        || proposal instanceof SubstratePhragmenElection
-        || proposal instanceof SubstrateDemocracyProposal // allow seconding
-        || proposal instanceof SubstrateCollectiveProposal // allow re-voting
-        );
+    let canVote = true;
+    if (proposal.completed) {
+      canVote = false;
+    } else if (proposal.isPassing === ProposalStatus.Passed || proposal.isPassing === ProposalStatus.Failed) {
+      canVote = false;
+    } else if (proposal instanceof EdgewareSignalingProposal && proposal.stage !== SignalingProposalStage.Voting) {
+      canVote = false;
+    } else if (proposal instanceof MolochProposal && proposal.state !== MolochProposalState.Voting) {
+      canVote = false;
+    } else if (hasVotedForAnyChoice) {
+      // enable re-voting for particular types
+      if (proposal instanceof SubstratePhragmenElection ||
+          proposal instanceof SubstrateDemocracyProposal ||
+          proposal instanceof SubstrateCollectiveProposal) {
+        canVote = true;
+      } else {
+        canVote = false;
+      }
+    }
 
     let buttons;
     if (proposal instanceof EdgewareSignalingProposal) {
@@ -348,6 +433,29 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         onclick: voteVeto,
       }, hasVotedVeto ? 'Vetoed' : 'Veto')
     ]);
+    // moloch: cancel
+    const cancelButton = m('.veto-button', [
+      m('button.formular-button-negative', {
+        class: (proposal as MolochProposal).canAbort(user) || (proposal as MolochProposal).completed ? '' : 'disabled',
+        onclick: cancelProposal,
+      }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
+    ]);
+    // V2 only: moloch: sponsor
+    //const sponsorButton = m('.yes-button', [
+    //  m('button.formular-button-positive', {
+    //    class: !(proposal as MolochProposal).state.sponsored &&
+    //    !(proposal as MolochProposal).state.processed
+    //      ? '' : 'disabled',
+    //    onclick: sponsorProposal,
+    //  }, (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor')
+    //]);
+    // moloch: process
+    const processButton = m('.yes-button', [
+      m('button.formular-button-tertiary', {
+        class: (proposal as MolochProposal).state === MolochProposalState.ReadyToProcess ? '' : 'disabled',
+        onclick: processProposal,
+      }, (proposal as MolochProposal).data.processed ? 'Processed' : 'Process')
+    ]);
 
     let votingActionObj;
     if (proposal.votingType === VotingType.SimpleYesNoVoting && !(proposal instanceof EdgewareSignalingProposal)) {
@@ -382,6 +490,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       votingActionObj = [
         m('button-row', buttons),
         m(ProposalExtensions, { proposal }),
+      ];
+    } else if (proposal.votingType === VotingType.MolochYesNo) {
+      votingActionObj = [
+        [ m('.button-row', [yesButton, noButton, /*sponsorButton, */processButton, cancelButton]),
+        m(ProposalExtensions, { proposal }) ]
       ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { text: '(TODO) Ranked choice voting unimplemented' });

@@ -120,9 +120,6 @@ export class CosmosProposal extends Proposal<
   public canVoteFrom(account) {
     return account instanceof CosmosAccount;
   }
-  public canCreateFrom(account) {
-    return account instanceof CosmosAccount;
-  }
   private readonly _title: string;
   private _tally: ICosmosProposalTally;
   private _status: CosmosProposalState;

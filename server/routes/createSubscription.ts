@@ -9,7 +9,7 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
     return next(new Error('Must provide category and object id'));
   }
 
-  const category = await models.NotificationCategory.find({
+  const category = await models.NotificationCategory.findOne({
     where: { name: req.body.category }
   });
   if (!category) {

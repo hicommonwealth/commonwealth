@@ -31,7 +31,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
   public get initialized() { return this._initialized; }
 
   // STORAGE
-  private _store: AccountsStore<CosmosToken, CosmosAccount> = new AccountsStore();
+  private _store: AccountsStore<CosmosAccount> = new AccountsStore();
   public get store() { return this._store; }
 
   private _Chain: CosmosChain;
