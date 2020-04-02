@@ -233,8 +233,7 @@ m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
   updateRoute.apply(this, args);
-  const container = document.getElementsByClassName('layout-content');
-  if (container.length > 0) container[0]?.scrollTo(0, 0);
+  document.getElementsByClassName('mithril-app')[0]?.scrollTo(0, 0);
 };
 
 // set up ontouchmove blocker
