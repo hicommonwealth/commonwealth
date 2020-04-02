@@ -4,8 +4,7 @@
     .home-content {
         background: #rgba4;
         position: relative;
-        padding: 0 20px;
-        margin: 0 0 36px;
+        padding: 0 20px 64px;
         width: 100%;
         @include xs-max {
             padding: 0 10px;
@@ -17,28 +16,12 @@
             font-weight: 600;
             font-size: 28px;
             line-height: 1.25;
-            margin: 46px 0 0;
+            margin: 42px 0 0;
         }
         p.lead-description {
             font-size: 16px;
             line-height: 1.25;
-            margin: 6px 0 0;
-        }
-        h3.category-name {
-            font-size: 16px;
-            color: #a8a8a8;
-            margin-top: 32px;
-            margin-bottom: 20px;
-            @include xs-max {
-                margin: 20px 0 4px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                height: 30px;
-                white-space: nowrap;
-            }
-        }
-        .communities {
-            margin-top: 30px;
+            margin: 6px 0 42px;
         }
     }
 }

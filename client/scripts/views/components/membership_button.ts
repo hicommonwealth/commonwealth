@@ -3,6 +3,7 @@ import 'components/membership_button.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 
@@ -43,6 +44,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
       const confirmed = await confirmationModalWithText('Are you sure you want to leave this community?')();
       if (!confirmed) {
         vnode.state.loading = false;
+        m.redraw();
         return;
       }
 
@@ -68,14 +70,16 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
       });
     };
 
-    return m('a.btn.btn-block.MembershipButton', {
-      class: ((isMember(chain, community) ? 'formular-button-primary is-member' : '') +
+    return m(Button, {
+      class: ('MembershipButton ' +
+              (isMember(chain, community) ? 'formular-button-primary is-member' : '') +
               (vnode.state.loading ? ' disabled' : '')),
-      href: '#',
-      onclick: isMember(chain, community) ? deleteMembership : createMembership
-    }, [
-      m('span', isMember(chain, community) ? 'Joined ✓' : 'Join'),
-    ]);
+      onclick: isMember(chain, community) ? deleteMembership : createMembership,
+      intent: isMember(chain, community) ? 'primary' : 'none',
+      iconLeft: Icons.CHECK,
+      label: isMember(chain, community) ? 'Joined' : 'Join',
+      size: 'xs',
+    });
   },
 };
 

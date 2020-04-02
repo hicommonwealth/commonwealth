@@ -107,7 +107,7 @@ interface IProposalHeaderAttrs {
   proposal: any;
 }
 
-interface ISidebarAttrs {
+interface IProposalSidebarAttrs {
   isThread: boolean;
   nComments: number;
   nVoters: number;
@@ -918,8 +918,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
   }
 };
 
-const Sidebar: m.Component<ISidebarAttrs> = {
-  view: (vnode: m.VnodeDOM<ISidebarAttrs>) => {
+const ProposalSidebar: m.Component<IProposalSidebarAttrs> = {
+  view: (vnode: m.VnodeDOM<IProposalSidebarAttrs>) => {
     const { isThread, nComments, nVoters, proposal } = vnode.attrs;
     const comments = app.comments.getByProposal(proposal)
       .filter((c) => c.parentComment === null);
@@ -934,18 +934,8 @@ const Sidebar: m.Component<ISidebarAttrs> = {
     // const parentHeight =  headerEle && bodyEle ? headerEle.clientHeight + bodyEle.clientHeight + 48 : undefined;
     // const commentsOffScreen = parentHeight > window.innerHeight;
 
-    return isThread ?
-      // m('.Sidebar.ThreadSidebar.forum-container.proposal-sidebar', [
-      //   comments.length && m('p.commenters', [
-      //     pluralize(nComments, 'comment') + ' by ',
-      //     authors.slice(0, 3).map((author) => m(User, { user: author }),
-      //     authors.length > 3 && 'and ' + pluralize((authors.length - 3) , 'other'),
-      //     commentsOffScreen && ' ',
-      //     commentsOffScreen && m('a', { href: '#ProposalComments' }, 'Go to comments')
-      //   ])
-      // ]) :
-      null :
-      m('.Sidebar.ProposalSidebar.forum-container.proposal-sidebar', [
+    return isThread ? null :
+      m('.ProposalSidebar.forum-container.proposal-sidebar', [
         getSupportText(proposal)
         && m('.proposal-row-support', getSupportText(proposal)),
         // getTurnoutText(proposal) && m('.proposal-row-turnout', getTurnoutText(proposal)),
@@ -1091,7 +1081,7 @@ const ViewProposalPage: m.Component<IViewProposalPageAttrs, IViewProposalPageSta
             replyParent
           }),
         ]),
-        m('.col-sm-3.col-md-4', m(Sidebar, { isThread, nComments, nVoters, proposal })),
+        m('.col-sm-3.col-md-4', m(ProposalSidebar, { isThread, nComments, nVoters, proposal })),
       ]),
     });
   }

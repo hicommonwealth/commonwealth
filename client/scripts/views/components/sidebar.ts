@@ -96,6 +96,14 @@ const SidebarSettingsMenu = {
         // settings
         m(MenuItem, {
           onclick: () => {
+            m.route.set('/');
+          },
+          contentLeft: m(Icon, { name: Icons.HOME }),
+          label: 'Home'
+        }),
+        // settings
+        m(MenuItem, {
+          onclick: () => {
             m.route.set('/settings');
           },
           contentLeft: m(Icon, { name: Icons.SETTINGS }),

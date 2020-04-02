@@ -12,7 +12,7 @@ const HomePage : m.Component<{}, {}> = {
           m('p.lead-description', [
             'Forums, profiles, and voting for decentralized organizations',
           ]),
-          m(JoinCommunitiesContent, { showLockdropContent: true })
+          m(JoinCommunitiesContent),
         ]),
       ]),
     ])

@@ -3,6 +3,7 @@ import 'modals/confirm_modal.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 export const confirmationModalWithText = (text) => {
   return async () : Promise<boolean> => {
@@ -27,8 +28,8 @@ const ConfirmModal = {
         m('h3', confirmText),
       ]),
       m('.compact-modal-actions', [
-        m('button', {
-          type: 'submit',
+        m(Button, {
+          intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalcomplete');
@@ -38,14 +39,17 @@ const ConfirmModal = {
           },
           oncreate: (vnode) => {
             $(vnode.dom).focus();
-          }
-        }, 'Yes'),
-        m('button', {
+          },
+          label: 'Yes',
+        }),
+        m(Button, {
+          intent: 'none',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
-          }
-        }, 'Cancel'),
+          },
+          label: 'Cancel',
+        }),
       ]),
     ]);
   }
