@@ -3,14 +3,14 @@ import app from 'state';
 import { IChainAdapter, ChainBase, ChainClass } from 'models/models';
 
 import { NearToken } from 'adapters/chain/near/types';
-import { NearChain } from './chain';
+import NearChain from './chain';
 import { NearAccounts } from './account';
 
 export default class Near extends IChainAdapter<NearToken, any> {
   public base = ChainBase.NEAR;
   public class = ChainClass.Near;
-  public readonly chain: NearChain = new NearChain();
-  public readonly accounts: NearAccounts = new NearAccounts();
+  public chain: NearChain;
+  public accounts: NearAccounts;
   public readonly server = {};
 
   private _loaded: boolean = false;
@@ -21,9 +21,11 @@ export default class Near extends IChainAdapter<NearToken, any> {
 
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
+    this.chain = new NearChain(this.app);
+    this.accounts = new NearAccounts(this.app);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
 
@@ -35,9 +37,9 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public deinit = async () => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
 
     await this.accounts.deinit();
     await this.chain.deinit();

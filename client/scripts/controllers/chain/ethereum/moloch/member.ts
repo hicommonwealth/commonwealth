@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { IApp } from 'state';
 import { from, of, Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
 
@@ -18,7 +19,6 @@ export default class MolochMember extends EthereumAccount {
   private _shares: BehaviorSubject<MolochShares> = new BehaviorSubject(null);
   private _highestIndexYesVote: BN;
   private _tokenTribute: BN; // Not populated
-  
 
   private _Members: MolochMembers;
 
@@ -33,8 +33,8 @@ export default class MolochMember extends EthereumAccount {
   public get shares() { return this._shares.value; }
   public get highestIndexYesVote() { return this._highestIndexYesVote; }
 
-  constructor(ChainInfo: EthereumChain, Accounts: EthereumAccounts, Members: MolochMembers, address: string, data?: IMolochMember) {
-    super(ChainInfo, Accounts, address);
+  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, Members: MolochMembers, address: string, data?: IMolochMember) {
+    super(app, ChainInfo, Accounts, address);
     this._Members = Members;
     if (data) {
       if (address.toLowerCase() !== data.id) {
@@ -129,7 +129,7 @@ export default class MolochMember extends EthereumAccount {
     if (this._Members.api.userAddress !== this.address) {
       throw new Error('can only ragequit metamask verified user');
     }
-  
+
     if (!(await this._Members.isSenderMember())) {
       throw new Error('sender must be member');
     }

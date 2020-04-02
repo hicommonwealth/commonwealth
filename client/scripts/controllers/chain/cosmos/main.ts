@@ -7,9 +7,9 @@ import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 
 class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
-  public readonly chain: CosmosChain = new CosmosChain();
-  public readonly accounts: CosmosAccounts = new CosmosAccounts();
-  public readonly governance: CosmosGovernance = new CosmosGovernance();
+  public chain: CosmosChain;
+  public accounts: CosmosAccounts;
+  public governance: CosmosGovernance;
   public readonly server = {};
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
@@ -22,6 +22,9 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+    this.chain = new CosmosChain(this.app);
+    this.accounts = new CosmosAccounts(this.app);
+    this.governance = new CosmosGovernance(this.app);
     await app.threads.refreshAll(this.id, null, true);
     await app.comments.refreshAll(this.id, null, true);
     await app.reactions.refreshAll(this.id, null, true);

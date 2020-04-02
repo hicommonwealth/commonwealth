@@ -16,10 +16,10 @@ import { selectLogin } from 'controllers/app/login';
 export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Moloch;
-  public readonly chain: EthereumChain = new EthereumChain();
-  public readonly ethAccounts: EthereumAccounts = new EthereumAccounts();
-  public readonly accounts: MolochMembers = new MolochMembers();
-  public readonly governance: MolochGovernance = new MolochGovernance();
+  public chain: EthereumChain;
+  public ethAccounts: EthereumAccounts;
+  public accounts: MolochMembers;
+  public governance: MolochGovernance;
   public readonly server = { };
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
@@ -35,10 +35,13 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
       throw new Error('no chain object id found')
     }
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
-
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
+    this.chain = new EthereumChain(this.app);
+    this.ethAccounts = new EthereumAccounts(this.app);
+    this.accounts = new MolochMembers(this.app);
+    this.governance = new MolochGovernance(this.app);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
 
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
@@ -54,7 +57,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     await api.init();
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', function (accounts) {
-      const updatedAddress = app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
       selectLogin(updatedAddress);
       api.updateSigner(accounts[0]);
     });
@@ -72,7 +75,9 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
     console.log('Ethereum/Moloch stopped.');
 
     return Promise.resolve();
