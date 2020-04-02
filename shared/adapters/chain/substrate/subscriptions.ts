@@ -1,4 +1,5 @@
 import { ApiRx } from '@polkadot/api';
+import BN from 'bn.js';
 import {
   ISubstrateDemocracyProposal, ISubstrateDemocracyReferendum,
   ISubstrateCollectiveProposal,
@@ -11,22 +12,22 @@ import {
 import {
   Call, BalanceOf, ReferendumInfoTo239, Hash, ProposalIndex,
   TreasuryProposal, VoteIndex, AccountId, PropIndex, ReferendumIndex, Votes,
-  VoterInfo, BlockNumber,
+  VoterInfo, BlockNumber, ReferendumInfo, ReferendumStatus
 } from '@polkadot/types/interfaces';
-import { Vec, Option, bool, u32 } from '@polkadot/types';
+import { Vec, Option, bool, u32, Bytes } from '@polkadot/types';
 import { createType } from '@polkadot/types/create';
 import { Codec } from '@polkadot/types/types';
 import { default as _ } from 'lodash';
 import { of, combineLatest, never, merge, concat } from 'rxjs';
-import { flatMap, first, map, takeWhile, startWith, auditTime } from 'rxjs/operators';
-import { DerivedReferendumVote } from '@polkadot/api-derive/types';
+import { flatMap, first, map, takeWhile, startWith, auditTime, switchMap } from 'rxjs/operators';
+import { DeriveReferendum, DeriveReferendumVotes } from '@polkadot/api-derive/types';
 import { EventData } from '@polkadot/types/generic/Event';
 import { ProposalAdapter } from '../../shared';
 import { marshallMethod, waitEvent } from './shared';
-import { PreImage } from '@polkadot/api-derive/democracy/proposals';
 
 type PublicProp = [PropIndex, Hash, AccountId] & Codec;
 type DepositOf = [BalanceOf, Vec<AccountId>] & Codec;
+type PreImage = Option<[Bytes, AccountId, BalanceOf, BlockNumber] & Codec>;
 
 export class SubstrateDemocracyProposalAdapter
 extends ProposalAdapter<ApiRx, ISubstrateDemocracyProposal, ISubstrateDemocracyProposalState> {
@@ -85,19 +86,19 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyProposal, ISubstrateDemocracyP
       method: null,
     };
     return merge(
-      api.query.democracy.preimages(proposal.hash).pipe(
-        map((preimage: PreImage) => {
-          // TODO: use this preimage in more detail once I understand it
-          if (preimage.isSome) {
-            const [ propVec, proposer, balance, at ] = preimage.unwrap();
-            //const prop = createType(api.registry, 'Proposal', propVec);
-            //state.method = marshallMethod(prop);
-            return state;
-          } else {
-            return state;
-          }
-        })
-      ),
+      //api.query.democracy.preimages(proposal.hash).pipe(
+      //  map((preimage: PreImage) => {
+      //    // TODO: use this preimage in more detail once I understand it
+      //    if (preimage.isSome) {
+      //      const [ propVec, proposer, balance, at ] = preimage.unwrap();
+      //      //const prop = createType(api.registry, 'Proposal', propVec);
+      //      //state.method = marshallMethod(prop);
+      //      return state;
+      //    } else {
+      //      return state;
+      //    }
+      //  })
+      //),
       api.query.democracy.depositOf(proposal.index).pipe(
         map((depositOpt: Option<DepositOf>) => {
           if (!depositOpt || !depositOpt.isSome) {
@@ -123,6 +124,12 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyProposal, ISubstrateDemocracyP
 export class SubstrateDemocracyReferendumAdapter
 extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocracyReferendumState> {
   private _lastIdEmitted = 0;
+
+  constructor(
+    private _useRedesignLogic: boolean = false,
+  ) {
+    super();
+  }
 
   public subscribeNew(api: ApiRx) {
     // lowestUnbaked = next referendum to tally = oldest index
@@ -155,20 +162,47 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
         );
       }),
       // emit adapted referendums
-      map(([ids, recordOpts]: [number[], Array<Option<ReferendumInfoTo239>>]) => {
-        const referenda = _.zip(ids, recordOpts);
-        const results = [];
-        for (const [ id, recordOpt ] of referenda) {
-          if (recordOpt.isSome) {
-            const record = recordOpt.unwrap();
-            results.push({
-              identifier: '' + id,
-              index: id,
-              hash: record.proposalHash.toU8a(),
-              threshold: record.threshold.toString() as DemocracyThreshold,
-              endBlock: +record.end,
-              executionDelay: +record.delay,
-            })
+      map(([ids, recordOpts]: [number[], Array<Option<ReferendumInfoTo239>> | Array<Option<ReferendumInfo>>]) => {
+        const results: ISubstrateDemocracyReferendum[] = [];
+        if (this._useRedesignLogic) {
+          const referenda = _.zip(ids, recordOpts as Array<Option<ReferendumInfo>>);
+          for (const [ id, recordOpt ] of referenda) {
+            if (recordOpt.isSome) {
+              const record = recordOpt.unwrap();
+              if (record.isFinished) {
+                const { end } = record.asFinished;
+                results.push({
+                  identifier: `${id}`,
+                  index: id,
+                  endBlock: +end,
+                });
+              } else {
+                const { proposalHash, threshold, end, delay } = record.asOngoing;
+                results.push({
+                  identifier: `${id}`,
+                  index: id,
+                  hash: proposalHash.toU8a(),
+                  threshold: threshold.toString() as DemocracyThreshold,
+                  endBlock: +end,
+                  executionDelay: +delay,
+                });
+              }
+            }
+          }
+        } else {
+          const referenda = _.zip(ids, recordOpts as Array<Option<ReferendumInfoTo239>>);
+          for (const [ id, recordOpt ] of referenda) {
+            if (recordOpt.isSome) {
+              const record = recordOpt.unwrap();
+              results.push({
+                identifier: `${id}`,
+                index: id,
+                hash: record.proposalHash.toU8a(),
+                threshold: record.threshold.toString() as DemocracyThreshold,
+                endBlock: +record.end,
+                executionDelay: +record.delay,
+              })
+            }
           }
         }
         return results;
@@ -188,7 +222,7 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
       executionBlock: null,
     };
     return merge(
-      api.query.democracy.preimages(proposal.hash).pipe(
+      proposal.hash ? api.query.democracy.preimages(proposal.hash).pipe(
         map((preimage: PreImage) => {
           // TODO: use this preimage in more detail once I understand it
           if (preimage.isSome) {
@@ -198,13 +232,21 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
           }
           return state;
         })
-      ),
-      api.derive.democracy.referendumVotesFor(proposal.index).pipe(
-        map((votes: DerivedReferendumVote[]) => {
-          votes.forEach((v) => {
-            state.votes[v.accountId.toString()] = [v.vote.isAye, v.vote.conviction.index, v.balance];
-          });
-          return state;
+      ) : never(),
+      api.derive.democracy.referendumsInfo([ new BN(proposal.identifier) ]).pipe(
+        switchMap((referenda: DeriveReferendum[]) => {
+          if (referenda.length) {
+            return api.derive.democracy._referendumVotes(referenda[0]).pipe(
+              map((votes: DeriveReferendumVotes) => {
+                votes.votes.forEach((v) => {
+                  state.votes[v.accountId.toString()] = [v.vote.isAye, v.vote.conviction.index, v.balance];
+                });
+                return state;
+              })
+            );
+          } else {
+            return of(state);
+          }
         })
       ),
       waitEvent(api, (e: EventData) => {
@@ -235,10 +277,11 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
           const data = queue.find(([executionBlock, hash, idx]) => +idx === proposal.index);
           if (data) {
             const [ executionBlock ] = data;
+            state.passed = true;
             state.executionBlock = +executionBlock;
             return of(state);
           } else {
-            return never();
+            return of(state);
           }
         })
       ),

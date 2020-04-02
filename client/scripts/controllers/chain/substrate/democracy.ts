@@ -96,7 +96,6 @@ class SubstrateDemocracy extends ProposalModule<
   private _votingPeriod: number = null;
   private _emergencyVotingPeriod: number = null;
   private _preimageByteDeposit: SubstrateCoin = null;
-  private _dispatchSubscription: Unsubscribable;
   get enactmentPeriod() { return this._enactmentPeriod; }
   get cooloffPeriod() { return this._cooloffPeriod; }
   get votingPeriod() { return this._votingPeriod; }
@@ -105,13 +104,16 @@ class SubstrateDemocracy extends ProposalModule<
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
+  private _useRedesignLogic: boolean;
+  public get isRedesignLogic() { return this._useRedesignLogic; }
 
   // Loads all proposals and referendums currently present in the democracy module
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+    this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstrateDemocracyReferendumAdapter();
+      this._adapter = new SubstrateDemocracyReferendumAdapter(useRedesignLogic);
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters
         this._enactmentPeriod = +(api.consts.democracy.enactmentPeriod as BlockNumber);
@@ -152,16 +154,14 @@ class SubstrateDemocracy extends ProposalModule<
 export default SubstrateDemocracy;
 
 export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
-  private _balance: SubstrateCoin;
-  public get balance(): SubstrateCoin { return this._balance; }
+  public readonly balance: SubstrateCoin;
 
-  constructor(proposal: SubstrateDemocracyReferendum, account: SubstrateAccount, choice: boolean, weight: number) {
+  constructor(proposal: SubstrateDemocracyReferendum, account: SubstrateAccount, choice: boolean, balance: SubstrateCoin, weight: number) {
     super(account, choice, weight);
-    this.account.balance.pipe(takeWhile(() => !proposal.completed)).subscribe((bal) => this._balance = bal);
+    this.balance = balance;
   }
 
-  public coinWeight(): Coin {
-    if (!this._balance) return null;
+  public get coinWeight(): Coin {
     return this.weight < 1 ?
         new Coin(this.balance.denom, this.balance.divn(1 / this.weight)) :
         new Coin(this.balance.denom, this.balance.muln(this.weight));
@@ -178,7 +178,6 @@ extends Proposal<
   public get title() { return this._title; }
   public get description() { return null; }
   public get author() { return null; }
-  public get hash() { return this._hash; }
 
   public get votingType() {
     return VotingType.ConvictionYesNoVoting;
@@ -193,7 +192,6 @@ extends Proposal<
     return account.chainBase === ChainBase.Substrate;
   }
   private _title: string;
-  private _hash: string;
   private readonly _endBlock: number;
 
   public get executed() { return this._executed; }
@@ -225,7 +223,6 @@ extends Proposal<
     this._Accounts = Accounts;
     this._Democracy = Democracy;
     this._endBlock = data.endBlock;
-    this._hash = data.hash.toString();
     this._title = `Referendum #${data.index}`;
     this.subscribe(
       this._Chain.api,
@@ -258,7 +255,7 @@ extends Proposal<
     }
     return this._Chain.coins(this.getVotes()
       .filter((vote) => vote.choice === true)
-      .reduce((total, vote) => vote.coinWeight().add(total), new BN(0)));
+      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
   }
   private get edgVotedNo(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
@@ -266,14 +263,14 @@ extends Proposal<
     }
     return this._Chain.coins(this.getVotes()
       .filter((vote) => vote.choice === false)
-      .reduce((total, vote) => vote.coinWeight().add(total), new BN(0)));
+      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
   }
   private get edgVoted(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
       throw new Error('Balances haven\'t resolved');
     }
     return this._Chain.coins(this.getVotes()
-      .reduce((total, vote) => vote.coinWeight().add(total), new BN(0)));
+      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
   }
   public get accountsVotedYes() {
     return this.getVotes()
@@ -394,7 +391,9 @@ extends Proposal<
       const acct = this._Accounts.fromAddress(voter);
       const [ vote, conviction, balance ] = state.votes[voter];
       if (!this.hasVoted(acct)) {
-        this.addOrUpdateVote(new SubstrateDemocracyVote(this, acct, vote, convictionToWeight(conviction)));
+        this.addOrUpdateVote(new SubstrateDemocracyVote(
+          this, acct, vote, this._Chain.coins(balance), convictionToWeight(conviction)
+        ));
       }
     }
     this._passed.next(state.passed);

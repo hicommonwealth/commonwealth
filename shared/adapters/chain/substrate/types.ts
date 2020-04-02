@@ -43,10 +43,10 @@ export interface ISubstrateDemocracyProposalState extends ICompletable {
 
 export interface ISubstrateDemocracyReferendum extends IIdentifiable {
   index: number;
-  hash: Uint8Array;
+  hash?: Uint8Array;
   endBlock: number;
-  threshold: DemocracyThreshold;
-  executionDelay: number;
+  threshold?: DemocracyThreshold;
+  executionDelay?: number;
 }
 
 export interface ISubstrateDemocracyReferendumState extends ICompletable {

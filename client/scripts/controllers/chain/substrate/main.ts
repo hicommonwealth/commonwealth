@@ -51,7 +51,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.council.init(this.chain, this.accounts),
       this.technicalCommittee.init(this.chain, this.accounts),
       this.democracyProposals.init(this.chain, this.accounts),
-      this.democracy.init(this.chain, this.accounts),
+      this.democracy.init(this.chain, this.accounts, true),
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
