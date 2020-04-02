@@ -8,7 +8,6 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import Navigation from 'views/components/navigation';
 import Sidebar from 'views/components/sidebar';
-import CommunityChat from 'views/components/community_chat';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
 import { AppToasts } from 'views/toast';
@@ -56,7 +55,6 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
           m('.clear'),
           m(PageNotFound),
         ]),
-        //m(CommunityChat),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -92,7 +90,6 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
         m('.clear'),
         vnode.children,
       ]),
-      //m(CommunityChat),
       m(AppModals),
       m(AppToasts),
     ]);

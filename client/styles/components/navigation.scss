@@ -124,6 +124,12 @@ $sidebar-padding: 16px;
             }
         }
     }
+    &.no-active-community .cui-list.cui-lg .title-selector {
+        border-bottom: none;
+    }
+    &.no-active-community .cui-list.cui-lg .login-selector {
+        border-top: none;
+    }
 }
 
 // notifications menu (outside Navigation, displayed in a cui-portal)

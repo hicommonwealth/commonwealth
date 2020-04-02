@@ -24,23 +24,11 @@
 }
 
 .ProposalHeader {
-    margin-top: 21px !important;
-    @include xs-max {
-        margin-top: 10px !important;
-    }
-
-    .proposal-title-row,
-    .discussion-meta,
-    .proposal-meta,
-    .proposal-subtitle-row,
-    .proposal-extra {
-        padding-left: 2px;
-    }
     .proposal-title-row {
         display: flex;
-        margin-bottom: 2px;
+        margin-bottom: 3px;
         .title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             flex: 1;
             line-height: 1.25;
@@ -51,7 +39,7 @@
     }
     .proposal-subtitle-row {
         display: flex;
-        margin-bottom: 2px;
+        margin-bottom: 4px;
         padding: 22px 48px 22px 26px;
 
         margin-top: 21px !important;
@@ -86,7 +74,7 @@
     .discussion-meta {
         display: flex;
         justify-content: left;
-        font-weight: 700;
+        font-weight: 500;
         > * {
             color: #999;
             margin-right: 14px;

@@ -1,4 +1,4 @@
-import 'components/community_chat.scss';
+import 'pages/chat.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -11,6 +11,8 @@ import ChatController from 'controllers/server/socket/chat';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import ListingPage from 'views/pages/_listing_page';
+import PageLoading from 'views/pages/loading';
 
 // how often outgoing typing indicators get sent
 const TYPING_INDICATOR_OUTGOING_FREQUENCY = 1000;
@@ -48,7 +50,7 @@ interface IChat {
   isConnected?: boolean;
 }
 
-const CommunityChat = {
+const Chat = {
   oninit: (vnode) => {
     vnode.state.collapsed = !!localStorage.getItem('cwChatCollapsed');
 
@@ -56,8 +58,8 @@ const CommunityChat = {
     const scrollToChatBottom = () => {
       // Use a synchronous redraw, or otherwise it may not happen in time for us to read the correct scrollHeight
       m.redraw.sync();
-      const $scroller = $(vnode.dom).find('.chat-messages');
-      $scroller.scrollTop($scroller[0].scrollHeight - $scroller[0].clientHeight + 20);
+      const scroller = $(vnode.dom).find('.chat-messages')[0];
+      scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     const onIncomingMessage = (text, author, author_chain, timestamp?) => {
       const sender = { address: author, chain: author_chain };
@@ -109,91 +111,69 @@ const CommunityChat = {
       return acc;
     }, []);
 
-    return m('.CommunityChat', [
-      m('.container', [
-        m('.chat-popup', { class: vnode.state.collapsed ? 'collapsed' : '' }, [
-          m('.chat-header', {
-            onclick: (e) => {
-              vnode.state.collapsed = !vnode.state.collapsed;
-              localStorage.setItem('cwChatCollapsed', vnode.state.collapsed ? 'true' : '');
-              if (!vnode.state.collapsed) {
-                setTimeout(() => {
-                  const $chat = $(e.target).closest('.CommunityChat');
-                  // scroll to chat bottom
-                  m.redraw.sync();
-                  const $scroller = $chat.find('.chat-messages');
-                  $scroller.scrollTop($scroller[0].scrollHeight - $scroller[0].clientHeight + 20);
-                  // fix compose textarea height, and set focus
-                  const $textarea = $chat.find('textarea.ResizableTextarea').focus();
-                  if (!$textarea[0]) return;
-                  $textarea[0].style.height = 'auto';
-                }, 1);
+    return m('.Chat', [
+      m('.chat-messages', [
+        groupedMessages.length === 0 && vnode.state.chat.isConnected
+          && m('.chat-message-placeholder', 'No messages yet'),
+        groupedMessages.map((grp) => m('.chat-message-group', [
+          m(User, { user: [grp.sender.address, grp.sender.chain], linkify: true }),
+          m('.chat-message-group-timestamp', formatTimestampForChat(grp.messages[0].timestamp)),
+          m('.clear'),
+          grp.messages.map((msg) => m('.chat-message-text', [
+            m(MarkdownFormattedText, { doc: msg.text }),
+          ])),
+        ])),
+      ]),
+      !app.isLoggedIn() ? m('.chat-composer-unavailable', 'Log in to join chat')
+        : !app.vm.activeAccount ? m('.chat-composer-unavailable', 'Set up account to join chat')
+        : !vnode.state.chat.isConnected ? m('.chat-composer-unavailable', 'Waiting for connection')
+        : m('form.chat-composer', [
+          m(ResizableTextarea, {
+            name: 'chat',
+            rows: 1,
+            class: vnode.state.chat.isConnected ? '' : 'disabled',
+            disabled: !vnode.state.chat.isConnected,
+            placeholder: vnode.state.chat.isConnected ? 'Enter a message...' : 'Disconnected',
+            oncreate: (vnode2) => $(vnode2.dom).focus(),
+            oninput: vnode.state.outgoingTypingInputHandler,
+            onkeydown: (e) => {
+              // collapse on escape
+              if (e.keyCode === 27) {
+                e.preventDefault();
+                vnode.state.collapsed = true;
+                localStorage.setItem('cwChatCollapsed', 'true');
               }
             },
-          }, [
-            !vnode.state.chat.isConnected ? 'Connecting...' : name,
-            vnode.state.typing && m('span.typing-indicator', 'Typing...'),
-          ]),
-          m('.chat-messages', [
-            groupedMessages.length === 0 && vnode.state.chat.isConnected
-              && m('.chat-message-placeholder', 'No messages yet'),
-            groupedMessages.map((grp) => m('.chat-message-group', [
-              m(User, { user: [grp.sender.address, grp.sender.chain], linkify: true }),
-              m('.chat-message-group-timestamp', formatTimestampForChat(grp.messages[0].timestamp)),
-              m('.clear'),
-              grp.messages.map((msg) => m('.chat-message-text', [
-                m(MarkdownFormattedText, { doc: msg.text }),
-              ])),
-            ])),
-          ]),
-          !app.isLoggedIn() ? m('.chat-composer-unavailable', 'Log in to join chat')
-            : !app.vm.activeAccount ? m('.chat-composer-unavailable', 'Set up account to join chat')
-            : !vnode.state.chat.isConnected ? m('.chat-composer-unavailable', 'Waiting for connection')
-            : m('form.chat-composer', [
-              m(ResizableTextarea, {
-                name: 'chat',
-                rows: 1,
-                class: vnode.state.chat.isConnected ? '' : 'disabled',
-                disabled: !vnode.state.chat.isConnected,
-                placeholder: vnode.state.chat.isConnected ? 'Enter a message...' : 'Disconnected',
-                oncreate: (vnode2) => $(vnode2.dom).focus(),
-                oninput: vnode.state.outgoingTypingInputHandler,
-                onkeydown: (e) => {
-                  // collapse on escape
-                  if (e.keyCode === 27) {
-                    e.preventDefault();
-                    vnode.state.collapsed = true;
-                    localStorage.setItem('cwChatCollapsed', 'true');
-                  }
-                },
-                onkeypress: (e) => {
-                  // submit on enter
-                  if (e.keyCode === 13 && !e.shiftKey) {
-                    e.preventDefault();
-                    if (!vnode.state.chat.isConnected) return;
-                    const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
-                    const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.vm.activeAccount, app.login.jwt);
-                    vnode.state.oninput = false; // HACK: clear the typing debounce
-                    $textarea.val('');
-                  }
-                },
-              }),
-            ]),
+            onkeypress: (e) => {
+              // submit on enter
+              if (e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault();
+                if (!vnode.state.chat.isConnected) return;
+                const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
+                const message = $textarea.val();
+                vnode.state.chat.send('message', message, app.vm.activeAccount, app.login.jwt);
+                vnode.state.oninput = false; // HACK: clear the typing debounce
+                $textarea.val('');
+              }
+            },
+          }),
         ]),
-      ]),
     ]);
   },
 };
 
-const CommunityChatOuter = {
+const ChatPage = {
   view: (vnode) => {
     const activeEntity = app.chain ? app.chain : app.community;
-    if (!activeEntity) return;
+    if (!activeEntity) return m(PageLoading);
     const room = activeEntity.id;
     const name = app.chain ? app.chain.meta.chain.name : app.community.meta.name;
-    return m(CommunityChat, { room, name });
+
+    return m(ListingPage, {
+      class: 'ChatPage',
+      content: m(Chat, { room, name }),
+    });
   },
 };
 
-export default CommunityChatOuter;
+export default ChatPage;

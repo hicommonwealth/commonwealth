@@ -162,6 +162,7 @@ const Navigation: m.Component<{}, {}> = {
        p.startsWith(`/${app.activeId()}/?`) ||
        p.startsWith(`/${app.activeId()}/proposal/discussion`) ||
        p.startsWith(`/${app.activeId()}/discussions`));
+    const onChatPage = (p) => p.startsWith(`/${app.activeChainId()}/chat`);
     const onProposalPage = (p) =>
       (p.startsWith(`/${app.activeChainId()}/proposals`) ||
        p.startsWith(`/${app.activeChainId()}/signaling`) ||
@@ -175,7 +176,8 @@ const Navigation: m.Component<{}, {}> = {
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
 
     return m('.Navigation', {
-      class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
+      class: (app.isLoggedIn() ? 'logged-in' : 'logged-out') + ' ' +
+        ((app.community || app.chain) ? 'active-community' : 'no-active-community'),
     }, [
       m(List, {
         interactive: true,
@@ -271,6 +273,13 @@ const Navigation: m.Component<{}, {}> = {
             active: onDiscussionsPage(m.route.get()),
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
+          }),
+        // chat (all communities)
+        (app.community || app.chain) &&
+          m(ListItem, {
+            active: onChatPage(m.route.get()),
+            label: 'Chat',
+            onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
           }),
         // governance (substrate and cosmos only)
         !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
