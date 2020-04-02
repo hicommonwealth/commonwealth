@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { Observable } from 'rxjs';
 import { IApp } from 'state';
 import { Coin } from 'shared/adapters/currency';
