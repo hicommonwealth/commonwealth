@@ -12,3 +12,7 @@ export interface IStoreUpdate<T> {
 export interface IHasId {
   id: string | number;
 }
+
+export interface IHasAddress {
+  address: string;
+}

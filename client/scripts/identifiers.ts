@@ -1,8 +1,8 @@
 import { Observable, merge } from 'rxjs';
 import { share, map, filter } from 'rxjs/operators';
 
-import { StorageModule, AnyProposal, ChainBase, ChainClass } from 'models/models';
-import { IStoreUpdate, UpdateType, ProposalStore } from 'models/stores';
+import { StorageModule, AnyProposal, ChainBase, ChainClass } from 'models';
+import { IStoreUpdate, UpdateType, ProposalStore } from 'stores';
 
 import app from './state';
 import Substrate from './controllers/chain/substrate/main';
@@ -29,28 +29,28 @@ export const proposalSlugToClass = () => {
     ]);
   }
 
-  const map = new Map<string, StorageModule>([
+  const mmap = new Map<string, StorageModule>([
     ['discussion', app.threads],
   ]);
   if (app.chain.base === ChainBase.Substrate) {
-    map.set('referendum', (app.chain as Substrate).democracy);
-    map.set('democracyproposal', (app.chain as Substrate).democracyProposals);
-    map.set('councilmotion', (app.chain as Substrate).council);
-    map.set('phragmenelection', (app.chain as Substrate).phragmenElections);
-    map.set('treasuryproposal', (app.chain as Substrate).treasury);
+    mmap.set('referendum', (app.chain as Substrate).democracy);
+    mmap.set('democracyproposal', (app.chain as Substrate).democracyProposals);
+    mmap.set('councilmotion', (app.chain as Substrate).council);
+    mmap.set('phragmenelection', (app.chain as Substrate).phragmenElections);
+    mmap.set('treasuryproposal', (app.chain as Substrate).treasury);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
-    map.set('cosmosproposal', (app.chain as Cosmos).governance);
+    mmap.set('cosmosproposal', (app.chain as Cosmos).governance);
   }
   if (app.chain.class === ChainClass.Kusama) {
-    map.set('technicalcommitteemotion', (app.chain as Substrate).technicalCommittee);
+    mmap.set('technicalcommitteemotion', (app.chain as Substrate).technicalCommittee);
   }
   if (app.chain.class === ChainClass.Edgeware) {
-    map.set('signalingproposal', (app.chain as Edgeware).signaling);
+    mmap.set('signalingproposal', (app.chain as Edgeware).signaling);
   }
   if (app.chain.class === ChainClass.Moloch) {
-    map.set('molochproposal', (app.chain as Moloch).governance);
+    mmap.set('molochproposal', (app.chain as Moloch).governance);
   }
-  return map;
+  return mmap;
 };
 
 /*

@@ -9,13 +9,15 @@ import Account from './Account';
 import { ProposalStore } from '../stores';
 
 abstract class Proposal<
-ApiT,
-C extends Coin,
-ConstructorT extends IIdentifiable,
-UpdateT extends ICompletable,
-VoteT extends IVote<C>> implements IUniqueId {
+  ApiT,
+  C extends Coin,
+  ConstructorT extends IIdentifiable,
+  UpdateT extends ICompletable,
+  VoteT extends IVote<C>
+> implements IUniqueId {
   // basic info
-  public readonly data: ConstructorT;
+  protected _data: ConstructorT;
+  public get data(): ConstructorT { return this._data; }
   public readonly identifier: string;
   public readonly slug: string;
   public abstract get shortIdentifier(): string;
@@ -31,7 +33,6 @@ VoteT extends IVote<C>> implements IUniqueId {
   public abstract get votingType(): VotingType;
   public abstract get votingUnit(): VotingUnit;
   public abstract canVoteFrom(account: Account<C>): boolean;
-  public abstract canCreateFrom(account: Account<C>): boolean;
 
   protected votes: BehaviorSubject<{ [account: string] : VoteT }> = new BehaviorSubject({});
   // TODO: these can be observables
@@ -42,8 +43,8 @@ VoteT extends IVote<C>> implements IUniqueId {
   // TODO: these should be observables
   public abstract get support(): Coin | number;
   public abstract get turnout(): number;
-  // public abstract get requirementName(): string;
-  // public abstract get requirementExplanation(): string;
+  //public abstract get requirementName(): string;
+  //public abstract get requirementExplanation(): string;
 
   // adapter logic
   protected _subscription: Unsubscribable;
@@ -59,7 +60,7 @@ VoteT extends IVote<C>> implements IUniqueId {
 
   constructor(slug: string, data: ConstructorT) {
     this.slug = slug;
-    this.data = data;
+    this._data = data;
     this.identifier = data.identifier;
   }
 
@@ -84,7 +85,8 @@ VoteT extends IVote<C>> implements IUniqueId {
     adapter: ProposalAdapter<ApiT, ConstructorT, UpdateT>
   ): void {
     this._subscription = api.pipe(
-      switchMap((api: ApiT) => (adapter.subscribeState(api, this.data)))
+      switchMap((api: ApiT) =>
+        adapter.subscribeState(api, this.data))
     ).subscribe((s) => this.updateState(store, s));
   }
   public unsubscribe(): void {

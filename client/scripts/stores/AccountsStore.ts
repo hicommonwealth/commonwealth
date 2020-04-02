@@ -1,8 +1,7 @@
-import { Coin } from 'shared/adapters/currency';
-import { Account } from '../models';
 import Store from './Store';
+import { IHasAddress } from './interfaces';
 
-class AccountsStore<C extends Coin, T extends Account<C>> extends Store<T> {
+export class AccountsStore<T extends IHasAddress> extends Store<T> {
   private _storeAddress: { [address: string]: T } = {};
 
   public add(account: T) {
@@ -23,7 +22,7 @@ class AccountsStore<C extends Coin, T extends Account<C>> extends Store<T> {
 
   public getByAddress(address: string): T {
     if (this._storeAddress[address] === undefined) {
-      throw new Error(`Invalid user: ${address}`);
+      throw new Error('Invalid user: ' + address);
     }
     return this._storeAddress[address];
   }

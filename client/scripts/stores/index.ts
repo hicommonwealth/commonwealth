@@ -11,4 +11,4 @@ export { default as ReactionsStore } from './ReactionsStore';
 export { default as Store } from './Store';
 export { default as TagsStore } from './TagsStore';
 
-export { UpdateType, IStoreUpdate, IHasId } from './interfaces';
+export { UpdateType, IStoreUpdate, IHasId, IHasAddress } from './interfaces';

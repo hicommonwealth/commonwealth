@@ -22,7 +22,11 @@ import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_elections';
 import { hexToUtf8 } from 'web3-utils';
-import MolochProposal, { MolochProposalVote, MolochVote, MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
+import MolochProposal, {
+  MolochProposalVote,
+  MolochVote,
+  MolochProposalState
+} from 'controllers/chain/ethereum/moloch/proposal';
 import { EthereumAccount } from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 

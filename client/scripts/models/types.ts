@@ -66,6 +66,7 @@ export enum VotingType {
   RankedChoiceVoting = 'rankedchoice',
   MultiOptionVoting = 'multioption',
   None = 'none',
+  MolochYesNo = 'moloch',
 }
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
