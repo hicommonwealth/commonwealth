@@ -6,12 +6,11 @@ import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccounts, { EthereumAccount } from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 
-import { ChainBase, ChainClass, IChainAdapter } from 'models/models';
-
+import { ChainBase, ChainClass, IChainAdapter } from 'models';
+import { selectLogin } from 'controllers/app/login';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
-import { selectLogin } from 'controllers/app/login';
 
 export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;

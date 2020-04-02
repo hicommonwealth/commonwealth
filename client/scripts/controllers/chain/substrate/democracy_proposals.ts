@@ -11,7 +11,7 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { SubstrateDemocracyProposalAdapter } from 'adapters/chain/substrate/subscriptions';
-import { ProposalModule } from 'models/models';
+import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';

@@ -4,7 +4,7 @@ import { default as m } from 'mithril';
 import User from 'views/components/widgets/user';
 import { Coin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
-import { Account } from 'client/scripts/models/models';
+import { Account } from 'models';
 
 // TODO: update this to be generic to all Accounts
 interface IAttrs {

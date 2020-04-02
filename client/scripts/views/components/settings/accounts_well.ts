@@ -8,7 +8,7 @@ import { orderAccountsByAddress, link } from 'helpers';
 import { selectLogin, unlinkLogin } from 'controllers/app/login';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
-import { AddressInfo, ChainClass } from 'models/models';
+import { AddressInfo, ChainClass } from 'models';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';

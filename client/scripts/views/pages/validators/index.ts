@@ -12,13 +12,14 @@ import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/accou
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import { formatAddressShort } from 'helpers';
 import User from 'views/components/widgets/user';
-import { ChainBase, Account, ChainClass } from 'models/models';
+import PageLoading from 'views/pages/loading';
+import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Tabs from '../../components/widgets/tabs';
 import ListingPage from '../_listing_page';
 import { createTXModal } from '../../modals/tx_signing_modal';
-import PageLoading from 'views/pages/loading';
+
 
 import * as CosmosValidationViews from './cosmos';
 import * as SubstrateValidationViews from './substrate';

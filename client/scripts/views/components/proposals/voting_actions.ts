@@ -7,7 +7,7 @@ import app from 'state';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
-import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models/models';
+import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';

@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';
-import { ProposalStore, TagsStore } from 'models/stores';
-import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models/models';
+import { ProposalStore, TagsStore } from 'stores';
+import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
 import { default as $ } from 'jquery';
 import app from 'state';

@@ -4,8 +4,11 @@ import { ApiStatus, IApp } from 'state';
 // `Web3` class type, so it's marked in comments below
 
 import {
-  NodeInfo, ITXModalData, ITXData, IChainModule
-} from 'models/models';
+  NodeInfo,
+  ITXModalData,
+  ITXData,
+  IChainModule
+} from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { EthereumAccount } from './account';
 

@@ -1,17 +1,26 @@
 import { IApp } from 'state';
-import { StorageModule, Identity } from 'models/models';
-import { ProposalStore } from 'models/stores';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import { StorageModule, Identity } from 'models';
+import { ProposalStore } from 'stores';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { Call, Registration, RegistrationJudgement, BalanceOf, AccountId, IdentityInfo, RegistrarInfo, IdentityJudgement } from '@polkadot/types/interfaces';
+import {
+  Call,
+  Registration,
+  RegistrationJudgement,
+  BalanceOf,
+  AccountId,
+  IdentityInfo,
+  RegistrarInfo,
+  IdentityJudgement,
+  IdentityFields
+} from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, Option, Data } from '@polkadot/types';
-import { IdentityFields } from '@polkadot/types/interfaces';
 import { Observable, Unsubscribable } from 'rxjs';
 import { map, takeWhile, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import BN from 'bn.js';
+import SubstrateChain from './shared';
+import SubstrateAccounts, { SubstrateAccount } from './account';
 
 export class SubstrateIdentityStore extends ProposalStore<SubstrateIdentity> { }
 

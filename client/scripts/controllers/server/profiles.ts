@@ -3,8 +3,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import app from 'state';
-import { ProfileStore } from 'models/stores';
-import { Profile } from 'models/models';
+import { ProfileStore } from 'stores';
+import { Profile } from 'models';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();

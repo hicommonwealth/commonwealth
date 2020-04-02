@@ -1,7 +1,7 @@
 import m from 'mithril';
 import lity from 'lity';
 import app from 'state';
-import { OffchainThread, OffchainThreadKind } from '../../../models/models';
+import { OffchainThread, OffchainThreadKind } from 'models';
 import User from '../../components/widgets/user';
 import { link, slugify } from '../../../helpers';
 

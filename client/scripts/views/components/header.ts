@@ -18,7 +18,7 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { NearAccount } from 'controllers/chain/near/account';
-import { ChainClass, ChainBase, Notification, NotificationCategory } from 'models/models';
+import { ChainClass, ChainBase, Notification, NotificationCategory } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 
 import { jumpHighlightComment } from 'views/pages/view_proposal';
@@ -34,8 +34,8 @@ import AddressesModal from 'views/modals/addresses_modal';
 import NewProposalModal from 'views/modals/proposals';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { OffchainCommunitiesStore } from 'client/scripts/models/stores';
-import ConfirmInviteModal from '../modals/confirm_invite_modal';
+import { OffchainCommunitiesStore } from 'stores';
+import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';

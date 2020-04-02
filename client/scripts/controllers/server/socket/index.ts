@@ -1,5 +1,4 @@
 import { default as moment } from 'moment-twitter';
-import { Account } from 'models/models';
 
 // how long to wait after being disconnected
 export const RECONNECT_DELAY = 5000;

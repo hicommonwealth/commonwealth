@@ -7,7 +7,7 @@ import { DropdownFormField, RadioSelectorFormField } from 'views/components/form
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { selectNode } from 'app';
-import { NodeInfo } from 'models/models';
+import { NodeInfo } from 'models';
 
 interface IState {
   initialized: boolean;

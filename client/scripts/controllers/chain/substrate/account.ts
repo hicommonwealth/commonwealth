@@ -3,7 +3,7 @@ import { Observable, combineLatest, of, Observer, empty } from 'rxjs';
 import { map, flatMap, auditTime, switchMap, first } from 'rxjs/operators';
 
 import { ApiRx } from '@polkadot/api';
-import { DeriveStakingValidators } from '@polkadot/api-derive/types';
+import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive/types';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
@@ -11,14 +11,13 @@ import {
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
-import { DeriveAccountInfo } from '@polkadot/api-derive/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
 import { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
-import { Account, IAccountsModule } from 'models/models';
-import { AccountsStore } from 'models/stores';
+import { Account, IAccountsModule } from 'models';
+import { AccountsStore } from 'stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';

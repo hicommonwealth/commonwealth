@@ -1,4 +1,4 @@
-import { IChainModule, ITXModalData, NodeInfo } from 'models/models';
+import { IChainModule, ITXModalData, NodeInfo } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';

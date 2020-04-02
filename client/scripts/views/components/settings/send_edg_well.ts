@@ -7,7 +7,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { featherIcon } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { Account, ChainBase } from 'models/models';
+import { Account, ChainBase } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';

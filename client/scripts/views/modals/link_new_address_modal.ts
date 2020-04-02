@@ -19,7 +19,7 @@ import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EthereumAccount } from 'controllers/chain/ethereum/account';
-import { Account, ChainBase, ChainClass, ChainNetwork } from 'models/models';
+import { Account, ChainBase, ChainClass, ChainNetwork } from 'models';
 
 import ChainIcon from 'views/components/chain_icon';
 import ProfileBlock from 'views/components/widgets/profile_block';

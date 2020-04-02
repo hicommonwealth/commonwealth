@@ -11,7 +11,7 @@ import { inputModalWithText } from 'views/modals/input_modal';
 //import User from 'views/components/widgets/user';
 import { selectLogin } from 'controllers/app/login';
 import { CompactModalExitButton } from 'views/modal';
-import { CommunityInfo } from 'models/models';
+import { CommunityInfo } from 'models';
 
 interface IAttrs {}
 

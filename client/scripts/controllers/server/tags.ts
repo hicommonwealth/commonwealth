@@ -1,8 +1,8 @@
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 
-import { TagsStore } from 'models/stores';
-import { IUniqueId, OffchainThread, OffchainTag } from 'models/models';
+import { TagsStore } from 'stores';
+import { IUniqueId, OffchainThread, OffchainTag } from 'models';
 
 const modelFromServer = (tag) => {
   return new OffchainTag(

@@ -7,7 +7,7 @@ import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_p
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 
-import { IChainAdapter, ChainBase, ChainClass } from 'models/models';
+import { IChainAdapter, ChainBase, ChainClass } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';

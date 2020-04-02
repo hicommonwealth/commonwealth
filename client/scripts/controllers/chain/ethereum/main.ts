@@ -3,7 +3,7 @@ import app from 'state';
 import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
-import { IChainAdapter, ChainBase, ChainClass } from 'models/models';
+import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import EthWebWalletController from '../../app/eth_web_wallet';
 import { selectLogin } from '../../app/login';

@@ -8,7 +8,7 @@ import app from 'state';
 import { Coin } from 'adapters/currency';
 
 import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
-import { ProposalStatus, VotingType, AnyProposal, ChainBase, ChainClass, Proposal } from 'models/models';
+import { ProposalStatus, VotingType, AnyProposal } from 'models';
 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';

@@ -11,7 +11,7 @@ import { u8aToString } from '@polkadot/util';
 
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import { createTXModal } from './tx_signing_modal';
-import { Account } from '../../models/models';
+import { Account } from 'models';
 import { SubstrateAccount } from '../../controllers/chain/substrate/account';
 import AvatarUpload from '../components/avatar_upload';
 import Substrate from '../../controllers/chain/substrate/main';

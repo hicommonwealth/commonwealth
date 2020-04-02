@@ -1,8 +1,7 @@
 import { default as moment } from 'moment-twitter';
-import { Account } from 'models/models';
+import { Account } from 'models';
 import app from 'state';
-import WebsocketController from './';
-import { IWebsocketsPayload } from './';
+import WebsocketController, { IWebsocketsPayload } from '.';
 
 class ChatController extends WebsocketController {
   private readonly _typingListeners: Array<() => void>;

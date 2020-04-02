@@ -4,11 +4,19 @@ import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
 import { IEdgewareSignalingProposal, IEdgewareSignalingProposalState } from 'adapters/chain/edgeware/types';
 import { EdgewareSignalingProposalAdapter } from 'adapters/chain/edgeware/subscriptions';
-import { Account, Proposal, ProposalStatus, ProposalEndTime, IVote,
-         VotingType, VotingUnit, ProposalModule, ChainClass } from 'models/models';
+import { Account,
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  IVote,
+  VotingType,
+  VotingUnit,
+  ProposalModule,
+  ChainClass
+} from 'models';
 import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { ProposalStore } from 'models/stores';
+import { ProposalStore } from 'stores';
 import { BehaviorSubject } from 'rxjs';
 import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
 import { VoteOutcome } from 'edgeware-node-types/dist';

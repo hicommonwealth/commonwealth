@@ -9,11 +9,9 @@ import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 
-import { ChainClass, IChainAdapter, ChainBase } from 'models/models';
-import { u128 } from '@polkadot/types';
+import { ChainClass, IChainAdapter, ChainBase } from 'models';
 import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
-import ProposalArchiveController from '../../server/proposals';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identity';
 

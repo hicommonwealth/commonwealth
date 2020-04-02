@@ -6,7 +6,7 @@ import { default as mixpanel } from 'mixpanel-browser';
 import { WalletAccount } from 'nearlib';
 
 import app from 'state';
-import { ChainBase } from 'models/models';
+import { ChainBase } from 'models';
 import { formatAsTitleCase } from 'helpers';
 import Near from 'controllers/chain/near/main';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';

@@ -12,14 +12,14 @@ import { SubstrateDemocracyReferendumAdapter } from 'adapters/chain/substrate/su
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   ITXModalData, ProposalModule, ChainBase, Account
-} from 'models/models';
-import { default as SubstrateChain } from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import { ProposalStore } from 'models/stores';
+} from 'models';
+import { ProposalStore } from 'stores';
 import { GenericCall } from '@polkadot/types';
 import { BehaviorSubject, Unsubscribable } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import SubstrateDemocracyProposal from './democracy_proposal';
+import { default as SubstrateChain } from './shared';
+import SubstrateAccounts, { SubstrateAccount } from './account';
 
 export enum DemocracyConviction {
   None = 0,

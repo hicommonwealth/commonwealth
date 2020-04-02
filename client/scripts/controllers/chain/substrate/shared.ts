@@ -17,17 +17,23 @@ import { ApiOptions, Signer } from '@polkadot/api/types';
 import { formatCoin, Coin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
-  Proposal, NodeInfo, StorageModule, ITXModalData,
-  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase,
-} from 'models/models';
+  Proposal,
+  NodeInfo,
+  StorageModule,
+  ITXModalData,
+  ITransactionResult,
+  TransactionStatus,
+  IChainModule,
+  ITXData,
+  ChainBase,
+} from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
-import { u128 } from '@polkadot/types';
-import { SubstrateAccount } from './account';
-import { TypeRegistry } from '@polkadot/types';
+import { u128, TypeRegistry } from '@polkadot/types';
 import addressDefaults from '@polkadot/util-crypto/address/defaults';
+import { SubstrateAccount } from './account';
 
 export type HandlerId = number;
 

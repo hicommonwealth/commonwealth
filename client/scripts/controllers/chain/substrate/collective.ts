@@ -6,13 +6,13 @@ import {
   ISubstrateCollectiveProposal, ISubstrateCollectiveProposalState, SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { SubstrateCollectiveAdapter } from 'adapters/chain/substrate/subscriptions';
-import { Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit, ProposalModule } from 'models/models';
-import { default as SubstrateChain } from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import { ProposalStore } from 'models/stores';
+import { Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit, ProposalModule } from 'models';
+import { ProposalStore } from 'stores';
 import { Unsubscribable, BehaviorSubject } from 'rxjs';
 import { Vec, GenericCall } from '@polkadot/types';
 import { CallFunction } from '@polkadot/types/types';
+import { default as SubstrateChain } from './shared';
+import SubstrateAccounts, { SubstrateAccount } from './account';
 
 class SubstrateCollective extends ProposalModule<
   ApiRx,

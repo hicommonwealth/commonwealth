@@ -21,13 +21,14 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models/models';
-import Cosmos from 'client/scripts/controllers/chain/cosmos/main';
+import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
 import { createTXModal } from '../tx_signing_modal';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {

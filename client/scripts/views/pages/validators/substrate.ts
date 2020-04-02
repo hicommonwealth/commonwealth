@@ -12,10 +12,9 @@ import { makeDynamicComponent } from 'models/mithril';
 import User from 'views/components/widgets/user';
 import { TextInputFormField, DropdownFormField } from 'views/components/forms';
 
-import { ITXModalData } from 'models/models';
 import { isU8a, isHex } from '@polkadot/util';
 import { decodeAddress } from '@polkadot/keyring';
-import { IManageStakingModalState, IValidatorAttrs, ViewNominatorsModal } from './';
+import { IManageStakingModalState, IValidatorAttrs, ViewNominatorsModal } from '.';
 import Tabs from '../../components/widgets/tabs';
 
 interface IStashFormState {

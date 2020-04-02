@@ -10,7 +10,7 @@ import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout, LoadingLayout } from 'views/layouts';
 import { ChainInfo, CommunityInfo, NodeInfo,
-  OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models/models';
+  OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { default as moment } from 'moment-twitter';
 import { default as mixpanel } from 'mixpanel-browser';

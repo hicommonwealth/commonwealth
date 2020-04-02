@@ -5,7 +5,7 @@ import { default as _ } from 'lodash';
 import { formatAddressShort, link } from 'helpers';
 
 import app from 'state';
-import { Account, Profile } from 'models/models';
+import { Account, Profile } from 'models';
 import Tooltip from 'views/components/tooltip';
 
 import { makeDynamicComponent } from 'models/mithril';
