@@ -30,8 +30,8 @@ const ProposalsPage: m.Component<{}> = {
   view: (vnode) => {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     // new proposals
-    const visibleDispatchQueue = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.executed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.executed && !p.passed);
+    const visibleDispatchQueue = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
+    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed);
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
     const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware) &&

@@ -47,7 +47,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await Promise.all([
-      this.phragmenElections.init(this.chain, this.accounts, 'electionsPhragmen'),
+      this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
       this.technicalCommittee.init(this.chain, this.accounts),
       this.democracyProposals.init(this.chain, this.accounts),

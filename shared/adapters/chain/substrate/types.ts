@@ -52,9 +52,7 @@ export interface ISubstrateDemocracyReferendum extends IIdentifiable {
 export interface ISubstrateDemocracyReferendumState extends ICompletable {
   method: IMethod;
   votes: { [account: string]: [boolean, number, u128] }; // choice, weight (conviction idx), balance
-  cancelled: boolean; // can only be done via council
   passed: boolean;
-  executed: boolean;
   executionBlock: number;
 }
 

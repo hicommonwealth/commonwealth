@@ -23,7 +23,7 @@ import { flatMap, first, map, takeWhile, startWith, auditTime, switchMap } from 
 import { DeriveReferendum, DeriveReferendumVotes } from '@polkadot/api-derive/types';
 import { EventData } from '@polkadot/types/generic/Event';
 import { ProposalAdapter } from '../../shared';
-import { marshallMethod, waitEvent } from './shared';
+import { marshallMethod, waitEvent, IMethod } from './shared';
 
 type PublicProp = [PropIndex, Hash, AccountId] & Codec;
 type DepositOf = [BalanceOf, Vec<AccountId>] & Codec;
@@ -217,75 +217,64 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
       method: null,
       votes: {},
       passed: false,
-      cancelled: false,
-      executed: false,
       executionBlock: null,
     };
-    return merge(
-      proposal.hash ? api.query.democracy.preimages(proposal.hash).pipe(
-        map((preimage: PreImage) => {
-          // TODO: use this preimage in more detail once I understand it
-          if (preimage.isSome) {
-            const [ propVec, proposer, balance, at ] = preimage.unwrap();
-            const prop = createType(api.registry, 'Proposal', propVec.toU8a(true));
-            state.method = marshallMethod(prop);
-          }
-          return state;
-        })
-      ) : never(),
+    return combineLatest(
+      // returns if the proposal is not yet passed/failed
       api.derive.democracy.referendumsInfo([ new BN(proposal.identifier) ]).pipe(
         switchMap((referenda: DeriveReferendum[]) => {
           if (referenda.length) {
-            return api.derive.democracy._referendumVotes(referenda[0]).pipe(
-              map((votes: DeriveReferendumVotes) => {
-                votes.votes.forEach((v) => {
-                  state.votes[v.accountId.toString()] = [v.vote.isAye, v.vote.conviction.index, v.balance];
-                });
-                return state;
-              })
-            );
+            // we can fetch the data, so grab the votes too
+            return api.derive.democracy._referendumVotes(referenda[0]);
           } else {
-            return of(state);
+            return of(null);
           }
         })
       ),
-      waitEvent(api, (e: EventData) => {
-        return e.section === 'democracy' &&
-          ((e.method === 'Passed' || e.method === 'NotPassed' ||
-            e.method === 'Cancelled' || e.method === 'Executed') &&
-          (+(e[0] as ReferendumIndex) === proposal.index));
-      }).pipe(
-        map((e: EventData) => {
-          if (e.method === 'Passed') {
-            state.passed = true;
-          } else if (e.method === 'NotPassed') {
-            state.completed = true;
-            state.passed = false;
-          } else if (e.method === 'Cancelled') {
-            state.completed = true;
-            state.cancelled = true;
-          } else if (e.method === 'Executed') {
-            // TODO: add "executed OK" flag?
-            state.completed = true;
-            state.executed = true;
-          }
-          return state;
-        })
-      ),
-      api.query.democracy.dispatchQueue().pipe(
-        flatMap((queue) => {
-          const data = queue.find(([executionBlock, hash, idx]) => +idx === proposal.index);
-          if (data) {
-            const [ executionBlock ] = data;
-            state.passed = true;
-            state.executionBlock = +executionBlock;
-            return of(state);
-          } else {
-            return of(state);
-          }
-        })
-      ),
+      this._useRedesignLogic ? api.query.democracy.referendumInfoOf(new BN(proposal.identifier)) : of(null),
+      // returns if proposal is passed and waiting
+      api.query.democracy.dispatchQueue(),
     ).pipe(
+      flatMap(([ votes, refInfo, dispatchQueue ]:
+          [ DeriveReferendumVotes, Option<ReferendumInfo>, Array<[BlockNumber, Hash, ReferendumIndex] & Codec> ]) => {
+        if (votes) {
+          votes.votes.forEach((v) => {
+            state.votes[v.accountId.toString()] = [v.vote.isAye, v.vote.conviction.index, v.balance];
+          });
+        }
+        const dispatchData = dispatchQueue.find(([executionBlock, hash, idx]) => +idx === proposal.index);
+        let hash = proposal.hash;
+        if (dispatchData) {
+          const [ executionBlock, proposalHash ] = dispatchData;
+          state.passed = true;
+          state.executionBlock = +executionBlock;
+
+          // now we can fetch the preimage without knowing the hash in the beginning
+          hash = hash || proposalHash;
+        } else if (refInfo && refInfo.isSome) {
+          // This only happens on kusama -- we use it to check whether a finished referendum passed
+          //   on edgeware, the finished referendum will just disappear.
+          // Note that in this case, the preimage will be deleted from the chain.
+          const ref = refInfo.unwrap() as ReferendumInfo;
+          if (ref.isFinished) {
+            const { approved } = ref.asFinished;
+            state.passed = approved.isTrue;
+            state.completed = true;
+          }
+        } else if (!votes) {
+          // on edgeware, once the votes and queue disapppear, we're done.
+          state.completed = true;
+        }
+        return hash ? api.query.democracy.preimages(hash) : of(null);
+      }),
+      map((preimage: PreImage) => {
+        if (preimage && preimage.isSome) {
+          const [ propVec, proposer, balance, at ] = preimage.unwrap();
+          const prop = createType(api.registry, 'Proposal', propVec.toU8a(true));
+          state.method = marshallMethod(prop);
+        }
+        return state;
+      }),
       takeWhile((s: ISubstrateDemocracyReferendumState) => !s.completed, true)
     );
   }

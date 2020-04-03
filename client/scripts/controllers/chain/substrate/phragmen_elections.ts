@@ -60,12 +60,16 @@ class SubstratePhragmenElections extends ProposalModule<
     super.deinit();
   }
 
-  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName: string): Promise<void> {
+  public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName?: string): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstratePhragmenElectionAdapter(moduleName);
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
+        if (!moduleName) {
+          moduleName = api.consts.elections ? 'elections' : 'phragmenElections';
+        }
+        this._adapter = new SubstratePhragmenElectionAdapter(moduleName);
+
         this._candidacyBond = this._Chain.coins(api.consts[moduleName].candidacyBond as BalanceOf);
         this._votingBond = this._Chain.coins(api.consts[moduleName].votingBond as BalanceOf);
         this._desiredMembers = +api.consts[moduleName].desiredMembers;

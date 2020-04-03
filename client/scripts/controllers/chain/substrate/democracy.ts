@@ -259,15 +259,11 @@ extends Proposal<
   private _title: string;
   private readonly _endBlock: number;
 
-  public get executed() { return this._executed; }
-  public get passed() { return this._passed; }
-
-  // set to true or false after voting ends, but before completed = true
   private _passed: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  // if true, referendum also has completed = true
-  private _cancelled: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  // if true, referendum also has completed = true
-  private _executed: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public get passed() { return this._passed.value; }
+
+  private _executionBlock: number;
+  public get executionBlock() { return this._executionBlock; }
 
   public _method: Call;
   get method() { return this._method; }
@@ -353,8 +349,8 @@ extends Proposal<
   }
 
   get isPassing() {
-    if (this._passed.getValue() === true) return ProposalStatus.Passed;
-    if (this.completed === true && this._passed.getValue() === false) return ProposalStatus.Failed;
+    if (this._passed.value === true) return ProposalStatus.Passed;
+    if (this.completed === true && this._passed.value === false) return ProposalStatus.Failed;
     if (this._Chain.totalbalance.eqn(0)) return ProposalStatus.None;
     if (this.edgVoted.eqn(0)) return ProposalStatus.Failing;
 
@@ -382,10 +378,13 @@ extends Proposal<
   }
 
   // TRANSACTIONS
+  // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
     let srmlVote;
     if (this._Democracy.isRedesignLogic) {
-      const balance = await vote.account.balance.pipe(first()).toPromise();
+      // fake the arg to compute balance
+      const balance = await (vote.account as SubstrateAccount).freeBalance.pipe(first()).toPromise();
+
       // "AccountVote" type, for kusama
       // we don't support "Split" votes right now
       srmlVote = {
@@ -397,6 +396,14 @@ extends Proposal<
           balance: balance.asBN,
         }
       }
+
+      // TODO: move this computation out into the view as needed, to prepopulate field
+      const fees = await this._Chain.computeFees(
+        vote.account.address,
+        (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote)
+      );
+
+      srmlVote.Standard.balance = balance.sub(fees).toString();
     } else {
       // "Vote" type, for edgeware
       srmlVote = {
@@ -472,7 +479,7 @@ extends Proposal<
       throw new Error('preimage does not match proposal hash');
     }
     // if the preimage is needed for a call in the dispatch queue, it is free to note
-    if (!this._passed.getValue()) {
+    if (!this._passed.value) {
       throw new Error('referendum is not yet in the dispatch queue');
     }
     return this._Chain.createTXModalData(
@@ -498,8 +505,7 @@ extends Proposal<
       }
     }
     this._passed.next(state.passed);
-    this._cancelled.next(state.cancelled);
-    this._executed.next(state.executed);
+    this._executionBlock = state.executionBlock;
     super.updateState(store, state);
   }
 }

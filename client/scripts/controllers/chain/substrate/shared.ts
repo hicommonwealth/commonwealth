@@ -8,17 +8,17 @@ import BN from 'bn.js';
 import { ApiRx, WsProvider, SubmittableResult, Keyring } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
-  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties
+  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties, DispatchError
 } from '@polkadot/types/interfaces';
 import { Vec, Compact } from '@polkadot/types/codec';
 import { createType } from '@polkadot/types/create';
-import { ApiOptions, Signer } from '@polkadot/api/types';
+import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { formatCoin, Coin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
   Proposal, NodeInfo, StorageModule, ITXModalData,
-  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase,
+  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase
 } from 'models/models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -452,6 +452,18 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._eventsInitialized = true;
   }
 
+  public async computeFees(senderAddress: string, txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>): Promise<SubstrateCoin> {
+    return new Promise((resolve, reject) => {
+      this.api.pipe(
+        switchMap((api: ApiRx) => {
+          return txFunc(api).paymentInfo(senderAddress);
+        }),
+      ).subscribe((fees) => {
+        resolve(this.coins(fees.partialFee.toBn()));
+      }, (error) => reject(error));
+    });
+  }
+
   public createTXModalData(
     author: SubstrateAccount,
     txFunc,
@@ -521,6 +533,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                         timestamp: app.chain.block.lastTime,
                       };
                     } else if (method === 'ExtrinsicFailed') {
+                      const errorData = data[0] as DispatchError;
+                      if (errorData.isModule) {
+                        const errorInfo = this.registry.findMetaError(errorData.asModule.toU8a());
+                        console.error(`${errorInfo.section}::${errorInfo.name}: ${errorInfo.documentation[0]}`);
+                      }
                       notifyError(`Failed ${txName}: "${objName}"`);
                       return {
                         status: TransactionStatus.Failed,
