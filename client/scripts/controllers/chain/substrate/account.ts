@@ -17,7 +17,7 @@ import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { Account, IAccountsModule } from 'models/models';
+import { Account, IAccountsModule, ChainClass } from 'models/models';
 import { AccountsStore } from 'models/stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -516,6 +516,18 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       }),
       'setKeys',
       `${this.address} sets validation commission ${this.validate}`,
+    );
+  }
+
+  public unlockTx() {
+    if (this.chainClass !== ChainClass.Kusama) {
+      throw new Error('unlock only supported on Kusama');
+    }
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.democracy.unlock(this.address),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
     );
   }
 

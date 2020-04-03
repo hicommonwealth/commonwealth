@@ -382,11 +382,28 @@ extends Proposal<
   }
 
   // TRANSACTIONS
-  public submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
-    const srmlVote = this._Chain.createType('Vote', {
-      aye: vote.choice,
-      conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight))
-    });
+  public async submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
+    let srmlVote;
+    if (this._Democracy.isRedesignLogic) {
+      const balance = await vote.account.balance.pipe(first()).toPromise();
+      // "AccountVote" type, for kusama
+      // we don't support "Split" votes right now
+      srmlVote = {
+        Standard: {
+          vote: {
+            aye: vote.choice,
+            conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index,
+          },
+          balance: balance.asBN,
+        }
+      }
+    } else {
+      // "Vote" type, for edgeware
+      srmlVote = {
+        aye: vote.choice,
+        conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index,
+      };
+    }
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
       (api: ApiRx) => api.tx.democracy.vote(this.data.index, srmlVote),
@@ -394,22 +411,41 @@ extends Proposal<
       this.title
     );
   }
-  public async proxyVoteTx(vote: BinaryVote<SubstrateCoin>) {
-    const proxyFor = await (vote.account as SubstrateAccount).proxyFor.pipe(first()).toPromise();
-    if (!proxyFor) {
-      throw new Error('not a proxy');
+
+  public unvote(who: SubstrateAccount, target?: SubstrateAccount) {
+    if (!this._Democracy.isRedesignLogic) {
+      throw new Error('unvote unsupported');
     }
-    const srmlVote = this._Chain.createType('Vote', {
-      aye: vote.choice,
-      conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)),
-    });
+    // you can remove someone else's vote if their unvote scope is set properly,
+    // but we don't support that in the UI right now (it requires their vote
+    // to be "expired", or for the proxy configuration to allow removing their vote)
+    if (!target) {
+      target = who;
+    }
     return this._Chain.createTXModalData(
-      vote.account as SubstrateAccount,
-      (api: ApiRx) => api.tx.democracy.proxyVote(this.data.index, srmlVote),
-      'submitProxyDemocracyVote',
-      this.title
+      who,
+      (api: ApiRx) => api.tx.democracy.removeOtherVote(target.address, this.data.index),
+      'unvote',
+      `${who.address} unvotes for ${target.address} on referendum ${this.data.index}`,
     );
   }
+
+  // public async proxyVoteTx(vote: BinaryVote<SubstrateCoin>) {
+  //   const proxyFor = await (vote.account as SubstrateAccount).proxyFor.pipe(first()).toPromise();
+  //   if (!proxyFor) {
+  //     throw new Error('not a proxy');
+  //   }
+  //   const srmlVote = this._Chain.createType('Vote', {
+  //     aye: vote.choice,
+  //     conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)),
+  //   });
+  //   return this._Chain.createTXModalData(
+  //     vote.account as SubstrateAccount,
+  //     (api: ApiRx) => api.tx.democracy.proxyVote(this.data.index, srmlVote),
+  //     'submitProxyDemocracyVote',
+  //     this.title
+  //   );
+  // }
 
   public async notePreimage(author: SubstrateAccount, action: Call) {
     const hash = action.hash;
