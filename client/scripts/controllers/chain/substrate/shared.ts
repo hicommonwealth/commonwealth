@@ -225,7 +225,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public getTxMethod(mod: string, func: string): SubmittableExtrinsicFunction<'rxjs'> {
-    return this._api.tx[mod][func];
+    const result = this._api.tx[mod][func];
+    if (!result) {
+      throw new Error(`unsupported transaction: ${mod}::${func}`);
+    }
+    return result;
   }
 
   public deinitMetadata() {

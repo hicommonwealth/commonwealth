@@ -430,66 +430,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  public async setProxyTx(proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('already a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.setProxy(proxy.address),
-      'setProxy',
-      `${this.address} sets proxy to ${proxy.address}`
-    );
-  }
-
-  public async resignProxyTx() {
-    const proxyFor = await this.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.resignProxy(),
-      'resignProxy',
-      `${this.address} resigns as proxy`
-    );
-  }
-
-  public async removeProxyTx(proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (!proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.removeProxy(proxy.address),
-      'removeProxy',
-      `${this.address} removes proxy ${proxy.address}`
-    );
-  }
-
-  public delegateTx(toAccount: SubstrateAccount, conviction: Conviction) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.delegate(toAccount.address, conviction),
-      'delegate',
-      `${this.address} delegates to ${toAccount.address}`
-    );
-  }
-
-  public undelegateTx() {
-    if (!this.delegation) {
-      throw new Error('Account not delegated');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.undelegate(),
-      'undelegate',
-      `undelegating ${this.address}`
-    );
-  }
-
   public nominateTx(nominees: SubstrateAccount[]) {
     return this._Chain.createTXModalData(
       this,

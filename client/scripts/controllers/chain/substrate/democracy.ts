@@ -146,6 +146,71 @@ class SubstrateDemocracy extends ProposalModule<
     );
   }
 
+ /*
+  * Proxying and Delegation currently unsupported...
+  * If we decide to support them, we'll update the controllers.
+
+  public async setProxyTx(who: SubstrateAccount, proxy: SubstrateAccount) {
+    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
+    if (proxyFor) {
+      throw new Error('already a proxy');
+    }
+    return this._Chain.createTXModalData(
+      who,
+      (api: ApiRx) => api.tx.democracy.setProxy(proxy.address),
+      'setProxy',
+      `${who.address} sets proxy to ${proxy.address}`
+    );
+  }
+
+  public async resignProxyTx(who: SubstrateAccount) {
+    const proxyFor = await who.proxyFor.pipe(first()).toPromise();
+    if (proxyFor) {
+      throw new Error('not a proxy');
+    }
+    return this._Chain.createTXModalData(
+      who,
+      (api: ApiRx) => api.tx.democracy.resignProxy(),
+      'resignProxy',
+      `${who.address} resigns as proxy`
+    );
+  }
+
+  public async removeProxyTx(who: SubstrateAccount, proxy: SubstrateAccount) {
+    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
+    if (!proxyFor) {
+      throw new Error('not a proxy');
+    }
+    return this._Chain.createTXModalData(
+      who,
+      (api: ApiRx) => api.tx.democracy.removeProxy(proxy.address),
+      'removeProxy',
+      `${who.address} removes proxy ${proxy.address}`
+    );
+  }
+
+  public delegateTx(who: SubstrateAccount, toAccount: SubstrateAccount, conviction: Conviction) {
+    return this._Chain.createTXModalData(
+      who,
+      (api: ApiRx) => api.tx.democracy.delegate(toAccount.address, conviction),
+      'delegate',
+      `${who.address} delegates to ${toAccount.address}`
+    );
+  }
+
+  public undelegateTx(who: SubstrateAccount) {
+    if (!who.delegation) {
+      throw new Error('Account not delegated');
+    }
+    return this._Chain.createTXModalData(
+      who,
+      (api: ApiRx) => api.tx.democracy.undelegate(),
+      'undelegate',
+      `undelegating ${who.address}`
+    );
+  }
+  */
+
   public createTx(...args): ITXModalData {
     throw new Error('cannot directly create democracy referendum');
   }
