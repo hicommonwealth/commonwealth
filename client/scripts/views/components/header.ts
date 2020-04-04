@@ -774,12 +774,12 @@ const NotificationButtons: m.Component<{ notifications }> = {
           app.login.notifications.markAsRead(notifications).then(() => m.redraw());
         }
       }, 'Mark All Read'),
-      m('.button', {
-        onclick: (e) => {
-          e.preventDefault();
-          app.login.notifications.clearAllRead().then(() => m.redraw());
-        }
-      }, 'Clear All Read'),
+      // m('.button', {
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.login.notifications.clearAllRead().then(() => m.redraw());
+      //   }
+      // }, 'Clear All Read'),
     ]);
   }
 };
