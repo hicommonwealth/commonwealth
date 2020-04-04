@@ -22,88 +22,81 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
+import ViewVotersModal from 'views/modals/view_voters_modal';
 
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
   title: string;
+  reelection: boolean;
 }
 
 const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
-    const { account, title } = vnode.attrs;
-    const expiresOnBlock = (app.chain as Substrate).phragmenElections.activeElection.endTime.blocknum;
+    const { account, title, reelection } = vnode.attrs;
+    const election = (app.chain as Substrate).phragmenElections;
 
-    return link('a.CollectiveMember', `/${account.chain.id}/account/${account.address}`, [
-      m('.col-member', m(ProfileBlock, { account })),
-      m('.col-info', [
-        m('.metadata-item', title),
-        m('.metadata-item', expiresOnBlock < app.chain.block.height ? [
-          `Term ended ${formatNumberLong(expiresOnBlock)} (refresh to update)`
-        ] : [
-          `Term ends ${formatNumberLong(expiresOnBlock)} (`,
-          m(CountdownUntilBlock, { block: expiresOnBlock }),
-          ')',
-        ]),
-      ]),
-    ]);
-  }
-};
-
-const CollectiveVotingButton: m.Component<{ candidates }> = {
-  view: (vnode) => {
-    const { candidates } = vnode.attrs;
-    return m('a.proposals-action.CollectiveVotingButton', {
-      class: !app.vm.activeAccount ? 'disabled' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: CouncilVotingModal,
-          data: { candidates },
-        });
-      }
-    }, 'Vote');
-  }
-};
-
-const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
-  view: (vnode) => {
-    const { activeAccountIsCandidate, candidates } = vnode.attrs;
-
-    // TODO: Retract candidacy buttons
-    return m('a.proposals-action.CandidacyButton', {
-      class: (!app.vm.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected) ?
-        'disabled' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        if (app.modals.getList().length > 0) return;
-        app.modals.create({ modal: NewProposalModal, data: { typeEnum: ProposalType.PhragmenCandidacy } });
-      },
-    }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
-  }
-};
-
-// TODO: identify and display whether user has already placed a voter bond
-interface ICouncilCandidateAttrs {
-  candidate: SubstrateAccount;
-}
-
-const CouncilCandidate: m.Component<ICouncilCandidateAttrs> = {
-  view: (vnode) => {
-    const candidate = vnode.attrs.candidate;
-    const votes: Array<IVote<SubstrateCoin>> =
+    const votes: PhragmenElectionVote[] =
       (app.chain as Substrate).phragmenElections.activeElection.getVotes()
-        .filter((v) => v.votes.includes(candidate.address));
+        .filter((v) => v.votes.includes(account.address));
+
     const hasMyVote = app.vm.activeAccount && votes.filter((v) => v.account === app.vm.activeAccount);
 
-    return link('a.CouncilCandidate', `/${candidate.chain.id}/account/${candidate.address})}`, [
-      m('.col-member', m(ProfileBlock, { account: candidate })),
-      m('.col-info', [
-        m('.metadata-item', [
-          `${pluralize(votes.length, 'account')} supporting`,
-          hasMyVote && ' (✓ Supporting)',
+    return m('.CollectiveMember', {
+      onclick: (e) => {
+        e.preventDefault();
+        app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
+        }
+      }, [
+      m('.proposal-row-left', [
+        m('.proposal-pre', [
+          m(User, {
+            user: account,
+            avatarOnly: true,
+            avatarSize: 36,
+            tooltip: true,
+          }),
+        ]),
+        m('.proposal-pre-mobile', [
+          m(User, {
+            user: account,
+            avatarOnly: true,
+            avatarSize: 16,
+            tooltip: true,
+          }),
         ]),
       ]),
+      m('.proposal-row-main', [
+        // Case One Councillor 3 same size divs
+        m('.item', [
+          m('.proposal-row-subheading', title),
+          m('.proposal-row-metadata', [
+            m('.proposal-user', [
+              m(User, {
+                user: account,
+                hideAvatar: true,
+                tooltip: true,
+              }),
+            ]),
+            m('.proposal-user-mobile', [
+              m(User, {
+                user: account,
+                hideAvatar: true,
+                tooltip: true,
+              }),
+            ]),
+          ]),
+        ]),
+        m('.item', [
+          m('.proposal-row-subheading', 'Backing'),
+          m('.proposal-row-metadata', (election.isMember(account)) ? election.backing(account).format(true) : votes.length),
+        ]),
+        reelection && m('.item', [
+          m('.proposal-row-subheading', 'Candidate for re-election'),
+          m('.proposal-row-metadata', 'Yes' )
+        ]),
+      ]),
+      m('.proposal-row-xs-clear'),
     ]);
   }
 };
@@ -156,6 +149,39 @@ const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
   }
 };
 
+const CollectiveVotingButton: m.Component<{ candidates }> = {
+  view: (vnode) => {
+    const { candidates } = vnode.attrs;
+    return m('a.proposals-action.CollectiveVotingButton', {
+      class: !app.vm.activeAccount ? 'disabled' : '',
+      onclick: (e) => {
+        e.preventDefault();
+        app.modals.create({
+          modal: CouncilVotingModal,
+          data: { candidates },
+        });
+      }
+    }, 'Vote');
+  }
+};
+
+const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
+  view: (vnode) => {
+    const { activeAccountIsCandidate, candidates } = vnode.attrs;
+
+    // TODO: Retract candidacy buttons
+    return m('a.proposals-action.CandidacyButton', {
+      class: (!app.vm.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected) ?
+        'disabled' : '',
+      onclick: (e) => {
+        e.preventDefault();
+        if (app.modals.getList().length > 0) return;
+        app.modals.create({ modal: NewProposalModal, data: { typeEnum: ProposalType.PhragmenCandidacy } });
+      },
+    }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
+  }
+};
+
 const CouncilPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
@@ -175,7 +201,7 @@ const CouncilPage: m.Component<{}> = {
     const candidates: Array<[SubstrateAccount, number]> = app.chain &&
      ((app.chain as Substrate).phragmenElections.activeElection &&
        (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
-       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
+       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]).filter(([c, n]) => !councillors.includes(c));
 
     const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
     const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;
@@ -199,7 +225,7 @@ const CouncilPage: m.Component<{}> = {
           ? m('.no-proposals', 'No members')
           : m('.councillors', [
             councillors.map(
-              (account) => m(CollectiveMember, { account, title: 'Councillor' })
+              (account) => m(CollectiveMember, { account, title: 'Councillor', reelection: true })
             ),
             m('.clear'),
           ]),
@@ -212,7 +238,7 @@ const CouncilPage: m.Component<{}> = {
         candidates.length === 0
           ? m('.no-proposals', 'No candidates')
           : m('.council-candidates', [
-            candidates.map(([candidate, slot]) => m(CouncilCandidate, { candidate })),
+            candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
             m('.clear'),
           ]),
         // voters

@@ -28,10 +28,9 @@ const ProposalsPage: m.Component<{}> = {
   },
   view: (vnode) => {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
-    // new proposals
 
+    // new proposals
     const visibleMolochProposals = onMoloch && (app.chain as Moloch).governance.store.getAll()
       .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 

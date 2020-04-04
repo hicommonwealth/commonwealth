@@ -42,7 +42,6 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
 import VersionHistoryModal from '../modals/version_history_modal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 
@@ -134,7 +133,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
 
-    const subtitle = (proposal.ProposalType === SubstrateTreasuryProposal) ?
+    const subtitle = (proposal.ProposalType === ProposalType.SubstrateTreasuryProposal) ?
       `Proposed spend: ${formatCoin(proposal.value)} to ${proposal.beneficiaryAddress}` :
       proposal.title;
 
@@ -144,7 +143,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       m('.row.row-narrow', [
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
-            m('.title', proposal.title),
+            m('.title', app.chain.base === ChainBase.Substrate && proposal.type !== 'discussions' && proposal.title.split('(')[0]),
           ]),
           isThread
             ? m('.discussion-meta', [

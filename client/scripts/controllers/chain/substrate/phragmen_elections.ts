@@ -7,13 +7,14 @@ import { ISubstratePhragmenElection, ISubstratePhragmenElectionState, SubstrateC
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstratePhragmenElectionAdapter } from 'adapters/chain/substrate/subscriptions';
 import SubstrateChain from './shared';
-import { takeWhile, first, switchMap, flatMap } from 'rxjs/operators';
+import { takeWhile, first, switchMap, flatMap, map } from 'rxjs/operators';
 import { Unsubscribable, combineLatest, of } from 'rxjs';
 import BN from 'bn.js';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
+import { BalanceOf, AccountId, Balance } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, StorageKey } from '@polkadot/types';
 import { ProposalStore } from 'models/stores';
+import _ from 'underscore';
 
 type ElectionResultCodec = [ AccountId, BalanceOf ] & Codec;
 
@@ -44,11 +45,13 @@ class SubstratePhragmenElections extends ProposalModule<
   private _members: { [who: string]: BN };
   public get members() { return Object.keys(this._members); }
   public isMember(who: SubstrateAccount) { return !!this._members[who.address]; }
+  public backing(who: SubstrateAccount) { return this._Chain.coins(this._members[who.address]); }
 
   private _runnersUp: Array<{ who: string, score: BN }>;
   public get runnersUp() { return this._runnersUp.map((r) => r.who); }
   public get nextRunnerUp() { return this._runnersUp[this._runnersUp.length - 1].who; }
   public isRunnerUp(who: SubstrateAccount) { return !!this._runnersUp.find((r) => r.who === who.address); }
+  public runnerUpBacking(who: SubstrateAccount) { return !!this._runnersUp.find((r) => r.who === who.address).score; }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -203,37 +206,64 @@ export class SubstratePhragmenElection extends Proposal<
   // updates, as voters would be returned in a single array or map.
   private subscribeVotes() {
     this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
-      api.query[this.moduleName].votesOf.entries().pipe(
-        // automatically close on complete
-        takeWhile(() => !this.completed),
-        flatMap((votes: Array<[StorageKey, Vec<AccountId>]>) => {
-          return combineLatest(
-            of(votes),
-            // update stakes too whenever the map gets updated -- changes in
-            // stake values will push updates here as well
-            api.queryMulti(votes.map(([ voter, votedFor ]) => {
-              return [ api.query[this.moduleName].stakeOf, voter ];
-            })).pipe(first()),
-          );
-        }),
-      ).subscribe(([ votes, stakes ]: [ Array<[StorageKey, Vec<AccountId>]>, BalanceOf[] ]) => {
-        // first, remove all retracted voters
-        for (const currentVoter of this.getVoters()) {
-          if (votes.find(([ voter ]) => voter.toString() === currentVoter) === undefined) {
-            this.removeVote(this._Accounts.get(currentVoter));
+      (api.query[this.moduleName].voting ?
+        // this branch is for kusama
+        api.query[this.moduleName].voting.entries().pipe(
+          map((voting: Array<[StorageKey, [ BalanceOf, Vec<AccountId> ] & Codec ]>) => {
+            const votingData: { [voter: string]: PhragmenElectionVote } = { }
+            for (const [ key, [ stake, votes ]] of voting) {
+              const voter = key.args[0].toString();
+              const vote = new PhragmenElectionVote(
+                this._Accounts.get(voter),
+                votes.map((v) => v.toString()),
+                stake ? this._Chain.coins(stake) : this._Chain.coins(0),
+              );
+              votingData[voter] = vote;
+            }
+            return votingData;
+          })
+        ) :
+        // this branch is for edgeware
+        api.query[this.moduleName].votesOf.entries().pipe(
+          flatMap((votes: Array<[StorageKey, Vec<AccountId>] & Codec>) => {
+            return combineLatest(
+              of(votes),
+              api.queryMulti(
+                votes.map(([ who ]) => [ api.query[this.moduleName].stakeOf, who.args[0] ])
+              ),
+            );
+          }),
+          map(([ votes, stakes ]: [ Array<[StorageKey, Vec<AccountId>] & Codec>, BalanceOf[] ]) => {
+            const votingData: { [voter: string]: PhragmenElectionVote } = {};
+            for (const [ [ key, voterVotes ], stake ] of _.zip(votes, stakes)) {
+              const voter = key.args[0].toString();
+              const vote = new PhragmenElectionVote(
+                this._Accounts.get(voter),
+                voterVotes.map((v) => v.toString()),
+                this._Chain.coins(stake)
+              );
+              votingData[voter] = vote;
+            }
+            return votingData;
+          })
+        )).pipe(
+          // automatically close on complete
+          takeWhile(() => !this.completed),
+        ).subscribe((votes: { [voter: string]: PhragmenElectionVote }) => {
+          // first, remove all retracted voters
+          for (const currentVoter of this.getVoters()) {
+            if (!votes[currentVoter]) {
+              this.removeVote(this._Accounts.get(currentVoter));
+            }
           }
-        }
 
-        // then, add or update all votes
-        for (const [ i, [ voter, votedFor ] ] of votes.entries()) {
-          if (!this._Accounts.isZero(voter.toString())) {
-            const stake = this._Chain.coins(stakes[i]);
-            const voterAcct = this._Accounts.fromAddress(voter.toString());
-            const voteStrings = votedFor.map((v) => v.toString());
-            this.addOrUpdateVote(new PhragmenElectionVote(voterAcct, voteStrings, stake));
+          // then, add or update all votes
+          for (const vote of Object.values(votes)) {
+            if (!this._Accounts.isZero(vote.account.address) && vote.stake.gtn(0)) {
+              this.addOrUpdateVote(vote);
+            }
           }
-        }
-      });
+        });
     });
   }
 
