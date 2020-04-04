@@ -1,28 +1,35 @@
 @import 'client/styles/shared';
 
-@mixin proposal-row-metadata {
-    > * {
-        margin-right: 15px;
-        margin-bottom: 3px;
-    }
-    .proposal-status {
-        color: #999;
-        font-weight: 700;
-        &.pass {
-            color: #06983a;
-        }
-        &.fail {
-            color: #d0021b;
-        }
-    }
-    .proposal-comments {
-        display: inline-block;
-        font-weight: 700;
-        color: #999;
-    }
+.ViewVotersModal {
+  max-width: 560px;
+  padding-bottom: 20px;
+
+  .compact-modal-title {
+    text-overflow: ellipsis;
+  }
+
+  pre {
+      padding: 12px 16px 11px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      background: #222;
+      color: #fff;
+      font-family: SF Mono, Roboto, Menlo, monospace;
+      font-size: 13px;
+      white-space: pre;
+      &.click-to-select {
+          cursor: pointer;
+      }
+      &.click-to-select:active {
+          opacity: 0.9;
+      }
+      &::selection {
+          background: #ffdd00;
+      }
+  }
 }
 
-.CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
+.VoterRow {
     display: flex;
     border: 1px solid #eee;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
@@ -44,6 +51,7 @@
             display: none;
         }
     }
+
     .proposal-pre-mobile {
         display: none;
         .User {
@@ -63,21 +71,9 @@
         flex: 1 0;
     }
     .proposal-row-left {
-        width: 60px;
-    }
-    .proposal-row-responsive-clear {
-        display: none;
-    }
-    .proposal-row-right {
-        min-width: 280px;
-        width: 280px;
-        padding-left: 30px;
-        display: flex;
-    }
-    .proposal-row-right-chart {
-        min-width: 120px;
-        width: 120px;
-        padding-left: 26px;
+        min-width: 50px;
+        width: 50px;
+        padding-right: 16px;
     }
 
     // left
@@ -89,7 +85,7 @@
         }
     }
     // main
-    .proposal-row-main {
+    .proposal-row-main.container {
         display: flex;
 
         @include xs-max {
@@ -117,7 +113,6 @@
 
         .proposal-row-metadata {
             font-weight: 600;
-            min-width: 90px;
 
             @include xs-max {
                 display: block;
@@ -125,7 +120,9 @@
 
             .proposal-user {
                 margin-top: 4px;
+                color: #bdbdbd;
                 .username {
+                    color: #bdbdbd;
                     font-weight: 400;
                 }
             }
@@ -141,17 +138,16 @@
             }
         }
 
-        .item {
+        .proposal-row-main.item {
             flex: 1 0 auto;
             text-overflow: ellipsis;
         }
-    }
-    // right
-    .proposal-row-right-text {
-        padding-top: 4px;
-    }
-    .proposal-row-right-chart {
-        padding-top: 2px;
+
+        .proposal-row-main-large.item {
+            flex: 2 0 auto;
+        }
+
+
     }
 
     // responsive
@@ -184,11 +180,9 @@
         .proposal-row-main {
             width: 100%;
             padding: 0;
+            margin-bottom: 24px;
             .proposal-row-description {
                 margin: 0 -2px;
-            }
-            .item {
-                margin-top: 10px;
             }
         }
         .proposal-row-xs-clear {
@@ -197,29 +191,6 @@
         }
         .proposal-row-right {
             padding: 0;
-        }
-    }
-}
-
-.CouncilPage {
-    // TODO: duplicated
-    h4.proposals-subheader {
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 0.4px;
-        margin-top: 26px;
-        font-weight: 500;
-    }
-    a.proposals-action {
-        float: right;
-        margin-left: 10px;
-        color: #999;
-        cursor: pointer;
-        &:hover {
-            color: #555;
-        }
-        @include xs-max {
-            float: none;
         }
     }
 }
