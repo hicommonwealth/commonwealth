@@ -4,6 +4,10 @@ import uuidv4 from 'uuid/v4';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
+AWS.config.update({
+  signatureVersion: 'v4'
+});
+
 const getUploadSignature = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Must be logged in'));
