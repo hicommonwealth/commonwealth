@@ -143,7 +143,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       m('.row.row-narrow', [
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
-            m('.title', app.chain.base === ChainBase.Substrate && proposal.type !== 'discussions' && proposal.title.split('(')[0]),
+            m('.title', proposal.title),
           ]),
           isThread
             ? m('.discussion-meta', [
