@@ -233,9 +233,9 @@ const Navigation: m.Component<IMenuAttrs> = {
       //     p.startsWith(`/${app.activeId()}/proposal/requests`) ||
       //     p.startsWith(`/${app.activeId()}/request`)
       // }),
-      (app.chain && !app.community && [
+      (app.chain && !app.community && ([
         ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1 || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
+      ].indexOf(app.chain.base) !== -1 || app.chain.class === ChainClass.Moloch)) && m(NavigationItem, {
         label: [
           'Proposals',
           allSubstrateGovernanceProposals > 0 && m('.header-count', allSubstrateGovernanceProposals),
