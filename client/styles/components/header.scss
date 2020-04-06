@@ -611,6 +611,24 @@ a.NavigationItem {
     position: relative;
     user-select: none;
 
+    .NotificationButtons {
+        display: flex;
+        flex-direction: row;
+        text-align: center;
+        .button {
+            width: 100%;
+            cursor: pointer;
+            padding: 10px 0;
+            &:hover {
+                background: #444;
+            }
+            // width: 50%;
+            // &:first-of-type {
+            //     border-right: 1px #555 solid;
+            // }
+        }
+    }
+
     .notification-count {
         padding: 0 10px 1px 9px;
         text-align: center;

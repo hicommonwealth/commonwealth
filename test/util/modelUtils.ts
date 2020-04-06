@@ -5,6 +5,7 @@ import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
 import app from '../../server-test';
 import models from '../../server/database';
+import { NotificationCategory } from 'client/scripts/models/models';
 const ethUtil = require('ethereumjs-util');
 
 export const createAndVerifyAddress = async ({ chain }) => {
@@ -131,4 +132,20 @@ export const assignAdmin = async (address_id, chainOrCommObj) => {
   });
 
   return admin;
+};
+
+interface SubscriptionArgs {
+  object_id: string | number;
+  jwt: any;
+  is_active: boolean;
+  category: string;
+}
+export const createSubscription = async (args: SubscriptionArgs) => {
+  const { jwt, object_id, is_active, category } = args;
+  const res = await chai.request(app)
+    .post('/api/createSubscription')
+    .set('Accept', 'application/json')
+    .send({ jwt, category, is_active, object_id, });
+  const subscription = res.body.result;
+  return subscription;
 };

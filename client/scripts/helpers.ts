@@ -117,6 +117,8 @@ export function formatNumberLong(num : number) {
 
 export function formatPercentShort(num : number) {
   if (num === 0) return '0%';
+  if (num === 1) return '100%';
+  if (num > 1) return '100%+';
   return (num * 100).toFixed(1) + '%';
 }
 
@@ -213,3 +215,18 @@ export class BlocktimeHelper {
     }
   }
 }
+
+// loads remote scripts from a URI, e.g. Twitter widgets
+export const loadScript = (scriptURI) => {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = scriptURI;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      reject();
+    };
+    document.head.appendChild(script);
+  });
+};

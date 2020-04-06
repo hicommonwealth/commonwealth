@@ -397,6 +397,8 @@
     .ql-editor .ql-video {
         display: block;
         max-width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
     .ql-editor .ql-video.ql-align-center {
         margin: 0 auto;

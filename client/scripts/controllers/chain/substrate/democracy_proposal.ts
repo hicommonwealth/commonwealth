@@ -59,10 +59,6 @@ class SubstrateDemocracyProposal extends ProposalModel<
     return account.chainBase === ChainBase.Substrate;
   }
 
-  public canCreateFrom(account: Account<any>) {
-    return account.chainBase === ChainBase.Substrate;
-  }
-
   private _title: string;
 
   private readonly _author: SubstrateAccount;

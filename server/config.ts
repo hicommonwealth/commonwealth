@@ -53,3 +53,4 @@ export const LOGIN_RATE_LIMIT_MINS = 5;
 export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
+export const QUERY_URL_OVERRIDE = process.env.QUERY_URL_OVERRIDE;

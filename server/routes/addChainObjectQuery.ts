@@ -16,8 +16,9 @@ const addChainObjectQuery = async (models, req: UserRequest, res: Response, next
       || !req.body.query_type
       || !req.body.description
       || !req.body.query_url
+      || !req.body.has_pagination
       || !req.body.query_data) {
-    return next(new Error('Must provide object_name, chain, unique_identifier, completion_field, query_type, description, query_url, and query_data'));
+    return next(new Error('Must provide object_name, chain, unique_identifier, completion_field, query_type, description, query_url, has_pagination, and query_data'));
   }
   if (req.body.query_type in ['INIT', 'ADD', 'UPDATE'] === false) {
     return next(new Error('invalid query type, must be INIT, ADD, or UPDATE'));
@@ -45,6 +46,7 @@ const addChainObjectQuery = async (models, req: UserRequest, res: Response, next
       query_type: req.body.query_type,
       description: req.body.description,
       query_url: req.body.query_url,
+      has_pagination: req.body.has_pagination,
       query: req.body.query,
     },
     defaults: {

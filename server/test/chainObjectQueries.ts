@@ -4,6 +4,7 @@ export default {
     chain: 'test',
     unique_identifier: 'id',
     completion_field: 'processed',
+    type: 'dao',
   },
   queries: [
     {
@@ -12,6 +13,7 @@ export default {
       active: true,
       description: 'fetches all proposals, run only once',
       query_url: 'http://localhost:4000/graphql',
+      has_pagination: false,
       query: `{
         proposals {
           id
@@ -26,6 +28,7 @@ export default {
       active: true,
       description: 'fetches all unprocessed proposals, used to update active proposal state',
       query_url: 'http://localhost:4000/graphql',
+      has_pagination: false,
       query: `{
         proposals(where: { processed: false }) {
           id
@@ -40,6 +43,7 @@ export default {
       active: true,
       description: 'fetches all processed proposals that we still have marked active',
       query_url: 'http://localhost:4000/graphql',
+      has_pagination: false,
       query: `{
         proposals(where: { id_in: %s, processed: true }) {
           id

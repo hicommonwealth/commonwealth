@@ -120,14 +120,12 @@
             justify-content: left;
             .AutoCompleteTagForm {
                 margin-right: 20px;
-                position: absolute;
-                z-index: 1;
                 @include xxs-max {
-                    position: relative;
+                    // position: relative;
                     margin: 0 0 20px 0;
                 }
                 @include sm-max {
-                    position: relative;
+                    // position: relative;
                     margin: 0;
                 }
             }

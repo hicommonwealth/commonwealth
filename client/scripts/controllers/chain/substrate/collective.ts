@@ -173,9 +173,6 @@ extends Proposal<
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
-  public canCreateFrom(account: SubstrateAccount) {
-    return this._Collective.isMember(account);
-  }
   private readonly _title: string;
   public readonly method: Call;
   private _approved: BehaviorSubject<boolean> = new BehaviorSubject(false);

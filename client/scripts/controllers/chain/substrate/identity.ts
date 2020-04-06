@@ -1,3 +1,4 @@
+import { IApp } from 'state';
 import { StorageModule, Identity } from 'models/models';
 import { ProposalStore } from 'models/stores';
 import SubstrateChain from './shared';
@@ -51,6 +52,13 @@ class SubstrateIdentities implements StorageModule {
   public get subAcctDeposit() { return this._subAcctDeposit; }
   public get maxSubAccts() { return this._maxSubAccts; }
   public get maxAddlFields() { return this._maxAddlFields; }
+
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
 
   public deinit() {
     if (this._registrarSubscription) {

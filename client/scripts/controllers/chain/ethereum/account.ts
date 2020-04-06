@@ -4,9 +4,12 @@ import hdkey from 'ethereumjs-wallet/hdkey';
 // tslint:disable-next-line
 const ethUtil = require('ethereumjs-util'); // doesn't import otherwise
 import { Wallet } from 'ethereumjs-wallet';
+import bip39 from 'bip39';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
-import app from 'state';
-import { Account, IAccountsModule } from 'models/models';
+import { IApp } from 'state';
+import { formatCoin, Coin } from 'shared/adapters/currency';
+import { Account, IAccountsModule, ITXModalData } from 'models/models';
 import { AccountsStore } from 'models/stores';
 
 import { default as EthereumChain } from './chain';
@@ -48,7 +51,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   public get initialized() { return this._initialized; }
 
   // STORAGE
-  private _store: AccountsStore<EthereumCoin, EthereumAccount> = new AccountsStore();
+  protected _store: AccountsStore<EthereumAccount> = new AccountsStore();
   public get store() { return this._store; }
 
   private _Chain: EthereumChain;
@@ -56,10 +59,18 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   public get bip39() { return this._bip39; }
 
   public get(address: string) {
-    return this.fromAddress(address);
+    return this.fromAddress(address.toLowerCase());
+  }
+
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
   }
 
   public fromAddress(address: string): EthereumAccount {
+    address = address.toLowerCase();
     if (address.indexOf('0x') !== -1) {
       assert(address.length === 42);
     } else {
@@ -69,7 +80,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new EthereumAccount(this._Chain, this, address);
+      return new EthereumAccount(this.app, this._Chain, this, address);
     }
   }
 
@@ -114,13 +125,31 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
 export default EthereumAccounts;
 
 export class EthereumAccount extends Account<EthereumCoin> {
-  public balance: import('rxjs').Observable<EthereumCoin>;
+  private _balance: Observable<EthereumCoin> ;
+
+  public get balance(): Observable<EthereumCoin> {
+    if (!this._Chain) return; // TODO
+    this._balance = this._Chain.api.web3.eth.getBalance(this.address);
+    return this._balance;
+  }
+
+  public tokenBalance(address: string): EthereumCoin {
+    if (!this._Chain) return; // TODO
+  }
+
   public sendBalanceTx(recipient: Account<EthereumCoin>, amount: EthereumCoin):
-    import('../../../models/models').ITXModalData | Promise<import('../../../models/models').ITXModalData> {
+    ITXModalData | Promise<ITXModalData> {
     throw new Error('Method not implemented.');
   }
 
-  private _initialized: Promise<boolean>;
+  public sendTx(recipient: Account<EthereumCoin>, amount: EthereumCoin):
+  ITXModalData | Promise<ITXModalData> {
+    throw new Error('Method not implemented.');
+  }
+
+  public tokens: Array<Observable<Coin>>;
+
+  protected _initialized: Promise<boolean>;
   get initialized(): Promise<boolean> { return this._initialized; }
 
   private _Chain: EthereumChain;
@@ -128,8 +157,8 @@ export class EthereumAccount extends Account<EthereumCoin> {
   private wallet: Wallet;
 
   // CONSTRUCTORS
-  constructor(ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
-    super(app.chain.meta.chain, address);
+  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
+    super(app, app.chain.meta.chain, address.toLowerCase());
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);

@@ -1,5 +1,4 @@
-import app from 'state';
-
+import { IApp } from 'state';
 import { Account, IOffchainAccountsModule, Profile, CommunityInfo } from 'models/models';
 import { AccountsStore } from 'models/stores';
 import { Coin } from 'adapters/currency';
@@ -10,8 +9,8 @@ export class OffchainAccount extends Account<Coin> {
   public balance: any;
 
   // CONSTRUCTORS
-  constructor(chain: string, address: string) {
-    super(app.config.chains.getById(chain), address);
+  constructor(app: IApp, chain: string, address: string) {
+    super(app, app.config.chains.getById(chain), address);
     this.address = address;
   }
 
@@ -55,15 +54,22 @@ class OffchainAccounts implements IOffchainAccountsModule<Coin, OffchainAccount>
   private _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
-  private _store: AccountsStore<Coin, OffchainAccount> = new AccountsStore();
+  private _store: AccountsStore<OffchainAccount> = new AccountsStore();
 
   public get store() { return this._store; }
+
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
 
   public get(address: string, chain?: string) {
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new OffchainAccount(chain, address);
+      return new OffchainAccount(this.app, chain, address);
     }
   }
 }

@@ -13,6 +13,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
 import SettingsController from 'controllers/app/settings';
+import { loadScript } from '../../helpers';
 import { Profile } from 'models/models';
 import User from './widgets/user';
 
@@ -53,6 +54,64 @@ const instantiateEditor = (
   // Register markdown shortcuts
   Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
 
+  const insertEmbeds = (text, quill) => {
+    const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
+    const videoRe = /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
+    const embeddableTweet = twitterRe.test(text);
+    const embeddableVideo = videoRe.test(text);
+    const insertionIdx = quill.getSelection().index;
+    // TODO: Build out embeds for non-Vimeo/YT players
+    if (embeddableTweet) {
+      const id = text.match(twitterRe)[1];
+      quill.insertEmbed(insertionIdx, 'twitter', id, 'user');
+      quill.insertText(insertionIdx + 1, '\n', 'user');
+      quill.setSelection(insertionIdx + 2, 'silent');
+      setTimeout(() => {
+        const embedEle = document.querySelectorAll(`div[data-id='${id}']`)[0];
+        const widgetsEle = embedEle?.children[0];
+        const isRendered = widgetsEle && Array.from(widgetsEle.classList).includes('twitter-tweet-rendered');
+        const isVisible = (embedEle?.children[0] as HTMLElement)?.style['visibility'] !== 'hidden';
+        if (isRendered && isVisible) {
+          quill.deleteText(insertionIdx - text.length, text.length + 1);
+          quill.setSelection(insertionIdx - text.length + 1, 'silent');
+        } else {
+          // Nested setTimeouts ensure that the embedded URL is deleted both more quickly
+          // and more reliably than would be the case with a single .750ms timeout
+          setTimeout(() => {
+            const _embedEle = document.querySelectorAll(`div[data-id='${id}']`)[0];
+            const _widgetsEle = _embedEle?.children[0];
+            const _isRendered = _widgetsEle && Array.from(_widgetsEle.classList).includes('twitter-tweet-rendered');
+            const _isVisible = (_embedEle?.children[0] as HTMLElement)?.style['visibility'] !== 'hidden';
+            if (_isRendered && _isVisible) {
+              quill.deleteText(insertionIdx - text.length, text.length + 1);
+              quill.setSelection(insertionIdx - text.length + 1, 'silent');
+            }
+          }, 500);
+        }
+      }, 250);
+      return true;
+    } else if (embeddableVideo) {
+      let url = `https://${text.match(videoRe)[1]}`;
+      if (url.indexOf('watch?v=') !== -1) {
+        url = url.replace('watch?v=', 'embed/');
+        url = url.replace(/&.*$/, '');
+      } else {
+        url = url.replace('vimeo.com', 'player.vimeo.com/video');
+      }
+      quill.insertEmbed(insertionIdx, 'video', url, 'user');
+      quill.insertText(insertionIdx + 1, '\n', 'user');
+      quill.setSelection(insertionIdx + 2, 'silent');
+      setTimeout(() => {
+        if (document.querySelectorAll(`iframe[src='${url}']`).length) {
+          quill.deleteText(insertionIdx - text.length, text.length + 1);
+          quill.setSelection(insertionIdx - text.length + 2, 'silent');
+        }
+      }, 1);
+      return true;
+    }
+    return false;
+  };
+
   // Register a patch to prevent pasting into long documents causing the editor to jump
   class CustomClipboard extends Clipboard {
     onPaste(e) {
@@ -63,8 +122,8 @@ const instantiateEditor = (
       if (e.defaultPrevented || !(this as any).quill.isEnabled()) return;
       const range = (this as any).quill.getSelection();
       let delta = new Delta().retain(range.index);
-      (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop ||
-                                           document.body.scrollTop || 0).toString()}px`;
+      (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop
+                                          || document.body.scrollTop || 0).toString()}px`;
       (this as any).container.focus();
       setTimeout(() => {
         (this as any).quill.selection.update(Quill.sources.SILENT);
@@ -75,12 +134,96 @@ const instantiateEditor = (
         (this as any).quill.scrollingContainer.scrollTop = bounds.top;
 
         // scroll window to previous position after paste
-        window.scrollTo({top, left});
+        window.scrollTo({ top, left });
       }, 1);
     }
   }
-  Quill.register('modules/clipboard', CustomClipboard, true);
 
+  // preemptively load Twitter Widgets, so users won't be confused by loading lag &
+  // abandon an embed attempt
+  if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
+    .then(() => console.log('Twitter Widgets loaded'));
+
+  const BlockEmbed = Quill.import('blots/block/embed');
+  class TwitterBlot extends BlockEmbed {
+    public static blotName: string = 'twitter';
+    public static className: string = 'ql-twitter';
+    public static tagName: string = 'div';
+
+    public static create(id) {
+      const node = super.create(id);
+      node.dataset.id = id;
+      if (!(<any>window).twttr) {
+        loadScript('//platform.twitter.com/widgets.js').then(() => {
+          setTimeout(() => {
+            (<any>window).twttr?.widgets?.load();
+            (<any>window).twttr?.widgets?.createTweet(id, node);
+          }, 1);
+        });
+      } else {
+        setTimeout(() => {
+          (<any>window).twttr?.widgets?.load();
+          (<any>window).twttr?.widgets?.createTweet(id, node);
+        }, 1);
+      }
+      return node;
+    }
+
+    public static value(domNode) {
+      const { id } = domNode.dataset;
+      return { id };
+    }
+  }
+
+  class VideoBlot extends BlockEmbed {
+    public static blotName: string = 'video';
+    public static className: string = 'ql-video';
+    public static tagName: string = 'iframe';
+    domNode: any;
+
+    public static create(url) {
+      const node = super.create(url);
+      node.setAttribute('src', url);
+      // Set non-format related attributes with static values
+      node.setAttribute('frameborder', '0');
+      node.setAttribute('allowfullscreen', true);
+      // TODO: Set height/width values according to Quill editor dimensions
+      return node;
+    }
+
+    public static formats(node) {
+      // We still need to report unregistered embed formats
+      const format = {};
+      if (node.hasAttribute('height')) {
+        format['height'] = node.getAttribute('height');
+      }
+      if (node.hasAttribute('width')) {
+        format['width'] = node.getAttribute('width');
+      }
+      return format;
+    }
+
+    public static value(node) {
+      return node.getAttribute('src');
+    }
+
+    format(name, value) {
+      // Handle unregistered embed formats
+      if (name === 'height' || name === 'width') {
+        if (value) {
+          this.domNode.setAttribute(name, value);
+        } else {
+          this.domNode.removeAttribute(name, value);
+        }
+      } else {
+        super.format(name, value);
+      }
+    }
+  }
+
+  Quill.register('modules/clipboard', CustomClipboard, true);
+  Quill.register('formats/twitter', TwitterBlot, true);
+  Quill.register('formats/video', VideoBlot, true);
 
   // Setup custom keyboard bindings, override Quill default bindings where necessary
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
@@ -89,6 +232,20 @@ const instantiateEditor = (
     'tab': {
       key: Keyboard.keys.TAB,
       handler: () => true,
+    },
+    // Check for embeds on return
+    'new line': {
+      key: Keyboard.keys.ENTER,
+      shortKey: false,
+      shiftKey: null,
+      handler: (range, context) => {
+        if (isMarkdownMode()) return true;
+        const [line, offset] = quill.getLine(range.index);
+        const { textContent } = line.domNode;
+        const isEmbed = insertEmbeds(textContent, quill);
+        // if embed, stopPropogation; otherwise continue
+        return !isEmbed;
+      }
     },
     // Submit on cmd-Enter/ctrl-Enter
     'submit': {
@@ -191,7 +348,7 @@ const instantiateEditor = (
     return new File([u8arr], filename, { type });
   };
 
-  const uploadImg = (file) => {
+  const uploadImg = async (file) => {
     return new Promise((resolve, reject) => {
       document.getElementsByClassName('ql-container')[0].appendChild(createSpinner());
       $.post(app.serverUrl() + '/getUploadSignature', {
@@ -202,6 +359,8 @@ const instantiateEditor = (
       }).then((response) => {
         if (response.status !== 'Success') {
           return reject(`Failed to get an S3 signed upload URL: ${response.error}`);
+          document.getElementsByClassName('spinner-wrap')[0].remove();
+          alert('Upload failed');
         }
         $.ajax({
           type: 'PUT',
@@ -217,6 +376,8 @@ const instantiateEditor = (
           console.log('Upload succeeded: ' + trimmedURL);
         }).catch((err) => {
           // file not uploaded
+          document.getElementsByClassName('spinner-wrap')[0].remove();
+          alert('Upload failed');
           console.log('Upload failed: ' + response.result);
           reject('Upload failed: ' + err);
         });
@@ -403,7 +564,7 @@ const instantiateEditor = (
     formats: hasFormats ? [
       'bold', 'italic', 'strike', 'code',
       'link', 'image', 'blockquote', 'code-block',
-      'header', 'list'
+      'header', 'list', 'twitter', 'video',
     ] : [],
     theme,
   });

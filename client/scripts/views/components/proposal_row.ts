@@ -7,7 +7,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { Coin } from 'adapters/currency';
 import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
-import { ProposalStatus, VotingType, AnyProposal, ChainBase } from 'models/models';
+import { ProposalStatus, VotingType, AnyProposal, ChainBase, ChainClass, Proposal } from 'models/models';
 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
@@ -16,6 +16,7 @@ import { ProposalType } from 'identifiers';
 import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury';
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
+import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing ? 'pass' :
@@ -24,12 +25,8 @@ export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
-  if (proposal.isPassing === ProposalStatus.Passed) return 'Passed';
-  if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
   if (proposal.completed) return 'Completed';
 
-  if (!showCountdown) return proposal.isPassing === ProposalStatus.Passing ? 'Passing' :
-    proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
   const countdown =
     proposal.endTime.kind === 'fixed' ?
     [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ] :
@@ -46,10 +43,44 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     proposal.endTime.kind === 'unavailable' ?
     '' : '';
   const status =
-    proposal.isPassing === ProposalStatus.Passing ? ' - Passing' :
-    proposal.isPassing === ProposalStatus.Failing ? ' - Needs more votes' : '';
-  return [ countdown, status ];
+    proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted ? 'Waiting to start' :
+    proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod ?
+        (proposal.isPassing === ProposalStatus.Passed ? 'Passed - In grace period' : 'Failed - In grace period') :
+    proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue ? 'In processing queue' :
+    proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess ? 'Ready to process' :
+    proposal.isPassing === ProposalStatus.Passed ? 'Passed' :
+    proposal.isPassing === ProposalStatus.Failed ? 'Did not pass' :
+    proposal.isPassing === ProposalStatus.Passing ? 'Passing' :
+    proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
+  if (proposal.isPassing === ProposalStatus.Passing
+      || proposal.isPassing === ProposalStatus.Failing
+      || (proposal instanceof MolochProposal
+        && (proposal as MolochProposal).state === MolochProposalState.GracePeriod)) {
+    return [ countdown, ` - ${status}` ];
+  } else {
+    return status;
+  }
 };
+
+export const getSecondaryStatusText = (proposal: AnyProposal): string | null => {
+  if (proposal instanceof MolochProposal) {
+    if (proposal.state === MolochProposalState.NotStarted) {
+      return 'Waiting for voting to start...';
+    } else if (proposal.state === MolochProposalState.Voting) {
+      return 'Voting Phase.';
+    } else if (proposal.state === MolochProposalState.GracePeriod) {
+      return 'Voting completed. Proposal in grace period.';
+    } else if (proposal.state === MolochProposalState.InProcessingQueue) {
+      return 'Voting completed. Waiting for prior proposals to process.';
+    } else if (proposal.state === MolochProposalState.ReadyToProcess) {
+      return 'Voting completed. Proposal ready for processing.';
+    } else {
+      return null;
+    }
+  } else {
+    return null;
+  }
+}
 
 export const getSupportText = (proposal: AnyProposal) =>
   typeof proposal.support === 'number' ?
@@ -245,7 +276,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
         ],
-        // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comment 1 1 1 2
+        // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug == ProposalType.SubstrateTreasuryProposal) && [
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Value'),

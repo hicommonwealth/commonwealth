@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import addChainObjectQueries from './addChainObjectQueries';
+import app from '../../server';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
@@ -12,13 +14,20 @@ const nodes = [
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
+  // [ '18.223.143.102:9944', 'edgeware-testnet' ],
+  // [ '157.230.218.41:9944', 'edgeware-testnet' ],
+  // [ '157.230.125.18:9944', 'edgeware-testnet' ],
+  // [ '206.189.33.216:9944', 'edgeware-testnet' ],
   [ 'localhost:26657', 'cosmos-local' ],
   [ 'gaia13k1.commonwealth.im:26657', 'cosmos-testnet' ],
   [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
   [ 'http://localhost:3030', 'near-local' ],
-  [ 'https://rpc.nearprotocol.com', 'near' ]
+  [ 'https://rpc.nearprotocol.com', 'near' ],
+  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1'],
+  [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
+  // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
+  [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
 ];
-
 const resetServer = (models, closeMiddleware) => {
   console.log('Resetting database...');
 
@@ -63,6 +72,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Edgeware Local',
       icon_url: '/static/img/protocols/edg.png',
       active: true,
+      type: 'chain',
     });
     const edgTest = await models.Chain.create({
       id: 'edgeware-testnet',
@@ -71,6 +81,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Edgeware Testnet',
       icon_url: '/static/img/protocols/edg.png',
       active: true,
+      type: 'chain',
     });
     const edgMain = await models.Chain.create({
       id: 'edgeware',
@@ -79,6 +90,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Edgeware Mainnet',
       icon_url: '/static/img/protocols/edg.png',
       active: true,
+      type: 'chain',
     });
     const kusamaLocal = await models.Chain.create({
       id: 'kusama-local',
@@ -87,6 +99,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Kusama Local',
       icon_url: '/static/img/protocols/ksm.png',
       active: true,
+      type: 'chain',
     });
     const kusamaMain = await models.Chain.create({
       id: 'kusama',
@@ -95,6 +108,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Kusama',
       icon_url: '/static/img/protocols/ksm.png',
       active: true,
+      type: 'chain',
     });
     const atomLocal = await models.Chain.create({
       id: 'cosmos-local',
@@ -103,6 +117,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Cosmos Local',
       icon_url: '/static/img/protocols/atom.png',
       active: true,
+      type: 'chain',
     });
     const atomTestnet = await models.Chain.create({
       id: 'cosmos-testnet',
@@ -111,6 +126,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Gaia 13006 Testnet',
       icon_url: '/static/img/protocols/atom.png',
       active: true,
+      type: 'chain',
     });
     const atom = await models.Chain.create({
       id: 'cosmos',
@@ -119,6 +135,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Cosmos Hub',
       icon_url: '/static/img/protocols/atom.png',
       active: true,
+      type: 'chain',
     });
     const mkr = await models.Chain.create({
       id: 'maker',
@@ -127,6 +144,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Maker',
       icon_url: '/static/img/protocols/mkr.png',
       active: false,
+      type: 'dao',
     });
     const xtz = await models.Chain.create({
       id: 'tezos',
@@ -135,6 +153,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Tezos',
       icon_url: '/static/img/protocols/xtz.png',
       active: false,
+      type: 'chain',
     });
     const dot = await models.Chain.create({
       id: 'polkadot',
@@ -143,6 +162,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Polkadot',
       icon_url: '/static/img/protocols/dot.png',
       active: false,
+      type: 'chain',
     });
     // const ethRopsten = await models.Chain.create({
     //   id: 'ethereum-ropsten',
@@ -151,6 +171,7 @@ const resetServer = (models, closeMiddleware) => {
     //   name: 'Ethereum Ropsten',
     //   icon_url: '/static/img/protocols/eth.png',
     //   active: false,
+    //   type: 'chain',
     // });
     const ethLocal = await models.Chain.create({
       id: 'ethereum-local',
@@ -159,6 +180,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Ethereum Local Testnet',
       icon_url: '/static/img/protocols/eth.png',
       active: true,
+      type: 'chain',
     });
     const eth = await models.Chain.create({
       id: 'ethereum',
@@ -167,6 +189,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'Ethereum',
       icon_url: '/static/img/protocols/eth.png',
       active: true,
+      type: 'chain',
     });
     const nearLocal = await models.Chain.create({
       id: 'near-local',
@@ -175,6 +198,7 @@ const resetServer = (models, closeMiddleware) => {
       name: 'NEAR Protocol',
       icon_url: '/static/img/protocols/near.png',
       active: true,
+      type: 'chain',
     });
     const nearTestnet = await models.Chain.create({
       id: 'near',
@@ -183,13 +207,44 @@ const resetServer = (models, closeMiddleware) => {
       name: 'NEAR Protocol',
       icon_url: '/static/img/protocols/near.png',
       active: true,
+      type: 'chain',
     });
     const moloch = await models.Chain.create({
       id: 'moloch',
       network: 'moloch',
       symbol: 'Moloch',
       name: 'Moloch',
+      icon_url: '/static/img/protocols/molochdao.png',
       active: true,
+      type: 'dao',
+    });
+
+    // This is the same exact as Moloch, but I want to show the picture on the front end
+    const metacartel = await models.Chain.create({
+      id: 'metacartel',
+      network: 'metacartel',
+      symbol: 'Metacartel',
+      name: 'Metacartel',
+      icon_url: '/static/img/protocols/metacartel.png',
+      active: true,
+      type: 'dao',
+    });
+
+    // add queries for daos
+    const molochQueries = (await import('../queries/moloch')).default;
+    await addChainObjectQueries(molochQueries, app, models);
+
+    const metacartelQueries = (await import('../queries/metacartel')).default;
+    await addChainObjectQueries(metacartelQueries, app, models);
+
+    const molochLocal = await models.Chain.create({
+      id: 'moloch-local',
+      network: 'moloch',
+      symbol: 'Moloch',
+      name: 'Moloch',
+      icon_url: '/static/img/protocols/molochdao.png',
+      active: true,
+      type: 'dao',
     });
     // Admin roles for specific communities
     await models.Address.create({
@@ -301,10 +356,8 @@ const resetServer = (models, closeMiddleware) => {
       offchain_community_id: 'staking',
       permission: 'admin',
     });
-    await Promise.all(nodes.map(([ url, chain ]) => models.ChainNode.create({
-      chain,
-      url,
-    })));
+
+    await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
     closeMiddleware().then(() => {
       console.log('Reset database and initialized default models');

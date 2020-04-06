@@ -4,7 +4,9 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import app from 'state';
+import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import { notifyError } from 'controllers/app/notifications';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import {
@@ -25,6 +27,7 @@ import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
 import { createTXModal } from '../tx_signing_modal';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -56,6 +59,8 @@ const NewProposalForm = {
     let hasExternalProposalSelector;
     let hasTreasuryProposalSelector;
     let hasThreshold;
+    // moloch proposal
+    let hasMolochFields;
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;
@@ -90,6 +95,8 @@ const NewProposalForm = {
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
       hasTitleAndDescription = true;
       hasDepositChooser = true;
+    } else if (proposalTypeEnum === ProposalType.MolochProposal) {
+      hasMolochFields = true;
     } else {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
@@ -226,6 +233,24 @@ const NewProposalForm = {
           'Proposal Type': 'Cosmos',
           'Thread Type': 'Proposal',
         });
+      } else if (proposalTypeEnum === ProposalType.MolochProposal) {
+        // TODO: check that applicant is valid ETH address in hex
+        if (!vnode.state.applicantAddress) throw new Error('Invalid applicant address');
+        if (typeof vnode.state.tokenTribute !== 'number') throw new Error('Invalid token tribute');
+        if (typeof vnode.state.sharesRequested !== 'number') throw new Error('Invalid shares requested');
+        if (!vnode.state.title) throw new Error('Invalid title');
+        const details = JSON.stringify({ title: vnode.state.title, description: vnode.state.description || '' });
+        (app.chain as Moloch).governance.createPropWebTx(
+          vnode.state.applicantAddress,
+          new BN(vnode.state.tokenTribute),
+          new BN(vnode.state.sharesRequested),
+          details,
+        )
+        // TODO: handling errors?
+        .then((result) => done(result))
+        .then(() => m.redraw())
+        .catch((err) => notifyError(err.toString()));
+        return;
       } else {
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -463,6 +488,71 @@ const NewProposalForm = {
             },
           }),
         ],
+        hasMolochFields && [
+          m(TextInputFormField, {
+            title: 'Applicant Address',
+            subtitle: 'The person who will get Moloch shares.',
+            options: {
+              name: 'applicant_address',
+              placeholder: 'Applicant Address',
+            },
+            callback: (result) => {
+              if (vnode.state.applicantAddress === result) return;
+              vnode.state.applicantAddress = result;
+              m.redraw();
+            },
+          }),
+          m(TextInputFormField, {
+            title: 'Token Tribute',
+            subtitle: 'The amount the applicant is offering Moloch, must pre-approve tokens.',
+            options: {
+              name: 'token_tribute',
+              placeholder: 'Tribute in tokens',
+            },
+            callback: (result) => {
+              if (vnode.state.tokenTribute === +result) return;
+              vnode.state.tokenTribute = +result;
+              m.redraw();
+            },
+          }),
+          m(TextInputFormField, {
+            title: 'Shares Requested',
+            subtitle: 'The number of shares that the applicant will get in return for the tribute',
+            options: {
+              name: 'shares_requested',
+              placeholder: 'Moloch shares requested',
+            },
+            callback: (result) => {
+              if (vnode.state.sharesRequested === +result) return;
+              vnode.state.sharesRequested = +result;
+              m.redraw();
+            },
+          }),
+          m(TextInputFormField, {
+            title: 'Title',
+            options: {
+              name: 'title',
+              placeholder: 'Proposal Title',
+            },
+            callback: (result) => {
+              if (vnode.state.title === result) return;
+              vnode.state.title = result;
+              m.redraw();
+            },
+          }),
+          m(TextInputFormField, {
+            title: 'Description',
+            options: {
+              name: 'description',
+              placeholder: 'Proposal Description',
+            },
+            callback: (result) => {
+              if (vnode.state.description === result) return;
+              vnode.state.description = result;
+              m.redraw();
+            },
+          }),
+        ]
       ]),
       m('.compact-modal-actions', [
         m('button', {

@@ -1,23 +1,203 @@
 @import 'client/styles/shared';
 
-a.CollectiveMember, a.CouncilCandidate, a.CouncilElectionVoter {
+@mixin proposal-row-metadata {
+    > * {
+        margin-right: 15px;
+        margin-bottom: 3px;
+    }
+    .proposal-status {
+        color: #999;
+        font-weight: 700;
+        &.pass {
+            color: #06983a;
+        }
+        &.fail {
+            color: #d0021b;
+        }
+    }
+    .proposal-comments {
+        display: inline-block;
+        font-weight: 700;
+        color: #999;
+    }
+}
+
+.CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
     display: flex;
     border: 1px solid #eee;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
     background: #fff;
     border-radius: 3px;
     margin: 10px 0;
-    padding: 15px 20px 13px;
+    padding: 17px 20px 13px;
     cursor: pointer;
+    flex-direction: row;
+
     // link styling
     text-decoration: none;
     color: #111;
     @include hoverFloat;
-    .col-member {
-        width: 200px;
+
+    .proposal-pre {
+        margin-top: 4px;
+        @include xs-max {
+            display: none;
+        }
     }
-    .col-info {
-        flex: 1;
+    .proposal-pre-mobile {
+        display: none;
+        .User {
+            position: relative;
+            top: 2px;
+        }
+        @include xs-max {
+            display: block;
+        }
+    }
+
+    .proposal-row-left,
+    .proposal-row-right {
+        flex: 0 0 auto;
+    }
+    .proposal-row-main {
+        flex: 1 0;
+    }
+    .proposal-row-left {
+        width: 60px;
+    }
+    .proposal-row-responsive-clear {
+        display: none;
+    }
+    .proposal-row-right {
+        min-width: 280px;
+        width: 280px;
+        padding-left: 30px;
+        display: flex;
+    }
+    .proposal-row-right-chart {
+        min-width: 120px;
+        width: 120px;
+        padding-left: 26px;
+    }
+
+    // left
+    .proposal-row-left {
+        .proposal-display-id {
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 1.2;
+        }
+    }
+    // main
+    .proposal-row-main {
+        display: flex;
+
+        @include xs-max {
+            display: block;
+        }
+
+        .proposal-row-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 3px;
+            word-break: break-word;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+        }
+
+        .proposal-row-subheading {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 3px;
+            word-break: break-word;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            color: #bdbdbd;
+        }
+
+        .proposal-row-metadata {
+            font-weight: 600;
+            min-width: 90px;
+
+            @include xs-max {
+                display: block;
+            }
+
+            .proposal-user {
+                margin-top: 4px;
+                .username {
+                    font-weight: 400;
+                }
+            }
+            .proposal-user-mobile {
+                display: none;
+                color: #bdbdbd;
+                .user-display-name username {
+                    position: relative;
+                    color: #bdbdbd;
+                    font-weight: 400;
+                    top: 2px;
+                }
+            }
+        }
+
+        .item {
+            flex: 1 0 auto;
+            text-overflow: ellipsis;
+        }
+    }
+    // right
+    .proposal-row-right-text {
+        padding-top: 4px;
+    }
+    .proposal-row-right-chart {
+        padding-top: 2px;
+    }
+
+    // responsive
+    @include sm-max {
+        .proposal-row-right {
+            display: block;
+            width: initial;
+            min-width: initial;
+            padding-left: 24px;
+            padding-right: 6px;
+        }
+        .proposal-row-right-chart {
+            padding-left: 0px;
+        }
+    }
+    @include xs-max {
+        display: block;
+        padding: 20px 22px;
+        margin: 15px 0;
+        .proposal-row-left {
+            width: 100%;
+            padding: 0;
+            .proposal-display-id {
+                margin: 0;
+            }
+        }
+        .proposal-row-right {
+            display: flex;
+        }
+        .proposal-row-main {
+            width: 100%;
+            padding: 0;
+            .proposal-row-description {
+                margin: 0 -2px;
+            }
+            .item {
+                margin-top: 10px;
+            }
+        }
+        .proposal-row-xs-clear {
+            display: block;
+            clear: both;
+        }
+        .proposal-row-right {
+            padding: 0;
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import 'components/header.scss';
 import m from 'mithril';
 import $ from 'jquery';
@@ -6,13 +7,14 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import { initAppState } from 'app';
-import { ApiStatus, default as app } from 'state';
+import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { NearAccount } from 'controllers/chain/near/account';
@@ -34,6 +36,12 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import { OffchainCommunitiesStore } from 'client/scripts/models/stores';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
+
+// Moloch specific
+import UpdateDelegateModal from 'views/modals/update_delegate_modal';
+import RagequitModal from 'views/modals/ragequit_modal';
+import TokenApprovalModal from 'views/modals/token_approval_modal';
+
 
 interface INavigationMenuAttrs {
   menusOpen: any;
@@ -76,7 +84,7 @@ const NavigationMenu : m.Component<INavigationMenuAttrs, INavigationMenuState> =
           menusOpen.splice(menusOpen.indexOf(menuClass), 1);
           m.redraw();
         }, menuCloseDelay);
-        $(innerVnode.dom).on('mouseleave', () => vnode.state.keepOpen = false);
+        $(innerVnode.dom).on('mouseleave', () => { vnode.state.keepOpen = false; });
         $(innerVnode.dom).on('mouseleave', debouncedCloseMenu);
         $(innerVnode.dom).on('menuclose', () => {
           menusOpen.splice(menusOpen.indexOf(menuClass), 1);
@@ -96,7 +104,7 @@ const NavigationMenu : m.Component<INavigationMenuAttrs, INavigationMenuState> =
             menusOpen.push(menuClass);
             m.redraw();
           }, menuOpenDelay);
-          $(innerVnode.dom).on('mouseenter', () => vnode.state.keepOpen = true);
+          $(innerVnode.dom).on('mouseenter', () => { vnode.state.keepOpen = true; });
           $(innerVnode.dom).on('mouseenter', debouncedOpenMenu);
           $(innerVnode.dom).on('click', (e) => {
             // click toggles the menu open; also toggles the menu closed on mobile viewports
@@ -120,7 +128,7 @@ const NavigationMenu : m.Component<INavigationMenuAttrs, INavigationMenuState> =
       m('.menu-dropdown', {
         class: (menusOpen.indexOf(menuClass) !== -1) ? 'open' : '',
         oncreate: (innerVnode) => {
-          $(innerVnode.dom).on('mouseenter', () => vnode.state.keepOpen = true);
+          $(innerVnode.dom).on('mouseenter', () => { vnode.state.keepOpen = true; });
           $(innerVnode.dom).on('click', (e) => {
             if (menusOpen.indexOf(menuClass) === -1) return;
             vnode.state.keepOpen = false;
@@ -181,36 +189,35 @@ interface IChainSelectorState {
 const Navigation: m.Component<IMenuAttrs> = {
   view: (vnode: m.VnodeDOM<IMenuAttrs>) => {
     const { menusOpen, selectedNode, selectedCommunity } = vnode.attrs;
-    const defaultChainId = (app.activeChainId()) ? app.activeChainId() :
-                          app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
+    const defaultChainId = (app.activeChainId()) ? app.activeChainId()
+      : app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
 
     const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
-      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length +
-       (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length +
-       (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length +
-       (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware) ?
-      (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
+      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
+    const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      ? (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
-    const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK) ?
-      (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
+    const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     return m('.Navigation', ([].concat([
       m(NavigationItem, {
         label: 'Home',
         path: '/',
         class: 'home-nav',
-        activeIf: (p) => p === `/`
+        activeIf: (p) => p === '/'
       })
     ]).concat((selectedNode || selectedCommunity) ? [
       m(NavigationItem, {
         label: 'Discussions',
         path: `/${app.activeId()}/`,
-        activeIf: (p) =>
-          p === `/${app.activeId()}/` ||
-          p.startsWith(`/${app.activeId()}/?`) ||
-          p.startsWith(`/${app.activeId()}/proposal/discussion`) ||
-          p.startsWith(`/${app.activeId()}/discussions`)
+        activeIf: (p) => p === `/${app.activeId()}/`
+          || p.startsWith(`/${app.activeId()}/?`)
+          || p.startsWith(`/${app.activeId()}/proposal/discussion`)
+          || p.startsWith(`/${app.activeId()}/discussions`)
       }),
       // m(NavigationItem, {
       //   label: 'Questions',
@@ -226,23 +233,23 @@ const Navigation: m.Component<IMenuAttrs> = {
       //     p.startsWith(`/${app.activeId()}/proposal/requests`) ||
       //     p.startsWith(`/${app.activeId()}/request`)
       // }),
-      app.chain && !app.community && [
-        ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
+      (app.chain && !app.community)
+        && ([ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1
+        || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
         label: [
           'Proposals',
           allSubstrateGovernanceProposals > 0 && m('.header-count', allSubstrateGovernanceProposals),
           cosmosGovernanceProposals > 0 && m('.header-count', cosmosGovernanceProposals),
         ],
         path: `/${app.activeChainId()}/proposals`,
-        activeIf: (p) => (p.startsWith(`/${app.activeChainId()}/proposals`) ||
-                          p.startsWith(`/${app.activeChainId()}/signaling`) ||
-                          p.startsWith(`/${app.activeChainId()}/treasury`) ||
-                          p.startsWith(`/${app.activeChainId()}/proposal/referendum`) ||
-                          p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`) ||
-                          p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`) ||
-                          p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`) ||
-                          p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`))
+        activeIf: (p) => (p.startsWith(`/${app.activeChainId()}/proposals`)
+                          || p.startsWith(`/${app.activeChainId()}/signaling`)
+                          || p.startsWith(`/${app.activeChainId()}/treasury`)
+                          || p.startsWith(`/${app.activeChainId()}/proposal/referendum`)
+                          || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
+                          || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
+                          || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
+                          || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`))
       }),
       //
       app.chain && app.chain.base === ChainBase.Substrate && m(NavigationItem, {
@@ -270,10 +277,10 @@ const ChainLabel : m.Component<{ selectedNode, selectedCommunity }> = {
     const selectedCommunity = vnode.attrs.selectedCommunity;
 
     return m('.ChainLabel', [
-      app.chain &&
-        m(ChainIcon, { chain: app.chain.meta.chain }),
-      selectedNode ? selectedNode.chain.name :
-        selectedCommunity ? selectedCommunity.meta.name : 'Commonwealth',
+      app.chain
+        && m(ChainIcon, { chain: app.chain.meta.chain }),
+      selectedNode ? selectedNode.chain.name
+        : selectedCommunity ? selectedCommunity.meta.name : 'Commonwealth',
       !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
       selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
     ]);
@@ -300,9 +307,9 @@ const AccountMenu : m.Component<IMenuAttrs> = {
         m('span.loading-spinner', [
           m('span.icon-spinner1.animate-spin'),
         ]),
-        app.chain && (app.chain.networkStatus === ApiStatus.Disconnected ?
-                      m('span.loading-text', ' Connecting...') :
-                      m('span.loading-text', ' Loading chain...'))
+        app.chain && (app.chain.networkStatus === ApiStatus.Disconnected
+          ? m('span.loading-text', ' Connecting...')
+          : m('span.loading-text', ' Loading chain...'))
       ] : !activeAcct ? [
         // logged in, has chain, account is loading
         m('a.setup-address-button', [
@@ -327,12 +334,14 @@ const AccountMenu : m.Component<IMenuAttrs> = {
             ]),
             (activeAcct instanceof SubstrateAccount
               || activeAcct instanceof CosmosAccount
-              || activeAcct instanceof NearAccount)
+              || activeAcct instanceof NearAccount
+              || activeAcct instanceof MolochMember
+            )
             && m('li.account-balance-item', [
-                m(AccountBalance, { account: activeAcct }),
-              ]),
-          ] :
-            m('li.account-menu-item.my-account-setup-outer', {
+              m(AccountBalance, { account: activeAcct }),
+            ]),
+          ]
+            : m('li.account-menu-item.my-account-setup-outer', {
               onclick: (e) => {
                 e.preventDefault();
               }
@@ -340,11 +349,11 @@ const AccountMenu : m.Component<IMenuAttrs> = {
               m('.my-account-setup', [
                 m('.account-setup-text', [
                   `Set up your ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} `,
-                  `account to participate in discussions.`
+                  'account to participate in discussions.'
                 ]),
                 m('a.btn.btn-block.formular-button-primary', {
                   onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-                }, `Begin setup`),
+                }, 'Begin setup'),
               ]),
             ]),
           activeAcct && m('li.add-account-menu-item', {
@@ -354,19 +363,22 @@ const AccountMenu : m.Component<IMenuAttrs> = {
             }
           }, [
             'Switch or add address',
-            app.login.activeAddresses && app.login.activeAddresses.length > 1 &&
-              m('.addresses-badge', app.login.activeAddresses.length),
+            app.login.activeAddresses && app.login.activeAddresses.length > 1
+              && m('.addresses-badge', app.login.activeAddresses.length),
           ]),
         ],
         m('li', {
-          onclick: () => app.activeId() ? m.route.set(`/${app.activeId()}/settings`) : m.route.set(`/settings`)
+          onclick: () => app.activeId() ? m.route.set(`/${app.activeId()}/settings`) : m.route.set('/settings')
         }, 'Settings'),
+        // app.isLoggedIn() && m('li', {
+        //   onclick: () => m.route.set('/subscriptions'),
+        // }, 'Subscriptions'),
         app.login.isSiteAdmin && m('li', {
           onclick: () => {
-            m.route.set('/' +
-                        (app.activeId() ||
-                         (app.vm.activeAccount ? app.vm.activeAccount.chain.id : app.config.defaultChain)) +
-                        '/admin');
+            m.route.set(`/${
+              app.activeId()
+                         || (app.vm.activeAccount ? app.vm.activeAccount.chain.id : app.config.defaultChain)
+            }/admin`);
           }
         }, 'Admin'),
         m('li.divider'),
@@ -374,7 +386,7 @@ const AccountMenu : m.Component<IMenuAttrs> = {
           href: '/logout',
           onclick: (e) => {
             e.preventDefault();
-            $.get(app.serverUrl() + '/logout').then(async () => {
+            $.get(`${app.serverUrl()}/logout`).then(async () => {
               await initAppState();
               notifySuccess('Logged out');
               m.route.set('/');
@@ -427,6 +439,29 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { typeEnum: ProposalType.CosmosProposal }
             })
           }, 'New proposal'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: NewProposalModal,
+              data: { typeEnum: ProposalType.MolochProposal }
+            })
+          }, 'New proposal'),
+          (activeAcct instanceof MolochMember) && m('li.divider'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: UpdateDelegateModal,
+            })
+          }, 'Update delegate key'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: RagequitModal,
+            })
+          }, 'Rage quit'),
+          (activeAcct instanceof MolochMember) && m('li', {
+            onclick: (e) => app.modals.create({
+              modal: TokenApprovalModal,
+            })
+          }, 'Approve tokens'),
+          // TODO: add a "reserve tokens" option here, in case you want to apply to DAO?
           activeAcct instanceof SubstrateAccount && activeAcct.chainClass === ChainClass.Edgeware && m('li', {
             onclick: () => { m.route.set(`/${activeAcct.chain.id}/new/signaling`); }
           }, 'New signaling proposal'),
@@ -595,6 +630,59 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
+    if (category === NotificationCategories.NewComment) {
+      const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
+        author_address, author_chain } = JSON.parse(notification.data);
+      if (!created_at || !object_title || (!object_id && !root_id)
+          || !comment_text || !comment_id || !author_address || !author_chain) return;
+
+      // legacy comments use object_id, new comments use root_id
+      const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
+      const commented_title = decodeURIComponent(object_title).trim();
+      const decoded_comment_text = (() => {
+        try {
+          const doc = JSON.parse(decodeURIComponent(comment_text));
+          return m(QuillFormattedText, {
+            doc: sliceQuill(doc, 140),
+            hideFormatting: true
+          });
+        } catch (e) {
+          return m(MarkdownFormattedText, {
+            doc: decodeURIComponent(comment_text).slice(0, 140),
+            hideFormatting: true
+          });
+        }
+      })();
+      return getHeaderNotificationRow(
+        [author_address, author_chain],
+        moment.utc(created_at),
+        m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
+        decoded_comment_text,
+        `/${community_id || chain_id}/proposal/discussion/`
+        + `${commented_id}?comment=${comment_id}`,
+        () => jumpHighlightComment(comment_id)
+      );
+    } else if (category === NotificationCategories.NewThread) {
+      const { created_at, thread_title, thread_id, chain_id, community_id,
+        author_address, author_chain } = JSON.parse(notification.data);
+      if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
+
+      const decoded_title = decodeURIComponent(thread_title);
+      const community_name = community_id
+        ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
+        : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+
+      return getHeaderNotificationRow(
+        [author_address, author_chain],
+        moment.utc(created_at),
+        m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
+        decoded_title,
+        `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
+          + `${slugify(decoded_title)}`,
+        () => jumpHighlightComment('parent')
+      );
+    }
+
     const {
       author,
       createdAt,
@@ -641,15 +729,15 @@ const InviteRow: m.Component<{ invites }> = {
       }
     }, [
       (invites.length > 2) ? [
-        `New invite to `,
+        'New invite to ',
         m('strong', invites[0].community_name),
         ` and ${invites.length - 1} others`
       ] : (invites.length === 2) ? [
-        `New invite to `,
+        'New invite to ',
         m('strong', invites[0].community_name),
-        ` and 1 other`,
+        ' and 1 other',
       ] : [
-        `New invite to `,
+        'New invite to ',
         m('strong', invites[0].community_name),
       ],
     ]);
@@ -675,6 +763,27 @@ const Notifications: m.Component<{ notifications }> = {
   },
 };
 
+const NotificationButtons: m.Component<{ notifications }> = {
+  view: (vnode) => {
+    const { notifications } = vnode.attrs;
+    return m('.NotificationButtons', [
+      m('.button', {
+        onclick: (e) => {
+          e.preventDefault();
+          if (notifications.length < 1) return;
+          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+        }
+      }, 'Mark All Read'),
+      // m('.button', {
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.login.notifications.clearAllRead().then(() => m.redraw());
+      //   }
+      // }, 'Clear All Read'),
+    ]);
+  }
+};
+
 const NotificationMenu : m.Component<{ menusOpen }> = {
   view: (vnode) => {
     const { menusOpen } = vnode.attrs;
@@ -691,6 +800,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
       }, unreadMessage),
     }, [
       m(Notifications, { notifications }),
+      notifications.length > 0 &&
+        m(NotificationButtons, { notifications }),
     ]);
   }
 };
@@ -705,8 +816,8 @@ const Header: m.Component<{}, IHeaderState> = {
     const { menusOpen } = vnode.state;
     const nodes = app.config.nodes.getAll();
     const activeNode = app.chain && app.chain.meta;
-    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url &&
-                                       n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
@@ -732,17 +843,16 @@ const Header: m.Component<{}, IHeaderState> = {
           ]),
           (selectedNode || selectedCommunity) && m(ChainLabel, { selectedNode, selectedCommunity }),
           m(Navigation, { menusOpen, selectedNode, selectedCommunity }),
-          !app.isLoggedIn() ?
-            m(NavigationMenu, {
+          !app.isLoggedIn()
+            ? m(NavigationMenu, {
               menusOpen,
               class: 'LoginMenu',
               selector: m('div', 'Login'),
               closeDelay: 350,
-            }, m('.login-menu-wrapper', m(Login))) :
-            m(AccountMenu, { menusOpen, selectedNode, selectedCommunity }),
-          app.isLoggedIn()
-            && m(NotificationMenu, { menusOpen }),
-          m(ActionMenu, { menusOpen, selectedNode, selectedCommunity }),
+            }, m('.login-menu-wrapper', m(Login)))
+            : m(AccountMenu, { menusOpen, selectedNode, selectedCommunity }),
+          app.isLoggedIn() && m(NotificationMenu, { menusOpen }),
+          app.isLoggedIn() && m(ActionMenu, { menusOpen, selectedNode, selectedCommunity }),
         ],
         m('.clear'),
       ]),

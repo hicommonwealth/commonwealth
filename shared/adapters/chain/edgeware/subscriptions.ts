@@ -1,20 +1,20 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable import/prefer-default-export */
 import { VoteRecord, VoteOutcome, ProposalRecord } from 'edgeware-node-types/dist';
-import { ProposalAdapter } from '../../shared';
 import { ApiRx } from '@polkadot/api';
-import {
-  IEdgewareSignalingProposal, IEdgewareSignalingProposalState,
-} from './types';
 import { flatMap, first, map, takeWhile } from 'rxjs/operators';
 import { from, combineLatest, of, never } from 'rxjs';
 import { Vec, Option } from '@polkadot/types';
 import { BlockNumber, H256 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import _ from 'underscore';
+import { IEdgewareSignalingProposal, IEdgewareSignalingProposalState } from './types';
+import { ProposalAdapter } from '../../shared';
 
 type SignalingProposal = [ H256, BlockNumber ] & Codec;
 
 export class EdgewareSignalingProposalAdapter
-extends ProposalAdapter<ApiRx, IEdgewareSignalingProposal, IEdgewareSignalingProposalState> {
+  extends ProposalAdapter<ApiRx, IEdgewareSignalingProposal, IEdgewareSignalingProposalState> {
   private _seenProposals = {};
 
   public subscribeNew(api: ApiRx) {
@@ -65,7 +65,7 @@ extends ProposalAdapter<ApiRx, IEdgewareSignalingProposal, IEdgewareSignalingPro
             const voteRecord = voteRecordOpt.unwrap();
             results.push({
               identifier: hash,
-              hash: hash,
+              hash,
               voteIndex: +record.vote_id,
               author: record.author.toString(),
               title: record.title.toString(),
@@ -73,7 +73,7 @@ extends ProposalAdapter<ApiRx, IEdgewareSignalingProposal, IEdgewareSignalingPro
               tallyType: voteRecord.data.tally_type,
               voteType: voteRecord.data.vote_type,
               choices: voteRecord.outcomes.toArray(),
-            })
+            });
           }
         }
         return results;

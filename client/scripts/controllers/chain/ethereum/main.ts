@@ -6,14 +6,15 @@ import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models/models';
 
 import EthWebWalletController from '../../app/eth_web_wallet';
+import { selectLogin } from '../../app/login';
 
 // TODO: hook up underlyung functionality of this boilerplate
 //       (e.g., EthereumChain and EthereumAccount methods, etc.)
 class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Ethereum;
-  public readonly chain: EthereumChain = new EthereumChain();
-  public readonly accounts: EthereumAccounts = new EthereumAccounts();
+  public chain: EthereumChain;
+  public accounts: EthereumAccounts;
   public readonly server = {};
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
@@ -25,7 +26,8 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
 
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
-
+    this.chain = new EthereumChain(this.app);
+    this.accounts = new EthereumAccounts(this.app);
     await app.threads.refreshAll(this.id, null, true);
     await app.comments.refreshAll(this.id, null, true);
     await app.reactions.refreshAll(this.id, null, true);
@@ -37,6 +39,11 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await this.chain.initEventLoop();
+
+    await this.webWallet.web3.givenProvider.on('accountsChanged', function (accounts) {
+      const updatedAddress = app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+      selectLogin(updatedAddress);
+    });
 
     this._loaded = true;
   }

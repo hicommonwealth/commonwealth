@@ -2,14 +2,14 @@ import {
   ITXModalData, ITransactionResult, TransactionStatus, NodeInfo, IChainModule, ITXData,
 } from 'models/models';
 import * as m from 'mithril';
-import app, { ApiStatus } from 'state';
+import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
-import { CosmosAccount } from './account';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { BlocktimeHelper } from 'helpers';
 import { Observable, Subject } from 'rxjs';
 import BN from 'bn.js';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
+import { CosmosAccount } from './account';
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -43,6 +43,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._staked;
   }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
   public coins(n: number | BN, inDollars?: boolean) {
     // never interpret a CosmosToken in dollars
     return new CosmosToken(this.denom, n);
@@ -67,15 +74,15 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       ('https://' + node.url.split(':')[0] + ':11318');
     console.log(`Starting Lunie API at ${restUrl} and Tendermint on ${rpcUrl}...`);
     this._api = new CosmosApi(rpcUrl, restUrl);
-    if (app.chain.networkStatus === ApiStatus.Disconnected) {
-      app.chain.networkStatus = ApiStatus.Connecting;
+    if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
+      this.app.chain.networkStatus = ApiStatus.Connecting;
     }
     await this._api.init((header) => {
       this._blocktimeHelper.stamp(moment(header.time));
-      app.chain.block.height = +header.height;
+      this.app.chain.block.height = +header.height;
       m.redraw();
     });
-    app.chain.networkStatus = ApiStatus.Connected;
+    this.app.chain.networkStatus = ApiStatus.Connected;
     const { bonded_tokens } = await this._api.query.pool();
     this._staked = +bonded_tokens;
     const { bond_denom } = await this._api.query.stakingParameters();
@@ -85,7 +92,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   public async deinit(): Promise<void> {
-    app.chain.networkStatus = ApiStatus.Disconnected;
+    this.app.chain.networkStatus = ApiStatus.Disconnected;
     this._api.deinit();
   }
 

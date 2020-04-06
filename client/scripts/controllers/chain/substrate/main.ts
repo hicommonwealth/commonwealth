@@ -14,15 +14,15 @@ import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identity';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
-  public readonly chain: SubstrateChain = new SubstrateChain(); // kusama chain id
-  public readonly accounts: SubstrateAccounts = new SubstrateAccounts();
-  public readonly phragmenElections: SubstratePhragmenElections = new SubstratePhragmenElections();
-  public readonly council: SubstrateCouncil = new SubstrateCouncil();
-  public readonly technicalCommittee: SubstrateTechnicalCommittee = new SubstrateTechnicalCommittee();
-  public readonly democracyProposals: SubstrateDemocracyProposals = new SubstrateDemocracyProposals();
-  public readonly democracy: SubstrateDemocracy = new SubstrateDemocracy();
-  public readonly treasury: SubstrateTreasury = new SubstrateTreasury();
-  public readonly identities: SubstrateIdentities = new SubstrateIdentities();
+  public chain: SubstrateChain;
+  public accounts: SubstrateAccounts;
+  public phragmenElections: SubstratePhragmenElections;
+  public council: SubstrateCouncil;
+  public technicalCommittee: SubstrateTechnicalCommittee;
+  public democracyProposals: SubstrateDemocracyProposals;
+  public democracy: SubstrateDemocracy;
+  public treasury: SubstrateTreasury;
+  public identities: SubstrateIdentities;
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly server = {};
 
@@ -37,6 +37,15 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+    this.chain = new SubstrateChain(this.app); // kusama chain id
+    this.accounts = new SubstrateAccounts(this.app);
+    this.phragmenElections = new SubstratePhragmenElections(this.app);
+    this.council = new SubstrateCouncil(this.app);
+    this.technicalCommittee = new SubstrateTechnicalCommittee(this.app);
+    this.democracyProposals = new SubstrateDemocracyProposals(this.app);
+    this.democracy = new SubstrateDemocracy(this.app);
+    this.treasury = new SubstrateTreasury(this.app);
+    this.identities = new SubstrateIdentities(this.app);
     await app.threads.refreshAll(this.id, null, true);
     await app.comments.refreshAll(this.id, null, true);
     await app.reactions.refreshAll(this.id, null, true);

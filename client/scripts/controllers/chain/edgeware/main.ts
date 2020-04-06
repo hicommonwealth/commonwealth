@@ -7,6 +7,7 @@ import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_p
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
+import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 
 import { ChainClass, IChainAdapter, ChainBase } from 'models/models';
 import { u128 } from '@polkadot/types';
@@ -16,53 +17,48 @@ import ProposalArchiveController from '../../server/proposals';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identity';
 
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 
 class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
-  public readonly chain: EdgewareChain = new EdgewareChain(); // edgeware chain id
-
-  public readonly accounts: SubstrateAccounts = new SubstrateAccounts();
-
-  public readonly phragmenElections: SubstratePhragmenElections = new SubstratePhragmenElections();
-
-  public readonly council: SubstrateCouncil = new SubstrateCouncil();
-
-  public readonly identities: SubstrateIdentities = new SubstrateIdentities();
-
+  public chain: EdgewareChain;
+  public accounts: SubstrateAccounts;
+  public phragmenElections: SubstratePhragmenElections;
+  public council: SubstrateCouncil;
+  public identities: SubstrateIdentities;
   // eslint-disable-next-line max-len
-  public readonly democracyProposals: SubstrateDemocracyProposals = new SubstrateDemocracyProposals();
-
-  public readonly democracy: SubstrateDemocracy = new SubstrateDemocracy();
-
-  public readonly treasury: SubstrateTreasury = new SubstrateTreasury();
-
-  public readonly signaling: EdgewareSignaling = new EdgewareSignaling();
+  public democracyProposals: SubstrateDemocracyProposals;
+  public democracy: SubstrateDemocracy;
+  public treasury: SubstrateTreasury;
+  public signaling: EdgewareSignaling;
 
   public readonly server = {
-    //proposals: new ProposalArchiveController(),
+    // proposals: new ProposalArchiveController(),
   };
 
   public readonly webWallet: WebWalletController = new WebWalletController();
-
   public readonly base = ChainBase.Substrate;
-
   public readonly class = ChainClass.Edgeware;
 
   private _loaded: boolean = false;
-
   get loaded() { return this._loaded; }
 
   private _serverLoaded: boolean = false;
-
   get serverLoaded() { return this._serverLoaded; }
 
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
-
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
-    //await this.server.proposals.init();
+    this.chain = new EdgewareChain(this.app); // edgeware chain this.appid
+    this.accounts = new SubstrateAccounts(this.app);
+    this.phragmenElections = new SubstratePhragmenElections(this.app);
+    this.council = new SubstrateCouncil(this.app);
+    this.identities = new SubstrateIdentities(this.app);
+    this.democracyProposals = new SubstrateDemocracyProposals(this.app);
+    this.democracy = new SubstrateDemocracy(this.app);
+    this.treasury = new SubstrateTreasury(this.app);
+    this.signaling = new EdgewareSignaling(this.app);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
+    // await this.server.proposals.init();
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
 
@@ -103,10 +99,10 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public deinit = async (): Promise<void> => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
-    //this.server.proposals.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
+    // this.server.proposals.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

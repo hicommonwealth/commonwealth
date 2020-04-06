@@ -31,6 +31,7 @@ import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
+import ProfileBlock from 'views/components/widgets/profile_block';
 import ViewCountBlock from 'views/components/widgets/view_count_block';
 import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -41,7 +42,6 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
 import VersionHistoryModal from '../modals/version_history_modal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 
@@ -133,7 +133,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
 
-    const subtitle = (proposal.ProposalType === SubstrateTreasuryProposal) ?
+    const subtitle = (proposal.ProposalType === ProposalType.SubstrateTreasuryProposal) ?
       `Proposed spend: ${formatCoin(proposal.value)} to ${proposal.beneficiaryAddress}` :
       proposal.title;
 

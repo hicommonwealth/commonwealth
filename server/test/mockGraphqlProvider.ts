@@ -1,4 +1,4 @@
-/***
+/** *
  * @file Mock server replicating the Graph Protocol graphql API.
  *
  * This file is designed to mock the Graph Protocol API by exposing a similar set of
@@ -15,7 +15,7 @@
  *   3. A GET "/complete" with required argument "id", which marks that proposal as processed.
  *   4. A GET "/description" with required arguments "id" and "description", which updates the description
  *      of the proposal with corresponding id to the provided value.
- **/
+ * */
 
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
@@ -47,7 +47,7 @@ const schema = buildSchema(`
   }
 `);
 
-const proposals = [...Array(5)].map((v, i) => ({ id: `${i}`, processed: true, description: `proposal ${i}`}));
+const proposals = [...Array(5)].map((v, i) => ({ id: `${i}`, processed: true, description: `proposal ${i}` }));
 
 const rootValue = {
   proposals: (request, response, params) => {

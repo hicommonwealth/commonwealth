@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract GuildBank is Ownable {
+contract GuildBank2 is Ownable {
     using SafeMath for uint256;
 
     event Withdrawal(address indexed receiver, address indexed tokenAddress, uint256 amount);

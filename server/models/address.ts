@@ -136,7 +136,10 @@ module.exports = (sequelize, DataTypes) => {
       } else {
         isValid = false;
       }
-    } else if (chain.network === 'ethereum') {
+    } else if (chain.network === 'ethereum'
+      || chain.network === 'moloch'
+      || chain.network === 'metacart'
+    ) {
       const msgBuffer = Buffer.from(addressModel.verification_token.trim());
       // toBuffer() doesn't work if there is a newline
       const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
