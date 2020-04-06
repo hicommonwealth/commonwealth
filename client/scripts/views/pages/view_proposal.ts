@@ -42,7 +42,6 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
 import VersionHistoryModal from '../modals/version_history_modal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 
@@ -134,7 +133,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
 
-    const subtitle = (proposal.ProposalType === SubstrateTreasuryProposal) ?
+    const subtitle = (proposal.ProposalType === ProposalType.SubstrateTreasuryProposal) ?
       `Proposed spend: ${formatCoin(proposal.value)} to ${proposal.beneficiaryAddress}` :
       proposal.title;
 
