@@ -106,17 +106,18 @@ class SubstrateDemocracyProposals extends ProposalModule<
     super.deinit();
   }
 
-  public createTx(author: SubstrateAccount, action: Call, proposalHash: Hash, deposit: SubstrateCoin) {
+  public async createTx(author: SubstrateAccount, action: Call, proposalHash: Hash, deposit: SubstrateCoin) {
     if (deposit.lt(this.minimumDeposit)) {
       throw new Error(`deposit must be greater than ${+this.minimumDeposit}`);
     }
+
+    const txFunc = (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit);
+    if (!(await this._Chain.canPayFee(author, txFunc, deposit))) {
+      throw new Error('insufficient funds');
+    }
+
     const title = this._Chain.methodToTitle(action);
-    return this._Chain.createTXModalData(
-      author,
-      (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit),
-      'createDemocracyProposal',
-      title
-    );
+    return this._Chain.createTXModalData(author, txFunc, 'createDemocracyProposal', title);
   }
 
   public notePreimage(author: SubstrateAccount, action: Call, encodedProposal: string) {

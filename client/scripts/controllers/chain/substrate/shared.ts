@@ -8,17 +8,17 @@ import BN from 'bn.js';
 import { ApiRx, WsProvider, SubmittableResult, Keyring } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
-  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties
+  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties, DispatchError
 } from '@polkadot/types/interfaces';
 import { Vec, Compact } from '@polkadot/types/codec';
 import { createType } from '@polkadot/types/create';
-import { ApiOptions, Signer } from '@polkadot/api/types';
+import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { formatCoin, Coin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
   Proposal, NodeInfo, StorageModule, ITXModalData,
-  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase,
+  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase, ChainClass
 } from 'models/models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -72,9 +72,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   private _creationfee: SubstrateCoin;
   public get creationfee() { return this._creationfee; }
-
-  private _transferfee: SubstrateCoin;
-  public get transferfee() { return this._transferfee; }
 
   private _metadataInitialized: boolean = false;
   public get metadataInitialized() { return this._metadataInitialized; }
@@ -232,7 +229,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public getTxMethod(mod: string, func: string): SubmittableExtrinsicFunction<'rxjs'> {
-    return this._api.tx[mod][func];
+    const result = this._api.tx[mod][func];
+    if (!result) {
+      throw new Error(`unsupported transaction: ${mod}::${func}`);
+    }
+    return result;
   }
 
   public deinitMetadata() {
@@ -253,7 +254,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             api.derive.chain.bestNumber(),
             api.query.balances.totalIssuance(),
             of(api.consts.balances.existentialDeposit),
-            of(api.consts.balances.transferFee),
             of(api.consts.balances.creationFee),
             api.query.sudo ? api.query.sudo.key() : of(null),
             api.rpc.system.properties(),
@@ -263,11 +263,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         first(), // TODO: leave this open?
       ).subscribe(([
         chainname, chainversion, chainruntimename, minimumperiod, blockNumber,
-        totalbalance, existentialdeposit, transferfee, creationfee, sudokey,
+        totalbalance, existentialdeposit, creationfee, sudokey,
         chainProps, reservationFee,
       ]: [
           string, string, string, Moment, BlockNumber,
-          Balance, Balance, Balance, Balance, AccountId, ChainProperties, Balance
+          Balance, Balance, Balance, AccountId, ChainProperties, Balance
       ]) => {
         this.app.chain.name = chainname;
         this.app.chain.version = chainversion;
@@ -288,7 +288,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
         this._totalbalance = this.coins(totalbalance);
         this._existentialdeposit = this.coins(existentialdeposit);
-        this._transferfee = this.coins(transferfee);
         this._creationfee = this.coins(creationfee);
         this._sudoKey = sudokey ? sudokey.toString() : undefined;
         this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
@@ -455,12 +454,49 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._eventsInitialized = true;
   }
 
+  // TODO: refactor fee computation into a more standard form that can be used throughout
+  //   and shown at TX creation time
+  public async canPayFee(
+    sender: SubstrateAccount,
+    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+    additionalDeposit?: SubstrateCoin,
+  ): Promise<boolean> {
+    const senderBalance = await sender.freeBalance.pipe(first()).toPromise();
+    const netBalance = additionalDeposit ? senderBalance.sub(additionalDeposit) : senderBalance;
+    let fees: SubstrateCoin;
+    if (sender.chainClass === ChainClass.Edgeware) {
+      // XXX: we cannot compute tx fees on edgeware yet, so we are forced to assume no fees
+      //   besides explicit additional fees
+      fees = additionalDeposit || this.coins(0);
+    } else {
+      fees = await this.computeFees(sender.address, txFunc);
+    }
+    console.log(`sender free balance: ${senderBalance.format(true)}, tx fees: ${fees.format(true)}, additional deposit: ${additionalDeposit ? additionalDeposit.format(true) : 'N/A'}`);
+    return netBalance.gte(fees);
+  }
+
+  public async computeFees(
+    senderAddress: string,
+    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+  ): Promise<SubstrateCoin> {
+    return new Promise((resolve, reject) => {
+      this.api.pipe(
+        switchMap((api: ApiRx) => {
+          return txFunc(api).paymentInfo(senderAddress);
+        }),
+      ).subscribe((fees) => {
+        resolve(this.coins(fees.partialFee.toBn()));
+      }, (error) => reject(error));
+    });
+  }
+
   public createTXModalData(
     author: SubstrateAccount,
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void): ITXModalData {
+    cb?: (success: boolean) => void, // TODO: remove this argument
+  ): ITXModalData {
     // TODO: check if author has funds for tx fee
     return {
       author: author,
@@ -524,6 +560,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                         timestamp: this.app.chain.block.lastTime,
                       };
                     } else if (method === 'ExtrinsicFailed') {
+                      const errorData = data[0] as DispatchError;
+                      if (errorData.isModule) {
+                        const errorInfo = this.registry.findMetaError(errorData.asModule.toU8a());
+                        console.error(`${errorInfo.section}::${errorInfo.name}: ${errorInfo.documentation[0]}`);
+                      }
                       notifyError(`Failed ${txName}: "${objName}"`);
                       return {
                         status: TransactionStatus.Failed,
@@ -564,8 +605,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         case 'Proposal': return this.methodToTitle(arg);
         case 'Bytes': return u8aToHex(arg).toString().slice(0, 16);
         case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString());
-        case 'Compact<Moment>': return moment(new Date(arg)).utc().toString();
-        case 'Compact<Balance>': return formatCoin(this.coins(arg));
+        // TODO: when do we actually see this Moment in practice? is this a correct decoding?
+        case 'Compact<Moment>': return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
+        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg)));
         default: return arg.toString().length > 16 ? arg.toString().substr(0, 15) + '...' : arg.toString();
       }
     });
