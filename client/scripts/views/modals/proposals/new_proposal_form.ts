@@ -73,13 +73,13 @@ const NewProposalForm = {
         vnode.state.councilMotionType === 'createExternalProposalMajority';
       hasVotingPeriodAndDelaySelector =
         vnode.state.councilMotionType === 'createFastTrack' ||
-        vnode.state.councilMotionType === 'pushExternalProposal';
+        vnode.state.councilMotionType === 'createExternalProposalDefault';
       hasReferendumSelector =
         vnode.state.councilMotionType === 'createEmergencyCancellation';
       hasExternalProposalSelector =
         vnode.state.councilMotionType === 'vetoNextExternal' ||
         vnode.state.councilMotionType === 'createFastTrack' ||
-        vnode.state.councilMotionType === 'pushExternalProposal';
+        vnode.state.councilMotionType === 'createExternalProposalDefault';
       hasTreasuryProposalSelector =
         vnode.state.councilMotionType === 'createTreasuryApprovalMotion' ||
         vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
@@ -169,11 +169,9 @@ const NewProposalForm = {
         } else if (vnode.state.councilMotionType === 'createExternalProposalMajority') {
           args = [author, threshold, EdgewareFunctionPicker.getMethod()];
           createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalMajority(a, t, m);
-        } else if (vnode.state.councilMotionType === 'pushExternalProposal') {
-          args = [author, threshold, vnode.state.nextExternalProposalHash, vnode.state.votingPeriod,
-            vnode.state.enactmentDelay];
-          createFunc = ([a, t, h, p, delay]) =>
-            (app.chain as Substrate).technicalCommittee.pushExternalProposal(a, t, h, p, delay);
+        } else if (vnode.state.councilMotionType === 'createExternalProposalDefault') {
+          args = [author, threshold, EdgewareFunctionPicker.getMethod()];
+          createFunc = ([a, t, m]) => (app.chain as Substrate).council.createExternalProposalDefault(a, t, m);
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
@@ -262,7 +260,9 @@ const NewProposalForm = {
         });
         throw new Error('Invalid proposal type');
       }
-      createTXModal(createFunc(args)).then(done);
+      Promise.resolve(createFunc(args))
+        .then((modalData) => createTXModal(modalData))
+        .then(done);
     };
 
     // default state options

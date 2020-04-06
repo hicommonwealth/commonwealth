@@ -1,6 +1,8 @@
 import 'components/widgets/account_balance.scss';
 
+import { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
 import { default as m } from 'mithril';
+
 import { Coin, formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
 import { makeDynamicComponent } from 'models/mithril';
@@ -21,6 +23,7 @@ interface IProfileSummaryState {
     lockedBalance?: SubstrateCoin;
     unlockedBalance?: SubstrateCoin;
     delegations?: number;
+    locks?: (BalanceLock | BalanceLockTo212)[];
   };
 }
 
@@ -28,8 +31,9 @@ const AccountBalance = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummar
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
     balance: attrs.account.balance,
-    lockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.reservedBalance : null,
+    lockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.lockedBalance : null,
     unlockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.freeBalance : null,
+    locks: attrs.account instanceof SubstrateAccount ? attrs.account.locks : null,
     delegations: attrs.account instanceof CosmosAccount ? attrs.account.delegations : null,
   }),
   view: (vnode) => {

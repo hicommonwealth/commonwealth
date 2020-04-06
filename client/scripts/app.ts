@@ -34,6 +34,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           id: node.id,
           url: node.url,
           chain: app.config.chains.getById(node.chain),
+          address: node.address,
         }));
       });
       data.communities.map((community) => {

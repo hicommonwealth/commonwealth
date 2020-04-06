@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-import { Observable, combineLatest, of, Observer, empty } from 'rxjs';
+import { Observable, combineLatest, of, Observer, empty, from } from 'rxjs';
 import { map, flatMap, auditTime, switchMap, first } from 'rxjs/operators';
 
 import { ApiRx } from '@polkadot/api';
@@ -7,7 +7,7 @@ import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
-  AccountData, BalanceOf, BalanceLock, BalanceLockTo212,
+  AccountData, Balance, BalanceLock, BalanceLockTo212,
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
@@ -185,7 +185,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // GETTERS AND SETTERS
   // staking
   public get stakedBalance(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this.stakingExposure.pipe(
       map((exposure) => this._Chain.coins(exposure ? exposure.total : NaN))
     );
@@ -193,7 +193,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // The total balance
   public get balance(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
       .pipe(map(({
         freeBalance,
@@ -202,62 +202,26 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   // The quantity of unlocked balance
+  // TODO: note that this uses `availableBalance` and not `freeBalance` here -- this is because freeBalance
+  //   only includes subtracted reserves, and not locks! And we want to see free for usage now.
   public get freeBalance(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
-      .pipe(map(({ freeBalance }) => this._Chain.coins(freeBalance)));
-  }
-
-  // The amount of balance locked up in reserve
-  public get reservedBalance(): Observable<SubstrateCoin> {
-    // TODO: should this return all coins if a votelock is on the account?
-    if(!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
-      .pipe(map(({ reservedBalance }) => this._Chain.coins(reservedBalance)));
-  }
-
-  public get miscFrozen(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
-      .pipe(map(({ frozenMisc }) => this._Chain.coins(frozenMisc)));
-  }
-
-  public get feeFrozen(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
-      .pipe(map(({ frozenFee }) => this._Chain.coins(frozenFee)));
+      .pipe(map(({ availableBalance }) => this._Chain.coins(availableBalance)));
   }
 
   public get lockedBalance(): Observable<SubstrateCoin> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
-      .pipe(map(({ lockedBalance }) => this._Chain.coins(lockedBalance)));
-  }
-
-  // public get voteLock(): Observable<number | null> {
-  //   if (!this._Chain?.apiInitialized) return; // TODO
-  //   return this._Chain.query((api: ApiRx) => api.query.democracy.locks(this.address))
-  //     .pipe(map((lockOpt) => lockOpt.isSome ? lockOpt.unwrap().toNumber() : null));
-  // }
-
-
-  // returns true if the funds can be withdrawn
-  public async canWithdraw(amount: BN, isTxFee = false): Promise<boolean> {
-    // const isLocked = await this.voteLock.pipe(first()).toPromise();
-    // if (isLocked > app.chain.block.height) {
-    //   return false;
-    // }
-
-    const free = await this.freeBalance.pipe(first()).toPromise();
-    const minimum = await (isTxFee
-      ? this.feeFrozen.pipe(first()).toPromise()
-      : this.miscFrozen.pipe(first()).toPromise());
-    return free.sub(minimum).gte(amount);
+      .pipe(map(({ availableBalance, votingBalance }) =>
+      // we compute illiquid balance by doing (total - available), because there's no query
+      // or parameter to fetch it
+        this._Chain.coins(votingBalance.sub(availableBalance))));
   }
 
   // The coin locks this account has on them
   public get locks(): Observable<(BalanceLock | BalanceLockTo212)[]> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.derive.balances.all(this.address))
       .pipe(map(({ lockedBreakdown }) => (lockedBreakdown.length > 0 ? lockedBreakdown : [])));
   }
@@ -266,19 +230,19 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // TODO: this only checks the council collective, we may want to include a list of all
   //   collective memberships.
   public get isCouncillor(): Observable<boolean> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.council.members())
       .pipe(map((members: Vec<AccountId>) => undefined !== members.find((m) => m.toString() === this.address)));
   }
 
   // The amount staked by this account & accounts who have nominated it
   public get stakingExposure(): Observable<Exposure> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.staking.stakers(this.address)) as Observable<Exposure>;
   }
 
   public get bonded(): Observable<SubstrateAccount> {
-    if(!this._Chain?.apiInitialized) return;
+    if( !this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.staking.bonded(this.address))
       .pipe(map((accountId) => {
         if (accountId && accountId.isSome) {
@@ -290,7 +254,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public get stakingLedger(): Observable<StakingLedger> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.staking.ledger(this.address))
       .pipe(map((ledger) => {
         if (ledger && ledger.isSome) {
@@ -303,7 +267,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // Accounts may set a proxy that can take council and democracy actions on behalf of their account
   public get proxyFor(): Observable<SubstrateAccount> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.democracy.proxy(this.address))
       .pipe(map((proxy) => {
         if (proxy && proxy.isSome) {
@@ -316,7 +280,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
   public get delegation(): Observable<[ SubstrateAccount, number ]> {
-    if(!this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     // we have to hack around the type here because of the linked_map wrapper
     return this._Chain.query((api: ApiRx) => api.query.democracy.delegations<Delegation[]>(this.address))
       .pipe(map(([ delegation ]: [ Delegation ]) => {
@@ -421,77 +385,29 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   // TRANSACTIONS
+  public get balanceTransferFee(): Observable<SubstrateCoin> {
+    if (this.chainClass === ChainClass.Edgeware) {
+      // grab const tx fee on edgeware
+      return this._Chain.api.pipe(
+        map((api: ApiRx) => this._Chain.coins(api.consts.balances.transferFee as Balance))
+      );
+    } else {
+      // compute fee on Kusama
+      const dummyTxFunc = (api: ApiRx) => api.tx.balances.transfer(this.address, '0');
+      return from(this._Chain.computeFees(this.address, dummyTxFunc));
+    }
+  }
+
   public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
-    console.log('send balance tx');
-    const fundsAvailable = await this.canWithdraw(amount, false);
-    if (!fundsAvailable) {
-      throw new Error('not enough liquid funds');
+    const txFunc = (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount);
+    if (!(await this._Chain.canPayFee(this, txFunc, amount))) {
+      throw new Error('insufficient funds');
     }
     return this._Chain.createTXModalData(
       this,
-      (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount),
+      txFunc,
       'balanceTransfer',
       `${formatCoin(amount)} to ${recipient.address}`
-    );
-  }
-
-  public async setProxyTx(proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('already a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.setProxy(proxy.address),
-      'setProxy',
-      `${this.address} sets proxy to ${proxy.address}`
-    );
-  }
-
-  public async resignProxyTx() {
-    const proxyFor = await this.proxyFor.pipe(first()).toPromise();
-    if (proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.resignProxy(),
-      'resignProxy',
-      `${this.address} resigns as proxy`
-    );
-  }
-
-  public async removeProxyTx(proxy: SubstrateAccount) {
-    const proxyFor = await proxy.proxyFor.pipe(first()).toPromise();
-    if (!proxyFor) {
-      throw new Error('not a proxy');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.removeProxy(proxy.address),
-      'removeProxy',
-      `${this.address} removes proxy ${proxy.address}`
-    );
-  }
-
-  public delegateTx(toAccount: SubstrateAccount, conviction: Conviction) {
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.delegate(toAccount.address, conviction),
-      'delegate',
-      `${this.address} delegates to ${toAccount.address}`
-    );
-  }
-
-  public undelegateTx() {
-    if (!this.delegation) {
-      throw new Error('Account not delegated');
-    }
-    return this._Chain.createTXModalData(
-      this,
-      (api: ApiRx) => api.tx.democracy.undelegate(),
-      'undelegate',
-      `undelegating ${this.address}`
     );
   }
 
@@ -581,6 +497,18 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       }),
       'setKeys',
       `${this.address} sets validation commission ${this.validate}`,
+    );
+  }
+
+  public unlockTx() {
+    if (this.chainClass !== ChainClass.Kusama) {
+      throw new Error('unlock only supported on Kusama');
+    }
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.democracy.unlock(this.address),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
     );
   }
 

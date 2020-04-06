@@ -2,6 +2,8 @@ import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polk
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 
+import AddressSwapper from 'views/components/addresses/address_swapper';
+
 // TODO: make this a generic controller, and have the polkadot-js extension implementation inherit
 class WebWalletController {
   // GETTERS/SETTERS
@@ -24,7 +26,12 @@ class WebWalletController {
 
   public async getSigner(who: string): Promise<Signer> {
     // finds an injector for an address
-    const injector = await web3FromAddress(who);
+    // web wallet stores addresses in testnet format for now, so we have to re-encode
+    const reencodedAddress = AddressSwapper({
+      address: who,
+      currentPrefix: 42,
+    });
+    const injector = await web3FromAddress(reencodedAddress);
     return injector.signer;
   }
 

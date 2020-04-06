@@ -4,6 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 
+import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { ModalExitButton } from 'views/modal';
@@ -210,7 +211,12 @@ const TXSigningWebWalletOption = {
     const isWebWalletAvailable = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available;
     const isWebWalletEnabled = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.enabled;
     const isAuthorInWebWallet = (app.chain as Substrate).webWallet &&
-      !!(app.chain as Substrate).webWallet.accounts.find((v) => v.address === vnode.attrs.author.address);
+      !!(app.chain as Substrate).webWallet.accounts.find((v) => {
+        return AddressSwapper({
+          address: v.address,
+          currentPrefix: (app.chain as Substrate).chain.ss58Format,
+        }) === vnode.attrs.author.address;
+      });
     return m('.TXSigningSeedOrMnemonicOption', [
       m('div', 'Use the polkadot-js extension to sign the transaction:'),
       m('button[type="submit"]', {

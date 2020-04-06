@@ -240,7 +240,7 @@ const ChainStats: m.Component<{}> = {
       header('Balances'),
       stat('Total EDG',           formatCoin((app.chain as Substrate).chain.totalbalance)),
       stat('Existential deposit', formatCoin((app.chain as Substrate).chain.existentialdeposit)),
-      stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
+      //stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
       stat('Creation fee',        formatCoin((app.chain as Substrate).chain.creationfee)),
       header('Democracy Proposals'),
       stat('Launch period',       formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)),

@@ -30,9 +30,10 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
 
   public init = async (onServerLoaded?) => {
     const useChainProposalData = this.meta.chain.id === 'moloch-local';
-    if (!this.meta.chain.chainObjectId && !useChainProposalData) {
-      throw new Error('no chain object id found')
-    }
+    // FIXME: This is breaking for me on moloch default (not local)
+    // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
+    //   throw new Error('no chain object id found');
+    // }
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
     this.chain = new EthereumChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);

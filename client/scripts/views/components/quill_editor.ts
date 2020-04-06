@@ -348,7 +348,7 @@ const instantiateEditor = (
     return new File([u8arr], filename, { type });
   };
 
-  const uploadImg = (file) => {
+  const uploadImg = async (file) => {
     return new Promise((resolve, reject) => {
       document.getElementsByClassName('ql-container')[0].appendChild(createSpinner());
       $.post(app.serverUrl() + '/getUploadSignature', {
@@ -359,6 +359,8 @@ const instantiateEditor = (
       }).then((response) => {
         if (response.status !== 'Success') {
           return reject(`Failed to get an S3 signed upload URL: ${response.error}`);
+          document.getElementsByClassName('spinner-wrap')[0].remove();
+          alert('Upload failed');
         }
         $.ajax({
           type: 'PUT',
@@ -374,6 +376,8 @@ const instantiateEditor = (
           console.log('Upload succeeded: ' + trimmedURL);
         }).catch((err) => {
           // file not uploaded
+          document.getElementsByClassName('spinner-wrap')[0].remove();
+          alert('Upload failed');
           console.log('Upload failed: ' + response.result);
           reject('Upload failed: ' + err);
         });

@@ -7,7 +7,7 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import { initAppState } from 'app';
-import { ApiStatus, default as app } from 'state';
+import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
@@ -192,16 +192,16 @@ const Navigation: m.Component<IMenuAttrs> = {
     const defaultChainId = (app.activeChainId()) ? app.activeChainId()
       : app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
 
-    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate)
-      ? ((app.chain as Substrate).democracy.store.getAll().length
-       + (app.chain as Substrate).democracyProposals.store.getAll().length
-       + (app.chain as Substrate).council.store.getAll().length
-       + (app.chain as Substrate).treasury.store.getAll().length) : 0;
+    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
+      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
     const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      ? (app.chain as Edgeware).signaling.store.getAll().length : 0;
+      ? (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      ? (app.chain as Cosmos).governance.store.getAll().length : 0;
+      ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     return m('.Navigation', ([].concat([
       m(NavigationItem, {
@@ -233,9 +233,9 @@ const Navigation: m.Component<IMenuAttrs> = {
       //     p.startsWith(`/${app.activeId()}/proposal/requests`) ||
       //     p.startsWith(`/${app.activeId()}/request`)
       // }),
-      (app.chain && !app.community && [
-        ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1 || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
+      (app.chain && !app.community)
+        && ([ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1
+        || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
         label: [
           'Proposals',
           allSubstrateGovernanceProposals > 0 && m('.header-count', allSubstrateGovernanceProposals),
@@ -774,12 +774,12 @@ const NotificationButtons: m.Component<{ notifications }> = {
           app.login.notifications.markAsRead(notifications).then(() => m.redraw());
         }
       }, 'Mark All Read'),
-      m('.button', {
-        onclick: (e) => {
-          e.preventDefault();
-          app.login.notifications.clearAllRead().then(() => m.redraw());
-        }
-      }, 'Clear All Read'),
+      // m('.button', {
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.login.notifications.clearAllRead().then(() => m.redraw());
+      //   }
+      // }, 'Clear All Read'),
     ]);
   }
 };

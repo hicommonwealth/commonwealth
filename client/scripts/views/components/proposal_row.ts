@@ -6,7 +6,6 @@ import moment from 'moment-twitter';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-
 import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal } from 'models';
 
@@ -52,7 +51,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
     proposal.isPassing === ProposalStatus.Passed ? 'Passed' :
     proposal.isPassing === ProposalStatus.Failed ? 'Did not pass' :
     proposal.isPassing === ProposalStatus.Passing ? 'Passing' :
-    proposal.isPassing === ProposalStatus.Failing ? 'Needs more votes' : '';
+    proposal.isPassing === ProposalStatus.Failing ? 'Will not pass' : '';
   if (proposal.isPassing === ProposalStatus.Passing
       || proposal.isPassing === ProposalStatus.Failing
       || (proposal instanceof MolochProposal
@@ -277,7 +276,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
         ],
-        // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comment 1 1 1 2
+        // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug == ProposalType.SubstrateTreasuryProposal) && [
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Value'),

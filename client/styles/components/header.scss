@@ -615,15 +615,17 @@ a.NavigationItem {
         display: flex;
         flex-direction: row;
         text-align: center;
-        padding: 5px;
-    
         .button {
-            width: 50%;
+            width: 100%;
             cursor: pointer;
-            
-            &:first-of-type {
-                border-right: 1px #555 solid;
+            padding: 10px 0;
+            &:hover {
+                background: #444;
             }
+            // width: 50%;
+            // &:first-of-type {
+            //     border-right: 1px #555 solid;
+            // }
         }
     }
 
