@@ -16,7 +16,7 @@ import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import SendingFrom from 'views/components/sending_from';
 import ObjectPage from 'views/pages/_object_page';
-import { ChainClass } from 'models/models';
+import { ChainClass } from 'models';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];

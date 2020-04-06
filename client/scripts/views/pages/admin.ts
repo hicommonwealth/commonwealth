@@ -9,7 +9,7 @@ import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import Tabs from 'views/components/widgets/tabs';
-import { ChainInfo, NodeInfo } from 'models/models';
+import { ChainInfo, NodeInfo } from 'models';
 import PageLoading from 'views/pages/loading';
 
 // import { OffchainComment, Proposal, AnyProposal } from 'models/models';
@@ -25,13 +25,13 @@ import DropdownButton from 'views/components/widgets/dropdown_button';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import PopopenTruncatedText from 'views/components/widgets/popopen_truncated_text';
-import EdgewareFunctionPicker from '../components/edgeware_function_picker';
 import { switchMap } from 'rxjs/operators';
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { DropdownFormField } from '../components/forms';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
+import { DropdownFormField } from '../components/forms';
+import EdgewareFunctionPicker from '../components/edgeware_function_picker';
 
 
 interface IChainManagerAttrs {

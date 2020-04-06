@@ -7,8 +7,15 @@ import app from 'state';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { ChainInfo, SocialAccount, Account, ChainBase, CommunityInfo,
-         AddressInfo, MembershipInfo } from 'models/models';
+import {
+  ChainInfo,
+  SocialAccount,
+  Account,
+  ChainBase,
+  CommunityInfo,
+  AddressInfo,
+  MembershipInfo
+} from 'models';
 import moment from 'moment';
 
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {

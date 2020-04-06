@@ -1,7 +1,7 @@
 import 'components/chain_icon.scss';
 
 import { default as m } from 'mithril';
-import { ChainInfo } from 'models/models';
+import { ChainInfo } from 'models';
 
 const ChainIcon: m.Component<{ chain: ChainInfo }> = {
   view: (vnode) => {

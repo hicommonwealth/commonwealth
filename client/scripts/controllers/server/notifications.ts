@@ -1,8 +1,8 @@
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 
-import { NotificationStore } from 'models/stores';
-import { NotificationSubscription, Notification } from 'models/models';
+import { NotificationStore } from 'stores';
+import { NotificationSubscription, Notification } from 'models';
 import app from 'state';
 
 const post = (route, args, callback) => {

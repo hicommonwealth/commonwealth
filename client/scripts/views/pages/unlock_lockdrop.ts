@@ -3,14 +3,15 @@ import 'pages/unlock_lockdrop.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { stat } from 'fs';
+import Web3 from 'web3';
 import {
   getLockStorage,
   setupWeb3Provider,
   getCurrentTimestamp,
   formatNumber,
 } from '../stats/stats_helpers';
-import { stat } from 'fs';
-import Web3 from 'web3';
+
 const LockdropV1 = '0x1b75b90e60070d37cfa9d87affd124bb345bf70a';
 const LockdropV2 = '0xfec6f679e32d45e22736ad09dfdf6e3368704e31';
 const defaultContract = 'LockdropV1';

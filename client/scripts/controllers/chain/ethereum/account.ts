@@ -1,20 +1,17 @@
 import assert from 'assert';
 import hdkey from 'ethereumjs-wallet/hdkey';
-
-// tslint:disable-next-line
-const ethUtil = require('ethereumjs-util'); // doesn't import otherwise
 import { Wallet } from 'ethereumjs-wallet';
-import bip39 from 'bip39';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 import { IApp } from 'state';
 import { formatCoin, Coin } from 'shared/adapters/currency';
-import { Account, IAccountsModule, ITXModalData } from 'models/models';
-import { AccountsStore } from 'models/stores';
-
-import { default as EthereumChain } from './chain';
+import { Account, IAccountsModule, ITXModalData } from 'models';
+import { AccountsStore } from 'stores';
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
+import EthereumChain from './chain';
+// tslint:disable-next-line
+const ethUtil = require('ethereumjs-util'); // doesn't import otherwise
 
 function addressFromSeed(seed: string): string {
   return getWalletFromSeed(seed).getAddressString();

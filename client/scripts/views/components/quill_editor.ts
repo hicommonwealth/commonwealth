@@ -13,8 +13,8 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
 import SettingsController from 'controllers/app/settings';
+import { Profile } from 'models';
 import { loadScript } from '../../helpers';
-import { Profile } from 'models/models';
 import User from './widgets/user';
 
 // Rich text and Markdown editor.

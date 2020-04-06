@@ -5,8 +5,8 @@ import { default as moment } from 'moment-twitter';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
-import { CommentsStore } from 'models/stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread } from 'models/models';
+import { CommentsStore } from 'stores';
+import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 // tslint:disable: object-literal-key-quotes
 

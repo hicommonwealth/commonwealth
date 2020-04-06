@@ -5,7 +5,7 @@ import { default as $ } from 'jquery';
 import { default as app } from 'state';
 import { default as Quill } from 'quill';
 import { default as moment } from 'moment';
-import { OffchainThread, OffchainComment } from 'client/scripts/models/models';
+import { OffchainThread, OffchainComment } from 'models';
 import { CompactModalExitButton } from '../modal';
 import QuillFormattedText from '../components/quill_formatted_text';
 import MarkdownFormattedText from '../components/markdown_formatted_text';

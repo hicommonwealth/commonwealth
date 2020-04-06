@@ -1,4 +1,4 @@
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { Subject, Observable, combineLatest, of } from 'rxjs';
 import { throttle, first, takeUntil } from 'rxjs/operators';
 import app from '../state';

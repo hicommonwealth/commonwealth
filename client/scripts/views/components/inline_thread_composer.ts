@@ -6,7 +6,7 @@ import { default as $ } from 'jquery';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind } from 'models/models';
+import { OffchainThread, Account, OffchainThreadKind } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';

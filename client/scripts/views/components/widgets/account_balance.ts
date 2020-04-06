@@ -6,7 +6,7 @@ import { default as m } from 'mithril';
 import { Coin, formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
 import { makeDynamicComponent } from 'models/mithril';
-import { Account } from 'models/models';
+import { Account } from 'models';
 
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { NearAccount } from 'controllers/chain/near/account';

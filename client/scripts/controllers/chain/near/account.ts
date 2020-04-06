@@ -1,8 +1,8 @@
-import { Account, IAccountsModule, ITXModalData } from 'models/models';
+import { Account, IAccountsModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { IApp } from 'state';
 import { Observable, from, Unsubscribable } from 'rxjs';
-import { AccountsStore } from 'models/stores';
+import { AccountsStore } from 'stores';
 import * as nearlib from 'nearlib';
 import { map, shareReplay } from 'rxjs/operators';
 import { AccountState } from 'nearlib/lib/account';

@@ -1,6 +1,6 @@
 import { map } from 'rxjs/operators';
 import BN from 'bn.js';
-import { ProposalStore } from 'models/stores';
+import { ProposalStore } from 'stores';
 import { Call, Proposal } from '@polkadot/types/interfaces';
 import { GenericCall, getTypeDef } from '@polkadot/types';
 import { Codec, TypeDef } from '@polkadot/types/types';
@@ -13,7 +13,7 @@ import {
 import {
   Proposal as ProposalModel, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account
-} from 'models/models';
+} from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';

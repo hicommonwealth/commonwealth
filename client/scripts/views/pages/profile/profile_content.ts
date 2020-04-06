@@ -1,6 +1,6 @@
 import m from 'mithril';
 import _ from 'lodash';
-import { OffchainThread, Account } from '../../../models/models';
+import { OffchainThread, Account } from 'models';
 import ProfileCommentGroup from './profile_comment_group';
 import { UserContent } from '.';
 import ProfileProposal from './profile_proposal';

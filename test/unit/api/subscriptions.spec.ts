@@ -5,11 +5,11 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
+import { NotificationCategories } from 'shared/types';
+import { NotificationSubscription, OffchainThread } from 'models';
 import app, { resetDatabase, closeServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
-import { NotificationCategories } from 'shared/types';
-import { NotificationSubscription, OffchainThread } from 'client/scripts/models/models';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);

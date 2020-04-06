@@ -6,8 +6,8 @@ import { IApp } from 'state';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import CosmosChain from 'controllers/chain/cosmos/chain';
-import { Account, IAccountsModule } from 'models/models';
-import { AccountsStore } from 'models/stores';
+import { Account, IAccountsModule } from 'models';
+import { AccountsStore } from 'stores';
 
 export interface ICosmosValidator {
   // TODO: add more properties (commission, unbonding, jailed, etc)

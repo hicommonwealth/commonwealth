@@ -1,6 +1,6 @@
 import { IApp } from 'state';
-import { Account, IOffchainAccountsModule, Profile, CommunityInfo } from 'models/models';
-import { AccountsStore } from 'models/stores';
+import { Account, IOffchainAccountsModule, Profile, CommunityInfo } from 'models';
+import { AccountsStore } from 'stores';
 import { Coin } from 'adapters/currency';
 
 export class OffchainAccount extends Account<Coin> {

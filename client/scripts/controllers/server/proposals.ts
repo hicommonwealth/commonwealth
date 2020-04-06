@@ -4,7 +4,7 @@ import moment from 'moment';
 import app from 'state';
 import { idToProposal, getProposalObservable } from 'identifiers';
 import { Unsubscribable } from 'rxjs';
-import { AnyProposal } from 'models/models';
+import { AnyProposal } from 'models';
 
 /* EXAMPLE RESPONSE
 {

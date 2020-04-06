@@ -1,6 +1,6 @@
 import { default as $ } from 'jquery';
 import app from 'state';
-import { ChainObject } from 'models/models';
+import { ChainObject } from 'models';
 
 export default class ChainObjectController<T> {
   constructor(

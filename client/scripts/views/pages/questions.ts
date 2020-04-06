@@ -10,7 +10,7 @@
 // import ObjectPage from 'views/pages/_object_page';
 // import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 // import ResizableTextarea from 'views/components/widgets/resizable_textarea';
-// import { OffchainThreadKind, AnyProposal } from '../../models/models';
+// import { OffchainThreadKind, AnyProposal } from 'models';
 // import ProposalComments from '../components/proposal_comments';
 // import { idToProposal, ProposalType } from 'identifiers';
 // import ReactionButton, { ReactionType } from '../components/reaction_button';

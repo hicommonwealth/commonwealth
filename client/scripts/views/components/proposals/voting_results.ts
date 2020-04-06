@@ -7,9 +7,8 @@ import { u8aToString } from '@polkadot/util';
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
-import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models/models';
-import { SignalingVote } from 'controllers/chain/edgeware/signaling';
-import { EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling';
+import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models';
+import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling';
 import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';

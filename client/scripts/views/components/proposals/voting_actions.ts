@@ -7,7 +7,7 @@ import app from 'state';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
-import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models/models';
+import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
@@ -22,7 +22,11 @@ import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_elections';
 import { hexToUtf8 } from 'web3-utils';
-import MolochProposal, { MolochProposalVote, MolochVote, MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
+import MolochProposal, {
+  MolochProposalVote,
+  MolochVote,
+  MolochProposalState
+} from 'controllers/chain/ethereum/moloch/proposal';
 import { EthereumAccount } from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 

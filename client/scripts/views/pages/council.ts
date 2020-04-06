@@ -9,7 +9,7 @@ import { ProposalType } from 'identifiers';
 import { formatNumberLong, pluralize, link } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ChainBase, ChainClass, IVote } from 'models/models';
+import { ChainBase, ChainClass, IVote } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

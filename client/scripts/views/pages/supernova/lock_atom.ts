@@ -7,11 +7,12 @@ import { default as mixpanel } from 'mixpanel-browser';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import ObjectPage from 'views/pages/_object_page';
+import Cosmos from 'controllers/chain/cosmos/main';
+import { ChainBase } from 'models';
 import { TextInputFormField, DropdownFormField } from '../../components/forms';
 import SupernovaPreheader from './supernova_preheader';
 import ATOMInstructions from './atom_instructions';
-import Cosmos from 'controllers/chain/cosmos/main';
-import { ChainBase } from 'models/models';
+
 
 interface IState {
   supernovaAddress: string;

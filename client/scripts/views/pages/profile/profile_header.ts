@@ -4,10 +4,9 @@ import $ from 'jquery';
 import app from 'state';
 import * as clipboard from 'clipboard-polyfill';
 import { Registration, IdentityInfo } from '@polkadot/types/interfaces';
-
+import { Account, ChainBase } from 'models';
 import { formatAddressShort, link } from '../../../helpers';
 import EditProfileModal from '../../modals/edit_profile_modal';
-import { Account, ChainBase } from '../../../models/models';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { makeDynamicComponent } from '../../../models/mithril';

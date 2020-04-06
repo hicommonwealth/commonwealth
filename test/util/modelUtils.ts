@@ -3,9 +3,9 @@ import chai from 'chai';
 import 'chai/register-should';
 import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
+import { NotificationCategory } from 'models';
 import app from '../../server-test';
 import models from '../../server/database';
-import { NotificationCategory } from 'client/scripts/models/models';
 const ethUtil = require('ethereumjs-util');
 
 export const createAndVerifyAddress = async ({ chain }) => {
