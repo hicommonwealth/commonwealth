@@ -2,7 +2,7 @@ import { default as _ } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-import app from 'state';
+import { IApp } from 'state';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import CosmosChain from 'controllers/chain/cosmos/chain';
@@ -45,6 +45,13 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     return this._validators;
   }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
   public CosmosKeys;
 
   public updateValidators = _.throttle(async () => {
@@ -79,7 +86,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new CosmosAccount(this._Chain, this, address);
+      acct = new CosmosAccount(this.app, this._Chain, this, address);
     }
     return acct;
   }
@@ -94,7 +101,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
 
   public fromMnemonic(mnemonic: string) {
     const { cosmosAddress, privateKey, publicKey } = this.CosmosKeys.getNewWalletFromSeed(mnemonic);
-    const acct = new CosmosAccount(this._Chain, this, cosmosAddress);
+    const acct = new CosmosAccount(this.app, this._Chain, this, cosmosAddress);
     acct.setMnemonic(mnemonic);
     acct.setPublicKey(publicKey);
     acct.setPrivateKey(privateKey);
@@ -102,7 +109,7 @@ export class CosmosAccounts implements IAccountsModule<CosmosToken, CosmosAccoun
   }
   public fromSeed(seed: string) {
     const { cosmosAddress, privateKey, publicKey } = this.CosmosKeys.getNewWalletFromSeed(seed);
-    const acct = new CosmosAccount(this._Chain, this, cosmosAddress);
+    const acct = new CosmosAccount(this.app, this._Chain, this, cosmosAddress);
     acct.setSeed(seed);
     acct.setPublicKey(publicKey);
     acct.setPrivateKey(privateKey);
@@ -215,8 +222,8 @@ export class CosmosAccount extends Account<CosmosToken> {
   public get validatorStake(): number {
     return this._validatorStake.getValue();
   }
-  constructor(ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
-    super(app.chain.meta.chain, address);
+  constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
+    super(app, app.chain.meta.chain, address);
     if (!ChainInfo) {
       // defer chain initialization
       app.chainReady.pipe(first()).subscribe(() => {

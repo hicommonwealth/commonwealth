@@ -7,7 +7,7 @@ import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import { initAppState } from 'app';
-import { ApiStatus, default as app } from 'state';
+import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
@@ -202,7 +202,6 @@ const Navigation: m.Component<IMenuAttrs> = {
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       ? (app.chain as Cosmos).governance.store.getAll().length : 0;
-
     return m('.Navigation', ([].concat([
       m(NavigationItem, {
         label: 'Home',
@@ -233,9 +232,9 @@ const Navigation: m.Component<IMenuAttrs> = {
       //     p.startsWith(`/${app.activeId()}/proposal/requests`) ||
       //     p.startsWith(`/${app.activeId()}/request`)
       // }),
-      (app.chain && !app.community && ([
-        ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1 || app.chain.class === ChainClass.Moloch)) && m(NavigationItem, {
+      (app.chain && !app.community)
+        && ([ChainBase.CosmosSDK, ChainBase.Substrate].indexOf(app.chain.base) !== -1
+        || app.chain.class === ChainClass.Moloch) && m(NavigationItem, {
         label: [
           'Proposals',
           allSubstrateGovernanceProposals > 0 && m('.header-count', allSubstrateGovernanceProposals),

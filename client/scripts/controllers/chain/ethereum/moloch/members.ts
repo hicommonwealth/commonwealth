@@ -1,13 +1,10 @@
-
+import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
-
 import EthereumAccounts from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-
 import { IAccountsModule } from 'models/models';
 import { AccountsStore } from 'models/stores';
-
 import MolochMember from './member';
 import MolochAPI from './api';
 
@@ -35,11 +32,18 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     this._store.clear();
   }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
   public get(address: string) {
     try {
       return this._store.getByAddress(address.toLowerCase());
     } catch (e) {
-      return new MolochMember(this._Chain, this._Accounts, this, address);
+      return new MolochMember(this.app, this._Chain, this._Accounts, this, address);
     }
   }
 
@@ -48,7 +52,7 @@ export default class MolochMembers implements IAccountsModule<EthereumCoin, Molo
     try {
       return this._store.getByAddress(member.id);
     } catch (e) {
-      return new MolochMember(this._Chain, this._Accounts, this, member.id, member);
+      return new MolochMember(this.app, this._Chain, this._Accounts, this, member.id, member);
     }
   }
 

@@ -1,11 +1,11 @@
 /* eslint-disable max-classes-per-file */
-import { default as m } from 'mithril';
-import { default as moment } from 'moment-twitter';
-import { default as jdenticon } from 'jdenticon';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import moment from 'moment-twitter';
+import jdenticon from 'jdenticon';
+import $ from 'jquery';
 import BN from 'bn.js';
 
-import app, { ApiStatus } from 'state';
+import { IApp, ApiStatus } from 'state';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable, ProposalAdapter } from 'adapters/shared';
 import { Unsubscribable, Observable, BehaviorSubject, Subject, of, forkJoin } from 'rxjs';
@@ -92,25 +92,33 @@ export abstract class ProposalModule<
   protected _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    super();
+    this._app = app;
+  }
+
   protected initSubscription(api: ApiT, newPropsFn: (ps: CT[]) => ProposalT[]): Promise<ProposalT[]> {
     return new Promise((resolve, reject) => {
       this._subscription = this.adapter.subscribeNew(api)
-      .pipe(
-        flatMap((ps: CT[]) => {
-          const props = newPropsFn(ps);
-          if (props.length === 0) {
-            return of(props);
-          } else {
-            return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
-          }
-        })
-      ).subscribe((props: ProposalT[]) => {
+        .pipe(
+          flatMap((ps: CT[]) => {
+            const props = newPropsFn(ps);
+            if (props.length === 0) {
+              return of(props);
+            } else {
+              return forkJoin(props.map((p) => p.initialized$)).pipe(map(() => props));
+            }
+          })
+        ).subscribe((props: ProposalT[]) => {
         //console.log('fetched proposals for: ' + this.constructor.name);
-        resolve(props);
-      }, (err) => {
-        console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);
-        reject(new Error(err));
-      });
+          resolve(props);
+        }, (err) => {
+          console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);
+          reject(new Error(err));
+        });
     });
   }
 
@@ -141,24 +149,22 @@ interface IServerControllers {
 // TODO create some generic class for ICommunity and IChainAdapter
 export abstract class ICommunityAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
-
   public abstract serverLoaded: boolean;
-
   public abstract server: IServerControllers;
-
   public abstract accounts: IOffchainAccountsModule<C, A>;
 
   public abstract init: (onServerLoaded? : () => void) => Promise<void>;
-
   public abstract deinit: () => Promise<void>;
 
   public networkStatus: ApiStatus = ApiStatus.Connected;
-
   public name: string;
-
   public readonly meta: CommunityInfo;
 
-  constructor(meta: CommunityInfo) {
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp, meta: CommunityInfo) {
+    this._app = app;
     this.meta = meta;
   }
 
@@ -193,7 +199,11 @@ export abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public name: string;
   public runtimeName: string;
 
-  constructor(meta: NodeInfo) {
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp, meta: NodeInfo) {
+    this._app = app;
     this.meta = meta;
     this.block = {
       height: 0,
@@ -373,14 +383,18 @@ export abstract class Account<C extends Coin> {
   private _profile: Profile;
   public get profile() { return this._profile; }
 
-  constructor(chain: ChainInfo, address: string, encoding?: number) {
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp, chain: ChainInfo, address: string, encoding?: number) {
     // Check if the account is being initialized from an offchain Community
     // Because there won't be any chain base or chain class
+    this._app = app;
     this.chain = chain;
-    this.chainBase = (app.chain) ? app.chain.base : null;
-    this.chainClass = (app.chain) ? app.chain.class : null;
+    this.chainBase = (this.app.chain) ? this.app.chain.base : null;
+    this.chainClass = (this.app.chain) ? this.app.chain.class : null;
     this.address = address;
-    this._profile = app.profiles.getProfile(chain.id, address);
+    this._profile = this.app.profiles.getProfile(this.chain.id, address);
     this._encoding = encoding;
   }
 
@@ -432,7 +446,7 @@ export abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
-        jwt: app.login.jwt,
+        jwt: this.app.login.jwt,
       };
       // If txParams is provided, the signature is actually for a
       // transaction, not a message. The transaction should be a
@@ -444,7 +458,7 @@ export abstract class Account<C extends Coin> {
       } else {
         params.signature = signature;
       }
-      return await Promise.resolve($.post(app.serverUrl() + '/verifyAddress', params));
+      return await Promise.resolve($.post(this.app.serverUrl() + '/verifyAddress', params));
     } else {
       throw new Error('signature or key required for validation');
     }
@@ -703,7 +717,7 @@ export class NodeInfo {
 
   constructor(id, chain, url, address?) {
     this.id = id;
-    this.chain = app.config.chains.getById(chain);
+    this.chain = chain;
     this.url = url;
     this.address = address;
   }
@@ -729,14 +743,14 @@ export class CommunityInfo {
     this.id = id;
     this.name = name;
     this.description = description;
-    this.defaultChain = app.config.chains.getById(defaultChain);
+    this.defaultChain = defaultChain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.tags = tags || [];
   }
   public static fromJSON(json) {
     return new CommunityInfo(json.id, json.name, json.description, json.default_chain, json.invitesEnabled,
-                             json.privacyEnabled, json.tags);
+      json.privacyEnabled, json.tags);
   }
 }
 
@@ -777,7 +791,7 @@ export class OffchainComment<T extends IUniqueId> {
   public readonly versionHistory: string[];
 
   constructor(chain, author, text, versionHistory, attachments, proposal, id, createdAt,
-              childComments = [], rootProposal, parentComment?, community?, authorChain?) {
+    childComments = [], rootProposal, parentComment?, community?, authorChain?) {
     this.chain = chain;
     this.author = author;
     this.text = text;
