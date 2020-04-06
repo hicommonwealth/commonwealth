@@ -598,8 +598,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         case 'Proposal': return this.methodToTitle(arg);
         case 'Bytes': return u8aToHex(arg).toString().slice(0, 16);
         case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString());
-        case 'Compact<Moment>': return moment(new Date(arg)).utc().toString();
-        case 'Compact<Balance>': return formatCoin(this.coins(arg));
+        // TODO: when do we actually see this Moment in practice? is this a correct decoding?
+        case 'Compact<Moment>': return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
+        case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg)));
         default: return arg.toString().length > 16 ? arg.toString().substr(0, 15) + '...' : arg.toString();
       }
     });
