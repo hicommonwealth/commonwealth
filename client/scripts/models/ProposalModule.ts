@@ -9,7 +9,7 @@ import Proposal from './Proposal';
 import StorageModule from './StorageModule';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
-abstract class ProposalModule<
+export abstract class ProposalModule<
   ApiT,
   CT extends IIdentifiable,
   ST extends ICompletable,
@@ -24,7 +24,7 @@ abstract class ProposalModule<
   protected _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
-  protected _app: IApp;
+  private _app: IApp;
   public get app() { return this._app; }
 
   constructor(app: IApp) {
@@ -45,7 +45,7 @@ abstract class ProposalModule<
             }
           })
         ).subscribe((props: ProposalT[]) => {
-        // console.log('fetched proposals for: ' + this.constructor.name);
+        //console.log('fetched proposals for: ' + this.constructor.name);
           resolve(props);
         }, (err) => {
           console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);
@@ -66,7 +66,7 @@ abstract class ProposalModule<
     this.store.clear();
   }
 
-  public abstract createTx(...args): ITXModalData;
+  public abstract createTx(...args): ITXModalData | Promise<ITXModalData>;
 }
 
 export default ProposalModule;

@@ -26,6 +26,7 @@ import {
   IChainModule,
   ITXData,
   ChainBase,
+  ChainClass,
 } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';

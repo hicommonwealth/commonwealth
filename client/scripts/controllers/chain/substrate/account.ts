@@ -16,7 +16,7 @@ import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
 import { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
-import { Account, IAccountsModule } from 'models';
+import { Account, IAccountsModule, ChainClass } from 'models';
 import { AccountsStore } from 'stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -24,8 +24,6 @@ import BN from 'bn.js';
 import { constants } from 'ethers';
 import SubstrateChain from './shared';
 import { SubstrateIdentity } from './identity';
-
-
 
 function addressFromSeed(seed: string, chain: SubstrateChain): string {
   return `${(chain.keyring()).addFromUri(`\/\/${seed}`).address}`;

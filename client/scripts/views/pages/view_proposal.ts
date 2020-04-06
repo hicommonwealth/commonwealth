@@ -48,11 +48,7 @@ import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
-<<<<<<< HEAD
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
-=======
-import VersionHistoryModal from '../modals/version_history_modal';
->>>>>>> master
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
