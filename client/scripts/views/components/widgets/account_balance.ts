@@ -9,6 +9,7 @@ import { Account } from 'models/models';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { NearAccount } from 'controllers/chain/near/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
 
 interface IProfileSummaryAttrs {
   account: Account<any>;
@@ -20,6 +21,7 @@ interface IProfileSummaryState {
     lockedBalance?: SubstrateCoin;
     unlockedBalance?: SubstrateCoin;
     delegations?: number;
+    locks?: (BalanceLock | BalanceLockTo212)[];
   };
 }
 
@@ -27,8 +29,9 @@ const AccountBalance = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummar
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
     balance: attrs.account.balance,
-    lockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.reservedBalance : null,
+    lockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.lockedBalance : null,
     unlockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.freeBalance : null,
+    locks: attrs.account instanceof SubstrateAccount ? attrs.account.locks : null,
     delegations: attrs.account instanceof CosmosAccount ? attrs.account.delegations : null,
   }),
   view: (vnode) => {

@@ -234,7 +234,9 @@ const NewProposalForm = {
         });
         throw new Error('Invalid proposal type');
       }
-      createTXModal(createFunc(args)).then(done);
+      Promise.resolve(createFunc(args))
+        .then((modalData) => createTXModal(modalData))
+        .then(done);
     };
 
     // default state options

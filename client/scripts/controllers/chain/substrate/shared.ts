@@ -18,7 +18,7 @@ import { formatCoin, Coin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
   Proposal, NodeInfo, StorageModule, ITXModalData,
-  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase
+  ITransactionResult, TransactionStatus, IChainModule, ITXData, ChainBase, ChainClass
 } from 'models/models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -72,9 +72,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   private _creationfee: SubstrateCoin;
   public get creationfee() { return this._creationfee; }
-
-  private _transferfee: SubstrateCoin;
-  public get transferfee() { return this._transferfee; }
 
   private _metadataInitialized: boolean = false;
   public get metadataInitialized() { return this._metadataInitialized; }
@@ -250,7 +247,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             api.derive.chain.bestNumber(),
             api.query.balances.totalIssuance(),
             of(api.consts.balances.existentialDeposit),
-            of(api.consts.balances.transferFee),
             of(api.consts.balances.creationFee),
             api.query.sudo ? api.query.sudo.key() : of(null),
             api.rpc.system.properties(),
@@ -260,11 +256,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         first(), // TODO: leave this open?
       ).subscribe(([
         chainname, chainversion, chainruntimename, minimumperiod, blockNumber,
-        totalbalance, existentialdeposit, transferfee, creationfee, sudokey,
+        totalbalance, existentialdeposit, creationfee, sudokey,
         chainProps, reservationFee,
       ]: [
           string, string, string, Moment, BlockNumber,
-          Balance, Balance, Balance, Balance, AccountId, ChainProperties, Balance
+          Balance, Balance, Balance, AccountId, ChainProperties, Balance
       ]) => {
         app.chain.name = chainname;
         app.chain.version = chainversion;
@@ -285,7 +281,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
         this._totalbalance = this.coins(totalbalance);
         this._existentialdeposit = this.coins(existentialdeposit);
-        this._transferfee = this.coins(transferfee);
         this._creationfee = this.coins(creationfee);
         this._sudoKey = sudokey ? sudokey.toString() : undefined;
         this._reservationFee = reservationFee ? this.coins(reservationFee) : null;
@@ -452,7 +447,31 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._eventsInitialized = true;
   }
 
-  public async computeFees(senderAddress: string, txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>): Promise<SubstrateCoin> {
+  // TODO: refactor fee computation into a more standard form that can be used throughout
+  //   and shown at TX creation time
+  public async canPayFee(
+    sender: SubstrateAccount,
+    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+    additionalDeposit?: SubstrateCoin,
+  ): Promise<boolean> {
+    const senderBalance = await sender.freeBalance.pipe(first()).toPromise();
+    const netBalance = additionalDeposit ? senderBalance.sub(additionalDeposit) : senderBalance;
+    let fees: SubstrateCoin;
+    if (sender.chainClass === ChainClass.Edgeware) {
+      // XXX: we cannot compute tx fees on edgeware yet, so we are forced to assume no fees
+      //   besides explicit additional fees
+      fees = additionalDeposit || this.coins(0);
+    } else {
+      fees = await this.computeFees(sender.address, txFunc);
+    }
+    console.log(`sender free balance: ${senderBalance.format(true)}, tx fees: ${fees.format(true)}, additional deposit: ${additionalDeposit ? additionalDeposit.format(true) : 'N/A'}`);
+    return netBalance.gte(fees);
+  }
+
+  public async computeFees(
+    senderAddress: string,
+    txFunc: (api: ApiRx) => SubmittableExtrinsic<'rxjs'>,
+  ): Promise<SubstrateCoin> {
     return new Promise((resolve, reject) => {
       this.api.pipe(
         switchMap((api: ApiRx) => {
@@ -469,7 +488,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void): ITXModalData {
+    cb?: (success: boolean) => void, // TODO: remove this argument
+  ): ITXModalData {
     // TODO: check if author has funds for tx fee
     return {
       author: author,

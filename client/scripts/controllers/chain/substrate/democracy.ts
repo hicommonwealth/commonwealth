@@ -381,6 +381,7 @@ extends Proposal<
   // TODO: allow the user to enter how much balance they want to vote with
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>) {
     let srmlVote;
+    const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
     if (this._Democracy.isRedesignLogic) {
       // fake the arg to compute balance
       const balance = await (vote.account as SubstrateAccount).freeBalance.pipe(first()).toPromise();
@@ -391,12 +392,14 @@ extends Proposal<
         Standard: {
           vote: {
             aye: vote.choice,
-            conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index,
+            conviction,
           },
           balance: balance.asBN,
         }
       }
 
+      // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
+      //   to align with old voting behavior -- we should change this soon.
       // TODO: move this computation out into the view as needed, to prepopulate field
       const fees = await this._Chain.computeFees(
         vote.account.address,
@@ -408,7 +411,7 @@ extends Proposal<
       // "Vote" type, for edgeware
       srmlVote = {
         aye: vote.choice,
-        conviction: convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index,
+        conviction,
       };
     }
     return this._Chain.createTXModalData(
@@ -461,13 +464,14 @@ extends Proposal<
     }
     const hexCall = action.toHex();
     const preimageDeposit = (this._Chain.coins(this._Democracy.preimageByteDeposit)).muln(hexCall.length / 2);
-    const canWithdraw = await author.canWithdraw(preimageDeposit);
-    if (!canWithdraw) {
-      throw new Error('not enough funds to note preimage');
+
+    const txFunc = (api: ApiRx) => api.tx.democracy.notePreimage(hexCall);
+    if (!(await this._Chain.canPayFee(author, txFunc, this._Chain.coins(preimageDeposit)))) {
+      throw new Error('insufficient funds');
     }
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.democracy.notePreimage(hexCall),
+      txFunc,
       'notePreimage',
       this._Chain.methodToTitle(action),
     );

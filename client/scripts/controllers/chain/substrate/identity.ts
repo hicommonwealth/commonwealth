@@ -156,15 +156,13 @@ class SubstrateIdentities implements StorageModule {
     }
 
     // verify the account has sufficient funds based on above computation
-    if (requiredBalance.gtn(0)) {
-      const canWithdraw = await who.canWithdraw(requiredBalance);
-      if (!canWithdraw) {
-        throw new Error('not enough funds to set identity');
-      }
+    const txFunc = (api: ApiRx) => api.tx.identity.setIdentity(info);
+    if (!(await this._Chain.canPayFee(who, txFunc, this._Chain.coins(requiredBalance)))) {
+      throw new Error('insufficient funds');
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiRx) => api.tx.identity.setIdentity(info),
+      txFunc,
       'setIdentity',
       `${who.address} registers identity ${info.display.toString()}`
     );
@@ -378,20 +376,21 @@ export class SubstrateIdentity extends Identity<SubstrateCoin> {
     }
 
     // compute required deposit, if necessary
+    let requiredDeposit = this._Identities.subAcctDeposit.muln(nSubs);
     if (nSubs > 0) {
-      let requiredDeposit = this._Identities.subAcctDeposit.muln(nSubs);
       const { deposit } = await this.subs().pipe(first()).toPromise();
       if (deposit.lt(requiredDeposit)) {
         requiredDeposit = requiredDeposit.sub(deposit);
-        const canWithdraw = await this.account.canWithdraw(requiredDeposit);
-        if (!canWithdraw) {
-          throw new Error('not enough funds to set subs');
-        }
       }
+    }
+
+    const txFunc = (api: ApiRx) => api.tx.identity.setSubs(Object.entries(subs));
+    if (!(await this._Chain.canPayFee(this.account, txFunc, this._Chain.coins(requiredDeposit)))) {
+      throw new Error('insufficient funds');
     }
     return this._Chain.createTXModalData(
       this.account,
-      (api: ApiRx) => api.tx.identity.setSubs(Object.entries(subs)),
+      txFunc,
       'setSubs',
       `${this.username} updated subs`,
     );
@@ -412,22 +411,21 @@ export class SubstrateIdentity extends Identity<SubstrateCoin> {
     if (!registrar) {
       throw new Error('registrar does not exist');
     }
-
     const fee = registrar.fee;
     if (fee.gt(maxFee)) {
       throw new Error('registrar fee greater than provided maxFee');
-    }
-    const canWithdraw = await this.account.canWithdraw(fee);
-    if (!canWithdraw) {
-      throw new Error('not enough funds to request judgement');
     }
     const previousJudgement = this.judgements.find(([ idx ]) => +idx === regIdx);
     if (previousJudgement && (previousJudgement[1].isErroneous || previousJudgement[1].isFeePaid)) {
       throw new Error('judgement is sticky and cannot be re-requested');
     }
+    const txFunc = (api: ApiRx) => api.tx.identity.requestJudgement(regIdx, maxFee);
+    if (!(await this._Chain.canPayFee(this.account, txFunc, this._Chain.coins(fee)))) {
+      throw new Error('insufficient funds');
+    }
     return this._Chain.createTXModalData(
       this.account,
-      (api: ApiRx) => api.tx.identity.requestJudgement(regIdx, maxFee),
+      txFunc,
       'requestjudgement',
       `${this.username} requests judgement from registrar ${regIdx}`,
     );

@@ -20,6 +20,7 @@ const getBalanceTransferChecks = (
   amount : SubstrateCoin,
   recipientAddress : string,
   senderAddress : string,
+  txFee : SubstrateCoin,
 ): [ boolean, any[] ] => {
   const checks: any[] = [];
   let canTransfer: boolean = true;
@@ -39,10 +40,10 @@ const getBalanceTransferChecks = (
       `Your balance will drop below the minimum, and any remaining balance may be lost.`
     ]);
   }
-  if (canTransfer && (app.chain as Substrate).chain.transferfee.gtn(0)) {
+  if (canTransfer && txFee.gtn(0)) {
     checks.push([
       featherIcon('info', 14, 2, '#444'),
-      `Transfer fee: ${formatCoin((app.chain as Substrate).chain.transferfee)}`
+      `Transfer fee: ${formatCoin(txFee)}`
     ]);
   }
   if (canTransfer && recipientBalance.eqn(0) && (app.chain as Substrate).chain.creationfee.gtn(0)) {
@@ -52,8 +53,8 @@ const getBalanceTransferChecks = (
     ]);
   }
   const resultingBalance = app.chain.chain.coins(recipientBalance.add(recipientBalance.gtn(0) ?
-                                                 amount.sub((app.chain as Substrate).chain.transferfee) :
-                                                 amount.sub((app.chain as Substrate).chain.transferfee)
+                                                 amount.sub(txFee) :
+                                                 amount.sub(txFee)
                                                   .sub((app.chain as Substrate).chain.creationfee)));
   if (recipientBalance.eqn(0) && resultingBalance.lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
@@ -61,7 +62,7 @@ const getBalanceTransferChecks = (
       `The recipient's balance must be above the minimum after fees: ` +
         `${formatCoin((app.chain as Substrate).chain.existentialdeposit)}`]);
     canTransfer = false;
-  } else if (amount.lte((app.chain as Substrate).chain.transferfee)) {
+  } else if (amount.lte(txFee)) {
       checks.push([
         featherIcon('slash', 14, 2, '#444'),
         `Amount sent must be greater than the transfer fee.`]);
@@ -89,6 +90,7 @@ interface IState {
   // sits with the page open. But this seems a minor point for now.
   dynamic: {
     senderBalance: SubstrateCoin;
+    substrateTxFee: SubstrateCoin;
   };
   recipientBalance: SubstrateCoin;
   recipientAddress: string;
@@ -101,6 +103,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
   getObservables: (attrs: IAttrs) => ({
     groupKey: attrs.sender.address,
     senderBalance: attrs.sender.balance,
+    substrateTxFee: attrs.sender.chainBase === ChainBase.Substrate ? (attrs.sender as SubstrateAccount).balanceTransferFee : null,
   }),
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     let canTransfer = true;
@@ -112,6 +115,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
         vnode.state.amount,
         vnode.state.recipientAddress,
         vnode.attrs.sender.address,
+        vnode.state.dynamic.substrateTxFee,
       );
     }
 

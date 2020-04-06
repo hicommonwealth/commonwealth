@@ -299,13 +299,13 @@ export class SubstratePhragmenElection extends Proposal<
     if (this.candidates.includes(candidate.address)) {
       throw new Error('duplicate candidate');
     }
-    const canWithdraw = await candidate.canWithdraw(this._Elections.candidacyBond);
-    if (!canWithdraw) {
-      throw new Error('not enough funds to submit candidacy');
+    const txFunc = (api: ApiRx) => api.tx[this.moduleName].submitCandidacy();
+    if (!(await this._Chain.canPayFee(candidate, txFunc, this._Elections.candidacyBond))) {
+      throw new Error('insufficient funds');
     }
     return this._Chain.createTXModalData(
       candidate,
-      (api: ApiRx) => api.tx[this.moduleName].submitCandidacy(),
+      txFunc,
       'submitCandidacy',
       this.title
     );
