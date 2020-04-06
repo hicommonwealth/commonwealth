@@ -192,16 +192,17 @@ const Navigation: m.Component<IMenuAttrs> = {
     const defaultChainId = (app.activeChainId()) ? app.activeChainId()
       : app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
 
-    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate)
-      ? ((app.chain as Substrate).democracy.store.getAll().length
-       + (app.chain as Substrate).democracyProposals.store.getAll().length
-       + (app.chain as Substrate).council.store.getAll().length
-       + (app.chain as Substrate).treasury.store.getAll().length) : 0;
+    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
+      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
+       + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
     const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      ? (app.chain as Edgeware).signaling.store.getAll().length : 0;
+      ? (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      ? (app.chain as Cosmos).governance.store.getAll().length : 0;
+      ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
+
     return m('.Navigation', ([].concat([
       m(NavigationItem, {
         label: 'Home',

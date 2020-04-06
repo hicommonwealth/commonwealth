@@ -43,18 +43,16 @@ export interface ISubstrateDemocracyProposalState extends ICompletable {
 
 export interface ISubstrateDemocracyReferendum extends IIdentifiable {
   index: number;
-  hash: Uint8Array;
+  hash?: Uint8Array;
   endBlock: number;
-  threshold: DemocracyThreshold;
-  executionDelay: number;
+  threshold?: DemocracyThreshold;
+  executionDelay?: number;
 }
 
 export interface ISubstrateDemocracyReferendumState extends ICompletable {
   method: IMethod;
   votes: { [account: string]: [boolean, number, u128] }; // choice, weight (conviction idx), balance
-  cancelled: boolean; // can only be done via council
   passed: boolean;
-  executed: boolean;
   executionBlock: number;
 }
 

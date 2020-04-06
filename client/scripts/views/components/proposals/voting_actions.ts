@@ -434,14 +434,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       }, hasVotedVeto ? 'Vetoed' : 'Veto')
     ]);
     // moloch: cancel
-    const cancelButton = m('.veto-button', [
+    const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
       m('button.formular-button-negative', {
         class: (proposal as MolochProposal).canAbort(user) || (proposal as MolochProposal).completed ? '' : 'disabled',
         onclick: cancelProposal,
       }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
     ]);
     // V2 only: moloch: sponsor
-    //const sponsorButton = m('.yes-button', [
+    //const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m('button.formular-button-positive', {
     //    class: !(proposal as MolochProposal).state.sponsored &&
     //    !(proposal as MolochProposal).state.processed
@@ -450,7 +450,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     //  }, (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor')
     //]);
     // moloch: process
-    const processButton = m('.yes-button', [
+    const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
       m('button.formular-button-tertiary', {
         class: (proposal as MolochProposal).state === MolochProposalState.ReadyToProcess ? '' : 'disabled',
         onclick: processProposal,

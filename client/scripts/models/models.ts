@@ -134,7 +134,7 @@ export abstract class ProposalModule<
     this.store.clear();
   }
 
-  public abstract createTx(...args): ITXModalData;
+  public abstract createTx(...args): ITXModalData | Promise<ITXModalData>;
 }
 
 // Offchain stores and management for discussion features.

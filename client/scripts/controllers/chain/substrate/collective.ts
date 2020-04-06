@@ -81,18 +81,17 @@ class SubstrateCollective extends ProposalModule<
     const func = this._Chain.getTxMethod('treasury', 'rejectProposal');
     return this.createTx(author, threshold, func(treasuryIdx).method);
   }
-  public pushExternalProposal(
-    author: SubstrateAccount, threshold: number, hash: string, votingPeriod: number, delay: number
-  ) {
-    const func = this._Chain.getTxMethod('democracy', 'externalPush');
-    return this.createTx(author, threshold, func(hash, votingPeriod, delay).method, true);
-  }
   public createExternalProposal(author: SubstrateAccount, threshold: number, action: Call) {
     const func = this._Chain.getTxMethod('democracy', 'externalPropose');
     return this.createTx(author, threshold, func(action.hash).method);
   }
   public createExternalProposalMajority(author: SubstrateAccount, threshold: number, action: Call) {
     const func = this._Chain.getTxMethod('democracy', 'externalProposeMajority');
+    return this.createTx(author, threshold, func(action.hash).method);
+  }
+  public createExternalProposalDefault(author: SubstrateAccount, threshold: number, action: Call) {
+    // only on kusama
+    const func = this._Chain.getTxMethod('democracy', 'externalProposeDefault');
     return this.createTx(author, threshold, func(action.hash).method);
   }
   public createFastTrack(
@@ -102,6 +101,9 @@ class SubstrateCollective extends ProposalModule<
     votingPeriod: number,
     delay: number
   ) {
+    // only on kusama
+    // TODO: we must check if Instant is allowed and if
+    // votingPeriod is valid wrt FastTrackVotingPeriod
     const func = (this._Chain.getTxMethod('democracy', 'fastTrack'));
     return this.createTx(
       author,
@@ -260,18 +262,18 @@ extends Proposal<
         label: 'Create majority-approval council proposal (2/3 councillors, majority public approval)',
         description: 'Introduces a council proposal. Requires approval from 2/3 of councillors, after which ' +
           'it turns into a 50% approval referendum.',
-      // pushExternalProposal and createFastTrack not supported on edgeware
+      // createExternalProposalDefault and createFastTrack not supported on edgeware
       // XXX: support on Kusama
       //}, {
-      //  name: 'pushExternalProposal',
-      //  label: 'Push majority-approval council proposal to voting immediately',
-      //  description: 'Immediately begins voting on a majority-public-approval council proposal. ' +
-      //    'Requires approval from 2/3 of councillors.',
+      //   name: 'createExternalProposalDefault',
+      //   label: 'Create negative-turnout-bias council proposal (100% councillors, supermajority public rejection)',
+      //   description: 'Introduces a council proposal. Requires approval from all councillors, after which ' +
+      //     'it turns into a supermajority rejection referendum (passes without supermajority voting "no").',
       // }, {
       //   name: 'createFastTrack',
       //   label: 'Fast-track the current exteranlly-proposed majority-approval referendum',
       //   description: 'Schedules a current democracy proposal for immediate consideration (i.e. a vote). ' +
-      //   'If there is no externally-proposed referendum currently, or it is not majority-carried, it fails.'
+      //     'If there is no externally-proposed referendum currently, or it is not majority-carried, it fails.'
       }, {
         name: 'createEmergencyCancellation',
         label: 'Emergency cancel referendum',
