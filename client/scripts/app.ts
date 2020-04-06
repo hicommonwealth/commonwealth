@@ -34,10 +34,10 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           id: node.id,
           url: node.url,
           chain: app.config.chains.getById(node.chain),
+          address: node.address,
         }));
       });
       data.communities.map((community) => {
-        console.log(community);
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
@@ -187,7 +187,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     const Near = (await import('./controllers/chain/near/main')).default;
     app.chain = new Near(app, n);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
     app.chain = new Moloch(app, n);
   } else {
     throw new Error('Invalid chain');
