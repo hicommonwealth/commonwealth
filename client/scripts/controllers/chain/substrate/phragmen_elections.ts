@@ -66,7 +66,7 @@ class SubstratePhragmenElections extends ProposalModule<
     return new Promise((resolve, reject) => {
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         if (!moduleName) {
-          moduleName = api.consts.elections ? 'elections' : 'phragmenElections';
+          moduleName = api.consts.elections ? 'elections' : api.consts.phragmenElections ? 'phragmenElections' : 'electionsPhragmen';
         }
         this._adapter = new SubstratePhragmenElectionAdapter(moduleName);
 
