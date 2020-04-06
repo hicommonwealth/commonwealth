@@ -614,7 +614,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
               jwt: app.login.jwt,
             }).then((response) => {
               const linkInfo = response.result;
-              const url = (!app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+              const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
               if (vnode.attrs.onChangeHandler) vnode.attrs.onChangeHandler(linkInfo);
               vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${linkInfo.id}`;
               m.redraw();
@@ -636,7 +636,7 @@ const InviteLinkRow: m.Component<{data}, {link}> = {
   },
   view: (vnode) => {
     const { id, active, multi_use, used, time_limit, created_at } = vnode.state.link;
-    const server = (!app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+    const server = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
     const url = `${server}${app.serverUrl()}/acceptInviteLink?id=${id}`;
 
     return m('tr.InviteLinkRow', [
