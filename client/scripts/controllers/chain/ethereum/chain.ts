@@ -1,4 +1,4 @@
-import app, { ApiStatus } from 'state';
+import { ApiStatus, IApp } from 'state';
 
 // Note: due to strange issues with Web3, we can't seem to use the
 // `Web3` class type, so it's marked in comments below
@@ -6,9 +6,8 @@ import app, { ApiStatus } from 'state';
 import {
   NodeInfo, ITXModalData, ITXData, IChainModule
 } from 'models/models';
-
-import { EthereumAccount } from './account';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { EthereumAccount } from './account';
 
 export interface IEthereumTXData extends ITXData {
   chainId: string;
@@ -30,13 +29,21 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private static _instance;
   public static get(): EthereumChain {
     if (!this._instance) {
-      this._instance = new EthereumChain();
+      // TODO: Figure out how to inject the app since this method is static
+      this._instance = new EthereumChain(null);
     }
     return this._instance;
   }
 
   public get denom() {
     return 'ETH';
+  }
+
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
   }
 
   public coins(n: number, inDollars?: boolean) {
@@ -60,10 +67,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
         try {
           const localProvider = new Web3.providers.WebsocketProvider(node.url);
           this._api = new Web3(localProvider);
-
         } catch (error) {
           console.log('Could not connect to Ethereum using local node');
-          app.chain.networkStatus = ApiStatus.Disconnected;
+          this.app.chain.networkStatus = ApiStatus.Disconnected;
           return reject(error);
         }
       } else if ((window as any).ethereum) {
@@ -73,7 +79,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           this._api = new Web3((window as any).ethereum);
         } catch (error) {
           console.log('Could not connect to Ethereum using injected web3');
-          app.chain.networkStatus = ApiStatus.Disconnected;
+          this.app.chain.networkStatus = ApiStatus.Disconnected;
           return reject(error);
         }
       } else if ((window as any).web3) {
@@ -83,7 +89,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           this._api = new Web3((window as any).web3.currentProvider);
         } catch (error) {
           console.log('Could not connect to Ethereum using injected web3');
-          app.chain.networkStatus = ApiStatus.Disconnected;
+          this.app.chain.networkStatus = ApiStatus.Disconnected;
           return reject(error);
         }
       } else {
@@ -93,13 +99,13 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           this._api = new Web3(provider);
         } catch (error) {
           console.log('Could not connect to Ethereum using remote node');
-          app.chain.networkStatus = ApiStatus.Disconnected;
+          this.app.chain.networkStatus = ApiStatus.Disconnected;
           return reject(error);
         }
       }
       const isListening = await this._api.eth.net.isListening();
       if (isListening) {
-        app.chain.networkStatus = ApiStatus.Connected;
+        this.app.chain.networkStatus = ApiStatus.Connected;
         resolve(this._api);
       } else {
         return reject(this._api);

@@ -7,7 +7,7 @@ import OffchainAccounts, { OffchainAccount } from './account';
 
 class Community extends ICommunityAdapter<Coin, OffchainAccount> {
   private _loaded: boolean = false;
-  public readonly accounts: OffchainAccounts = new OffchainAccounts();
+  public accounts: OffchainAccounts;
   public readonly server = {};
 
   get loaded() { return this._loaded; }
@@ -17,9 +17,10 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
 
   public init = async () => {
     console.log(`Starting ${this.meta.name}`);
-    await app.threads.refreshAll(null, this.id, true);
-    await app.comments.refreshAll(null, this.id, true);
-    await app.reactions.refreshAll(null, this.id, true);
+    this.accounts = new OffchainAccounts(this.app);
+    await this.app.threads.refreshAll(null, this.id, true);
+    await this.app.comments.refreshAll(null, this.id, true);
+    await this.app.reactions.refreshAll(null, this.id, true);
     this._serverLoaded = true;
     this._loaded = true;
   }
@@ -27,9 +28,9 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
   public deinit = async (): Promise<void> => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
     console.log('Community stopped.');
   }
 }

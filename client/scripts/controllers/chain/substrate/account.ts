@@ -15,7 +15,7 @@ import { DeriveAccountInfo } from '@polkadot/api-derive/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 
-import app from 'state';
+import { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
 import { Account, IAccountsModule } from 'models/models';
 import { AccountsStore } from 'models/stores';
@@ -63,6 +63,13 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     return this.fromAddress(address, keytype && keytype === 'ed25519');
   }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
   public isZero(address: string) {
     const decoded = decodeAddress(address);
     return decoded.every((v) => v === 0);
@@ -78,12 +85,12 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       const acct = this._store.getByAddress(address);
       // update account key type if created with incorrect settings
       if (acct.isEd25519 !== isEd25519) {
-        return new SubstrateAccount(this._Chain, this, address, isEd25519);
+        return new SubstrateAccount(this.app, this._Chain, this, address, isEd25519);
       } else {
         return acct;
       }
     } catch (e) {
-      return new SubstrateAccount(this._Chain, this, address, isEd25519);
+      return new SubstrateAccount(this.app, this._Chain, this, address, isEd25519);
     }
   }
 
@@ -354,10 +361,10 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public readonly isEd25519: boolean;
 
   // CONSTRUCTORS
-  constructor(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, address: string, isEd25519: boolean = false) {
+  constructor(app: IApp, ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, address: string, isEd25519: boolean = false) {
     if (!ChainInfo) {
       // defer chain initialization
-      super(app.chain.meta.chain, address, null);
+      super(app, app.chain.meta.chain, address, null);
       app.chainReady.pipe(first()).subscribe(() => {
         if (app.chain.chain instanceof SubstrateChain) {
           this._Chain = app.chain.chain;
@@ -367,7 +374,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         }
       });
     } else {
-      super(app.chain.meta.chain, address, ChainInfo.ss58Format);
+      super(app, app.chain.meta.chain, address, ChainInfo.ss58Format);
       this._Chain = ChainInfo;
       this.setEncoding(this._Chain.ss58Format);
     }

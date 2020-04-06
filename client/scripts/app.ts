@@ -22,11 +22,6 @@ import { default as mixpanel } from 'mixpanel-browser';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
-import Edgeware from './controllers/chain/edgeware/main';
-import Substrate from './controllers/chain/substrate/main';
-import Cosmos from './controllers/chain/cosmos/main';
-import Ethereum from './controllers/chain/ethereum/main';
-import Near from './controllers/chain/near/main';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
@@ -38,8 +33,25 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.nodes.clear();
       app.config.communities.clear();
       data.chains.map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
-      data.nodes.map((node) => app.config.nodes.add(NodeInfo.fromJSON(node)));
-      data.communities.map((community) => app.config.communities.add(CommunityInfo.fromJSON(community)));
+      data.nodes.map((node) => {
+        return app.config.nodes.add(NodeInfo.fromJSON({
+          id: node.id,
+          url: node.url,
+          chain: app.config.chains.getById(node.chain),
+          address: node.address,
+        }));
+      });
+      data.communities.map((community) => {
+        return app.config.communities.add(CommunityInfo.fromJSON({
+          id: community.id,
+          name: community.name,
+          description: community.description,
+          default_chain: app.config.chains.getById(community.default_chain),
+          invitesEnabled: community.invitesEnabled,
+          privacyEnabled: community.privacyEnabled,
+          tags: community.tags,
+        }));
+      });
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories =
         data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
@@ -123,7 +135,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   await deinitChainOrCommunity();
 
   // Initialize the community
-  app.community = new Community(c);
+  app.community = new Community(app, c);
   await app.community.init();
   console.log(`${c.name.toUpperCase()} started.`);
 
@@ -167,22 +179,22 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // Initialize modules.
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import('./controllers/chain/edgeware/main')).default;
-    app.chain = new Edgeware(n);
+    app.chain = new Edgeware(app, n);
   } else if (n.chain.network === ChainNetwork.Kusama) {
     const Substrate = (await import('./controllers/chain/substrate/main')).default;
-    app.chain = new Substrate(n);
+    app.chain = new Substrate(app, n);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import('./controllers/chain/cosmos/main')).default;
-    app.chain = new Cosmos(n);
+    app.chain = new Cosmos(app, n);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import('./controllers/chain/ethereum/main')).default;
-    app.chain = new Ethereum(n);
+    app.chain = new Ethereum(app, n);
   } else if (n.chain.network === ChainNetwork.NEAR) {
     const Near = (await import('./controllers/chain/near/main')).default;
-    app.chain = new Near(n);
+    app.chain = new Near(app, n);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
-    app.chain = new Moloch(n);
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
+    app.chain = new Moloch(app, n);
   } else {
     throw new Error('Invalid chain');
   }

@@ -1,15 +1,15 @@
 import { Account, IAccountsModule, ITXModalData } from 'models/models';
 import { NearToken } from 'adapters/chain/near/types';
-import app from 'state';
+import { IApp } from 'state';
 import { Observable, from, Unsubscribable } from 'rxjs';
 import { AccountsStore } from 'models/stores';
-import { NearChain } from './chain';
 import * as nearlib from 'nearlib';
 import { map, shareReplay } from 'rxjs/operators';
 import { AccountState } from 'nearlib/lib/account';
 import nacl from 'tweetnacl';
 import { BrowserLocalStorageKeyStore } from 'nearlib/lib/key_stores';
 import { NodeStatusResult } from 'nearlib/lib/providers/provider';
+import NearChain from './chain';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
 //    the library is wrong, it's not just a string.
@@ -35,7 +35,11 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
   private _validators: INearValidators = {};
   public get validators() { return this._validators; }
 
-  constructor() {
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
     this.keyStore = new BrowserLocalStorageKeyStore(localStorage);
   }
 
@@ -49,7 +53,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
     try {
       acct = this._store.getByAddress(address);
     } catch (e) {
-      acct = new NearAccount(this._Chain, this, address);
+      acct = new NearAccount(this.app, this._Chain, this, address);
     }
     return acct;
   }
@@ -84,8 +88,8 @@ export class NearAccount extends Account<NearToken> {
   private _keyPair: nearlib.KeyPair;
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
-  constructor(Chain: NearChain, Accounts: NearAccounts, address: string) {
-    super(app.chain.meta.chain, address);
+  constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
+    super(app, app.chain.meta.chain, address);
     this._nearlibAccount = new nearlib.Account(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;

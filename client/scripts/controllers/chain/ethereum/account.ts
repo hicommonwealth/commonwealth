@@ -7,7 +7,7 @@ import { Wallet } from 'ethereumjs-wallet';
 import bip39 from 'bip39';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
-import app from 'state';
+import { IApp } from 'state';
 import { formatCoin, Coin } from 'shared/adapters/currency';
 import { Account, IAccountsModule, ITXModalData } from 'models/models';
 import { AccountsStore } from 'models/stores';
@@ -62,6 +62,13 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     return this.fromAddress(address.toLowerCase());
   }
 
+  private _app: IApp;
+  public get app() { return this._app; }
+
+  constructor(app: IApp) {
+    this._app = app;
+  }
+
   public fromAddress(address: string): EthereumAccount {
     address = address.toLowerCase();
     if (address.indexOf('0x') !== -1) {
@@ -73,7 +80,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new EthereumAccount(this._Chain, this, address);
+      return new EthereumAccount(this.app, this._Chain, this, address);
     }
   }
 
@@ -150,8 +157,8 @@ export class EthereumAccount extends Account<EthereumCoin> {
   private wallet: Wallet;
 
   // CONSTRUCTORS
-  constructor(ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
-    super(app.chain.meta.chain, address.toLowerCase());
+  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
+    super(app, app.chain.meta.chain, address.toLowerCase());
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Accounts.store.add(this);

@@ -24,7 +24,7 @@ export const enum LoginState {
   LoggedIn = 'logged_in',
 }
 
-interface IApp {
+export interface IApp {
   socket: WebsocketController;
   chain: IChainAdapter<any, any>;
   community: ICommunityAdapter<any, any>;
@@ -36,7 +36,7 @@ interface IApp {
   threads: ThreadsController;
   reactions: ReactionsController;
 
-  /// XXX: replace this with some app.chain helper
+  // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
   activeId(): string;
