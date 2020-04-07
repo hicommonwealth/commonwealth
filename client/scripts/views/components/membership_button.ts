@@ -21,20 +21,20 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
     const createMembership = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      $.post('/api/createMembership', {
-        jwt: app.login.jwt,
-        chain,
-        community,
-      }).then((result) => {
-        app.login.memberships.push(result.result)
-        onMembershipChanged && onMembershipChanged(true);
-        vnode.state.loading = false;
-        m.redraw();
-      }).catch((e) => {
-        vnode.state.loading = false;
-        m.redraw();
-        console.error(e);
-      });
+      // $.post('/api/createMembership', {
+      //   jwt: app.login.jwt,
+      //   chain,
+      //   community,
+      // }).then((result) => {
+      //   app.login.memberships.push(result.result)
+      //   onMembershipChanged && onMembershipChanged(true);
+      //   vnode.state.loading = false;
+      //   m.redraw();
+      // }).catch((e) => {
+      //   vnode.state.loading = false;
+      //   m.redraw();
+      //   console.error(e);
+      // });
     };
     const deleteMembership = async (e) => {
       e.preventDefault();
@@ -48,26 +48,26 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
         return;
       }
 
-      $.post('/api/deleteMembership', {
-        jwt: app.login.jwt,
-        chain,
-        community,
-      }).then((result) => {
-        if (chain) {
-          const chainIndex = app.login.memberships.map((m) => m.chain).indexOf(chain)
-          app.login.memberships.splice(chainIndex, 1);
-        } else if (community) {
-          const communityIndex = app.login.memberships.map((m) => m.community).indexOf(community)
-          app.login.memberships.splice(communityIndex, 1);
-        }
-        onMembershipChanged && onMembershipChanged(false);
-        vnode.state.loading = false;
-        m.redraw();
-      }).catch((e) => {
-        vnode.state.loading = false;
-        m.redraw();
-        console.error(e);
-      });
+      // $.post('/api/deleteMembership', {
+      //   jwt: app.login.jwt,
+      //   chain,
+      //   community,
+      // }).then((result) => {
+      //   if (chain) {
+      //     const chainIndex = app.login.memberships.map((m) => m.chain).indexOf(chain)
+      //     app.login.memberships.splice(chainIndex, 1);
+      //   } else if (community) {
+      //     const communityIndex = app.login.memberships.map((m) => m.community).indexOf(community)
+      //     app.login.memberships.splice(communityIndex, 1);
+      //   }
+      //   onMembershipChanged && onMembershipChanged(false);
+      //   vnode.state.loading = false;
+      //   m.redraw();
+      // }).catch((e) => {
+      //   vnode.state.loading = false;
+      //   m.redraw();
+      //   console.error(e);
+      // });
     };
 
     return m(Button, {

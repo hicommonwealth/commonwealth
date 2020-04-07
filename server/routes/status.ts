@@ -57,10 +57,9 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
       loggedIn: false,
     });
   }
-  const [addresses, socialAccounts, memberships, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
+  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
     user.getAddresses().filter((address) => !!address.verified),
     user.getSocialAccounts(),
-    user.getMemberships(),
     user.getSelectedNode(),
     user.isAdmin,
     user.disableRichText,
@@ -146,7 +145,6 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
       isAdmin,
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
-      memberships,
       unseenPosts
     }
   });

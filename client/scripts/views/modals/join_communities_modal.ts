@@ -3,7 +3,7 @@ import 'modals/join_communities_modal.scss';
 import { default as m } from 'mithril';
 import { link } from 'helpers';
 import ChainIcon from 'views/components/chain_icon';
-import MembershipButton, { isMember } from 'views/components/membership_button';
+import MembershipButton from 'views/components/membership_button';
 import app from 'state';
 import { Button, Card, Icons } from 'construct-ui';
 

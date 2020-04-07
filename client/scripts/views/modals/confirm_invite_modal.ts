@@ -108,7 +108,7 @@ const ConfirmInviteModal = {
                       app.config.invites = app.config.invites.filter(
                         (invite) => invite.community_name !== invites[vnode.state.location].community_name
                       );
-                      app.login.memberships.push(result.result.membership);
+                      app.login.roles.push(result.result.role);
                       vnode.state.accepted.push(vnode.state.location);
                       vnode.state.selectedAddress = null;
                       m.redraw();
