@@ -52,6 +52,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
+import TagEditor from '../components/tag_edit_button';
 
 const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
@@ -148,6 +149,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
+      m(TagEditor, { thread: proposal as OffchainThread }),
       m('.row.row-narrow', [
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
