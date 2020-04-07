@@ -28,11 +28,11 @@
             width: $size;
             height: $size;
         }
-        .ChainIcon, .community-icon-inner {
+        .ChainIcon, .icon-inner {
             opacity: 0.3;
         }
         &:hover, &.active {
-            .ChainIcon, .community-icon-inner {
+            .ChainIcon, .icon-inner {
                 opacity: 1;
             }
         }
