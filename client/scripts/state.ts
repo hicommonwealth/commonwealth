@@ -2,6 +2,7 @@ import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
 import {
   NodeInfo,
   AddressInfo,
+  RoleInfo,
   MembershipInfo,
   SocialAccount,
   OffchainTag,
@@ -59,6 +60,7 @@ export interface IApp {
     email?: string;
     jwt?: string;
     addresses: AddressInfo[];
+    roles: RoleInfo[];
     memberships: MembershipInfo[];
     activeAddresses: Array<Account<any>>;
     socialAccounts: SocialAccount[];
@@ -111,6 +113,7 @@ const app: IApp = {
     addresses: [],
     activeAddresses: [],
     socialAccounts: [],
+    roles: [],
     memberships: [],
     selectedNode: null,
     isSiteAdmin: false,

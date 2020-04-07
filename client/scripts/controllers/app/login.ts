@@ -72,7 +72,7 @@ export function updateActiveUser(data) {
     app.login.jwt = data.jwt;
 
     app.login.addresses = data.addresses.sort((a, b) => (b.selected ? 1 : 0) - (a.selected ? 1 : 0))
-      .map((a) => new AddressInfo(a.address, a.chain, a.selected, a.keytype));
+      .map((a) => new AddressInfo(a.id, a.address, a.chain, a.selected, a.keytype));
     app.login.socialAccounts = data.socialAccounts
       .map((sa) => new SocialAccount(sa.provider, sa.provider_username));
     app.login.memberships = data.memberships
@@ -165,6 +165,7 @@ export async function selectLogin(account: Account<any>, suppressNotification?):
       auth: true,
       jwt: app.login.jwt,
     }).then((result) => {
+      const addressId = result.result.id;
       const acct = app.login.addresses.find((a) => {
         return a.address === account.address && app.chain && app.chain.id === a.chain;
       });
@@ -174,7 +175,7 @@ export async function selectLogin(account: Account<any>, suppressNotification?):
         if (app.chain) {
           app.login.activeAddresses.push(account);
           const keytype = (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined;
-          app.login.addresses.push(new AddressInfo(account.address, account.chain.id, true, keytype));
+          app.login.addresses.push(new AddressInfo(addressId, account.address, account.chain.id, true, keytype));
         }
       } else {
         acct.selected = true;

@@ -8,8 +8,8 @@ import { Button, Icon, Icons } from 'construct-ui';
 import app from 'state';
 
 export const isMember = (chain, community) => {
-  return chain ? app.login.memberships.map((m) => m.chain).indexOf(chain) !== -1 :
-    community ? app.login.memberships.map((m) => m.community).indexOf(community) !== -1 :
+  return chain ? app.login.roles.map((m) => m.chain_id).indexOf(chain) !== -1 :
+    community ? app.login.roles.map((m) => m.offchain_community_id).indexOf(community) !== -1 :
     false;
 };
 
