@@ -1,31 +1,51 @@
 import m from 'mithril';
 import { OffchainThread } from 'models';
-import { Button, Dialog, Classes } from 'construct-ui';
-import { isValueNode } from 'graphql';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
+  onChangeHandler: Function;
 }
 
-const TagWindow: m.Component<ITagEditorAttrs> = {
+const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
   view: (vnode) => {
-    return m('Tags', [
-      vnode.attrs.thread.tags.map((tag) => {
-        return m('.tag', tag.name);
-      })
-    ]);
+    const { onChangeHandler, tags } = vnode.attrs;
+    return m(TagInput, {
+      contentLeft: m(Icon, { name: Icons.TAG }),
+      tags: tags && (tags.length !== 0) &&
+        vnode.attrs.tags.map((tag) => {
+          return m(Tag, {
+            label: `#${tag}`,
+            onRemove: () => {
+              onChangeHandler(tags.filter((t) => t !== tag));
+            },
+          });
+        }),
+      intent: 'none',
+      size: 'lg',
+      onAdd: (value: string) => {
+        if (!tags.includes(value)) {
+          tags.push(value);
+          onChangeHandler(tags);
+        }
+      },
+    });
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean}> = {
+const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}> = {
   oninit: (vnode) => {
     vnode.state.isOpen = false;
+    vnode.state.tags = [];
+  },
+  oncreate: (vnode) => {
+    vnode.attrs.thread.tags.map((tag) => vnode.state.tags.push(tag.name));
   },
   view: (vnode) => {
-    return m('TagEditor', [
+    return m('.TagEditor', [
       m(Button, {
-        label: `tags for ${vnode.attrs.thread.title}`,
-        intent: 'primary',
+        label: m(Icon, { name: Icons.TAG }),
+        intent: 'none',
         onclick: () => { vnode.state.isOpen = !vnode.state.isOpen; },
       }),
       m(Dialog, {
@@ -33,7 +53,10 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean}> = {
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
-        content: m(TagWindow, { thread: vnode.attrs.thread }), // TODO: PUT TAGS HERE
+        content: m(TagWindow, {
+          tags: vnode.state.tags,
+          onChangeHandler: (tags: string[]) => { vnode.state.tags = tags; },
+        }),
         hasBackdrop: true,
         isOpen: vnode.state.isOpen,
         inline: false,
@@ -48,7 +71,10 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean}> = {
           m(Button, {
             label: 'Submit',
             intent: 'primary',
-            onclick: () => { console.dir('Submit Changes Here'); },
+            onclick: () => {
+              vnode.attrs.onChangeHandler(vnode.state.tags);
+              vnode.state.isOpen = false;
+            },
           }),
         ])
       }),

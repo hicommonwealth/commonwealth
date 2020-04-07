@@ -149,7 +149,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
-      m(TagEditor, { thread: proposal as OffchainThread }),
       m('.row.row-narrow', [
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
@@ -159,6 +158,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
             ? m('.discussion-meta', [
               proposal.createdAt && m('.created', proposal.createdAt.format('MMM D, YYYY')),
               m('.Tags', [
+                m(TagEditor, { thread: proposal as OffchainThread, onChangeHandler: (value) => { console.dir(value); } }),
                 (proposal as OffchainThread).tags?.map((tag) => {
                   return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
                 }),
