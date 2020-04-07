@@ -1,5 +1,3 @@
-import app from 'state';
-
 import { MolochShares } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -29,7 +27,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   get serverLoaded() { return this._serverLoaded; }
 
   public init = async (onServerLoaded?) => {
-    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !app.isProduction();
+    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
     // FIXME: This is breaking for me on moloch default (not local)
     // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
     //   throw new Error('no chain object id found');

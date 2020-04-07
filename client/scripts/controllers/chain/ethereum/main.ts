@@ -1,5 +1,3 @@
-import app from 'state';
-
 import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
@@ -28,9 +26,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
 
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
@@ -41,7 +39,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.chain.initEventLoop();
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', function (accounts) {
-      const updatedAddress = app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
       selectLogin(updatedAddress);
     });
 
@@ -51,9 +49,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public deinit = async () => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
