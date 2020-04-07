@@ -31,21 +31,27 @@ describe('Edgeware Subscriber Tests', () => {
     const subscriber = new Subscriber(api);
 
     // run test
+    let seenBlocks = 0;
     subscriber.subscribe(
       (block) => {
         try {
-          if (block.header.hash === hashes[0]) {
+          if (seenBlocks === 0) {
             // first block
+            assert.deepEqual(block.header.hash, hashes[0]);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
-          } else if (block.header.hash === hashes[1]) {
+          } else if (seenBlocks === 1) {
             // second block
+            assert.deepEqual(block.header.hash, hashes[1]);
             assert.lengthOf(block.events, 2);
             assert.deepEqual(block.events[0], events[1][0]);
             assert.deepEqual(block.events[1], events[1][1]);
-            done();
           } else {
             assert.fail('invalid hash');
+          }
+          seenBlocks++;
+          if (seenBlocks === 2) {
+            done();
           }
         } catch (err) {
           done(err);
