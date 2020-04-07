@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { OffchainThread } from 'models';
+import { OffchainThread, OffchainTag } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
 
 interface ITagEditorAttrs {
