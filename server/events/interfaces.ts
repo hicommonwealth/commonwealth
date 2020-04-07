@@ -4,36 +4,35 @@
 
 // handles individual events by sending them off to storage/notifying
 export abstract class IEventHandler<Event> {
-  public abstract handle(event: Event): Promise<void>; // TODO: return a status
+  // throws on error
+  public abstract handle(event: Event): Promise<void>;
 }
 
 // parses events out of blocks into a standard format and
 // passes them through to the handler
 export abstract class IBlockProcessor<Block, Event> {
-  constructor(
-    protected _eventHandler: IEventHandler<Event>
-  ) { }
-
+  // throws on error
   public abstract process(block: Block): Event[];
 }
 
 // fetches blocks from chain in real-time via subscription for processing
-export abstract class IBlockSubscriber<Block, Event> {
+export abstract class IBlockSubscriber<Api, Block> {
   constructor(
-    protected _blockProcessor: IBlockProcessor<Block, Event>,
-    protected _connectionOptions: any,
+    protected _api: Api,
   ) { }
 
-  public abstract async connect(): Promise<void>;
-  public abstract disconnect(): void;
+  // throws on error
+  public abstract subscribe(cb: (block: Block) => any): void;
+
+  public abstract unsubscribe(): void;
 }
 
 // fetches historical blocks from chain for processing
-export abstract class IBlockPoller<Block, Event> {
+export abstract class IBlockPoller<Api, Block> {
   constructor(
-    protected _blockProcessor: IBlockProcessor<Block, Event>,
-    protected _connectionOptions: any,
+    protected _api: Api,
   ) { }
 
-  public abstract async poll(startBlock: number, endBlock?: number): Promise<void>;
+  // throws on error
+  public abstract async poll(startBlock: number, endBlock?: number): Promise<Block[]>;
 }

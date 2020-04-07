@@ -2,17 +2,10 @@
  * Processes edgeware blocks and emits events.
  */
 import { IBlockProcessor } from '../interfaces';
-import EventHandler from './eventHandler';
 import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
 import { decodeSubstrateType } from './util';
 
 export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
-  constructor(
-    protected _eventHandler: EventHandler,
-  ) {
-    super(_eventHandler);
-  }
-
   /**
    * Parse events out of an edgeware block and standardizes their format
    * for processing.

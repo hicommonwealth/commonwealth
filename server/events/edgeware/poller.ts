@@ -4,21 +4,10 @@
 import { ApiPromise } from '@polkadot/api';
 import { Hash } from '@polkadot/types/interfaces';
 
-import Processor from './processor';
 import { IBlockPoller } from '../interfaces';
-import { constructSubstrateApiPromise } from './util';
 import { SubstrateBlock } from './types';
 
-export default class extends IBlockPoller<any, any> {
-  private _api: ApiPromise;
-
-  constructor(
-    protected _blockProcessor: Processor,
-    protected _connectionOptions,
-  ) {
-    super(_blockProcessor, _connectionOptions);
-  }
-
+export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
   /**
    * Connects to chain, fetches specified blocks and passes them
    * along for processing.
@@ -26,11 +15,7 @@ export default class extends IBlockPoller<any, any> {
    * @param startBlock first block to fetch
    * @param endBlock last block to fetch, omit to fetch to latest
    */
-  public async poll(startBlock: number, endBlock?: number) {
-    if (!this._api) {
-      this._api = await constructSubstrateApiPromise(this._connectionOptions);
-    }
-
+  public async poll(startBlock: number, endBlock?: number): Promise<SubstrateBlock[]> {
     // discovery current block if no end block provided
     if (!endBlock) {
       endBlock = (await this._api.derive.chain.bestNumber()).toNumber();
@@ -50,6 +35,6 @@ export default class extends IBlockPoller<any, any> {
       return { header, events };
     }));
 
-    blocks.map((b) => this._blockProcessor.process(b));
+    return blocks;
   }
 }

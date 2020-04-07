@@ -1,9 +1,5 @@
 import { Header, EventRecord } from '@polkadot/types/interfaces';
 
-export interface SubstrateConnectionOptions {
-  url: string;
-}
-
 /**
  * Substrate lacks a block type that includes events as well, so we synthesize a type
  * from the combination of headers and events.
