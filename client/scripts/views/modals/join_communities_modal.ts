@@ -7,6 +7,27 @@ import MembershipButton, { isMember } from 'views/components/membership_button';
 import app from 'state';
 import { Button, Card, Icons } from 'construct-ui';
 
+const VisitButton: m.Component<{ chain?, community? }> = {
+  view: (vnode) => {
+    const { chain, community } = vnode.attrs;
+    if (!chain && !community) return;
+
+    return m(Button, {
+      class: 'VisitButton',
+      onclick: (e) => {
+        if (community) {
+          m.route.set(community);
+        } else {
+          m.route.set(chain);
+        }
+      },
+      iconLeft: Icons.CHEVRON_RIGHT,
+      label: isMember(chain, community) ? 'Visit' : 'Preview',
+      size: 'xs',
+    });
+  }
+};
+
 const ChainCard : m.Component<{ chain, nodeList, justJoinedChains, disableNavigation }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains, disableNavigation } = vnode.attrs;
@@ -27,6 +48,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains, disableNaviga
         newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
       ],
       app.isLoggedIn() && m('.chain-membership', [
+        m(VisitButton, { chain }),
         m(MembershipButton, {
           chain: chain,
           onMembershipChanged: (created) => {
@@ -60,7 +82,9 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities, disableNav
         newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
       ],
       app.isLoggedIn() && [
-        c.privacyEnabled
+        m(VisitButton, { community: c.id }),
+        // This is weird, but the weird will be fixed after Roles and Memberships are merged
+        (c.privacyEnabled && isMember(null, c.id))
           ? m(MembershipButton, {
             community: c.id,
             onMembershipChanged: (created) => {
