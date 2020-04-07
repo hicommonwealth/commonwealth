@@ -1,6 +1,6 @@
+/* eslint-disable dot-notation */
 import { ApiPromise } from '@polkadot/api';
 
-/* eslint-disable dot-notation */
 export function constructFakeApi(callOverrides): ApiPromise {
   return {
     rpc: {

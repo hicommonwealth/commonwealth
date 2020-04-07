@@ -2,8 +2,8 @@
  * Processes edgeware blocks and emits events.
  */
 import { IBlockProcessor } from '../interfaces';
-import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
-import { decodeSubstrateType } from './util';
+import { SubstrateBlock, SubstrateEvent } from './types';
+import { decodeSubstrateCodec, parseEventType } from './util';
 
 export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
   /**
@@ -15,21 +15,12 @@ export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
    */
   public process(block: SubstrateBlock): SubstrateEvent[] {
     return block.events.map(({ event }) => {
-      switch (event.section) {
-        case 'staking':
-          switch (event.method) {
-            case 'slashing': return {
-              type: SubstrateEventType.Slashing,
-              data: event.data.map((d) => decodeSubstrateType(d)),
-            };
-            default:
-              return null;
-          }
-        default:
-          return null;
+      const type = parseEventType(event);
+      if (type) {
+        return { type, data: event.data.map((d) => decodeSubstrateCodec(d)) };
+      } else {
+        return null;
       }
-    })
-    // remove null / unwanted events
-      .filter((e) => !!e);
+    }).filter((e) => !!e); // remove null / unwanted events
   }
 }

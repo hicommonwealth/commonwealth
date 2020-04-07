@@ -13,7 +13,13 @@ export interface SubstrateBlock {
  * To implement a new form of event, add it to this enum.
  */
 export enum SubstrateEventType {
-  Slashing = 'slashing',
+  Slash = 'slash',
+  Reward = 'reward',
+  DemocracyProposed = 'democracy-proposed',
+  DemocracyStarted = 'democracy-started',
+  DemocracyPassed = 'democracy-passed',
+  DemocracyNotPassed = 'democracy-not-passed',
+  DemocracyCancelled = 'democracy-cancelled',
 }
 
 /**

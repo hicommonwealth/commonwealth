@@ -7,7 +7,7 @@ import Subscriber from '../../../../shared/events/edgeware/subscriber';
 const { assert } = chai;
 
 /* eslint-disable: dot-notation */
-describe('Edgeware Subscriber Tests', () => {
+describe('Edgeware Event Subscriber Tests', () => {
   it('should callback with block data', (done) => {
     // setup mock data
     const hashes = [1 as unknown as Hash, 2 as unknown as Hash];
