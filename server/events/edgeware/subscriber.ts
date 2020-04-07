@@ -1,13 +1,21 @@
 /**
  * Fetches events from edgeware chain in real time.
  */
-import EdgewareBlockProcessor from './processor';
-import { IBlockSubscriber } from '../interfaces';
+import { ApiPromise } from '@polkadot/api';
+import { Header } from '@polkadot/types/interfaces';
 
-export default class EdgewareBlockSubscriber extends IBlockSubscriber<any, any, any> {
+import { IBlockSubscriber } from '../interfaces';
+import Processor from './processor';
+import { SubstrateConnectionOptions, SubstrateBlock, SubstrateEvent } from './types';
+import { constructSubstrateApiPromise } from './util';
+
+export default class extends IBlockSubscriber<SubstrateBlock, SubstrateEvent> {
+  private _api: ApiPromise;
+  private _subscription: () => void;
+
   constructor(
-    protected _blockProcessor: EdgewareBlockProcessor,
-    protected _connectionOptions,
+    protected _blockProcessor: Processor,
+    protected _connectionOptions: SubstrateConnectionOptions,
   ) {
     super(_blockProcessor, _connectionOptions);
   }
@@ -16,13 +24,23 @@ export default class EdgewareBlockSubscriber extends IBlockSubscriber<any, any, 
    * Initializes subscription to chain and starts emitting events.
    */
   public async connect() {
-    // TODO
+    this._api = await constructSubstrateApiPromise(this._connectionOptions);
+
+    // subscribe to events and pass to block processor
+    this._subscription = await this._api.rpc.chain.subscribeNewHeads(async (header: Header) => {
+      const events = await this._api.query.system.events.at(header.hash);
+      const block: SubstrateBlock = { header, events };
+      this._blockProcessor.process(block);
+    });
   }
 
   /**
    * Halts emission of chain events.
    */
-  public disconnect() {
-    // TODO
+  public async disconnect() {
+    if (this._subscription) {
+      this._subscription();
+      this._subscription = null;
+    }
   }
 }

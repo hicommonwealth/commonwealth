@@ -1,26 +1,42 @@
 /**
  * Processes edgeware blocks and emits events.
  */
-
-import EdgewareEventHandler from './events';
 import { IBlockProcessor } from '../interfaces';
+import EventHandler from './eventHandler';
+import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
+import { decodeSubstrateType } from './util';
 
-export default class EdgewareBlockProcessor extends IBlockProcessor<any, any, any> {
+export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
   constructor(
-    protected _eventHandler: EdgewareEventHandler,
+    protected _eventHandler: EventHandler,
   ) {
     super(_eventHandler);
   }
 
   /**
-   * Parse events out of an edgeware block and submits them to
-   * the corresponding event handler.
+   * Parse events out of an edgeware block and standardizes their format
+   * for processing.
    *
    * @param block the block received for processing
    * @returns an array of processed events
    */
-  public process(block) {
-    // TODO
-    return [];
+  public process(block: SubstrateBlock): SubstrateEvent[] {
+    return block.events.map(({ event }) => {
+      switch (event.section) {
+        case 'staking':
+          switch (event.method) {
+            case 'slashing': return {
+              type: SubstrateEventType.Slashing,
+              data: event.data.map((d) => decodeSubstrateType(d)),
+            };
+            default:
+              return null;
+          }
+        default:
+          return null;
+      }
+    })
+    // remove null / unwanted events
+      .filter((e) => !!e);
   }
 }

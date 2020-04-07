@@ -2,24 +2,25 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-// handles events by processing them into the correct form for storage/notifying
-export abstract class IEventHandler<RawEvent, Event> {
-  public abstract handle(event: RawEvent): Event;
+// handles individual events by sending them off to storage/notifying
+export abstract class IEventHandler<Event> {
+  public abstract handle(event: Event): Promise<void>; // TODO: return a status
 }
 
-// parses events out of blocks and passes them through to the handler
-export abstract class IBlockProcessor<Block, RawEvent, Event> {
+// parses events out of blocks into a standard format and
+// passes them through to the handler
+export abstract class IBlockProcessor<Block, Event> {
   constructor(
-    protected _eventHandler: IEventHandler<RawEvent, Event>
+    protected _eventHandler: IEventHandler<Event>
   ) { }
 
   public abstract process(block: Block): Event[];
 }
 
 // fetches blocks from chain in real-time via subscription for processing
-export abstract class IBlockSubscriber<Block, RawEvent, Event> {
+export abstract class IBlockSubscriber<Block, Event> {
   constructor(
-    protected _blockProcessor: IBlockProcessor<Block, RawEvent, Event>,
+    protected _blockProcessor: IBlockProcessor<Block, Event>,
     protected _connectionOptions: any,
   ) { }
 
@@ -28,9 +29,9 @@ export abstract class IBlockSubscriber<Block, RawEvent, Event> {
 }
 
 // fetches historical blocks from chain for processing
-export abstract class IBlockPoller<Block, RawEvent, Event> {
+export abstract class IBlockPoller<Block, Event> {
   constructor(
-    protected _blockProcessor: IBlockProcessor<Block, RawEvent, Event>,
+    protected _blockProcessor: IBlockProcessor<Block, Event>,
     protected _connectionOptions: any,
   ) { }
 
