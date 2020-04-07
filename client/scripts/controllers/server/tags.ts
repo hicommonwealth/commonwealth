@@ -25,6 +25,10 @@ class TagsController {
   public addToStore(tag: OffchainTag) {
     return this._store.add(tag);
   }
+
+  public removeFromStore(tag: OffchainTag) {
+    return this._store.remove(tag);
+  }
 }
 
 export default TagsController;
