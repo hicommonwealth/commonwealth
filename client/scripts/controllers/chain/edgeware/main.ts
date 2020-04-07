@@ -60,7 +60,9 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
 
-    const types = Object.values(edgewareDefinitions).reduce((res, { types }): object => ({ ...res, ...types }), {});
+    const types = Object.values(edgewareDefinitions)
+      .map((v) => v.default)
+      .reduce((res, { types }): object => ({ ...res, ...types }), {});
 
     await this.chain.resetApi(this.meta, {
       types: {

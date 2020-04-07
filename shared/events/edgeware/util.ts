@@ -3,12 +3,14 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
 import { Event } from '@polkadot/types/interfaces';
 
+import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+
 import { SubstrateEventType } from './types';
 
 export async function constructSubstrateApiPromise(url: string): Promise<ApiPromise> {
-  const edgewareDefinitions = await import('edgeware-node-types/dist/definitions');
   const registry = new TypeRegistry();
-  const edgewareTypes = Object.values(edgewareDefinitions.default)
+  const edgewareTypes = Object.values(edgewareDefinitions)
+    .map((v) => v.default)
     .reduce((res, { types }): object => ({ ...res, ...types }), {});
   return ApiPromise.create({
     provider : new WsProvider(url),

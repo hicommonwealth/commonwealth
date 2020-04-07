@@ -4669,10 +4669,10 @@ ecdsa-sig-formatter@1.0.11:
   dependencies:
     safe-buffer "^5.0.1"
 
-edgeware-node-types@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/edgeware-node-types/-/edgeware-node-types-2.0.0.tgz#72a58cc3d36977683b811befaae310c78de998e3"
-  integrity sha512-TohkFH8EqZEgXyruk2dduJFKclUggBdgusXo9HnhTy1wPU6QW63dvAmKdBZD8XNWNQNeZDU6QxJNSiZcnc0lMQ==
+edgeware-node-types@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/edgeware-node-types/-/edgeware-node-types-2.0.1.tgz#880704d6de4c46e9d1ce568453232323ebc804b7"
+  integrity sha512-n2SFsiPVIFBbQ7gDzzvEdabLavHyJb5Xwlw5FAXCrdk6liBXdnwycvWHrOC33UP42GWy2PdR60yELLEz1dX6oA==
 
 editorconfig@^0.15.3:
   version "0.15.3"

@@ -5,9 +5,8 @@ import Processor from './processor';
 import { constructSubstrateApiPromise } from './util';
 import { SubstrateBlock, SubstrateEvent } from './types';
 
-export default async function () {
+export default async function (url = 'ws://localhost:9944') {
   // TODO: make this adjustable
-  const url = 'ws://localhost:9944';
   const api = await constructSubstrateApiPromise(url);
   const subscriber = new Subscriber(api);
   const poller = new Poller(api);
@@ -15,6 +14,7 @@ export default async function () {
   const handler = new EventHandler();
 
   try {
+    console.log(`Subscribing to Edgeware at ${url}...`);
     subscriber.subscribe(
       async (block: SubstrateBlock) => {
         const events: SubstrateEvent[] = processor.process(block);

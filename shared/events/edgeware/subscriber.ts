@@ -18,6 +18,7 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
     this._subscription = this._api.rpc.chain.subscribeNewHeads(async (header: Header) => {
       const events = await this._api.query.system.events.at(header.hash);
       const block: SubstrateBlock = { header, events };
+      console.log(`Block: ${block.header.number.toNumber()}`);
       cb(block);
     });
   }

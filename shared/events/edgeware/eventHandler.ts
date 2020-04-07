@@ -12,5 +12,6 @@ export default class extends IEventHandler<SubstrateEvent> {
    */
   public async handle(event: SubstrateEvent) {
     // TODO
+    console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
   }
 }
