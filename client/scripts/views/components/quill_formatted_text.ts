@@ -2,8 +2,8 @@ import 'components/quill_formatted_text.scss';
 
 import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
-import { loadScript } from '../../helpers';
 import { stringUpperFirst } from '@polkadot/util';
+import { loadScript } from '../../helpers';
 
 interface IQuillJSON {
   ops: IQuillOps[];

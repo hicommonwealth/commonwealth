@@ -5,9 +5,9 @@ import { default as $ } from 'jquery';
 import { default as mixpanel } from 'mixpanel-browser';
 
 import ObjectPage from 'views/pages/_object_page';
-import { TextInputFormField, ButtonSelectorFormField } from '../../components/forms';
 import { formatAsTitleCase } from 'helpers';
 import app from 'state';
+import { TextInputFormField, ButtonSelectorFormField } from '../../components/forms';
 import SupernovaPreheader from './supernova_preheader';
 import ETHInstructions from './eth_instructions';
 import SocialShare from './social_share';

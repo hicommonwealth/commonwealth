@@ -20,10 +20,6 @@ describe('API Tests', () => {
     await resetDatabase();
   });
 
-  after('teardown', async () => {
-    await closeServer();
-  });
-
   describe('address tests', () => {
     it('should call the /api/status route', async () => {
       const res = await chai.request(app)

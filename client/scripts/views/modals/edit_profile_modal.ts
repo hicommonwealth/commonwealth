@@ -3,10 +3,15 @@ import 'modals/edit_profile_modal.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
+import {
+  PROFILE_BIO_MAX_CHARS,
+  PROFILE_HEADLINE_MAX_CHARS,
+  PROFILE_NAME_MAX_CHARS,
+  PROFILE_NAME_MIN_CHARS
+} from 'types';
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import ResizableTextarea from '../components/widgets/resizable_textarea';
 import AvatarUpload from '../components/avatar_upload';
-import { PROFILE_BIO_MAX_CHARS, PROFILE_HEADLINE_MAX_CHARS, PROFILE_NAME_MAX_CHARS, PROFILE_NAME_MIN_CHARS } from 'types';
 
 const EditProfileModal = {
   view: (vnode) => {

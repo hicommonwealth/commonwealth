@@ -14,7 +14,7 @@ import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import { newThread, getLinkTitle, detectURL, newLink } from 'views/pages/threads';
 import { re_weburl } from '../../lib/url-validation';
-import { OffchainThreadKind, CommunityInfo, NodeInfo } from '../../models/models';
+import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { updateLastVisited } from '../../controllers/app/login';
 import AutoCompleteTagForm from '../components/autocomplete_tag_form';
 import PageLoading from './loading';

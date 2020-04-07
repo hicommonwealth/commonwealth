@@ -5,8 +5,8 @@ import { default as moment } from 'moment-twitter';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
-import { ReactionsStore } from 'models/stores';
-import { OffchainReaction, IUniqueId } from 'models/models';
+import { ReactionsStore } from 'stores';
+import { OffchainReaction, IUniqueId } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 const modelFromServer = (reaction, proposal?) => {

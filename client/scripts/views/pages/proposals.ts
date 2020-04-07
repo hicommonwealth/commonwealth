@@ -7,7 +7,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models/models';
+import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
 
 import ListingPage from 'views/pages/_listing_page';

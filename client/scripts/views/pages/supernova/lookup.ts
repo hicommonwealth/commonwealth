@@ -6,11 +6,9 @@ import { default as m } from 'mithril';
 
 import { pluralize } from 'helpers';
 import ObjectPage from 'views/pages/_object_page';
+import { isHex, formatNumber } from 'views/stats/stats_helpers';
 import { TextInputFormField } from '../../components/forms';
 import SupernovaPreheader from './supernova_preheader';
-
-import { isHex, formatNumber } from 'views/stats/stats_helpers';
-import { format } from 'util';
 
 /*
   TODO: Add storing unverified address route to on button click, if vnode.state.addressSummary !== null;

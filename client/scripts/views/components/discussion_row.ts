@@ -8,7 +8,7 @@ import app from 'state';
 import { pluralize, slugify, link, externalLink } from 'helpers';
 
 import User from 'views/components/widgets/user';
-import { OffchainThread, OffchainThreadKind } from 'models/models';
+import { OffchainThread, OffchainThreadKind } from 'models';
 
 interface IAttrs {
   proposal: OffchainThread;

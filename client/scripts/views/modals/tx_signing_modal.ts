@@ -10,7 +10,7 @@ import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { ModalExitButton } from 'views/modal';
 import app from 'state';
 import { formatAsTitleCase } from 'helpers';
-import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models/models';
+import { ITXModalData, ITransactionResult, TransactionStatus, ChainBase } from 'models';
 import SubkeyInstructions from 'views/components/subkey_instructions';
 import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';

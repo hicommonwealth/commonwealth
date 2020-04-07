@@ -4,7 +4,7 @@ import { default as m, VnodeDOM } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
 
 import app from 'state';
-import { IUniqueId, OffchainReaction } from 'models/models';
+import { IUniqueId } from 'models';
 
 export enum ReactionType {
   Like = 'like',

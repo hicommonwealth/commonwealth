@@ -6,7 +6,7 @@ import m from 'mithril';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThreadKind } from 'models/models';
+import { OffchainThreadKind } from 'models';
 
 interface ITagSelectorAttrs {
   activeTag?: string;

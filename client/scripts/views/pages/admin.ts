@@ -3,28 +3,25 @@ import 'pages/admin.scss';
 import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
-import app from 'state';
-
 import { SubmittableResult, ApiRx } from '@polkadot/api';
-import { blockperiodToDuration, formatDuration } from 'helpers';
-import { formatCoin } from 'adapters/currency';
-import Tabs from 'views/components/widgets/tabs';
-import { ChainInfo, NodeInfo } from 'models/models';
-import PageLoading from 'views/pages/loading';
-
-// import { OffchainComment, Proposal, AnyProposal } from 'models/models';
-// import { default as CommentsController } from 'controllers/server/comments';
-// import { default as AdminController } from 'controllers/server/comments';
-import { DropdownFormField } from '../components/forms';
-import Substrate from 'controllers/chain/substrate/main';
-import { switchMap } from 'rxjs/operators';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ISubmittableResult } from '@polkadot/types/types';
-import EdgewareFunctionPicker from '../components/edgeware_function_picker';
-import CreateCommunityModal from 'views/modals/create_community_modal';
-import User from 'views/components/widgets/user';
+import { switchMap } from 'rxjs/operators';
 
+import app from 'state';
+import { blockperiodToDuration, formatDuration } from 'helpers';
+import { ChainInfo, NodeInfo } from 'models';
+import { formatCoin } from 'adapters/currency';
+import Substrate from 'controllers/chain/substrate/main';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+
+import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
+import { DropdownFormField } from 'views/components/forms';
+import Tabs from 'views/components/widgets/tabs';
+import User from 'views/components/widgets/user';
+import CreateCommunityModal from 'views/modals/create_community_modal';
+import CreateInviteModal from 'views/modals/create_invite_modal';
 import ListingPage from 'views/pages/_listing_page';
+import PageLoading from 'views/pages/loading';
 
 interface IChainManagerAttrs {
   success?: string;
@@ -468,7 +465,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
               jwt: app.login.jwt,
             }).then((response) => {
               const linkInfo = response.result;
-              const url = (!app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+              const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
               if (vnode.attrs.onChangeHandler) vnode.attrs.onChangeHandler(linkInfo);
               vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${linkInfo.id}`;
               m.redraw();
@@ -490,7 +487,7 @@ const InviteLinkRow: m.Component<{data}, {link}> = {
   },
   view: (vnode) => {
     const { id, active, multi_use, used, time_limit, created_at } = vnode.state.link;
-    const server = (!app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+    const server = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
     const url = `${server}${app.serverUrl()}/acceptInviteLink?id=${id}`;
 
     return m('tr.InviteLinkRow', [

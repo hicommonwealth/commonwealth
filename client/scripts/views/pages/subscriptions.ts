@@ -3,7 +3,7 @@ import 'pages/subscriptions.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models/models';
+import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
 import ListingPage from './_listing_page';

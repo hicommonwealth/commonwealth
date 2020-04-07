@@ -1,6 +1,4 @@
-import { default as m } from 'mithril';
-import app, { ApiStatus } from 'state';
-import { CommunityInfo, ICommunityAdapter } from 'models/models';
+import { CommunityInfo, ICommunityAdapter } from 'models';
 
 import { Coin } from 'adapters/currency';
 import OffchainAccounts, { OffchainAccount } from './account';

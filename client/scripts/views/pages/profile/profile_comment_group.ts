@@ -2,7 +2,7 @@ import m from 'mithril';
 import _ from 'lodash';
 
 import app from 'state';
-import { OffchainThread, OffchainComment } from '../../../models/models';
+import { OffchainThread, OffchainComment } from 'models';
 import User from '../../components/widgets/user';
 import { link, slugify } from '../../../helpers';
 import QuillFormattedText from '../../components/quill_formatted_text';

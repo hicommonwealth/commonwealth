@@ -4,7 +4,7 @@ import { default as m } from 'mithril';
 
 import app from 'state';
 import ListingPage from './_listing_page';
-import { NotificationSubscription, Notification, OffchainComment } from 'models/models';
+import { NotificationSubscription, Notification, OffchainComment } from 'models';
 import User from 'views/components/widgets/user';
 import { NotificationCategories } from 'types';
 

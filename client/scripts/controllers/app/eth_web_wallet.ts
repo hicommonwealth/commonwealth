@@ -1,7 +1,6 @@
 declare let window: any;
 
 import app from 'state';
-import { ChainBase } from '../../models/models';
 import Ethereum from '../chain/ethereum/main';
 
 // tslint:disable-next-line

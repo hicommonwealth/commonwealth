@@ -6,15 +6,20 @@ import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatAddressShort } from 'helpers';
-import { ISubstrateTreasuryProposal, ISubstrateTreasuryProposalState, SubstrateCoin } from 'adapters/chain/substrate/types';
+import {
+  ISubstrateTreasuryProposal,
+  ISubstrateTreasuryProposalState,
+  SubstrateCoin
+} from 'adapters/chain/substrate/types';
 import { SubstrateTreasuryProposalAdapter } from 'adapters/chain/substrate/subscriptions';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ProposalModule, ChainBase, Account
-} from 'models/models';
+} from 'models';
+import { ProposalStore } from 'stores';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import { ProposalStore } from 'models/stores';
+
 
 class SubstrateTreasury extends ProposalModule<
   ApiRx,

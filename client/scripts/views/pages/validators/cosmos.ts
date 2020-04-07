@@ -11,9 +11,10 @@ import { ICosmosValidator, CosmosAccount, CosmosValidatorState } from 'controlle
 import User from 'views/components/widgets/user';
 import { TextInputFormField, DropdownFormField } from 'views/components/forms';
 
-import { Account } from 'models/models';
+import { Account } from 'models';
+import Cosmos from 'controllers/chain/cosmos/main';
 import { IValidatorAttrs } from '.';
-import Cosmos from 'client/scripts/controllers/chain/cosmos/main';
+
 import Tabs from '../../components/widgets/tabs';
 
 export interface ICosmosDelegationState {

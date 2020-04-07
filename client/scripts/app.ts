@@ -14,7 +14,7 @@ import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout, LoadingLayout } from 'views/layouts';
 import { ChainInfo, CommunityInfo, NodeInfo,
-  OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models/models';
+  OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { default as moment } from 'moment-twitter';
 import { default as mixpanel } from 'mixpanel-browser';
@@ -135,7 +135,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   await deinitChainOrCommunity();
 
   // Initialize the community
-  app.community = new Community(app, c);
+  app.community = new Community(c, app);
   await app.community.init();
   console.log(`${c.name.toUpperCase()} started.`);
 
@@ -179,22 +179,22 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // Initialize modules.
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import('./controllers/chain/edgeware/main')).default;
-    app.chain = new Edgeware(app, n);
+    app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
     const Substrate = (await import('./controllers/chain/substrate/main')).default;
-    app.chain = new Substrate(app, n);
+    app.chain = new Substrate(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import('./controllers/chain/cosmos/main')).default;
-    app.chain = new Cosmos(app, n);
+    app.chain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (await import('./controllers/chain/ethereum/main')).default;
-    app.chain = new Ethereum(app, n);
+    app.chain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
     const Near = (await import('./controllers/chain/near/main')).default;
-    app.chain = new Near(app, n);
+    app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
-    app.chain = new Moloch(app, n);
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
   }

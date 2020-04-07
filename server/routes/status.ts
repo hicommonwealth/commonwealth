@@ -2,8 +2,6 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
-import { OffchainThreadKind } from '../../client/scripts/models/models';
-
 import { UserRequest } from '../types';
 
 const status = async (models, req: UserRequest, res: Response, next: NextFunction) => {

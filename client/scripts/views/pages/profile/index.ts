@@ -5,7 +5,7 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
-import { OffchainThread } from 'models/models';
+import { OffchainThread } from 'models';
 
 import PageLoading from 'views/pages/loading';
 import ObjectPage from 'views/pages/_object_page';

@@ -1,20 +1,32 @@
+import _ from 'underscore';
 import {
-  ProposalModule, Proposal, IVote, VotingType, VotingUnit,
-  Account, ChainBase, ProposalStatus, IFixedBlockEndTime, ITXModalData
-} from 'models/models';
+  ProposalModule,
+  Proposal,
+  IVote,
+  VotingType,
+  VotingUnit,
+  Account,
+  ChainBase,
+  ProposalStatus,
+  IFixedBlockEndTime,
+  ITXModalData,
+} from 'models';
 import { ApiRx } from '@polkadot/api';
-import { ISubstratePhragmenElection, ISubstratePhragmenElectionState, SubstrateCoin } from 'adapters/chain/substrate/types';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import {
+  ISubstratePhragmenElection,
+  ISubstratePhragmenElectionState,
+  SubstrateCoin
+} from 'adapters/chain/substrate/types';
 import { SubstratePhragmenElectionAdapter } from 'adapters/chain/substrate/subscriptions';
-import SubstrateChain from './shared';
 import { takeWhile, first, switchMap, flatMap, map } from 'rxjs/operators';
 import { Unsubscribable, combineLatest, of } from 'rxjs';
 import BN from 'bn.js';
 import { BalanceOf, AccountId, Balance } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, StorageKey } from '@polkadot/types';
-import { ProposalStore } from 'models/stores';
-import _ from 'underscore';
+import { ProposalStore } from 'stores';
+import SubstrateChain from './shared';
+import SubstrateAccounts, { SubstrateAccount } from './account';
 
 type ElectionResultCodec = [ AccountId, BalanceOf ] & Codec;
 

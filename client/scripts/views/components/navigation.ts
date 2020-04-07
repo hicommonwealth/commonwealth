@@ -17,7 +17,7 @@ import { NotificationCategories } from 'types';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
-import { ChainClass, ChainBase, Notification } from 'models/models';
+import { ChainClass, ChainBase, Notification } from 'models';
 
 import { jumpHighlightComment } from 'views/pages/view_proposal';
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
@@ -32,8 +32,8 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import JoinCommunitiesModal from 'views/modals/join_communities_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { OffchainCommunitiesStore } from 'client/scripts/models/stores';
-import ConfirmInviteModal from '../modals/confirm_invite_modal';
+import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import { OffchainCommunitiesStore } from 'stores';
 
 const NotificationRow: m.Component<{ notification: Notification }> = {
   view: (vnode) => {

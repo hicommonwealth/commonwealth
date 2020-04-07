@@ -3,8 +3,8 @@ import 'components/view_count.scss';
 import { default as m } from 'mithril';
 import app from 'state';
 import { default as $ } from 'jquery';
+import { OffchainThread } from 'models';
 import { pluralize } from '../../../helpers';
-import { OffchainThread } from 'client/scripts/models/models';
 
 interface IAttrs {
   proposal: OffchainThread;

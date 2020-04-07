@@ -3,8 +3,8 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
 import EthereumAccounts from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import { IAccountsModule } from 'models/models';
-import { AccountsStore } from 'models/stores';
+import { IAccountsModule } from 'models';
+import { AccountsStore } from 'stores';
 import MolochMember from './member';
 import MolochAPI from './api';
 

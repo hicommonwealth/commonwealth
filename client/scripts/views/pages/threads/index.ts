@@ -3,8 +3,8 @@ import 'pages/new_thread.scss';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import app from 'state';
+import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
-import { OffchainThreadKind, CommunityInfo, NodeInfo } from '../../../models/models';
 import { updateLastVisited } from '../../../controllers/app/login';
 
 export const parseMentionsForServer = (text, isMarkdown) => {

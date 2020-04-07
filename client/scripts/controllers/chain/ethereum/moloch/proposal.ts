@@ -6,8 +6,14 @@ import { IMolochProposalResponse, IMolochVote } from 'adapters/chain/moloch/type
 import { ICompletable } from 'adapters/shared';
 
 import {
-  Proposal, IVote, ITXModalData, VotingType, VotingUnit, ProposalStatus, ProposalEndTime
-} from 'models/models';
+  Proposal,
+  IVote,
+  ITXModalData,
+  VotingType,
+  VotingUnit,
+  ProposalStatus,
+  ProposalEndTime
+} from 'models';
 
 import MolochMember from './member';
 import MolochMembers from './members';

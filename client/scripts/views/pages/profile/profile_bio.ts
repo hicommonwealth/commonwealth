@@ -1,8 +1,8 @@
 import m from 'mithril';
 import _ from 'lodash';
-
+import { Account } from 'models';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
-import { Account } from '../../../models/models';
+
 
 const ProfileBio: m.Component<{ account: Account<any> }> = {
   view: (vnode) => {

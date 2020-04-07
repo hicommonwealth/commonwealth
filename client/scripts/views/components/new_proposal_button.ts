@@ -5,7 +5,7 @@ import { Tooltip, Button, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass } from 'models/models';
+import { ChainClass } from 'models';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import NewProposalModal from 'views/modals/proposals';

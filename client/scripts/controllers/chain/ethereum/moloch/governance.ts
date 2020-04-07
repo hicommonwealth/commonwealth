@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import { ProposalModule, ITXModalData } from 'models/models';
+import { ProposalModule, ITXModalData } from 'models';
 
 import { ICompletable } from 'adapters/shared';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';

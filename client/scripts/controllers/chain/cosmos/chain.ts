@@ -1,6 +1,11 @@
 import {
-  ITXModalData, ITransactionResult, TransactionStatus, NodeInfo, IChainModule, ITXData,
-} from 'models/models';
+  ITXModalData,
+  ITransactionResult,
+  TransactionStatus,
+  NodeInfo,
+  IChainModule,
+  ITXData,
+} from 'models';
 import * as m from 'mithril';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';

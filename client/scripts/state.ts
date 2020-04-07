@@ -1,6 +1,16 @@
-import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'models/stores';
-import { NodeInfo, AddressInfo, MembershipInfo, SocialAccount, OffchainTag, ContractCategory, Account,
-         IChainAdapter, ICommunityAdapter, NotificationCategory } from 'models/models';
+import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
+import {
+  NodeInfo,
+  AddressInfo,
+  MembershipInfo,
+  SocialAccount,
+  OffchainTag,
+  ContractCategory,
+  Account,
+  IChainAdapter,
+  ICommunityAdapter,
+  NotificationCategory
+} from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { Subject, ReplaySubject } from 'rxjs';

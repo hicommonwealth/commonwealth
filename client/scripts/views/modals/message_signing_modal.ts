@@ -7,7 +7,7 @@ import app from 'state';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import SubkeyInstructions from 'views/components/subkey_instructions';
-import { Account, ChainClass, ChainBase } from 'models/models';
+import { Account, ChainBase } from 'models';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
 
 const MessageSigningSeedOrMnemonicOption = {
