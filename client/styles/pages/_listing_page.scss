@@ -39,6 +39,7 @@
         .stats-tile-figure-minor {
             color: #888;
             margin-top: 2px;
+            overflow-wrap: break-word;
         }
         @include xs-max {
             padding: 15px;
