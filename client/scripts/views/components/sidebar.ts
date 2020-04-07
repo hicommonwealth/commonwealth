@@ -9,17 +9,18 @@ import app from 'state';
 import { initAppState } from 'app';
 import { link } from 'helpers';
 
+import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
 import { isMember } from 'views/components/membership_button';
 import FeedbackModal from 'views/modals/feedback_modal';
 import JoinCommunitiesModal from 'views/modals/join_communities_modal';
 
-const SidebarChainIcon = {
+const SidebarChain = {
   view: (vnode) => {
     const { chain, nodeList } = vnode.attrs;
 
-    const linkClass = 'a.SidebarChainIcon' + (app.activeChainId() === chain ? '.active' : '');
+    const linkClass = 'a.SidebarChain' + (app.activeChainId() === chain ? '.active' : '');
     return m(Tooltip, {
       hoverOpenDelay: 0,
       hoverCloseDelay: 0,
@@ -28,16 +29,17 @@ const SidebarChainIcon = {
       content: m('.SidebarTooltip', nodeList[0].chain.name),
       trigger: link(linkClass, `/${chain}/`, [
         m(ChainIcon, { chain: nodeList[0].chain }),
+        app.vm.activeAccount && m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 16 }),
       ])
     });
   }
 };
 
-const SidebarCommunityIcon = {
+const SidebarCommunity = {
   view: (vnode) => {
     const { community } = vnode.attrs;
 
-    const linkClass = 'a.SidebarCommunityIcon' + (app.activeCommunityId() === community.id ? '.active' : '');
+    const linkClass = 'a.SidebarCommunity' + (app.activeCommunityId() === community.id ? '.active' : '');
     return m(Tooltip, {
       hoverOpenDelay: 0,
       hoverCloseDelay: 0,
@@ -45,13 +47,16 @@ const SidebarCommunityIcon = {
       size: 'lg',
       content: m('.SidebarTooltip', community.name),
       trigger: link(linkClass, `/${community.id}/`, [
-        m('.name', community.name.slice(0, 2).toLowerCase())
+        m('.icon-inner', [
+          m('.name', community.name.slice(0, 2).toLowerCase()),
+        ]),
+        app.vm.activeAccount && m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 16 }),
       ])
     });
   }
 };
 
-const SidebarManageIcon = {
+const SidebarManage = {
   view: (vnode) => {
     return m(Tooltip, {
       hoverOpenDelay: 0,
@@ -59,7 +64,7 @@ const SidebarManageIcon = {
       position: 'right',
       size: 'lg',
       content: m('.SidebarTooltip', 'Manage Communities'),
-      trigger: m('.SidebarManageIcon', {
+      trigger: m('.SidebarManage', {
         onclick: (e) => {
           e.preventDefault();
           app.modals.create({
@@ -67,10 +72,12 @@ const SidebarManageIcon = {
           });
         }
       }, [
-        m(Icon, {
-          name: Icons.GRID,
-          style: 'color: white;'
-        })
+        m('.icon-inner', [
+          m(Icon, {
+            name: Icons.GRID,
+            style: 'color: white;'
+          }),
+        ]),
       ])
     });
   }
@@ -166,9 +173,9 @@ const Sidebar = {
     const myCommunities = app.config.communities.getAll().filter((c) => isMember(null, c.id));
 
     return m('.Sidebar', [
-      myChains.map(([chain, nodeList] : [string, any]) => m(SidebarChainIcon, { chain, nodeList })),
-      myCommunities.map((community) => m(SidebarCommunityIcon, { community })),
-      m(SidebarManageIcon),
+      myChains.map(([chain, nodeList] : [string, any]) => m(SidebarChain, { chain, nodeList })),
+      myCommunities.map((community) => m(SidebarCommunity, { community })),
+      m(SidebarManage),
       m(SidebarSettingsMenu),
     ]);
   }

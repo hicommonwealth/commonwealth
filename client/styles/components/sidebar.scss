@@ -10,10 +10,11 @@
 
     $size: 42px;
 
-    a.SidebarChainIcon,
-    a.SidebarCommunityIcon,
-    .SidebarManageIcon,
+    a.SidebarChain,
+    a.SidebarCommunity,
+    .SidebarManage,
     .SidebarSettingsMenu .trigger {
+        position: relative;
         display: block;
         width: $size;
         height: $size;
@@ -27,34 +28,51 @@
             width: $size;
             height: $size;
         }
-        opacity: 0.3;
+        .ChainIcon, .community-icon-inner {
+            opacity: 0.3;
+        }
         &:hover, &.active {
-            opacity: 1;
+            .ChainIcon, .community-icon-inner {
+                opacity: 1;
+            }
+        }
+        .User {
+            position: absolute;
+            right: -4px;
+            bottom: -4px;
         }
         .name {
             position: relative;
             top: 11px;
         }
     }
-    .SidebarSettingsMenu {
-        position: absolute;
-        bottom: 0;
-        margin: 16px;
-    }
-    a.SidebarCommunityIcon,
-    .SidebarManageIcon {
-        background: #36393f;
+    a.SidebarCommunity,
+    .SidebarManage {
+        .icon-inner {
+            background: #36393f;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border-radius: 8px;
+        }
         &:hover, &.active {
-            background: darken(#36393f, 7%);
+            .icon-inner {
+                background: darken(#36393f, 7%);
+            }
         }
     }
-    .SidebarManageIcon {
+    .SidebarManage {
         color: #fff;
         cursor: pointer;
         .cui-icon {
             position: relative;
             top: 9px;
         }
+    }
+    .SidebarSettingsMenu {
+        position: absolute;
+        bottom: 0;
+        margin: 16px;
     }
 }
 
