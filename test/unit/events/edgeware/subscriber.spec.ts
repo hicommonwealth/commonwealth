@@ -2,7 +2,7 @@ import chai from 'chai';
 import { Hash, EventRecord } from '@polkadot/types/interfaces';
 
 import { constructFakeApi } from './testUtil';
-import Subscriber from '../../../../server/events/edgeware/subscriber';
+import Subscriber from '../../../../shared/events/edgeware/subscriber';
 
 const { assert } = chai;
 
