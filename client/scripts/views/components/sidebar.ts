@@ -21,17 +21,30 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
 
-    const linkClass = 'a.SidebarChain' + (app.activeChainId() === chain ? '.active' : '');
+    const active = app.activeChainId() === chain && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
+                                                                  address.address === app.vm.activeAccount?.address));
+
     return m(Tooltip, {
       hoverOpenDelay: 0,
       hoverCloseDelay: 0,
       position: 'right',
       size: 'lg',
       content: m('.SidebarTooltip', nodeList[0].chain.name),
-      trigger: link(linkClass, `/${chain}/`, [
+      trigger: m('a.SidebarChain', {
+        href: '#',
+        class: active ? '.active' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          if (address)  {
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
+          }
+          m.route.set(`/${chain}/`);
+        }
+      }, [
         m(ChainIcon, { chain: nodeList[0].chain }),
         m(User, { user: [address.chain, address.address], avatarOnly: true, avatarSize: 16 }),
-      ])
+      ]),
     });
   }
 };
@@ -40,14 +53,26 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
   view: (vnode) => {
     const { community, address } = vnode.attrs;
 
-    const linkClass = 'a.SidebarCommunity' + (app.activeCommunityId() === community.id ? '.active' : '');
+    const active = app.activeCommunityId() === community.id && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
+                                                                             address.address === app.vm.activeAccount?.address));
     return m(Tooltip, {
       hoverOpenDelay: 0,
       hoverCloseDelay: 0,
       position: 'right',
       size: 'lg',
       content: m('.SidebarTooltip', community.name),
-      trigger: link(linkClass, `/${community.id}/`, [
+      trigger: m('a.SidebarCommunity', {
+        href: '#',
+        class: active ? '.active' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          if (address) {
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
+          }
+          m.route.set(`/${community.id}/`);
+        },
+      }, [
         m('.icon-inner', [
           m('.name', community.name.slice(0, 2).toLowerCase()),
         ]),

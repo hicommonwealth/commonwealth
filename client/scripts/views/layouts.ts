@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
 import app from 'state';
+import { selectLogin } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import Navigation from 'views/components/navigation';
 import Sidebar from 'views/components/sidebar';
@@ -65,10 +66,31 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = vnode.attrs.scope;
       if (scopeMatchesChain) {
+        const address = localStorage.getItem('initAddress');
+        localStorage.setItem('initAddress', null);
+        localStorage.setItem('initChain', null);
+
+        // select the chain
         initChain(vnode.attrs.scope);
+        // select the address
+        if (address) {
+          const matching = app.login.activeAddresses.filter((a) => a.address === address);
+          if (matching.length > 0) selectLogin(matching[0]);
+        }
         return m(LoadingLayout);
       } else if (scopeMatchesCommunity) {
+        const address = localStorage.getItem('initAddress');
+        const chain = localStorage.getItem('initChain');
+        localStorage.setItem('initAddress', null);
+        localStorage.setItem('initChain', null);
+
+        // select the community
         initCommunity(vnode.attrs.scope);
+        // select the address
+        if (address && chain) {
+          const matching = app.login.activeAddresses.filter((a) => a.address === address && a.chain.id === chain);
+          if (matching.length > 0) selectLogin(matching[0]);
+        }
         return m(LoadingLayout);
       }
     } else if (!vnode.attrs.scope && ((app.chain && app.chain.class) || app.community)) {

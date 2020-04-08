@@ -1,5 +1,3 @@
-import { Button, Icons } from 'construct-ui';
-
 /* eslint-disable no-unused-expressions */
 import 'pages/discussions.scss';
 
@@ -10,19 +8,20 @@ import moment from 'moment-twitter';
 
 import app from 'state';
 import { updateRoute } from 'app';
-import { link } from 'helpers';
+import { link, articlize } from 'helpers';
 import PageLoading from 'views/pages/loading';
 import ListingPage from 'views/pages/_listing_page';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/components/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
-import MembershipButton from 'views/components/membership_button';
+import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';
 import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import DiscussionsSubscriptionButton from './subscription_button';
 import TagSelector from './tag_selector';
 import ChainOrCommunityRoles from './roles';
+import { Button, Callout, Icons } from 'construct-ui';
 
 // TODO: refactor all of the below into a controller.
 
@@ -216,12 +215,29 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       ]);
     };
 
+    const activeAddressInfo = app.vm.activeAccount && app.login.addresses
+      .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
+
     return m(ListingPage, {
       class: 'DiscussionsPage',
       title: 'Discussions',
       subtitle: 'Discuss proposals and improvements',
       content: m('.row', [
-        m('.col-sm-8.col-md-9', [
+        (app.chain || app.community) && m('.col-sm-8.col-md-9', [
+          !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
+            icon: Icons.INFO,
+            header: 'Showing preview',
+            content: m('.callout-content', [
+              m('.callout-left', { style: 'margin-bottom: 8px;'}, [
+                `Join this community to see more.`
+              ]),
+              m('.callout-right', [
+                app.community ?
+                  m(MembershipButton, { community: app.community.meta.id, address: app.vm.activeAccount }) :
+                  m(MembershipButton, { chain: app.chain.id, address: app.vm.activeAccount }),
+              ]),
+            ]),
+          }),
           vnode.attrs.tag
             ? getSingleTagListing(vnode.attrs.tag)
             : getHomepageListing(),
