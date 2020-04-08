@@ -7,6 +7,14 @@
     background: #e4e4e6;
     padding: 2px 0;
     z-index: 10;
+    .sidebar-content {
+        position: absolute;
+        top: 0;
+        bottom: 72px;
+        width: 100%;
+        overflow-y: scroll;
+        border-bottom: 1px solid #d5d5d5;
+    }
 
     $size: 42px;
 
@@ -80,4 +88,14 @@
     font-weight: 500;
     margin: 1px 4px 0;
     line-height: 1.1;
+    .sidebar-tooltip-name,
+    .sidebar-tooltip-user {
+        display: inline-block;
+    }
+    .sidebar-tooltip-name {
+        margin-right: 8px;
+    }
+    .sidebar-tooltip-user {
+        margin-left: 8px;
+    }
 }

@@ -29,7 +29,11 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
       hoverCloseDelay: 0,
       position: 'right',
       size: 'lg',
-      content: m('.SidebarTooltip', nodeList[0].chain.name),
+      content: m('.SidebarTooltip', [
+        m('.sidebar-tooltip-name', nodeList[0].chain.name),
+        m.trust('&middot;'),
+        m('.sidebar-tooltip-user', m(User, { user: [address.chain, address.address] })),
+      ]),
       trigger: m('a.SidebarChain', {
         href: '#',
         class: active ? '.active' : '',
@@ -60,7 +64,11 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
       hoverCloseDelay: 0,
       position: 'right',
       size: 'lg',
-      content: m('.SidebarTooltip', community.name),
+      content: m('.SidebarTooltip', [
+        m('.sidebar-tooltip-name', community.name),
+        m.trust('&middot;'),
+        m('.sidebar-tooltip-user', m(User, { user: [address.chain, address.address] })),
+      ]),
       trigger: m('a.SidebarCommunity', {
         href: '#',
         class: active ? '.active' : '',
@@ -196,16 +204,18 @@ const Sidebar: m.Component<{}> = {
     });
 
     return m('.Sidebar', [
-      app.login.roles.map((role) => {
-        const address = app.login.addresses.find((address) => address.id === role.address_id);
-        if (role.offchain_community_id) {
-          const community = app.config.communities.getAll().find((community) => community.id === role.offchain_community_id);
-          return m(SidebarCommunity, { community, address });
-        } else {
-          return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
-        }
-      }),
-      m(SidebarManage),
+      m('.sidebar-content', [
+        app.login.roles.map((role) => {
+          const address = app.login.addresses.find((address) => address.id === role.address_id);
+          if (role.offchain_community_id) {
+            const community = app.config.communities.getAll().find((community) => community.id === role.offchain_community_id);
+            return m(SidebarCommunity, { community, address });
+          } else {
+            return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+          }
+        }),
+        m(SidebarManage),
+      ]),
       m(SidebarSettingsMenu),
     ]);
   }
