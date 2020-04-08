@@ -52,6 +52,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           tags: community.tags,
         }));
       });
+      app.login.roles = data.roles;
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories =
         data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));

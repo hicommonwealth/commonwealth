@@ -50,17 +50,12 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
   });
   if (!role) return next(new Error('Failed to create new Role'));
 
-  const membership = await models.Membership.create({
-    user_id: req.user.id,
-    community: community.id,
-  });
-
   const updatedCode = await code.update({
     used: true,
   });
   if (!updatedCode) return next(new Error('Failed to Update Code'));
 
-  return res.json({ status: 'Success', result: { updatedCode, membership } });
+  return res.json({ status: 'Success', result: { updatedCode, role } });
 };
 
 export default acceptInvite;
