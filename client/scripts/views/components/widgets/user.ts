@@ -40,8 +40,6 @@ export interface ISubstrateIdentityState {
 
 const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
-    // TODO: the identity observable does not update correctly when groupKey is changed.
-    // observe by switching from an edgeware address with on-chain identity to one without
     groupKey: attrs.account.address,
     identity: (attrs.account instanceof SubstrateAccount) ? attrs.account.identity : null,
   }),
