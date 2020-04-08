@@ -57,7 +57,7 @@ const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
   // However, threading is overdue for a refactor anyway, so we'll handle this then
-  return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1
+  return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1;
 };
 
 // highlight the header/body of a parent thread, or the body of a comment
@@ -141,9 +141,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
 
-    const subtitle = (proposal.ProposalType === ProposalType.SubstrateTreasuryProposal) ?
-      `Proposed spend: ${formatCoin(proposal.value)} to ${proposal.beneficiaryAddress}` :
-      proposal.title;
+    const subtitle = (proposal.ProposalType === ProposalType.SubstrateTreasuryProposal)
+      ? `Proposed spend: ${formatCoin(proposal.value)} to ${proposal.beneficiaryAddress}`
+      : proposal.title;
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -163,7 +163,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               ]),
               m(ViewCountBlock, { proposal }),
               m('.proposal-comment-summary', pluralize(nComments, 'comment')),
-              m('.reaction', m(ReactionButton, { proposal, type: ReactionType.Like })),
+              m('.reaction', m(ReactionButton, { post: proposal, type: ReactionType.Like })),
             ])
             : m('.proposal-meta', [
               author && m('span.proposal-user', [
@@ -199,9 +199,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               }
             }
           }, [
-            subscription?.isActive ?
-              [ m('span.icon-bell'), ' Notifications on' ] :
-              [ m('span.icon-bell-off'), ' Notifications off' ]
+            subscription?.isActive
+              ? [ m('span.icon-bell'), ' Notifications on' ]
+              : [ m('span.icon-bell-off'), ' Notifications off' ]
           ]),
         ]),
         !isThread && m('.col-xs-12.col-lg-12', [
@@ -420,7 +420,7 @@ interface IProposalCommentAttrs {
 
 const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
   view: (vnode) => {
-    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal } = vnode.attrs;
+    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, proposal } = vnode.attrs;
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
     const versionHistory = comment.versionHistory;
@@ -593,6 +593,9 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           theme: 'snow',
           editorNamespace: document.location.pathname + '-editing-comment-' + comment.id,
         }),
+        m('.lower-meta', [
+          m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like })),
+        ])
       ]),
     ]);
   }
@@ -941,7 +944,7 @@ const Sidebar: m.Component<ISidebarAttrs> = {
     // const parentHeight =  headerEle && bodyEle ? headerEle.clientHeight + bodyEle.clientHeight + 48 : undefined;
     // const commentsOffScreen = parentHeight > window.innerHeight;
 
-    return isThread ?
+    return isThread
       // m('.Sidebar.ThreadSidebar.forum-container.proposal-sidebar', [
       //   comments.length && m('p.commenters', [
       //     pluralize(nComments, 'comment') + ' by ',
@@ -951,8 +954,8 @@ const Sidebar: m.Component<ISidebarAttrs> = {
       //     commentsOffScreen && m('a', { href: '#ProposalComments' }, 'Go to comments')
       //   ])
       // ]) :
-      null :
-      m('.Sidebar.ProposalSidebar.forum-container.proposal-sidebar', [
+      ? null
+      : m('.Sidebar.ProposalSidebar.forum-container.proposal-sidebar', [
         getSupportText(proposal)
         && m('.proposal-row-support', getSupportText(proposal)),
         // getTurnoutText(proposal) && m('.proposal-row-turnout', getTurnoutText(proposal)),
@@ -1052,9 +1055,9 @@ const ViewProposalPage: m.Component<IViewProposalPageAttrs, IViewProposalPageSta
 
         // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
         setTimeout(() => {
-          const $reply = parentId ?
-            $(`.comment-${parentId}`).nextAll('.CreateComment') :
-            $('.ProposalComments > .CreateComment');
+          const $reply = parentId
+            ? $(`.comment-${parentId}`).nextAll('.CreateComment')
+            : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
           const scrollTop = $('html, body').scrollTop();

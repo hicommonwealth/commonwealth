@@ -4,7 +4,7 @@ import { default as m, VnodeDOM } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
 
 import app from 'state';
-import { IUniqueId } from 'models';
+import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
 
 export enum ReactionType {
   Like = 'like',
@@ -12,16 +12,15 @@ export enum ReactionType {
 }
 
 interface IAttrs {
-  proposal: IUniqueId;
+  post: AnyProposal | OffchainThread | OffchainComment<any>;
   type: ReactionType;
   displayAsLink?: boolean;
 }
 
 const ReactionButton: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
-    const proposal = vnode.attrs.proposal;
-    const type : string = vnode.attrs.type;
-    const reactions = app.reactions.getByProposal(proposal);
+    const { post, type, displayAsLink } = vnode.attrs;
+    const reactions = app.reactions.getByPost(post);
 
     let dislikes;
     let likes;
@@ -29,16 +28,15 @@ const ReactionButton: m.Component<IAttrs> = {
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
     const disabled = !app.vm.activeAccount;
-
-    const rxn = reactions.find((r) =>
-      r.reaction && app.vm.activeAccount && r.author === app.vm.activeAccount.address);
+    const activeAddress = app.vm.activeAccount?.address;
+    const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
     let hasReactedType;
     if (hasReacted) hasReactedType = rxn.reaction;
 
     return m('.ReactionButton', {
       class: (disabled ? 'disabled' : type === hasReactedType ? 'active' : '') +
-        (vnode.attrs.displayAsLink ? ' as-link' : ''),
+        (displayAsLink ? ' as-link' : ''),
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -47,23 +45,22 @@ const ReactionButton: m.Component<IAttrs> = {
         const communityId = app.activeCommunityId();
 
         if (hasReacted) {
-          const reaction = reactions.find((r) =>
-            r.reaction === hasReactedType && r.author === app.vm.activeAccount.address);
+          const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
           app.reactions.delete(reaction).then(() => m.redraw());
-          if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike) ||
-            hasReactedType === ReactionType.Dislike && type === ReactionType.Like) {
-            app.reactions.create(app.vm.activeAccount.address, proposal, type, chainId, communityId)
+          if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
+            || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
+            app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
               .then(() => m.redraw());
-            }
+          }
         } else {
-          app.reactions.create(app.vm.activeAccount.address, proposal, type, chainId, communityId)
+          app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
             .then(() => m.redraw());
         }
         mixpanel.track('Create Reaction ', {
           'Step No': 1,
           'Step': 'Create Reaction',
-          'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-          'Scope': app.activeId() ,
+          'Post Name': `${post.slug}: ${post.identifier}`,
+          'Scope': app.activeId(),
         });
         mixpanel.people.increment('Reaction');
         mixpanel.people.set({
