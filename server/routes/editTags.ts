@@ -17,6 +17,12 @@ const editTags = async (models, req: UserRequest, res: Response, next: NextFunct
 
   const { thread_id, community_id, chain_id, tags } = req.body;
 
+  const thread = await models.OffchainThread.findOne({
+    where: {
+      thread_id,
+    },
+  });
+
   try {
     const activeTags = await models.OffchainTag.findAll({
       where: {
@@ -28,24 +34,26 @@ const editTags = async (models, req: UserRequest, res: Response, next: NextFunct
       return !tags.includes(activeTag.name); // not included in tags
     });
     await oldTags.map(async (tag) => {
-      await tag.destroy();
+      await thread.removeTag(tag);
     });
     // create new tags
     const newTags = tags.filter((tag) => {
       return activeTags.map((a) => a.name).indexOf(tag) === -1;
     });
 
-    const addTags = [];
     await newTags.map(async (tag) => {
-      addTags.push(await models.OffchainTag.create({
+      const newTag = await models.OffchainTag.create({
         thread_id,
         name: tag,
         community_id,
         chain_id,
-      }));
+      });
+      thread.addTag(newTag);
     });
 
-    return res.json({ status: 'Success', result: { addTags, oldTags } });
+    await thread.update(); // gets updated model associations?
+
+    return res.json({ status: 'Success', result: thread.toJSON() });
   } catch (e) {
     return next(e);
   }
