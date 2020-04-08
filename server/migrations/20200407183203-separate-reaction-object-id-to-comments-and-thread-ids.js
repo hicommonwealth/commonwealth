@@ -16,7 +16,6 @@ module.exports = {
       });
       return updated_reactions;
     }
-
     await queryInterface.removeColumn('OffchainReactions', 'object_id', {
       type: Sequelize.STRING,
     });
@@ -30,7 +29,6 @@ module.exports = {
       allowNull: true,
       references: { model: 'OffchainComments', key: 'id' }
     });
-
     const updatedReactions = await populateThreadIds(reactions);
     await Promise.all(Object.entries(updatedReactions).map(async (rxn) => {
       const rxnId = rxn[0];

@@ -42,17 +42,16 @@ class ReactionsStore extends IdStore<OffchainReaction<any>> {
     this._storeProposal = {};
   }
 
-  public clearPost(id: number | string, type: PostType) {
-    if (this._storeProposal[`${type}-${id.toString()}`]) {
-      const reactions = this._storeProposal[`${type}-${id.toString()}`].slice();
+  public clearPost(identifier: string) {
+    if (this._storeProposal[identifier]) {
+      const reactions = this._storeProposal[identifier].slice();
       reactions.map(this.remove.bind(this));
-      delete this._storeProposal[`${type}-${id.toString()}`];
+      delete this._storeProposal[identifier];
     }
     return this;
   }
 
-  public getByPost(id: number | string, type: PostType): Array<OffchainReaction<any>> {
-    const identifier = `${type}-${id.toString()}`;
+  public getByPost(identifier): Array<OffchainReaction<any>> {
     return this._storeProposal[identifier] || [];
   }
 

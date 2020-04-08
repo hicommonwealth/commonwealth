@@ -60,7 +60,8 @@ class ReactionsController {
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
-      this._store.clearProposal(post);
+      const identifier = this._store.getIdentifier(response.result[0]);
+      this._store.clearPost(identifier);
       for (const reaction of response.result) {
         // TODO: Reactions should always have a linked Address
         if (!reaction.Address) console.error('Reaction missing linked address');

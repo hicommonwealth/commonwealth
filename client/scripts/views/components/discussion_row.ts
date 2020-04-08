@@ -24,6 +24,8 @@ const formatLastUpdated = (timestamp) => {
 
 const DiscussionRow: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
+    const a = app;
+    debugger
     const proposal: OffchainThread = vnode.attrs.proposal;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
