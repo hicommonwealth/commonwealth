@@ -8,15 +8,17 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
   if (!req.body.thread_id) {
     return next(new Error('Must provide thread_id'));
   }
-  if (!req.body.tags) {
+  console.dir(req.body);
+  if (!req.body['tags[]']) {
     return next(new Error('Must provide tags: string[]'));
   }
 
-  const { thread_id, tags } = req.body;
+  const { thread_id } = req.body;
+  const tags = req.body['tags[]'];
 
   const thread = await models.OffchainThread.findOne({
     where: {
-      thread_id,
+      id: thread_id,
     },
   });
 
@@ -40,7 +42,7 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
     });
     // create new tags
     const newTags = tags.filter((tag) => {
-      return activeTags.map((a) => a.name).indexOf(tag) === -1;
+      return (activeTags.map((a) => a.name)).indexOf(tag) === -1;
     });
 
     await newTags.map(async (tag) => {
