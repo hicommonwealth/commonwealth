@@ -76,6 +76,7 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
+import updateTags from './routes/updateTags';
 
 import addChainObjectQuery from './routes/addChainObjectQuery';
 import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
@@ -144,6 +145,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/deleteReaction', passport.authenticate('jwt', { session: false }), deleteReaction.bind(this, models));
   router.get('/viewReactions', viewReactions.bind(this, models));
   router.get('/bulkReactions', bulkReactions.bind(this, models));
+
+  // tags
+  router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
+
 
   // generic invite link
   router.post('/createInviteLink', passport.authenticate('jwt', { session: false }), createInviteLink.bind(this, models));

@@ -1,6 +1,8 @@
 import m from 'mithril';
+import $ from 'jquery';
 import { OffchainThread, OffchainTag } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
+import app from 'state';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
@@ -72,6 +74,12 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
             label: 'Submit',
             intent: 'primary',
             onclick: () => {
+              // do query, return value in change handler to be passed to view Proposal
+              $.post(`${app.serverUrl()}/updateTags`, {
+                jwt: app.login.jwt,
+                thread_id: vnode.attrs.thread.id,
+                tags: vnode.state.tags,
+              });
               vnode.attrs.onChangeHandler(vnode.state.tags);
               vnode.state.isOpen = false;
             },

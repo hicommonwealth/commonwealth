@@ -1,21 +1,18 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
-const editTags = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const updateTags = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
   if (!req.body.thread_id) {
     return next(new Error('Must provide thread_id'));
   }
-  if (!req.body.community_id && !req.body.chain_id) {
-    return next(new Error('Must provide community_id or chain_id'));
-  }
   if (!req.body.tags) {
     return next(new Error('Must provide tags: string[]'));
   }
 
-  const { thread_id, community_id, chain_id, tags } = req.body;
+  const { thread_id, tags } = req.body;
 
   const thread = await models.OffchainThread.findOne({
     where: {
@@ -23,12 +20,17 @@ const editTags = async (models, req: UserRequest, res: Response, next: NextFunct
     },
   });
 
+  const [community_id, chain_id] = [thread.community, thread.authorChain];
+
   try {
-    const activeTags = await models.OffchainTag.findAll({
-      where: {
-        thread_id,
-      },
-    });
+    // const activeTags = await models.OffchainTag.findAll({
+    //   where: {
+    //     thread_id,
+    //   },
+    // });
+    const activeTags = thread.getTags();
+    console.dir(activeTags);
+
     // remove deleted tags
     const oldTags = activeTags.filter((activeTag) => {
       return !tags.includes(activeTag.name); // not included in tags
@@ -59,4 +61,4 @@ const editTags = async (models, req: UserRequest, res: Response, next: NextFunct
   }
 };
 
-export default editTags;
+export default updateTags;
