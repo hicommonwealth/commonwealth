@@ -72,11 +72,11 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
 
         // select the chain
         initChain(vnode.attrs.scope);
+
         // select the address
-        if (address) {
-          const matching = app.login.activeAddresses.filter((a) => a.address === address);
-          if (matching.length > 0) selectLogin(matching[0]);
-        }
+        const initAddress = app.login.activeAddresses.filter((a) => a.address === address)[0];
+        if (initAddress) selectLogin(initAddress);
+
         return m(LoadingLayout);
       } else if (scopeMatchesCommunity) {
         const address = localStorage.getItem('initAddress');
@@ -86,11 +86,11 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
 
         // select the community
         initCommunity(vnode.attrs.scope);
+
         // select the address
-        if (address && chain) {
-          const matching = app.login.activeAddresses.filter((a) => a.address === address && a.chain.id === chain);
-          if (matching.length > 0) selectLogin(matching[0]);
-        }
+        const initAddress = app.login.activeAddresses.filter((a) => a.address === address && a.chain.id === chain)[0];
+        if (initAddress) selectLogin(initAddress);
+
         return m(LoadingLayout);
       }
     } else if (!vnode.attrs.scope && ((app.chain && app.chain.class) || app.community)) {

@@ -1,5 +1,3 @@
-import app from 'state';
-
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
@@ -46,9 +44,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
 
@@ -72,9 +70,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public deinit = async (): Promise<void> => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

@@ -1,5 +1,3 @@
-import app from 'state';
-
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 import { CosmosAccount, CosmosAccounts } from './account';
@@ -25,9 +23,9 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
-    await app.threads.refreshAll(this.id, null, true);
-    await app.comments.refreshAll(this.id, null, true);
-    await app.reactions.refreshAll(this.id, null, true);
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
 
@@ -40,9 +38,9 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public deinit = async (): Promise<void> => {
     this._loaded = false;
     this._serverLoaded = false;
-    app.threads.deinit();
-    app.comments.deinit();
-    app.reactions.deinit();
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
 
     await this.governance.deinit();
     await this.accounts.deinit();
