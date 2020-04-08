@@ -8,6 +8,7 @@ export { default as IChainAdapter } from './IChainAdapter';
 export { default as ICommunityAdapter } from './ICommunityAdapter';
 export { default as Identity } from './Identity';
 export { default as MembershipInfo } from './MembershipInfo';
+export { default as RoleInfo } from './RoleInfo';
 export { default as NodeInfo } from './NodeInfo';
 export { default as Notification } from './Notification';
 export { default as NotificationCategory } from './NotificationCategory';
