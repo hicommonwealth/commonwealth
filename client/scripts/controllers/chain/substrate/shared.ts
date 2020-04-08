@@ -38,9 +38,6 @@ import { SubstrateAccount } from './account';
 
 export type HandlerId = number;
 
-const registry = new TypeRegistry();
-const DEFAULT_SS58 = createType(registry, 'u32', addressDefaults.prefix);
-
 // TODO: it may make sense to abstract this further, and keep api as a member
 //   of the main chain module, but not necessary for now.
 function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
@@ -48,6 +45,7 @@ function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
     if (ChainBase.Substrate !== app.chain.base) {
       throw new Error('Invalid chain selection');
     }
+    const registry = new TypeRegistry();
     const nodeUrl = node.url;
     const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
     const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1;
@@ -146,14 +144,18 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return api;
   }
 
+  private _connectedCb: () => void;
+  private _disconnectedCb: () => void;
+  private _errorCb: (err) => void;
+
   public initApi(api: ApiRx, node?: NodeInfo): Promise<ApiRx> {
-    api.on('connected', () => {
+    this._connectedCb = () => {
       this.app.chain.networkStatus = ApiStatus.Connected;
       this.app.chain.networkError = null;
       this._suppressAPIDisconnectErrors = false;
       m.redraw();
-    });
-    api.on('disconnected', () => {
+    };
+    this._disconnectedCb = () => {
       if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = null;
@@ -163,8 +165,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         }, 5000);
         m.redraw();
       }
-    });
-    api.on('error', (err) => {
+    };
+    this._errorCb = (err) => {
       if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
         console.log('api error');
         this.app.chain.networkStatus = ApiStatus.Disconnected;
@@ -176,7 +178,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         }, 5000);
         m.redraw();
       }
-    });
+    };
+    api.on('connected', this._connectedCb);
+    api.on('disconnected', this._disconnectedCb);
+    api.on('error', this._errorCb);
     this._api = api;
     return this._api.isReady.toPromise();
   }
@@ -185,6 +190,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     if (!this._api) return;
     try {
       this._api.disconnect();
+      if (this._connectedCb) this._api.off('connected', this._connectedCb);
+      if (this._disconnectedCb) this._api.off('disconnected', this._disconnectedCb);
+      if (this._errorCb) this._api.off('error', this._errorCb);
+      this._api = null;
     } catch (e) {
       console.error('Error disconnecting from API, it might already be disconnected.');
     }
@@ -287,7 +296,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         // chainProps needs to be set first so calls to coins() correctly populate the denom
         if (chainProps) {
           const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
-          registry.setChainProperties(createType(registry, 'ChainProperties', { ...chainProps, ss58Format }));
+          this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
           this._ss58Format = +ss58Format.unwrapOr(42);
           this._tokenDecimals = +tokenDecimals.unwrapOr(12);
           this._tokenSymbol = tokenSymbol.unwrapOr(this.app.chain.currency).toString();
