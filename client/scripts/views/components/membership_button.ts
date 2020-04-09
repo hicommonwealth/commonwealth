@@ -6,7 +6,7 @@ import { Button, Icon, Icons, MenuItem, MenuDivider, PopoverMenu } from 'constru
 
 import app from 'state';
 import { Account, AddressInfo } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 
@@ -30,10 +30,16 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
         chain,
         community,
       }).then((result) => {
+        // handle state updates
         app.login.roles.push(result.result)
         onMembershipChanged && onMembershipChanged(true);
         vnode.state.loading = false;
         m.redraw();
+        // notify
+        const name = chain
+          ? app.config.chains.getById(chain)?.name
+          : app.config.communities.getById(community)?.name;
+        notifySuccess(`Joined ${name}`);
       }).catch((e) => {
         vnode.state.loading = false;
         m.redraw();
@@ -57,6 +63,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
         chain,
         community,
       }).then((result) => {
+        // handle state updates
         const index = chain
           ? app.login.roles.findIndex((role) => role.chain_id === chain && role.address_id === address.id)
           : app.login.roles.findIndex((role) => role.offchain_community_id === community && role.address_id === address.id);
@@ -64,6 +71,11 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
         onMembershipChanged && onMembershipChanged(false);
         vnode.state.loading = false;
         m.redraw();
+        // notify
+        const name = chain
+          ? app.config.chains.getById(chain)?.name
+          : app.config.communities.getById(community)?.name;
+        notifySuccess(`Left ${name}`);
       }).catch((e) => {
         vnode.state.loading = false;
         m.redraw();
@@ -88,25 +100,28 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
           // select an existing address
           existingJoinableAddresses.map((address) => {
             const hasExistingRole = existingRolesAddressIDs.indexOf(address.id) !== -1;
-            // TODO: disable option to join a community if it has privacyEnabled === true
+            const cannotJoinPrivateCommunity = community && app.config.communities.getById(community)?.privacyEnabled &&
+              !hasExistingRole;
             return m(MenuItem, {
+              disabled: cannotJoinPrivateCommunity,
               hasAnyExistingRole: hasExistingRole,
               iconLeft: hasExistingRole ? Icons.CHECK : null,
               label: [
-                m(User, { user: [address.chain, address.address] }),
+                m(User, { user: [address.address, address.chain] }),
                 ` ${address.address.slice(0, 6)}...`,
               ],
               onclick: hasExistingRole ? deleteRole.bind(this, address) : createRoleWithAddress.bind(this, address),
             });
           }),
-          // TODO: allow linking a new address
-          // m(MenuItem, {
-          //   iconLeft: Icons.PLUS,
-          //   label: 'New address',
-          //   onclick: (e) => {
-          //     // TODO
-          //   }
-          // }),
+          // link a new address
+          existingJoinableAddresses.length > 1 && m(MenuDivider),
+          m(MenuItem, {
+            iconLeft: Icons.PLUS,
+            label: 'New address',
+            onclick: (e) => {
+              // TODO
+            }
+          }),
         ],
         menuAttrs: { size: 'xs' },
         trigger: m(Button, {

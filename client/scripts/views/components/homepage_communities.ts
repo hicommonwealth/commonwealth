@@ -28,18 +28,16 @@ const VisitButton: m.Component<{ chain?, community? }> = {
   }
 };
 
-const ChainCard : m.Component<{ chain, nodeList, justJoinedChains, disableNavigation }> = {
+const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {
-    const { chain, nodeList, justJoinedChains, disableNavigation } = vnode.attrs;
+    const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const visitedChain = !!app.login.unseenPosts[chain];
     const newThreads = app.login.unseenPosts[chain]?.threads ? app.login.unseenPosts[chain]?.threads : 0;
 
     return m(Card, {
       class: 'home-card',
-      interactive: !disableNavigation,
       fluid: true,
       elevation: 1,
-      onclick: disableNavigation ? null : (e) => m.route.set(`/${chain}/`),
     }, [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
@@ -52,7 +50,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains, disableNaviga
         m(MembershipButton, {
           chain: chain,
           onMembershipChanged: (created) => {
-            if (created) justJoinedChains.push(chain);
+            if (created && !isMember(chain, null)) justJoinedChains.push(chain);
           }
         })
       ]),
@@ -60,18 +58,16 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains, disableNaviga
   }
 };
 
-const CommunityCard : m.Component<{ community, justJoinedCommunities, disableNavigation }> = {
+const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
   view: (vnode) => {
-    const { justJoinedCommunities, disableNavigation } = vnode.attrs;
+    const { justJoinedCommunities } = vnode.attrs;
     const c = vnode.attrs.community;
     const visitedCommunity = !!app.login.unseenPosts[c.id];
     const newThreads = app.login.unseenPosts[c.id]?.threads ? app.login.unseenPosts[c.id]?.threads : 0;
     return m(Card, {
       class: 'home-card',
-      interactive: !disableNavigation,
       fluid: true,
       elevation: 1,
-      onclick: disableNavigation ? null : (e) => m.route.set(`/${c.id}/`),
     }, [
       m('h3', [
         c.name,
@@ -83,22 +79,12 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities, disableNav
       ],
       app.isLoggedIn() && [
         m(VisitButton, { community: c.id }),
-        // This is weird, but the weird will be fixed after Roles and Memberships are merged
-        (c.privacyEnabled && isMember(null, c.id))
-          ? m(MembershipButton, {
-            community: c.id,
-            onMembershipChanged: (created) => {
-              if (created) justJoinedCommunities.push(c.id);
-            }
-          })
-          : m(Button, {
-            intent: 'primary',
-            disabled: true,
-            iconLeft: Icons.CHECK,
-            label: 'Joined',
-            style: 'pointer-events: none;',
-            size: 'xs',
-          })
+        m(MembershipButton, {
+          community: c.id,
+          onMembershipChanged: (created) => {
+            if (created && !isMember(null, c.id)) justJoinedCommunities.push(c.id);
+          }
+        })
       ],
     ]);
   }
@@ -118,13 +104,12 @@ const LinkCard = {
   }
 };
 
-const HomepageCommunities: m.Component<{ disableNavigation? }, { justJoinedChains, justJoinedCommunities }> = {
+const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommunities }> = {
   oninit: (vnode) => {
     vnode.state.justJoinedChains = [];
     vnode.state.justJoinedCommunities = [];
   },
   view: (vnode) => {
-    const { disableNavigation } = vnode.attrs;
     const { justJoinedChains, justJoinedCommunities } = vnode.state;
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
@@ -159,19 +144,17 @@ const HomepageCommunities: m.Component<{ disableNavigation? }, { justJoinedChain
       // chains and communities
       m('.my-communities', [
         m('h4', 'My communities'),
-        myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains, disableNavigation })),
-        myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities, disableNavigation })),
+        myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
+        myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
       ]),
       m('.more-communities', [
         m('h4', 'More communities'),
-        otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains, disableNavigation })),
-        otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities, disableNavigation })),
+        otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
+        otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
       ]),
       // other
-      !vnode.attrs.disableNavigation && [
-        m(LinkCard, { title: 'Edgeware Lockdrop Statistics', target: '/edgeware/stats' }),
-        m(LinkCard, { title: 'Edgeware Lockdrop Unlock', target: '/unlock', }),
-      ],
+      m(LinkCard, { title: 'Edgeware Lockdrop Statistics', target: '/edgeware/stats' }),
+      m(LinkCard, { title: 'Edgeware Lockdrop Unlock', target: '/unlock', }),
     ]);
   }
 };

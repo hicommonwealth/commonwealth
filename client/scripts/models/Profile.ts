@@ -51,6 +51,7 @@ class Profile {
       return m('svg.Jdenticon', {
         width: size,
         height: size,
+        'data-address': this.address.toString(),
         oncreate: (vnode) => {
           jdenticon.update(vnode.dom as HTMLElement, this.address);
         },
