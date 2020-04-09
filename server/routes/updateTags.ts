@@ -58,9 +58,9 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
       });
       await thread.addTag(newTag);
     }));
-
-    console.dir(thread);
-    return res.json({ status: 'Success', result: thread.toJSON() });
+    const returnTags = await thread.getTags();
+    console.dir(returnTags);
+    return res.json({ status: 'Success', result: returnTags });
   } catch (e) {
     return next(e);
   }

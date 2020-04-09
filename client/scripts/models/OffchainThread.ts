@@ -18,7 +18,7 @@ class OffchainThread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public readonly tags: OffchainTag[];
+  public tags: OffchainTag[];
   public readonly slug = 'discussion';
   public readonly url: string;
   public readonly versionHistory: string[];

@@ -79,8 +79,11 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
                 jwt: app.login.jwt,
                 thread_id: vnode.attrs.thread.id,
                 tags: vnode.state.tags,
+              }).then((r) => {
+                const tags: OffchainTag[] = r.result;
+                console.log(tags);
+                vnode.attrs.onChangeHandler(tags);
               });
-              vnode.attrs.onChangeHandler(vnode.state.tags);
               vnode.state.isOpen = false;
             },
           }),
