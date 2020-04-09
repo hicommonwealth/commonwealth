@@ -269,13 +269,13 @@ const Navigation: m.Component<{}, {}> = {
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
-        // chat (all communities)
-        (app.community || app.chain) &&
-          m(ListItem, {
-            active: onChatPage(m.route.get()),
-            label: 'Chat',
-            onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          }),
+        // // chat (all communities)
+        // (app.community || app.chain) &&
+        //   m(ListItem, {
+        //     active: onChatPage(m.route.get()),
+        //     label: 'Chat',
+        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   }),
         // governance (substrate and cosmos only)
         !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
           m('h4', 'On-chain'),
