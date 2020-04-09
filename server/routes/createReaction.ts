@@ -17,7 +17,6 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   }
 
   const options = {
-    object_id: req.body.object_id,
     reaction: req.body.reaction,
     address_id: author.id,
   };

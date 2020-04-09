@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-restricted-syntax */
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
@@ -14,9 +15,9 @@ const modelFromServer = (reaction, proposal?) => {
   return new OffchainReaction(
     reaction.chain,
     reaction.Address.address,
-    decodeURIComponent(reaction.reaction),
-    uniqueIdToProposal(decodeURIComponent(reaction.thread_id)),
-    uniqueIdToProposal(decodeURIComponent(reaction.comment_id)),
+    reaction.reaction,
+    reaction.thread_id,
+    reaction.comment_id,
     reaction.id,
     reaction.community,
   );
@@ -30,33 +31,40 @@ class ReactionsController {
     return this._store.getByPost(post);
   }
 
-  public create<T extends IUniqueId>(address: string, post: any, reaction: string, chainId: string, communityId: string) {
-    return $.post(`${app.serverUrl()}/createReaction`, {
+  public async create(address: string, post: any, reaction: string, chainId: string, communityId: string) {
+    const options = {
       author_chain: app.vm.activeAccount.chain.id,
       chain: chainId,
       community: communityId,
       address,
-      thread_id: encodeURIComponent((post as OffchainThread).identifier),
-      comment_id: encodeURIComponent((post as OffchainComment<any>).id),
-      reaction: encodeURIComponent(reaction),
+      reaction,
       jwt: app.login.jwt,
-    }).then((response) => {
-      console.log('Created reaction');
+    };
+    if ((post as OffchainThread).identifier) options['thread_id'] = (post as OffchainThread).identifier;
+    else options['comment_id'] = (post as OffchainComment<any>).id;
+
+    try {
+      const response = await $.post(`${app.serverUrl()}/createReaction`, options);
+      // TODO: Set up store
       return this.refresh(post, chainId, communityId);
-    }, (err) => {
+    } catch (err) {
       console.log('Failed to create reaction');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
         : 'Failed to create reaction');
-    });
+    }
   }
 
-  public refresh<T extends IUniqueId>(post: any, chainId: string, communityId: string) {
-    return $.get(`${app.serverUrl()}/viewReactions`, {
+  public async refresh(post: any, chainId: string, communityId: string) {
+    const options = {
       chain: chainId,
       community: communityId,
-      thread_id: encodeURIComponent((post as OffchainThread).identifier),
-      comment_id: encodeURIComponent((post as OffchainComment<any>).id),
-    }).then((response) => {
+    };
+    if ((post as OffchainThread).identifier) options['thread_id'] = (post as OffchainThread).identifier;
+    else options['comment_id'] = (post as OffchainComment<any>).id;
+
+    try {
+      const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
@@ -71,11 +79,12 @@ class ReactionsController {
           // console.error(e.message);
         }
       }
-    }, (err) => {
+    } catch (err) {
       console.log('Failed to load reactions');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
         : 'Error loading reactions');
-    });
+    }
   }
 
   public async delete(reaction) {
@@ -100,7 +109,7 @@ class ReactionsController {
       const response = await $.get(`${app.serverUrl()}/bulkReactions`, {
         chain: chainId,
         community: communityId,
-      })
+      });
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
