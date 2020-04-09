@@ -13,6 +13,7 @@ export interface SubstrateBlock {
  * To implement a new form of event, add it to this enum.
  */
 export enum SubstrateEventType {
+  Unknown = 'unknown',
   Slash = 'slash',
   Reward = 'reward',
   DemocracyProposed = 'democracy-proposed',
@@ -26,6 +27,7 @@ export enum SubstrateEventType {
  * The full event, including data.
  */
 export interface SubstrateEvent {
+  blockNumber: number;
   type: SubstrateEventType;
   data: any; // data format specific to event type
 }

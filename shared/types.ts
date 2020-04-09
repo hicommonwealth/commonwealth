@@ -10,6 +10,7 @@ export const NotificationCategories = {
   NewMention: 'new-mention',
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
+  ChainEvent: 'chain-event',
 };
 
 export const PROFILE_NAME_MAX_CHARS = 40;

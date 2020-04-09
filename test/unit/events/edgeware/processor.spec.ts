@@ -77,16 +77,19 @@ describe('Edgeware Event Processor Tests', () => {
       {
         type: SubstrateEventType.Slash,
         data: [ 'Alice', '10000' ],
+        blockNumber: 1,
       },
       {
         type: SubstrateEventType.DemocracyProposed,
         data: [ ],
+        blockNumber: 1,
       },
     ]);
     assert.deepEqual(processor.process(fakeBlocks[1]), [
       {
         type: SubstrateEventType.DemocracyPassed,
         data: [ '5' ],
+        blockNumber: 2,
       },
     ]);
     done();

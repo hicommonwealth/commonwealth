@@ -3,14 +3,15 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
+import { SubstrateEventType } from '../../shared/events/edgeware/types';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
   [ 'berlin1.edgewa.re', 'edgeware-testnet' ],
   [ 'berlin2.edgewa.re', 'edgeware-testnet' ],
   [ 'berlin3.edgewa.re', 'edgeware-testnet' ],
-  [ 'mainnet1.edgewa.re', 'edgeware' ],
-  //[ 'localhost:9944', 'kusama-local' ],
+  [ 'mainnet1.edgewa.re:9944', 'edgeware' ],
+  // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
@@ -289,6 +290,10 @@ const resetServer = (models, closeMiddleware) => {
       name: NotificationCategories.NewMention,
       description: 'someone @ mentions a user',
     });
+    await models.NotificationCategory.create({
+      name: NotificationCategories.ChainEvent,
+      description: 'a chain event occurs',
+    });
 
     // Admins need to be subscribed to mentions
     await models.Subscription.create({
@@ -358,6 +363,30 @@ const resetServer = (models, closeMiddleware) => {
     });
 
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
+
+    // initialize chain event types
+    const initChainEventTypes = (enumObject, chain) => {
+      return Promise.all(
+        Object.keys(enumObject)
+          .map((eventType) => {
+            // check >0 to avoid "Unknown"
+            const event_name = enumObject[eventType];
+            if (event_name && event_name !== SubstrateEventType.Unknown) {
+              return models.ChainEventType.create({
+                id: `${chain}-${event_name}`,
+                chain,
+                event_name,
+                event_schema: {} // TODO: populate this
+              });
+            } else {
+              return null;
+            }
+          })
+      );
+    };
+
+    await initChainEventTypes(SubstrateEventType, 'edgeware');
+    await initChainEventTypes(SubstrateEventType, 'edgeware-local');
 
     closeMiddleware().then(() => {
       console.log('Reset database and initialized default models');

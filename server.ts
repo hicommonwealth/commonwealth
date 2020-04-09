@@ -30,6 +30,7 @@ import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
+import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import { UserRequest } from './server/types.js';
@@ -135,7 +136,6 @@ const templateFile = (() => {
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
-//setupPrerenderServer();
 setupMiddleware();
 setupPassport(models);
 setupAPI(app, models, fetcher, viewCountCache);
@@ -180,6 +180,8 @@ if (SHOULD_RESET_DB) {
       });
     });
 } else {
+  //setupPrerenderServer();
+  setupChainEventListeners(models);
   setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }

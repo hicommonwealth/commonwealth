@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { NotificationCategories } from '../../shared/types';
 
 const { Op } = Sequelize;
 
@@ -33,26 +32,30 @@ module.exports = (sequelize, DataTypes) => {
     webhook_data: WebhookContent,
     wss?,
   ) => {
-    const creatorAddress = await models.Address.findOne({
-      where: {
-        address: notification_data.author_address,
-      },
-    });
+    const creatorAddress = notification_data.author_address
+      ? await models.Address.findOne({
+        where: {
+          address: notification_data.author_address,
+        },
+      })
+      : null;
     // get subscribers to send notifications to
-    const subscribers = await models.Subscription.findAll({
-      where: {
-        [Op.and]: [
-          { category_id },
-          { object_id },
-          { is_active: true },
-        ],
-        [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
-      },
-    });
+    const findOptions: any = {
+      [Op.and]: [
+        { category_id },
+        { object_id },
+        { is_active: true },
+      ],
+    };
+    if (creatorAddress) {
+      findOptions[Op.not] = [{ subscriber_id: creatorAddress.user_id }];
+    }
+    const subscribers = await models.Subscription.findAll({ where: findOptions });
 
     // create notifications if data exists
+    let notifications = [];
     if (notification_data) {
-      await Promise.all(subscribers.map(async (subscription) => {
+      notifications = await Promise.all(subscribers.map(async (subscription) => {
         const notification = await models.Notification.create({
           subscription_id: subscription.id,
           notification_data: JSON.stringify(notification_data),
@@ -76,6 +79,7 @@ module.exports = (sequelize, DataTypes) => {
       notificationCategory: category_id,
       ...webhook_data
     });
+    return notifications;
   };
 
   return Subscription;

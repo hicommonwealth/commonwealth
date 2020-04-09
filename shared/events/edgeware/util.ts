@@ -30,7 +30,7 @@ export function parseEventType(event: Event): SubstrateEventType {
       switch (event.method) {
         case 'Slash': return SubstrateEventType.Slash;
         case 'Reward': return SubstrateEventType.Reward;
-        default: return null;
+        default: return SubstrateEventType.Unknown;
       }
     case 'democracy':
       switch (event.method) {
@@ -39,9 +39,9 @@ export function parseEventType(event: Event): SubstrateEventType {
         case 'Passed': return SubstrateEventType.DemocracyPassed;
         case 'NotPassed': return SubstrateEventType.DemocracyNotPassed;
         case 'Cancelled': return SubstrateEventType.DemocracyCancelled;
-        default: return null;
+        default: return SubstrateEventType.Unknown;
       }
     default:
-      return null;
+      return SubstrateEventType.Unknown;
   }
 }
