@@ -15,19 +15,35 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     const activeAccount = app.vm.activeAccount;
     const fluid = !!vnode.attrs.fluid;
 
-    return app.isLoggedIn() && m(PopoverMenu, {
-      class: 'NewProposalButton',
-      trigger: activeAccount ? m(Button, {
+    if (!app.isLoggedIn()) return;
+
+    // just a button for communities, or chains without governance
+    if (app.community) {
+      return m(Button, {
+        class: 'NewProposalButton',
         iconLeft: Icons.PLUS,
         intent: 'primary',
         label: 'New post',
         fluid,
+        disabled: !activeAccount,
+        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+      });
+    }
+
+    // a button with popover menu for chains
+    return m(PopoverMenu, {
+      class: 'NewProposalButton',
+      trigger: activeAccount ? m(Button, {
+        iconLeft: Icons.CHEVRON_DOWN,
+        intent: 'primary',
+        label: 'New post or proposal',
+        fluid,
       }) : m(Tooltip, {
         content: 'Link an address to post',
         trigger: m(Button, {
-          iconLeft: Icons.PLUS,
+          iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
-          label: 'New post',
+          label: 'New post or proposal',
           class: 'cui-disabled',
           style: 'cursor: pointer !important',
           fluid,
@@ -44,7 +60,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
           label: 'New thread',
         }),
 
-        (activeAccount instanceof CosmosAccount || activeAccount instanceof SubstrateAccount) && m(MenuDivider),
+        m(MenuDivider),
         activeAccount instanceof CosmosAccount && m(MenuItem, {
           onclick: (e) => app.modals.create({
             modal: NewProposalModal,
