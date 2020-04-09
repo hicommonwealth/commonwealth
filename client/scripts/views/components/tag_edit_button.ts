@@ -44,11 +44,14 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
     vnode.attrs.thread.tags.map((tag) => vnode.state.tags.push(tag.name));
   },
   view: (vnode) => {
-    return m('.TagEditor', [
+    return m('TagEditor', [
       m(Button, {
-        label: m(Icon, { name: Icons.TAG }),
         intent: 'none',
+        compact: true,
+        label: m(Icon, { name: Icons.TAG }),
         onclick: () => { vnode.state.isOpen = !vnode.state.isOpen; },
+        outlined: true,
+        size: 'xs',
       }),
       m(Dialog, {
         autofocus: true,
@@ -74,14 +77,12 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
             label: 'Submit',
             intent: 'primary',
             onclick: () => {
-              // do query, return value in change handler to be passed to view Proposal
               $.post(`${app.serverUrl()}/updateTags`, {
                 jwt: app.login.jwt,
                 thread_id: vnode.attrs.thread.id,
                 tags: vnode.state.tags,
               }).then((r) => {
                 const tags: OffchainTag[] = r.result;
-                console.log(tags);
                 vnode.attrs.onChangeHandler(tags);
               });
               vnode.state.isOpen = false;

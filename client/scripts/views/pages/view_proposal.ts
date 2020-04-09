@@ -161,10 +161,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               m('.Tags', [
                 m(TagEditor, {
                   thread: proposal as OffchainThread,
-                  onChangeHandler: (tags: OffchainTag[]) => {
-                    (proposal as OffchainThread).tags = tags;
-                    // m.redraw();
-                  },
+                  onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; },
                 }),
                 (proposal as OffchainThread).tags?.map((tag) => {
                   return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
