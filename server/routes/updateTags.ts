@@ -8,11 +8,11 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
   if (!req.body.thread_id) {
     return next(new Error('Must provide thread_id'));
   }
-  console.dir(req.body);
   if (!req.body['tags[]']) {
     return next(new Error('Must provide tags: string[]'));
   }
 
+  console.dir(req.body);
   const { thread_id } = req.body;
   const tags = req.body['tags[]'];
 
@@ -30,33 +30,36 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
     //     thread_id,
     //   },
     // });
-    const activeTags = thread.getTags();
-    console.dir(activeTags);
+    const activeTags: any[] = await thread.getTags();
+    // console.dir(activeTags);
 
     // remove deleted tags
     const oldTags = activeTags.filter((activeTag) => {
       return !tags.includes(activeTag.name); // not included in tags
     });
-    await oldTags.map(async (tag) => {
+    console.dir(oldTags);
+    console.dir('removing old tags');
+    await Promise.all(oldTags.map(async (tag) => {
       await thread.removeTag(tag);
-    });
+    }));
     // create new tags
+    const activeNames: any[] = activeTags.map((a) => a.name);
     const newTags = tags.filter((tag) => {
-      return (activeTags.map((a) => a.name)).indexOf(tag) === -1;
+      return !activeNames.includes(tag);
     });
 
-    await newTags.map(async (tag) => {
-      const newTag = await models.OffchainTag.create({
-        thread_id,
-        name: tag,
-        community_id,
-        chain_id,
+    await Promise.all(newTags.map(async (tag) => {
+      const [newTag] = await models.OffchainTag.findOrCreate({
+        where: {
+          name: tag,
+          community_id: community_id || null,
+          chain_id: chain_id || null,
+        },
       });
-      thread.addTag(newTag);
-    });
+      await thread.addTag(newTag);
+    }));
 
-    await thread.update(); // gets updated model associations?
-
+    console.dir(thread);
     return res.json({ status: 'Success', result: thread.toJSON() });
   } catch (e) {
     return next(e);
