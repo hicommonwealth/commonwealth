@@ -30,7 +30,6 @@ import User from 'views/components/widgets/user';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import JoinCommunitiesModal from 'views/modals/join_communities_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { OffchainCommunitiesStore } from 'stores';
@@ -249,10 +248,6 @@ const Navigation: m.Component<{}, {}> = {
             //       });
             //     }),
             //     m(MenuDivider),
-            //     m(MenuItem, {
-            //       onclick: () => app.modals.create({ modal: JoinCommunitiesModal }),
-            //       label: 'Find more communities...'
-            //     }),
             //     // new community
             //     app.login?.isSiteAdmin && m(MenuItem, {
             //       onclick: (e) => app.modals.create({ modal: CreateCommunityModal }),

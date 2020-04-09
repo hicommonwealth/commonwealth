@@ -1,7 +1,7 @@
 import 'pages/home.scss';
 
 import { default as m } from 'mithril';
-import { JoinCommunitiesContent } from 'views/modals/join_communities_modal';
+import HomepageCommunities from 'views/components/homepage_communities';
 
 const HomePage : m.Component<{}, {}> = {
   view: (vnode) => {
@@ -12,7 +12,7 @@ const HomePage : m.Component<{}, {}> = {
           m('p.lead-description', [
             'Forums, profiles, and voting for decentralized organizations',
           ]),
-          m(JoinCommunitiesContent),
+          m(HomepageCommunities),
         ]),
       ]),
     ])

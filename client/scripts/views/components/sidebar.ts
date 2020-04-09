@@ -15,7 +15,6 @@ import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
 import FeedbackModal from 'views/modals/feedback_modal';
-import JoinCommunitiesModal from 'views/modals/join_communities_modal';
 
 const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
@@ -91,33 +90,6 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
           m('.name', community.name.slice(0, 2).toLowerCase()),
         ]),
         m(User, { user: [address.chain, address.address], avatarOnly: true, avatarSize: 16 }),
-      ])
-    });
-  }
-};
-
-const SidebarManage: m.Component<{}> = {
-  view: (vnode) => {
-    return m(Tooltip, {
-      hoverOpenDelay: 0,
-      hoverCloseDelay: 0,
-      position: 'right',
-      size: 'lg',
-      content: m('.SidebarTooltip', 'Manage Communities'),
-      trigger: m('.SidebarManage', {
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: JoinCommunitiesModal
-          });
-        }
-      }, [
-        m('.icon-inner', [
-          m(Icon, {
-            name: Icons.GRID,
-            style: 'color: white;'
-          }),
-        ]),
       ])
     });
   }
@@ -220,7 +192,6 @@ const Sidebar: m.Component<{}> = {
             return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
           }
         }),
-        m(SidebarManage),
       ]),
       m(SidebarSettingsMenu),
     ]);

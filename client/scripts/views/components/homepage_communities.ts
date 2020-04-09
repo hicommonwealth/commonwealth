@@ -1,4 +1,4 @@
-import 'modals/join_communities_modal.scss';
+import 'components/homepage_communities.scss';
 
 import { default as m } from 'mithril';
 import { link } from 'helpers';
@@ -118,7 +118,7 @@ const LinkCard = {
   }
 };
 
-export const JoinCommunitiesContent: m.Component<{ disableNavigation? }, { justJoinedChains, justJoinedCommunities }> = {
+const HomepageCommunities: m.Component<{ disableNavigation? }, { justJoinedChains, justJoinedCommunities }> = {
   oninit: (vnode) => {
     vnode.state.justJoinedChains = [];
     vnode.state.justJoinedCommunities = [];
@@ -154,7 +154,7 @@ export const JoinCommunitiesContent: m.Component<{ disableNavigation? }, { justJ
         .filter((c) => !isMember(null, c.id) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
     }
 
-    return m('.JoinCommunitiesContent', [
+    return m('.HomepageCommunities', [
 
       // chains and communities
       m('.my-communities', [
@@ -176,12 +176,4 @@ export const JoinCommunitiesContent: m.Component<{ disableNavigation? }, { justJ
   }
 };
 
-const JoinCommunitiesModal = {
-  view: (vnode) => {
-    return m('.JoinCommunitiesModal', [
-      m(JoinCommunitiesContent, { disableNavigation: true }),
-    ]);
-  }
-};
-
-export default JoinCommunitiesModal;
+export default HomepageCommunities;
