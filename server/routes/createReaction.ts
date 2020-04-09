@@ -26,8 +26,11 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   if (req.body.thread_id) options['thread_id'] = req.body.thread_id;
   else if (req.body.comment_id) options['comment_id'] = req.body.comment_id;
 
-  const reaction = await models.OffchainReaction.create(options);
+  const [ reaction, created ] = await models.OffchainReaction.findOrCreate({
+    where: options, default: options
+  });
   console.log(reaction);
+  console.log(created);
   return res.json({ status: 'Success', result: reaction.toJSON() });
 };
 

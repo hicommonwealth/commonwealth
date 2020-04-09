@@ -27,7 +27,7 @@ class ReactionsController {
   private _store: ReactionsStore = new ReactionsStore();
   public get store() { return this._store; }
 
-  public getByPost(post: AnyProposal | OffchainThread | OffchainComment<any>) {
+  public getByPost(post: OffchainThread | OffchainComment<any>) {
     return this._store.getByPost(post);
   }
 
@@ -40,13 +40,13 @@ class ReactionsController {
       reaction,
       jwt: app.login.jwt,
     };
-    if ((post as OffchainThread).identifier) options['thread_id'] = (post as OffchainThread).identifier;
+    if ((post as OffchainThread).title) options['thread_id'] = (post as OffchainThread).id;
     else options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
-      // TODO: Set up store
-      return this.refresh(post, chainId, communityId);
+      const { result } = response;
+      this._store.add(modelFromServer(result));
     } catch (err) {
       console.log('Failed to create reaction');
       throw new Error((err.responseJSON && err.responseJSON.error)
@@ -60,16 +60,15 @@ class ReactionsController {
       chain: chainId,
       community: communityId,
     };
-    if ((post as OffchainThread).identifier) options['thread_id'] = (post as OffchainThread).identifier;
+    if ((post as OffchainThread).title) options['thread_id'] = (post as OffchainThread).identifier;
     else options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
-      console.log(options);
       const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
-      const identifier = this._store.getIdentifier(response.result[0]);
+      const identifier = this._store.getPostIdentifier(response.result[0]);
       this._store.clearPost(identifier);
       for (const reaction of response.result) {
         // TODO: Reactions should always have a linked Address
