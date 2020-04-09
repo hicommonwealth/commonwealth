@@ -10,6 +10,7 @@ import { initAppState } from 'app';
 import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
+import { selectLogin } from 'controllers/app/login';
 import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
@@ -32,7 +33,7 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
         m('.sidebar-tooltip-name', nodeList[0].chain.name),
         m.trust('&middot;'),
         m('.sidebar-tooltip-user', [
-          m(User, { user: [address.chain, address.address] }),
+          m(User, { user: [address.address, address.chain] }),
           // address.address.slice(0, 6),
         ]),
       ]),
@@ -41,15 +42,18 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
         class: active ? 'active' : '',
         onclick: (e) => {
           e.preventDefault();
-          if (address)  {
-            localStorage.setItem('initAddress', address.address);
-            localStorage.setItem('initChain', address.chain);
+          if (address) {
+            const activeAddress =
+              app.login.activeAddresses.filter((a) => a.address === address.address && a.chain.id === address.chain)[0];
+            selectLogin(activeAddress);
+            address && localStorage.setItem('initAddress', address.address);
+            address && localStorage.setItem('initChain', address.chain);
           }
           m.route.set(`/${chain}/`);
         }
       }, [
         m(ChainIcon, { chain: nodeList[0].chain }),
-        m(User, { user: [address.chain, address.address], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
       ]),
     });
   }
@@ -70,7 +74,7 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
         m('.sidebar-tooltip-name', community.name),
         m.trust('&middot;'),
         m('.sidebar-tooltip-user', [
-          m(User, { user: [address.chain, address.address] }),
+          m(User, { user: [address.address, address.chain] }),
           // address.address.slice(0, 6),
         ]),
       ]),
@@ -80,8 +84,11 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
         onclick: (e) => {
           e.preventDefault();
           if (address) {
-            localStorage.setItem('initAddress', address.address);
-            localStorage.setItem('initChain', address.chain);
+            const activeAddress =
+              app.login.activeAddresses.filter((a) => a.address === address.address && a.chain.id === address.chain)[0];
+            selectLogin(activeAddress);
+            address && localStorage.setItem('initAddress', address.address);
+            address && localStorage.setItem('initChain', address.chain);
           }
           m.route.set(`/${community.id}/`);
         },
@@ -89,7 +96,7 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
         m('.icon-inner', [
           m('.name', community.name.slice(0, 2).toLowerCase()),
         ]),
-        m(User, { user: [address.chain, address.address], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
       ])
     });
   }

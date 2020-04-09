@@ -66,31 +66,10 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = vnode.attrs.scope;
       if (scopeMatchesChain) {
-        const address = localStorage.getItem('initAddress');
-        localStorage.setItem('initAddress', null);
-        localStorage.setItem('initChain', null);
-
-        // select the chain
         initChain(vnode.attrs.scope);
-
-        // select the address
-        const initAddress = app.login.activeAddresses.filter((a) => a.address === address)[0];
-        if (initAddress) selectLogin(initAddress);
-
         return m(LoadingLayout);
       } else if (scopeMatchesCommunity) {
-        const address = localStorage.getItem('initAddress');
-        const chain = localStorage.getItem('initChain');
-        localStorage.setItem('initAddress', null);
-        localStorage.setItem('initChain', null);
-
-        // select the community
         initCommunity(vnode.attrs.scope);
-
-        // select the address
-        const initAddress = app.login.activeAddresses.filter((a) => a.address === address && a.chain.id === chain)[0];
-        if (initAddress) selectLogin(initAddress);
-
         return m(LoadingLayout);
       }
     } else if (!vnode.attrs.scope && ((app.chain && app.chain.class) || app.community)) {

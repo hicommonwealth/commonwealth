@@ -216,6 +216,8 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Emit chain as updated
   app.chainReady.next(true);
+
+  // If the user was invited to a chain/community, we can now pop up a dialog for them
   handleInviteLinkRedirect();
 
   // Reset the available addresses only if switching chains
