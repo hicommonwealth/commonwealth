@@ -57,8 +57,8 @@ import createInviteLink from './routes/createInviteLink';
 import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 
-import createMembership from './routes/createMembership';
-import deleteMembership from './routes/deleteMembership';
+import createRole from './routes/createRole';
+import deleteRole from './routes/deleteRole';
 
 import getUploadSignature from './routes/getUploadSignature';
 import registerWaitingList from './routes/registerWaitingList';
@@ -166,9 +166,9 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/deleteWebhook', passport.authenticate('jwt', { session: false }), deleteWebhook.bind(this, models));
   router.get('/getWebhooks', passport.authenticate('jwt', { session: false }), getWebhooks.bind(this, models));
 
-  // memberships
-  router.post('/createMembership', passport.authenticate('jwt', { session: false }), createMembership.bind(this, models));
-  router.post('/deleteMembership', passport.authenticate('jwt', { session: false }), deleteMembership.bind(this, models));
+  // roles
+  router.post('/createRole', passport.authenticate('jwt', { session: false }), createRole.bind(this, models));
+  router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));
 
   // offchain profiles
   router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));

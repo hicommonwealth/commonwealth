@@ -1,0 +1,10 @@
+.MembershipButton {
+}
+
+.MembershipButtonPopover {
+    z-index: 1005 !important;
+    .cui-menu {
+        min-width: 200px;
+        max-width: 200px;
+    }
+}
