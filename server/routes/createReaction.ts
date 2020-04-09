@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
@@ -26,11 +27,15 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   if (req.body.thread_id) options['thread_id'] = req.body.thread_id;
   else if (req.body.comment_id) options['comment_id'] = req.body.comment_id;
 
-  const [ reaction, created ] = await models.OffchainReaction.findOrCreate({
-    where: options, default: options
+  let [ reaction, created ] = await models.OffchainReaction.findOrCreate({
+    where: options,
+    default: options,
+    include: [ models.Address]
   });
-  console.log(reaction);
-  console.log(created);
+  if (created) reaction = await models.OffchainReaction.find({
+    where: options,
+    include: [ models.Address]
+  });
   return res.json({ status: 'Success', result: reaction.toJSON() });
 };
 

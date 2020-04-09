@@ -11,15 +11,16 @@ import { ReactionsStore } from 'stores';
 import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
-const modelFromServer = (reaction, proposal?) => {
+const modelFromServer = (reaction) => {
+  debugger
   return new OffchainReaction(
-    reaction.chain,
+    reaction.id,
     reaction.Address.address,
+    reaction.chain,
+    reaction.community,
     reaction.reaction,
     reaction.thread_id,
     reaction.comment_id,
-    reaction.id,
-    reaction.community,
   );
 };
 
@@ -74,7 +75,7 @@ class ReactionsController {
         // TODO: Reactions should always have a linked Address
         if (!reaction.Address) console.error('Reaction missing linked address');
         try {
-          this._store.add(modelFromServer(reaction, post));
+          this._store.add(modelFromServer(reaction));
         } catch (e) {
           // console.error(e.message);
         }

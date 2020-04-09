@@ -36,6 +36,9 @@ class ReactionsStore extends IdStore<OffchainReaction<any>> {
       throw new Error('Reaction not in proposals store');
     }
     this._storePost[identifier].splice(proposalIndex, 1);
+    if (this._storePost[identifier].length === 0) {
+      delete this._storePost[identifier];
+    }
     return this;
   }
 
