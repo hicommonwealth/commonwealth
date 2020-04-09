@@ -64,6 +64,7 @@ class ReactionsController {
     else options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
+      console.log(options);
       const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);

@@ -9,7 +9,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
-  if (!req.body.thread_id || !req.body.comment_id) {
+  if (!req.body.thread_id && !req.body.comment_id) {
     return next(new Error('Must provide a comment or thread id'));
   }
   if (!req.body.reaction) {
