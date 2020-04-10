@@ -83,9 +83,6 @@ abstract class Account<C extends Coin> {
       throw new Error('no validation token found');
     }
 
-    console.log(this._validationToken);
-    console.log(signature);
-
     // We add a newline to the validation token because signing via the
     // command line always adds an implicit newline.
     if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
@@ -97,7 +94,6 @@ abstract class Account<C extends Coin> {
       if (withNewline && withoutNewline) {
         throw new Error('invalid signature');
       }
-      console.log('hey');
     }
 
     if (signature) {
