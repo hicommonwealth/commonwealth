@@ -14,13 +14,8 @@ const createRole = async (models, req: UserRequest, res: Response, next: NextFun
   if (community && community.privacyEnabled) return next(new Error('Invalid chain or community'));
 
   const validAddress = await models.Address.findOne({
-    where: chain ? {
+    where: {
       id: req.body.address_id,
-      user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    } : {
-      id: req.body.address_id,
-      chain: chain.id,
       user_id: req.user.id,
       verified: { [Sequelize.Op.ne]: null }
     }
