@@ -1,10 +1,16 @@
-import { NotificationCategories } from '../../shared/types';
+import sgMail from '@sendgrid/mail';
+
 import { Response, NextFunction } from 'express';
+import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { createCommonwealthUrl } from '../util/routeUtils';
+import { SENDGRID_API_KEY } from '../config';
+
+sgMail.setApiKey(SENDGRID_API_KEY);
+
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -212,7 +218,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       }
     }
     if (shouldNotifyMentionedUser) {
-      const subscription = await models.Subscription.emitNotifications(
+      await models.Subscription.emitNotifications(
         models,
         NotificationCategories.NewMention,
         `user-${mentionedAddress.User.id}`,
@@ -228,8 +234,27 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         },
         req.wss
       );
-      if (subscription.isActive) {
-        // Send Email
+      const subscription = await models.Subscription.findOne({
+        where: {
+          subscriber_id: mentionedAddress.User.id,
+          category_id: NotificationCategories.NewMention,
+        },
+      });
+      if (subscription.is_active) {
+        const msg = {
+          to: mentionedAddress.User.email,
+          from: 'Commonwealth <no-reply@commonwealth.im>',
+          subject: 'You were mentioned in a thread on Commonwealth',
+          text: `You were mentioned in '${finalThread.title}' over in '${finalThread.community}'. Log on to Commonwealth to read the post.`,
+          html: `You were mentioned in '${finalThread.title}' over in '${finalThread.community}'. Log on to Commonwealth to read the post.`,
+        };
+        try {
+          await sgMail.send(msg);
+          console.dir('sent email.');
+        } catch (e) {
+          console.dir('failed to send email');
+          return next(new Error(`'Could not send email to 'User: ${mentionedAddress.User}' 'Email: ${mentionedAddress.User.email}'`));
+        }
       }
     }
   }));
