@@ -51,6 +51,7 @@ import PageNotFound from 'views/pages/404';
 import moment from 'moment';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
+import TagEditor from 'views/components/tag_editor';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
 
