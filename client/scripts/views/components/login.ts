@@ -4,6 +4,7 @@ import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import { default as mixpanel } from 'mixpanel-browser';
 import { WalletAccount } from 'nearlib';
+import { Button, Input, Icons } from 'construct-ui';
 
 import app from 'state';
 import { ChainBase } from 'models';
@@ -68,7 +69,8 @@ const Login: m.Component<IAttrs, IState> = {
     }, [
       m('h4', creatingAccount ? 'Create account' : 'Log in or create account'),
       m('form.login-option', [
-        m('input[type="text"]', {
+        m(Input, {
+          fluid: true,
           name: 'email',
           placeholder: 'Email',
           autocomplete: 'off',
@@ -79,7 +81,9 @@ const Login: m.Component<IAttrs, IState> = {
             $(vnode.dom).focus();
           }
         }),
-        m('button', {
+        m(Button, {
+          intent: 'positive',
+          fluid: true,
           disabled: vnode.state.disabled,
           type: 'submit',
           onclick: (e) => {
@@ -106,10 +110,11 @@ const Login: m.Component<IAttrs, IState> = {
               vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
               m.redraw();
             });
-          }
-        }, creatingAccount ?
-          (vnode.state.disabled ? 'Creating account...' : 'Sign up') :
-          (vnode.state.disabled ? 'Logging in...' : 'Log in with email')),
+          },
+          label: creatingAccount ?
+            (vnode.state.disabled ? 'Creating account...' : 'Sign up') :
+            (vnode.state.disabled ? 'Logging in...' : 'Log in with email')
+        }),
         vnode.state.success && m('.login-message.success', [
           creatingAccount ?
             'Check your email to finish creating your account.' :
@@ -120,7 +125,9 @@ const Login: m.Component<IAttrs, IState> = {
         ]),
       ]),
       m('form.login-option', [
-        m('a.btn.formular-button-black', {
+        m(Button, {
+          intent: 'primary',
+          fluid: true,
           href: app.serverUrl() + '/auth/github',
           class: 'login-with-github',
           onclick: (e) => {
@@ -128,20 +135,22 @@ const Login: m.Component<IAttrs, IState> = {
               timestamp: (+new Date()).toString(),
               path: m.route.get()
             }));
-          }
-        }, creatingAccount ? 'Sign up with Github' : 'Log in with Github'),
-        m('a.btn.formular-button-black', {
+          },
+          label: creatingAccount ? 'Sign up with Github' : 'Log in with Github'
+        }),
+        m(Button, {
+          intent: 'primary',
+          fluid: true,
           class: 'login-with-web3',
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('menuclose');
             app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
-          }
-        }, [
-          creatingAccount ?
+          },
+          label: creatingAccount ?
             `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet` :
             `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
-        ])
+        }),
       ])
     ]);
   },

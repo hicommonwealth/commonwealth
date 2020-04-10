@@ -53,7 +53,6 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
-import TagEditor from '../components/tag_edit_button';
 
 const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]

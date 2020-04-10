@@ -1,21 +1,6 @@
 @import 'client/styles/shared';
 
-.JoinCommunitiesModal {
-    .JoinCommunitiesContent {
-        max-width: none !important;
-        display: flex;
-        .my-communities {
-            margin-right: 40px;
-        }
-        .my-communities,
-        .more-communities {
-            min-width: 400px;
-        }
-    }
-    padding: 0px 40px 40px;
-}
-
-.JoinCommunitiesContent {
+.HomepageCommunities {
     max-width: 560px;
     h4 {
         margin-top: 32px;

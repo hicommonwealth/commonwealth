@@ -7,12 +7,19 @@
     background: #e4e4e6;
     padding: 2px 0;
     z-index: 10;
+    .sidebar-content {
+        position: absolute;
+        top: 0;
+        bottom: 72px;
+        width: 100%;
+        overflow-y: scroll;
+        border-bottom: 1px solid #d5d5d5;
+    }
 
     $size: 42px;
 
     a.SidebarChain,
     a.SidebarCommunity,
-    .SidebarManage,
     .SidebarSettingsMenu .trigger {
         position: relative;
         display: block;
@@ -46,8 +53,7 @@
             top: 11px;
         }
     }
-    a.SidebarCommunity,
-    .SidebarManage {
+    a.SidebarCommunity {
         .icon-inner {
             background: #36393f;
             position: absolute;
@@ -61,14 +67,6 @@
             }
         }
     }
-    .SidebarManage {
-        color: #fff;
-        cursor: pointer;
-        .cui-icon {
-            position: relative;
-            top: 9px;
-        }
-    }
     .SidebarSettingsMenu {
         position: absolute;
         bottom: 0;
@@ -78,6 +76,6 @@
 
 .SidebarTooltip {
     font-weight: 500;
-    margin: 1px 4px 0;
+    margin: 1px 1px 0 4px;
     line-height: 1.1;
 }

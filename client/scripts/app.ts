@@ -19,7 +19,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { default as moment } from 'moment-twitter';
 import { default as mixpanel } from 'mixpanel-browser';
 
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
@@ -108,6 +108,7 @@ export async function deinitChainOrCommunity() {
     app.community = null;
   }
   app.login.selectedNode = null;
+  clearActiveAddresses();
 }
 
 export function handleInviteLinkRedirect() {
@@ -140,11 +141,8 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   await app.community.init();
   console.log(`${c.name.toUpperCase()} started.`);
 
-  // Reset the available addresses, unless we were already on an
-  // offchain community in which case no change is needed
-  if (!oldCommunity) {
-    updateActiveAddresses();
-  }
+  // Initialize available addresses
+  updateActiveAddresses();
 
   // Redraw with community fully loaded
   m.redraw();
@@ -211,17 +209,17 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // online before others. The solution should be to have some kind of
   // locking in place before modules start working.
   //
-  await app.chain.init(() => m.redraw());
-  console.log(`${n.chain.network.toUpperCase()} started.`);
+  app.chain.init(() => m.redraw()).then(() => {
+    // Emit chain as updated
+    app.chainReady.next(true);
+    console.log(`${n.chain.network.toUpperCase()} started.`);
+  });
 
-  // Emit chain as updated
-  app.chainReady.next(true);
+  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 
-  // Reset the available addresses only if switching chains
-  if (!oldNode || n.chain !== oldNode.chain) {
-    updateActiveAddresses(n.chain);
-  }
+  // Initialize available addresses
+  updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {

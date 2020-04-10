@@ -1,6 +1,7 @@
 import 'components/settings/accounts_well.scss';
 
 import m from 'mithril';
+import _ from 'lodash';
 import app from 'state';
 
 import { formatCoin, Coin } from 'adapters/currency';
@@ -17,17 +18,8 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
-interface IAttrs {
-  account: AddressInfo;
-  onclick?: (e: Event) => any;
-}
-
-interface IState {
-  removing: boolean;
-}
-
-const AccountRow : m.Component<IAttrs, IState> = {
-  view: (vnode: m.VnodeDOM<IAttrs, IState>): m.Vnode => {
+const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
+  view: (vnode): m.Vnode => {
     const { account } = vnode.attrs;
     const isActiveAccount =
       app.vm.activeAccount &&
@@ -92,12 +84,15 @@ const AccountRow : m.Component<IAttrs, IState> = {
 
 const AccountsWell: m.Component<{}> = {
   view: () => {
+    const addressGroups = Object.entries(_.groupBy(app.login.addresses, (account) => account.chain));
+
     return m('.AccountsWell', [
       m('h4', 'Linked Addresses'),
       m('.address-listing-explanation', 'Log into your account using any of these addresses'),
-      app.login.addresses
-        .sort(orderAccountsByAddress)
-        .map((account) => m(AccountRow, { account })),
+      addressGroups.map(([chain_id, addresses]) => m('.address-group', [
+        m('h4', app.config.chains.getById(chain_id).name),
+        addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
+      ])),
       app.login.addresses.length === 0
         && m('.no-accounts', `No addresses`),
       m('button.formular-button-primary.add-account', {

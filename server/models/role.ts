@@ -16,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
       { fields: ['address_id'] },
       { fields: ['offchain_community_id'] },
       { fields: ['chain_id'] },
+      { fields: ['address_id', 'chain_id'], unique: true },
+      { fields: ['address_id', 'offchain_community_id'], unique: true },
     ],
     validate: {
       // roles should only have 1 of these properties

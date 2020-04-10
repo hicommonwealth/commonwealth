@@ -30,7 +30,6 @@ import User from 'views/components/widgets/user';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import JoinCommunitiesModal from 'views/modals/join_communities_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { OffchainCommunitiesStore } from 'stores';
@@ -249,10 +248,6 @@ const Navigation: m.Component<{}, {}> = {
             //       });
             //     }),
             //     m(MenuDivider),
-            //     m(MenuItem, {
-            //       onclick: () => app.modals.create({ modal: JoinCommunitiesModal }),
-            //       label: 'Find more communities...'
-            //     }),
             //     // new community
             //     app.login?.isSiteAdmin && m(MenuItem, {
             //       onclick: (e) => app.modals.create({ modal: CreateCommunityModal }),
@@ -274,13 +269,13 @@ const Navigation: m.Component<{}, {}> = {
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
-        // chat (all communities)
-        (app.community || app.chain) &&
-          m(ListItem, {
-            active: onChatPage(m.route.get()),
-            label: 'Chat',
-            onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          }),
+        // // chat (all communities)
+        // (app.community || app.chain) &&
+        //   m(ListItem, {
+        //     active: onChatPage(m.route.get()),
+        //     label: 'Chat',
+        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   }),
         // governance (substrate and cosmos only)
         !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
           m('h4', 'On-chain'),
@@ -382,18 +377,20 @@ const Navigation: m.Component<{}, {}> = {
                       label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
                     }),
                     m(MenuDivider),
-                    // existing addresses
-                    app.login.activeAddresses.map((account) => m(MenuItem, {
-                      key: `${account.chain.id}-${account.address}`,
-                      disabled: account === activeAccount,
-                      class: account === activeAccount ? 'selected' : '',
-                      onclick: async () => {
-                        await selectLogin(account);
-                      },
-                      label: [
-                        m(User, { user: account }),
-                      ],
-                    })),
+                    // existing addresses that have a Role in the community
+                    app.login.activeAddresses
+                      .filter((account) => isMember(app.chain?.meta.chain.id, app.community?.id, account))
+                      .map((account) => m(MenuItem, {
+                        key: `${account.chain.id}-${account.address}`,
+                        disabled: account === activeAccount,
+                        class: account === activeAccount ? 'selected' : '',
+                        onclick: async () => {
+                          await selectLogin(account);
+                        },
+                        label: [
+                          m(User, { user: account }),
+                        ],
+                      })),
                   ],
                 }),
             ],

@@ -263,44 +263,6 @@ $electricblue: #229bd6;
     }
 }
 
-@mixin login {
-    h4 {
-        text-align: left;
-        color: #eee;
-        margin: 24px 0 20px;
-    }
-    input[type="text"] {
-        @include formfield-text;
-        margin: 10px 0;
-    }
-    button, a.btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 6px;
-    }
-    .login-option {
-        margin: 10px auto 20px;
-    }
-    .login-message {
-        text-align: center;
-        margin: 10px 0 22px;
-        &.error {
-            color: #d32e26;
-        }
-    }
-
-    @include xxs-max {
-        .Login {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-    }
-}
-
 @mixin clean-button {
     background-color: white !important;
     border: 1px solid $electricblue !important;

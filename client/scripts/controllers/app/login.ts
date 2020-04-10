@@ -38,6 +38,11 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
   }
 }
 
+export function clearActiveAddresses() {
+  app.login.activeAddresses = [];
+  app.vm.activeAccount = null;
+}
+
 export function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for an offchain community
   app.login.activeAddresses = chain
@@ -49,8 +54,15 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
       .map((addr) => app.community.accounts.get(addr.address, addr.chain));
 
+  // select the address that the new chain should be initialized with
+  const initAddress = localStorage.getItem('initAddress');
+  const initChain = localStorage.getItem('initChain');
+  localStorage.removeItem('initAddress');
+  localStorage.removeItem('initChain');
+  const initAddressObj = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
+  app.vm.activeAccount = initAddressObj ? initAddressObj : null;
+
   // TODO: select the default active account for the chain/community
-  app.vm.activeAccount = null;
 }
 
 // called from the server, which returns public keys

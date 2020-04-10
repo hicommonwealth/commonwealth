@@ -8,7 +8,6 @@ import app from 'state';
 import { formatAsTitleCase } from 'helpers';
 import { CreateInviteLink } from 'views/pages/admin';
 
-import { selectLogin } from 'controllers/app/login';
 import { CommunityInfo } from 'models';
 
 import { inputModalWithText } from 'views/modals/input_modal';
