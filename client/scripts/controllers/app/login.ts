@@ -38,6 +38,11 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
   }
 }
 
+export function clearActiveAddresses() {
+  app.login.activeAddresses = [];
+  app.vm.activeAccount = null;
+}
+
 export function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for an offchain community
   app.login.activeAddresses = chain

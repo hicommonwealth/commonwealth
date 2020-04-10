@@ -43,11 +43,8 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
         onclick: (e) => {
           e.preventDefault();
           if (address) {
-            const activeAddress =
-              app.login.activeAddresses.filter((a) => a.address === address.address && a.chain.id === address.chain)[0];
-            selectLogin(activeAddress);
-            address && localStorage.setItem('initAddress', address.address);
-            address && localStorage.setItem('initChain', address.chain);
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
           }
           m.route.set(`/${chain}/`);
         }
@@ -84,11 +81,8 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
         onclick: (e) => {
           e.preventDefault();
           if (address) {
-            const activeAddress =
-              app.login.activeAddresses.filter((a) => a.address === address.address && a.chain.id === address.chain)[0];
-            selectLogin(activeAddress);
-            address && localStorage.setItem('initAddress', address.address);
-            address && localStorage.setItem('initChain', address.chain);
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
           }
           m.route.set(`/${community.id}/`);
         },
