@@ -11,9 +11,13 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
-export const isMember = (chain: string, community: string, address?: AddressInfo) => {
+export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any>) => {
   if (!app.login.roles) return false;
-  const roles = app.login.roles.filter((role) => address ? role.address_id === address.id : true);
+
+  const addressinfo = (address instanceof Account)
+    ? app.login.addresses.find((a) => address.address === a.address && address.chain.id === a.chain)
+    : address;
+  const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
 
   return chain ? roles.map((m) => m.chain_id).indexOf(chain) !== -1 :
     community ? roles.map((m) => m.offchain_community_id).indexOf(community) !== -1 :
