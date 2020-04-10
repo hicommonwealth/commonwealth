@@ -209,11 +209,11 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // online before others. The solution should be to have some kind of
   // locking in place before modules start working.
   //
-  await app.chain.init(() => m.redraw());
-  console.log(`${n.chain.network.toUpperCase()} started.`);
-
-  // Emit chain as updated
-  app.chainReady.next(true);
+  app.chain.init(() => m.redraw()).then(() => {
+    // Emit chain as updated
+    app.chainReady.next(true);
+    console.log(`${n.chain.network.toUpperCase()} started.`);
+  });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
