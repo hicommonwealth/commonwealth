@@ -212,7 +212,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
             category_id: NotificationCategories.NewMention,
           },
         });
-        if (subscription.is_active) {
+        if (subscription.is_active && mentionedAddress.User.email) {
           const msg = {
             to: mentionedAddress.User.email,
             from: 'Commonwealth <no-reply@commonwealth.im>',
