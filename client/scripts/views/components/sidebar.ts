@@ -31,11 +31,6 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
       size: 'lg',
       content: m('.SidebarTooltip', [
         m('.sidebar-tooltip-name', nodeList[0].chain.name),
-        m.trust('&middot;'),
-        m('.sidebar-tooltip-user', [
-          m(User, { user: [address.address, address.chain] }),
-          // address.address.slice(0, 6),
-        ]),
       ]),
       trigger: m('a.SidebarChain', {
         href: '#',
@@ -69,11 +64,6 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
       size: 'lg',
       content: m('.SidebarTooltip', [
         m('.sidebar-tooltip-name', community.name),
-        m.trust('&middot;'),
-        m('.sidebar-tooltip-user', [
-          m(User, { user: [address.address, address.chain] }),
-          // address.address.slice(0, 6),
-        ]),
       ]),
       trigger: m('a.SidebarCommunity', {
         href: '#',

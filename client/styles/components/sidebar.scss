@@ -76,16 +76,6 @@
 
 .SidebarTooltip {
     font-weight: 500;
-    margin: 1px 4px 0;
+    margin: 1px 1px 0 4px;
     line-height: 1.1;
-    .sidebar-tooltip-name,
-    .sidebar-tooltip-user {
-        display: inline-block;
-    }
-    .sidebar-tooltip-name {
-        margin-right: 8px;
-    }
-    .sidebar-tooltip-user {
-        margin-left: 8px;
-    }
 }
