@@ -377,18 +377,20 @@ const Navigation: m.Component<{}, {}> = {
                       label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
                     }),
                     m(MenuDivider),
-                    // existing addresses
-                    app.login.activeAddresses.map((account) => m(MenuItem, {
-                      key: `${account.chain.id}-${account.address}`,
-                      disabled: account === activeAccount,
-                      class: account === activeAccount ? 'selected' : '',
-                      onclick: async () => {
-                        await selectLogin(account);
-                      },
-                      label: [
-                        m(User, { user: account }),
-                      ],
-                    })),
+                    // existing addresses that have a Role in the community
+                    app.login.activeAddresses
+                      .filter((account) => isMember(app.chain?.meta.chain.id, app.community?.id, account))
+                      .map((account) => m(MenuItem, {
+                        key: `${account.chain.id}-${account.address}`,
+                        disabled: account === activeAccount,
+                        class: account === activeAccount ? 'selected' : '',
+                        onclick: async () => {
+                          await selectLogin(account);
+                        },
+                        label: [
+                          m(User, { user: account }),
+                        ],
+                      })),
                   ],
                 }),
             ],

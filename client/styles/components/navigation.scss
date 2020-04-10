@@ -51,6 +51,7 @@ $sidebar-padding: 16px;
             display: flex;
             text-decoration: none;
             color: #111;
+            max-width: 140px;
         }
         // prevent long names from overflowing
         .community-name {
