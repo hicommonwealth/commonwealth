@@ -541,6 +541,12 @@ const LinkNewAddressModal = {
                 const signerAccount = await createUserWithAddress(address) as EthereumAccount;
                 const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
 
+                console.log('webWalletSignature');
+                console.log(webWalletSignature);
+
+                console.log('signerAccount.validationToken');
+                console.log(signerAccount.validationToken);
+
                 signerAccount.validate(webWalletSignature).then(() => {
                   return accountVerifiedCallback(signerAccount, vnode);
                 })

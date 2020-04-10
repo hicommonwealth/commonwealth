@@ -12,7 +12,6 @@
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint client/\\**/*.ts server/\\**/*.ts",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
-    "unit-test": "nyc ts-mocha --project tsconfig.node.json ./test/unit/**/*.spec.ts",
     "integration-test": "nyc ts-mocha --project tsconfig.node.json ./test/integration/**/*.spec.ts",
     "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/**/*.spec.ts ./test/integration/**/*.spec.ts --exit",
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/unit/api/*.spec.ts --exit",
