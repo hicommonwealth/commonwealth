@@ -180,25 +180,30 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
         }
       }
-      if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
-        models,
-        NotificationCategories.NewMention,
-        `user-${mentionedAddress.User.id}`,
-        {
-          created_at: new Date(),
-          mention_context: 'comment',
-          thread_title: commentedObject?.title,
-          thread_id: commentedObject?.id,
-          root_id,
-          comment_text: finalComment.text,
-          comment_id: finalComment.id,
-          chain_id: finalComment.chain,
-          community_id: finalComment.community,
-          author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.chain,
-        },
-        req.wss
-      );
+      if (shouldNotifyMentionedUser) {
+        const subscription = await models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            mention_context: 'comment',
+            thread_title: commentedObject?.title,
+            thread_id: commentedObject?.id,
+            root_id,
+            comment_text: finalComment.text,
+            comment_id: finalComment.id,
+            chain_id: finalComment.chain,
+            community_id: finalComment.community,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          req.wss
+        );
+        if (subscription.isActive) {
+          // Send Email
+        }
+      }
     }));
   }
 

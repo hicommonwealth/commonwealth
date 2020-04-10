@@ -211,22 +211,27 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
       }
     }
-    if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
-      models,
-      NotificationCategories.NewMention,
-      `user-${mentionedAddress.User.id}`,
-      {
-        created_at: new Date(),
-        mention_context: 'thread',
-        thread_title: finalThread.title,
-        thread_id: finalThread.id,
-        chain_id: finalThread.chain,
-        community_id: finalThread.community,
-        author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
-      },
-      req.wss
-    );
+    if (shouldNotifyMentionedUser) {
+      const subscription = await models.Subscription.emitNotifications(
+        models,
+        NotificationCategories.NewMention,
+        `user-${mentionedAddress.User.id}`,
+        {
+          created_at: new Date(),
+          mention_context: 'thread',
+          thread_title: finalThread.title,
+          thread_id: finalThread.id,
+          chain_id: finalThread.chain,
+          community_id: finalThread.community,
+          author_address: finalThread.Address.address,
+          author_chain: finalThread.Address.chain,
+        },
+        req.wss
+      );
+      if (subscription.isActive) {
+        // Send Email
+      }
+    }
   }));
 
   return res.json({ status: 'Success', result: finalThread.toJSON() });

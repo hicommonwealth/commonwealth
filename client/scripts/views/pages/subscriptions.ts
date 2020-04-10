@@ -36,6 +36,14 @@ const NotificationButtons: m.Component = {
   }
 };
 
+const NotificationTab: m.Component = {
+  view: (vnode) => {
+    return m('.NotificationTab', [
+      m(NotificationButtons),
+    ]);
+  }
+};
+
 interface ICoCSubscriptionsButtonAttrs {
   community?: CommunityInfo;
   chain?: ChainInfo;
@@ -89,6 +97,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     if (activeSubscription) {
       vnode.state.subscription = activeSubscription;
     }
+    const mentions = (vnode.state.subscription.category === 'new-mention');
     return m('.SubscriptionRow', [
       m('h3', `${vnode.state.subscription.objectId}`),
       m('h4', `Subscription Type: ${vnode.state.subscription.category}`),
@@ -106,26 +115,27 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
             m.redraw();
           }
         }, activeSubscription.isActive ? 'Pause' : 'Unpause'),
-      m('button.activeSubscriptionButton', {
-        class: activeSubscription ? 'formular-button-primary' : '',
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          if (activeSubscription) {
-            subscriptions.deleteSubscription(activeSubscription).then(() => {
-              m.redraw();
-            });
-          } else {
-            subscriptions.subscribe(vnode.state.subscription.category, vnode.state.subscription.objectId).then(() => {
-              m.redraw();
-            });
+      !mentions &&
+        m('button.activeSubscriptionButton', {
+          class: activeSubscription ? 'formular-button-primary' : '',
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            if (activeSubscription) {
+              subscriptions.deleteSubscription(activeSubscription).then(() => {
+                m.redraw();
+              });
+            } else {
+              subscriptions.subscribe(vnode.state.subscription.category, vnode.state.subscription.objectId).then(() => {
+                m.redraw();
+              });
+            }
           }
-        }
-      }, [
-        activeSubscription
-          ? [ m('span.icon-bell'), ' Notifications on' ]
-          : [ m('span.icon-bell-off'), ' Notifications off' ]
-      ]),
+        }, [
+          activeSubscription
+            ? [ m('span.icon-bell'), ' Notifications on' ]
+            : [ m('span.icon-bell-off'), ' Notifications off' ]
+        ]),
     ]);
   }
 };
@@ -326,7 +336,7 @@ const SubscriptionsPage: m.Component = {
           content: m(CommunitySubscriptions),
         }, {
           name: 'Notifications',
-          content: m(NotificationButtons),
+          content: m(NotificationTab),
         },
         ]),
       ]),
