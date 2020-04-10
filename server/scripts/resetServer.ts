@@ -4,6 +4,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventType } from '../../shared/events/edgeware/types';
+import { getEventStrings } from '../../shared/events/util';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
@@ -367,21 +368,14 @@ const resetServer = (models, closeMiddleware) => {
     // initialize chain event types
     const initChainEventTypes = (enumObject, chain) => {
       return Promise.all(
-        Object.keys(enumObject)
-          .map((eventType) => {
-            // check >0 to avoid "Unknown"
-            const event_name = enumObject[eventType];
-            if (event_name && event_name !== SubstrateEventType.Unknown) {
-              return models.ChainEventType.create({
-                id: `${chain}-${event_name}`,
-                chain,
-                event_name,
-                event_schema: {} // TODO: populate this
-              });
-            } else {
-              return null;
-            }
-          })
+        getEventStrings(enumObject).map((event_name) => {
+          return models.ChainEventType.create({
+            id: `${chain}-${event_name}`,
+            chain,
+            event_name,
+            event_schema: {} // TODO: populate this
+          });
+        })
       );
     };
 

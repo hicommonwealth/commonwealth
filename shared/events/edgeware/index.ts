@@ -24,7 +24,9 @@ export default async function (
       }
     );
   } catch (e) {
+    // TODO: get real failure handling esp for disconnections
     console.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
   }
+
   return subscriber;
 }

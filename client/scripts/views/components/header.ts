@@ -36,6 +36,7 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import { OffchainCommunitiesStore } from 'stores';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import ManageChainNotificationsModal from 'views/modals/manage_chain_notifications_modal';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -681,6 +682,26 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
           + `${slugify(decoded_title)}`,
         () => jumpHighlightComment('parent')
       );
+    } else if (category === NotificationCategories.ChainEvent) {
+      // TODO: this needs to be improved a lot lol
+      const obj = JSON.parse(notification.data);
+      return m('li.HeaderNotificationRow', {
+        class: notification.isRead ? '' : 'active',
+        onclick: async () => {
+          const notificationArray: Notification[] = [];
+          notificationArray.push(notification);
+          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          // TODO: figure out redirect!
+          // await m.route.set(target);
+          m.redraw.sync();
+        },
+      }, [
+        m('.comment-body', [
+          m('.comment-body-top', obj.chain_event_type_id),
+          m('.comment-body-bottom', `Block ${obj.block_number}`),
+          m('.comment-body-excerpt', obj.event_data.toString()),
+        ]),
+      ]);
     }
 
     const {
@@ -770,6 +791,15 @@ const NotificationButtons: m.Component<{ notifications }> = {
       m('.button', {
         onclick: (e) => {
           e.preventDefault();
+          app.modals.create({
+            modal: ManageChainNotificationsModal,
+          });
+        }
+      }, 'Manage Chain Notifications'),
+      m('.button', {
+        class: notifications.length > 0 ? '' : 'disabled',
+        onclick: (e) => {
+          e.preventDefault();
           if (notifications.length < 1) return;
           app.login.notifications.markAsRead(notifications).then(() => m.redraw());
         }
@@ -799,9 +829,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
         class: (unreadCount > 0 || invites.length > 0) ? 'unread-notifications' : '',
       }, unreadMessage),
     }, [
+      m(NotificationButtons, { notifications }),
       m(Notifications, { notifications }),
-      notifications.length > 0 &&
-        m(NotificationButtons, { notifications }),
     ]);
   }
 };
