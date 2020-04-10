@@ -9,8 +9,10 @@ import { Account, AddressInfo } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 export const isMember = (chain: string, community: string, address?: AddressInfo) => {
+  if (!app.login.roles) return false;
   const roles = app.login.roles.filter((role) => address ? role.address_id === address.id : true);
 
   return chain ? roles.map((m) => m.chain_id).indexOf(chain) !== -1 :
@@ -22,6 +24,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
   view: (vnode) => {
     const { chain, community, onMembershipChanged, address } = vnode.attrs; // TODO: onMembershipChanged
     if (!chain && !community) return;
+    if (!app.login.roles) return;
 
     const createRoleWithAddress = (address, e) => {
       $.post('/api/createRole', {
@@ -119,7 +122,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
             iconLeft: Icons.PLUS,
             label: 'New address',
             onclick: (e) => {
-              // TODO
+              app.modals.create({ modal: LinkNewAddressModal });
             }
           }),
         ],

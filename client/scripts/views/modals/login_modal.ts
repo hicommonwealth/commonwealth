@@ -6,9 +6,6 @@ import Login from 'views/components/login';
 const LoginModal = {
   view: (vnode) => {
     return m('.LoginModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Login'),
-      ]),
       m('.compact-modal-body', [
         m(Login),
       ]),
