@@ -13,6 +13,8 @@ import { updateRoute } from 'app';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType, proposalSlugToFriendlyName } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
+import { isRoleOfCommunity } from 'helpers/roles';
+
 
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
@@ -159,7 +161,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
             ? m('.discussion-meta', [
               proposal.createdAt && m('.created', proposal.createdAt.format('MMM D, YYYY')),
               m('.Tags', [
-                (isSameAccount(app.vm.activeAccount, author)) && // TODO: or condition for isAdmin
+                isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
+                // (isSameAccount(app.vm.activeAccount, author)) && // TODO: or condition for isAdmin
                   m(TagEditor, {
                     thread: proposal as OffchainThread,
                     onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; },
