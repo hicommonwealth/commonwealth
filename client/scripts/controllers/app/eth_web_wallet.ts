@@ -10,7 +10,7 @@ const ethUtil = require('ethereumjs-util');
 class EthWebWalletController {
   // GETTERS/SETTERS
   private _enabled: boolean;
-  private _accounts: any[]; // TodoTypecasting...
+  private _accounts: any[]; // Todo Typecasting...
   private _injectedAddress: string;
   private _provider: any;
   private _web3: any;
@@ -23,8 +23,7 @@ class EthWebWalletController {
     return (window.ethereum) ? true : false;
   }
   public get enabled() {
-    // this.available &&
-    return this._enabled;
+    return this.available && this._enabled;
   }
   public get accounts() {
     return this._accounts || [];
