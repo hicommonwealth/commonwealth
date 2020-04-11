@@ -149,7 +149,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // tags
   router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
 
-
   // generic invite link
   router.post('/createInviteLink', passport.authenticate('jwt', { session: false }), createInviteLink.bind(this, models));
   router.get('/acceptInviteLink', acceptInviteLink.bind(this, models));
