@@ -5,31 +5,30 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.thread_id) return next(new Error('Must provide thread_id'));
   if (!req.body.address) return next(new Error('Must provide address'));
-  const user = await models.User.findOne({
-    where: {
-      id: req.user.id,
-    },
-  });
-  const userAddresses = await user.getAddresses();
-  const userAddress = userAddresses.find((a) => {
-    return a.address === req.body.address;
-  });
-  const roles: any[] = await models.Role.findAll({
-    where: {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-    },
-  });
+
+  const userAddresses = await req.user.getAddresses();
+  const userAddress = userAddresses.find((a) => a.verified && a.address === req.body.address);
+  if (!userAddress) return next(new Error('Invalid address'));
 
   const thread = await models.OffchainThread.findOne({
     where: {
       id: req.body.thread_id,
     },
   });
+  const roles: any[] = await models.Role.findAll({
+    where: thread.community ? {
+      permission: ['admin', 'moderator'],
+      address_id: userAddress.id,
+      offchain_community_id: thread.community,
+    } : {
+      permission: ['admin', 'moderator'],
+      address_id: userAddress.id,
+      chain_id: thread.chain,
+    },
+  });
+  const isAdminOrMod = roles.length > 0;
   const isAuthor = (thread.author_id === userAddress.id);
 
-  const chainOrCommunity = thread.community || thread.chain;
-  const isAdminOrMod = roles.map((role) => role.offchain_community_id || role.chaid_id).includes(chainOrCommunity);
   let tags: string[] = [];
   if (req.body['tags[]']) {
     if (typeof req.body['tags[]'] === 'string') {
@@ -38,7 +37,6 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
       tags = req.body['tags[]'];
     }
   }
-  const [community_id, chain_id] = [thread.community, thread.authorChain];
 
   const activeTags = await thread.getTags();
   if (!isAdminOrMod && !isAuthor) return res.json({ result: activeTags });
@@ -53,8 +51,8 @@ const updateTags = async (models, req: UserRequest, res: Response, next: NextFun
     const [newTag] = await models.OffchainTag.findOrCreate({
       where: {
         name: tag,
-        community_id: community_id || null,
-        chain_id: chain_id || null,
+        community_id: thread.community || null,
+        chain_id: thread.community ? null : thread.chain,
       },
     });
     await thread.addTag(newTag);

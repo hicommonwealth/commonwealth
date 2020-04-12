@@ -1,0 +1,69 @@
+Sidebar Redesign
+
+1. remove memberships from frontend (tues)
+[x] make the sidebar show chains/communities based on the list of roles (45 min)
+[x] remove getMemberships from /status route, remove memberships from app.login (15 min)
+[x] viewing membership button: should no longer render Joined status based on Membership, but based on Role (15 min)
+[x] need to put Join button on the Callout, so you can click to join a community you are previewing (15 min)
+
+2. additional changes to frontend (tues)
+[x] clicking on a community in the sidebar should trigger a switch to that address (maybe an extra arg for initCommunity?) (30 min)
+[x] if no address is chosen, then we're in preview mode
+[x] add a preview button to the join_communities_modal that takes you to the community (30 min)
+[x] if you do not have a Role in a community, you should be shown a Callout prompting you to Join The Community (30 min)
+
+3. remove memberships from backend (tues)
+[x] finish writing this migration - which will remove all memberships (1 h)
+
+4. associated address linking changes (weds)
+[x] clicking membership button: should now prompt you to associate an Address with the community (60 min)
+    [x] case 1 - join: if the button is generic to all addresses - show a menu
+    [x] case 2 - join: if the button is specific to an address - just prompt, then add Role (requires endpoint)
+    [x] case 3 - leave: if the button is active - confirm, then remove Role (requires endpoint)
+[x] when done, it should auto-add you to the community (2h)
+[x] bug: clicking visit community needs to go to community & close the management modal (15 min)
+[x] bug: clicking on a chain doesn't load correct address (1h)
+[x] change settings page to show all addresses (separated by chain) (15 min)
+[x] gate off chat (15 min)
+[x] rename New post -> New post/proposal (15 min)
+
+(thurs)
+[x] remove duplicate memberships - write a migration, clean up duplicates, add constraints (1h)
+[x] clicking on a chain should unload previously loaded addresses (1h)
+[x] double check that role creation isn't broken in any cases (30m)
+[x] join button should have an option to go through Link New Address modal (1h)
+[x] clean up address switcher menu
+
+6. individual discussion page (thurs/fri)
+[ ] remove 'selected' field from Address, instead add a 'selected_address_id' field to Roles (2h)
+    [ ] migration
+    [ ] make server/routes/selectAddress.ts take a chain/community, then update a Role
+    [ ] make selectLogin select an address
+    [ ] make the role creation process select an address
+    [ ] make updateActiveAddresses select the default address for the chain/community if there is one
+[ ] implement updated view discussion page, clean up placeholder (1.5h)
+[ ] implement updated loading state for governance pages - "Loading Edgeware proposals from chain..." (30m)
+[ ] re-merge header (1h)
+[ ] link new address modal should take an option to immediately join a chain/community with the new address (30m)
+[ ] check the flows for NEAR (30m)
+
+NEXT WEEK
+
+1. monday/tuesday
+[ ] merge featured tags, merge tag editing (1h)
+[ ] implement a design for notifications (2h)
+[ ] update members display - add members page with join dates, update the preview we have right now (1h)
+[ ] update homepage - add notification pips on the communities + show notification data in the tooltip/popups (2h)
+[ ] migrate over any remaining Modals - in particular, migrate over TX signing modal, message signing modal (2h)
+
+2. wednesday/thursday
+[ ] responsive design; polish up the homepage, join communities page; address any remaining sidebar issues (tues-weds)
+
+AFTER MERGE
+
+[ ] threading experience improvements - clean up the experience, fix issues with images, Quill formatting experience
+[ ] profile experience improvements - clean up the page with a new design, so others can build on top
+[ ] fix up ChainClass, ChainBase, chain friendly names, etc.
+[ ] implement an updated composer?
+[ ] loading state: bring back "connecting..." state for chains, focusing on address loading
+[ ] loading state: lock up the whole app with a loading spinner when switching chains?

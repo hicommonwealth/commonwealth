@@ -19,10 +19,8 @@ export function isRoleOfCommunity(
   const userRole = roles.find((r) => {
     const permission = (r.permission === role);
     const referencedAddress = addresses.find((address) => address.id === r.address_id);
-    console.dir(account);
-    console.dir(referencedAddress.address);
     const isSame = account.address === referencedAddress.address;
-    const ofCommunity = (r.chain_id === community) || (r.offchain_community_id === community); 
+    const ofCommunity = (r.chain_id === community) || (r.offchain_community_id === community);
     return permission && referencedAddress && isSame && ofCommunity;
   });
   return userRole;
