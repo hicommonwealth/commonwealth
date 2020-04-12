@@ -54,12 +54,17 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       });
       app.login.roles = data.roles;
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
-      app.config.notificationCategories =
-        data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
+      app.config.notificationCategories = data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
+
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+
+      // add roles data for user
+      if (data.roles) {
+        data.roles.map((role) => app.login.roles.push(role));
+      }
 
       // update the selectedNode, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)

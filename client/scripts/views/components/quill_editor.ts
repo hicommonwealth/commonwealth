@@ -13,7 +13,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import { detectURL } from 'views/pages/threads/index';
 import SettingsController from 'controllers/app/settings';
-import { Profile } from 'models';
+import { Profile, RolePermission } from 'models';
 import { loadScript } from '../../helpers';
 import User from './widgets/user';
 
@@ -434,7 +434,7 @@ const instantiateEditor = (
   //   if (response.status !== 'Success') {
   //     throw new Error(`got unsuccessful status: ${response.status}`);
   //   }
-  //   const admins = response.result.filter((role) => role.permission !== 'member');
+  // const admins = response.result.filter((role) => role.permission !== RolePermission.member);
   //   const res = admins.map((role) => ({
   //     address: role.Address.address,
   //     chain: role.Address.chain,
@@ -683,13 +683,13 @@ const instantiateEditor = (
     } else {
       const linkText = prompt('Enter link text:');
       if (linkText === null) return;
-      const linkHref =
-        (linkText.startsWith('https://') || linkText.startsWith('http://')) ? linkText :
-        prompt('Enter link:', 'https://');
+      let linkHref = (linkText.startsWith('https://') || linkText.startsWith('http://'))
+        ? linkText
+        : prompt('Enter link:', 'https://');
       if (linkHref === null) {
         // Insert link with placeholder href
         const linkPre = `[${linkText}](`;
-        const linkHref = 'https://';
+        linkHref = 'https://';
         const linkPost = ')';
         quill.insertText(index, linkPre + linkHref + linkPost);
         quill.setSelection(index + linkPre.length, linkHref.length);

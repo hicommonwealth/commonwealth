@@ -3,8 +3,8 @@ import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
-import EthWebWalletController from '../../app/eth_web_wallet';
-import { setActiveAccount } from '../../app/login';
+import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import { setActiveAccount } from 'controllers/app/login';
 
 // TODO: hook up underlyung functionality of this boilerplate
 //       (e.g., EthereumChain and EthereumAccount methods, etc.)
@@ -38,10 +38,13 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     await this.accounts.init(this.chain);
     await this.chain.initEventLoop();
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', function (accounts) {
-      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
-      setActiveAccount(updatedAddress);
-    });
+    if (this.webWallet) {
+      await this.webWallet.enable();
+      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        setActiveAccount(updatedAddress);
+      });
+    }
 
     this._loaded = true;
   }

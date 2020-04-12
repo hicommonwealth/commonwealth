@@ -110,8 +110,8 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
             $.post(app.serverUrl() + '/createCommunity', {
               creator_address: vnode.state.selectedAddress,
               creator_chain: vnode.state.selectedChain,
-              name: name,
-              description: description,
+              name,
+              description,
               default_chain: chain,
               isAuthenticatedForum: 'false', // TODO: fetch from isAuthenticatedForum
               privacyEnabled: privacyEnabled ? 'true' : 'false',
@@ -125,7 +125,9 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 result.result.description,
                 result.result.default_chain,
                 result.result.invitesEnabled,
-                result.result.privacyEnabled
+                result.result.privacyEnabled,
+                result.featured_tags,
+                result.tags,
               );
               app.config.communities.add(newCommunityInfo);
               vnode.state.success = 'Sucessfully added';

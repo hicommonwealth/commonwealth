@@ -19,8 +19,6 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
         {
           model: models.OffchainTag,
           as: 'tags',
-          required: false,
-          attributes: ['id', 'name', 'community_id', 'chain_id'],
         },
         {
           model: models.ChainObjectVersion,
@@ -36,8 +34,6 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
       include: {
         model: models.OffchainTag,
         as: 'tags',
-        required: false,
-        attributes: ['id', 'name', 'community_id', 'chain_id'],
       }
     }),
     models.OffchainTag.findAll(),
@@ -85,7 +81,6 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
     include: [{
       model: models.OffchainTag,
       as: 'tags',
-      attributes: ['id', 'name', 'community_id', 'chain_id'],
     }],
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');

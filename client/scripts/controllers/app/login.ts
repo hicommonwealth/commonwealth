@@ -14,7 +14,6 @@ import {
   ChainBase,
   CommunityInfo,
   AddressInfo,
-  MembershipInfo
 } from 'models';
 import moment from 'moment';
 

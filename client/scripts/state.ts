@@ -3,14 +3,13 @@ import {
   NodeInfo,
   AddressInfo,
   RoleInfo,
-  MembershipInfo,
   SocialAccount,
   OffchainTag,
   ContractCategory,
   Account,
   IChainAdapter,
   ICommunityAdapter,
-  NotificationCategory
+  NotificationCategory,
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -46,6 +45,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
+  tags: TagsController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -61,7 +61,6 @@ export interface IApp {
     jwt?: string;
     addresses: AddressInfo[];
     roles: RoleInfo[];
-    memberships: MembershipInfo[];
     activeAddresses: Array<Account<any>>;
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
@@ -101,6 +100,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
+  tags: new TagsController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -115,7 +115,6 @@ const app: IApp = {
     activeAddresses: [],
     socialAccounts: [],
     roles: [],
-    memberships: [],
     selectedNode: null,
     isSiteAdmin: false,
     disableRichText: null,

@@ -9,28 +9,25 @@ class TagsStore extends IdStore<OffchainTag> {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(tag);
     this.getAll().sort(byAscendingCreationDate);
-
     const parentEntity = tag.communityId ? tag.communityId : tag.chainId;
-
-    if (!this._storeCommunity[tag[parentEntity]]) {
-      this._storeCommunity[tag[parentEntity]] = [];
+    if (!this._storeCommunity[parentEntity]) {
+      this._storeCommunity[parentEntity] = [];
     }
-    this._storeCommunity[tag[parentEntity]].push(tag);
-    this._storeCommunity[tag[parentEntity]].sort(byAscendingCreationDate);
-
+    this._storeCommunity[parentEntity].push(tag);
+    this._storeCommunity[parentEntity].sort(byAscendingCreationDate);
     return this;
   }
 
   public remove(tag: OffchainTag) {
     super.remove(tag);
-
     const parentEntity = tag.communityId ? tag.communityId : tag.chainId;
-
-    const proposalIndex = this._storeCommunity[tag[parentEntity]].indexOf(tag);
+    const communityStore = this._storeCommunity[parentEntity];
+    const matchingTag = communityStore.filter((t) => t.id === tag.id)[0];
+    const proposalIndex = communityStore.indexOf(matchingTag);
     if (proposalIndex === -1) {
       throw new Error('Tag not in proposals store');
     }
-    this._storeCommunity[tag[parentEntity]].splice(proposalIndex, 1);
+    communityStore.splice(proposalIndex, 1);
     return this;
   }
 

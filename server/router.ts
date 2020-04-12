@@ -76,6 +76,8 @@ import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import updateTags from './routes/updateTags';
+import editTag from './routes/editTag';
+import bulkTags from './routes/bulkTags';
 
 import addChainObjectQuery from './routes/addChainObjectQuery';
 import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
@@ -138,14 +140,16 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
 
+  // offchain tags
+  router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
+  router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
+  router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
+
   // offchain reactions
   router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));
   router.post('/deleteReaction', passport.authenticate('jwt', { session: false }), deleteReaction.bind(this, models));
   router.get('/viewReactions', viewReactions.bind(this, models));
   router.get('/bulkReactions', bulkReactions.bind(this, models));
-
-  // tags
-  router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
 
   // generic invite link
   router.post('/createInviteLink', passport.authenticate('jwt', { session: false }), createInviteLink.bind(this, models));

@@ -19,10 +19,10 @@ export const isMember = (chain: string, community: string, address?: AddressInfo
     : address;
   const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
 
-  return chain ? roles.map((m) => m.chain_id).indexOf(chain) !== -1 :
-    community ? roles.map((m) => m.offchain_community_id).indexOf(community) !== -1 :
+  return chain ? roles.map((r) => r.chain_id).indexOf(chain) !== -1 :
+    community ? roles.map((r) => r.offchain_community_id).indexOf(community) !== -1 :
     false;
-};
+}
 
 const MembershipButton: m.Component<{ chain?: string, community?: string, onMembershipChanged?, address? }, { loading }> = {
   view: (vnode) => {
@@ -33,7 +33,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
     const createRoleWithAddress = (address, e) => {
       $.post('/api/createRole', {
         jwt: app.login.jwt,
-        address_id: address.id,
+        addressId: address.id,
         chain,
         community,
       }).then((result) => {
