@@ -13,6 +13,8 @@ import { updateRoute } from 'app';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType, proposalSlugToFriendlyName } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
+import { isRoleOfCommunity } from 'helpers/roles';
+
 
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
@@ -26,7 +28,8 @@ import {
   AnyProposal,
   Account,
   Profile,
-  ChainBase
+  ChainBase,
+  OffchainTag
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -50,6 +53,7 @@ import PageNotFound from 'views/pages/404';
 import moment from 'moment';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
+import TagEditor from 'views/components/tag_editor';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
 
@@ -157,6 +161,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
             ? m('.discussion-meta', [
               proposal.createdAt && m('.created', proposal.createdAt.format('MMM D, YYYY')),
               m('.Tags', [
+                ((app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
+                isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())) &&
+                  m(TagEditor, {
+                    thread: proposal as OffchainThread,
+                    onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; m.redraw(); },
+                  }),
                 (proposal as OffchainThread).tags?.map((tag) => {
                   return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
                 }),
