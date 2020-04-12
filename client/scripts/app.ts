@@ -63,6 +63,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 
       // add roles data for user
       if (data.roles) {
+        data.roles = [];
         data.roles.map((role) => app.login.roles.push(role));
       }
 
