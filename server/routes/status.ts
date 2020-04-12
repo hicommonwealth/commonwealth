@@ -57,13 +57,15 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
       loggedIn: false,
     });
   }
-  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
+  // TODO: fetch all this data with a single query
+  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited, selectedAddresses] = await Promise.all([
     user.getAddresses().filter((address) => !!address.verified),
     user.getSocialAccounts(),
     user.getSelectedNode(),
     user.isAdmin,
     user.disableRichText,
     user.lastVisited,
+    user.selectedAddresses,
   ]);
 
   // look up my roles & private communities
@@ -96,10 +98,15 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
     },
   });
 
+  // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
   const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
   const unseenPosts = {};
   await Promise.all(commsAndChains.map(async (c) => {
     const [name, time] = c;
+    if (isNaN(new Date(time as string).getDate())) {
+      unseenPosts[name] = {};
+      return;
+    }
     const threadNum = await models.OffchainThread.findAndCountAll({
       where: {
         kind: { [Op.or]: ['forum', 'link'] },
@@ -145,6 +152,7 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
       isAdmin,
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
+      selectedAddresses: JSON.parse(selectedAddresses),
       unseenPosts
     }
   });

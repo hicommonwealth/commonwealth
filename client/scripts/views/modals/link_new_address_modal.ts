@@ -12,7 +12,7 @@ import ExtrinsicPayload from '@polkadot/types/extrinsic/v4/ExtrinsicPayload';
 import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
-import { updateActiveAddresses, createUserWithAddress, selectLogin } from 'controllers/app/login';
+import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
@@ -83,7 +83,7 @@ let canExit = true;
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
-    selectLogin(account, true);
+    setActiveAccount(account, true);
     vnode.state.newAddress = account;
     vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     vnode.state.error = null;

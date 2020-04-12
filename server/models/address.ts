@@ -24,7 +24,6 @@ module.exports = (sequelize, DataTypes) => {
   const Address = sequelize.define('Address', {
     address:                    { type: DataTypes.STRING, allowNull: false },
     chain:                      { type: DataTypes.STRING, allowNull: false },
-    selected:                   { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     verification_token:         { type: DataTypes.STRING, allowNull: false },
     verification_token_expires: { type: DataTypes.DATE, allowNull: true },
     verified:                   { type: DataTypes.DATE, allowNull: true },

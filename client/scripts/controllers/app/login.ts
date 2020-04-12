@@ -44,25 +44,38 @@ export function clearActiveAddresses() {
 }
 
 export function updateActiveAddresses(chain?: ChainInfo) {
-  // update addresses for a chain (if provided) or for an offchain community
+  // update addresses for a chain (if provided) or for offchain communities (if null)
+  // for offchain communities, addresses on all chains are available by default
   app.login.activeAddresses = chain
     ? app.login.addresses
       .filter((a) => a.chain === chain.id)
-      .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
       .map((addr) => app.chain.accounts.get(addr.address, addr.keytype))
+      .filter((addr) => addr)
     : app.login.addresses
-      .sort((addr1, addr2) => (addr2.selected ? 1 : 0) - (addr1.selected ? 1 : 0))
-      .map((addr) => app.community.accounts.get(addr.address, addr.chain));
+      .map((addr) => app.community.accounts.get(addr.address, addr.chain))
+      .filter((addr) => addr)
 
   // select the address that the new chain should be initialized with
   const initAddress = localStorage.getItem('initAddress');
   const initChain = localStorage.getItem('initChain');
-  localStorage.removeItem('initAddress');
-  localStorage.removeItem('initChain');
-  const initAddressObj = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
-  app.vm.activeAccount = initAddressObj ? initAddressObj : null;
+  if (initAddress && initChain) {
+    const account = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
+    if (account) {
+      localStorage.removeItem('initAddress');
+      localStorage.removeItem('initChain');
+      setActiveAccount(account);
+      return;
+    }
+  }
 
-  // TODO: select the default active account for the chain/community
+  // try to load a previously selected account for the chain/community
+  if (chain) {
+    const defaultAddress = app.login.selectedAddresses.chains[chain.id];
+    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
+  } else if (app.activeCommunityId()) {
+    const defaultAddress = app.login.selectedAddresses.communities[app.activeCommunityId()];
+    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
+  }
 }
 
 // called from the server, which returns public keys
@@ -75,6 +88,7 @@ export function updateActiveUser(data) {
     app.login.socialAccounts = [];
     app.login.isSiteAdmin = false;
     app.login.lastVisited = {};
+    app.login.selectedAddresses = { chains: {}, communities: {} };
     app.login.unseenPosts = {};
     app.login.activeAddresses = [];
     app.vm.activeAccount = null;
@@ -83,14 +97,18 @@ export function updateActiveUser(data) {
     app.login.jwt = data.jwt;
 
     app.login.addresses = data.addresses.sort((a, b) => (b.selected ? 1 : 0) - (a.selected ? 1 : 0))
-      .map((a) => new AddressInfo(a.id, a.address, a.chain, a.selected, a.keytype));
+      .map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype));
     app.login.socialAccounts = data.socialAccounts
       .map((sa) => new SocialAccount(sa.provider, sa.provider_username));
 
     app.login.isSiteAdmin = data.isAdmin;
     app.login.disableRichText = data.disableRichText;
     app.login.lastVisited = data.lastVisited;
+    app.login.selectedAddresses = data.selectedAddresses;
     app.login.unseenPosts = data.unseenPosts;
+
+    if (!app.login.selectedAddresses.chains) app.login.selectedAddresses.chains = {};
+    if (!app.login.selectedAddresses.communities) app.login.selectedAddresses.communities = {};
   }
 }
 
@@ -158,59 +176,28 @@ export function unlinkLogin(account) {
     app.login.addresses.splice(index, 1);
 
     if (!unlinkingCurrentlyActiveAccount) return;
-    if (app.login.activeAddresses.length > 0) {
-      selectLogin(app.login.activeAddresses[0]);
-    } else {
-      app.vm.activeAccount = null;
-    }
+    app.vm.activeAccount = app.login.activeAddresses.length > 0 ? app.login.activeAddresses[0] : null;
   });
 }
 
-export async function selectLogin(account: Account<any>, suppressNotification?): Promise<Account<any>> {
-  return new Promise((resolve, reject) => {
-    $.post(app.serverUrl() + '/selectAddress', {
-      address: account.address,
-      chain: account.chain.id,
-      auth: true,
-      jwt: app.login.jwt,
-    }).then((result) => {
-      const addressId = result.result.id;
-      const acct = app.login.addresses.find((a) => {
-        return a.address === account.address && app.chain && app.chain.id === a.chain;
-      });
+export async function setActiveAccount(account: Account<any>, suppressNotification?) {
+  if (!suppressNotification) {
+    notifySuccess('Switched account');
+  }
+  app.vm.activeAccount = account;
 
-      if (!acct) {
-        // Only push if is chain because adds another address if in a community
-        if (app.chain) {
-          app.login.activeAddresses.push(account);
-          const keytype = (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined;
-          app.login.addresses.push(new AddressInfo(addressId, account.address, account.chain.id, true, keytype));
-        }
-      } else {
-        acct.selected = true;
-      }
+  if (app.activeCommunityId()) {
+    app.login.selectedAddresses['communities'][app.activeCommunityId()] = account.address;
+  } else if (app.activeChainId()) {
+    app.login.selectedAddresses['chains'][app.activeChainId()] = account.address;
+  }
 
-      // remove old selection
-      for (const acct of app.login.addresses) {
-        if (app.chain) {
-          if (acct.selected && app.chain && app.chain.id === acct.chain && acct.address !== account.address) {
-            acct.selected = false;
-          }
-        }
-        // else if (isCommunity) {
-        //   if (acct.selected && app.community && acct.address !== account.address) {
-        //     acct.selected = false;
-        //   }
-        // }
-      }
-
-      if (!suppressNotification) {
-        notifySuccess('Switched account');
-      }
-      app.vm.activeAccount = account;
-      // Usually it would be bad practice to put an m.redraw() in controller code, but we're mutating view state here...
-      m.redraw();
-      resolve(account);
-    }).catch((error) => reject(error));
+  // kick off request to update the server
+  $.post(`${app.serverUrl()}/writeUserSetting`, {
+    jwt: app.login.jwt,
+    key: 'selectedAddresses',
+    value: JSON.stringify(app.login.selectedAddresses),
+  }).catch((e) => {
+    throw new Error(e.responseJSON.error);
   });
 }

@@ -10,7 +10,6 @@ import { initAppState } from 'app';
 import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
-import { selectLogin } from 'controllers/app/login';
 import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';

@@ -1,6 +1,6 @@
 import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading } from 'construct-ui';
 import Infinite from "mithril-infinite"
-import { selectLogin } from 'controllers/app/login';
+import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
 
 import 'components/navigation.scss';
@@ -384,9 +384,7 @@ const Navigation: m.Component<{}, {}> = {
                         key: `${account.chain.id}-${account.address}`,
                         disabled: account === activeAccount,
                         class: account === activeAccount ? 'selected' : '',
-                        onclick: async () => {
-                          await selectLogin(account);
-                        },
+                        onclick: () => setActiveAccount(account),
                         label: [
                           m(User, { user: account }),
                         ],

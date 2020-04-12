@@ -5,7 +5,6 @@ import $ from 'jquery';
 
 import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
 import app from 'state';
-import { selectLogin } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import Navigation from 'views/components/navigation';
 import Sidebar from 'views/components/sidebar';

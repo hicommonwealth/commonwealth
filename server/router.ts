@@ -20,7 +20,6 @@ import createHedgehogUser from './routes/createHedgehogUser';
 import createAddress from './routes/createAddress';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
-import selectAddress from './routes/selectAddress';
 import selectNode from './routes/selectNode';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
@@ -110,7 +109,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/createAddress', createAddress.bind(this, models));
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
-  router.post('/selectAddress', passport.authenticate('jwt', { session: false }), selectAddress.bind(this, models));
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
 
   // proposals

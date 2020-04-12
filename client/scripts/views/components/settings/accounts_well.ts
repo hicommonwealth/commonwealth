@@ -6,7 +6,7 @@ import app from 'state';
 
 import { formatCoin, Coin } from 'adapters/currency';
 import { orderAccountsByAddress, link } from 'helpers';
-import { selectLogin, unlinkLogin } from 'controllers/app/login';
+import { unlinkLogin } from 'controllers/app/login';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 import { AddressInfo, ChainClass } from 'models';
@@ -59,11 +59,6 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
         ]) : [],
       ]),
       m('.action-col', [
-        // TODO: re-enable this as 'go to chain and account'
-        // (app.chain || app.community) && m('button.formular-button-primary', {
-        //   class: isActiveAccount ? 'disabled' : '',
-        //   onclick: () => selectLogin(account),
-        // }, 'Switch account'),
         m('button.formular-button-negative', {
           class: vnode.state.removing ? ' disabled' : '',
           onclick: async () => {

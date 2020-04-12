@@ -69,6 +69,7 @@ export interface IApp {
     disableRichText: boolean;
     notifications: NotificationsController;
     lastVisited: object;
+    selectedAddresses: { chains: object, communities: object };
     unseenPosts: object;
   };
   config: {
@@ -119,6 +120,7 @@ const app: IApp = {
     isSiteAdmin: false,
     disableRichText: null,
     lastVisited: {},
+    selectedAddresses: { chains: {}, communities: {} },
     unseenPosts: {},
     notifications: new NotificationsController(),
   },

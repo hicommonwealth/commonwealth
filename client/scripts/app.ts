@@ -212,6 +212,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   app.chain.init(() => m.redraw()).then(() => {
     // Emit chain as updated
     app.chainReady.next(true);
+    updateActiveAddresses(n.chain);
     console.log(`${n.chain.network.toUpperCase()} started.`);
   });
 

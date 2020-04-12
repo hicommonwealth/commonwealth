@@ -4,7 +4,7 @@ import { default as mixpanel } from 'mixpanel-browser';
 import app from 'state';
 import { initAppState } from 'app';
 
-import { updateActiveAddresses, createUserWithAddress, selectLogin } from 'controllers/app/login';
+import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase } from 'models';
@@ -121,7 +121,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
               updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain :
                                     app.config.nodes.getByChain(app.activeChainId())[0].chain);
             }
-            return await selectLogin(acct, true);
+            setActiveAccount(acct, true);
           })
           .then(() => {
             vnode.state.validationCompleted = true;
