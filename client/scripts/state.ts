@@ -9,8 +9,10 @@ import {
   Account,
   IChainAdapter,
   ICommunityAdapter,
-  NotificationCategory
+  NotificationCategory,
+  RoleInfo,
 } from 'models';
+
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { Subject, ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
@@ -44,6 +46,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
+  tags: TagsController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -58,6 +61,7 @@ export interface IApp {
     jwt?: string;
     addresses: AddressInfo[];
     memberships: MembershipInfo[];
+    roles: any;
     activeAddresses: Array<Account<any>>;
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
@@ -96,6 +100,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
+  tags: new TagsController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -109,6 +114,7 @@ const app: IApp = {
     activeAddresses: [],
     socialAccounts: [],
     memberships: [],
+    roles: {},
     selectedNode: null,
     isSiteAdmin: false,
     disableRichText: null,

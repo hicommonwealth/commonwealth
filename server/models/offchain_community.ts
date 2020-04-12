@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     creator_id: { type: DataTypes.INTEGER, allowNull: false },
     default_chain: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.TEXT, allowNull: true },
+    featured_tags: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false, defaultValue: [] },
     // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking
     // ^^^ other names: community_config, OffchainCommunityConfiguration, CommunityConditions

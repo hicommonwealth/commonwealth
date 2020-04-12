@@ -1,5 +1,5 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { UserRequest } from '../types';
 
 const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFunction) => {
@@ -13,8 +13,6 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
       {
         model: models.OffchainTag,
         as: 'tags',
-        required: false,
-        attributes: ['id', 'name', 'community_id', 'chain_id'],
         through: {
           model: models.TaggedThread,
           as: 'taggedThreads',

@@ -600,7 +600,7 @@ const LinkNewAddressModal = {
           ],
           app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
             name: 'is-ed25519',
-            title: 'Key is ed25519 format',
+            label: 'Key is ed25519 format',
             callback: async (result) => {
               vnode.state.isEd25519 = !!result;
 
@@ -710,7 +710,7 @@ const LinkNewAddressModal = {
             vnode.state.error && vnode.state.newAddress && m('.error-message', vnode.state.error),
             app.chain.base === ChainBase.Substrate && m(CheckboxFormField, {
               name: 'secret-phrase-saved',
-              title: 'My secret phrase is saved somewhere safe',
+              label: 'My secret phrase is saved somewhere safe',
               callback: (result) => {
                 vnode.state.secretPhraseSaved = result;
               },

@@ -76,6 +76,8 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
+import editTag from './routes/editTag';
+import bulkTags from './routes/bulkTags';
 
 import addChainObjectQuery from './routes/addChainObjectQuery';
 import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
@@ -138,6 +140,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/deleteComment', passport.authenticate('jwt', { session: false }), deleteComment.bind(this, models));
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
+
+  // offchain tags
+  router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
+  router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
 
   // offchain reactions
   router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));

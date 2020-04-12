@@ -65,7 +65,7 @@ export const TextareaFormField: m.Component<ITextFormFieldAttrs> = {
       }
       oninput.call(this, e);
     };
-    options.class = (options.class || '') + ' form-field';
+    options.class = `${options.class || ''} form-field`;
 
     return m('.TextareaFormField.FormField', [
       m('.form-group', [
@@ -125,24 +125,34 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
 
 interface ICheckboxFormFieldAttrs {
   callback?: CallableFunction;
+  label?: string;
   name: string;
+  options?: ICheckboxFormFieldOptions;
   title?: string;
+}
+
+interface ICheckboxFormFieldOptions {
+  class: string;
 }
 
 export const CheckboxFormField: m.Component<ICheckboxFormFieldAttrs> = {
   view: (vnode: m.VnodeDOM<ICheckboxFormFieldAttrs>) => {
+    const { callback, label, name, title } = vnode.attrs;
+    const defaultOptions = {
+      id: name,
+      oninput: (e) => {
+        if (callback) {
+          callback(e.target.checked);
+        }
+      },
+    };
+    const options = Object.assign(defaultOptions, vnode.attrs.options || {});
     return m('.CheckboxFormField.FormField', [
       m('.form-group', [
+        title && m('.form-title', title),
         m('form.form-field', [
-          m('input[type="checkbox"]', {
-            id: vnode.attrs.name,
-            oninput: (e) => {
-              if (vnode.attrs.callback) {
-                vnode.attrs.callback(e.target.checked);
-              }
-            },
-          }),
-          m('label', { for: vnode.attrs.name }, vnode.attrs.title),
+          m('input[type="checkbox"]', options),
+          m('label', { for: name }, label),
         ]),
       ]),
     ]);

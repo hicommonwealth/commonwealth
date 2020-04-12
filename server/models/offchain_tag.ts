@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const OffchainTag = sequelize.define('OffchainTag', {
     name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     community_id: { type: DataTypes.STRING, allowNull: true },
     chain_id: { type: DataTypes.STRING, allowNull: true },
   }, {

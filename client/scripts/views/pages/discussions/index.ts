@@ -74,7 +74,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-listing.tag-listing', [
           m('h4.tag-name', [
-            tag.name,
+            tag,
             getBackHomeButton(),
           ]),
           m(ProposalsLoadingRow),
@@ -91,6 +91,15 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
         .filter((thread) => thread.tags && thread.tags.filter((t) => t.name === tag).length > 0)
         .sort(orderDiscussionsbyLastComment);
+
+      if (sortedThreads.length === 0) {
+        return m('.discussions-listing.tag-listing.no-tags-found', [
+          m('h4.tag-name', [
+            `No threads contain the tag '${tag}.'`,
+          ]),
+          getBackHomeButton(),
+        ]);
+      }
 
       const firstThread = sortedThreads[0];
       const lastThread = sortedThreads[sortedThreads.length - 1];
@@ -259,7 +268,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
                 m(MembershipButton, { chain: app.activeChainId(), community: app.activeCommunityId() }),
               m(DiscussionsSubscriptionButton),
             ],
-            m('h4.sidebar-header', 'Tags'),
             m(TagSelector, { activeTag: vnode.attrs.tag }),
             pinnedThreads.length > 0
             && [

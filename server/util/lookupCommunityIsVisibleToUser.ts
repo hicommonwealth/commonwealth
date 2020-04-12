@@ -30,7 +30,6 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
     include: {
       model: models.OffchainTag,
       as: 'tags',
-      attributes: ['id', 'name', 'community_id', 'chain_id'],
     },
   });
 

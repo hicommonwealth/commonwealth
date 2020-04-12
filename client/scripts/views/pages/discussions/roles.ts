@@ -6,17 +6,22 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
+import { RolePermission } from 'models';
 import User from 'views/components/widgets/user';
 import CreateInviteModal from '../../modals/create_invite_modal';
 import UpgradeMemberModal from '../../modals/upgrade_member_modal';
 import ManageCommunityModal from '../../modals/manage_community_modal';
 
-const sortAdminsAndModsFirst = (a, b) => {
+export const isCommunityAdmin = () => {
+  return (app.login.roles[app.activeId()]?.permission === RolePermission.admin);
+};
+
+export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission) return a.Address.address.localeCompare(b.Address.address);
-  if (a.permission === 'admin') return -1;
-  if (b.permission === 'admin') return 1;
-  if (a.permission === 'mod') return -1;
-  if (b.permission === 'mod') return 1;
+  if (a.permission === RolePermission.admin) return -1;
+  if (b.permission === RolePermission.admin) return 1;
+  if (a.permission === RolePermission.moderator) return -1;
+  if (b.permission === RolePermission.moderator) return 1;
   return a.Address.address.localeCompare(b.Address.address);
 };
 
@@ -25,21 +30,21 @@ const isAdminOrModOfChain = (vnode, account) => {
   return vnode.state.roleData.findIndex((role) => (
     role.Address.address === app.vm.activeAccount.address
     && role.Address.chain === app.vm.activeAccount.chain.id
-    && role.permission !== 'member')) !== -1;
+    && role.permission !== RolePermission.member)) !== -1;
 };
 
 const isAdminOrMod = (vnode, account) => {
   if (!account) return false;
   return vnode.state.roleData.findIndex((role) => (
     role.Address.address === account.address
-    && role.permission !== 'member')) !== -1;
+    && role.permission !== RolePermission.member)) !== -1;
 };
 
 const isAdmin = (vnode, account) => {
   if (!account) return false;
   return vnode.state.roleData.findIndex((role) => (
     role.Address.address === account.address
-    && role.permission === 'admin')) !== -1;
+    && role.permission === RolePermission.admin)) !== -1;
 };
 
 const InviteButton = (vnode, account, isCommunity) => {
@@ -135,24 +140,25 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
 
     return m('.OffchainCommunityRoles', [
       vnode.state.roleData?.length > 0 && m('h4.sidebar-header', 'Members'),
-      vnode.state.loadingFinished && app.vm.activeAccount &&
-        m('.members', [
-          // list of mods/admins
-          !vnode.state.roleData && m('.no-mods', 'None'),
-          vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
-            return m('.member-item', [
-              m(User, {
-                user: [role.Address.address, role.Address.chain],
-                linkify: true,
-                tooltip: true,
-              }),
-              role.permission !== 'member' && m('span.role-level', ` (${role.permission})`),
-            ]);
-          }),
-          InviteButton(vnode, app.vm.activeAccount, isCommunity),
-          UpgradeMemberButton(vnode, app.vm.activeAccount),
-          ManageCommunityButton(vnode, app.vm.activeAccount),
-        ])
+      vnode.state.loadingFinished
+      && app.vm.activeAccount
+      && m('.members', [
+        // list of mods/admins
+        !vnode.state.roleData && m('.no-mods', 'None'),
+        vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
+          return m('.member-item', [
+            m(User, {
+              user: [role.Address.address, role.Address.chain],
+              linkify: true,
+              tooltip: true,
+            }),
+            role.permission !== RolePermission.member && m('span.role-level', ` (${role.permission})`),
+          ]);
+        }),
+        InviteButton(vnode, app.vm.activeAccount, isCommunity),
+        UpgradeMemberButton(vnode, app.vm.activeAccount),
+        ManageCommunityButton(vnode, app.vm.activeAccount),
+      ])
     ]);
   },
 };

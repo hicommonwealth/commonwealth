@@ -6,17 +6,9 @@ import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
 
+import { RolePermission } from 'models';
 import { CompactModalExitButton } from 'views/modal';
-
-
-const sortAdminsAndModsFirst = (a, b) => {
-  if (a.permission === b.permission) return a.Address.address.localeCompare(b.Address.address);
-  if (a.permission === 'admin') return -1;
-  if (b.permission === 'admin') return 1;
-  if (a.permission === 'mod') return -1;
-  if (b.permission === 'mod') return 1;
-  return a.Address.address.localeCompare(b.Address.address);
-};
+import { sortAdminsAndModsFirst } from '../pages/discussions/roles';
 
 const UpgradeMemberModal = {
   oncreate: (vnode) => {
@@ -33,7 +25,7 @@ const UpgradeMemberModal = {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
       vnode.state.roleData = response.result;
-      if (vnode.state.roleData.findIndex((role) => (role.Address.address === app.vm.activeAccount.address && role.permission === 'moderator')) !== -1) {
+      if (vnode.state.roleData.findIndex((role) => (role.Address.address === app.vm.activeAccount.address && role.permission === RolePermission.moderator)) !== -1) {
         vnode.state.isMod = true;
       }
       vnode.state.loadingFinished = true;
@@ -93,14 +85,14 @@ const UpgradeMemberModal = {
       m('form.compact-modal-body', [
         m('h3', 'Role Type: '),
         m('.role-selection', [
-          !vnode.state.isMod &&
-          m('input[type="radio"]', {
+          !vnode.state.isMod
+          && m('input[type="radio"]', {
             name: 'role',
             value: 'admin',
             id: 'adminRadio',
           }),
-          !vnode.state.isMod &&
-          m('label', {
+          !vnode.state.isMod
+          && m('label', {
             for: 'adminRadio',
           }, 'Admin'),
           m('input[type="radio"]', {
@@ -115,7 +107,7 @@ const UpgradeMemberModal = {
         m('h3', 'Member to upgrade:'),
         (vnode.state.roleData)
           ? vnode.state.roleData.sort(sortAdminsAndModsFirst).filter(
-            (role) => role.permission === 'member' || (!vnode.state.isMod && role.permission === 'moderator')
+            (role) => role.permission === RolePermission.member || (!vnode.state.isMod && role.permission === RolePermission.moderator)
           ).map((role) => {
             const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
             return m('.form-field', [

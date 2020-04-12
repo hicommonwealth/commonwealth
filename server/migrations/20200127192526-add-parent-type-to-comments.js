@@ -10,7 +10,7 @@ module.exports = {
         allowNull: false,
         defaultValue: 'proposal'
       }
-    )
+    );
   },
 
   down: (queryInterface, DataTypes) => {
@@ -22,6 +22,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 'proposal'
       }
-    )
+    );
   }
 };
