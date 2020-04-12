@@ -1,52 +1,47 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const updateTags = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error('Invalid chain or community'));
-  if (chain && community) return next(new Error('Invalid chain or community'));
   if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.address_id) return next(new Error('Invalid address'));
   if (!req.body.thread_id) return next(new Error('Must provide thread_id'));
-  if (!req.body['tags[]']) return next(new Error('Must provide tags'));
-
-  // check address
-  const validAddress = await models.Address.findOne({
+  if (!req.body.address) return next(new Error('Must provide address'));
+  const user = await models.User.findOne({
     where: {
-      id: req.body.address_id,
-      user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    }
+      id: req.user.id,
+    },
   });
-  if (!validAddress) return next(new Error('Invalid address'));
-
-  // check mod or admin status
-  const chainOrCommObj = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
-  const requesterIsAdminOrMod = await models.Role.findAll({
+  const userAddresses = await user.getAddresses();
+  const userAddress = userAddresses.find((a) => {
+    return a.address === req.body.address;
+  });
+  const roles: any[] = await models.Role.findAll({
     where: {
-      ...chainOrCommObj,
-      address_id: req.user.address,
-      permission: ['moderator', 'admin'],
+      permission: ['admin', 'moderator'],
+      address_id: userAddress.id,
     },
   });
 
-  // lookup thread
-  const chainOrCommObjForThread = chain ? { chain: chain.id } : { community: community.id };
-  const memberPermissionsCheck = requesterIsAdminOrMod ? {} : { author_id: validAddress.id };
   const thread = await models.OffchainThread.findOne({
     where: {
-      ...chainOrCommObjForThread,
-      ...memberPermissionsCheck,
       id: req.body.thread_id,
     },
   });
+  const isAuthor = (thread.author_id === userAddress.id);
 
-  const tags = req.body['tags[]'];
+  const chainOrCommunity = thread.community || thread.chain;
+  const isAdminOrMod = roles.map((role) => role.offchain_community_id || role.chaid_id).includes(chainOrCommunity);
+  let tags: string[] = [];
+  if (req.body['tags[]']) {
+    if (typeof req.body['tags[]'] === 'string') {
+      tags = [req.body['tags[]']];
+    } else if (typeof req.body['tags[]'] === 'object') {
+      tags = req.body['tags[]'];
+    }
+  }
   const [community_id, chain_id] = [thread.community, thread.authorChain];
 
   const activeTags = await thread.getTags();
+  if (!isAdminOrMod && !isAuthor) return res.json({ result: activeTags });
 
   // remove deleted tags
   const oldTags = activeTags.filter((activeTag) => !tags.includes(activeTag.name));

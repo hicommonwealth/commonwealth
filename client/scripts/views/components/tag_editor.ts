@@ -78,9 +78,10 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
             intent: 'primary',
             onclick: () => {
               $.post(`${app.serverUrl()}/updateTags`, {
-                jwt: app.login.jwt,
-                thread_id: vnode.attrs.thread.id,
-                tags: vnode.state.tags,
+                'jwt': app.login.jwt,
+                'thread_id': vnode.attrs.thread.id,
+                'tags[]': vnode.state.tags,
+                'address': app.vm.activeAccount.address,
               }).then((r) => {
                 const tags: OffchainTag[] = r.result;
                 vnode.attrs.onChangeHandler(tags);

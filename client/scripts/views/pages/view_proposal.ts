@@ -161,11 +161,11 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
             ? m('.discussion-meta', [
               proposal.createdAt && m('.created', proposal.createdAt.format('MMM D, YYYY')),
               m('.Tags', [
-                isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
-                // (isSameAccount(app.vm.activeAccount, author)) && // TODO: or condition for isAdmin
+                ((app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
+                isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())) &&
                   m(TagEditor, {
                     thread: proposal as OffchainThread,
-                    onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; },
+                    onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; m.redraw(); },
                   }),
                 (proposal as OffchainThread).tags?.map((tag) => {
                   return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
