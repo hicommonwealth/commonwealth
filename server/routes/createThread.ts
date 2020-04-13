@@ -217,7 +217,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        mention_context: 'thread',
+        post_type: 'thread',
         thread_title: finalThread.title,
         thread_id: finalThread.id,
         chain_id: finalThread.chain,

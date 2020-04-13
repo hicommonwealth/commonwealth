@@ -526,8 +526,9 @@ const decodeComment = (comment_text) => {
 
 const getNotificationFields = (category, data) => {
   const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-    author_address, author_chain, thread_title, thread_id, mention_context } = JSON.parse(data);
-  if (mention_context) category += `-${mention_context}`;
+    author_address, author_chain, thread_title, thread_id, post_type, root_title, reacted_text,
+    reacted_id } = JSON.parse(data);
+  if (post_type) category += `-${post_type}`;
   const linksToComment = (category === NotificationCategories.NewComment || category === 'new-mention-comment');
   const linksToThread = (category === NotificationCategories.NewThread || category === 'new-mention-thread');
   if (!linksToComment && !linksToThread) {
@@ -535,6 +536,10 @@ const getNotificationFields = (category, data) => {
     return;
   }
   if (!created_at || !author_address || !author_chain) {
+    console.error('Notification data is incomplete.');
+    return;
+  }
+  if (!chain_id && !community_id) {
     console.error('Notification data is incomplete.');
     return;
   }
@@ -568,23 +573,34 @@ const getNotificationFields = (category, data) => {
     }
     notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
     notificationBody = decoded_title;
-  } else if (category === 'new-mention-thread') {
+  } else if (category === `${NotificationCategories.NewMention}-thread`) {
     if (!decoded_title || !thread_id) {
       console.error('Notification data is incomplete.');
       return;
     }
     notificationBody = decoded_title;
     notificationHeader = m('span', [ 'New mention in ', m('span.commented-obj', community_name) ]);
-  } else if (category === 'new-mention-comment') {
+  } else if (category === `${NotificationCategories.NewMention}-comment`) {
     if (!comment_text || !comment_id) {
       console.error('Notification data is incomplete.');
       return;
     }
-    const decoded_comment_text = decodeComment(comment_text);
-    notificationBody = decoded_comment_text;
+    notificationBody = decodeComment(comment_text);
     notificationHeader = m('span', [
       'New mention in ', m('span.commented-obj', decoded_title.trim() || community_name)
     ]);
+  } else if (category === `${NotificationCategories.NewReaction}-thread`) {
+    if (!root_title || !reacted_text || !reacted_id) {
+      console.error('Notification data is incomplete.');
+      return;
+    }
+    notificationBody = decodeComment(comment_text);
+    notificationHeader = m('span', [
+      'New reaction to ', m('span.commented-obj', decoded_title.trim() || community_name)
+    ]);
+  } else if (category === `${NotificationCategories.NewReaction}-comment`) {
+    notificationBody = decoded_title;
+    notificationHeader = m('span', [ 'New reaction in ', m('span.commented-obj', community_name) ]);
   }
 
   const path = linksToComment
@@ -630,58 +646,58 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
-    if (category === NotificationCategories.NewComment) {
-      const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !object_title || (!object_id && !root_id)
-          || !comment_text || !comment_id || !author_address || !author_chain) return;
+    // if (category === NotificationCategories.NewComment) {
+    //   const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
+    //     author_address, author_chain } = JSON.parse(notification.data);
+    //   if (!created_at || !object_title || (!object_id && !root_id)
+    //       || !comment_text || !comment_id || !author_address || !author_chain) return;
 
-      // legacy comments use object_id, new comments use root_id
-      const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-      const commented_title = decodeURIComponent(object_title).trim();
-      const decoded_comment_text = (() => {
-        try {
-          const doc = JSON.parse(decodeURIComponent(comment_text));
-          return m(QuillFormattedText, {
-            doc: sliceQuill(doc, 140),
-            hideFormatting: true
-          });
-        } catch (e) {
-          return m(MarkdownFormattedText, {
-            doc: decodeURIComponent(comment_text).slice(0, 140),
-            hideFormatting: true
-          });
-        }
-      })();
-      return getHeaderNotificationRow(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
-        decoded_comment_text,
-        `/${community_id || chain_id}/proposal/discussion/`
-        + `${commented_id}?comment=${comment_id}`,
-        () => jumpHighlightComment(comment_id)
-      );
-    } else if (category === NotificationCategories.NewThread) {
-      const { created_at, thread_title, thread_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
+    //   // legacy comments use object_id, new comments use root_id
+    //   const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
+    //   const commented_title = decodeURIComponent(object_title).trim();
+    //   const decoded_comment_text = (() => {
+    //     try {
+    //       const doc = JSON.parse(decodeURIComponent(comment_text));
+    //       return m(QuillFormattedText, {
+    //         doc: sliceQuill(doc, 140),
+    //         hideFormatting: true
+    //       });
+    //     } catch (e) {
+    //       return m(MarkdownFormattedText, {
+    //         doc: decodeURIComponent(comment_text).slice(0, 140),
+    //         hideFormatting: true
+    //       });
+    //     }
+    //   })();
+    //   return getHeaderNotificationRow(
+    //     [author_address, author_chain],
+    //     moment.utc(created_at),
+    //     m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
+    //     decoded_comment_text,
+    //     `/${community_id || chain_id}/proposal/discussion/`
+    //     + `${commented_id}?comment=${comment_id}`,
+    //     () => jumpHighlightComment(comment_id)
+    //   );
+    // } else if (category === NotificationCategories.NewThread) {
+    //   const { created_at, thread_title, thread_id, chain_id, community_id,
+    //     author_address, author_chain } = JSON.parse(notification.data);
+    //   if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
 
-      const decoded_title = decodeURIComponent(thread_title);
-      const community_name = community_id
-        ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-        : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+    //   const decoded_title = decodeURIComponent(thread_title);
+    //   const community_name = community_id
+    //     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
+    //     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
-      return getHeaderNotificationRow(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
-        decoded_title,
-        `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
-          + `${slugify(decoded_title)}`,
-        () => jumpHighlightComment('parent')
-      );
-    }
+    //   return getHeaderNotificationRow(
+    //     [author_address, author_chain],
+    //     moment.utc(created_at),
+    //     m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
+    //     decoded_title,
+    //     `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
+    //       + `${slugify(decoded_title)}`,
+    //     () => jumpHighlightComment('parent')
+    //   );
+    // }
 
     const {
       author,

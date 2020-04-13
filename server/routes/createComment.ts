@@ -183,7 +183,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          mention_context: 'comment',
+          post_type: 'comment',
           thread_title: commentedObject?.title,
           thread_id: commentedObject?.id,
           root_id,

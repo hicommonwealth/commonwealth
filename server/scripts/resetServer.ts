@@ -289,6 +289,10 @@ const resetServer = (models, closeMiddleware) => {
       name: NotificationCategories.NewMention,
       description: 'someone @ mentions a user',
     });
+    await models.NotificationCategory.create({
+      name: NotificationCategories.NewMention,
+      description: 'someone reacts to a post',
+    });
 
     // Admins need to be subscribed to mentions
     await models.Subscription.create({
