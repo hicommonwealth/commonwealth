@@ -105,11 +105,9 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     where: { id: comment.id },
     include: [models.Address, models.OffchainAttachment],
   });
-  const commentedObject = root_id.startsWith('discussion_')
-    ? await models.OffchainThread.findOne({
-      where: { id: root_id.replace('discussion_', '') }
-    })
-    : null;
+  const commentedObject = await models.OffchainThread.findOne({
+    where: { id: root_id.replace('discussion_', '') }
+  });
 
   // grab mentions to notify tagged users
   let mentionedAddresses;
@@ -132,7 +130,9 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   }
 
   // craft commonwealth url
-  const thread = await models.OffchainThread.findOne({ where: { id: finalComment.root_id.split('_')[1] } });
+  const thread = await models.OffchainThread.findOne({
+    where: { id: finalComment.root_id.split('_')[1] }
+  });
   const cwUrl = createCommonwealthUrl(thread, finalComment);
 
   // dispatch notifications
@@ -142,10 +142,10 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     root_id,
     {
       created_at: new Date(),
-      object_title: commentedObject?.title,
-      root_id,
-      comment_text: finalComment.text,
-      comment_id: finalComment.id,
+      root_id: commentedObject.id,
+      root_title: commentedObject.title,
+      object_id: finalComment.id,
+      object_text: finalComment.text,
       chain_id: finalComment.chain,
       community_id: finalComment.community,
       author_address: finalComment.Address.address,
@@ -183,12 +183,10 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          post_type: 'comment',
-          thread_title: commentedObject?.title,
-          thread_id: commentedObject?.id,
-          root_id,
-          comment_text: finalComment.text,
-          comment_id: finalComment.id,
+          root_id: commentedObject.id,
+          root_title: commentedObject.title,
+          object_id: finalComment.id,
+          object_text: finalComment.text,
           chain_id: finalComment.chain,
           community_id: finalComment.community,
           author_address: finalComment.Address.address,

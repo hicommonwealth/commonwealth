@@ -65,9 +65,10 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
     {
       created_at: new Date(),
       root_title: parentThread.title,
-      reacted_text: reactedPost.text,
-      reacted_id: reactedPost.id,
-      post_type: comment ? 'thread' : 'comment',
+      root_id: parentThread.id,
+      object_type: comment ? 'thread' : 'comment',
+      object_text: reactedPost.text,
+      object_id: reactedPost.id,
       chain_id: reactedPost.chain,
       community_id: reactedPost.community,
       author_address: reactedPost.Address.address,

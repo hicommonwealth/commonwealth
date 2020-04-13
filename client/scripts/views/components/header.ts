@@ -1,3 +1,5 @@
+/* eslint-disable dot-notation */
+/* eslint-disable eqeqeq */
 /* eslint-disable no-restricted-globals */
 import 'components/header.scss';
 import m from 'mithril';
@@ -192,8 +194,8 @@ const Navigation: m.Component<IMenuAttrs> = {
     const defaultChainId = (app.activeChainId()) ? app.activeChainId()
       : app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
 
-    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
-      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
+    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate)
+      ? ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
        + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
        + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
        + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
@@ -525,21 +527,11 @@ const decodeComment = (comment_text) => {
 };
 
 const getNotificationFields = (category, data) => {
-  const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-    author_address, author_chain, thread_title, thread_id, post_type, root_title, reacted_text,
-    reacted_id } = JSON.parse(data);
-  if (post_type) category += `-${post_type}`;
-  const linksToComment = (category === NotificationCategories.NewComment || category === 'new-mention-comment');
-  const linksToThread = (category === NotificationCategories.NewThread || category === 'new-mention-thread');
-  if (!linksToComment && !linksToThread) {
-    console.error('Missing or invalid notification category.');
-    return;
-  }
-  if (!created_at || !author_address || !author_chain) {
-    console.error('Notification data is incomplete.');
-    return;
-  }
-  if (!chain_id && !community_id) {
+  const { created_at, object_text, object_id, root_id, root_title, comment_text, comment_id, chain_id, community_id,
+    author_address, author_chain } = JSON.parse(data);
+  const object_type = (object_id == root_id) ? 'thread' : 'comment';
+  if (!created_at || !author_address || !author_chain || !created_at || (!chain_id && !community_id)
+    || root_title || root_id || object_id || object_text) {
     console.error('Notification data is incomplete.');
     return;
   }
@@ -550,63 +542,36 @@ const getNotificationFields = (category, data) => {
 
   let notificationHeader;
   let notificationBody;
-  let commented_type;
-  let commented_id;
-  let decoded_title;
+  const decoded_title = decodeURIComponent(root_title).trim();
 
-  if (thread_title) decoded_title = decodeURIComponent(thread_title);
-  if (category === NotificationCategories.NewComment) {
-    if (!object_title || (!object_id && !root_id) || !comment_text || !comment_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    // legacy comments use object_id, new comments use root_id
-    [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-    const commented_title = decodeURIComponent(object_title).trim();
-    const decoded_comment_text = decodeComment(comment_text);
-    notificationHeader = m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]);
-    notificationBody = decoded_comment_text;
-  } else if (category === NotificationCategories.NewThread) {
-    if (!decoded_title || !thread_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
+  if (object_type === 'comment') {
+    notificationBody = decodeComment(object_text);
+  } else if (object_type === 'thread') {
     notificationBody = decoded_title;
-  } else if (category === `${NotificationCategories.NewMention}-thread`) {
-    if (!decoded_title || !thread_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationBody = decoded_title;
-    notificationHeader = m('span', [ 'New mention in ', m('span.commented-obj', community_name) ]);
-  } else if (category === `${NotificationCategories.NewMention}-comment`) {
-    if (!comment_text || !comment_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationBody = decodeComment(comment_text);
-    notificationHeader = m('span', [
-      'New mention in ', m('span.commented-obj', decoded_title.trim() || community_name)
-    ]);
-  } else if (category === `${NotificationCategories.NewReaction}-thread`) {
-    if (!root_title || !reacted_text || !reacted_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationBody = decodeComment(comment_text);
-    notificationHeader = m('span', [
-      'New reaction to ', m('span.commented-obj', decoded_title.trim() || community_name)
-    ]);
-  } else if (category === `${NotificationCategories.NewReaction}-comment`) {
-    notificationBody = decoded_title;
-    notificationHeader = m('span', [ 'New reaction in ', m('span.commented-obj', community_name) ]);
+  } else {
+    console.error('Invalid notification type');
+    return;
   }
 
+  if (category === NotificationCategories.NewComment) {
+    notificationHeader = m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ]);
+  } else if (category === NotificationCategories.NewThread) {
+    notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
+  } else if (category === `${NotificationCategories.NewMention}`) {
+    notificationHeader = (object_type === 'thread')
+      ? m('span', ['New mention in ', m('span.commented-obj', community_name) ])
+      : m('span', ['New mention in ', m('span.commented-obj', decoded_title || community_name) ]);
+  } else if (category === `${NotificationCategories.NewReaction}`) {
+    notificationHeader = (object_type === 'thread')
+      ? m('span', ['New reaction to ', m('span.commented-obj', decoded_title) ])
+      : m('span', ['New reaction in ', m('span.commented-obj', decoded_title || community_name) ]);
+  }
+
+  const linksToComment = (category === NotificationCategories.NewComment || object_type === 'comment');
   const path = linksToComment
-    ? `/${community_id || chain_id}/proposal/discussion/${commented_id || thread_id}?comment=${comment_id}`
-    : `/${community_id || chain_id}/proposal/discussion/${thread_id}-${slugify(decoded_title)}`;
-  const pageJump = linksToComment ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+    ? `/${community_id || chain_id}/proposal/discussion/${root_id}?comment=${object_id}`
+    : `/${community_id || chain_id}/proposal/discussion/${root_id}-${slugify(decoded_title)}`;
+  const pageJump = linksToComment ? () => jumpHighlightComment(object_id) : () => jumpHighlightComment('parent');
 
   return ({
     author: [author_address, author_chain],
@@ -816,8 +781,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
       }, unreadMessage),
     }, [
       m(Notifications, { notifications }),
-      notifications.length > 0 &&
-        m(NotificationButtons, { notifications }),
+      notifications.length > 0
+        && m(NotificationButtons, { notifications }),
     ]);
   }
 };
