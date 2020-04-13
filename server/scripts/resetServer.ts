@@ -373,7 +373,6 @@ const resetServer = (models, closeMiddleware) => {
             id: `${chain}-${event_name}`,
             chain,
             event_name,
-            event_schema: {} // TODO: populate this
           });
         })
       );

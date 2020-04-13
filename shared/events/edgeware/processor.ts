@@ -17,9 +17,14 @@ export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
     return block.events.map(({ event }) => {
       const type = parseEventType(event);
       if (type !== SubstrateEventType.Unknown) {
+        console.log(JSON.stringify(event.meta));
+        console.log(JSON.stringify(event.typeDef));
         return {
           type,
           blockNumber: +block.header.number,
+          name: event.meta.name.toString(),
+          documentation: event.meta.documentation.length > 0 ? event.meta.documentation.join(' ') : '',
+          typedefs: event.meta.args.map((t) => t.toString()),
           data: event.data.map((d) => decodeSubstrateCodec(d))
         };
       } else {

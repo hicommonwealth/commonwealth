@@ -1,13 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
   const ChainEventType = sequelize.define('ChainEventType', {
-    // id = chain-event_name
+    // id = chain-event_name (event_name is value of string enum)
     id: { type: DataTypes.STRING, primaryKey: true },
     chain: { type: DataTypes.STRING, allowNull: false },
     event_name: { type: DataTypes.STRING, allowNull: false },
 
-    // a JSON schema defining the interface for the event
-    // TODO: is this needed?
-    event_schema: { type: DataTypes.JSONB, allowNull: false },
+    // metadata fetched from chain, starts null
+    raw_name: { type: DataTypes.STRING, allowNull: true },
+    documentation: { type: DataTypes.TEXT, allowNull: true },
+    typedefs: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

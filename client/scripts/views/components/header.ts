@@ -699,9 +699,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', notification.chainEvent.type.id),
+          m('.comment-body-top', `${notification.chainEvent.type.rawName}(${notification.chainEvent.data.join(', ')})`),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', notification.chainEvent.data.toString()),
+          m('.comment-body-excerpt', notification.chainEvent.type.documentation.toString()),
         ]),
       ]);
     }

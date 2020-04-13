@@ -81,9 +81,11 @@ const ChainSubscriptionForm: m.Component<IChainSubscriptionFormAttrs, IChainSubs
           class: availableSubscriptionTypes.length === 0 ? 'disabled' : '',
           onclick: (e) => {
             e.preventDefault();
-            // TODO: verify this redraws as expected
             app.login.notifications.subscribe('chain-event', objectId(vnode.state.subscriptionType))
-              .then((res) => m.redraw());
+              .then((res) => {
+                // TODO: how to manage dropdown state once this is done?
+                m.redraw();
+              });
           }
         }, 'Subscribe'),
       ]);
