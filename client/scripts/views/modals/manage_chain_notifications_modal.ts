@@ -1,6 +1,7 @@
 import 'modals/manage_chain_notifications_modal.scss';
 
 import app from 'state';
+import $ from 'jquery';
 
 import { default as m } from 'mithril';
 import { NotificationSubscription, ChainClass } from 'models';
@@ -83,8 +84,11 @@ const ChainSubscriptionForm: m.Component<IChainSubscriptionFormAttrs, IChainSubs
             e.preventDefault();
             app.login.notifications.subscribe('chain-event', objectId(vnode.state.subscriptionType))
               .then((res) => {
-                // TODO: how to manage dropdown state once this is done?
+                // TODO: refactor this once component library is available
                 m.redraw();
+                setTimeout(() => {
+                  vnode.state.subscriptionType = '' + $(e.target).closest('.event-subscription').find('select').val();
+                }, 100);
               });
           }
         }, 'Subscribe'),
