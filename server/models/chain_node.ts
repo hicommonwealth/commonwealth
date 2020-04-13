@@ -1,7 +1,5 @@
-type ChainAttributes = {};
-type ChainInstance = {};
-
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { ChainInstance } from './chain';
 
 export interface ChainNodeAttributes {
   id: number;
@@ -11,9 +9,8 @@ export interface ChainNodeAttributes {
 }
 
 export interface ChainNodeInstance extends Sequelize.Instance<ChainNodeAttributes>, ChainNodeAttributes {
+  // TODO: add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
-  setChain: Sequelize.BelongsToSetAssociationMixin<ChainInstance, string>;
-  createChain: Sequelize.BelongsToCreateAssociationMixin<ChainAttributes, ChainInstance>;
 }
 
 export default (
