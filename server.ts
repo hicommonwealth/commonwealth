@@ -181,7 +181,7 @@ if (SHOULD_RESET_DB) {
     });
 } else {
   //setupPrerenderServer();
-  setupChainEventListeners(models);
+  setupChainEventListeners(models, wss);
   setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }

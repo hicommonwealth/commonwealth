@@ -8,6 +8,7 @@ import { NotificationCategories } from '../../shared/types';
 export default class extends IEventHandler<SubstrateEvent> {
   constructor(
     private readonly _models,
+    private readonly _wss,
     private readonly _chain: string,
   ) {
     super();
@@ -49,9 +50,12 @@ export default class extends IEventHandler<SubstrateEvent> {
       this._models,
       NotificationCategories.ChainEvent,
       dbEventType.id,
-      dbEvent.toJSON(),
+      {
+        created_at: new Date(),
+      },
       { }, // TODO: what is webhook data here?
-      // TODO: wss?
+      this._wss,
+      dbEvent.id,
     );
     console.log(`Emitted ${dbNotifications.length} notifications.`);
   }

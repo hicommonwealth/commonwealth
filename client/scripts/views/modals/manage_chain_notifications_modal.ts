@@ -58,7 +58,7 @@ const ChainSubscriptionForm: m.Component<IChainSubscriptionFormAttrs, IChainSubs
           .find((s) => s.category === 'chain-event' && s.objectId === objectId(eventString)));
 
       // set dropdown default
-      if (availableSubscriptionTypes.length > 0) {
+      if (availableSubscriptionTypes.length > 0 && !vnode.state.subscriptionType) {
         vnode.state.subscriptionType = availableSubscriptionTypes[0];
       }
 

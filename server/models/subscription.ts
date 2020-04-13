@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     notification_data,
     webhook_data: WebhookContent,
     wss?,
+    chainEventId?: number,
   ) => {
     const creatorAddress = notification_data.author_address
       ? await models.Address.findOne({
@@ -56,10 +57,14 @@ module.exports = (sequelize, DataTypes) => {
     let notifications = [];
     if (notification_data) {
       notifications = await Promise.all(subscribers.map(async (subscription) => {
-        const notification = await models.Notification.create({
+        const notificationObj: any = {
           subscription_id: subscription.id,
           notification_data: JSON.stringify(notification_data),
-        });
+        };
+        if (chainEventId) {
+          notificationObj.chain_event_id = chainEventId;
+        }
+        const notification = await models.Notification.create(notificationObj);
         return notification;
       }));
     }

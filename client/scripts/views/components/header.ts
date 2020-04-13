@@ -684,7 +684,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       );
     } else if (category === NotificationCategories.ChainEvent) {
       // TODO: this needs to be improved a lot lol
-      const obj = JSON.parse(notification.data);
+      if (!notification.chainEvent) {
+        throw new Error('chain event notification does not have expected data');
+      }
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
         onclick: async () => {
@@ -697,9 +699,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', obj.chain_event_type_id),
-          m('.comment-body-bottom', `Block ${obj.block_number}`),
-          m('.comment-body-excerpt', obj.event_data.toString()),
+          m('.comment-body-top', notification.chainEvent.type.id),
+          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+          m('.comment-body-excerpt', notification.chainEvent.data.toString()),
         ]),
       ]);
     }
