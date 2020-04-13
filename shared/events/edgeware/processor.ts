@@ -22,7 +22,7 @@ export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
         return {
           type,
           blockNumber: +block.header.number,
-          name: event.meta.name.toString(),
+          name: `${event.section}.${event.method}`,
           documentation: event.meta.documentation.length > 0 ? event.meta.documentation.join(' ') : '',
           typedefs: event.meta.args.map((t) => t.toString()),
           data: event.data.map((d) => decodeSubstrateCodec(d))
