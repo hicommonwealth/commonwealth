@@ -27,9 +27,9 @@ module.exports = (sequelize, DataTypes) => {
 
   Subscription.emitNotifications = async (
     models,
-    category_id,
-    object_id,
-    notification_data,
+    category_id: string,
+    object_id: string,
+    notification_data: any,
     webhook_data: WebhookContent,
     wss?,
   ) => {
@@ -49,7 +49,6 @@ module.exports = (sequelize, DataTypes) => {
         [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
       },
     });
-
     // create notifications if data exists
     if (notification_data) {
       await Promise.all(subscribers.map(async (subscription) => {

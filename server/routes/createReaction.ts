@@ -43,11 +43,11 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   let comment;
   let parentThread;
   if (req.body.comment_id) {
-    comment = await models.OffchainComment.findByPk(req.body.comment_id);
+    comment = await models.OffchainComment.findByPk(Number(req.body.comment_id));
     // Test on variety of comments to ensure root relation + type
-    parentThread = await models.OffchainThread.findByPk(comment.root_id.replace('discussion_', ''));
+    parentThread = await models.OffchainThread.findByPk(Number(comment.root_id.replace('discussion_', '')));
   } else {
-    parentThread = await models.OffchainThread.findByPk(req.body.thread_id);
+    parentThread = await models.OffchainThread.findByPk(Number(req.body.thread_id));
   }
 
   // craft commonwealth url
@@ -60,7 +60,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,
-    reaction.id,
+    `${reaction.id}`,
     {
       created_at: new Date(),
       root_title: parentThread.title,
@@ -69,15 +69,15 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       object_id: reactedPost.id,
       chain_id: reactedPost.chain,
       community_id: reactedPost.community,
-      author_address: reactedPost.Address.address,
-      author_chain: reactedPost.Address.chain,
+      author_address: reaction.Address.address,
+      author_chain: reaction.Address.chain,
     },
     {
-      user: reactedPost.Address.address,
+      user: reaction.Address.address,
       url: cwUrl,
-      title: reactedPost.title,
-      chain: reactedPost.chain,
-      community: reactedPost.community,
+      title: parentThread.title,
+      chain: chain?.id,
+      community: community?.id,
     },
     req.wss,
   );
