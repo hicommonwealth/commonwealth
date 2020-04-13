@@ -2,14 +2,10 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
-import moment from 'moment';
 import app, { resetDatabase, closeServer } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
-import TagsController from 'client/scripts/controllers/server/tags';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
