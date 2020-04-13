@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.STRING, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: true },
+    featured_tags: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: DataTypes.STRING, allowNull: false },
     network: { type: DataTypes.STRING, allowNull: false },
     icon_url: { type: DataTypes.STRING },

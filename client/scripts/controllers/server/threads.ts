@@ -159,8 +159,9 @@ class ThreadsController {
         this._initialized = true;
       }, (err) => {
         console.log('failed to load offchain discussions');
-        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-          'Error loading offchain discussions');
+        throw new Error((err.responseJSON && err.responseJSON.error)
+          ? err.responseJSON.error
+          : 'Error loading offchain discussions');
       });
   }
 

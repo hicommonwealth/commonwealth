@@ -20,6 +20,8 @@ export { default as OffchainThread } from './OffchainThread';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
+export { default as RoleInfo } from './RoleInfo';
+export { default as RolePermission } from './RolePermission';
 export { default as SocialAccount } from './SocialAccount';
 export { default as StorageModule } from './StorageModule';
 export { default as ChainObject } from './ChainObject';

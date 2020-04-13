@@ -49,12 +49,17 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
-      app.config.notificationCategories =
-        data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
+      app.config.notificationCategories = data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
+
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+
+      // add roles data for user
+      (data.roles || []).forEach((role) => {
+        app.login.roles[role.offchain_community_id || role.chain_id] = role;
+      });
 
       // update the selectedNode, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)

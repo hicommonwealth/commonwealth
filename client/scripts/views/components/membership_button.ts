@@ -7,9 +7,11 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import app from 'state';
 
 export const isMember = (chain, community) => {
-  return chain ? app.login.memberships.map((m) => m.chain).indexOf(chain) !== -1 :
-    community ? app.login.memberships.map((m) => m.community).indexOf(community) !== -1 :
-    false;
+  return chain
+    ? app.login.memberships.map((mem) => mem.chain).indexOf(chain) !== -1
+    : community
+      ? app.login.memberships.map((mem) => mem.community).indexOf(community) !== -1
+      : false;
 };
 
 const MembershipButton: m.Component<{ chain?: string, community?: string, onMembershipChanged? }, { loading }> = {
@@ -25,7 +27,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
         chain,
         community,
       }).then((result) => {
-        app.login.memberships.push(result.result)
+        app.login.memberships.push(result.result);
         onMembershipChanged && onMembershipChanged(true);
         vnode.state.loading = false;
         m.redraw();
@@ -69,8 +71,8 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
     };
 
     return m('a.btn.btn-block.MembershipButton', {
-      class: ((isMember(chain, community) ? 'formular-button-primary is-member' : '') +
-              (vnode.state.loading ? ' disabled' : '')),
+      class: ((isMember(chain, community) ? 'formular-button-primary is-member' : '')
+              + (vnode.state.loading ? ' disabled' : '')),
       href: '#',
       onclick: isMember(chain, community) ? deleteMembership : createMembership
     }, [
