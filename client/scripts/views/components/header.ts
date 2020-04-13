@@ -687,6 +687,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
+      const argString = _.zip(notification.chainEvent.type.typedefs, notification.chainEvent.data)
+        .map(([ type, data ]) => `${type}: ${data}`)
+        .join(', ');
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
         onclick: async () => {
@@ -699,9 +702,12 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', `${notification.chainEvent.type.rawName}(${notification.chainEvent.data.join(', ')})`),
+          m('.comment-body-top', `${notification.chainEvent.type.rawName}`),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', notification.chainEvent.type.documentation.toString()),
+          m('.comment-body-excerpt', [
+            m('.event-description', `Description: ${notification.chainEvent.type.documentation}`),
+            m('.event-args', `Args: (${argString})`),
+          ]),
         ]),
       ]);
     }
