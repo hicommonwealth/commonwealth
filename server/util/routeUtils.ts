@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 export const createCommonwealthUrl = (thread, comment?) => {
   const aId = (thread.community) ? thread.community : thread.chain;
   const tId = thread.id;

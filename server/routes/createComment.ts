@@ -133,10 +133,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
 
   // craft commonwealth url
   const thread = await models.OffchainThread.findOne({ where: { id: finalComment.root_id.split('_')[1] } });
-  const activeId = (finalComment.community) ? finalComment.community : finalComment.chain;
-  const cwUrl = (process.env.NODE_ENV === 'production')
-    ? `https://commonwealth.im/${activeId}/proposal/discussion/${thread.id}-${thread.title.toLowerCase()}?comment=${finalComment.id}`
-    : `http://localhost:8080/${activeId}/proposal/discussion/${thread.id}-${thread.title.toLowerCase()}?comment=${finalComment.id}`;
+  const cwUrl = createCommonwealthUrl(thread, finalComment);
 
   // dispatch notifications
   await models.Subscription.emitNotifications(
@@ -156,7 +153,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     },
     {
       user: finalComment.Address.address,
-      url: createCommonwealthUrl(thread, finalComment),
+      url: cwUrl,
       title: thread.title,
       chain: finalComment.chain,
       community: finalComment.community,
