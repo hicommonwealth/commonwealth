@@ -12,7 +12,6 @@ class ReactionsStore extends IdStore<OffchainReaction<any>> {
   private _storePost: { [identifier: string]: Array<OffchainReaction<any>> } = {};
 
   public add(reaction: OffchainReaction<any>) {
-    debugger
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(reaction);
     this.getAll().sort(byAscendingCreationDate);
@@ -29,7 +28,6 @@ class ReactionsStore extends IdStore<OffchainReaction<any>> {
 
   public remove(reaction: OffchainReaction<any>) {
     super.remove(reaction);
-    debugger
     const identifier = this.getPostIdentifier(reaction);
     const proposalIndex = this._storePost[identifier].indexOf(reaction);
     if (proposalIndex === -1) {

@@ -1,5 +1,5 @@
-import { NotificationCategories } from '../../shared/types';
 import { Response, NextFunction } from 'express';
+import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';

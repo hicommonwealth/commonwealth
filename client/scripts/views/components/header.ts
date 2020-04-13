@@ -527,11 +527,12 @@ const decodeComment = (comment_text) => {
 };
 
 const getNotificationFields = (category, data) => {
-  const { created_at, object_text, object_id, root_id, root_title, comment_text, comment_id, chain_id, community_id,
+  const { created_at, object_text, object_id, root_id, root_title, chain_id, community_id,
     author_address, author_chain } = JSON.parse(data);
+  console.log(JSON.parse(data));
   const object_type = (object_id == root_id) ? 'thread' : 'comment';
   if (!created_at || !author_address || !author_chain || !created_at || (!chain_id && !community_id)
-    || root_title || root_id || object_id || object_text) {
+    || !root_title || !root_id || !object_id || !object_text) {
     console.error('Notification data is incomplete.');
     return;
   }

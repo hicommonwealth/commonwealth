@@ -22,7 +22,6 @@ const ReactionButton: m.Component<IAttrs> = {
     const { post, type, displayAsLink } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
     const a = app;
-    debugger
     let dislikes;
     let likes;
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
@@ -36,15 +35,14 @@ const ReactionButton: m.Component<IAttrs> = {
     if (hasReacted) hasReactedType = rxn.reaction;
 
     return m('.ReactionButton', {
-      class: (disabled ? 'disabled' : type === hasReactedType ? 'active' : '') +
-        (displayAsLink ? ' as-link' : ''),
+      class: (disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
+        + (displayAsLink ? ' as-link' : ''),
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
         const chainId = app.activeCommunityId() ? null : app.activeChainId();
         const communityId = app.activeCommunityId();
-        debugger
         if (hasReacted) {
           const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
           app.reactions.delete(reaction).then(() => m.redraw());

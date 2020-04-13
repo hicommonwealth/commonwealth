@@ -12,7 +12,6 @@ import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThre
 import { notifyError } from 'controllers/app/notifications';
 
 const modelFromServer = (reaction) => {
-  debugger
   return new OffchainReaction(
     reaction.id,
     reaction.Address.address,

@@ -4,9 +4,8 @@ import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { UserRequest } from '../types';
-import { NotificationCategories } from 'shared/types';
-import { createCommonwealthUrl } from 'server/util/routeUtils';
-import { create } from 'client/scripts/lib/quill';
+import { NotificationCategories } from '../../shared/types';
+import { createCommonwealthUrl } from '../util/routeUtils';
 
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -46,7 +45,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   if (req.body.comment_id) {
     comment = await models.OffchainComment.findByPk(req.body.comment_id);
     // Test on variety of comments to ensure root relation + type
-    parentThread = await models.OffchainThread.findByPk(comment.root_id);
+    parentThread = await models.OffchainThread.findByPk(comment.root_id.replace('discussion_', ''));
   } else {
     parentThread = await models.OffchainThread.findByPk(req.body.thread_id);
   }
@@ -66,7 +65,6 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       created_at: new Date(),
       root_title: parentThread.title,
       root_id: parentThread.id,
-      object_type: comment ? 'thread' : 'comment',
       object_text: reactedPost.text,
       object_id: reactedPost.id,
       chain_id: reactedPost.chain,
