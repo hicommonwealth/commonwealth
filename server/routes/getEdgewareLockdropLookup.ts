@@ -1,17 +1,19 @@
 import fs from 'fs';
 import Web3 from 'web3';
 import _ from 'lodash';
+import { Response, NextFunction } from 'express';
 import { INFURA_API_KEY } from '../config';
+import { UserRequest } from '../types';
 
 const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
 const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';
 const ROPSTEN_LOCKDROP = '0x111ee804560787E0bFC1898ed79DAe24F2457a04';
 
-function setupWeb3Provider(network) {
+export function setupWeb3Provider(network) {
   return new Web3(new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`));
 }
 
-const getLocks = (lockdropContract, address) => {
+export const getLocks = (lockdropContract, address) => {
   return lockdropContract.getPastEvents('Locked', {
     fromBlock: 0,
     toBlock: 'latest',
@@ -48,7 +50,7 @@ const getLockStorage = async (lockAddress, web3) => {
     });
 };
 
-const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
+export const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
   console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
   const json = JSON.parse(fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString());
   const contract = new web3.eth.Contract(json.abi, lockdropContractAddress);
@@ -72,7 +74,7 @@ const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) =>
   return results;
 };
 
-const getSignalsForAddress = async (userAddress, lockdropContractAddress, web3) => {
+export const getSignalsForAddress = async (userAddress, lockdropContractAddress, web3) => {
   const json = JSON.parse(fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString());
   const contract = new web3.eth.Contract(json.abi, lockdropContractAddress);
   const signalEvents = await getSignals(contract, userAddress);
@@ -102,9 +104,6 @@ const fetchSignals = async (network = 'mainnet', address, contract) => {
   return results;
 };
 
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
-
 export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
@@ -125,8 +124,6 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
     // eslint-disable-next-line no-return-await
     return await fetchSignals(network, address, c);
   }));
-  const results = _.merge(
-    _.merge(locks[0], locks[1]),
-    _.merge(signals[0], signals[1]));
+  const results = _.merge(_.merge(locks[0], locks[1]), _.merge(signals[0], signals[1]));
   return res.json({ status: 'Success', results });
 };

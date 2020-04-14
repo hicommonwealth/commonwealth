@@ -612,7 +612,7 @@ const EdgewareStatsPage = {
                   vnode.state.lookupLoading = true;
                   vnode.state.lookupCount = formattedAddrs.length;
 
-                  const results = await $.get(`${app.serverUrl()}/edgewareLockdrop`, {
+                  const results = await $.get(`${app.serverUrl()}/edgewareLockdropLookup`, {
                     address: addrText,
                     network: state.network,
                   });

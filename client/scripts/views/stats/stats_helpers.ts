@@ -1,6 +1,7 @@
 import app from 'state';
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
+import $ from 'jquery';
+import _ from 'lodash';
+import Web3 from 'web3';
 
 export const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
 export const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';
@@ -84,7 +85,7 @@ export const getAllSignals = async (web3, lockdropContract) => {
     cachedSignals = results;
     return cachedSignals;
   } else {
-    return await lockdropContract.getPastEvents('Signaled', {
+    return lockdropContract.getPastEvents('Signaled', {
       fromBlock: 0,
       toBlock: 'latest',
     });
@@ -94,6 +95,7 @@ export const getAllSignals = async (web3, lockdropContract) => {
 export const getAllLocks = async (web3, lockdropContract) => {
   if (cachedLocks) return cachedLocks;
   const network = await web3.eth.net.getNetworkType();
+  console.log(network);
   if (network === 'main') {
     const req = await $.get(`${app.serverUrl()}/stats/edgeware/lockdrop/events?origin=${MAINNET_LOCKDROP_ORIG}&name=Locked`);
     const req2 = await $.get(
@@ -112,7 +114,7 @@ export const getAllLocks = async (web3, lockdropContract) => {
     cachedLocks = filterDuplicateLocks(results);
     return cachedLocks;
   } else {
-    return await lockdropContract.getPastEvents('Locked', {
+    return lockdropContract.getPastEvents('Locked', {
       fromBlock: 0,
       toBlock: 'latest',
     });
@@ -125,7 +127,7 @@ export const getLocksFromAddr = async (lockdropContract, address) => {
                                        d.returnValues.owner.toLowerCase() === address.toLowerCase());
     if (matches) return filterDuplicateLocks(matches);
   }
-  return await lockdropContract.getPastEvents('Locked', {
+  return lockdropContract.getPastEvents('Locked', {
     fromBlock: 0,
     toBlock: 'latest',
     filter: {
@@ -139,7 +141,7 @@ export const getSignalsFromAddr = async (lockdropContract, address) => {
     const matches = cachedSignals.filter((d) => d.returnValues.contractAddr.toLowerCase() === address.toLowerCase());
     if (matches) return matches;
   }
-  return await lockdropContract.getPastEvents('Signaled', {
+  return lockdropContract.getPastEvents('Signaled', {
     fromBlock: 0,
     toBlock: 'latest',
     filter: {
@@ -178,8 +180,9 @@ export const calculateEffectiveLocks = async (lockdropContract, initialContract,
   let totalETHLocked6mo = web3.utils.toBN(0);
   let totalETHLocked12mo = web3.utils.toBN(0);
   let totalEffectiveETHLocked = web3.utils.toBN(0);
-
+  console.log(initialContract)
   const lockdropStartTime = await initialContract.methods.LOCK_START_TIME().call();
+  console.log(lockdropStartTime);
   const lockEvents = await getAllLocks(web3, lockdropContract);
   // Add balances and effective values to total
   const locks = {};
@@ -463,11 +466,12 @@ export const getEarlyParticipationBonus = (web3, lockTime, lockStart) => {
  * Setup web3 provider using InjectedWeb3's injected providers
  */
 export function setupWeb3Provider(network, url = null) {
-  return (url)
-  // tslint:disable-next-line:no-string-literal
-    ? new window['Web3'](new window['Web3'].providers.HttpProvider(url))
-  // tslint:disable-next-line:no-string-literal
-    : new window['Web3'](new window['Web3'].providers.HttpProvider(`https://${network}.infura.io`));
+  const providerUrl = url || `https://${network}.infura.io`;
+  const provider = (window['Web3'])
+    ? new window['Web3'].providers.HttpProvider(providerUrl)
+    : new Web3.providers.HttpProvider(providerUrl);
+
+  return new Web3(provider);
 }
 
 export const getAddressSummary = async (addrs, network, token = 'edgeware', contractAddr?) => {
@@ -523,16 +527,34 @@ export const getParticipationSummary = async (network) => {
   const initialContract = new web3.eth.Contract(json.abi, initialContractAddress);
   const lockdropContract = new web3.eth.Contract(json.abi, lockdropContractAddress);
 
-  const { locks, validatingLocks, totalETHLocked, totalEffectiveETHLocked,
-        totalETHLocked3mo, totalETHLocked6mo, totalETHLocked12mo, numLocks } =
-    await calculateEffectiveLocks(lockdropContract, initialContract, web3);
+  const {
+    locks,
+    validatingLocks,
+    totalETHLocked,
+    totalEffectiveETHLocked,
+    totalETHLocked3mo,
+    totalETHLocked6mo,
+    totalETHLocked12mo,
+    numLocks
+  } = await calculateEffectiveLocks(lockdropContract, initialContract, web3);
 
-  const { signals, totalETHSignaled, totalEffectiveETHSignaled, numSignals } =
-    await calculateEffectiveSignals(lockdropContract, web3);
+  const {
+    signals,
+    totalETHSignaled,
+    totalEffectiveETHSignaled,
+    numSignals
+  } = await calculateEffectiveSignals(lockdropContract, web3);
 
-  const { participantsByBlock, lockEventsByBlock, signalEventsByBlock,
-        ethLockedByBlock, ethSignaledByBlock, effectiveETHByBlock, blocknumToTime, lastBlock } =
-    await getCountsByBlock(web3, lockdropContract);
+  const {
+    participantsByBlock,
+    lockEventsByBlock,
+    signalEventsByBlock,
+    ethLockedByBlock,
+    ethSignaledByBlock,
+    effectiveETHByBlock,
+    blocknumToTime,
+    lastBlock
+  } = await getCountsByBlock(web3, lockdropContract);
 
   const lastBlockObj = await web3.eth.getBlock(lastBlock);
   const lastBlockTime = lastBlockObj.timestamp;
