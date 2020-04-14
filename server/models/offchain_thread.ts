@@ -1,17 +1,49 @@
-module.exports = (sequelize, DataTypes) => {
+import * as Sequelize from 'sequelize';
 
-  const OffchainThread = sequelize.define('OffchainThread', {
-    author_id: { type: DataTypes.INTEGER, allowNull: false },
-    title: { type: DataTypes.TEXT, allowNull: false },
-    body: { type: DataTypes.TEXT, allowNull: true },
-    kind: { type: DataTypes.TEXT, allowNull: false },
-    url: { type: DataTypes.TEXT, allowNull: true },
-    pinned: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-    chain: { type: DataTypes.STRING, allowNull: true },
-    community: { type: DataTypes.STRING, allowNull: true },
-    private: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    read_only: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    version_history: { type: DataTypes.ARRAY(DataTypes.TEXT), defaultValue: [], allowNull: false }
+export interface OffchainThreadAttributes {
+  id?: number;
+  author_id: number;
+  title: string;
+  body?: string;
+  kind: string;
+  url?: string;
+  pinned?: boolean;
+  chain?: string;
+  community?: string;
+  private?: boolean;
+  read_only?: boolean;
+  version_history?: string[];
+  created_at?: Date;
+  updated_at?: Date;
+  deleted_at?: Date;
+}
+
+export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
+  // no mixins used
+}
+
+export type OffchainThreadModel = Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes>;
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): OffchainThreadModel => {
+  const OffchainThread = sequelize.define<OffchainThreadInstance, OffchainThreadAttributes>('OffchainThread', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    author_id: { type: dataTypes.INTEGER, allowNull: false },
+    title: { type: dataTypes.TEXT, allowNull: false },
+    body: { type: dataTypes.TEXT, allowNull: true },
+    kind: { type: dataTypes.TEXT, allowNull: false },
+    url: { type: dataTypes.TEXT, allowNull: true },
+    pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+    chain: { type: dataTypes.STRING, allowNull: true },
+    community: { type: dataTypes.STRING, allowNull: true },
+    private: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    read_only: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
+    deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
     underscored: true,
     paranoid: true,
