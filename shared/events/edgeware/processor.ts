@@ -6,6 +6,9 @@ import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
 import { decodeSubstrateCodec, parseEventType } from './util';
 
 export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
+  private _lastBlockNumber: number;
+  public get lastBlockNumber() { return this._lastBlockNumber; }
+
   /**
    * Parse events out of an edgeware block and standardizes their format
    * for processing.
@@ -14,6 +17,13 @@ export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
    * @returns an array of processed events
    */
   public process(block: SubstrateBlock): SubstrateEvent[] {
+    // cache block number if needed for disconnection purposes
+    const blockNumber = +block.header.number;
+    if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {
+      this._lastBlockNumber = blockNumber;
+    }
+
+    // pass along events
     return block.events.map(({ event }) => {
       const type = parseEventType(event);
       if (type !== SubstrateEventType.Unknown) {
@@ -21,7 +31,7 @@ export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
         console.log(JSON.stringify(event.typeDef));
         return {
           type,
-          blockNumber: +block.header.number,
+          blockNumber,
           name: `${event.section}.${event.method}`,
           documentation: event.meta.documentation.length > 0 ? event.meta.documentation.join(' ') : '',
           typedefs: event.meta.args.map((t) => t.toString()),

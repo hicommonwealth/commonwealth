@@ -19,7 +19,7 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
       const events = await this._api.query.system.events.at(header.hash);
       const block: SubstrateBlock = { header, events };
       // TODO: add logging prefix output
-      console.log(`Block: ${+block.header.number}`);
+      console.log(`Subscriber fetched Block: ${+block.header.number}`);
       cb(block);
     });
   }

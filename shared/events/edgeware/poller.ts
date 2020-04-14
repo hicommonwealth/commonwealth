@@ -4,7 +4,7 @@
 import { ApiPromise } from '@polkadot/api';
 import { Hash } from '@polkadot/types/interfaces';
 
-import { IBlockPoller } from '../interfaces';
+import { IBlockPoller, IDisconnectedRange } from '../interfaces';
 import { SubstrateBlock } from './types';
 
 export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
@@ -15,25 +15,31 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
    * @param startBlock first block to fetch
    * @param endBlock last block to fetch, omit to fetch to latest
    */
-  public async poll(startBlock: number, endBlock?: number): Promise<SubstrateBlock[]> {
+  public async poll(range: IDisconnectedRange): Promise<SubstrateBlock[]> {
     // discovery current block if no end block provided
-    if (!endBlock) {
-      endBlock = (await this._api.derive.chain.bestNumber()).toNumber();
+    if (!range.endBlock) {
+      const header = await this._api.rpc.chain.getHeader();
+      range.endBlock = +header.number;
+      console.log(`Discovered endBlock: ${range.endBlock}`);
     }
-    if ((endBlock - startBlock) >= 0) {
+    if ((range.endBlock - range.startBlock) <= 0) {
+      console.error(`End of range (${range.endBlock}) is less that start (${range.startBlock})! No blocks to fetch.`);
       return;
     }
 
     // fetch blocks from start to end
-    const blockNumbers = [ ...Array(endBlock - startBlock).keys()]
-      .map((i) => startBlock + i);
-    const blockHashes: Hash[] = await this._api.query.system.header.multi(blockNumbers);
-
+    const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
+      .map((i) => range.startBlock + i);
+    console.log(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
+    const blockHashes: Hash[] = await this._api.query.system.blockHash.multi(blockNumbers);
+    console.log('Hashes fetched! Fetching headers and events...');
     const blocks: SubstrateBlock[] = await Promise.all(blockHashes.map(async (hash) => {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
+      console.log(`Poller fetched Block: ${+header.number}`);
       return { header, events };
     }));
+    console.log('Finished polling past blocks!');
 
     return blocks;
   }

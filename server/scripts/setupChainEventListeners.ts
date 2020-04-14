@@ -1,5 +1,18 @@
 import EdgewareEventHandler from '../eventHandlers/edgeware';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
+import { IDisconnectedRange } from '../../shared/events/interfaces';
+
+const discoverReconnectRange = async (models): Promise<IDisconnectedRange> => {
+  const lastChainEvent = await models.ChainEvent.findAll({
+    limit: 1,
+    order: [ [ 'createdAt', 'DESC' ]]
+  });
+  if (lastChainEvent) {
+    return { startBlock: (lastChainEvent.block_number + 1) };
+  } else {
+    return { startBlock: null };
+  }
+};
 
 const setupChainEventListeners = async (models, wss) => {
   // TODO: add a flag to the db for this filter, but for now
@@ -9,7 +22,11 @@ const setupChainEventListeners = async (models, wss) => {
     .map(async (node) => {
       const eventHandler = new EdgewareEventHandler(models, wss, node.chain);
       const url = `ws://${node.url}`;
-      const subscriber = await subscribeEdgewareEvents(url, eventHandler);
+      const subscriber = await subscribeEdgewareEvents(
+        url,
+        eventHandler,
+        () => discoverReconnectRange(models),
+      );
 
       // hook for clean exit
       process.on('SIGTERM', () => {

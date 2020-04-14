@@ -27,6 +27,11 @@ export abstract class IBlockSubscriber<Api, Block> {
   public abstract unsubscribe(): void;
 }
 
+export interface IDisconnectedRange {
+  startBlock: number;
+  endBlock?: number;
+}
+
 // fetches historical blocks from chain for processing
 export abstract class IBlockPoller<Api, Block> {
   constructor(
@@ -34,5 +39,5 @@ export abstract class IBlockPoller<Api, Block> {
   ) { }
 
   // throws on error
-  public abstract async poll(startBlock: number, endBlock?: number): Promise<Block[]>;
+  public abstract async poll(range: IDisconnectedRange): Promise<Block[]>;
 }
