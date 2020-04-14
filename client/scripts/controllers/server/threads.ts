@@ -50,7 +50,7 @@ class ThreadsController {
   }
 
   public create(address: string, kind: string, chainId: string, communityId: string, title: string, body?: string,
-    tags?: string[], url?: string, attachments?: string[], mentions?: string[]) {
+    tags?: string[], url?: string, attachments?: string[], mentions?: string[], privacy?: boolean, readOnly?: boolean) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
@@ -67,6 +67,8 @@ class ThreadsController {
       'mentions[]': mentions,
       'tags[]': tags,
       'url': url,
+      'privacy': privacy,
+      'readOnly': readOnly,
       'jwt': app.login.jwt,
     }).then((response) => {
       const result = modelFromServer(response.result);

@@ -9,7 +9,9 @@ import { createCommonwealthUrl } from '../util/routeUtils';
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { title, body, kind, url } = req.body;
+  const { title, body, kind, url, privacy, readOnly } = req.body;
+  console.dir(privacy);
+  console.dir(readOnly);
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -70,6 +72,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     version_history: versionHistory,
     kind,
     url,
+    private: privacy,
+    read_only: readOnly,
   } : {
     chain: chain.id,
     author_id: author.id,
@@ -78,9 +82,12 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     version_history: versionHistory,
     kind,
     url,
+    private: privacy,
+    read_only: readOnly,
   };
 
   const thread = await models.OffchainThread.create(threadContent);
+  console.dir(thread);
 
   // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
   if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {

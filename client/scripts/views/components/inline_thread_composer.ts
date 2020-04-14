@@ -134,6 +134,8 @@ interface ITextPostAttrs {
 }
 
 interface ITextPostState {
+  read_only: boolean;
+  private: boolean;
   tags: string[];
   uploadsInProgress: number;
   closed: boolean;
@@ -155,7 +157,19 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
     const createThread = (e?) => {
       if (e) e.preventDefault();
       const { form, quillEditorState } = vnode.state;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum);
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, false, false);
+      m.redraw();
+    };
+    const createPrivateThread = (e?) => {
+      if (e) e.preventDefault();
+      const { form, quillEditorState } = vnode.state;
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, true, false);
+      m.redraw();
+    };
+    const createPublicReadOnlyThread = (e?) => {
+      if (e) e.preventDefault();
+      const { form, quillEditorState } = vnode.state;
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, false, true);
       m.redraw();
     };
 
@@ -178,10 +192,16 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             onclick: createThread,
             tabindex: 4
           }, 'Create thread'),
-          // m('button', {
-          //   type: 'cancel',
-          //   onclick: closeComposer,
-          // }, 'Cancel'),
+          m('button', {
+            type: 'submit',
+            onclick: createPrivateThread,
+            tabindex: 4
+          }, 'Create private thread'),
+          m('button', {
+            type: 'submit',
+            onclick: createPublicReadOnlyThread,
+            tabindex: 4
+          }, 'Create Read Only Thread (Public)'),
         ]),
         m('.tag-selection', [
           m(AutoCompleteTagForm, {
@@ -197,12 +217,12 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             tabindex: 3,
           }),
         ]),
+        (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
+          && m('.error-message', [
+            (typeof vnode.state.error === 'string') ? m('span', vnode.state.error)
+              : Object.values(vnode.state.error).map((val) => m('span', `${val} `)),
+          ]),
       ]),
-      (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
-        && m('.error-message', [
-          (typeof vnode.state.error === 'string') ? m('span', vnode.state.error)
-            : Object.values(vnode.state.error).map((val) => m('span', `${val} `)),
-        ]),
     ]);
   },
 };
