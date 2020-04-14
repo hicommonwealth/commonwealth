@@ -174,6 +174,24 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               m(ViewCountBlock, { proposal }),
               m('.proposal-comment-summary', pluralize(nComments, 'comment')),
               m('.reaction', m(ReactionButton, { proposal, type: ReactionType.Like })),
+              proposal.kind === OffchainThreadKind.Link
+              && m('.discussion-meta-right', [
+                // !getSetGlobalEditingStatus(GlobalStatus.Get)
+                isSameAccount(app.vm.activeAccount, author)
+                // && !vnode.state.editing
+                && m('a', {
+                  href: '#',
+                  onclick: async (e) => {
+                    e.preventDefault();
+                    const confirmed = await confirmationModalWithText('Delete this entire thread?')();
+                    if (!confirmed) return;
+                    app.threads.delete(proposal).then(() => {
+                      m.route.set(`/${app.activeId()}/`);
+                      // TODO: set notification bar for 'thread deleted'
+                    });
+                  },
+                }, 'Delete'),
+              ]),
             ])
             : m('.proposal-meta', [
               author && m('span.proposal-user', [
