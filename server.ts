@@ -135,7 +135,7 @@ const templateFile = (() => {
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
-//setupPrerenderServer();
+if (process.env.WITH_PRERENDER) setupPrerenderServer();
 setupMiddleware();
 setupPassport(models);
 setupAPI(app, models, fetcher, viewCountCache);
