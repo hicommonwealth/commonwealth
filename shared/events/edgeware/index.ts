@@ -10,6 +10,7 @@ import { IEventHandler, IBlockSubscriber, IDisconnectedRange } from '../interfac
 export default function (
   url = 'ws://localhost:9944',
   handler: IEventHandler<SubstrateEvent>,
+  skipCatchup: boolean,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
   const provider = new WsProvider(url);
@@ -31,6 +32,10 @@ export default function (
 
         const pollMissedBlocksFn = async () => {
           console.log('Detected offline time, polling missed blocks...');
+          // grab the cached block immediately to avoid a new block appearing before the
+          // server can do its thing...
+          const lastBlockNumber = processor.lastBlockNumber;
+
           // determine how large of a reconnect we dealt with
           let offlineRange: IDisconnectedRange;
 
@@ -43,7 +48,6 @@ export default function (
           // compare with default range algorithm: take last cached block in processor
           // if it exists, and is more recent than the provided algorithm
           // (note that on first run, we wont have a cached block/this wont do anything)
-          const lastBlockNumber = processor.lastBlockNumber;
           if (lastBlockNumber
               && (!offlineRange || !offlineRange.startBlock || offlineRange.startBlock < lastBlockNumber)) {
             offlineRange = { startBlock: lastBlockNumber };
@@ -64,7 +68,12 @@ export default function (
             console.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
           }
         };
-        pollMissedBlocksFn();
+
+        if (!skipCatchup) {
+          pollMissedBlocksFn();
+        } else {
+          console.log('Skipping event catchup on startup!');
+        }
 
         try {
           console.log(`Subscribing to Edgeware at ${url}...`);

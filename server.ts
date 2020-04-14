@@ -47,6 +47,7 @@ const SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY = process.env.UPDATE_OBJECTS === '
 const SHOULD_ADD_TEST_QUERIES = process.env.ADD_TEST_QUERIES === 'true';
 const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
+const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -181,7 +182,7 @@ if (SHOULD_RESET_DB) {
     });
 } else {
   //setupPrerenderServer();
-  setupChainEventListeners(models, wss);
+  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP);
   setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }

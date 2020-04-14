@@ -1,6 +1,6 @@
 import subscribeEdgewareEvents from './shared/events/edgeware/index';
 import { IEventHandler } from './shared/events/interfaces';
-import { SubstrateEvent, SubstrateEventType } from './shared/events/edgeware/types';
+import { SubstrateEvent } from './shared/events/edgeware/types';
 
 const url = process.env.NODE_URL || undefined;
 
@@ -11,4 +11,5 @@ class StandaloneSubstrateEventHandler extends IEventHandler<SubstrateEvent> {
   }
 }
 
-subscribeEdgewareEvents(url, new StandaloneSubstrateEventHandler());
+const skipCatchup = false;
+subscribeEdgewareEvents(url, new StandaloneSubstrateEventHandler(), skipCatchup);

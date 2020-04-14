@@ -7,7 +7,10 @@ import { DATABASE_URI } from './config';
 const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
-  logging: (process.env.NODE_ENV === 'test') ? false : () => {},
+  logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { console.log(msg); },
+  dialectOptions: {
+    requestTimeout: 10000
+  },
 });
 const db = { sequelize, Sequelize };
 

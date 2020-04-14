@@ -31,9 +31,13 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
       .map((i) => range.startBlock + i);
     console.log(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
-    const blockHashes: Hash[] = await this._api.query.system.blockHash.multi(blockNumbers);
-    console.log('Hashes fetched! Fetching headers and events...');
-    const blocks: SubstrateBlock[] = await Promise.all(blockHashes.map(async (hash) => {
+    const hashes: Hash[] = await this._api.query.system.blockHash.multi(blockNumbers);
+
+    // remove all-0 block hashes -- those blocks have been pruned & we cannot fetch their data
+    const nonZeroHashes = hashes.filter((hash) => !hash.isEmpty);
+    console.log(`${nonZeroHashes.length} active and ${hashes.length - nonZeroHashes.length} pruned hashes fetched!`);
+    console.log('Fetching headers and events...');
+    const blocks: SubstrateBlock[] = await Promise.all(nonZeroHashes.map(async (hash) => {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
       console.log(`Poller fetched Block: ${+header.number}`);
