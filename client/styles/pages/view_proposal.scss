@@ -107,6 +107,21 @@
                 right: 0px;
             }
         }
+        .discussion-meta-right {
+            font-weight: 500;
+            :last-child {
+                margin-right: 0 !important;
+            }
+            a {
+                color: $lighttextgrey;
+                text-decoration: none;
+                margin-right: 16px;
+                &:hover {
+                    text-decoration: underline;
+                    color: #555;
+                }
+            }
+        }
     }
     a.external-link {
         display: inline-block;
