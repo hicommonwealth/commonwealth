@@ -34,18 +34,23 @@ export default function (
           // determine how large of a reconnect we dealt with
           let offlineRange: IDisconnectedRange;
 
-          // first attempt a provided range finding method
+          // first, attempt the provided range finding method if it exists
+          // (this should fetch the block of the last server event from database)
           if (discoverReconnectRange) {
             offlineRange = await discoverReconnectRange();
           }
 
-          // fall back to default range algorithm: take last cached block in processor
-          if (!offlineRange || !offlineRange.startBlock) {
-            const lastBlockNumber = processor.lastBlockNumber;
+          // compare with default range algorithm: take last cached block in processor
+          // if it exists, and is more recent than the provided algorithm
+          // (note that on first run, we wont have a cached block/this wont do anything)
+          const lastBlockNumber = processor.lastBlockNumber;
+          if (lastBlockNumber
+              && (!offlineRange || !offlineRange.startBlock || offlineRange.startBlock < lastBlockNumber)) {
             offlineRange = { startBlock: lastBlockNumber };
           }
 
-          // if we haven't seen any blocks, don't attempt recovery
+          // if we can't figure out when the last block we saw was, do nothing
+          // (i.e. don't try and fetch all events from block 0 onward)
           if (!offlineRange || !offlineRange.startBlock) {
             console.error('Unable to determine offline time range.');
             return;
