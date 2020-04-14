@@ -52,7 +52,7 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .filter((addr) => addr)
     : app.login.addresses
       .map((addr) => app.community.accounts.get(addr.address, addr.chain))
-      .filter((addr) => addr)
+      .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
   const initAddress = localStorage.getItem('initAddress');
@@ -69,10 +69,10 @@ export function updateActiveAddresses(chain?: ChainInfo) {
 
   // try to load a previously selected account for the chain/community
   if (chain) {
-    const defaultAddress = app.login.selectedAddresses.chains[chain.id];
+    const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
     app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
   } else if (app.activeCommunityId()) {
-    const defaultAddress = app.login.selectedAddresses.communities[app.activeCommunityId()];
+    const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
     app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
   }
 }
@@ -87,7 +87,7 @@ export function updateActiveUser(data) {
     app.login.socialAccounts = [];
     app.login.isSiteAdmin = false;
     app.login.lastVisited = {};
-    app.login.selectedAddresses = { chains: {}, communities: {} };
+    app.login.selectedAddresses.reset();
     app.login.unseenPosts = {};
     app.login.activeAddresses = [];
     app.vm.activeAccount = null;
@@ -103,11 +103,8 @@ export function updateActiveUser(data) {
     app.login.isSiteAdmin = data.isAdmin;
     app.login.disableRichText = data.disableRichText;
     app.login.lastVisited = data.lastVisited;
-    app.login.selectedAddresses = data.selectedAddresses;
+    app.login.selectedAddresses.reset(data.selectedAddresses);
     app.login.unseenPosts = data.unseenPosts;
-
-    if (!app.login.selectedAddresses.chains) app.login.selectedAddresses.chains = {};
-    if (!app.login.selectedAddresses.communities) app.login.selectedAddresses.communities = {};
   }
 }
 
@@ -186,17 +183,11 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
   app.vm.activeAccount = account;
 
   if (app.activeCommunityId()) {
-    app.login.selectedAddresses['communities'][app.activeCommunityId()] = account.address;
+    app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
   } else if (app.activeChainId()) {
-    app.login.selectedAddresses['chains'][app.activeChainId()] = account.address;
+    app.login.selectedAddresses.setByChain(app.activeChainId(), account);
+  } else {
+    localStorage.setItem('initChain', account.chain.id);
+    localStorage.setItem('initAddress', account.address);
   }
-
-  // kick off request to update the server
-  $.post(`${app.serverUrl()}/writeUserSetting`, {
-    jwt: app.login.jwt,
-    key: 'selectedAddresses',
-    value: JSON.stringify(app.login.selectedAddresses),
-  }).catch((e) => {
-    throw new Error(e.responseJSON.error);
-  });
 }

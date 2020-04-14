@@ -33,7 +33,7 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
     const createRoleWithAddress = (address, e) => {
       $.post('/api/createRole', {
         jwt: app.login.jwt,
-        addressId: address.id,
+        address_id: address.id,
         chain,
         community,
       }).then((result) => {

@@ -26,7 +26,7 @@ const writeUserSetting = async (models, req: UserRequest, res: Response, next: N
     } catch (e) {
       return next(new Error('value is not valid JSON'));
     }
-    req.user.lastVisited = value;
+    req.user.selectedAddresses = value;
     await req.user.save();
 
   } else if (key === 'disableRichText' && value === 'true') {

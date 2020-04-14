@@ -21,6 +21,7 @@ import ReactionsController from './controllers/server/reactions';
 import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
+import SelectedAddressesController from './controllers/server/selected_addresses';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -68,7 +69,7 @@ export interface IApp {
     disableRichText: boolean;
     notifications: NotificationsController;
     lastVisited: object;
-    selectedAddresses: { chains: object, communities: object };
+    selectedAddresses: SelectedAddressesController;
     unseenPosts: object;
   };
   config: {
@@ -119,7 +120,7 @@ const app: IApp = {
     isSiteAdmin: false,
     disableRichText: null,
     lastVisited: {},
-    selectedAddresses: { chains: {}, communities: {} },
+    selectedAddresses: new SelectedAddressesController(),
     unseenPosts: {},
     notifications: new NotificationsController(),
   },

@@ -218,14 +218,16 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   app.chain.init(() => m.redraw()).then(() => {
     // Emit chain as updated
     app.chainReady.next(true);
-    updateActiveAddresses(n.chain);
     console.log(`${n.chain.network.toUpperCase()} started.`);
+    // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
+    updateActiveAddresses(n.chain);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 
-  // Initialize available addresses
+  // Try to instantiate Account<> objects for the new chain. However, app.chain.accounts.get() may not be able to
+  // create the Account object, so we also call this again in the callback that runs after the chain initializes
   updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
