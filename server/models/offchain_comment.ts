@@ -1,14 +1,44 @@
-module.exports = (sequelize, DataTypes) => {
-  const OffchainComment = sequelize.define('OffchainComment', {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: DataTypes.STRING, allowNull: true },
-    root_id: { type: DataTypes.STRING, allowNull: false },
-    parent_id: { type: DataTypes.STRING, allowNull: true },
-    child_comments: { type: DataTypes.ARRAY(DataTypes.INTEGER), allowNull: false, defaultValue: [] },
-    address_id: { type: DataTypes.INTEGER, allowNull: false },
-    text: { type: DataTypes.TEXT, allowNull: false },
-    community: { type: DataTypes.STRING, allowNull: true },
-    version_history: { type: DataTypes.ARRAY(DataTypes.TEXT), defaultValue: [], allowNull: false }
+import * as Sequelize from 'sequelize';
+
+export interface OffchainCommentAttributes {
+  id?: number;
+  chain?: string;
+  root_id: string;
+  parent_id?: string;
+  child_comments?: number[];
+  address_id: number;
+  text: string;
+  community?: string;
+  version_history?: string[];
+  created_at?: Date;
+  updated_at?: Date;
+  deleted_at?: Date;
+}
+
+export interface OffchainCommentInstance
+extends Sequelize.Instance<OffchainCommentAttributes>, OffchainCommentAttributes {
+  // no mixins used
+}
+
+export type OffchainCommentModel = Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes>;
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): OffchainCommentModel => {
+  const OffchainComment = sequelize.define<OffchainCommentInstance, OffchainCommentAttributes>('OffchainComment', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    chain: { type: dataTypes.STRING, allowNull: true },
+    root_id: { type: dataTypes.STRING, allowNull: false },
+    parent_id: { type: dataTypes.STRING, allowNull: true },
+    child_comments: { type: dataTypes.ARRAY(dataTypes.INTEGER), allowNull: false, defaultValue: [] },
+    address_id: { type: dataTypes.INTEGER, allowNull: false },
+    text: { type: dataTypes.TEXT, allowNull: false },
+    community: { type: dataTypes.STRING, allowNull: true },
+    version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
+    deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
     underscored: true,
     paranoid: true,

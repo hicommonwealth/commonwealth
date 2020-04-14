@@ -1,9 +1,36 @@
-module.exports = (sequelize, DataTypes) => {
-  const OffchainTag = sequelize.define('OffchainTag', {
-    name: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
-    community_id: { type: DataTypes.STRING, allowNull: true },
-    chain_id: { type: DataTypes.STRING, allowNull: true },
+import * as Sequelize from 'sequelize';
+
+export interface OffchainTagAttributes {
+  id?: number;
+  name: string;
+  description?: string;
+  community_id: string;
+  chain_id: string;
+  created_at?: Date;
+  updated_at?: Date;
+  deleted_at?: Date;
+}
+
+export interface OffchainTagInstance extends Sequelize.Instance<OffchainTagAttributes>, OffchainTagAttributes {
+  // no mixins used
+  // TODO: do we need to implement the "as" stuff here?
+}
+
+export type OffchainTagModel = Sequelize.Model<OffchainTagInstance, OffchainTagAttributes>;
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): OffchainTagModel => {
+  const OffchainTag = sequelize.define<OffchainTagInstance, OffchainTagAttributes>('OffchainTag', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    name: { type: dataTypes.STRING, allowNull: false },
+    description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
+    community_id: { type: dataTypes.STRING, allowNull: true },
+    chain_id: { type: dataTypes.STRING, allowNull: true },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
+    deleted_at: { type: dataTypes.DATE, allowNull: true },
   }, {
     underscored: true,
     paranoid: true,

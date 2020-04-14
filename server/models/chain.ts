@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { ChainNodeInstance } from './chain_node';
 
 export interface ChainAttributes {
-  id: string;
+  id?: string;
   name: string;
   description?: string;
   featured_tags: string[];
@@ -18,10 +18,12 @@ export interface ChainInstance extends Sequelize.Instance<ChainAttributes>, Chai
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 
+export type ChainModel = Sequelize.Model<ChainInstance, ChainAttributes>;
+
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
-): Sequelize.Model<ChainInstance, ChainAttributes> => {
+): ChainModel => {
   const Chain = sequelize.define<ChainInstance, ChainAttributes>('Chain', {
     id: { type: dataTypes.STRING, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
