@@ -913,19 +913,8 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       class: 'ViewProposalPage',
       content: [
         m(ProposalHeader, { isThread, nComments, proposal }),
-        hasBody
-          && m(ProposalBody, {
-            isThread,
-            proposal,
-            getSetGlobalEditingStatus,
-            getSetGlobalReplyStatus
-          }),
-        m(ProposalComments, {
-          proposal,
-          getSetGlobalEditingStatus,
-          getSetGlobalReplyStatus,
-          replyParent
-        }),
+        m(ProposalBody, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, isThread }),
+        m(ProposalComments, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent }),
         m(ProposalSidebar, { proposal }),
       ],
     });

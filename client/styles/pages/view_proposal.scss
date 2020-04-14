@@ -11,96 +11,15 @@
 }
 
 .ViewProposalPage {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    .page-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-    }
 }
 
-.ProposalHeader,
-.ProposalBody,
-.ProposalComment,
-.CreateComment {
-    margin: 10px 0 0;
-    background-color: #fff;
-    box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.04);
-    @include xs-max {
-        padding-right: 26px;
-        margin: 8px 0;
-    }
-    .User.avatar-only {
-        // ensure tooltip appears above avatar circle
-        display: block;
-    }
-}
 .ProposalHeader,
 .ProposalBody,
 .ProposalComment {
     @include supports-jump-highlight();
 }
 
-.ProposalBody,
-.ProposalComment,
-.CreateComment {
-    .upper-meta, .lower-meta {
-        display: flex;
-        justify-content: space-between;
-        .upper-meta-left {
-            flex: 1;
-            margin: 1px 0 12px;
-            .icon-reply {
-                margin-right: 8px;
-            }
-            a.last-edited {
-                padding-left: 12px;
-            }
-        }
-        .upper-meta-right {
-            margin: 1px 0 12px;
-            :last-child {
-                margin-right: 0 !important;
-            }
-            a {
-                margin-right: 16px;
-            }
-        }
-        .comment-timestamp {
-            color: $lighttextgrey;
-            margin-left: 10px;
-        }
-        a, span {
-            color: $lighttextgrey;
-            text-decoration: none;
-        }
-        a {
-            &:hover {
-                text-decoration: underline;
-                color: #555;
-            }
-        }
-    }
-    .lower-meta {
-        margin: 12px 0 0;
-    }
-    .body-text,
-    .proposal-comment-text {
-        margin-bottom: 2px;
-    }
-}
-
 .ProposalComments {
-    .loading-comments {
-        color: #888;
-        margin: 30px 0 47px;
-        .icon-spinner2 {
-            margin-left: 15px;
-        }
-    }
     .threading-level {
         margin-left: 36px;
     }
@@ -149,18 +68,6 @@
 
 // new comment
 .CreateComment {
-    @include supports-jump-highlight();
-    &.proposal-comment {
-        margin-bottom: 20px;
-    }
-    .upper-meta .upper-meta-left {
-        margin-bottom: 0;
-    }
-    .icon-reply {
-        font-size: 10px;
-        position: relative;
-        top: -2px;
-    }
     .QuillEditor {
         margin: 14px 0 18px;
         .ql-toolbar, .ql-editor {
@@ -171,39 +78,8 @@
             border-radius: 2px;
         }
     }
-    .form-bottom, .actions {
-        button + button {
-            margin-left: 8px;
-        }
-    }
-    .empty-profile-notification {
-        @include profile-notice(#fdf3e1, #111);
-    }
     .new-comment-error {
         color: $error-red;
         font-weight: 700;
-    }
-    @include xs-max {
-        .User, .left-col {
-            display: none;
-        }
-        .right-col {
-            width: 100%;
-        }
-    }
-}
-
-.ProposalSidebar {
-    &.ThreadSidebar {
-        .meta {
-            border-bottom: 1px solid $lighttextgrey;
-            margin-bottom: 1em;
-        }
-        .tags {
-            margin-top: 1em;
-        }
-        .meta, .tags {
-            min-height: 45px;
-        }
     }
 }
