@@ -23,8 +23,8 @@ class OffchainThread implements IUniqueId {
   public readonly url: string;
   public readonly versionHistory: string[];
   public readonly community: string | number;
-  public readonly privacy: boolean;
-  public readonly readOnly: boolean;
+  public readonly privacy?: boolean;
+  public readonly readOnly?: boolean;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -44,8 +44,8 @@ class OffchainThread implements IUniqueId {
     url?: string,
     authorChain?: string,
     pinned?: boolean,
-    privacy: boolean,
-    readOnly: boolean,
+    privacy?: boolean,
+    readOnly?: boolean,
 
   ) {
     this.author = author;
@@ -62,8 +62,8 @@ class OffchainThread implements IUniqueId {
     this.url = url;
     this.versionHistory = versionHistory;
     this.community = community;
-    this.privacy = privacy,
-    this.readOnly = readOnly,
+    this.privacy = privacy;
+    this.readOnly = readOnly;
   }
 }
 
