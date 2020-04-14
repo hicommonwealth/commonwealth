@@ -16,11 +16,51 @@ describe('Tag Tests', () => {
     await resetDatabase();
   });
 
+  describe('Bulk Tags', () => {
+    const markdownThread = require('../../util/fixtures/markdownThread');
+    const community = 'staking';
+    const chain = 'ethereum';
+    let adminJWT;
+    let adminAddress;
+
+    before(async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      adminAddress = res.address;
+      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
+      expect(adminAddress).to.not.be.null;
+      expect(adminJWT).to.not.be.null;
+      expect(isAdmin).to.not.be.null;
+      const res2 = await modelUtils.createThread({
+        chain,
+        address: adminAddress,
+        jwt: adminJWT,
+        title: decodeURIComponent(markdownThread.title),
+        body: decodeURIComponent(markdownThread.body),
+        tags: ['tag', 'tag2', 'tag3'],
+      });
+      expect(res2.result).to.not.be.null;
+    });
+
+    it('Should pass /bulkTags', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkTags')
+        .set('Accept', 'application/json')
+        .query({
+          chain,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      console.dir(res.body);
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.length).to.be.equal(3);
+    });
+  });
+
   describe('Update Tags', () => {
     const markdownThread = require('../../util/fixtures/markdownThread');
-    const markdownComment = require('../../util/fixtures/markdownComment');
-    const richTextThread = require('../../util/fixtures/richTextThread');
-    const richTextComment = require('../../util/fixtures/richTextComment');
     const community = 'staking';
     const chain = 'ethereum';
     let adminJWT;
