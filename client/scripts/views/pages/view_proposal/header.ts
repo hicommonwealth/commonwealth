@@ -2,6 +2,8 @@ import 'pages/view_proposal/header.scss';
 
 import m from 'mithril';
 import app from 'state';
+import { Button } from 'construct-ui';
+
 import { pluralize, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 import { proposalSlugToFriendlyName } from 'identifiers';
@@ -152,9 +154,10 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
 
     const subscription = app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
 
-    return m('button.ProposalHeaderSubscriptionButton', {
+    return m(Button, {
+      class: 'ProposalHeaderSubscriptionButton',
       disabled: !app.isLoggedIn(),
-      class: subscription?.isActive ? 'formular-button-primary' : '',
+      intent: subscription?.isActive ? 'primary' : 'none',
       onclick: (e) => {
         e.preventDefault();
         if (subscription?.isActive) {
@@ -164,11 +167,10 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
             NotificationCategories.NewComment, proposal.uniqueIdentifier,
           ).then(() => m.redraw());
         }
-      }
-    }, [
-      subscription?.isActive ?
+      },
+      label: subscription?.isActive ?
         [ m('span.icon-bell'), ' Notifications on' ] :
         [ m('span.icon-bell-off'), ' Notifications off' ]
-    ]);
+    });
   }
 };

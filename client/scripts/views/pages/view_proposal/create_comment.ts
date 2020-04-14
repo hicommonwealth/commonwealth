@@ -1,5 +1,6 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 
@@ -137,23 +138,27 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
           onkeyboardSubmit: submitComment,
         }),
         m('.form-bottom', [
-          m('button', {
+          m(Button, {
+            intent: 'primary',
             type: 'submit',
             disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
-            onclick: submitComment
-          }, (uploadsInProgress > 0)
-            ? 'Uploading...'
-            : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'),
+            onclick: submitComment,
+            label: (uploadsInProgress > 0)
+              ? 'Uploading...'
+              : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+          }),
           cancellable
-          && m('button', {
-            type: 'cancel',
-            onclick: (e) => {
-              e.preventDefault();
-              getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-            }
-          }, 'Cancel'),
+            && m(Button, {
+              intent: 'none',
+              type: 'cancel',
+              onclick: (e) => {
+                e.preventDefault();
+                getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+              },
+              label: 'Cancel'
+            }),
           error
-          && m('.new-comment-error', error),
+            && m('.new-comment-error', error),
         ]),
       ])
     ]);
