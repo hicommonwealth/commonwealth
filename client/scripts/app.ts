@@ -340,7 +340,7 @@ $(() => {
     '/:scope/discussions/:tag':  importRoute(import('views/pages/discussions'), true),
     '/:scope/chat':              importRoute(import('views/pages/chat'), true),
     '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
-    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal'), true),
+    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), true),
     '/:scope/council':           importRoute(import('views/pages/council'), true),
     '/:scope/login':             importRoute(import('views/pages/login'), true),
     '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),

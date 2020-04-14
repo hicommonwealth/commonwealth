@@ -1,0 +1,44 @@
+@import 'client/styles/shared';
+
+.ProposalHeaderAuthor {
+}
+.ProposalHeaderComments {
+}
+.ProposalHeaderCreated {
+}
+.ProposalHeaderDelete {
+}
+a.ProposalHeaderExternalLink {
+    color: $primary-green;
+    text-decoration: none;
+    margin-top: 14px;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+.ProposalHeaderTags {
+    a {
+        color: #999;
+        text-decoration: none;
+        margin-right: 10px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+.ProposalHeaderTitle {
+    font-size: 22px;
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.25;
+}
+.ProposalHeaderOnchainId {
+}
+.ProposalHeaderOnchainStatus, {
+}
+.ProposalHeaderSpacer {
+    margin: 0;
+    color: #999;
+}
+.ProposalHeaderSubscriptionButton {
+}
