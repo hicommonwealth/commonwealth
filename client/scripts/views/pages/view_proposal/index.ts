@@ -2,18 +2,19 @@ import 'pages/view_proposal.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import lity from 'lity';
 
 import Near from 'controllers/chain/near/main';
 import { WalletAccount } from 'nearlib';
 
-import { updateRoute } from 'app';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 
 import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSubscriptionButton } from './header';
+import { GlobalStatus, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
 
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
@@ -31,6 +32,7 @@ import {
   OffchainTag
 } from 'models';
 
+import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
@@ -47,53 +49,10 @@ import PreviewModal from 'views/modals/preview_modal';
 import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import moment from 'moment';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from 'views/pages/threads';
 import VersionHistoryModal from 'views/modals/version_history_modal';
-
-const activeQuillEditorHasText = () => {
-  // TODO: Better lookup than document.getElementsByClassName[0]
-  // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
-  // However, threading is overdue for a refactor anyway, so we'll handle this then
-  return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1
-};
-
-// highlight the header/body of a parent thread, or the body of a comment
-export const jumpHighlightComment = (commentId, shouldScroll = true, animationDelayTime = 2000) => {
-  const $div = commentId === 'parent'
-    ? $('html, body').find('.ProposalHeader')
-    : commentId === 'body'
-    ? $('html, body').find('.ProposalBody')
-    : $('html, body').find(`.comment-${commentId}`);
-  if ($div.length === 0) return; // if the passed comment was invalid, abort
-  const divTop = $div.position().top;
-  const scrollTime = 500; // time to scroll
-  const minimumVisibleHeight = 250; // minimum amount of the comment that must appear in the current viewport
-
-  // clear any previous animation
-  $div.removeClass('highlighted highlightAnimationComplete');
-
-  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
-  if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
-    $div.addClass('highlighted');
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime + scrollTime);
-  } else {
-    $div.addClass('highlighted');
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime);
-  }
-};
-
-enum GlobalStatus {
-  Get = 'get',
-  Set = 'set'
-}
 
 const ProposalHeader: m.Component<{ isThread: boolean, nComments: number, proposal: any }> = {
   view: (vnode) => {
@@ -107,16 +66,15 @@ const ProposalHeader: m.Component<{ isThread: boolean, nComments: number, propos
       isThread
         ? m('.proposal-meta', [
           m(ProposalHeaderAuthor, { proposal }),
-          m(ProposalHeaderTags, { proposal }),
           m(ProposalHeaderCreated, { proposal }),
           m(ProposalHeaderComments, { proposal, nComments }),
           m(ProposalHeaderDelete, { proposal }),
           m(ViewCountBlock, { proposal }),
         ])
         : m('.proposal-meta', [
-          m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderOnchainId, { proposal }),
           m(ProposalHeaderOnchainStatus, { proposal }),
+          m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderCreated, { proposal }),
         ]),
       m(ProposalHeaderExternalLink, { proposal }),
@@ -125,9 +83,10 @@ const ProposalHeader: m.Component<{ isThread: boolean, nComments: number, propos
   }
 };
 
-export const ProposalBody: m.Component<{ getSetGlobalEditingStatus: any, getSetGlobalReplyStatus: CallableFunction, isThread: boolean, proposal: AnyProposal | OffchainThread }, { editing: boolean, quillEditorState: any }> = {
+export const ProposalBody: m.Component<{ getSetGlobalEditingStatus: any, getSetGlobalReplyStatus: CallableFunction, proposal: AnyProposal | OffchainThread }, { editing: boolean, quillEditorState: any }> = {
   view: (vnode) => {
-    const { getSetGlobalEditingStatus, getSetGlobalReplyStatus, isThread, proposal } = vnode.attrs;
+    const { getSetGlobalEditingStatus, getSetGlobalReplyStatus, proposal } = vnode.attrs;
+    const isThread = proposal instanceof OffchainThread;
     const description = isThread ? false : (proposal as AnyProposal).description;
     const body = isThread ? (proposal as OffchainThread).body : false;
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
@@ -144,174 +103,49 @@ export const ProposalBody: m.Component<{ getSetGlobalEditingStatus: any, getSetG
     return m('.ProposalBody', {
       class: `proposal-${proposal.slug}`
     }, [
-      m('.upper-meta', [
-        m('.upper-meta-left', [
-          proposal.createdAt
-            && m('a.comment-timestamp', {
-              href: proposalLink + '?comment=body',
-              onclick: (e) => {
-                e.preventDefault();
-                updateRoute(proposalLink + '?comment=body');
-                jumpHighlightComment('body', false, 500);
-              }
-            }, proposal.createdAt.fromNow()),
-          isThread
-            && versionHistory.length > 1
-            && m('a.last-edited', {
-              href: '#',
-              onclick: async (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: VersionHistoryModal,
-                  data: {
-                    proposal
-                  }
-                });
-              }
-            }, [
-              'Edited ',
-              moment(lastEdit.timestamp).fromNow()
-            ])
-        ]),
-        m('.upper-meta-right', [
-          app.vm.activeAccount
-            && !getSetGlobalEditingStatus(GlobalStatus.Get)
-            && !vnode.state.editing
-            && m('a', {
-              class: 'reply',
-              href: '#',
-              onclick: async (e) => {
-                e.preventDefault();
-                if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-                  const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-                  if (!confirmed) return;
-                }
-                getSetGlobalReplyStatus(GlobalStatus.Set, false);
-              },
-            }, 'Reply'),
-          !getSetGlobalEditingStatus(GlobalStatus.Get)
-            && isSameAccount(app.vm.activeAccount, author)
-            && isThread
-            && !vnode.state.editing
-            && m('a', {
-              class: 'edit-proposal',
-              href: '#',
-              onclick: async (e) => {
-                e.preventDefault();
-                if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
-                  if (activeQuillEditorHasText()) {
-                    const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-                    if (!confirmed) return;
-                  }
-                  getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-                }
-                vnode.state.editing = true;
-                getSetGlobalEditingStatus(GlobalStatus.Set, true);
-              },
-            }, 'Edit'),
-          !getSetGlobalEditingStatus(GlobalStatus.Get)
-            && isSameAccount(app.vm.activeAccount, author)
-            && !vnode.state.editing
-            && m('a', {
-              href: '#',
-              onclick: async (e) => {
-                e.preventDefault();
-                const confirmed = await confirmationModalWithText('Delete this entire thread?')();
-                if (!confirmed) return;
-                app.threads.delete(proposal).then(() => {
-                  m.route.set(`/${app.activeId()}/`);
-                  // TODO: set notification bar for 'thread deleted'
-                });
-              },
-            }, 'Delete'),
-          vnode.state.editing
-            && m('a', {
-              class: 'cancel-editing',
-              href: '#',
-              onclick: async (e) => {
-                e.preventDefault();
-                // TODO: Only show confirmation modal if edits have been made
-                const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
-                if (!confirmed) return;
-                vnode.state.editing = false;
-                getSetGlobalEditingStatus(GlobalStatus.Set, false);
-                m.redraw();
-              }
-            }, 'Cancel'),
-          vnode.state.editing
-            && m('a', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                const threadText = vnode.state.quillEditorState.markdownMode
-                  ? vnode.state.quillEditorState.editor.getText()
-                  : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
-                app.threads.edit((proposal as OffchainThread), threadText)
-                  .then(() => {
-                    m.route.set(`/${app.activeId()}/proposal/${proposal.slug}/${(proposal as OffchainThread).id}`);
-                    vnode.state.editing = false;
-                    getSetGlobalEditingStatus(GlobalStatus.Set, false);
-                    m.redraw();
-                    // TODO: set notification bar for 'thread edited' (?)
-                  });
-              }
-            }, 'Save')
-        ]),
+      m('.proposal-body-header', [
+        proposal instanceof OffchainThread && [
+          m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
+          isThread && m(ProposalBodyLastEdited, { item: proposal }),
+        ],
+
+        app.vm.activeAccount
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && !vnode.state.editing
+          && m(ProposalBodyReply, { item: proposal, getSetGlobalReplyStatus }),
+
+        proposal instanceof OffchainThread
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && isSameAccount(app.vm.activeAccount, author)
+          && !vnode.state.editing
+          && m(ProposalBodyEdit, { item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+
+        proposal instanceof OffchainThread
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && isSameAccount(app.vm.activeAccount, author)
+          && !vnode.state.editing
+          && m(ProposalBodyDelete, { item: proposal }),
+
+        proposal instanceof OffchainThread
+          && vnode.state.editing
+          && m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+        proposal instanceof OffchainThread
+          && vnode.state.editing
+          && m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
       ]),
-      isThread
-        && !vnode.state.editing
-        && body
-        ? m('.body-text', (() => {
-          try {
-            const doc = JSON.parse(body);
-            return m(QuillFormattedText, { doc });
-          } catch (e) {
-            return m(MarkdownFormattedText, { doc: body });
-          }
-        })())
-        : description
-        && m('.body-text', [
-          m(MarkdownFormattedText, { doc: description })
-        ]),
-      isThread
-        && !vnode.state.editing
-        && attachments
-        && attachments.length > 0
-        && m('.proposal-attachments', [
-          m('p', `Attachments (${attachments.length})`),
-          attachments.map((attachment) => m('a.attachment-item', {
-            href: attachment.url,
-            title: attachment.description,
-            target: '_blank',
-            noopener: 'noopener',
-            noreferrer: 'noreferrer',
-            onclick: (e) => {
-              e.preventDefault();
-              lity(attachment.url);
-            }
-          }, [
-            m('img', {
-              src: attachment.url
-            }),
-          ]))
-        ]),
-      isThread
-        && vnode.state.editing
-        && m(QuillEditor, {
-          contentsDoc: (() => {
-            try {
-              return JSON.parse((proposal as OffchainThread).body);
-            } catch (e) {
-              return (proposal as OffchainThread).body;
-            }
-          })(),
-          oncreateBind: (state) => {
-            vnode.state.quillEditorState = state;
-          },
-          tabindex: 1,
-          theme: 'snow',
-          editorNamespace: document.location.pathname + '-editing-thread',
-        }),
+
+      proposal instanceof OffchainThread && [
+        !vnode.state.editing
+          && m(ProposalBodyText, { item: proposal }),
+
+        !vnode.state.editing
+          && attachments
+          && attachments.length > 0
+          && m(ProposalBodyAttachments, { item: proposal }),
+
+        vnode.state.editing
+          && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
+      ],
     ]);
   }
 };
@@ -335,8 +169,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
     const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal } = vnode.attrs;
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
-    const versionHistory = comment.versionHistory;
-    const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
 
     const commentLink = `/${app.activeId()}/proposal/${proposal.slug}/`
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
@@ -344,165 +176,46 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`
     }, [
-      m('.right-col', [
-        m('.upper-meta', [
-          m('.upper-meta-left', [
-            m(User, { user: [comment.author, comment.authorChain], linkify: true, tooltip: true }),
-            m('a.comment-timestamp', {
-              href: commentLink,
-              onclick: (e) => {
-                e.preventDefault();
-                updateRoute(commentLink);
-                jumpHighlightComment(comment.id, false, 500);
-              }
-            }, comment.createdAt.fromNow()),
-            versionHistory.length > 1
-              && m('a.last-edited', {
-                href: '#',
-                onclick: async (e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: VersionHistoryModal,
-                    data: {
-                      comment
-                    }
-                  });
-                }
-              }, [
-                'Edited ',
-                moment(lastEdit.timestamp).fromNow()
-              ])
-          ]),
-          m('.upper-meta-right', [
-            app.vm.activeAccount
-              && !getSetGlobalEditingStatus(GlobalStatus.Get)
-            // For now, we are limiting threading to 1 level deep. Therefore, comments whose parents
-            // are other comments do not display the option to reply
-              && (parentType === CommentParent.Proposal)
-              && m('a', {
-                class: 'reply',
-                href: '#',
-                onclick: async (e) => {
-                  e.preventDefault();
-                  if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-                    const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-                    if (!confirmed) return;
-                  }
-                  getSetGlobalReplyStatus(GlobalStatus.Set, comment.id);
-                },
-              }, parentType === CommentParent.Proposal ? 'Reply' : 'Reply to thread'),
-            !getSetGlobalEditingStatus(GlobalStatus.Get)
-              && !vnode.state.editing
-              && (app.login.activeAddresses || []).findIndex((a) => a.address === comment.author) !== -1
-              && m('a', {
-                class: 'edit-comment',
-                href: '#',
-                onclick: async (e) => {
-                  e.preventDefault();
-                  vnode.state.editing = true;
-                  if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
-                    if (activeQuillEditorHasText()) {
-                      const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-                      if (!confirmed) return;
-                    }
-                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-                  }
-                  getSetGlobalEditingStatus(GlobalStatus.Set, true);
-                },
-              }, 'Edit'),
-            app.vm.activeAccount
-              && app.vm.activeAccount.address === comment.author
-              && !vnode.state.editing
-              && m('a', {
-                href: '#',
-                onclick: async (e) => {
-                  e.preventDefault();
-                  const confirmed = await confirmationModalWithText('Delete this comment?')();
-                  if (!confirmed) return;
-                  app.comments.delete(comment).then(() => {
-                    m.redraw();
-                    // TODO: set notification bar for 'comment deleted'
-                  });
-                },
-              }, 'Delete'),
-            vnode.state.editing
-              && m('a', {
-                class: 'cancel-editing',
-                href: '#',
-                onclick: async (e) => {
-                  e.preventDefault();
-                  // TODO: Only show confirmation modal if edits have been made
-                  const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
-                  if (!confirmed) return;
-                  vnode.state.editing = false;
-                  getSetGlobalEditingStatus(GlobalStatus.Set, false);
-                  m.redraw();
-                }
-              }, 'Cancel'),
-            vnode.state.editing
-              && m('a', {
-                href: '#',
-                onclick: (e) => {
-                  e.preventDefault();
-                  const commentText = vnode.state.quillEditorState.markdownMode
-                    ? vnode.state.quillEditorState.editor.getText()
-                    : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
-                  app.comments.edit(comment, commentText)
-                    .then((response) => {
-                      vnode.state.editing = false;
-                      getSetGlobalEditingStatus(GlobalStatus.Set, false);
-                      m.redraw();
-                      // TODO: set notification bar for 'thread edited' (?)
-                    });
-                }
-              }, 'Save'),
-          ]),
-        ]),
-        !vnode.state.editing
-          && m('.proposal-comment-text', (() => {
-            try {
-              const doc = JSON.parse(comment.text);
-              return m(QuillFormattedText, { doc });
-            } catch (e) {
-              return m(MarkdownFormattedText, { doc: comment.text });
-            }
-          })()),
-        !vnode.state.editing
-          && comment.attachments
-          && comment.attachments.length > 0
-          && m('.proposal-comment-attachments', [
-            m('p', `Attachments (${comment.attachments.length})`),
-            comment.attachments.map((attachment) => m('a.attachment-item', {
-              href: attachment.url,
-              title: attachment.description,
-              target: '_blank',
-              noopener: 'noopener',
-              noreferrer: 'noreferrer',
-              onclick: (e) => {
-                e.preventDefault();
-                lity(attachment.url);
-              }
-            }, [
-              m('img', { src: attachment.url }),
-            ]))
-          ]),
+      m('.proposal-body-header', [
+        m(User, { user: [comment.author, comment.authorChain], linkify: true, tooltip: true }), // TODO
+        m(ProposalBodyCreated, { item: comment, link: commentLink }),
+        m(ProposalBodyLastEdited, { item: comment }),
+
+        app.vm.activeAccount
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && (parentType === CommentParent.Proposal)
+          && !vnode.state.editing
+          && m(ProposalBodyReply, { item: comment, getSetGlobalReplyStatus, parentType }),
+        // For now, we are limiting threading to 1 level deep,
+        // Therefore, comments whose parents are other comments
+        // do not display the option to reply
+
+        !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && (app.login.activeAddresses || []).findIndex((a) => a.address === comment.author) !== -1
+          && !vnode.state.editing
+          && m(ProposalBodyEdit, { item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+
+        !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && isSameAccount(app.vm.activeAccount, comment.author)
+          && !vnode.state.editing
+          && m(ProposalBodyDelete, { item: comment }),
+
         vnode.state.editing
-          && m(QuillEditor, {
-            contentsDoc: (() => {
-              try {
-                return JSON.parse(comment.text);
-              } catch (e) {
-                return comment.text;
-              }
-            })(),
-            oncreateBind: (state) => {
-              vnode.state.quillEditorState = state;
-            },
-            tabindex: 1,
-            theme: 'snow',
-            editorNamespace: document.location.pathname + '-editing-comment-' + comment.id,
-          }),
-      ])
+          && m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+        vnode.state.editing
+          && m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+      ]),
+
+      !vnode.state.editing
+        && m(ProposalBodyText, { item: comment }),
+
+      !vnode.state.editing
+        && comment.attachments
+        && comment.attachments.length > 0
+        && m(ProposalBodyAttachments, { item: comment }),
+
+      vnode.state.editing
+        && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
     ]);
   }
 };
@@ -913,7 +626,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       class: 'ViewProposalPage',
       content: [
         m(ProposalHeader, { isThread, nComments, proposal }),
-        m(ProposalBody, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, isThread }),
+        m(ProposalBody, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
         m(ProposalComments, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent }),
         m(ProposalSidebar, { proposal }),
       ],

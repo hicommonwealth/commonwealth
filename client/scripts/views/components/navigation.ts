@@ -19,7 +19,7 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import { ChainClass, ChainBase, Notification } from 'models';
 
-import { jumpHighlightComment } from 'views/pages/view_proposal/index';
+import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import ChainIcon from 'views/components/chain_icon';
