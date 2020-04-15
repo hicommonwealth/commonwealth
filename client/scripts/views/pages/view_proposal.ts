@@ -281,6 +281,7 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
           m('.upper-meta-right', [
             app.vm.activeAccount
             && !getSetGlobalEditingStatus(GlobalStatus.Get)
+            && !(proposal as OffchainThread).readOnly
             && !vnode.state.editing
             && m('a', {
               class: 'reply',
@@ -485,6 +486,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           m('.upper-meta-right', [
             app.vm.activeAccount
             && !getSetGlobalEditingStatus(GlobalStatus.Get)
+            && !(proposal as OffchainThread).readOnly
             // For now, we are limiting threading to 1 level deep. Therefore, comments whose parents
             // are other comments do not display the option to reply
             && (parentType === CommentParent.Proposal)
@@ -817,12 +819,14 @@ interface IProposalCommentsAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   replyParent: number | boolean;
   user?: any;
+  readOnly?: boolean;
 }
 
 // TODO: clarify that 'user' = user who is commenting
 const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
   oncreate: async (vnode) => {
     const { proposal } = vnode.attrs;
+    console.dir(proposal);
     if (!proposal) return;
     const chainId = app.activeCommunityId() ? null : app.activeChainId();
     const communityId = app.activeCommunityId();
@@ -839,7 +843,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     }
   },
   view: (vnode) => {
-    const { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent } = vnode.attrs;
+    const { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent, readOnly } = vnode.attrs;
     vnode.state.comments = app.comments.getByProposal(proposal)
       .filter((c) => c.parentComment === null);
 
@@ -926,6 +930,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       // create comment
       app.vm.activeAccount
       && !getSetGlobalReplyStatus(GlobalStatus.Get)
+      && (!(proposal as OffchainThread).readOnly)
       && m(CreateComment, {
         callback: createdCommentCallback,
         cancellable: false,

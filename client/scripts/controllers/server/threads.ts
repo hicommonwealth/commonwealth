@@ -22,6 +22,8 @@ const modelFromServer = (thread) => {
     thread.kind,
     thread.version_history,
     thread.community,
+    thread.private,
+    thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
     thread.Address.chain,
@@ -143,7 +145,6 @@ class ThreadsController {
 
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
-
           if (!thread.Address) {
             console.error('OffchainThread missing address');
           }
