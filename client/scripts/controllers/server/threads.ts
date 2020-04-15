@@ -83,8 +83,9 @@ class ThreadsController {
     });
   }
 
-  public async edit(proposal: OffchainThread, body?: string, attachments?: string[]) {
+  public async edit(proposal: OffchainThread, body?: string, attachments?: string[], readOnly?: boolean) {
     const newBody = body || proposal.body;
+    const newReadOnly = readOnly || proposal.readOnly;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
 
@@ -95,6 +96,7 @@ class ThreadsController {
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
+        'read_only': newReadOnly,
         'jwt': app.login.jwt
       });
       const result = modelFromServer(response.result);
