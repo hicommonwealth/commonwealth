@@ -3,17 +3,17 @@ import $ from 'jquery';
 import app from 'state';
 
 class SelectedAddressesController {
-  private _chains = {};
-  private _communities = {};
+  private _chains;
+  private _communities;
+
+  public constructor() {
+    this._chains = {};
+    this._communities = {};
+  }
 
   public reset(data?) {
-    if (data) {
-      this._chains = data.chains;
-      this._communities = data.communities;
-    } else {
-      this._chains = {};
-      this._communities = {};
-    }
+    this._chains = data.chains ? data.chains : {};
+    this._communities = data.communities ? data.communities : {};
   }
 
   public setByChain(chainId: string, account: Account<any>): void {
