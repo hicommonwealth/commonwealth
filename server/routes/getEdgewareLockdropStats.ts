@@ -353,7 +353,7 @@ export const getCountsByBlock = async (web3, lockdropContract) => {
   };
 };
 
-export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export const fetchStats = async (models, net) => {
   const result = await models.EdgewareLockdropEverything.findAll({
     limit: 1,
     order: [ [ 'createdAt', 'DESC' ]]
@@ -363,7 +363,7 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
   if (result.length > 0) {
     results = JSON.parse(result[0].data);
   } else {
-    const network = req.query.network || 'mainnet';
+    const network = net || 'mainnet';
     const json = JSON.parse(fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString());
     const web3 = await setupWeb3Provider(network);
     const contracts = (network === 'mainnet')
@@ -432,5 +432,10 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
     results = aggregateResult;
   }
 
+  return results;
+};
+
+export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const results = await fetchStats(models, req.query.network);
   return res.json({ status: 'Success', results });
 };
