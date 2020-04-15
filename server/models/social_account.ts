@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { UserInstance } from './user';
+import { UserInstance, UserAttributes } from './user';
 
 export interface SocialAccountAttributes {
   id?: number;
@@ -10,6 +10,9 @@ export interface SocialAccountAttributes {
   refresh_token: string;
   created_at?: Date;
   updated_at?: Date;
+
+  // associations
+  User?: UserAttributes | UserAttributes['id'];
 }
 
 export interface SocialAccountInstance extends Sequelize.Instance<SocialAccountAttributes>, SocialAccountAttributes {

@@ -1,5 +1,12 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { ChainNodeInstance } from './chain_node';
+
+import { AddressAttributes } from './address';
+import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
+import { MembershipAttributes } from './membership';
+import { OffchainTagAttributes } from './offchain_tag';
+import { OffchainThreadAttributes } from './offchain_thread';
+import { OffchainCommentAttributes } from './offchain_comment';
+import { UserAttributes } from './user';
 
 export interface ChainAttributes {
   id?: string;
@@ -11,10 +18,20 @@ export interface ChainAttributes {
   icon_url: string;
   active: boolean;
   type: string;
+
+  // associations
+  ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
+  Addresses?: AddressAttributes[] | AddressAttributes['id'][];
+  Memberships?: MembershipAttributes[] | MembershipAttributes['id'][];
+  tags?: OffchainTagAttributes[] | OffchainTagAttributes['id'][];
+  OffchainThreads?: OffchainThreadAttributes[] | OffchainThreadAttributes['id'][];
+  OffchainComments?: OffchainCommentAttributes[] | OffchainCommentAttributes['id'][];
+  Users?: UserAttributes[] | UserAttributes['id'][];
+  ChainObjectVersion?; // TODO
 }
 
 export interface ChainInstance extends Sequelize.Instance<ChainAttributes>, ChainAttributes {
-  // TODO: add mixins as needed
+  // add mixins as needed
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 

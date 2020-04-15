@@ -1,11 +1,14 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { ChainInstance } from './chain';
+import { ChainInstance, ChainAttributes } from './chain';
 
 export interface ChainNodeAttributes {
   id?: number;
   chain: string;
   url: string;
   address: string;
+
+  // associations
+  Chain: ChainAttributes;
 }
 
 export interface ChainNodeInstance extends Sequelize.Instance<ChainNodeAttributes>, ChainNodeAttributes {

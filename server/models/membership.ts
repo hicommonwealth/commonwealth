@@ -1,5 +1,9 @@
 import * as Sequelize from 'sequelize';
 
+import { UserAttributes } from './user';
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+
 export interface MembershipAttributes {
   id?: number;
   user_id: number;
@@ -8,6 +12,11 @@ export interface MembershipAttributes {
   active?: boolean;
   created_at?: Date;
   updated_at?: Date;
+
+  // associations
+  User?: UserAttributes | UserAttributes['id'];
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
 }
 
 export interface MembershipInstance extends Sequelize.Instance<MembershipAttributes>, MembershipAttributes {

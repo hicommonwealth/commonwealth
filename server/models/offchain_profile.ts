@@ -1,8 +1,12 @@
 import * as Sequelize from 'sequelize';
+import { AddressAttributes } from './address';
 
 export interface OffchainProfileAttributes {
   address_id: number;
   data?: string;
+
+  // associations
+  Address: AddressAttributes;
 }
 
 export interface OffchainProfileInstance

@@ -1,5 +1,9 @@
 import * as Sequelize from 'sequelize';
 
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+import { OffchainThreadAttributes } from './offchain_thread';
+
 export interface OffchainTagAttributes {
   id?: number;
   name: string;
@@ -9,6 +13,11 @@ export interface OffchainTagAttributes {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+
+  // associations
+  community?: OffchainCommunityAttributes;
+  chain?: ChainAttributes;
+  threads?: OffchainThreadAttributes[] | OffchainTagAttributes['id'][];
 }
 
 export interface OffchainTagInstance extends Sequelize.Instance<OffchainTagAttributes>, OffchainTagAttributes {
