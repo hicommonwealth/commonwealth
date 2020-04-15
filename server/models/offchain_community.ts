@@ -1,5 +1,11 @@
 import * as Sequelize from 'sequelize';
 
+import { AddressAttributes } from './address';
+import { ChainAttributes } from './chain';
+import { MembershipAttributes } from './membership';
+import { OffchainTagAttributes } from './offchain_tag';
+import { OffchainThreadAttributes } from './offchain_thread';
+
 export interface OffchainCommunityAttributes {
   id: string;
   name: string;
@@ -12,6 +18,13 @@ export interface OffchainCommunityAttributes {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+
+  // associations
+  Chain?: ChainAttributes;
+  Address?: AddressAttributes;
+  tags?: OffchainTagAttributes[] | OffchainTagAttributes['id'][];
+  OffchainThreads?: OffchainThreadAttributes[] | OffchainThreadAttributes['id'][];
+  Memberships?: MembershipAttributes[] | MembershipAttributes['id'][];
 }
 
 export interface OffchainComunityInstance

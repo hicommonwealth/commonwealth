@@ -1,5 +1,10 @@
 import * as Sequelize from 'sequelize';
 
+import { AddressAttributes } from './address';
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+import { OffchainAttachmentAttributes } from './offchain_attachment';
+
 export interface OffchainCommentAttributes {
   id?: number;
   chain?: string;
@@ -13,6 +18,12 @@ export interface OffchainCommentAttributes {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+
+  // associations
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+  Address?: AddressAttributes;
+  OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
 }
 
 export interface OffchainCommentInstance

@@ -17,6 +17,10 @@ import { KeyringOptions } from '@polkadot/keyring/types';
 import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { ChainAttributes } from './chain';
+import { UserAttributes } from './user';
+import { OffchainProfileAttributes } from './offchain_profile';
+import { RoleAttributes } from './role';
 
 // tslint:disable-next-line
 const ethUtil = require('ethereumjs-util');
@@ -34,6 +38,12 @@ export interface AddressAttributes {
   created_at?: Date;
   updated_at?: Date;
   user_id?: number;
+
+  // associations
+  Chain?: ChainAttributes;
+  User?: UserAttributes;
+  OffchainProfile?: OffchainProfileAttributes;
+  Roles?: RoleAttributes[];
 }
 
 export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {

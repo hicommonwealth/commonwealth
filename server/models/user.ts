@@ -16,8 +16,7 @@ export interface UserAttributes {
   created_at?: Date;
   updated_at?: Date;
 
-  // associations
-  // XXX: do everywhere, see https://vivacitylabs.com/setup-typescript-sequelize/
+  // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
   selectedNode?: ChainNodeAttributes | ChainNodeAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
