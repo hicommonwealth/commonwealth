@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false,
     underscored: true,
-    paranoid: true,
     indexes: [
       { fields: ['id'] },
       { fields: ['chain', 'event_name'] },

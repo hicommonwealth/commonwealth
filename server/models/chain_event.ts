@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
 
     // we could store this as a raw data blob too if necessary
     event_data: { type: DataTypes.JSONB, allowNull: false },
+    created_at: { type: DataTypes.DATE, allowNull: false },
+    updated_at: { type: DataTypes.DATE, allowNull: false },
   }, {
     timestamps: true,
     underscored: true,
