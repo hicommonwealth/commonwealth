@@ -18,7 +18,7 @@
             top: -1px;
         }
         a {
-            color: #999;
+            color: #888;
             text-decoration: none;
             margin-right: 10px;
             &:hover {
@@ -41,13 +41,13 @@
         .ProposalHeaderComments {
             font-size: 17px;
             margin-left: 11px;
-            color: #999;
+            color: #888;
             position: relative;
             top: -1px;
             .cui-icon {
                 position: relative;
                 top: -1px;
-                color: #999;
+                color: #888;
                 margin-left: 4px;
             }
         }
@@ -69,10 +69,11 @@
     .ViewCountBlock,
     .ProposalHeaderExternalLink {
         display: inline-block;
-        color: #999;
+        color: #888;
         font-size: 14px;
-        a:link {
-            color: #999;
+        a:link,
+        a:visited {
+            color: #888;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
@@ -81,7 +82,7 @@
     }
     .ProposalHeaderAuthor {
         .User .user-display-name {
-            color: #999;
+            color: #888;
         }
     }
     .ProposalHeaderExternalLink a {

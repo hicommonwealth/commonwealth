@@ -28,11 +28,12 @@
     .ProposalBodySaveEdit,
     .ProposalBodySpacer {
         display: inline-block;
-        color: #999;
+        color: #888;
         font-size: 14px;
         a:link,
+        a:visited,
         .User a.user-display-name {
-            color: #999;
+            color: #888;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;

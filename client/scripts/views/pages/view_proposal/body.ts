@@ -66,14 +66,16 @@ export const ProposalBodyCreated: m.Component<{ item: OffchainThread | OffchainC
     if (!item.createdAt) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('.ProposalBodyCreated', {
-      href: isThread ? `${link}?comment=body` : link,
-      onclick: (e) => {
-        e.preventDefault();
-        updateRoute(isThread ? `${link}?comment=body` : link);
-        jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
-      }
-    }, item.createdAt.fromNow());
+    return m('.ProposalBodyCreated', [
+      m('a', {
+        href: isThread ? `${link}?comment=body` : link,
+        onclick: (e) => {
+          e.preventDefault();
+          updateRoute(isThread ? `${link}?comment=body` : link);
+          jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
+        }
+      }, item.createdAt.fromNow())
+    ]);
   }
 };
 
@@ -86,18 +88,20 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
     const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
     if (!lastEdit) return;
 
-    return m('a.ProposalBodyLastEdited', {
-      href: '#',
-      onclick: async (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: VersionHistoryModal,
-          data: isThread ? { proposal: item } : { comment: item }
-        });
-      }
-    }, [
-      'Edited ',
-      moment(lastEdit.timestamp).fromNow()
+    return m('.ProposalBodyLastEdited', [
+      m('a', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: VersionHistoryModal,
+            data: isThread ? { proposal: item } : { comment: item }
+          });
+        }
+      }, [
+        'Edited ',
+        moment(lastEdit.timestamp).fromNow()
+      ])
     ]);
   }
 };

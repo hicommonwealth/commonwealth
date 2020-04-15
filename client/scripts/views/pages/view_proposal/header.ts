@@ -59,14 +59,16 @@ export const ProposalHeaderCreated: m.Component<{ proposal: AnyProposal | Offcha
     if (!proposal) return;
     if (!proposal.createdAt) return;
 
-    return m('.ProposalHeaderCreated', {
-      href: `${link}?comment=body`,
-      onclick: (e) => {
-        e.preventDefault();
-        updateRoute(`${link}?comment=body`);
-        jumpHighlightComment('body', false, 500);
-      }
-    }, proposal.createdAt.format('MMM D, YYYY'));
+    return m('.ProposalHeaderCreated', [
+      m('a', {
+        href: `${link}?comment=body`,
+        onclick: (e) => {
+          e.preventDefault();
+          updateRoute(`${link}?comment=body`);
+          jumpHighlightComment('body', false, 500);
+        }
+      }, proposal.createdAt.format('MMM D, YYYY'))
+    ]);
   }
 };
 
@@ -81,7 +83,7 @@ export const ProposalHeaderLastEdited: m.Component<{ proposal: AnyProposal | Off
     return m('.ProposalHeaderLastEdited', [
       m('a', {
         href: '#',
-        onclick: async (e) => {
+        onclick: (e) => {
           e.preventDefault();
           app.modals.create({
             modal: VersionHistoryModal,
