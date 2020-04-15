@@ -6,29 +6,27 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
-  // const userAddresses = req.user.getAddresses().filter((address) => !!address.verified);
-  const userAddresses = req.user.getAddresses();
+  const userAddresses = await req.user.getAddresses();
   const userAddressIds = Array.from(userAddresses.map((address) => address.id));
-  console.dir(userAddresses);
-  console.dir(userAddressIds);
-  console.dir(community);
   const roles = await models.Role.findAll({
-    where: {
+    where: community ? {
       address_id: { [Op.in]: userAddressIds },
-    }
+      offchain_community_id: community.id,
+    } : chain ? {
+      address_id: { [Op.in]: userAddressIds },
+      chain_id: chain.id,
+    } : {},
   });
 
-  console.dir(roles);
+  const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
-  const publicThreads = await models.OffchainThread.findAll({
+  const allThreads = await models.OffchainThread.findAll({
     where:
       community
         ? {
           community: community.id,
-          private: false,
         } : chain ? {
           chain: chain.id,
-          private: false,
         } : {},
     include: [
       models.Address,
@@ -44,25 +42,19 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
     order: [['created_at', 'DESC']],
   });
 
-  const threads = publicThreads;
+  const filteredThreads = await allThreads.filter((thread) => {
+    if (thread.private === false) {
+      console.dir('public thread');
+      return true;
+    } else if (adminRoles.length > 0) {
+      console.dir('private thread, but admin/mod');
+      return true;
+    } else {
+      return false;
+    }
+  });
 
-  // const threads = await models.OffchainThread.findAll({
-  //   where: community ? { community: community.id }
-  //     : chain ? { chain: chain.id } : {},
-  //   include: [
-  //     models.Address,
-  //     {
-  //       model: models.OffchainTag,
-  //       as: 'tags',
-  //       through: {
-  //         model: models.TaggedThread,
-  //         as: 'taggedThreads',
-  //       },
-  //     },
-  //   ],
-  //   order: [['created_at', 'DESC']],
-  // });
-  return res.json({ status: 'Success', result: threads.map((c) => c.toJSON()) });
+  return res.json({ status: 'Success', result: filteredThreads.map((c) => c.toJSON()) });
 };
 
 export default bulkThreads;
