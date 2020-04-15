@@ -28,7 +28,7 @@ const ViewCountBlock: m.Component<IAttrs, IState> = {
     });
   },
   view: (vnode) => {
-    return vnode.state.count && m('.ViewCountBlock', pluralize(vnode.state.count, 'view'));
+    return m('.ViewCountBlock', pluralize(vnode.state.count ? vnode.state.count : 0, 'view'));
   }
 };
 

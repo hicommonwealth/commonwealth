@@ -53,6 +53,7 @@ export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> 
       m(User, {
         user: author,
         tooltip: true,
+        linkify: true,
       }),
     ]);
   }
