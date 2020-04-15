@@ -241,23 +241,6 @@ interface IProposalCommentsAttrs {
 
 // TODO: clarify that 'user' = user who is commenting
 const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
-  oncreate: async (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    const chainId = app.activeCommunityId() ? null : app.activeChainId();
-    const communityId = app.activeCommunityId();
-    try {
-      await app.comments.refresh(proposal, chainId, communityId);
-      vnode.state.comments = app.comments.getByProposal(proposal)
-        .filter((c) => c.parentComment === null);
-      m.redraw();
-    } catch (err) {
-      console.log('Failed to load comments');
-      vnode.state.comments = [];
-      vnode.state.commentError = err.message;
-      m.redraw();
-    }
-  },
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent } = vnode.attrs;
     vnode.state.comments = app.comments.getByProposal(proposal)
@@ -336,10 +319,6 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     return m('.ProposalComments', {
       oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; }
     }, [
-      // show loading spinner
-      comments === undefined
-      && !commentError
-      && m('.loading-comments', [ 'Loading comments...', m('span.icon-spinner2.animate-spin') ]),
       // show comments
       comments
       && m('.proposal-comments', AllComments(comments, replyParent)),
@@ -372,9 +351,15 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, mixpanelExecuted: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
+    mixpanel.track('Proposal Funnel', {
+      'Step No': 1,
+      'Step': 'Viewing Proposal',
+      'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
+      'Scope': app.activeId(),
+    });
     if (!vnode.state.editing) { vnode.state.editing = false; }
   },
   view: (vnode) => {
@@ -383,10 +368,12 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
 
+    // load app controller
     if (!app.threads.initialized) {
       return m(PageLoading);
     }
 
+    // load proposal
     let proposal: AnyProposal;
     try {
       proposal = idToProposal(proposalType, proposalId);
@@ -403,14 +390,23 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         { replace: true });
     }
 
-    if (!vnode.state.mixpanelExecuted) {
-      vnode.state.mixpanelExecuted = true;
-      mixpanel.track('Proposal Funnel', {
-        'Step No': 1,
-        'Step': 'Viewing Proposal',
-        'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId(),
-      });
+    // load comments
+    if (!vnode.state.commentsLoaded) {
+      (app.activeCommunityId()
+       ? app.comments.refresh(proposal, null, app.activeCommunityId())
+       : app.comments.refresh(proposal, app.activeChainId(), null))
+        .then((result) => {
+          vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
+          m.redraw();
+        }).catch((err) => {
+          throw new Error('Failed to load comments');
+          vnode.state.comments = [];
+          m.redraw();
+        });
+      vnode.state.commentsLoaded = true;
+    }
+    if (!vnode.state.comments) {
+      return m(PageLoading);
     }
 
     // fetch completed cosmos proposal votes only when we load the page
