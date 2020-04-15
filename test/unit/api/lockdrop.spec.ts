@@ -15,7 +15,7 @@ describe('Edgeware Lockdrop Tests', () => {
     await resetDatabase();
   });
 
-  it('should fetch the lockdrop stats', async () => {
+  it.only('should fetch the lockdrop stats', async () => {
     const network = 'mainnet';
     const res = await chai.request(app)
       .get('/api/edgewareLockdropStats')

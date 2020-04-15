@@ -120,7 +120,6 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
     lockdropStartTime = (await lockdropContracts[0].methods.LOCK_START_TIME().call());
   }
   console.log(`Lock events ${lockEvents.length}`);
-  console.log(lockEvents[0]);
   lockEvents.forEach((event) => {
     const data = event.returnValues;
     // allocate locks to first key if multiple submitted or malformed larger key submitted
@@ -203,7 +202,9 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
     signalEvents = [ ...signalEvents, ...events ];
   }
   console.log(`Signal events ${signalEvents.length}`);
-  const promises = signalEvents.map(async (event) => {
+  const gLocks = {};
+  for (let i = 0; i < signalEvents.length; i++) {
+    const event = signalEvents[i];
     const data = event.returnValues;
     // Get balance at block that lockdrop ends
     let balance = -1;
@@ -215,18 +216,9 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
           balance = await web3.eth.getBalance(data.contractAddr);
         }
       } catch (e) {
-        console.log(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
+        // console.log(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
       }
     }
-
-    return balance;
-  });
-
-  // Resolve promises to ensure all inner async functions have finished
-  const balances = await Promise.all(promises);
-  const gLocks = {};
-  signalEvents.forEach((event, index) => {
-    const data = event.returnValues;
     // if contract address has been seen (it is in a previously processed signal)
     // then we ignore it; this means that we only acknolwedge the first signal
     // for a given address.
@@ -243,40 +235,40 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
 
       // Treat generalized locks as 3 month locks
       if (generalizedLocks.lockedContractAddresses.includes(data.contractAddr)) {
-        console.log('Generalized lock:', balances[index], data.contractAddr);
-        value = getEffectiveValue(balances[index], '0')
+        console.log('Generalized lock:', balance, data.contractAddr);
+        value = getEffectiveValue(balance, '0');
         if (keys[0] in gLocks) {
           gLocks[keys[0]] = toBN(gLocks[keys[0]]).add(value).toString();
         } else {
           gLocks[keys[0]] = value.toString();
         }
-        totalETHSignaled = totalETHSignaled.add(toBN(balances[index]));
+        totalETHSignaled = totalETHSignaled.add(toBN(balance));
         totalEffectiveETHSignaled = totalEffectiveETHSignaled.add(value);
         // keep generalized locks collection separate from other signals
-        return;
       } else {
-        value = getEffectiveValue(balances[index], 'signaling');
-      }
-      // Add value to total signaled ETH
-      totalETHSignaled = totalETHSignaled.add(toBN(balances[index]));
-      totalEffectiveETHSignaled = totalEffectiveETHSignaled.add(value);
-      // Iterate over signals, partition reward into delayed and immediate amounts
-      if (keys[0] in signals) {
-        signals[keys[0]] = {
-          signalAmt: toBN(balances[index]).add(toBN(signals[keys[0]].signalAmt)).toString(),
-          effectiveValue: toBN(signals[keys[0]]
-            .effectiveValue)
-            .add(value)
-            .toString(),
-        };
-      } else {
-        signals[keys[0]] = {
-          signalAmt: toBN(balances[index]).toString(),
-          effectiveValue: value.toString(),
-        };
+        value = getEffectiveValue(balance, 'signaling');
+        // Add value to total signaled ETH
+        totalETHSignaled = totalETHSignaled.add(toBN(balance));
+        totalEffectiveETHSignaled = totalEffectiveETHSignaled.add(value);
+        // Iterate over signals, partition reward into delayed and immediate amounts
+        if (keys[0] in signals) {
+          signals[keys[0]] = {
+            signalAmt: toBN(balance).add(toBN(signals[keys[0]].signalAmt)).toString(),
+            effectiveValue: toBN(signals[keys[0]]
+              .effectiveValue)
+              .add(value)
+              .toString(),
+          };
+        } else {
+          signals[keys[0]] = {
+            signalAmt: toBN(balance).toString(),
+            effectiveValue: value.toString(),
+          };
+        }
       }
     }
-  });
+  }
+
   // Return signals and total ETH signaled
   return {
     signals,
@@ -284,7 +276,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
     totalEffectiveETHSignaled,
     genLocks: gLocks,
     numSignals: signalEvents.length,
-  }
+  };
 };
 
 export const getCountsByBlock = async (web3, lockdropContract) => {
@@ -388,14 +380,14 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
       totalETHLocked12mo,
       numLocks
     } = await calculateEffectiveLocks(contracts);
-
+    console.log('Numlocks', numLocks);
     const {
       signals,
       totalETHSignaled,
       totalEffectiveETHSignaled,
       numSignals
     } = await calculateEffectiveSignals(web3, contracts);
-
+    console.log('Numsignals', numSignals);
     const {
       participantsByBlock,
       lockEventsByBlock,
@@ -406,7 +398,7 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
       blocknumToTime,
       lastBlock
     } = await getCountsByBlock(web3, contracts);
-
+    console.log(lastBlock);
     const aggregateResult = {
       // locks
       locks,
@@ -432,7 +424,7 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
       blocknumToTime,
       lastBlock,
     };
-
+    console.log(aggregateResult);
     await models.EdgewareLockdropEverything.create({
       data: JSON.stringify(aggregateResult),
     });
