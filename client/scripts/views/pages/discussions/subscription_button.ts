@@ -16,7 +16,8 @@ const DiscussionsSubscriptionButton = {
 
     return m(Button, {
       intent: communitySubscription ? 'primary' : 'none',
-      onclick: () => {
+      onclick: (e) => {
+        e.preventDefault();
         communitySubscription ?
           subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw()) :
           subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => m.redraw());

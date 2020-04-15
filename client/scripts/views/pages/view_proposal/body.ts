@@ -1,4 +1,4 @@
-import 'pages/view_proposal/header.scss';
+import 'pages/view_proposal/body.scss';
 
 import m from 'mithril';
 import moment from 'moment';
@@ -20,6 +20,7 @@ import {
 import { CommentParent } from 'controllers/server/comments';
 
 import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
+import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -36,6 +37,25 @@ const activeQuillEditorHasText = () => {
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
   // However, threading is overdue for a refactor anyway, so we'll handle this then
   return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1
+};
+
+export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> = {
+  view: (vnode) => {
+    const { comment } = vnode.attrs;
+    if (!comment) return;
+    if (!comment.author) return;
+
+    const author : Account<any> = app.community
+      ? app.community.accounts.get(comment.author, comment.authorChain)
+      : app.chain.accounts.get(comment.author);
+
+    return m('.ProposalBodyAuthor', [
+      m(User, {
+        user: author,
+        tooltip: true,
+      }),
+    ]);
+  }
 };
 
 export const ProposalBodyCreated: m.Component<{ item: OffchainThread | OffchainComment<any>, link: string }> = {
@@ -81,24 +101,25 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
   }
 };
 
-export const ProposalBodyReply: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, parentType? }> = {
+export const ProposalBodyReply: m.Component<{ item: OffchainComment<any>, getSetGlobalReplyStatus, parentType? }> = {
   view: (vnode) => {
     const { item, parentType, getSetGlobalReplyStatus } = vnode.attrs;
     if (!item) return;
-    const isComment = item instanceof OffchainComment;
 
-    return m('a.ProposalBodyReply', {
-      class: 'reply',
-      href: '#',
-      onclick: async (e) => {
-        e.preventDefault();
-        if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-          const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-          if (!confirmed) return;
-        }
-        getSetGlobalReplyStatus(GlobalStatus.Set, item instanceof OffchainComment ? item.id : false);
-      },
-    }, parentType === CommentParent.Proposal ? 'Reply' : 'Reply to thread');
+    return m('.ProposalBodyReply', [
+      m('a', {
+        class: 'reply',
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
+            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+            if (!confirmed) return;
+          }
+          getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
+        },
+      }, 'Reply'),
+    ]);
   }
 };
 
@@ -108,22 +129,24 @@ export const ProposalBodyEdit: m.Component<{ item: OffchainThread | OffchainComm
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('a.ProposalBodyEdit', {
-      class: isThread ? 'edit-proposal' : 'edit-comment',
-      href: '#',
-      onclick: async (e) => {
-        e.preventDefault();
-        if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
-          if (activeQuillEditorHasText()) {
-            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-            if (!confirmed) return;
+    return m('.ProposalBodyEdit', [
+      m('a', {
+        class: isThread ? 'edit-proposal' : 'edit-comment',
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
+            if (activeQuillEditorHasText()) {
+              const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
+              if (!confirmed) return;
+            }
+            getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-        }
-        parentState.editing = true;
-        getSetGlobalEditingStatus(GlobalStatus.Set, true);
-      },
-    }, 'Edit');
+          parentState.editing = true;
+          getSetGlobalEditingStatus(GlobalStatus.Set, true);
+        },
+      }, 'Edit'),
+    ]);
   }
 };
 
@@ -133,18 +156,20 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('a.ProposalBodyDelete', {
-      href: '#',
-      onclick: async (e) => {
-        e.preventDefault();
-        const confirmed = await confirmationModalWithText(isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
-        if (!confirmed) return;
-        (isThread ? app.threads : app.comments).delete(item).then(() => {
-          if (isThread) m.route.set(`/${app.activeId()}/`);
+    return m('.ProposalBodyDelete', [
+      m('a', {
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          const confirmed = await confirmationModalWithText(isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
+          if (!confirmed) return;
+          (isThread ? app.threads : app.comments).delete(item).then(() => {
+            if (isThread) m.route.set(`/${app.activeId()}/`);
             // TODO: set notification bar for 'thread deleted/comment deleted'
           });
-      },
-    }, 'Delete');
+        },
+      }, 'Delete'),
+    ]);
   }
 };
 
@@ -152,19 +177,21 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
   view: (vnode) => {
     const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
-    return m('a.ProposalBodyCancelEdit', {
-      class: 'cancel-editing',
-      href: '#',
-      onclick: async (e) => {
-        e.preventDefault();
-        // TODO: Only show confirmation modal if edits have been made
-        const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
-        if (!confirmed) return;
-        parentState.editing = false;
-        getSetGlobalEditingStatus(GlobalStatus.Set, false);
-        m.redraw();
-      }
-    }, 'Cancel');
+    return m('.ProposalBodyCancelEdit', [
+      m('a', {
+        class: 'cancel-editing',
+        href: '#',
+        onclick: async (e) => {
+          e.preventDefault();
+          // TODO: Only show confirmation modal if edits have been made
+          const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+          if (!confirmed) return;
+          parentState.editing = false;
+          getSetGlobalEditingStatus(GlobalStatus.Set, false);
+          m.redraw();
+        }
+      }, 'Cancel')
+    ]);
   }
 };
 
@@ -174,31 +201,39 @@ export const ProposalBodySaveEdit: m.Component<{ item: OffchainThread | Offchain
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('a.ProposalBodySaveEdit', {
-      href: '#',
-      onclick: (e) => {
-        e.preventDefault();
-        const itemText = parentState.quillEditorState.markdownMode
-          ? parentState.quillEditorState.editor.getText()
-          : JSON.stringify(parentState.quillEditorState.editor.getContents());
-        if (item instanceof OffchainThread) {
-          app.threads.edit(item, itemText).then(() => {
-            m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
-            parentState.editing = false;
-            getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            m.redraw();
-            // TODO: set notification bar for 'thread edited' (?)
-          });
-        } else if (item instanceof OffchainComment) {
-          app.comments.edit(item, itemText).then(() => {
-            parentState.editing = false;
-            getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            m.redraw();
-            // TODO: set notification bar for 'comment edited' (?)
-          });
+    return m('.ProposalBodySaveEdit', [
+      m('a', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          const itemText = parentState.quillEditorState.markdownMode
+            ? parentState.quillEditorState.editor.getText()
+            : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          if (item instanceof OffchainThread) {
+            app.threads.edit(item, itemText).then(() => {
+              m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
+              parentState.editing = false;
+              getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              m.redraw();
+              // TODO: set notification bar for 'thread edited' (?)
+            });
+          } else if (item instanceof OffchainComment) {
+            app.comments.edit(item, itemText).then(() => {
+              parentState.editing = false;
+              getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              m.redraw();
+              // TODO: set notification bar for 'comment edited' (?)
+            });
+          }
         }
-      }
-    }, 'Save');
+      }, 'Save'),
+    ]);
+  }
+};
+
+export const ProposalBodySpacer: m.Component<{}> = {
+  view: (vnode) => {
+    return m('.ProposalBodySpacer', m.trust('&middot;'));
   }
 };
 

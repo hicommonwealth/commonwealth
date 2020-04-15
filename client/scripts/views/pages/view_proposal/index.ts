@@ -1,4 +1,4 @@
-import 'pages/view_proposal.scss';
+import 'pages/view_proposal/index.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -50,42 +50,26 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 
-import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSubscriptionButton } from './header';
-import { GlobalStatus, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
+import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderSubscriptionButton } from './header';
+import { GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
 import CreateComment from './create_comment';
 
-const ProposalHeader: m.Component<{ isThread: boolean, nComments: number, proposal: any }> = {
-  view: (vnode) => {
-    const { isThread, nComments, proposal } = vnode.attrs;
 
-    return m('.ProposalHeader', {
-      class: `proposal-${proposal.slug}`
-    }, [
-      isThread && m(ProposalHeaderTags, { proposal: proposal as OffchainThread }),
-      m(ProposalHeaderTitle, { proposal }),
-      isThread
-        ? m('.proposal-meta', [
-          m(ProposalHeaderAuthor, { proposal }),
-          m(ProposalHeaderCreated, { proposal }),
-          m(ProposalHeaderComments, { proposal, nComments }),
-          m(ProposalHeaderDelete, { proposal }),
-          m(ViewCountBlock, { proposal }),
-        ])
-        : m('.proposal-meta', [
-          m(ProposalHeaderOnchainId, { proposal }),
-          m(ProposalHeaderOnchainStatus, { proposal }),
-          m(ProposalHeaderAuthor, { proposal }),
-          m(ProposalHeaderCreated, { proposal }),
-        ]),
-      m(ProposalHeaderExternalLink, { proposal }),
-      m(ProposalHeaderSubscriptionButton, { proposal }),
-    ]);
-  }
-};
+interface IProposalHeaderAttrs {
+  nComments: number;
+  getSetGlobalEditingStatus: CallableFunction;
+  getSetGlobalReplyStatus: CallableFunction;
+  proposal: AnyProposal | OffchainThread;
+}
 
-export const ProposalBody: m.Component<{ getSetGlobalEditingStatus: any, getSetGlobalReplyStatus: CallableFunction, proposal: AnyProposal | OffchainThread }, { editing: boolean, quillEditorState: any }> = {
+interface IProposalHeaderState {
+  editing: boolean;
+  quillEditorState: any;
+}
+
+const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
   view: (vnode) => {
-    const { getSetGlobalEditingStatus, getSetGlobalReplyStatus, proposal } = vnode.attrs;
+    const { nComments, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus } = vnode.attrs;
     const isThread = proposal instanceof OffchainThread;
     const description = isThread ? false : (proposal as AnyProposal).description;
     const body = isThread ? (proposal as OffchainThread).body : false;
@@ -93,59 +77,74 @@ export const ProposalBody: m.Component<{ getSetGlobalEditingStatus: any, getSetG
     const versionHistory = (proposal as OffchainThread).versionHistory;
     const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
     const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`;
-
     const author : Account<any> = proposal instanceof OffchainThread
       ? (!app.community)
       ? app.chain.accounts.get(proposal.author)
       : app.community.accounts.get(proposal.author, proposal.authorChain)
     : proposal.author;
 
-    return m('.ProposalBody', {
+    return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
-      m('.proposal-body-header', [
-        proposal instanceof OffchainThread && [
-          m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
-          isThread && m(ProposalBodyLastEdited, { item: proposal }),
-        ],
+      m('.proposal-header', [
+        m(ProposalHeaderTags, { proposal }),
+        m('.proposal-title', [
+          m(ProposalHeaderTitle, { proposal }),
+          m(ProposalHeaderComments, { proposal, nComments }),
+        ]),
+        m('.proposal-meta', proposal instanceof OffchainThread ? [
+          m(ProposalHeaderAuthor, { proposal }),
+          m(ProposalHeaderSpacer),
+          m(ProposalHeaderCreated, { proposal, link: proposalLink }),
+          proposal instanceof OffchainThread && proposal.versionHistory?.length > 1 && m(ProposalHeaderSpacer),
+          m(ProposalHeaderLastEdited, { proposal }),
+          m(ProposalHeaderSpacer),
+          m(ViewCountBlock, { proposal }),
+          m(ProposalHeaderDelete, { proposal }),
 
-        app.vm.activeAccount
-          && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && !vnode.state.editing
-          && m(ProposalBodyReply, { item: proposal, getSetGlobalReplyStatus }),
+          !getSetGlobalEditingStatus(GlobalStatus.Get)
+            && isSameAccount(app.vm.activeAccount, author)
+            && !vnode.state.editing
+            && [
+              m(ProposalHeaderSpacer),
+              m(ProposalBodyEdit, { item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalHeaderSpacer),
+              m(ProposalBodyDelete, { item: proposal }),
+            ],
 
-        proposal instanceof OffchainThread
-          && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && isSameAccount(app.vm.activeAccount, author)
-          && !vnode.state.editing
-          && m(ProposalBodyEdit, { item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+          vnode.state.editing && [
+            m(ProposalHeaderSpacer),
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalHeaderSpacer),
+            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+          ],
 
-        proposal instanceof OffchainThread
-          && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && isSameAccount(app.vm.activeAccount, author)
-          && !vnode.state.editing
-          && m(ProposalBodyDelete, { item: proposal }),
-
-        proposal instanceof OffchainThread
-          && vnode.state.editing
-          && m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-        proposal instanceof OffchainThread
-          && vnode.state.editing
-          && m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+          proposal instanceof OffchainThread && proposal.kind === OffchainThreadKind.Link && m(ProposalHeaderSpacer),
+          m(ProposalHeaderExternalLink, { proposal }),
+        ] : [
+          m(ProposalHeaderOnchainId, { proposal }),
+          m(ProposalHeaderOnchainStatus, { proposal }),
+          m(ProposalHeaderAuthor, { proposal }),
+          m(ProposalHeaderCreated, { proposal, link: proposalLink }),
+        ]),
+        m('.proposal-subscription-button', [
+          m(ProposalHeaderSubscriptionButton, { proposal }),
+        ]),
       ]),
+      proposal instanceof OffchainThread && m('.proposal-body', [
+        m('.proposal-body-content', [
+          !vnode.state.editing
+            && m(ProposalBodyText, { item: proposal }),
 
-      proposal instanceof OffchainThread && [
-        !vnode.state.editing
-          && m(ProposalBodyText, { item: proposal }),
+          !vnode.state.editing
+            && attachments
+            && attachments.length > 0
+            && m(ProposalBodyAttachments, { item: proposal }),
 
-        !vnode.state.editing
-          && attachments
-          && attachments.length > 0
-          && m(ProposalBodyAttachments, { item: proposal }),
-
-        vnode.state.editing
-          && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
-      ],
+          vnode.state.editing
+            && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
+        ]),
+      ]),
     ]);
   }
 };
@@ -176,46 +175,51 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
     return m('.ProposalComment', {
       class: `${parentType}-child comment-${comment.id}`
     }, [
-      m('.proposal-body-header', [
-        m(User, { user: [comment.author, comment.authorChain], linkify: true, tooltip: true }), // TODO
+      m('.comment-body-meta', [
+        m(ProposalBodyAuthor, { comment }),
+        m(ProposalBodySpacer),
         m(ProposalBodyCreated, { item: comment, link: commentLink }),
+        comment.versionHistory?.length > 1 && m(ProposalBodySpacer),
         m(ProposalBodyLastEdited, { item: comment }),
 
-        app.vm.activeAccount
+        !vnode.state.editing
+          && app.vm.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && (parentType === CommentParent.Proposal)
-          && !vnode.state.editing
-          && m(ProposalBodyReply, { item: comment, getSetGlobalReplyStatus, parentType }),
-        // For now, we are limiting threading to 1 level deep,
-        // Therefore, comments whose parents are other comments
-        // do not display the option to reply
-
-        !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && (app.login.activeAddresses || []).findIndex((a) => a.address === comment.author) !== -1
-          && !vnode.state.editing
-          && m(ProposalBodyEdit, { item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
-
-        !getSetGlobalEditingStatus(GlobalStatus.Get)
           && isSameAccount(app.vm.activeAccount, comment.author)
-          && !vnode.state.editing
-          && m(ProposalBodyDelete, { item: comment }),
+          && [
+            m(ProposalBodySpacer),
+            m(ProposalBodyEdit, { item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodyDelete, { item: comment }),
+          ],
 
-        vnode.state.editing
-          && m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-        vnode.state.editing
-          && m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+        // For now, we are limiting threading to 1 level deep, so comments whose parents are other comments do not display the option to reply
+        !vnode.state.editing
+          && app.vm.activeAccount
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && parentType === CommentParent.Proposal && [
+            m(ProposalBodySpacer),
+            m(ProposalBodyReply, { item: comment, getSetGlobalReplyStatus, parentType }),
+          ],
+
+        vnode.state.editing && [
+          m(ProposalBodySpacer),
+          m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+          m(ProposalBodySpacer),
+          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+        ],
       ]),
+      m('.comment-body-content', [
+        !vnode.state.editing
+          && m(ProposalBodyText, { item: comment }),
 
-      !vnode.state.editing
-        && m(ProposalBodyText, { item: comment }),
+        !vnode.state.editing
+          && comment.attachments
+          && comment.attachments.length > 0
+          && m(ProposalBodyAttachments, { item: comment }),
 
-      !vnode.state.editing
-        && comment.attachments
-        && comment.attachments.length > 0
-        && m(ProposalBodyAttachments, { item: comment }),
-
-      vnode.state.editing
-        && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
+        vnode.state.editing
+          && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
+      ]),
     ]);
   }
 };
@@ -416,7 +420,6 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
     const nComments : number = app.comments.nComments(proposal);
     const nVoters : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
-    const isThread = !!(proposal instanceof OffchainThread);
 
     const hasBody: boolean = proposal instanceof OffchainThread
       ? (proposal as OffchainThread).body && (() => {
@@ -476,9 +479,8 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     return m(ListingPage, {
       class: 'ViewProposalPage',
       content: [
-        m(ProposalHeader, { isThread, nComments, proposal }),
-        m(ProposalBody, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-        m(ProposalComments, { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent }),
+        m(ProposalHeader, { proposal, nComments, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+        m(ProposalComments, { proposal, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
         m(ProposalSidebar, { proposal }),
       ],
     });

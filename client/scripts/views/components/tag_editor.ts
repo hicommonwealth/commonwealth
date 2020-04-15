@@ -45,14 +45,13 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
   },
   view: (vnode) => {
     return m('TagEditor', [
-      m(Button, {
-        intent: 'none',
-        compact: true,
-        label: m(Icon, { name: Icons.TAG }),
-        onclick: () => { vnode.state.isOpen = !vnode.state.isOpen; },
-        outlined: true,
-        size: 'xs',
-      }),
+      m('a', {
+        href: '#',
+        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; }
+      }, [
+        // m(Icon, { size: 'xs', name: Icons.TAG, style: 'color: #999;' }),
+        'Edit tags'
+      ]),
       m(Dialog, {
         autofocus: true,
         basic: false,

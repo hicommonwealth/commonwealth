@@ -1,44 +1,104 @@
 @import 'client/styles/shared';
 
-.ProposalHeaderAuthor {
-}
-.ProposalHeaderComments {
-}
-.ProposalHeaderCreated {
-}
-.ProposalHeaderDelete {
-}
-a.ProposalHeaderExternalLink {
-    color: $primary-green;
-    text-decoration: none;
-    margin-top: 14px;
-    &:hover {
-        text-decoration: underline;
+.ProposalHeader {
+    .proposal-header {
+        margin: 20px 0;
     }
-}
-.ProposalHeaderTags {
-    a {
+    .proposal-body {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e7e7e7;
+    }
+
+
+    // proposal-tags
+    .ProposalHeaderTags {
+        font-size: 14px;
+        .cui-icon {
+            position: relative;
+            top: -1px;
+        }
+        a {
+            color: #999;
+            text-decoration: none;
+            margin-right: 10px;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    // proposal-title
+    .proposal-title {
+        margin: 8px 0 6px;
+        .ProposalHeaderTitle,
+        .ProposalHeaderComments {
+            display: inline;
+            font-size: 23px;
+            font-weight: 600;
+            flex: 1;
+            line-height: 1.25;
+        }
+        .ProposalHeaderComments {
+            font-size: 17px;
+            margin-left: 11px;
+            color: #999;
+            position: relative;
+            top: -1px;
+            .cui-icon {
+                position: relative;
+                top: -1px;
+                color: #999;
+                margin-left: 4px;
+            }
+        }
+    }
+
+    // proposal-meta
+    .ProposalHeaderAuthor,
+    .ProposalHeaderCreated,
+    .ProposalHeaderLastEdited,
+    .ProposalHeaderDelete,
+    .ProposalBodyDelete,
+    .ProposalHeaderOnchainId,
+    .ProposalHeaderOnchainStatus,
+    .ProposalHeaderSpacer,
+    .ProposalBodyEdit,
+    .ProposalBodyDelete,
+    .ProposalBodyCancelEdit,
+    .ProposalBodySaveEdit,
+    .ViewCountBlock,
+    .ProposalHeaderExternalLink {
+        display: inline-block;
         color: #999;
+        font-size: 14px;
+        a:link {
+            color: #999;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .ProposalHeaderAuthor {
+        .User .user-display-name {
+            color: #999;
+        }
+    }
+    .ProposalHeaderExternalLink a {
+        color: $primary-green;
         text-decoration: none;
-        margin-right: 10px;
         &:hover {
             text-decoration: underline;
         }
     }
-}
-.ProposalHeaderTitle {
-    font-size: 22px;
-    font-weight: 600;
-    flex: 1;
-    line-height: 1.25;
-}
-.ProposalHeaderOnchainId {
-}
-.ProposalHeaderOnchainStatus, {
-}
-.ProposalHeaderSpacer {
-    margin: 0;
-    color: #999;
-}
-.ProposalHeaderSubscriptionButton {
+    .ProposalHeaderSpacer {
+        margin: 0 7px;
+    }
+
+    // subscription button
+    .ProposalHeaderSubscriptionButton {
+        position: absolute;
+        right: 20px;
+        top: 2px;
+    }
 }

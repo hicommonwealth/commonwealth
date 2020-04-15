@@ -1,3 +1,5 @@
+import 'pages/view_proposal/create_comment.scss';
+
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Button } from 'construct-ui';
@@ -117,49 +119,39 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
     return m('.CreateComment', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
-      m('.left-col', m(User, { user: author, avatarOnly: true, avatarSize: 36, tooltip: true })),
-      m('.right-col', [
-        m('.upper-meta', [
-          m('.upper-meta-left', [
-            parentType === CommentParent.Comment
-              ? m('span', [
-                m('span.icon-reply'),
-                'Replying',
-              ])
-              : m(User, { user: author, hideAvatar: true, linkify: true, tooltip: true }),
-          ]),
-        ]),
-        m(QuillEditor, {
-          contentsDoc: '',
-          oncreateBind: (state) => {
-            vnode.state.quillEditorState = state;
-          },
-          editorNamespace: document.location.pathname + '-commenting',
-          onkeyboardSubmit: submitComment,
+      m(User, { user: author, tooltip: true }),
+      m(QuillEditor, {
+        contentsDoc: '',
+        oncreateBind: (state) => {
+          vnode.state.quillEditorState = state;
+        },
+        editorNamespace: document.location.pathname + '-commenting',
+        onkeyboardSubmit: submitComment,
+      }),
+      m('.form-bottom', [
+        m(Button, {
+          intent: 'primary',
+          type: 'submit',
+          compact: true,
+          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+          onclick: submitComment,
+          label: (uploadsInProgress > 0)
+            ? 'Uploading...'
+            : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
         }),
-        m('.form-bottom', [
-          m(Button, {
-            intent: 'primary',
-            type: 'submit',
-            disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
-            onclick: submitComment,
-            label: (uploadsInProgress > 0)
-              ? 'Uploading...'
-              : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+        cancellable
+          && m(Button, {
+            intent: 'none',
+            type: 'cancel',
+            compact: true,
+            onclick: (e) => {
+              e.preventDefault();
+              getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+            },
+            label: 'Cancel'
           }),
-          cancellable
-            && m(Button, {
-              intent: 'none',
-              type: 'cancel',
-              onclick: (e) => {
-                e.preventDefault();
-                getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-              },
-              label: 'Cancel'
-            }),
-          error
-            && m('.new-comment-error', error),
-        ]),
+        error
+          && m('.new-comment-error', error),
       ])
     ]);
   }

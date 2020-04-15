@@ -1,5 +1,3 @@
-import 'components/view_count.scss';
-
 import { default as m } from 'mithril';
 import app from 'state';
 import { default as $ } from 'jquery';
@@ -30,7 +28,7 @@ const ViewCountBlock: m.Component<IAttrs, IState> = {
     });
   },
   view: (vnode) => {
-    return vnode.state.count && m('.view-count-block',  pluralize(vnode.state.count, 'view'));
+    return vnode.state.count && m('.ViewCountBlock', pluralize(vnode.state.count, 'view'));
   }
 };
 
