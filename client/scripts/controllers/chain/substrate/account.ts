@@ -76,7 +76,8 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     try {
       decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
-      throw new Error(`invalid address: ${address}`);
+      console.error(`Decoded invalid address: ${address}`);
+      return;
     }
     try {
       const acct = this._store.getByAddress(address);
