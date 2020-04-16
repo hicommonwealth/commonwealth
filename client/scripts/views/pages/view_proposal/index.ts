@@ -459,10 +459,10 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
             $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('html, body').scrollTop();
+          const scrollTop = $('.mithril-app').scrollTop();
           const replyTop = $reply.offset().top;
           if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-            $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
+            $('.mithril-app').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
 
           // highlight the reply form
           const animationDelayTime = 2000;
