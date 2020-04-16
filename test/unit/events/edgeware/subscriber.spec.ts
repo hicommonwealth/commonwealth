@@ -17,8 +17,8 @@ describe('Edgeware Event Subscriber Tests', () => {
     ];
     const api = constructFakeApi({
       subscribeNewHeads: (callback) => {
-        callback({ hash: hashes[0] });
-        setTimeout(() => callback({ hash: hashes[1] }), 0);
+        callback({ hash: hashes[0], number: '1' });
+        setTimeout(() => callback({ hash: hashes[1], number: '2' }), 0);
       },
       'events.at': (hash) => {
         if (hash === hashes[0]) return events[0];
@@ -38,11 +38,13 @@ describe('Edgeware Event Subscriber Tests', () => {
           if (seenBlocks === 0) {
             // first block
             assert.deepEqual(block.header.hash, hashes[0]);
+            assert.equal(+block.header.number, 1);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
           } else if (seenBlocks === 1) {
             // second block
             assert.deepEqual(block.header.hash, hashes[1]);
+            assert.equal(+block.header.number, 2);
             assert.lengthOf(block.events, 2);
             assert.deepEqual(block.events[0], events[1][0]);
             assert.deepEqual(block.events[1], events[1][1]);

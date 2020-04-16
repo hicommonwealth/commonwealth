@@ -3,16 +3,14 @@ import { Header, EventRecord } from '@polkadot/types/interfaces';
 
 import Processor from '../../../../shared/events/edgeware/processor';
 import { SubstrateEventType } from '../../../../shared/events/edgeware/types';
+import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;
 
 interface IFakeEvent {
   section: string;
   method: string;
-  data: any[];
-  typeDef: {
-    types: string[];
-  };
+  data: any;
 }
 
 const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
@@ -27,7 +25,6 @@ const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
   };
 };
 
-/*
 describe('Edgeware Event Processor Tests', () => {
   it('should process blocks into events', (done) => {
     // setup fake data
@@ -36,33 +33,21 @@ describe('Edgeware Event Processor Tests', () => {
         section: 'staking',
         method: 'Slash',
         data: [ 'Alice', '10000' ],
-        typeDef: {
-          types: [ 'string', 'string' ],
-        }
       },
       {
         section: 'staking',
         method: 'Bonded',
         data: [ 'Alice', '10000' ],
-        typeDef: {
-          types: [ 'string', 'string' ],
-        }
       },
       {
         section: 'democracy',
         method: 'Proposed',
-        data: [ ],
-        typeDef: {
-          types: [ ],
-        }
+        data: [ '4', '100000' ],
       },
       {
         section: 'democracy',
-        method: 'Passed',
+        method: 'Started',
         data: [ '5' ],
-        typeDef: {
-          types: [ 'string' ],
-        }
       },
     ];
 
@@ -71,30 +56,60 @@ describe('Edgeware Event Processor Tests', () => {
       constructFakeBlock(2, fakeEvents.slice(3, 4)),
     ];
 
+    const api = constructFakeApi({
+      referendumInfoOf: async (idx) => {
+        if (+idx === 5) {
+          return {
+            isSome: true,
+            isNone: false,
+            unwrap: () => {
+              return {
+                end: '123',
+              };
+            },
+          };
+        } else {
+          throw new Error('bad referendum idx');
+        }
+      }
+    });
+
     // run test
-    const processor = new Processor();
-    assert.deepEqual(processor.process(fakeBlocks[0]), [
-      {
-        type: SubstrateEventType.Slash,
-        data: [ 'Alice', '10000' ],
-        blockNumber: 1,
-      },
-      {
-        type: SubstrateEventType.DemocracyProposed,
-        data: [ ],
-        blockNumber: 1,
-      },
-    ]);
-    assert.deepEqual(processor.process(fakeBlocks[1]), [
-      {
-        type: SubstrateEventType.DemocracyPassed,
-        data: [ '5' ],
-        blockNumber: 2,
-      },
-    ]);
-    done();
+    const processor = new Processor(api);
+    Promise.all(
+      fakeBlocks.map((block) => processor.process(block))
+    ).then((results) => {
+      assert.deepEqual(results[0], [
+        {
+          type: SubstrateEventType.Slash,
+          data: {
+            validator: 'Alice',
+            amount: '10000',
+          },
+          blockNumber: 1,
+        },
+        {
+          type: SubstrateEventType.DemocracyProposed,
+          data: {
+            proposalIndex: 4,
+            deposit: '100000',
+          },
+          blockNumber: 1,
+        },
+      ]);
+      assert.deepEqual(results[1], [
+        {
+          type: SubstrateEventType.DemocracyStarted,
+          data: {
+            referendumIndex: 5,
+            endBlock: 123,
+          },
+          blockNumber: 2,
+        },
+      ]);
+      done();
+    });
   });
 
   // TODO: fail tests
 });
-*/

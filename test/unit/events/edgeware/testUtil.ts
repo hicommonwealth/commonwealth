@@ -14,6 +14,9 @@ export function constructFakeApi(callOverrides): ApiPromise {
         events: {
           at: callOverrides['events.at'],
         }
+      },
+      democracy: {
+        referendumInfoOf: callOverrides['referendumInfoOf'],
       }
     },
     derive: {

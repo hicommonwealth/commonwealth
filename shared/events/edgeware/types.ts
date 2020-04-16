@@ -29,5 +29,5 @@ export enum SubstrateEventType {
 export interface SubstrateEvent {
   blockNumber: number;
   type: SubstrateEventType;
-  data: any[]; // data format specific to event type
+  data: any; // data format specific to event type
 }
