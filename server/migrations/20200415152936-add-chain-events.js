@@ -9,7 +9,6 @@ const substrateEventStrings = [
   'democracy-passed',
   'democracy-not-passed',
   'democracy-cancelled',
-  'new-signaling-proposal',
 ];
 
 const initChainEventTypes = (queryInterface, Sequelize, t) => {

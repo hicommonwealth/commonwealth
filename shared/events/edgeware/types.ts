@@ -21,7 +21,6 @@ export enum SubstrateEventType {
   DemocracyPassed = 'democracy-passed',
   DemocracyNotPassed = 'democracy-not-passed',
   DemocracyCancelled = 'democracy-cancelled',
-  NewSignalingProposal = 'new-signaling-proposal',
 }
 
 /**
@@ -31,9 +30,4 @@ export interface SubstrateEvent {
   blockNumber: number;
   type: SubstrateEventType;
   data: any[]; // data format specific to event type
-
-  // metadata
-  name?: string;
-  documentation?: string;
-  typedefs?: string[];
 }

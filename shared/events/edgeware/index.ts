@@ -24,9 +24,9 @@ export default function (
       createApi(provider).isReady.then((api) => {
         subscriber = new Subscriber(api);
         const poller = new Poller(api);
-        const processor = new Processor();
+        const processor = new Processor(api);
         const processBlockFn = async (block: SubstrateBlock) => {
-          const events: SubstrateEvent[] = processor.process(block);
+          const events: SubstrateEvent[] = await processor.process(block);
           events.map((event) => handler.handle(event));
         };
 

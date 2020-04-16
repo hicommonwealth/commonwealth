@@ -4,11 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.STRING, primaryKey: true },
     chain: { type: DataTypes.STRING, allowNull: false },
     event_name: { type: DataTypes.STRING, allowNull: false },
-
-    // metadata fetched from chain, starts null
-    raw_name: { type: DataTypes.STRING, allowNull: true },
-    documentation: { type: DataTypes.TEXT, allowNull: true },
-    typedefs: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

@@ -37,6 +37,8 @@ import CreateCommunityModal from 'views/modals/create_community_modal';
 import { OffchainCommunitiesStore } from 'stores';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import ManageChainNotificationsModal from 'views/modals/manage_chain_notifications_modal';
+import { labelEvent } from 'events/edgeware/filters/labeler';
+import { SubstrateEventType } from 'events/edgeware/types';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -687,27 +689,26 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      const argString = _.zip(notification.chainEvent.type.typedefs, notification.chainEvent.data)
-        .map(([ type, data ]) => `${type}: ${data}`)
-        .join(', ');
+      const label = labelEvent(
+        notification.chainEvent.blockNumber,
+        notification.chainEvent.type.eventName as SubstrateEventType,
+        notification.chainEvent.data,
+      );
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
         onclick: async () => {
+          if (!label.linkUrl) return;
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          // TODO: figure out redirect!
-          // await m.route.set(target);
+          await m.route.set(label.linkUrl);
           m.redraw.sync();
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', `${notification.chainEvent.type.rawName}`),
+          m('.comment-body-top', label.heading),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', [
-            m('.event-description', `Description: ${notification.chainEvent.type.documentation}`),
-            m('.event-args', `Args: (${argString})`),
-          ]),
+          m('.comment-body-excerpt', label.label),
         ]),
       ]);
     }

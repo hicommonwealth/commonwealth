@@ -10,9 +10,13 @@ export abstract class IEventHandler<Event> {
 
 // parses events out of blocks into a standard format and
 // passes them through to the handler
-export abstract class IBlockProcessor<Block, Event> {
+export abstract class IBlockProcessor<Api, Block, Event> {
+  constructor(
+    protected _api: Api,
+  ) { }
+
   // throws on error
-  public abstract process(block: Block): Event[];
+  public abstract async process(block: Block): Promise<Event[]>;
 }
 
 // fetches blocks from chain in real-time via subscription for processing

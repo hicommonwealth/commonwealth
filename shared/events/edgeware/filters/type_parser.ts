@@ -18,11 +18,6 @@ export function parseEventType(event: Event): SubstrateEventType {
         case 'Cancelled': return SubstrateEventType.DemocracyCancelled;
         default: return SubstrateEventType.Unknown;
       }
-    case 'signaling':
-      switch (event.method) {
-        case 'NewProposal': return SubstrateEventType.NewSignalingProposal;
-        default: return SubstrateEventType.Unknown;
-      }
     default:
       return SubstrateEventType.Unknown;
   }
