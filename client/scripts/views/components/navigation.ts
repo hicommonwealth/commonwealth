@@ -161,7 +161,8 @@ const Navigation: m.Component<{}, {}> = {
        p.startsWith(`/${app.activeId()}/?`) ||
        p.startsWith(`/${app.activeId()}/proposal/discussion`) ||
        p.startsWith(`/${app.activeId()}/discussions`));
-    const onChatPage = (p) => p.startsWith(`/${app.activeChainId()}/chat`);
+    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
+    const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
     const onProposalPage = (p) =>
       (p.startsWith(`/${app.activeChainId()}/proposals`) ||
        p.startsWith(`/${app.activeChainId()}/signaling`) ||
@@ -268,6 +269,13 @@ const Navigation: m.Component<{}, {}> = {
             active: onDiscussionsPage(m.route.get()),
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
+          }),
+        // members (all communities)
+        (app.community || app.chain) &&
+          m(ListItem, {
+            active: onMembersPage(m.route.get()),
+            label: 'Members',
+            onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
           }),
         // // chat (all communities)
         // (app.community || app.chain) &&

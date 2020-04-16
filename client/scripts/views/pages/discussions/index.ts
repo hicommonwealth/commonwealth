@@ -257,7 +257,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
               m(DiscussionsSubscriptionButton),
             ],
             m(TagSelector, { activeTag: vnode.attrs.tag }),
-            m(ChainOrCommunityRoles),
           ]),
         ]),
       ]),
