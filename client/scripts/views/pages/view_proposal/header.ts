@@ -159,11 +159,14 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!(proposal instanceof OffchainThread)) return;
 
     return m('.ProposalHeaderTags', [
-      (proposal as OffchainThread).tags?.map((tag) => {
-        return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
-      }),
+      m('span.proposal-header-tags', [
+        proposal.tags?.map((tag) => {
+          return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
+        }),
+      ]),
       ((app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())) &&
+        m(ProposalHeaderSpacer),
         m(TagEditor, {
           thread: proposal as OffchainThread,
           onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; m.redraw(); },

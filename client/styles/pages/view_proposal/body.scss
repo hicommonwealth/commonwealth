@@ -1,12 +1,13 @@
 @import 'client/styles/shared';
+@import './index';
 
 .ProposalComment {
+    padding: $padding $gutter;
+    border-top: 1px solid #e7e7e7;
     .comment-body-meta {
-        margin: 20px 0 12px;
+        margin-bottom: 12px;
     }
     .comment-body-content {
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e7e7e7;
     }
 }
 

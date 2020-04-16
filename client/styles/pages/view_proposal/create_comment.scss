@@ -1,7 +1,9 @@
 @import 'client/styles/shared';
+@import './index';
 
 .CreateComment {
-    padding-top: 20px;
+    padding: $padding $gutter;;
+    border-top: 1px solid #e7e7e7;
 
     .User {
         font-size: 14px;
