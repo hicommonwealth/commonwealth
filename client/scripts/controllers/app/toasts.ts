@@ -31,6 +31,7 @@ export class ToastStore {
       size: Size.DEFAULT,
       position: ToasterPosition.BOTTOM,
     });
+    toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
   }
@@ -46,6 +47,7 @@ export class ToastStore {
       size: Size.DEFAULT,
       position: ToasterPosition.BOTTOM,
     });
+    toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
   }
@@ -61,6 +63,7 @@ export class ToastStore {
       size: Size.DEFAULT,
       position: ToasterPosition.BOTTOM,
     });
+    toast['_message'] = message;
     this._toasts.push(toast);
     m.redraw();
   }
