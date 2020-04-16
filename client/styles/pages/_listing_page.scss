@@ -1,10 +1,7 @@
 @import 'client/styles/shared';
 
 @mixin ui3page() {
-    min-height: calc(100vh - 110px);
-    @include xs-max {
-        min-height: calc(100vh - 150px);
-    }
+    min-height: calc(100vh - 40px);
     .page-container {
         background: #f7f7f7;
     }

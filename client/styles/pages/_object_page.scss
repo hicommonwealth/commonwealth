@@ -3,9 +3,4 @@
 
 .ObjectPage {
     @include ui3page();
-    min-height: calc(100vh - 130px);
-
-    h2.page-title {
-        margin-top: 0;
-    }
 }
