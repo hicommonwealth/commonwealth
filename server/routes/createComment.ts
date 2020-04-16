@@ -109,6 +109,14 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     where: { id: root_id.replace('discussion_', '') }
   });
 
+  // auto-subscribe comment author to reactions
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewReaction,
+    object_id: `comment-${finalComment.id}`,
+    is_active: true,
+  });
+
   // grab mentions to notify tagged users
   let mentionedAddresses;
   if (mentions && mentions.length) {

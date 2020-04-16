@@ -16,9 +16,6 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   if (!req.body.reaction) {
     return next(new Error('Must provide text'));
   }
-  if (chain && author.chain !== req.body.chain) {
-    return next(new Error(`Author must have a ${req.body.chain} account`));
-  }
 
   const options = {
     reaction: req.body.reaction,

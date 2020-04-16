@@ -143,13 +143,21 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     return next(err);
   }
 
-  // auto-subscribe thread creator to replies
+  // auto-subscribe thread creator to replies & reactions
   await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewComment,
     object_id: `discussion_${finalThread.id}`,
     is_active: true,
   });
+
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewReaction,
+    object_id: `discussion_${finalThread.id}`,
+    is_active: true,
+  });
+
   const location = finalThread.community || finalThread.chain;
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(

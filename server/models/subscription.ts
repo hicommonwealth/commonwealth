@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         address: notification_data.author_address,
       },
     });
+    console.log(category_id);
     // get subscribers to send notifications to
     const subscribers = await models.Subscription.findAll({
       where: {
@@ -49,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
         [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
       },
     });
+    console.log(subscribers);
     // create notifications if data exists
     if (notification_data) {
       await Promise.all(subscribers.map(async (subscription) => {

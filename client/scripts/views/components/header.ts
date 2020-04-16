@@ -612,59 +612,6 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
-    // if (category === NotificationCategories.NewComment) {
-    //   const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-    //     author_address, author_chain } = JSON.parse(notification.data);
-    //   if (!created_at || !object_title || (!object_id && !root_id)
-    //       || !comment_text || !comment_id || !author_address || !author_chain) return;
-
-    //   // legacy comments use object_id, new comments use root_id
-    //   const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-    //   const commented_title = decodeURIComponent(object_title).trim();
-    //   const decoded_comment_text = (() => {
-    //     try {
-    //       const doc = JSON.parse(decodeURIComponent(comment_text));
-    //       return m(QuillFormattedText, {
-    //         doc: sliceQuill(doc, 140),
-    //         hideFormatting: true
-    //       });
-    //     } catch (e) {
-    //       return m(MarkdownFormattedText, {
-    //         doc: decodeURIComponent(comment_text).slice(0, 140),
-    //         hideFormatting: true
-    //       });
-    //     }
-    //   })();
-    //   return getHeaderNotificationRow(
-    //     [author_address, author_chain],
-    //     moment.utc(created_at),
-    //     m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
-    //     decoded_comment_text,
-    //     `/${community_id || chain_id}/proposal/discussion/`
-    //     + `${commented_id}?comment=${comment_id}`,
-    //     () => jumpHighlightComment(comment_id)
-    //   );
-    // } else if (category === NotificationCategories.NewThread) {
-    //   const { created_at, thread_title, thread_id, chain_id, community_id,
-    //     author_address, author_chain } = JSON.parse(notification.data);
-    //   if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
-
-    //   const decoded_title = decodeURIComponent(thread_title);
-    //   const community_name = community_id
-    //     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-    //     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
-
-    //   return getHeaderNotificationRow(
-    //     [author_address, author_chain],
-    //     moment.utc(created_at),
-    //     m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
-    //     decoded_title,
-    //     `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
-    //       + `${slugify(decoded_title)}`,
-    //     () => jumpHighlightComment('parent')
-    //   );
-    // }
-
     const {
       author,
       createdAt,
