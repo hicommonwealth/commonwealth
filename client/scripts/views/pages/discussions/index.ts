@@ -12,7 +12,7 @@ import { link, articlize } from 'helpers';
 import PageLoading from 'views/pages/loading';
 import ListingPage from 'views/pages/_listing_page';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
-import DiscussionRow from 'views/components/discussion_row';
+import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';

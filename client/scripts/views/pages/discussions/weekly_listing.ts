@@ -5,7 +5,7 @@ import _ from 'lodash';
 import m from 'mithril';
 
 import app from 'state';
-import DiscussionRow from 'views/components/discussion_row';
+import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 interface IWeeklyDiscussionListingAttrs {
   isCurrentWeek: boolean;
