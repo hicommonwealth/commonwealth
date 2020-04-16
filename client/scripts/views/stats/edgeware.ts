@@ -71,6 +71,7 @@ async function triggerUpdateData() {
   m.redraw();
   try {
     state.participationSummary = await getParticipationSummary(state.network);
+    console.log(state.participationSummary);
   } catch (e) {
     console.error(e);
     state.participationSummary = undefined;

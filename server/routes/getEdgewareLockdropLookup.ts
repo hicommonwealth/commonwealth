@@ -104,6 +104,13 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
   const address = req.query.address;
   const network = req.query.network || 'mainnet';
 
+  const result = await models.EdgewareLockdropEverything.findAll({
+    limit: 1,
+    order: [ [ 'createdAt', 'DESC' ]]
+  });
+
+  console.log(result);
+
   const contracts = (network === 'mainnet')
     ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP]
     : [ROPSTEN_LOCKDROP];

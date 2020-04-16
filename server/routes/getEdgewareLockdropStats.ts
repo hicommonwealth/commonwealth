@@ -101,6 +101,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
   let totalETHLocked12mo = toBN(0);
   let totalEffectiveETHLocked = toBN(0);
   const locks = {};
+  const ethAddrToEvent = {};
   const validatingLocks = {};
 
   let lockEvents = [];
@@ -123,12 +124,22 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
   lockEvents.forEach((event, inx) => {
     if (inx % 500 === 0) console.log(`Processing lock event #${inx + 1}`);
     const data = event.returnValues;
+
     // allocate locks to first key if multiple submitted or malformed larger key submitted
     // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
     let keys = [data.edgewareAddr];
     if (data.edgewareAddr.length >= 66) {
       keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
     }
+
+    if (data.owner in ethAddrToEvent) {
+      if (!ethAddrToEvent[data.owner].includes(event)) {
+        ethAddrToEvent[data.owner].push(event);
+      }
+    } else {
+      ethAddrToEvent[data.owner] = [event];
+    }
+
     const value = getEffectiveValue(data.eth, data.term, data.time, lockdropStartTime);
     // Add to totals
     totalETHLocked = totalETHLocked.add(toBN(data.eth));
@@ -185,6 +196,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
     totalETHLocked6mo,
     totalETHLocked12mo,
     numLocks: lockEvents.length,
+    ethAddrToLockEvent: ethAddrToEvent,
   };
 };
 
@@ -192,6 +204,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
   let totalETHSignaled = toBN(0);
   let totalEffectiveETHSignaled = toBN(0);
   const signals = {};
+  const ethAddrToEvent = {};
   const seenContracts = {};
   let signalEvents = [];
   for (let i = 0; i < lockdropContracts.length; i++) {
@@ -220,6 +233,13 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       } catch (e) {
         // console.log(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
       }
+    }
+    if (data.owner in ethAddrToEvent) {
+      if (!ethAddrToEvent[data.owner].includes(event)) {
+        ethAddrToEvent[data.owner].push(event);
+      }
+    } else {
+      ethAddrToEvent[data.owner] = [event];
     }
     // if contract address has been seen (it is in a previously processed signal)
     // then we ignore it; this means that we only acknolwedge the first signal
@@ -278,6 +298,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
     totalEffectiveETHSignaled,
     genLocks: gLocks,
     numSignals: signalEvents.length,
+    ethAddrToSignalEvent: ethAddrToEvent,
   };
 };
 
@@ -384,13 +405,15 @@ export const fetchStats = async (models, net) => {
       totalETHLocked3mo,
       totalETHLocked6mo,
       totalETHLocked12mo,
-      numLocks
+      numLocks,
+      ethAddrToLockEvent,
     } = await calculateEffectiveLocks(contracts);
     const {
       signals,
       totalETHSignaled,
       totalEffectiveETHSignaled,
-      numSignals
+      numSignals,
+      ethAddrToSignalEvent,
     } = await calculateEffectiveSignals(web3, contracts);
     const {
       participantsByBlock,
@@ -400,7 +423,7 @@ export const fetchStats = async (models, net) => {
       ethSignaledByBlock,
       effectiveETHByBlock,
       blocknumToTime,
-      lastBlock
+      lastBlock,
     } = await getCountsByBlock(web3, contracts);
 
     const aggregateResult = {
@@ -413,6 +436,11 @@ export const fetchStats = async (models, net) => {
       totalETHLocked6mo,
       totalETHLocked12mo,
       numLocks,
+      // addr to event mapping
+      ethAddrToEvent: {
+        ...ethAddrToLockEvent,
+        ...ethAddrToSignalEvent,
+      },
       // signals
       signals,
       totalETHSignaled,
@@ -428,6 +456,7 @@ export const fetchStats = async (models, net) => {
       blocknumToTime,
       lastBlock,
     };
+
     await models.EdgewareLockdropEverything.create({
       data: JSON.stringify(aggregateResult),
       createdAt: Date.now(),
