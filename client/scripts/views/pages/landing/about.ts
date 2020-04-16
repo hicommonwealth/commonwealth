@@ -12,17 +12,8 @@ const AboutPage = {
   view: (vnode) => {
     return m(LandingPage, {
       header: m('.AboutPage', [
-        m('.about-container', [
-          m('h2.page-title', 'About'),
-          m('.page-header', [
-            m('p', 'We help cryptocurrency networks organize themselves with forums, voting systems, ' +
-              'and other governance tools.'),
-          ]),
-        ]),
       ]),
       body: m('.AboutPage', [
-        m('.about-container', [
-        ]),
       ]),
     });
   }

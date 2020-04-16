@@ -1,0 +1,49 @@
+@import 'client/styles/shared';
+
+.DiscussionsPage {
+    h4 {
+        font-size: 14px;
+        color: #888;
+        margin: 14px 0;
+    }
+
+    .cui-callout {
+        .MembershipButton .cui-icon {
+            position: relative;
+        }
+    }
+
+    // content
+    a.back-home {
+        color: #888;
+        font-weight: 400;
+        margin-left: 14px;
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    // content: discussion group
+    .WeeklyDiscussionListing, .tag-forum {
+        margin-bottom: 15px;
+        .LastSeenDivider {
+            display: flex;
+            padding: 12px 0 10px;
+            span {
+                color: #ea7a60;
+                font-size: 14px;
+                font-weight: 600;
+                width: max-content;
+                text-align: center;
+                padding: 0 10px;
+                white-space: nowrap;
+            }
+            hr {
+                height: 1px;
+                border: none;
+                border-bottom: 1px solid lighten(#ea7a60, 11%);
+                width: -webkit-fill-available;
+            }
+        }
+    }
+}

@@ -1,3 +1,5 @@
+import 'pages/discussions/discussion_row.scss';
+
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';

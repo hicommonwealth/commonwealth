@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import 'pages/discussions.scss';
+import 'pages/discussions/index.scss';
 
 import _ from 'lodash';
 import m from 'mithril';

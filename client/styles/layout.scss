@@ -16,7 +16,7 @@ html {
     line-height: 1.4;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #f7f7f7;
+    background: #fff;
 }
 .mithril-app {
     height: 100%;
@@ -245,7 +245,6 @@ body.modal-open {
 
 .layout-content {
     padding-left: 310px;
-    padding-top: 20px;
     &.logged-out {
         padding-left: 310px - 80px;
     }
