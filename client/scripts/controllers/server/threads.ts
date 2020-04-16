@@ -85,7 +85,7 @@ class ThreadsController {
 
   public async edit(proposal: OffchainThread, body?: string, attachments?: string[], readOnly?: boolean) {
     const newBody = body || proposal.body;
-    const newReadOnly = readOnly || proposal.readOnly;
+    const newReadOnly = readOnly || false;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
 
