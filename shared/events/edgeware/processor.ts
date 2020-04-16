@@ -3,7 +3,8 @@
  */
 import { IBlockProcessor } from '../interfaces';
 import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
-import { decodeSubstrateCodec, parseEventType } from './util';
+import { decodeSubstrateCodec } from './util';
+import { parseEventType } from './filters/type_parser';
 
 export default class extends IBlockProcessor<SubstrateBlock, SubstrateEvent> {
   private _lastBlockNumber: number;
