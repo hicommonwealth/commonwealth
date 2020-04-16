@@ -106,6 +106,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     include: [models.Address, models.OffchainAttachment],
   });
 
+  // TODO: This isn't a reliable check and may fail. It should never fail.
+  // Comments always need identified parents.
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_');
   if (prefix === 'discussion') {
@@ -159,21 +161,22 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     root_id,
     {
       created_at: new Date(),
-      root_id: commentedObject.id,
-      root_title: commentedObject.title,
-      object_id: finalComment.id,
-      object_text: finalComment.text,
-      chain_id: finalComment.chain,
-      community_id: finalComment.community,
+      root_id: Number(proposal.id),
+      root_title: proposal.title || '',
+      root_type: prefix,
+      comment_id: Number(finalComment.id),
+      comment_text: finalComment.text,
+      chain_id: chain.id,
+      community_id: community.id,
       author_address: finalComment.Address.address,
       author_chain: finalComment.Address.chain,
     },
     {
       user: finalComment.Address.address,
       url: cwUrl,
-      title: thread.title,
-      chain: finalComment.chain,
-      community: finalComment.community,
+      title: proposal.title || '',
+      chain: chain.id,
+      community: community.id,
     },
     req.wss,
   );
@@ -200,12 +203,13 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: commentedObject.id,
-          root_title: commentedObject.title,
-          object_id: finalComment.id,
-          object_text: finalComment.text,
-          chain_id: finalComment.chain,
-          community_id: finalComment.community,
+          root_id: Number(proposal.id),
+          root_title: proposal.title || '',
+          root_type: prefix,
+          comment_id: Number(finalComment.id),
+          comment_text: finalComment.text,
+          chain_id: chain.id,
+          community_id: community.id,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },

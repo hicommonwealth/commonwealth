@@ -1,8 +1,11 @@
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+
   const { body, kind, thread_id, version_history } = req.body;
 
   if (!req.user) {
@@ -61,7 +64,11 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
       '',
       {
         created_at: new Date(),
-        thread_id: finalThread.id,
+        root_id: Number(finalThread.id),
+        root_type: ProposalType.OffchainThread,
+        root_title: finalThread.title,
+        chain_id: chain.id,
+        community_id: community.id,
         author_address: finalThread.Address.address
       },
       // don't send webhook notifications for edits

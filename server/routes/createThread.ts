@@ -5,6 +5,7 @@ import { UserRequest } from '../types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { createCommonwealthUrl } from '../util/routeUtils';
+import { ProposalType } from 'client/scripts/identifiers';
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -166,12 +167,11 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     location,
     {
       created_at: new Date(),
-      root_id: finalThread.id,
+      root_id: Number(finalThread.id),
+      root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
-      object_id: finalThread.id,
-      object_text: finalThread.body,
-      chain_id: finalThread.chain,
-      community_id: finalThread.community,
+      chain_id: chain.id,
+      community_id: community.id,
       author_address: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
     },
@@ -180,8 +180,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       url: createCommonwealthUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
-      chain: finalThread.chain,
-      community: finalThread.community,
+      chain: chain.id,
+      community: community.id,
     },
     req.wss,
   );
@@ -227,12 +227,11 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        root_id: finalThread.id,
+        root_id: Number(finalThread.id),
+        root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
-        object_id: finalThread.id,
-        object_text: finalThread.body,
-        chain_id: finalThread.chain,
-        community_id: finalThread.community,
+        chain_id: chain.id,
+        community_id: community.id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },

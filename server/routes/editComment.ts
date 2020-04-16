@@ -1,9 +1,12 @@
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 import { createCommonwealthUrl } from '../util/routeUtils';
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -61,7 +64,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       });
     }
     const cwUrl = createCommonwealthUrl(prefix, proposal, comment);
- 
+
     // dispatch notifications to subscribers of the comment/thread
     await models.Subscription.emitNotifications(
       models,
@@ -69,12 +72,13 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       '',
       {
         created_at: new Date(),
-        root_id: proposal.id,
+        root_id: Number(proposal.id),
         root_title: proposal.title || '',
-        object_id: finalComment.id,
-        object_text: finalComment.text,
-        chain_id: finalComment.chain,
-        community_id: finalComment.community,
+        root_type: prefix,
+        comment_id: Number(finalComment.id),
+        comment_text: finalComment.text,
+        chain_id: chain.id,
+        community_id: community.id,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -83,8 +87,8 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         user: finalComment.Address.address,
         url: cwUrl,
         title: proposal.title || '',
-        chain: finalComment.chain,
-        community: finalComment.community,
+        chain: chain.id,
+        community: community.id,
       },
       req.wss,
     );

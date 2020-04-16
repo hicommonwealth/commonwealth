@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 
 const { Op } = Sequelize;
 
@@ -27,12 +27,13 @@ module.exports = (sequelize, DataTypes) => {
 
   interface IPostNotificationData {
     created_at: any;
-    root_id: string | number;
-    root_title: string,
-    object_id: string | number;
-    object_text: string;
-    chain_id: string | number;
-    community_id: string | number;
+    root_id: number;
+    root_title: string;
+    root_type: ProposalType;
+    comment_id?: number;
+    comment_text?: string;
+    chain_id: string;
+    community_id: string;
     author_address: string;
     author_chain: string;
   }
@@ -53,12 +54,6 @@ module.exports = (sequelize, DataTypes) => {
     webhook_data: WebhookContent,
     wss?,
   ) => {
-    if (!object_id.includes('discussion_')
-      && !object_id.includes('comment-')
-      && !object_id.includes('user-')) {
-      console.log('Invalid object_id');
-    }
-
     const creatorAddress = await models.Address.findOne({
       where: {
         address: notification_data.author_address,

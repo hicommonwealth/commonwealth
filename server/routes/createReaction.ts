@@ -38,12 +38,12 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   });
 
   let comment;
-  let parentThread;
   let cwUrl;
+  let root_type;
+  let proposal;
   if (req.body.comment_id) {
     comment = await models.OffchainComment.findByPk(Number(req.body.comment_id));
     // Test on variety of comments to ensure root relation + type
-    let proposal;
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.OffchainThread.findOne({
@@ -55,34 +55,41 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       });
     }
     cwUrl = createCommonwealthUrl(prefix, proposal, comment);
+    root_type = prefix;
   } else {
-    parentThread = await models.OffchainThread.findByPk(Number(req.body.thread_id));
-    cwUrl = createCommonwealthUrl('discussion', parentThread, comment);
+    proposal = await models.OffchainThread.findByPk(Number(req.body.thread_id));
+    cwUrl = createCommonwealthUrl('discussion', proposal, comment);
+    root_type = 'discussion';
   }
 
   // dispatch notifications
-  const reactedPost = comment || parentThread;
+  const notification_data = {
+    created_at: new Date(),
+    root_id: Number(proposal.id),
+    root_title: proposal.title || '',
+    root_type,
+    chain_id: chain.id,
+    community_id: community.id,
+    author_address: reaction.Address.address,
+    author_chain: reaction.Address.chain,
+  };
+
+  if (req.body.comment_id) {
+    notification_data['comment_id'] = Number(comment.id);
+    notification_data['comment_text'] = comment.text;
+  }
+
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,
     `${reaction.id}`,
-    {
-      created_at: new Date(),
-      root_id: parentThread.id,
-      root_title: parentThread.title,
-      object_id: reactedPost.id,
-      object_text: reactedPost.text,
-      chain_id: reactedPost.chain,
-      community_id: reactedPost.community,
-      author_address: reaction.Address.address,
-      author_chain: reaction.Address.chain,
-    },
+    notification_data,
     {
       user: reaction.Address.address,
       url: cwUrl,
-      title: parentThread.title,
-      chain: chain?.id,
-      community: community?.id,
+      title: proposal.title || '',
+      chain: chain.id,
+      community: community.id,
     },
     req.wss,
   );
