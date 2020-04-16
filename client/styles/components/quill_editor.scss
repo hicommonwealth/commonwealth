@@ -48,27 +48,11 @@
         display: flex;
         right: 10px;
         top: 6px;
-        .selector-option {
+        user-select: none;
+        .cui-tag {
             cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            border-radius: $form-border-radius $form-border-radius 0 0;
-            padding: 8px 12px 7px;
-            font-size: 14px;
-            color: #444;
-            &.active {
-                border-color: $form-border-color;
-                background: #fff;
-            }
-        }
-    }
-    @include sm-max {
-        .type-selector {
-            left: 12px;
-            top: 39px;
-        }
-        .ql-toolbar.ql-snow {
-            padding-bottom: 38px !important;
+            margin-top: 3px;
+            margin-right: 0;
         }
     }
 
@@ -923,7 +907,7 @@
         border: 1px solid $form-border-color;
         border-radius: $form-border-radius $form-border-radius 0 0;
         box-sizing: border-box;
-        padding: 7px 8px 5px;
+        padding: 5px 8px 5px;
     }
     .ql-toolbar.ql-snow .ql-formats {
         margin-right: 15px;
