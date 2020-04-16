@@ -93,18 +93,6 @@ import ViewCountCache from './util/viewCountCache';
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
 
-  if (MIXPANEL_TOKEN) {
-    const mixpanel = Mixpanel.init(MIXPANEL_TOKEN, {
-      debug: true,
-    });
-
-    // Mixpanel before any calls
-    router.use((req, res, next) => {
-      mixpanel.track('API Call', { Call: req.path, });
-      next();
-    });
-  }
-
   router.get('/status', status.bind(this, models));
 
   router.post('/createGist', passport.authenticate('jwt', { session: false }), createGist.bind(this, models));
