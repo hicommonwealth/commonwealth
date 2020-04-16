@@ -12,6 +12,7 @@ import { WalletAccount } from 'nearlib';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
+import { isRoleOfCommunity } from 'helpers/roles';
 
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
@@ -87,20 +88,30 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
       class: `proposal-${proposal.slug}`
     }, [
       m('.proposal-header', [
-        m(ProposalHeaderTags, { proposal }),
+        m('.proposal-header-meta', [
+          m(ProposalHeaderTags, { proposal }),
+          proposal instanceof OffchainThread && (proposal.tags?.length > 0 ||
+                                                 (app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
+                                                 isRoleOfCommunity(app.vm.activeAccount, app.login.addresses,
+                                                                   app.login.roles, 'admin', app.activeId())) && m(ProposalHeaderSpacer),
+          m(ViewCountBlock, { proposal }),
+          m(ProposalHeaderDelete, { proposal }),
+        ]),
         m('.proposal-title', [
           m(ProposalHeaderTitle, { proposal }),
           m(ProposalHeaderComments, { proposal, nComments }),
         ]),
-        m('.proposal-meta', proposal instanceof OffchainThread ? [
+        m('.proposal-subscription-button', [
+          m(ProposalHeaderSubscriptionButton, { proposal }),
+        ]),
+      ]),
+      proposal instanceof OffchainThread && m('.proposal-body', [
+        m('.proposal-body-meta', proposal instanceof OffchainThread ? [
           m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderSpacer),
           m(ProposalHeaderCreated, { proposal, link: proposalLink }),
           proposal instanceof OffchainThread && proposal.versionHistory?.length > 1 && m(ProposalHeaderSpacer),
           m(ProposalHeaderLastEdited, { proposal }),
-          m(ProposalHeaderSpacer),
-          m(ViewCountBlock, { proposal }),
-          m(ProposalHeaderDelete, { proposal }),
 
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
@@ -127,11 +138,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderCreated, { proposal, link: proposalLink }),
         ]),
-        m('.proposal-subscription-button', [
-          m(ProposalHeaderSubscriptionButton, { proposal }),
-        ]),
-      ]),
-      proposal instanceof OffchainThread && m('.proposal-body', [
         m('.proposal-body-content', [
           !vnode.state.editing
             && m(ProposalBodyText, { item: proposal }),

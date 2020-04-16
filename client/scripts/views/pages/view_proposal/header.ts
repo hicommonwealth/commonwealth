@@ -166,7 +166,7 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
       ]),
       ((app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())) &&
-        m(ProposalHeaderSpacer),
+        proposal.tags?.length > 0 && m(ProposalHeaderSpacer),
         m(TagEditor, {
           thread: proposal as OffchainThread,
           onChangeHandler: (tags: OffchainTag[]) => { (proposal as OffchainThread).tags = tags; m.redraw(); },

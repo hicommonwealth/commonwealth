@@ -14,13 +14,19 @@
         padding: $padding $gutter;
     }
     .proposal-body {
-        padding: $padding $gutter;
+        padding: $padding $gutter ($padding + 6px);
         border-top: 1px solid #e7e7e7;
+        .proposal-body-meta {
+            margin-bottom: 12px;
+        }
+        .proposal-body-content {
+        }
     }
 
 
     // proposal-tags
     .ProposalHeaderTags {
+        display: inline-block;
         font-size: 14px;
         .cui-icon {
             position: relative;
@@ -41,7 +47,7 @@
 
     // proposal-title
     .proposal-title {
-        margin: 5px 0;
+        margin-top: 5px;
         .ProposalHeaderTitle,
         .ProposalHeaderComments {
             display: inline;
@@ -113,6 +119,6 @@
     .ProposalHeaderSubscriptionButton {
         position: absolute;
         right: 20px;
-        top: 2px;
+        top: 20px;
     }
 }

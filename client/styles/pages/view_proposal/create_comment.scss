@@ -2,7 +2,7 @@
 @import './index';
 
 .CreateComment {
-    padding: $padding $gutter;;
+    padding: $padding $gutter ($padding + 6px);
     border-top: 1px solid #e7e7e7;
 
     .User {

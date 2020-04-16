@@ -1,11 +1,11 @@
 import { default as m } from 'mithril';
 import app from 'state';
 import { default as $ } from 'jquery';
-import { OffchainThread } from 'models';
+import { OffchainThread, AnyProposal } from 'models';
 import { pluralize } from '../../../helpers';
 
 interface IAttrs {
-  proposal: OffchainThread;
+  proposal: OffchainThread | AnyProposal;
 }
 
 interface IState {
@@ -18,7 +18,7 @@ const ViewCountBlock: m.Component<IAttrs, IState> = {
     $.post(`${app.serverUrl()}/viewCount`, {
       chain: app.activeChainId(),
       community: app.activeCommunityId(),
-      object_id: vnode.attrs.proposal.id,
+      object_id: (vnode.attrs.proposal instanceof OffchainThread) ? vnode.attrs.proposal.id : vnode.attrs.proposal.slug,
     }).then((response) => {
       if (response.status !== 'Success') {
         throw new Error('got unsuccessful status: ' + response.status);

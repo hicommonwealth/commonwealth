@@ -2,12 +2,10 @@
 @import './index';
 
 .ProposalComment {
-    padding: $padding $gutter;
+    padding: $padding $gutter ($padding + 6px);
     border-top: 1px solid #e7e7e7;
     .comment-body-meta {
         margin-bottom: 12px;
-    }
-    .comment-body-content {
     }
 }
 
