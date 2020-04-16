@@ -1,8 +1,6 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
-import Mixpanel from 'mixpanel';
-import { MIXPANEL_TOKEN } from './config';
 
 import status from './routes/status';
 import createGist from './routes/createGist';
