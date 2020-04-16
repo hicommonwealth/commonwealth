@@ -26,6 +26,9 @@
             display: inline-block;
         }
     }
+    .ql-tooltip {
+        z-index: 9999;
+    }
 
     // Image upload spinner
     .spinner-wrap.img-spinner {

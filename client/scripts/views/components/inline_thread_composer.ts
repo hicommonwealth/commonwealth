@@ -3,6 +3,7 @@ import 'components/inline_thread_composer.scss';
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { default as $ } from 'jquery';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 
@@ -92,29 +93,32 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         editorNamespace: 'new-link-inline',
         onkeyboardSubmit: createLink,
       }),
+      m(AutoCompleteTagForm, {
+        results: activeEntity.meta.tags || [],
+        updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
+        updateParentErrors: (err: string) => {
+          if (err) vnode.state.error = err;
+          else delete vnode.state.error;
+          m.redraw();
+        },
+        tabindex: 3,
+      }),
       m('.bottom-panel', [
         m('.actions', [
-          m('button', {
+          m(Button, {
             type: 'submit',
+            intent: 'primary',
             onclick: createLink,
             tabindex: 4,
-          }, 'Create link'),
-          // m('button', {
-          //   class: !author ? 'disabled' : '',
-          //   type: 'cancel',
-          //   onclick: closeComposer,
-          // }, 'Cancel'),
-        ]),
-        m('.tag-selection', [
-          m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
+            label: 'Create link'
+          }),
+          m(Button, {
+            class: !author ? 'disabled' : '',
+            type: 'cancel',
+            onclick: closeComposer,
+            basic: true,
+            outlined: false,
+            label: 'Cancel',
           }),
         ]),
       ]),
@@ -171,30 +175,33 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         editorNamespace: 'new-thread-inline',
         onkeyboardSubmit: createThread,
       }),
+      m(AutoCompleteTagForm, {
+        results: activeEntity.meta.tags || [],
+        updateFormData: (tags: string[]) => {
+          vnode.state.form.tags = tags;
+        },
+        updateParentErrors: (err: string) => {
+          if (err) vnode.state.error = err;
+          else delete vnode.state.error;
+          m.redraw();
+        },
+        tabindex: 3,
+      }),
       m('.bottom-panel', [
         m('.actions', [
-          m('button', {
+          m(Button, {
             type: 'submit',
+            intent: 'primary',
             onclick: createThread,
-            tabindex: 4
-          }, 'Create thread'),
-          // m('button', {
-          //   type: 'cancel',
-          //   onclick: closeComposer,
-          // }, 'Cancel'),
-        ]),
-        m('.tag-selection', [
-          m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
+            tabindex: 4,
+            label: 'Create thread'
+          }),
+          m(Button, {
+            type: 'cancel',
+            onclick: closeComposer,
+            basic: true,
+            outlined: false,
+            label: 'Cancel'
           }),
         ]),
       ]),
@@ -265,7 +272,7 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
         if (e.keyCode === 17) vnode.state.ctrlkeydown = false;
       },
     }, [
-      m('.flex-wrap', {
+      m('.top-panel', {
         onclick: (e) => {
           e.stopPropagation();
           if (vnode.state.open) return;
@@ -274,21 +281,16 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
         },
       }, [
         m('.thread-avatar', [
-          m(User, { user: author, avatarOnly: true, avatarSize: 28 }),
+          m(User, { user: author, avatarOnly: true, avatarSize: 30 }),
         ]),
         m('.thread-content', [
           m('.thread-title', [
             m('input[type="text"].form-field', {
               name: 'thread-composer',
-              placeholder: 'Start a thread, or paste a link',
+              placeholder: 'Start a thread...',
               autocomplete: 'off',
               onfocus: (e) => {
                 vnode.state.open = true;
-              },
-              onblur: (e) => {
-                if (e.relatedTarget && $(e.relatedTarget).hasClass('ql-editor')) return; // handle tabbing
-                if (vnode.state.mousedown || vnode.state.ctrlkeydown || textTitle || linkTitle) return;
-                vnode.state.open = false;
               },
               oninput: async (e) => {
                 const { value } = e.target;

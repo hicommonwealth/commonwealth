@@ -5,62 +5,37 @@
     margin: 6px 0 22px;
     border: 1px solid #eee;
     box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.04);
-    cursor: text;
-    &.open {
-        cursor: initial;
-    }
 
-    .flex-wrap {
+    $small-margin: 16px;
+    $left-margin: 69px;
+
+    .top-panel {
         display: flex;
+        align-items: center;
     }
     // layout
     .thread-avatar {
-        height: 54px;
-        width: 70px;
+        height: $left-margin;
+        width: $left-margin;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .thread-content {
         flex: 1;
-        padding-right: 16px;
+        padding-right: $small-margin;
         max-width: 100%;
         z-index: 1;
     }
-
-    // form fields
-    .thread-title {
-        height: 54px;
-        display: flex;
-        align-items: center;
-    }
-
-    input[name='thread-composer'], input[name='link-title'] {
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0;
-        font-weight: 500;
-        font-size: 17px;
-    }
-    input[name='thread-composer']::placeholder, input[name='link-title']::placeholder {
-        font-weight: 400 !important;
-    }
-    input[name='thread-composer']::-webkit-input-placeholder, input[name='link-title']::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-        font-weight: 400 !important;
-    }
-    input[name='thread-composer']::-moz-placeholder, input[name='link-title']::-moz-placeholder { /* Firefox 19+ */
-        font-weight: 400 !important;
-    }
-    input[name='thread-composer']:-ms-input-placeholder, input[name='link-title']:-ms-input-placeholder { /* IE 10+ */
-        font-weight: 400 !important;
-    }
-    input[name='thread-composer']:-moz-placeholder, input[name='link-title']:-moz-placeholder { /* Firefox 18- */
-        font-weight: 400 !important;
-    }
     input[name='link-title'] {
         margin-bottom: 20px;
-        margin-left: 69px;
+        margin-left: $left-margin;
         width: calc(100% - 69px);
+    }
+    input[name='thread-composer'], input[name='link-title'], .QuillEditor .ql-bubble .ql-editor {
+        border: 1px solid #e4e4e4;
+        border-radius: 4px;
+        padding: 10px 12px;
     }
 
     .spinner-wrap {
@@ -73,93 +48,39 @@
         span {
             color: $lighttextgrey;
         }
-    }
-    .spinner-wrap.img-spinner {
-        height: 55px;
-    }
-    .LinkPost, .TextPost {
-        > p {
-            font-size: 13px;
-            margin: 16px 0 7px;
-            color: #aaa;
-        }
-        > p.title {
-            margin-top: 10px;
-        }
-        > p.text-body {
-            margin-top: 10px;
-        }
-        .QuillEditor .ql-bubble .ql-editor {
-            padding: 0;
-            padding-right: 30px;
+        &.img-spinner {
+            height: 55px;
         }
     }
-    .QuillEditor {
-        margin-left: 69px;
-        margin-top: -4px;
-        position: relative;
-        .ql-editor > p {
-            color: black;
+    .LinkPost .ql-editor,
+    .TextPost .ql-editor {
+        min-height: 64px !important;
+        margin-left: $left-margin;
+        margin-right: $small-margin;
+        margin-bottom: $small-margin;
+    }
+
+    .AutoCompleteTagForm {
+        margin-left: $left-margin;
+        margin-bottom: $small-margin;
+        .AutoCompletePureForm {
+            margin: 0;
         }
     }
-    .bottom-panel {
-        display: flex;
-        align-items: flex-start;
-        margin-top: 20px;
-        padding: 16px 0 20px;
-        border-top: 1px solid #eee;
-        justify-content: left;
-        @include xxs-max {
-            margin: 0 20px 0 69px;
-            padding: 12px 0 20px;
-            align-items: flex-start;
-            flex-direction: column-reverse;
-        }
-        .tag-selection {
-            display: flex;
-            flex-direction: row;
-            justify-content: left;
-            .AutoCompleteTagForm {
-                margin-right: 20px;
-                @include xxs-max {
-                    // position: relative;
-                    margin: 0 0 20px 0;
-                }
-                @include sm-max {
-                    // position: relative;
-                    margin: 0;
-                }
-            }
-            // form styles
-        }
-        .actions {
-            @include xxs-max {
-                margin-left: 0;
-            }
-            margin-left: 69px;
-            min-width: 127px;
-            button {
-                margin-right: 8px;
-                padding: 6px 13px 5px;
-                min-width: inherit;
-            }
+
+    .bottom-panel .actions {
+        margin-left: $left-margin;
+        margin-bottom: 20px;
+        .cui-button {
+            margin-right: 10px;
         }
     }
-    .LinkPost {
-        .ql-editor {
-            min-height: 92px !important;
-        }
-    }
-    .TextPost {
-        .ql-editor {
-            min-height: 60px !important;
-        }
-    }
+
     .error-message {
         color: $error-red;
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 20px;
-        margin-left: 69px;
+        margin-left: $left-margin;
     }
 }

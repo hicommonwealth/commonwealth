@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-$border-radius: 16px;
+$border-radius: 4px;
 
 .AutoCompleteTagForm {
     .top-wrap {
@@ -61,7 +61,6 @@ $border-radius: 16px;
                     border: none !important;
                     border-radius: 9999px;
                     color: darken($lighttextgrey, 8%);
-                    cursor: pointer;
                     &:focus {
                         border: none !important;
                     }
