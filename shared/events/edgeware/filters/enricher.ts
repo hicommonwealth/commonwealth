@@ -1,7 +1,9 @@
 import { ApiPromise } from '@polkadot/api';
 import { Event, ReferendumInfoTo239 } from '@polkadot/types/interfaces';
+import { Option } from '@polkadot/types';
 import { SubstrateEventType } from '../types';
 
+// TODO: better balance/BN handling than string
 export async function enrichEvent(api: ApiPromise, type: SubstrateEventType, event: Event): Promise<any> {
   switch (type) {
     case SubstrateEventType.Slash:
@@ -9,7 +11,7 @@ export async function enrichEvent(api: ApiPromise, type: SubstrateEventType, eve
       const [ validator, amount ] = event.data;
       return {
         validator: validator.toString(),
-        amount: +amount,
+        amount: amount.toString(),
       };
     }
 
@@ -17,7 +19,7 @@ export async function enrichEvent(api: ApiPromise, type: SubstrateEventType, eve
       const [ proposalIndex, deposit ] = event.data;
       return {
         proposalIndex: +proposalIndex,
-        deposit: +deposit,
+        deposit: deposit.toString(),
       };
     }
 
@@ -25,10 +27,10 @@ export async function enrichEvent(api: ApiPromise, type: SubstrateEventType, eve
       const [ referendumIndex ] = event.data;
 
       // query for edgeware only -- kusama has different type
-      const info = await api.query.democracy.referendumInfoOf<ReferendumInfoTo239>(referendumIndex);
+      const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
       return {
         referendumIndex: +referendumIndex,
-        endBlock: +info.end,
+        endBlock: info.isSome ? (+info.unwrap().end) : null,
       };
     }
 

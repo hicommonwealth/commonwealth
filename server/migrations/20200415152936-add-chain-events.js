@@ -43,9 +43,6 @@ module.exports = {
           references: { model: 'Chains', key: 'id' },
         },
         event_name: { type: Sequelize.STRING, allowNull: false },
-        raw_name: { type: Sequelize.STRING, allowNull: true },
-        documentation: { type: Sequelize.TEXT, allowNull: true },
-        typedefs: { type: Sequelize.ARRAY(Sequelize.STRING), allowNull: true },
       }, {
         transaction: t,
         timestamps: false,
@@ -89,6 +86,21 @@ module.exports = {
         name: 'chain-event',
         description: 'a chain event occurs'
       }], { transaction: t });
+
+      // TODO: TESTING ONLY
+      // await queryInterface.bulkInsert('Chains', [{
+      //   id: 'edgeware-local',
+      //   network: 'edgeware',
+      //   symbol: 'EDG',
+      //   name: 'Edgeware Local',
+      //   icon_url: '/static/img/protocols/edg.png',
+      //   active: true,
+      //   type: 'chain',
+      // }], { transaction: t });
+      // await queryInterface.bulkInsert('ChainNodes', [{
+      //   chain: 'edgeware-local',
+      //   url: 'localhost:9944',
+      // }], { transaction: t });
 
       // initialize chain event types as needed
       await initChainEventTypes(queryInterface, Sequelize, t);

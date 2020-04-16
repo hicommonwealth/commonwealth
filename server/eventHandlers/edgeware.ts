@@ -33,24 +33,6 @@ export default class extends IEventHandler<SubstrateEvent> {
       console.log(`found chain event type: ${dbEventType.id}`);
     }
 
-    // add event metadata if not yet seen
-    let didUpdateDbEventType = false;
-    if (!dbEventType.raw_name && event.name) {
-      dbEventType.raw_name = event.name;
-      didUpdateDbEventType = true;
-    }
-    if (!dbEventType.documentation && event.documentation) {
-      dbEventType.documentation = event.documentation;
-      didUpdateDbEventType = true;
-    }
-    if (!dbEventType.typedefs && event.typedefs !== undefined) {
-      dbEventType.typedefs = event.typedefs;
-      didUpdateDbEventType = true;
-    }
-    if (didUpdateDbEventType) {
-      await dbEventType.save();
-    }
-
     // create event in db
     const dbEvent = await this._models.ChainEvent.create({
       chain_event_type_id: dbEventType.id,

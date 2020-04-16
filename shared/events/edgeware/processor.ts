@@ -30,10 +30,8 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock, Substra
     const events = await Promise.all(block.events.map(async ({ event }) => {
       // apply filters
       const type = parseEventType(event);
-      const data = await enrichEvent(this._api, type, event);
-
-      // construct event
       if (type !== SubstrateEventType.Unknown) {
+        const data = await enrichEvent(this._api, type, event);
         return { type, blockNumber, data };
       } else {
         return null;

@@ -15,7 +15,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
       { model: models.ChainEventType }
     ]
   });
-  if (lastChainEvent) {
+  if (lastChainEvent && lastChainEvent.length > 0 && lastChainEvent[0]) {
     const lastEventBlockNumber = lastChainEvent[0].block_number;
     console.log(`Discovered chain event in db at block ${lastEventBlockNumber}.`);
     return { startBlock: lastEventBlockNumber + 1 };
@@ -33,7 +33,7 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
   nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
     .map(async (node) => {
       const eventHandler = new EdgewareEventHandler(models, wss, node.chain);
-      const url = `ws://${node.url}`;
+      const url = node.url.substr(0, 2) === 'ws' ? node.url : `ws://${node.url}`;
       const subscriber = await subscribeEdgewareEvents(
         url,
         eventHandler,

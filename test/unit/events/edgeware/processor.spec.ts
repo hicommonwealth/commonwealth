@@ -27,7 +27,7 @@ const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
   };
 };
 
-/* eslint-disable: dot-notation */
+/*
 describe('Edgeware Event Processor Tests', () => {
   it('should process blocks into events', (done) => {
     // setup fake data
@@ -97,3 +97,4 @@ describe('Edgeware Event Processor Tests', () => {
 
   // TODO: fail tests
 });
+*/

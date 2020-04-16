@@ -16,7 +16,17 @@ export function createApi(provider: WsProvider): ApiPromise {
     .reduce((res, { types }): object => ({ ...res, ...types }), {});
   return new ApiPromise({
     provider,
-    types: { ...edgewareTypes },
+    types: {
+      ...edgewareTypes,
+      'voting::VoteType': 'VoteType',
+      'voting::TallyType': 'TallyType',
+      // chain-specific overrides
+      Address: 'GenericAddress',
+      Keys: 'SessionKeys4',
+      StakingLedger: 'StakingLedgerTo223',
+      Votes: 'VotesTo230',
+      ReferendumInfo: 'ReferendumInfoTo239',
+    },
     registry
   });
 }

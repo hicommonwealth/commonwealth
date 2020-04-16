@@ -27,7 +27,9 @@ export function labelEvent(blockNumber: number, type: SubstrateEventType, data: 
     case SubstrateEventType.DemocracyStarted:
       return {
         heading: 'Democracy Referendum Started',
-        label: `Referendum ${data.referendumIndex} has started, voting until block ${data.endBlock}.`,
+        label: data.endBlock
+          ? `Referendum ${data.referendumIndex} has started, voting until block ${data.endBlock}.`
+          : `Referendum ${data.referendumIndex} has started.`,
         linkUrl: null, // TODO
       };
     case SubstrateEventType.DemocracyPassed:
