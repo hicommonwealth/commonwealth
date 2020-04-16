@@ -39,18 +39,26 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
 
   let comment;
   let parentThread;
+  let cwUrl;
   if (req.body.comment_id) {
     comment = await models.OffchainComment.findByPk(Number(req.body.comment_id));
     // Test on variety of comments to ensure root relation + type
-    parentThread = await models.OffchainThread.findByPk(Number(comment.root_id.replace('discussion_', '')));
+    let proposal;
+    const [prefix, id] = comment.root_id.split('_');
+    if (prefix === 'discussion') {
+      proposal = await models.OffchainThread.findOne({
+        where: { id }
+      });
+    } else if (prefix.includes('proposal')) {
+      proposal = await models.Proposal.findOne({
+        where: { id }
+      });
+    }
+    cwUrl = createCommonwealthUrl(prefix, proposal, comment);
   } else {
     parentThread = await models.OffchainThread.findByPk(Number(req.body.thread_id));
+    cwUrl = createCommonwealthUrl('discussion', parentThread, comment);
   }
-
-  // craft commonwealth url
-  const cwUrl = comment
-    ? createCommonwealthUrl(parentThread, comment)
-    : createCommonwealthUrl(parentThread);
 
   // dispatch notifications
   const reactedPost = comment || parentThread;

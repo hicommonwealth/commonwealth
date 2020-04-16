@@ -105,9 +105,24 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     where: { id: comment.id },
     include: [models.Address, models.OffchainAttachment],
   });
-  const commentedObject = await models.OffchainThread.findOne({
-    where: { id: root_id.replace('discussion_', '') }
-  });
+
+  let proposal;
+  const [prefix, id] = finalComment.root_id.split('_');
+  if (prefix === 'discussion') {
+    proposal = await models.OffchainThread.findOne({
+      where: { id }
+    });
+  } else if (prefix.includes('proposal')) {
+    proposal = await models.Proposal.findOne({
+      where: { id }
+    });
+  }
+
+  // craft commonwealth url
+  const cwUrl = createCommonwealthUrl(prefix, proposal, finalComment);
+
+  // CHECK THAT SEARCH IS WORKING PROPERLY
+  console.log(proposal);
 
   // auto-subscribe comment author to reactions
   await models.Subscription.create({
@@ -136,12 +151,6 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       console.log(err);
     }
   }
-
-  // craft commonwealth url
-  const thread = await models.OffchainThread.findOne({
-    where: { id: finalComment.root_id.split('_')[1] }
-  });
-  const cwUrl = createCommonwealthUrl(thread, finalComment);
 
   // dispatch notifications
   await models.Subscription.emitNotifications(

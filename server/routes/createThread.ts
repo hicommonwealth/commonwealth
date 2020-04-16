@@ -177,7 +177,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     },
     {
       user: finalThread.Address.address,
-      url: createCommonwealthUrl(finalThread),
+      url: createCommonwealthUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
