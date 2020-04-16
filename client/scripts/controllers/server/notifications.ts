@@ -98,10 +98,13 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
     return post('/viewNotifications', { }, (result) => {
+      console.log(result);
       this._store.clear();
       this._subscriptions = [];
       for (const subscriptionJSON of result) {
+        console.log(subscriptionJSON);
         const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+        console.log(subscription);
         this._subscriptions.push(subscription);
         for (const notificationJSON of subscriptionJSON.Notifications) {
           const notification = Notification.fromJSON(notificationJSON, subscription);

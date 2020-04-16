@@ -50,7 +50,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       include: [models.Address, models.OffchainAttachment],
     });
     // get thread for crafting commonwealth url
-    const thread = await models.OffchainThread.findOne({ where: { id: finalComment.root_id.split('_')[1] } });
+    const parentThread = await models.OffchainThread.findOne({ where: { id: finalComment.root_id.split('_')[1] } });
     // dispatch notifications to subscribers of the comment/thread
     await models.Subscription.emitNotifications(
       models,
@@ -58,14 +58,20 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       '',
       {
         created_at: new Date(),
-        comment_id: finalComment.id,
-        author_address: finalComment.Address.address
+        root_id: parentThread.id,
+        root_title: parentThread.title,
+        object_id: finalComment.id,
+        object_text: finalComment.text,
+        chain_id: finalComment.chain,
+        community_id: finalComment.community,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Addrses.chain,
       },
       // don't send webhook notifications for edits
       {
         user: finalComment.Address.address,
-        url: createCommonwealthUrl(thread, finalComment),
-        title: thread.title,
+        url: createCommonwealthUrl(parentThread, finalComment),
+        title: parentThread.title,
         chain: finalComment.chain,
         community: finalComment.community,
       },

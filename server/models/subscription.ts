@@ -25,14 +25,40 @@ module.exports = (sequelize, DataTypes) => {
     models.Subscription.hasMany(models.Notification);
   };
 
+  interface IPostNotificationData {
+    created_at: any;
+    root_id: string | number;
+    root_title: string,
+    object_id: string | number;
+    object_text: string;
+    chain_id: string | number;
+    community_id: string | number;
+    author_address: string;
+    author_chain: string;
+  }
+
+  interface ICommunityNotificationData {
+    created_at: any;
+    role_id: string | number;
+    author_address: string;
+    chain: string;
+    community: string;
+  }
+
   Subscription.emitNotifications = async (
     models,
     category_id: string,
     object_id: string,
-    notification_data: any,
+    notification_data: IPostNotificationData | ICommunityNotificationData,
     webhook_data: WebhookContent,
     wss?,
   ) => {
+    if (!object_id.includes('discussion_')
+      && !object_id.includes('comment-')
+      && !object_id.includes('user-')) {
+      console.log('Invalid object_id');
+    }
+
     const creatorAddress = await models.Address.findOne({
       where: {
         address: notification_data.author_address,

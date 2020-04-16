@@ -166,8 +166,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     location,
     {
       created_at: new Date(),
-      root_title: finalThread.title,
       root_id: finalThread.id,
+      root_title: finalThread.title,
       object_id: finalThread.id,
       object_text: finalThread.body,
       chain_id: finalThread.chain,
