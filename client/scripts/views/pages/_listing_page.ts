@@ -10,12 +10,12 @@ const ListingPage: m.Component<{ title?, subtitle?, content, sidebar?, class }> 
     }, [
       m('.page-container', [
         m('.container', [
-          vnode.attrs.sidebar ? [
-            m('.row', [
+          vnode.attrs.sidebar
+            ? m('.row', [
               m('.col-sm-9', vnode.attrs.content),
               m('.col-sm-3', vnode.attrs.sidebar),
             ])
-          ] : vnode.attrs.content
+            : m('.col-xs-12', vnode.attrs.content),
         ])
       ]),
     ]);

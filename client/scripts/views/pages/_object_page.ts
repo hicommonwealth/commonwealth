@@ -14,18 +14,14 @@ const ObjectPage: m.Component<IAttrs> = {
     return m('.ObjectPage', { class: vnode.attrs.class }, [
       m('.page-container', [
         m('.container', [
-          vnode.attrs.compact ? [
-            m('.row', [
-              m('.col-sm-10.col-sm-offset-1', vnode.attrs.content),
-            ]),
-          ] :
-          vnode.attrs.sidebar ? [
-            m('.row', [
+          vnode.attrs.compact
+            ? m('.row', m('.col-sm-10.col-sm-offset-1', vnode.attrs.content))
+            : vnode.attrs.sidebar
+            ? m('.row', [
               m('.col-sm-8', vnode.attrs.content),
               m('.col-sm-4', vnode.attrs.sidebar),
             ])
-          ] :
-          vnode.attrs.content
+            : m('.col-xs-12', vnode.attrs.content),
         ]),
       ]),
     ]);
