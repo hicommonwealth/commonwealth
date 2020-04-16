@@ -105,7 +105,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
 
   let lockEvents = [];
   for (let i = 0; i < lockdropContracts.length; i++) {
-    let events = await lockdropContracts[i].getPastEvents('Locked', {
+    const events = await lockdropContracts[i].getPastEvents('Locked', {
       fromBlock: 0,
       toBlock: 'latest',
     });
@@ -120,7 +120,8 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
     lockdropStartTime = (await lockdropContracts[0].methods.LOCK_START_TIME().call());
   }
   console.log(`Lock events ${lockEvents.length}`);
-  lockEvents.forEach((event) => {
+  lockEvents.forEach((event, inx) => {
+    if (inx % 500 === 0) console.log(`Processing lock event #${inx + 1}`);
     const data = event.returnValues;
     // allocate locks to first key if multiple submitted or malformed larger key submitted
     // NOTE: if key was less than length of a correct submission (66 chars), funds are considered lost
@@ -204,6 +205,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
   console.log(`Signal events ${signalEvents.length}`);
   const gLocks = {};
   for (let i = 0; i < signalEvents.length; i++) {
+    if (i % 100 === 0) console.log(`Processing signal event #${i + 1}`);
     const event = signalEvents[i];
     const data = event.returnValues;
     // Get balance at block that lockdrop ends
@@ -279,11 +281,18 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
   };
 };
 
-export const getCountsByBlock = async (web3, lockdropContract) => {
-  // TODO: no lockdropContract is passed because we assume the cached request has been fulfilled...
-  // TODO: we don't consider the difference between mainnet and ropsten
-  const locks = await getLocks(web3, lockdropContract);
-  const signals = await getSignals(web3, lockdropContract);
+export const getCountsByBlock = async (web3, contracts) => {
+  let locks = [];
+  let signals = [];
+  for (let i = 0; i < contracts.length; i++) {
+    const lockdropContract = contracts[i];
+    const ls = await getLocks(lockdropContract);
+    const ss = await getSignals(lockdropContract);
+    locks.push(ls);
+    signals.push(ss);
+  }
+  locks = [].concat(...locks);
+  signals = [].concat(...signals);
   const allEvents = locks.concat(signals);
   locks.sort((a, b) => a.blockNumber - b.blockNumber);
   signals.sort((a, b) => a.blockNumber - b.blockNumber);
@@ -316,26 +325,23 @@ export const getCountsByBlock = async (web3, lockdropContract) => {
   // TODO: This code assumes there is at least one event of each type
   // number of participants, by blocknum
   const participantsByBlock = reduceOverBlocks(allEvents, (value) => 1);
-  const lockEventsByBlock = reduceOverBlocks(allEvents.filter((e) => e.name === 'Locked'), (value) => 1);
-  const signalEventsByBlock = reduceOverBlocks(allEvents.filter((e) => e.name === 'Signaled'), (value) => 1);
-  const ethLockedByBlock = reduceOverBlocks(
-    locks, (value) => Number(web3.utils.fromWei(web3.utils.toBN(value.returnValues.eth), 'ether')));
+  const lockEventsByBlock = reduceOverBlocks(locks, (value) => 1);
+  const signalEventsByBlock = reduceOverBlocks(signals, (value) => 1);
+  const ethLockedByBlock = reduceOverBlocks(locks, (value) => Number(
+    web3.utils.fromWei(web3.utils.toBN(value.returnValues.eth), 'ether')
+  ));
   const ethSignaledByBlock = [];
   const effectiveETHByBlock = [];
 
   // construct array converting blocknums to time
   const blocknumToTime = {};
   allEvents.forEach((event) => {
-    const time = isHex(event.returnValues.time)
-      ? web3.utils.hexToNumber(event.returnValues.time)
-      : parseInt(event.returnValues.time, 10);
+    const time = parseInt(event.returnValues.time, 10);
     blocknumToTime[event.blockNumber] = new Date(+web3.utils.toBN(time) * 1000);
     blocknumToTime[Math.ceil(event.blockNumber / roundToBlocks) * roundToBlocks] =
       new Date(+web3.utils.toBN(time) * 1000);
   });
-  const time2 = isHex(allEvents[0].returnValues.time)
-    ? web3.utils.hexToNumber(allEvents[0].returnValues.time)
-    : parseInt(allEvents[0].returnValues.time, 10);
+  const time2 = parseInt(allEvents[0].returnValues.time, 10);
   blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =
     new Date(+web3.utils.toBN(time2) * 1000);
 
@@ -380,14 +386,12 @@ export const fetchStats = async (models, net) => {
       totalETHLocked12mo,
       numLocks
     } = await calculateEffectiveLocks(contracts);
-    console.log('Numlocks', numLocks);
     const {
       signals,
       totalETHSignaled,
       totalEffectiveETHSignaled,
       numSignals
     } = await calculateEffectiveSignals(web3, contracts);
-    console.log('Numsignals', numSignals);
     const {
       participantsByBlock,
       lockEventsByBlock,
@@ -398,7 +402,7 @@ export const fetchStats = async (models, net) => {
       blocknumToTime,
       lastBlock
     } = await getCountsByBlock(web3, contracts);
-    console.log(lastBlock);
+
     const aggregateResult = {
       // locks
       locks,
@@ -424,9 +428,9 @@ export const fetchStats = async (models, net) => {
       blocknumToTime,
       lastBlock,
     };
-    console.log(aggregateResult);
     await models.EdgewareLockdropEverything.create({
       data: JSON.stringify(aggregateResult),
+      createdAt: Date.now(),
     });
 
     results = aggregateResult;

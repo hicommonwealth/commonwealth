@@ -13,24 +13,20 @@ export function setupWeb3Provider(network) {
   return new Web3(new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`));
 }
 
-export const getLocks = (lockdropContract, address) => {
-  return lockdropContract.getPastEvents('Locked', {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      owner: address,
-    }
-  });
+export const getLocks = (lockdropContract, address?) => {
+  const options = (address)
+    ? { fromBlock: 0, toBlock: 'latest' }
+    : { fromBlock: 0, toBlock: 'latest', filter: { owner: address } };
+
+  return lockdropContract.getPastEvents('Locked', options);
 };
 
-export const getSignals = (lockdropContract, address) => {
-  return lockdropContract.getPastEvents('Signaled', {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      contractAddr: address,
-    }
-  });
+export const getSignals = (lockdropContract, address?) => {
+  const options = (address)
+    ? { fromBlock: 0, toBlock: 'latest' }
+    : { fromBlock: 0, toBlock: 'latest', filter: { contractAddr: address } };
+
+  return lockdropContract.getPastEvents('Signaled', options);
 };
 
 const getCurrentTimestamp = async (web3) => {
@@ -105,10 +101,6 @@ const fetchSignals = async (network = 'mainnet', address, contract) => {
 };
 
 export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
-
   const address = req.query.address;
   const network = req.query.network || 'mainnet';
 

@@ -12,8 +12,7 @@ import { pluralize } from 'helpers';
 import Tabs from 'views/components/widgets/tabs';
 import {
   isHex, formatDate, formatNumber, formatNumberRound,
-  MAINNET_LOCKDROP, ROPSTEN_LOCKDROP,
-  getParticipationSummary, getAddressSummary, MAINNET_LOCKDROP_ORIG
+  MAINNET_LOCKDROP, ROPSTEN_LOCKDROP, getParticipationSummary,
 } from './stats_helpers';
 
 
@@ -77,7 +76,6 @@ async function triggerUpdateData() {
     state.participationSummary = undefined;
   }
 
-  console.log(state.participationSummary);
   state.loading = false;
   if (!state.participationSummary) {
     console.log('No data');
@@ -231,7 +229,7 @@ const EdgewareStatsPage = {
                         data: summary.participantsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }, {
                         label: 'Lock events',
                         backgroundColor: '#ff9f40',
@@ -241,7 +239,7 @@ const EdgewareStatsPage = {
                         data: summary.lockEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }, {
                         label: 'Signal events',
                         backgroundColor: '#ffcd56',
@@ -251,7 +249,7 @@ const EdgewareStatsPage = {
                         data: summary.signalEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }]
                     }
                   };
@@ -273,7 +271,7 @@ const EdgewareStatsPage = {
                         data: summary.ethLockedByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y.toFixed(2)} ETH`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }]
                     }
                   };

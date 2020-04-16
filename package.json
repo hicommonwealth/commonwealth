@@ -23,6 +23,7 @@
     "update-balances": "UPDATE_BALANCES=true ts-node --project tsconfig.node.json server.ts",
     "update-supernova": "UPDATE_SUPERNOVA=true ts-node --project tsconfig.node.json server.ts",
     "update-objects": "UPDATE_OBJECTS=true ts-node --project tsconfig.node.json server.ts",
+    "update-edgeware-lockdrop": "UPDATE_EDGEWARE_LOCKDROP_STATS=true ts-node --project tsconfig.node.json server.ts",
     "mock-graphql-provider": "ts-node --project tsconfig.node.json server/test/mockGraphqlProvider.ts",
     "add-test-queries": "ADD_TEST_QUERIES=true ts-node --project tsconfig.node.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
