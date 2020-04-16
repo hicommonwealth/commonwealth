@@ -93,9 +93,6 @@ a.btn {
     &:hover {
         background: #f2f2f2;
     }
-    &:focus {
-        box-shadow: 0 0 3px 1px #08c;
-    }
     &:disabled,
     &.disabled, {
         opacity: 0.4;
@@ -173,13 +170,6 @@ button[type="submit"] {
     background-color: #41a360;
     background-image: linear-gradient(-180deg, #61cc82 -25%, #41a360 100%);
     color: #fff;
-    &:hover {
-        background-color: lighten(#41a360, 2%);
-        background-image: linear-gradient(-180deg, lighten(#61cc82, 2%) -25%, lighten(#41a360, 2%) 100%);
-    }
-    &:focus {
-        box-shadow: 0 0 3px 1px #41a360;
-    }
 }
 
 input[type="radio"],
