@@ -228,6 +228,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
                 app.threads.edit(proposal, null, null, true).then(() => m.redraw());
               }
             }, (proposal as OffchainThread).readOnly ? 'Make Commentable?' : 'Make Read-Only?'),
+          app.isLoggedIn() && isSameAccount(app.vm.activeAccount, author) && (proposal as OffchainThread).privacy
+            && m('button.privacy-to-public-toggle', {
+              onclick: (e) => {
+                e.preventDefault();
+                app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
+              }
+            }, 'Make Thread Public'),
         ]),
         !isThread && m('.col-xs-12.col-lg-12', [
           m('.proposal-subtitle-row', [
