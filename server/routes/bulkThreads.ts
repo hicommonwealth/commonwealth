@@ -44,10 +44,8 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
 
   const filteredThreads = await allThreads.filter((thread) => {
     if (thread.private === false) {
-      console.dir('public thread');
       return true;
     } else if (adminRoles.length > 0) {
-      console.dir('private thread, but admin/mod');
       return true;
     } else {
       return false;

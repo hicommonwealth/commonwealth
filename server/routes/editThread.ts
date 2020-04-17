@@ -4,7 +4,6 @@ import { UserRequest } from '../types';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
-  console.dir(`privacy: ${privacy}`);
 
   if (!req.user) {
     return next(new Error('Not logged in'));
