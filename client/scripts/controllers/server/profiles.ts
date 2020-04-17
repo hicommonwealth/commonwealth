@@ -15,6 +15,10 @@ class ProfilesController {
 
   private _fetchNewProfiles;
 
+  public allLoaded() {
+    return this._unfetched.length === 0;
+  }
+
   public constructor() {
     this._unfetched = [];
     this._fetchNewProfiles = _.debounce(() => {

@@ -14,7 +14,7 @@ import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 
-import CommentsController, { CommentParent } from 'controllers/server/comments';
+import { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
@@ -231,7 +231,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 };
 
 interface IProposalCommentsState {
-  comments: Array<OffchainComment<any>>;
   commentError: any;
   dom;
   highlightedComment: boolean;
@@ -239,6 +238,8 @@ interface IProposalCommentsState {
 
 interface IProposalCommentsAttrs {
   proposal: OffchainThread | AnyProposal;
+  comments: Array<OffchainComment<any>>;
+  createdCommentCallback: CallableFunction;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   replyParent: number | boolean;
@@ -248,26 +249,18 @@ interface IProposalCommentsAttrs {
 // TODO: clarify that 'user' = user who is commenting
 const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
   view: (vnode) => {
-    const { proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent } = vnode.attrs;
-    vnode.state.comments = app.comments.getByProposal(proposal)
-      .filter((c) => c.parentComment === null);
+    const { proposal, comments, createdCommentCallback, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent } = vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
-    if (vnode.state.dom && vnode.state.comments?.length > 0 && !vnode.state.highlightedComment) {
+    if (vnode.state.dom && comments?.length > 0 && !vnode.state.highlightedComment) {
       vnode.state.highlightedComment = true;
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
         : null;
       if (commentId) jumpHighlightComment(commentId);
     }
-
-    const createdCommentCallback = () => {
-      vnode.state.comments = app.comments.getByProposal(proposal)
-        .filter((c) => c.parentComment === null);
-      m.redraw();
-    };
 
     const nestedReply = (comment, replyParent2) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
@@ -321,7 +314,6 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       });
     };
 
-    const { commentError, comments } = vnode.state;
     return m('.ProposalComments', {
       oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; }
     }, [
@@ -330,17 +322,17 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       && m('.proposal-comments', AllComments(comments, replyParent)),
       // create comment
       app.vm.activeAccount
-      && !getSetGlobalReplyStatus(GlobalStatus.Get)
-      && m(CreateComment, {
-        callback: createdCommentCallback,
-        cancellable: false,
-        getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus,
-        rootProposal: proposal,
-      }),
+        && !getSetGlobalReplyStatus(GlobalStatus.Get)
+        && m(CreateComment, {
+          callback: createdCommentCallback,
+          cancellable: false,
+          getSetGlobalEditingStatus,
+          getSetGlobalReplyStatus,
+          rootProposal: proposal,
+        }),
       // errors
-      commentError
-      && m('.comments-error', commentError),
+      vnode.state.commentError
+        && m('.comments-error', vnode.state.commentError),
     ]);
   }
 };
@@ -357,7 +349,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments, viewCountLoaded: boolean, viewCount: number }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments, viewCountLoaded: boolean, viewCount: number, profilesLoaded: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -411,16 +403,17 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         });
       vnode.state.commentsLoaded = true;
     }
-    if (vnode.state.comments === undefined) {
-      return m(PageLoading);
-    }
+    const createdCommentCallback = () => {
+      vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
+      m.redraw();
+    };
 
     // load view count
-    if (!vnode.state.viewCountLoaded) {
+    if (!vnode.state.viewCountLoaded && proposal instanceof OffchainThread) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         community: app.activeCommunityId(),
-        object_id: (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
+        object_id: proposal.id, // (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
       }).then((response) => {
         if (response.status !== 'Success') {
           vnode.state.viewCount = 0;
@@ -434,8 +427,30 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         throw new Error('could not load view count');
       });
       vnode.state.viewCountLoaded = true;
+    } else if (!vnode.state.viewCountLoaded) {
+      // view counts currently not supported for proposals
+      vnode.state.viewCountLoaded = true;
+      vnode.state.viewCount = 0;
+    }
+
+    if (vnode.state.comments === undefined) {
+      return m(PageLoading);
     }
     if (vnode.state.viewCount === undefined) {
+      return m(PageLoading);
+    }
+
+    // load profiles
+    if (vnode.state.profilesLoaded === undefined) {
+      if (proposal.author instanceof Account) {
+        app.profiles.getProfile(proposal.author.chain.id, proposal.author.address);
+      }
+      vnode.state.comments.map((comment) => {
+        app.profiles.getProfile(comment.authorChain, comment.author);
+      });
+      vnode.state.profilesLoaded = true;
+    }
+    if (!app.profiles.allLoaded) {
       return m(PageLoading);
     }
 
@@ -444,6 +459,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     //   proposal.fetchVotes().then(() => m.redraw());
     // }
 
+    const comments = vnode.state.comments;
     const viewCount : number = vnode.state.viewCount;
     const commentCount : number = app.comments.nComments(proposal);
     const voterCount : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
@@ -507,7 +523,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       class: 'ViewProposalPage',
       content: [
         m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-        m(ProposalComments, { proposal, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+        m(ProposalComments, { proposal, comments, createdCommentCallback, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
         m(ProposalSidebar, { proposal }),
       ],
     });
