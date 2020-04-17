@@ -38,7 +38,7 @@ interface ThreadArgs {
   body: any;
   tags?: string[];
   privacy?: boolean;
-  readOnly: boolean;
+  readOnly?: boolean;
 }
 export const createThread = async (args: ThreadArgs) => {
   const { chain, community, address, jwt, title, body, tags, privacy, readOnly } = args;
