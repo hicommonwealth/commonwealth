@@ -3,6 +3,9 @@ import 'modals/edit_tag_modal.scss';
 import { default as m } from 'mithril';
 import { default as app } from 'state';
 import $ from 'jquery';
+import { Button } from 'construct-ui';
+
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from '../modal';
 import { TextInputFormField, CheckboxFormField, TextareaFormField } from '../components/forms';
 import { isCommunityAdmin } from '../pages/discussions/roles';
@@ -37,6 +40,7 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
     if (!vnode.state.form) {
       vnode.state.form = { description, featured, id, name };
     }
+
     const updateTag = async (form) => {
       const tagInfo = {
         id,
@@ -54,6 +58,15 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
         await app.tags.edit(tagInfo);
       }
       m.redraw();
+    };
+
+    const deleteTag = async (form) => {
+      const tagInfo = {
+        id,
+        communityId: app.activeCommunityId(),
+        chainId: app.activeChainId(),
+      };
+      await app.tags.remove(tagInfo);
     };
 
     return m('.EditTagModal', {
@@ -101,17 +114,33 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
           })
         ]),
       ]),
-      m('.compact-modal-bottom', [
+      m('.compact-modal-actions', [
         m('.buttons', [
-          m('button.btn.formular-button-primary', {
+          m(Button, {
+            intent: 'primary',
             class: vnode.state.saving ? 'disabled' : '',
-            onclick: (e) => {
+            onclick: async (e) => {
               e.preventDefault();
-              updateTag(vnode.state.form);
+              await updateTag(vnode.state.form);
               if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
               vnode.state.saving = false;
-            }
-          }, 'Save Changes')
+            },
+            label: 'Save Changes',
+          }),
+          m(Button, {
+            intent: 'negative',
+            class: vnode.state.saving ? 'disabled' : '',
+            onclick: async (e) => {
+              e.preventDefault();
+              const confirmed = await confirmationModalWithText('Delete this tag?')();
+              if (!confirmed) return;
+              await deleteTag(id);
+              if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
+              vnode.state.saving = false;
+              m.redraw();
+            },
+            label: 'Delete Tag',
+          }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),
       ])

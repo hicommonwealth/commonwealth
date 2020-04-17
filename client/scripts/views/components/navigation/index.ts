@@ -166,6 +166,7 @@ const Navigation: m.Component<{ activeTag: string }, {}> = {
        p.startsWith(`/${app.activeId()}/proposal/discussion`) ||
        p.startsWith(`/${app.activeId()}/discussions`));
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
+    const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
     const onProposalPage = (p) =>
       (p.startsWith(`/${app.activeChainId()}/proposals`) ||
@@ -278,8 +279,14 @@ const Navigation: m.Component<{ activeTag: string }, {}> = {
           }),
         // TODO: tag selector
         (app.community || app.chain) &&
-          m(TagSelector, { activeTag }),
+          m(TagSelector, { activeTag, showFullListing: false }),
         // members (all communities)
+        (app.community || app.chain) &&
+          m(ListItem, {
+            active: onTagsPage(m.route.get()),
+            label: 'Tags',
+            onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+          }),
         (app.community || app.chain) &&
           m(ListItem, {
             active: onMembersPage(m.route.get()),

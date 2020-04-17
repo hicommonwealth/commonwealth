@@ -61,6 +61,23 @@ class TagsController {
     }
   }
 
+  public async remove(tag) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/deleteTag`, {
+        'id': tag.id,
+        'community': tag.communityId,
+        'chain': tag.chainId,
+        'jwt': app.login.jwt
+      });
+      this._store.remove(this._store.getById(tag.id));
+    } catch (err) {
+      console.log('Failed to delete tag');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to delete tag');
+    }
+  }
+
   public async refreshAll(communityId?, chainId?, reset = false) {
     try {
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {

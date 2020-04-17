@@ -77,6 +77,7 @@ import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
+import deleteTag from './routes/deleteTag';
 import bulkTags from './routes/bulkTags';
 
 import addChainObjectQuery from './routes/addChainObjectQuery';
@@ -143,6 +144,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // offchain tags
   router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
   router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
+  router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));
   router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
 
   // offchain reactions

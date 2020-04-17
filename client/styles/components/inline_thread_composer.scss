@@ -6,7 +6,7 @@
     border: 1px solid #eee;
     box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.04);
 
-    $small-margin: 16px;
+    $small-margin: 10px;
     $left-margin: 69px;
 
     .top-panel {
@@ -15,7 +15,7 @@
     }
     // layout
     .thread-avatar {
-        height: $left-margin;
+        height: 60px;
         width: $left-margin;
         display: flex;
         align-items: center;
@@ -30,7 +30,7 @@
     input[name='link-title'] {
         margin-bottom: 20px;
         margin-left: $left-margin;
-        width: calc(100% - 69px);
+        width: calc(100% - $left-margin);
     }
     input[name='thread-composer'], input[name='link-title'], .QuillEditor .ql-bubble .ql-editor {
         border: 1px solid #e4e4e4;

@@ -341,6 +341,7 @@ $(() => {
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
     '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
+    '/:scope/tags':              importRoute(import('views/pages/tags'), true),
     '/:scope/members':           importRoute(import('views/pages/members'), true),
     '/:scope/chat':              importRoute(import('views/pages/chat'), true),
     '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),

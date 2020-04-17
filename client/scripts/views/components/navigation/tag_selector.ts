@@ -13,58 +13,6 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
-interface ITagRowAttrs {
-  count: number,
-  description: string,
-  id: number,
-  featured: boolean;
-  featured_order?: number,
-  name: string;
-  selected: boolean;
-  addFeaturedTag: Function;
-  removeFeaturedTag: Function;
-}
-
-const TagRow: m.Component<ITagRowAttrs, {}> = {
-  view: (vnode) => {
-    const { count, description, id, featured, featured_order, name, selected, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
-    if (featured && typeof Number(featured_order) !== 'number') return null;
-
-    return m('a.TagRow', {
-      key: id,
-      id,
-      class: selected ? 'selected' : '',
-      href: '#',
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
-      },
-    }, [
-      m('span.tag-name', `${name} (${count})`),
-      isCommunityAdmin()
-        && m('a.edit-button', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            app.modals.create({
-              modal: EditTagModal,
-              data: {
-                description,
-                featured,
-                featured_order,
-                id,
-                name,
-                addFeaturedTag,
-                removeFeaturedTag
-              }
-            });
-          }
-        }, 'Edit')
-    ]);
-  }
-};
-
 interface IGetTagListingParams {
   activeTag: string,
   featuredTagIds: string[],
@@ -72,8 +20,8 @@ interface IGetTagListingParams {
   removeFeaturedTag: Function
 }
 
-const getTagListing = (IGetTagListingParams) => {
-  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag } = IGetTagListingParams;
+export const getTagListing = (params: IGetTagListingParams) => {
+  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag } = params;
   const otherTags = {};
   const featuredTags = {};
 
@@ -145,11 +93,64 @@ const getTagListing = (IGetTagListingParams) => {
   return ({ featuredTagListing, otherTagListing });
 };
 
-const TagSelector: m.Component<{ activeTag: string }, { refreshed, featuredTagIds }> = {
+interface ITagRowAttrs {
+  count: number,
+  description: string,
+  id: number,
+  featured: boolean;
+  featured_order?: number,
+  name: string;
+  selected: boolean;
+  addFeaturedTag: Function;
+  removeFeaturedTag: Function;
+}
+
+const TagRow: m.Component<ITagRowAttrs, {}> = {
   view: (vnode) => {
-    const { activeTag } = vnode.attrs;
+    const { count, description, id, featured, featured_order, name, selected, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
+    if (featured && typeof Number(featured_order) !== 'number') return null;
+
+    return m('a.TagRow', {
+      key: id,
+      id,
+      class: selected ? 'selected' : '',
+      href: '#',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
+      },
+    }, [
+      m('span.tag-name', `${name} (${count})`),
+      isCommunityAdmin()
+        && m('a.edit-button', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.modals.create({
+              modal: EditTagModal,
+              data: {
+                description,
+                featured,
+                featured_order,
+                id,
+                name,
+                addFeaturedTag,
+                removeFeaturedTag
+              }
+            });
+          }
+        }, 'Edit')
+    ]);
+  }
+};
+
+const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean }, { refreshed, featuredTagIds }> = {
+  view: (vnode) => {
+    const { activeTag, showFullListing } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
+
     if (!vnode.state.featuredTagIds) {
       vnode.state.featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
     }
@@ -167,6 +168,7 @@ const TagSelector: m.Component<{ activeTag: string }, { refreshed, featuredTagId
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
+      showFullListing && m('h4', 'Featured tags'),
       !!featuredTagListing.length && m('.featured-tag-list', {
         oncreate: () => {
           if (isCommunityAdmin()) {
@@ -181,7 +183,8 @@ const TagSelector: m.Component<{ activeTag: string }, { refreshed, featuredTagId
           }
         }
       }, featuredTagListing),
-      !!otherTagListing.length && m('.other-tag-list', otherTagListing),
+      showFullListing && m('h4', 'Other tags'),
+      showFullListing && !!otherTagListing.length && m('.other-tag-list', otherTagListing),
     ]);
   },
 };
