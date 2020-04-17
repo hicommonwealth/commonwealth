@@ -244,9 +244,10 @@ body.modal-open {
 }
 
 .layout-content {
-    padding-left: 282px;
+    padding: 15px 40px;
+    padding-left: $side-width + 40px;
     &.logged-out {
-        padding-left: 282px - 80px;
+        padding-left: $side-width - $switcher-width;
     }
 }
 

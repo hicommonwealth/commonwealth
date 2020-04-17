@@ -50,10 +50,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
         m(Navigation, { activeTag }),
         m('.layout-content', {
           class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
-        }, [
-          m('.clear'),
-          m(PageNotFound),
-        ]),
+        }, m(PageNotFound)),
         m(AppModals),
         m(AppToasts),
       ]);
@@ -85,10 +82,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
       m(Navigation, { activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
-      }, [
-        m('.clear'),
-        vnode.children,
-      ]),
+      }, vnode.children),
       m(AppModals),
       m(AppToasts),
     ]);
