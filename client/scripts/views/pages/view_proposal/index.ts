@@ -441,7 +441,9 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
     // load profiles
     if (vnode.state.profilesPrefetchStarted === undefined) {
-      if (proposal.author instanceof Account) {
+      if (proposal instanceof OffchainThread) {
+        app.profiles.getProfile(proposal.authorChain, proposal.author);
+      } else if (proposal.author instanceof Account) { // AnyProposal
         app.profiles.getProfile(proposal.author.chain.id, proposal.author.address);
       }
       vnode.state.comments.map((comment) => {
