@@ -3688,10 +3688,10 @@ constants-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
   integrity sha1-wguW2MYXdIqvHBYCF2DNJ/y4y3U=
 
-construct-ui@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/construct-ui/-/construct-ui-0.2.3.tgz#05ce3d6a20c137bb52e6bc93f2fac585a61fc06f"
-  integrity sha512-u1RoMHFFdI5MAPDIdpWsqZcoJlpcHsrmjpP/E9cf2qUGQ9+0/I4BVX0JXFy9pdp3T/6A3egQGd2T2UIzyKUxxg==
+construct-ui@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/construct-ui/-/construct-ui-0.2.4.tgz#feb26d3e8ec11e31124ab8229418afc8a578bcb4"
+  integrity sha512-JAVr4yRfQfOCwBQeMNubuGWeGy2aj1S+I/jHJHrT5zuwjE/YTC37kNPiavgSQo3sgyNX+uoZPRvh38cevzK8nw==
   dependencies:
     classnames "^2.2.6"
     enquire.js "^2.1.6"
