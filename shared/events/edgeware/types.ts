@@ -80,11 +80,3 @@ export const SubstrateEventKindMap: { [P in SubstrateEventKind]: P } = {
 };
 
 export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKindMap);
-
-/**
- * The full event, including data.
- */
-export interface SubstrateEvent {
-  blockNumber: number;
-  data: ISubstrateEventType;
-}

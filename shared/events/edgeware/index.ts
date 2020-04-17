@@ -1,15 +1,44 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
+import { TypeRegistry } from '@polkadot/types';
+
+import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 
 import Subscriber from './subscriber';
 import Poller from './poller';
 import Processor from './processor';
-import { createApi } from './util';
-import { SubstrateBlock, SubstrateEvent } from './types';
-import { IEventHandler, IBlockSubscriber, IDisconnectedRange } from '../interfaces';
+import { SubstrateBlock } from './types';
+import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
+
+/**
+ * Attempts to open an API connection, retrying if it cannot be opened.
+ * @param url websocket endpoing to connect to, including ws[s]:// and port
+ * @returns a promise resolving to an ApiPromise once the connection has been established
+ */
+export function createApi(provider: WsProvider): ApiPromise {
+  const registry = new TypeRegistry();
+  const edgewareTypes = Object.values(edgewareDefinitions)
+    .map((v) => v.default)
+    .reduce((res, { types }): object => ({ ...res, ...types }), {});
+  return new ApiPromise({
+    provider,
+    types: {
+      ...edgewareTypes,
+      'voting::VoteType': 'VoteType',
+      'voting::TallyType': 'TallyType',
+      // chain-specific overrides
+      Address: 'GenericAddress',
+      Keys: 'SessionKeys4',
+      StakingLedger: 'StakingLedgerTo223',
+      Votes: 'VotesTo230',
+      ReferendumInfo: 'ReferendumInfoTo239',
+    },
+    registry
+  });
+}
 
 export default function (
   url = 'ws://localhost:9944',
-  handler: IEventHandler<SubstrateEvent>,
+  handler: IEventHandler,
   skipCatchup: boolean,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
@@ -26,7 +55,7 @@ export default function (
         const poller = new Poller(api);
         const processor = new Processor(api);
         const processBlockFn = async (block: SubstrateBlock) => {
-          const events: SubstrateEvent[] = await processor.process(block);
+          const events: CWEvent[] = await processor.process(block);
           events.map((event) => handler.handle(event));
         };
 

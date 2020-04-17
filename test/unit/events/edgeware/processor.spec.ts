@@ -88,6 +88,7 @@ describe('Edgeware Event Processor Tests', () => {
             amount: '10000',
           },
           blockNumber: 1,
+          affectedAddresses: ['Alice'],
         },
         {
           data: {
@@ -96,6 +97,7 @@ describe('Edgeware Event Processor Tests', () => {
             deposit: '100000',
           },
           blockNumber: 1,
+          affectedAddresses: [],
         },
       ]);
       assert.deepEqual(results[1], [
@@ -106,6 +108,7 @@ describe('Edgeware Event Processor Tests', () => {
             endBlock: 123,
           },
           blockNumber: 2,
+          affectedAddresses: [],
         },
       ]);
       done();

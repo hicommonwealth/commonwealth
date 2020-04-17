@@ -1,11 +1,10 @@
 /**
  * Transforms raw edgeware events into the final form for storage
  */
-import { IEventHandler } from '../../shared/events/interfaces';
-import { SubstrateEvent } from '../../shared/events/edgeware/types';
+import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
 import { NotificationCategories } from '../../shared/types';
 
-export default class extends IEventHandler<SubstrateEvent> {
+export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _wss,
@@ -19,7 +18,7 @@ export default class extends IEventHandler<SubstrateEvent> {
    * @param event the raw event from chain
    * @returns the processed event
    */
-  public async handle(event: SubstrateEvent) {
+  public async handle(event: CWEvent) {
     console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
@@ -43,10 +42,6 @@ export default class extends IEventHandler<SubstrateEvent> {
     console.log(`created db event: ${dbEvent.id}`);
 
     // locate subscriptions generate notifications as needed
-    // TODO: we are replicating all the event data here N times! is there any way
-    //   to make this use less data? We could be wasting a lot of space.
-    //   Currently, notifications and subscriptions are not changed, but maybe we should
-    //   make explicit references?
     const dbNotifications = await this._models.Subscription.emitNotifications(
       this._models,
       NotificationCategories.ChainEvent,
@@ -57,6 +52,7 @@ export default class extends IEventHandler<SubstrateEvent> {
       { }, // TODO: what is webhook data here?
       this._wss,
       dbEvent.id,
+      event.affectedAddresses,
     );
     console.log(`Emitted ${dbNotifications.length} notifications.`);
   }

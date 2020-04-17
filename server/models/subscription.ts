@@ -32,7 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     webhook_data: WebhookContent,
     wss?,
     chainEventId?: number,
+    affectedAddresses?: string[],
   ) => {
+    // TODO: replace this with "excluded addresses"
     const creatorAddress = notification_data.author_address
       ? await models.Address.findOne({
         where: {
@@ -48,9 +50,26 @@ module.exports = (sequelize, DataTypes) => {
         { is_active: true },
       ],
     };
+
     if (creatorAddress) {
-      findOptions[Op.not] = [{ subscriber_id: creatorAddress.user_id }];
+      findOptions[Op.and].push({ [Op.not]: [{ subscriber_id: creatorAddress.user_id }] });
+    } else if (affectedAddresses) {
+      // fetch user ids of included/affected addresses
+      const addressModels = await models.Address.findAll({
+        where: {
+          address: {
+            [Op.in]: affectedAddresses,
+          },
+        },
+      });
+      const userIds = addressModels.map((a) => a.user_id);
+
+      // remove duplicates
+      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      findOptions[Op.and].push({ subscriber_id: { [Op.in]: userIdsDedup } });
     }
+
+    console.log(findOptions);
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
     // create notifications if data exists
