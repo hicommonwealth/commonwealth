@@ -41,9 +41,7 @@ const DiscussionRow: m.Component<IAttrs> = {
         && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url))
     ];
 
-    const extraAttrs = { key: proposal.identifier };
-
-    return link('a.DiscussionRow', `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
+    return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
         m('.discussion-pre', [
           m(User, {
@@ -88,7 +86,7 @@ const DiscussionRow: m.Component<IAttrs> = {
         ]),
       ]),
       m('.discussion-content-mobile', getContent(proposal)),
-    ], extraAttrs);
+    ]);
   }
 };
 

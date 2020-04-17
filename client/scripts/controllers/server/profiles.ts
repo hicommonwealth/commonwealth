@@ -16,7 +16,6 @@ class ProfilesController {
   private _fetchNewProfiles;
 
   public allLoaded() {
-    console.log('allloaded?', this._unfetched.length, this._unfetched.map(p => p.address));
     return this._unfetched.length === 0;
   }
 

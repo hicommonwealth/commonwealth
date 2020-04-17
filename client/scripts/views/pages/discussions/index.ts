@@ -180,11 +180,14 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
             }
             count += proposals.length;
             const isCurrentWeek = +msecAgo === 0;
+            const isLastWeek = +msecAgo === +week * 2;
             const attrs = {
               isCurrentWeek,
               isFirstWeek,
               heading: isCurrentWeek
                 ? 'This week'
+                : isLastWeek
+                ? 'Last week'
                 : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`,
               proposals
             };

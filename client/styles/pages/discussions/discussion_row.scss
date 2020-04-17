@@ -1,16 +1,12 @@
 @import 'client/styles/shared';
 
 $discussion-row-color: #999;
-$discussion-row-hpadding: 18px;
-$discussion-row-vpadding: 16px;
+$discussion-row-hpadding: 0;
+$discussion-row-vpadding: 11px;
 
-a.DiscussionRow {
+.DiscussionRow {
     display: block;
     padding: $discussion-row-vpadding $discussion-row-hpadding;
-    text-decoration: none;
-    &:hover {
-        background: #f9f9f9;
-    }
 
     .discussion-row {
         display: flex;
@@ -56,6 +52,10 @@ a.DiscussionRow {
         a.discussion-tag, a.discussion-created, a.discussion-replies {
             text-decoration: none;
             color: $discussion-row-color;
+            &:hover {
+                color: darken($discussion-row-color, 8%);
+                text-decoration: underline;
+            }
         }
         .User a {
             display: inline-block;
@@ -86,6 +86,9 @@ a.DiscussionRow {
         font-size: 16px;
         text-decoration: none;
         font-weight: 500;
+        &:hover {
+            text-decoration: underline;
+        }
     }
     .discussion-body-preview {
         font-size: 14px;
