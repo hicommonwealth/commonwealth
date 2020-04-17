@@ -694,7 +694,6 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       }
       const label = labelEvent(
         notification.chainEvent.blockNumber,
-        notification.chainEvent.type.eventName,
         notification.chainEvent.data,
         (bal) => formatCoin(app.chain.chain.coins(new BN(bal, 10)), true),
       );
