@@ -136,7 +136,7 @@ const getTagListing = (IGetTagListingParams) => {
   });
 
 
-  const OtherTagListing = Object.keys(otherTags)
+  const otherTagListing = Object.keys(otherTags)
     .sort((a, b) => otherTags[b].count - otherTags[a].count)
     .map((name, idx) => m(TagRow, {
       count: otherTags[name].count,
@@ -149,7 +149,7 @@ const getTagListing = (IGetTagListingParams) => {
       removeFeaturedTag
     }));
 
-  const FeaturedTagListing = featuredTagIds.length
+  const featuredTagListing = featuredTagIds.length
     ? Object.keys(featuredTags)
       .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
       .map((name, idx) => m(TagRow, {
@@ -165,7 +165,7 @@ const getTagListing = (IGetTagListingParams) => {
       }))
     : [];
 
-  return ({ FeaturedTagListing, OtherTagListing });
+  return ({ featuredTagListing, otherTagListing });
 };
 
 const TagSelector: m.Component<ITagSelectorAttrs, { refreshed, featuredTagIds }> = {
@@ -187,30 +187,24 @@ const TagSelector: m.Component<ITagSelectorAttrs, { refreshed, featuredTagIds }>
     };
 
     const params = { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag };
-    const { FeaturedTagListing, OtherTagListing } = getTagListing(params);
+    const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
-      !!FeaturedTagListing.length && m('.featured-tags', [
-        m('h4.sidebar-header', 'Featured Tags'),
-        m('.featured-tag-list', {
-          oncreate: () => {
-            if (isCommunityAdmin()) {
-              dragula([document.querySelector('.featured-tag-list')])
-                .on('drop', async (el, target, source) => {
-                  const reorder = Array.from(source.children).map((child) => {
-                    return (child as HTMLElement).id;
-                  });
-                  vnode.state.featuredTagIds = reorder;
-                  await app.community.meta.updateFeaturedTags(reorder);
+      !!featuredTagListing.length && m('.featured-tag-list', {
+        oncreate: () => {
+          if (isCommunityAdmin()) {
+            dragula([document.querySelector('.featured-tag-list')])
+              .on('drop', async (el, target, source) => {
+                const reorder = Array.from(source.children).map((child) => {
+                  return (child as HTMLElement).id;
                 });
-            }
+                vnode.state.featuredTagIds = reorder;
+                await app.community.meta.updateFeaturedTags(reorder);
+              });
           }
-        }, FeaturedTagListing)
-      ]),
-      !!OtherTagListing.length && m('.other-tags', [
-        m('h4.sidebar-header', FeaturedTagListing.length ? 'Other Tags' : 'Tags'),
-        OtherTagListing
-      ])
+        }
+      }, featuredTagListing),
+      !!otherTagListing.length && m('.other-tag-list', otherTagListing),
     ]);
   },
 };
