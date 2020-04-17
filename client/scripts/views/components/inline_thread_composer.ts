@@ -166,18 +166,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, read_only);
       m.redraw();
     };
-    const createPrivateThread = (e?) => {
-      if (e) e.preventDefault();
-      const { form, quillEditorState } = vnode.state;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, true, false);
-      m.redraw();
-    };
-    const createPublicReadOnlyThread = (e?) => {
-      if (e) e.preventDefault();
-      const { form, quillEditorState } = vnode.state;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, false, true);
-      m.redraw();
-    };
 
     return m('.TextPost', [
       m(QuillEditor, {
@@ -198,14 +186,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             onclick: createThread,
             tabindex: 4
           }, 'Create thread'),
-          // m('button', {
-          //   type: 'submit',
-          //   onclick: createPrivateThread,
-          // }, 'Create private thread'),
-          // m('button', {
-          //   type: 'submit',
-          //   onclick: createPublicReadOnlyThread,
-          // }, 'Create Read Only Thread (Public)'),
           m('.property-group', [
             m('input[type="radio"]', {
               name: 'properties',
