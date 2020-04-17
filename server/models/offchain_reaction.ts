@@ -2,8 +2,8 @@ module.exports = (sequelize, DataTypes) => {
   const OffchainReaction = sequelize.define('OffchainReaction', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: DataTypes.STRING, allowNull: true },
-    thread_id: { type: DataTypes.STRING, allowNull: true },
-    comment_id: { type: DataTypes.STRING, allowNull: true },
+    thread_id: { type: DataTypes.INTEGER, allowNull: true },
+    comment_id: { type: DataTypes.INTEGER, allowNull: true },
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     reaction: { type: DataTypes.STRING, allowNull: false },
     community: { type: DataTypes.STRING, allowNull: true },

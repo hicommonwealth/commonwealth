@@ -290,7 +290,7 @@ const resetServer = (models, closeMiddleware) => {
       description: 'someone @ mentions a user',
     });
     await models.NotificationCategory.create({
-      name: NotificationCategories.NewMention,
+      name: NotificationCategories.NewReaction,
       description: 'someone reacts to a post',
     });
 
