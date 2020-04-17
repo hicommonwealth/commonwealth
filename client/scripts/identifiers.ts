@@ -1,7 +1,7 @@
 import { Observable, merge } from 'rxjs';
 import { share, map, filter } from 'rxjs/operators';
 
-import { StorageModule, AnyProposal, ChainBase, ChainClass } from 'client/scripts/models';
+import { StorageModule, AnyProposal, ChainBase, ChainClass } from 'models';
 import { IStoreUpdate, UpdateType, ProposalStore } from 'stores';
 
 import app from './state';

@@ -36,13 +36,14 @@ import AddressesModal from 'views/modals/addresses_modal';
 import NewProposalModal from 'views/modals/proposals';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { OffchainCommunitiesStore } from 'stores';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+import { createCommonwealthUrl } from '../../../../shared/utils';
 
 
 interface INavigationMenuAttrs {
@@ -527,12 +528,11 @@ const decodeComment = (comment_text) => {
 };
 
 const getNotificationFields = (category, data) => {
-  const { created_at, object_text, object_id, root_id, root_title, chain_id, community_id,
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text, chain_id, community_id,
     author_address, author_chain } = JSON.parse(data);
   console.log(JSON.parse(data));
-  const object_type = (object_id == root_id) ? 'thread' : 'comment';
   if (!created_at || !author_address || !author_chain || !created_at || (!chain_id && !community_id)
-    || !root_title || !root_id || !object_id || !object_text) {
+    || !root_id || !root_title || !root_type) {
     console.error('Notification data is incomplete.');
     return;
   }
@@ -545,34 +545,35 @@ const getNotificationFields = (category, data) => {
   let notificationBody;
   const decoded_title = decodeURIComponent(root_title).trim();
 
-  if (object_type === 'comment') {
-    notificationBody = decodeComment(object_text);
-  } else if (object_type === 'thread') {
+  if (comment_text) {
+    notificationBody = decodeComment(comment_text);
+  } else if (root_type === ProposalType.OffchainThread) {
     notificationBody = decoded_title;
-  } else {
-    console.error('Invalid notification type');
-    return;
   }
 
   if (category === NotificationCategories.NewComment) {
+    // Needs logic for notifications issued to parents of nested comments
     notificationHeader = m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ]);
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = (object_type === 'thread')
+    notificationHeader = (!comment_id)
       ? m('span', ['New mention in ', m('span.commented-obj', community_name) ])
       : m('span', ['New mention in ', m('span.commented-obj', decoded_title || community_name) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
-    notificationHeader = (object_type === 'thread')
+    notificationHeader = (!comment_id)
       ? m('span', ['New reaction to ', m('span.commented-obj', decoded_title) ])
       : m('span', ['New reaction in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
-
-  const linksToComment = (category === NotificationCategories.NewComment || object_type === 'comment');
-  const path = linksToComment
-    ? `/${community_id || chain_id}/proposal/discussion/${root_id}?comment=${object_id}`
-    : `/${community_id || chain_id}/proposal/discussion/${root_id}-${slugify(decoded_title)}`;
-  const pageJump = linksToComment ? () => jumpHighlightComment(object_id) : () => jumpHighlightComment('parent');
+  const pseudoProposal = {
+    id: root_id,
+    title: root_title,
+    chain: chain_id,
+    community: community_id,
+  };
+  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
+  const path = (createCommonwealthUrl as any)(...args);
+  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
     author: [author_address, author_chain],

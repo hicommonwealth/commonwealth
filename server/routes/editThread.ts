@@ -69,8 +69,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
         root_id: Number(finalThread.id),
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
-        chain_id: chain.id,
-        community_id: community.id,
+        chain_id: finalThread.chain,
+        community_id: finalThread.community,
         author_address: finalThread.Address.address
       },
       // don't send webhook notifications for edits
@@ -81,6 +81,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
   } catch (e) {
     return next(e);
   }
+
+  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editThread;

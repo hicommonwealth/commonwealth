@@ -5,7 +5,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { UserRequest } from '../types';
 import { NotificationCategories } from '../../shared/types';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { createCommonwealthUrl } from '../../shared/utils';
 
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -68,8 +68,8 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
     root_id: Number(proposal.id),
     root_title: proposal.title || '',
     root_type,
-    chain_id: chain.id,
-    community_id: community.id,
+    chain_id: reaction.chain,
+    community_id: reaction.community,
     author_address: reaction.Address.address,
     author_chain: reaction.Address.chain,
   };
@@ -88,8 +88,8 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       user: reaction.Address.address,
       url: cwUrl,
       title: proposal.title || '',
-      chain: chain.id,
-      community: community.id,
+      chain: reaction.chain,
+      community: reaction.community,
     },
     req.wss,
   );

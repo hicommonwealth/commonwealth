@@ -13,11 +13,6 @@ export const NotificationCategories = {
   CommentEdit: 'comment-edit',
 };
 
-export const PROFILE_NAME_MAX_CHARS = 40;
-export const PROFILE_HEADLINE_MAX_CHARS = 80;
-export const PROFILE_BIO_MAX_CHARS = 1000;
-export const PROFILE_NAME_MIN_CHARS = 3;
-
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
   SubstrateDemocracyProposal = 'democracyproposal',
@@ -29,3 +24,8 @@ export enum ProposalType {
   CosmosProposal = 'cosmosproposal',
   MolochProposal = 'molochproposal',
 }
+
+export const PROFILE_NAME_MAX_CHARS = 40;
+export const PROFILE_HEADLINE_MAX_CHARS = 80;
+export const PROFILE_BIO_MAX_CHARS = 1000;
+export const PROFILE_NAME_MIN_CHARS = 3;

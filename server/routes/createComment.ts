@@ -4,7 +4,7 @@ import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { createCommonwealthUrl } from '../../shared/utils';
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -166,8 +166,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       root_type: prefix,
       comment_id: Number(finalComment.id),
       comment_text: finalComment.text,
-      chain_id: chain.id,
-      community_id: community.id,
+      chain_id: finalComment.chain,
+      community_id: finalComment.community,
       author_address: finalComment.Address.address,
       author_chain: finalComment.Address.chain,
     },
@@ -175,8 +175,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       user: finalComment.Address.address,
       url: cwUrl,
       title: proposal.title || '',
-      chain: chain.id,
-      community: community.id,
+      chain: finalComment.chain,
+      community: finalComment.community,
     },
     req.wss,
   );
@@ -208,8 +208,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           root_type: prefix,
           comment_id: Number(finalComment.id),
           comment_text: finalComment.text,
-          chain_id: chain.id,
-          community_id: community.id,
+          chain_id: finalComment.chain,
+          community_id: finalComment.community,
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },

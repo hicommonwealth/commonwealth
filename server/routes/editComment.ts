@@ -3,7 +3,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { createCommonwealthUrl } from '../../shared/utils';
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -79,8 +79,8 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         root_type: prefix,
         comment_id: Number(finalComment.id),
         comment_text: finalComment.text,
-        chain_id: chain.id,
-        community_id: community.id,
+        chain_id: finalComment.chain,
+        community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -89,8 +89,8 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         user: finalComment.Address.address,
         url: cwUrl,
         title: proposal.title || '',
-        chain: chain.id,
-        community: community.id,
+        chain: finalComment.chain,
+        community: finalComment.community,
       },
       req.wss,
     );
@@ -99,6 +99,8 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
   } catch (e) {
     return next(e);
   }
+
+  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editComment;

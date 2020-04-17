@@ -92,6 +92,7 @@ const User : m.Component<IAttrs> = {
       const chainId = vnode.attrs.user[1];
       const address = vnode.attrs.user[0];
       if (!chainId || !address) return;
+      debugger
       const chain = app.config.chains.getById(chainId);
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === chainId) {

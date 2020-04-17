@@ -68,7 +68,7 @@ module.exports = {
         test: /\.tsx?$/,
         include: [
           path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared/adapters')
+          path.resolve(__dirname, '../shared')
         ],
         use: {
           loader: 'ts-loader'
@@ -78,7 +78,7 @@ module.exports = {
         test: /\.(js)$/,
         include: [
           path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared/adapters')
+          path.resolve(__dirname, '../shared')
         ],
         use: {
           loader: 'babel-loader'

@@ -4,7 +4,7 @@ import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { createCommonwealthUrl } from '../../shared/utils';
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -169,8 +169,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       root_id: Number(finalThread.id),
       root_type: ProposalType.OffchainThread,
       root_title: finalThread.title,
-      chain_id: chain.id,
-      community_id: community.id,
+      chain_id: finalThread.chain,
+      community_id: finalThread.community,
       author_address: finalThread.Address.address,
       author_chain: finalThread.Address.chain,
     },
@@ -179,8 +179,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       url: createCommonwealthUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
-      chain: chain.id,
-      community: community.id,
+      chain: finalThread.chain,
+      community: finalThread.community,
     },
     req.wss,
   );
@@ -229,8 +229,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         root_id: Number(finalThread.id),
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
-        chain_id: chain.id,
-        community_id: community.id,
+        chain_id: finalThread.chain,
+        community_id: finalThread.community,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
