@@ -2,7 +2,6 @@
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
-import ObjectPage from 'views/pages/_object_page';
 import { renderMultilineText } from 'helpers';
 
 const PrivacyPolicy = `
@@ -117,13 +116,12 @@ const PrivacyPage = {
     mixpanel.track('PageVisit', {'Page Name': 'PrivacyPage'});
   },
   view: (vnode) => {
-    return m(ObjectPage, {
-      class: 'PrivacyPage',
-      content: m('.forum-container', [
+    return m('.PrivacyPage', [
+      m('.forum-container', [
         m('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),
       ]),
-    });
+    ]);
   }
 };
 

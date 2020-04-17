@@ -2,7 +2,6 @@ import 'pages/supernova/key_gen.scss';
 
 import { default as m } from 'mithril';
 
-import ObjectPage from '../_object_page';
 import CodeBlock from '../../components/widgets/code_block';
 import SupernovaPreheader from './supernova_preheader';
 
@@ -193,9 +192,7 @@ const GaiaCLIKeygen: m.Component = {
 
 const SupernovaKeygen: m.Component<{}, IState> = {
   view: (vnode: m.VnodeDOM<{}, IState>) => {
-    return m(ObjectPage, {
-      class: 'SupernovaKeygen',
-      content: [
+    return m('.SupernovaKeygen', [
         m('.forum-container.keygen-layout', [
           m(SupernovaPreheader),
           m('h2.page-title', 'Generate Supernova Address'),
@@ -210,8 +207,7 @@ const SupernovaKeygen: m.Component<{}, IState> = {
           m(SupernovaCLIKeygen),
           m(GaiaCLIKeygen)
         ])
-      ]
-    });
+    ]);
   }
 };
 

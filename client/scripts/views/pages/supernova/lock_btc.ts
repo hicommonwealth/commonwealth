@@ -4,7 +4,6 @@ import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
 
-import ObjectPage from 'views/pages/_object_page';
 import { TextInputFormField } from '../../components/forms';
 import CodeBlock from '../../components/widgets/code_block';
 import SupernovaPreheader from './supernova_preheader';
@@ -46,9 +45,7 @@ const SupernovaLockBTCPage: m.Component<{}, IState> = {
       return true;
     };
 
-    return m(ObjectPage, {
-      class: 'SupernovaLockBTCPage',
-      content: [
+    return m('.SupernovaLockBTCPage', [
         m('.forum-container.lockBTC-layout', [
           m(SupernovaPreheader),
           m('h2.page-title', 'Lock Bitcoin'),
@@ -113,8 +110,7 @@ const SupernovaLockBTCPage: m.Component<{}, IState> = {
           !vnode.state.error && vnode.state.instructional && m(BTCInstructions),
           vnode.state.error && m('.lock-error', vnode.state.error)
         ])
-      ]
-    });
+    ]);
   }
 };
 

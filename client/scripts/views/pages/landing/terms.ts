@@ -2,7 +2,6 @@
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
-import ObjectPage from 'views/pages/_object_page';
 import { renderMultilineText } from 'helpers';
 
 const TermsOfService = `
@@ -123,13 +122,12 @@ const TermsPage = {
     mixpanel.track('PageVisit', {'Page Name': 'TermsPage'});
   },
   view: (vnode) => {
-    return m(ObjectPage, {
-      class: 'TermsPage',
-      content: m('.forum-container', [
+    return m('.TermsPage', [
+      m('.forum-container', [
         m('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),
       ])
-    });
+    ]);
   }
 };
 

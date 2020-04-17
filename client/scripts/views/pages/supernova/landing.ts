@@ -9,7 +9,6 @@ import Countdown from 'views/components/countdown';
 import app from 'state';
 
 import { formatNumberLong, link } from 'helpers';
-import ObjectPage from 'views/pages/_object_page';
 
 const supernovaStart = null; //moment('2019-12-01 00:00');
 const supernovaEnd = null; //moment('2020-06-30 23:59');
@@ -31,9 +30,7 @@ const SupernovaLandingPage : m.Component<{}, { globalStats }> = {
   view: (vnode) => {
     const globalStats = vnode.state.globalStats;
 
-    return m(ObjectPage, {
-      class: 'SupernovaLandingPage',
-      content: [
+    return m('.SupernovaLandingPage', [
         m('.forum-container', [
           m('.supernova-cover', [
             m('img.supernova-title', {
@@ -154,8 +151,7 @@ const SupernovaLandingPage : m.Component<{}, { globalStats }> = {
           ]),
           m('br'),
         ]),
-      ],
-    });
+    ]);
   }
 };
 

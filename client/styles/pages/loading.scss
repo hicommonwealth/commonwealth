@@ -1,8 +1,6 @@
-.ObjectPage.PageLoading {
-    position: relative;
-    .page-container, .container {
-        position: absolute;
-        height: 100%;
-        width: 100%;
-    }
+.LoadingPage {
+    position: absolute;
+    padding-left: 280px;
+    height: 100%;
+    width: calc(100% - 280px);
 }

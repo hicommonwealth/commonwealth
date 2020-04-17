@@ -8,7 +8,6 @@ import app from 'state';
 import { RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 
 import { notifyInfo } from 'controllers/app/notifications';
-import ObjectPage from 'views/pages/_object_page';
 import PreviewModal from 'views/modals/preview_modal';
 import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
@@ -87,9 +86,7 @@ const NewThreadPage = {
       ]),
     ]);
 
-    return m(ObjectPage, {
-      class: 'NewThreadPage',
-      content: [
+    return m('.NewThreadPage', [
         m('.forum-container', [
           m('h2.page-title', 'New Post'),
           vnode.state.newType === 'Link' && m(Form, [
@@ -213,8 +210,7 @@ const NewThreadPage = {
               : m('.error-placeholder'),
           ]),
         ]),
-      ],
-    });
+    ]);
   },
 };
 

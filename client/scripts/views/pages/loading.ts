@@ -1,17 +1,14 @@
 import 'pages/loading.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { Spinner } from 'construct-ui';
 
-import ObjectPage from 'views/pages/_object_page';
-
-const PageLoading: m.Component<{}> = {
+const LoadingPage: m.Component<{}> = {
   view: (vnode) => {
-    return m(ObjectPage, {
-      class: 'PageLoading',
-      content: m(Spinner, { fill: true, size: 'xl', style: 'visibility: visible; opacity: 1;' }),
-    });
+    return m('.LoadingPage', [
+      m(Spinner, { fill: true, size: 'xl', style: 'visibility: visible; opacity: 1;' }),
+    ]);
   }
 };
 
-export default PageLoading;
+export default LoadingPage;

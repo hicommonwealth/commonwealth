@@ -5,7 +5,6 @@ import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
 
 import { pluralize } from 'helpers';
-import ObjectPage from 'views/pages/_object_page';
 import { isHex, formatNumber } from 'views/stats/stats_helpers';
 import { TextInputFormField } from '../../components/forms';
 import SupernovaPreheader from './supernova_preheader';
@@ -49,9 +48,7 @@ const SupernovaLockLookupPage: m.Component<{}, IState> = {
   view: (vnode: m.VnodeDOM<{}, IState>) => {
     vnode.state.network = 'mainnet';
 
-    return m(ObjectPage, {
-      class: 'SupernovaLockLookupPage',
-      content: [
+    return m('.SupernovaLockLookupPage', [
         m('.forum-container.lookup-layout', [
           m(SupernovaPreheader),
           m('h2.page-title', 'Check Supernova lock status'),
@@ -327,8 +324,7 @@ const SupernovaLockLookupPage: m.Component<{}, IState> = {
             vnode.state.atomError && m('.lookup-error', vnode.state.atomError),
           ]),
         ])
-      ]
-    });
+    ]);
   }
 };
 

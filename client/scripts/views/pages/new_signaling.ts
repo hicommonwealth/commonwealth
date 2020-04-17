@@ -17,7 +17,6 @@ import { TextInputFormField, TextareaFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import SendingFrom from 'views/components/sending_from';
-import ObjectPage from 'views/pages/_object_page';
 import { ChainClass } from 'models';
 
 export interface ISignalingPageState {
@@ -97,9 +96,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       md: 7,
     };
 
-    return m(ObjectPage, {
-      class: 'NewSignalingPage',
-      content: [
+    return m('.NewSignalingPage', [
         m('.forum-container', [
           m('h2.page-title', 'New Signaling Proposal'),
           m(Grid, [
@@ -205,8 +202,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
             ]),
           ]),
         ]),
-      ],
-    });
+    ]);
   }
 };
 

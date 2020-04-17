@@ -1,15 +1,12 @@
 import 'pages/supernova/lock_notes.scss';
 
 import { default as m } from 'mithril';
-import ObjectPage from '../_object_page';
 import CodeBlock from '../../components/widgets/code_block';
 import SupernovaPreheader from './supernova_preheader';
 
 const SupernovaLockNotesPage: m.Component<{}> = {
   view: (vnode: m.VnodeDOM<{}>) => {
-    return m(ObjectPage, {
-      class: 'SupernovaLockNotesPage',
-      content: [
+    return m('.SupernovaLockNotesPage', [
         m(SupernovaPreheader),
         m('h1', 'Understanding the Lockdrop CLI'),
         m('h3#general-lock-notes[name="general-lock-notes"]', 'Time-lock transactions in Bitcoin vs. Ethereum'),
@@ -132,8 +129,8 @@ const SupernovaLockNotesPage: m.Component<{}> = {
         m('h3#testing-notes[name="testing-notes"]', 'Testing the CLI'),
         m('p', 'If you are running the tests in the CLI package, the options we use are:'),
         m(CodeBlock, 'bcoin --network=regtest --http-host=0.0.0.0 --api-key=test --index-tx --index-address')
-        )]
-      });
+        )
+    ]);
   }
 };
 

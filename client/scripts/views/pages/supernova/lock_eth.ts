@@ -4,7 +4,6 @@ import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import { default as mixpanel } from 'mixpanel-browser';
 
-import ObjectPage from 'views/pages/_object_page';
 import { formatAsTitleCase } from 'helpers';
 import app from 'state';
 import { TextInputFormField, ButtonSelectorFormField } from '../../components/forms';
@@ -96,9 +95,7 @@ const SupernovaLockETHPage: m.Component<{}, IState> = {
       return true;
     };
 
-    return m(ObjectPage, {
-      class: 'SupernovaLockETHPage',
-      content: [
+    return m('.SupernovaLockETHPage', [
         m('.forum-container.lockETH-layout', [
           m(SupernovaPreheader),
           m('h2.page-title', 'Lock Ethereum'),
@@ -313,8 +310,7 @@ const SupernovaLockETHPage: m.Component<{}, IState> = {
             m(SocialShare),
           ]
         ])
-      ],
-    });
+    ]);
   }
 };
 

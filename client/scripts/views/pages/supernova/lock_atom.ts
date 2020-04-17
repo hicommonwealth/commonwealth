@@ -6,7 +6,6 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import ObjectPage from 'views/pages/_object_page';
 import Cosmos from 'controllers/chain/cosmos/main';
 import { ChainBase } from 'models';
 import { TextInputFormField, DropdownFormField } from '../../components/forms';
@@ -33,9 +32,7 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
   },
   view: (vnode: m.VnodeDOM<{}, IState>) => {
     const loading = (error?) => {
-      return m(ObjectPage, {
-        class: 'SupernovaLockATOMPage',
-        content: [
+      return m('.SupernovaLockATOMPage', [
           m('.forum-container.lockATOM-layout', [
             m(SupernovaPreheader),
             m('h2.page-title', 'Lock ATOM'),
@@ -46,7 +43,7 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
             ])
           ])
         ]
-      });
+      ]);
     };
     if (!app.chain) {
       // loading
@@ -98,9 +95,7 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
     const loggedInAddress = app.vm.activeAccount ? app.vm.activeAccount.address : '';
     vnode.state.supernovaAddress = loggedInAddress;
 
-    return m(ObjectPage, {
-      class: 'SupernovaLockATOMPage',
-      content: [
+    return m('.SupernovaLockATOMPage', [
         m('.forum-container.lockATOM-layout', [
           m(SupernovaPreheader),
           m('h2.page-title', 'Lock ATOM'),
@@ -205,8 +200,7 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
           vnode.state.error && m('.lock-error', vnode.state.error),
           vnode.state.instructional && m(ATOMInstructions)
         ]),
-      ]
-    });
+    ]);
   }
 };
 
