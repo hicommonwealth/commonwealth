@@ -17,7 +17,6 @@ import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Tabs from '../../components/widgets/tabs';
-import ListingPage from '../_listing_page';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
 
@@ -156,15 +155,10 @@ const ValidatorPage : m.Component = {
       }
     }
 
-    return m(ListingPage, {
-      class: 'ValidatorPage',
-      title: 'Validators',
-      subtitle: 'Stake, nominate, and view validator statistics',
-      content: m('.forum-container', [
-        m(Validators),
-        m('.clear'),
-      ]),
-    });
+    return m('.ValidatorPage', [
+      m(Validators),
+      m('.clear'),
+    ]);
   },
 };
 

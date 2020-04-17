@@ -42,7 +42,6 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
               error && m('p', 'ERROR: ' + error)
             ])
           ])
-        ]
       ]);
     };
     if (!app.chain) {

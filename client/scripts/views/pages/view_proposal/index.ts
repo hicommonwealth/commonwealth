@@ -43,7 +43,6 @@ import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import PreviewModal from 'views/modals/preview_modal';
-import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
@@ -519,14 +518,11 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     };
 
     const { replyParent } = vnode.state;
-    return m(ListingPage, {
-      class: 'ViewProposalPage',
-      content: [
-        m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-        m(ProposalComments, { proposal, comments, createdCommentCallback, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-        m(ProposalSidebar, { proposal }),
-      ],
-    });
+    return m('.ViewProposalPage', [
+      m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+      m(ProposalComments, { proposal, comments, createdCommentCallback, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+      m(ProposalSidebar, { proposal }),
+    ]);
   }
 };
 

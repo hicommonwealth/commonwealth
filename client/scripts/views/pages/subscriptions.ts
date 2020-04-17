@@ -6,7 +6,6 @@ import $ from 'jquery';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 
 const NotificationButtons: m.Component = {
@@ -310,11 +309,8 @@ const CommunitySubscriptions: m.Component<{}, ICommunitySubscriptionsState> = {
 
 const SubscriptionsPage: m.Component = {
   view: () => {
-    return m(ListingPage, {
-      title: 'Subscriptions',
-      subtitle: 'Manage your Commonwealth Subscriptions + Notifications',
-      class: 'SubscriptionsPage',
-      content: m('.forum-container', [
+    return m('.SubscriptionsPage', [
+      m('.forum-container', [
         m(Tabs, [{
           name: 'Active Subscriptions',
           content: m(ActiveSubscriptions),
@@ -330,7 +326,7 @@ const SubscriptionsPage: m.Component = {
         },
         ]),
       ]),
-    });
+    ]);
   },
 };
 

@@ -20,7 +20,6 @@ import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 
 interface IChainManagerAttrs {
@@ -575,11 +574,8 @@ const AdminPage: m.Component<{}> = {
       return m(PageLoading);
     }
 
-    return m(ListingPage, {
-      class: 'AdminPage',
-      title: 'Admin',
-      subtitle: 'Manage the Commonwealth site internals',
-      content: m('.forum-container', [
+    return m('.AdminPage', [
+      m('.forum-container', [
         m(Tabs, [{
           name: 'Admin',
           content: app.community ? [ m(AdminActions), ] :
@@ -592,7 +588,7 @@ const AdminPage: m.Component<{}> = {
           content: m(GenericInviteLinks),
         }]),
       ]),
-    });
+    ]);
   }
 };
 

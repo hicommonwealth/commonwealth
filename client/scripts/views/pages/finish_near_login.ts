@@ -66,6 +66,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
         class: 'FinishNearLogin',
         title: 'Near Login',
         subtitle: 'Error!',
+        sidebar: [],
         content: [
           m('h3', 'NEAR account log in error: ' + vnode.state.validationError),
           m('button.formular-button-primary', {
@@ -79,6 +80,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
     } else if (vnode.state.validationCompleted) {
       return m(ListingPage, {
         class: 'FinishNearLogin',
+        sidebar: [],
         content: [
           m('div', {
             oncreate: (e) => {

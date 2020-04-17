@@ -11,7 +11,6 @@ import ChatController from 'controllers/server/socket/chat';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 
 // how often outgoing typing indicators get sent
@@ -169,10 +168,9 @@ const ChatPage = {
     const room = activeEntity.id;
     const name = app.chain ? app.chain.meta.chain.name : app.community.meta.name;
 
-    return m(ListingPage, {
-      class: 'ChatPage',
-      content: m(Chat, { room, name }),
-    });
+    return m('.ChatPage', [
+      m(Chat, { room, name }),
+    ]);
   },
 };
 

@@ -3,7 +3,7 @@ import 'pages/_listing_page.scss';
 import { default as m } from 'mithril';
 import app from 'state';
 
-const ListingPage: m.Component<{ title?, subtitle?, content, sidebar?, class }> = {
+const ListingPage: m.Component<{ title?, subtitle?, content, sidebar, class }> = {
   view: (vnode) => {
     return m('.ListingPage', {
       class: vnode.attrs.class

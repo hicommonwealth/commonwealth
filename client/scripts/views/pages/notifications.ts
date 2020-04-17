@@ -3,7 +3,6 @@ import 'pages/notifications.scss';
 import { default as m } from 'mithril';
 
 import app from 'state';
-import ListingPage from './_listing_page';
 import { NotificationSubscription, Notification, OffchainComment } from 'models';
 import User from 'views/components/widgets/user';
 import { NotificationCategories } from 'types';
@@ -169,14 +168,9 @@ const Notifications = {
 
 const NotificationsPage = {
   view: (vnode) => {
-    return m(ListingPage, {
-      class: 'NotificationsPage',
-      title: 'Notifications',
-      subtitle: 'View notifications',
-      content: [
-        m(Notifications)
-      ]
-    });
+    return m('.NotificationsPage', [
+      m(Notifications)
+    ]);
   }
 };
 

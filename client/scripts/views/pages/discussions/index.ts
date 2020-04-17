@@ -10,7 +10,6 @@ import app from 'state';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
 import PageLoading from 'views/pages/loading';
-import ListingPage from 'views/pages/_listing_page';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
@@ -225,11 +224,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
-    return m(ListingPage, {
-      class: 'DiscussionsPage',
-      title: 'Discussions',
-      subtitle: 'Discuss proposals and improvements',
-      content: (app.chain || app.community) && [
+    return m('.DiscussionsPage', [
+      (app.chain || app.community) && [
         !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
           icon: Icons.INFO,
           header: 'Showing preview',
@@ -248,7 +244,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           ? getSingleTagListing(vnode.attrs.tag)
           : getHomepageListing(),
       ],
-    });
+    ]);
   },
 };
 
