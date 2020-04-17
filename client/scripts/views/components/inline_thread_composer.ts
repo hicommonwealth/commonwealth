@@ -6,11 +6,12 @@ import { default as $ } from 'jquery';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from './autocomplete_tag_form';
+import { isCommunityAdmin } from '../pages/discussions/roles';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -155,7 +156,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!vnode.state.error) vnode.state.error = {};
     if (closed) return null;
-
     vnode.state.form = vnode.state.form ? Object.assign(vnode.state.form, { title }) : { title };
 
     const createThread = (e?) => {
@@ -211,7 +211,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             }),
             m('label', {
               for: 'private-thread',
-            }, 'Private (no user, just admins/mods)'),
+            }, 'Private (Only admins/mods)'),
             m('input[type="radio"]', {
               name: 'properties',
               value: 'readOnly',
