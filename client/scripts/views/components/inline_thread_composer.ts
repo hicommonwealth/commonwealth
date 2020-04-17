@@ -135,7 +135,7 @@ interface ITextPostAttrs {
 
 interface ITextPostState {
   read_only: boolean;
-  private: boolean;
+  privacy: boolean;
   tags: string[];
   uploadsInProgress: number;
   closed: boolean;
@@ -145,6 +145,10 @@ interface ITextPostState {
 }
 
 const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
+  oninit: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
+    vnode.state.privacy = false;
+    vnode.state.read_only = false;
+  },
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
     const { closed } = vnode.state;
@@ -157,7 +161,9 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
     const createThread = (e?) => {
       if (e) e.preventDefault();
       const { form, quillEditorState } = vnode.state;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, false, false);
+      const read_only = vnode.state.read_only || false;
+      const privacy = vnode.state.privacy || false;
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, read_only);
       m.redraw();
     };
     const createPrivateThread = (e?) => {
@@ -192,16 +198,53 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             onclick: createThread,
             tabindex: 4
           }, 'Create thread'),
-          m('button', {
-            type: 'submit',
-            onclick: createPrivateThread,
-            tabindex: 4
-          }, 'Create private thread'),
-          m('button', {
-            type: 'submit',
-            onclick: createPublicReadOnlyThread,
-            tabindex: 4
-          }, 'Create Read Only Thread (Public)'),
+          // m('button', {
+          //   type: 'submit',
+          //   onclick: createPrivateThread,
+          // }, 'Create private thread'),
+          // m('button', {
+          //   type: 'submit',
+          //   onclick: createPublicReadOnlyThread,
+          // }, 'Create Read Only Thread (Public)'),
+          m('.property-group', [
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'public',
+              id: 'public-thread',
+              checked: (vnode.state.read_only === false && vnode.state.privacy === false),
+              onclick: () => {
+                vnode.state.read_only = false;
+                vnode.state.privacy = false;
+              }
+            }),
+            m('label', {
+              for: 'public-thread',
+            }, 'Public'),
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'private',
+              id: 'private-thread',
+              onclick: () => {
+                vnode.state.read_only = false;
+                vnode.state.privacy = true;
+              }
+            }),
+            m('label', {
+              for: 'private-thread',
+            }, 'Private (no user, just admins/mods)'),
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'readOnly',
+              id: 'read-only',
+              onclick: () => {
+                vnode.state.read_only = true;
+                vnode.state.privacy = false;
+              }
+            }),
+            m('label', {
+              for: 'read-only',
+            }, 'Read-Only'),
+          ]),
         ]),
         m('.tag-selection', [
           m(AutoCompleteTagForm, {
