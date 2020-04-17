@@ -23,7 +23,7 @@ import { Button, Callout, Icons } from 'construct-ui';
 // TODO: refactor all of the below into a controller.
 
 interface IDiscussionPageAttrs {
-  tag?: string;
+  activeTag?: string;
 }
 
 interface IDiscussionPageState {
@@ -240,8 +240,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
             ]),
           ]),
         }),
-        vnode.attrs.tag
-          ? getSingleTagListing(vnode.attrs.tag)
+        vnode.attrs.activeTag
+          ? getSingleTagListing(vnode.attrs.activeTag)
           : getHomepageListing(),
       ],
     ]);

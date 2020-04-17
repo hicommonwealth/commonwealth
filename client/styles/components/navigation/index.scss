@@ -16,6 +16,10 @@ $sidebar-padding: 16px;
     background: #fff !important;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
 
+    .cui-list {
+        max-height: none;
+    }
+
     // individual menu items
     .cui-list.cui-lg > h4 {
         margin: 0;

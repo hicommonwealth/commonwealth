@@ -15,15 +15,11 @@ import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-interface ILayoutAttrs {
-  scope: string;
-}
-
-export const LoadingLayout: m.Component<{}> = {
+export const LoadingLayout: m.Component<{ activeTag?: string }> = {
   view: (vnode) => {
     return m('.mithril-app', [
       app.isLoggedIn() && m(Sidebar),
-      m(Navigation),
+      m(Navigation, { activeTag: vnode.attrs.activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
       }, [
@@ -35,20 +31,21 @@ export const LoadingLayout: m.Component<{}> = {
   }
 };
 
-export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
+export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadingScope }> = {
   view: (vnode) => {
-    const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === vnode.attrs.scope);
-    const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === vnode.attrs.scope);
+    const { scope, activeTag } = vnode.attrs;
+    const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
+    const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
-      return m(LoadingLayout);
-    } else if (vnode.attrs.scope && !scopeMatchesChain && !scopeMatchesCommunity) {
+      return m(LoadingLayout, { activeTag });
+    } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.mithril-app', [
         app.isLoggedIn() && m(Sidebar),
-        m(Navigation),
+        m(Navigation, { activeTag }),
         m('.layout-content', {
           class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
         }, [
@@ -58,27 +55,27 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
         m(AppModals),
         m(AppToasts),
       ]);
-    } else if (vnode.attrs.scope &&
-               vnode.attrs.scope !== app.activeId() &&
-               vnode.attrs.scope !== vnode.state.loadingScope) {
+    } else if (scope &&
+               scope !== app.activeId() &&
+               scope !== vnode.state.loadingScope) {
       // If we are supposed to load a new chain or community, we do so now
       // This happens only once, and then loadingScope should be set
-      vnode.state.loadingScope = vnode.attrs.scope;
+      vnode.state.loadingScope = scope;
       if (scopeMatchesChain) {
-        initChain(vnode.attrs.scope);
-        return m(LoadingLayout);
+        initChain(scope);
+        return m(LoadingLayout, { activeTag });
       } else if (scopeMatchesCommunity) {
-        initCommunity(vnode.attrs.scope);
-        return m(LoadingLayout);
+        initCommunity(scope);
+        return m(LoadingLayout, { activeTag });
       }
-    } else if (!vnode.attrs.scope && ((app.chain && app.chain.class) || app.community)) {
+    } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're
       // going to a page that doesn't have one
       deinitChainOrCommunity().then(() => {
         vnode.state.loadingScope = null;
         m.redraw();
       });
-      return m(LoadingLayout);
+      return m(LoadingLayout, { activeTag });
     }
 
     return m('.mithril-app', [

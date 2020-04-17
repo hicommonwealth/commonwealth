@@ -35,55 +35,46 @@ interface ITagRowState {
 
 const TagRow: m.Component<ITagRowAttrs, ITagRowState> = {
   view: (vnode) => {
-    const {
-      count,
-      description,
-      id,
-      featured,
-      featured_order,
-      name,
-      selected,
-      addFeaturedTag,
-      removeFeaturedTag
-    } = vnode.attrs;
-
+    const { count, description, id, featured, featured_order, name, selected, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
-    const options = {
+
+    return m('a.TagRow', {
+      key: id,
       id,
+      class: selected ? 'selected' : '',
+      href: '#',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
+      },
       onmouseenter: (e) => {
         vnode.state.hovered = true;
       },
       onmouseleave: (e) => {
         vnode.state.hovered = false;
       }
-    };
-
-    options['class'] = selected ? 'selected' : '';
-    // options.onclick = vnode.attrs.onclick(name);
-    return m('.tag-selector-item', options, [
-      link('a.tag-name',
-        selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`,
-        `#${name} (${count})`),
-      vnode.state.hovered
-      && isCommunityAdmin()
-      && m('a.edit-button', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: EditTagModal,
-            data: {
-              description,
-              featured,
-              featured_order,
-              id,
-              name,
-              addFeaturedTag,
-              removeFeaturedTag
-            }
-          });
-        }
-      }, 'Edit')
+    }, [
+      m('span.tag-name', `${name} (${count})`),
+      isCommunityAdmin()
+        && m('a.edit-button', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.modals.create({
+              modal: EditTagModal,
+              data: {
+                description,
+                featured,
+                featured_order,
+                id,
+                name,
+                addFeaturedTag,
+                removeFeaturedTag
+              }
+            });
+          }
+        }, 'Edit')
     ]);
   }
 };
@@ -109,6 +100,7 @@ const getTagListing = (IGetTagListingParams) => {
       if (!existing) app.tags.addToStore(tag);
       const { id, name, description } = existing || tag;
       const selected = name === activeTag;
+
       if (featuredTagIds.includes(`${id}`)) {
         if (featuredTags[name]) featuredTags[name].count += 1;
         else {

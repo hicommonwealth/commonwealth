@@ -307,7 +307,8 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      return m(Layout, { scope }, [ vnode ]);
+      const activeTag = vnode.attrs.activeTag;
+      return m(Layout, { scope, activeTag }, [ vnode ]);
     },
   });
 
@@ -339,7 +340,7 @@ $(() => {
     '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
-    '/:scope/discussions/:tag':  importRoute(import('views/pages/discussions'), true),
+    '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
     '/:scope/members':           importRoute(import('views/pages/members'), true),
     '/:scope/chat':              importRoute(import('views/pages/chat'), true),
     '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
@@ -350,7 +351,7 @@ $(() => {
     '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/web3login':         importRoute(import('views/pages/web3_login'), true),
+    '/:scope/link_new_address':  importRoute(import('views/pages/link_new_address'), true),
 
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {

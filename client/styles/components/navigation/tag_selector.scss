@@ -1,35 +1,29 @@
 @import 'client/styles/shared';
 
 .TagSelector {
-    margin-top: 0;
-    padding: 10px 0;
-    .sidebar-header {
-        padding-bottom: 4px;
-    }
-    .tag-selector-item {
-        font-size: 13.5px;
-        padding: 4px 0;
+    padding: 8px 0;
+    a.TagRow {
+        padding: 4px 17px;
         display: flex;
         justify-content: space-between;
-        a {
-            color: $lighttextgrey;
-            text-decoration: none;
-            line-height: 1;
-            &:hover {
-                color: rgb(100, 100, 100);
-            }
+        color: $lighttextgrey;
+        text-decoration: none;
+        line-height: 1.25;
+        .edit-button {
+            display: none;
         }
-        &.selected a.tag-name {
+        &:hover .edit-button {
+            display: block;
+            color: rgb(100, 100, 100);
+        }
+        &.selected {
             font-weight: 600;
         }
-        a.tag-name {
+        .tag-name {
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
         }
     }
     @include dragula;
-    @include xs-max {
-        padding: 15px 5px 8px;
-    }
 }

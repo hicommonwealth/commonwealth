@@ -120,9 +120,9 @@ const NotificationRow: m.Component<{ notification: Notification }> = {
   },
 };
 
-const Navigation: m.Component<{ tag: string }, {}> = {
+const Navigation: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
-    const { tag } = vnode.attrs;
+    const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
     const activeAccount = app.vm.activeAccount;
     const activeNode = app.chain && app.chain.meta;
@@ -278,7 +278,7 @@ const Navigation: m.Component<{ tag: string }, {}> = {
           }),
         // TODO: tag selector
         (app.community || app.chain) &&
-          m(TagSelector, { activeTag: vnode.attrs.tag }),
+          m(TagSelector, { activeTag }),
         // members (all communities)
         (app.community || app.chain) &&
           m(ListItem, {
