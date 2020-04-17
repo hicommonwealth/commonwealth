@@ -440,6 +440,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     }
 
     // load profiles
+    // TODO: recursively fetch child comments as well (this will also prevent a reloading flash for threads with child comments)
     if (vnode.state.profilesPrefetchStarted === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
@@ -450,7 +451,6 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
       vnode.state.profilesPrefetchStarted = true;
-      return m(PageLoading);
     }
     if (!app.profiles.allLoaded()) {
       return m(PageLoading);
