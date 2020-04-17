@@ -7,7 +7,7 @@ const BTCInstructions: m.Component = {
   view: (vnode: m.VnodeDOM) => {
     return m('.BTCInstructions', {
       oncreate: (vnode) => {
-        $('.mithril-app').animate({ scrollTop: $(vnode.dom).position().top }, 500);
+        $('html, body').animate({ scrollTop: $(vnode.dom).position().top }, 500);
       }
     }, [
       m('.step', [

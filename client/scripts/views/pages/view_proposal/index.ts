@@ -232,7 +232,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 interface IProposalCommentsState {
   commentError: any;
   dom;
-  highlightedComment: boolean;
+  jumpedToHighlightedComment: boolean;
 }
 
 interface IProposalCommentsAttrs {
@@ -253,8 +253,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
-    if (vnode.state.dom && comments?.length > 0 && !vnode.state.highlightedComment) {
-      vnode.state.highlightedComment = true;
+    if (vnode.state.dom && comments?.length > 0 && !vnode.state.jumpedToHighlightedComment) {
+      vnode.state.jumpedToHighlightedComment = true;
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
         : null;
@@ -348,7 +348,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -502,10 +502,10 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
             $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('.mithril-app').scrollTop();
+          const scrollTop = $('body').scrollTop();
           const replyTop = $reply.offset().top;
           if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-            $('.mithril-app').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
+            $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
 
           // highlight the reply form
           const animationDelayTime = 2000;
