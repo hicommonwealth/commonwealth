@@ -695,8 +695,8 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       // TODO: fix this balance formatter! header loads before app.chain...
       const label = labelEvent(
         notification.chainEvent.blockNumber,
+        app.activeId(),
         notification.chainEvent.data,
-        // (bal) => formatCoin(app.chain.chain.coins(new BN(bal, 10)), true),
       );
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',

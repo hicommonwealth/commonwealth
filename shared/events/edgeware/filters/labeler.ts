@@ -14,6 +14,7 @@ function formatAddressShort(addr : string) {
 
 export default function (
   blockNumber: number,
+  chainId: string,
   data: ISubstrateEventType,
   balanceFormatter: (balance: SubstrateBalanceString) => string = (s) => s,
 ): IEventLabel {
@@ -33,11 +34,11 @@ export default function (
       };
     }
     case 'democracy-proposed': {
-      const { deposit } = data;
+      const { deposit, proposalIndex } = data;
       return {
         heading: 'Democracy Proposal Created',
         label: `A new Democracy proposal was introduced with deposit ${balanceFormatter(deposit)}.`,
-        linkUrl: null, // TODO
+        linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
     case 'democracy-started': {
@@ -47,7 +48,7 @@ export default function (
         label: endBlock
           ? `Referendum ${referendumIndex} has started, voting until block ${endBlock}.`
           : `Referendum ${referendumIndex} has started.`,
-        linkUrl: null, // TODO
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case 'democracy-passed': {
@@ -57,7 +58,6 @@ export default function (
         label: dispatchBlock
           ? `Referendum ${referendumIndex} has passed and will be dispatched on block ${dispatchBlock}.`
           : `Referendum ${referendumIndex} has passed was dispatched on block ${blockNumber}`,
-        linkUrl: null, // TODO ???
       };
     }
     case 'democracy-not-passed': {
@@ -66,7 +66,6 @@ export default function (
         heading: 'Democracy Referendum Failed',
         // TODO: include final tally?
         label: `Referendum ${referendumIndex} has failed.`,
-        linkUrl: null, // will this exist?
       };
     }
     case 'democracy-cancelled': {
@@ -75,7 +74,6 @@ export default function (
         heading: 'Democracy Referendum Cancelled',
         // TODO: include cancellation vote?
         label: `Referendum ${referendumIndex} was cancelled.`,
-        linkUrl: null, // will this exist?
       };
     }
     default: {
