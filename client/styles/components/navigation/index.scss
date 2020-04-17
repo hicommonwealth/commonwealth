@@ -19,6 +19,7 @@ $sidebar-padding: 16px;
     .cui-list {
         max-height: 100%;
         padding-bottom: 80px;
+        user-select: none;
     }
 
     // individual menu items

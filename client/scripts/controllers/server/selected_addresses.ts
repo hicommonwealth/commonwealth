@@ -12,8 +12,8 @@ class SelectedAddressesController {
   }
 
   public reset(data?) {
-    this._chains = data.chains ? data.chains : {};
-    this._communities = data.communities ? data.communities : {};
+    this._chains = data?.chains ? data.chains : {};
+    this._communities = data?.communities ? data.communities : {};
   }
 
   public setByChain(chainId: string, account: Account<any>): void {

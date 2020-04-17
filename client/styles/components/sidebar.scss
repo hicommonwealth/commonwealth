@@ -7,13 +7,15 @@
     background: #e4e4e6;
     padding: 2px 0;
     z-index: 10;
+    user-select: none;
     .sidebar-content {
         position: absolute;
         top: 0;
-        bottom: 72px;
+        bottom: 67px;
         width: 100%;
         overflow-y: scroll;
-        border-bottom: 1px solid #d5d5d5;
+        overflow-x: hidden;
+        border-bottom: 1px solid #d7d7d7;
     }
 
     $size: 42px;
@@ -70,7 +72,7 @@
     .SidebarSettingsMenu {
         position: absolute;
         bottom: 0;
-        margin: 16px;
+        margin: 14px 16px;
     }
 }
 
