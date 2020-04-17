@@ -692,10 +692,11 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
+      // TODO: fix this balance formatter! header loads before app.chain...
       const label = labelEvent(
         notification.chainEvent.blockNumber,
         notification.chainEvent.data,
-        (bal) => formatCoin(app.chain.chain.coins(new BN(bal, 10)), true),
+        // (bal) => formatCoin(app.chain.chain.coins(new BN(bal, 10)), true),
       );
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
