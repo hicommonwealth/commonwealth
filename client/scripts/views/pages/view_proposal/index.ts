@@ -348,7 +348,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments, viewCountLoaded: boolean, viewCount: number, profilesLoaded: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -388,7 +388,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     }
 
     // load comments
-    if (!vnode.state.commentsLoaded) {
+    if (!vnode.state.commentsPrefetchStarted) {
       (app.activeCommunityId()
        ? app.comments.refresh(proposal, null, app.activeCommunityId())
        : app.comments.refresh(proposal, app.activeChainId(), null))
@@ -400,7 +400,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
           vnode.state.comments = [];
           m.redraw();
         });
-      vnode.state.commentsLoaded = true;
+      vnode.state.commentsPrefetchStarted = true;
     }
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
@@ -408,7 +408,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     };
 
     // load view count
-    if (!vnode.state.viewCountLoaded && proposal instanceof OffchainThread) {
+    if (!vnode.state.viewCountPrefetchStarted && proposal instanceof OffchainThread) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         community: app.activeCommunityId(),
@@ -425,10 +425,10 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         vnode.state.viewCount = 0;
         throw new Error('could not load view count');
       });
-      vnode.state.viewCountLoaded = true;
-    } else if (!vnode.state.viewCountLoaded) {
+      vnode.state.viewCountPrefetchStarted = true;
+    } else if (!vnode.state.viewCountPrefetchStarted) {
       // view counts currently not supported for proposals
-      vnode.state.viewCountLoaded = true;
+      vnode.state.viewCountPrefetchStarted = true;
       vnode.state.viewCount = 0;
     }
 
@@ -440,16 +440,17 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     }
 
     // load profiles
-    if (vnode.state.profilesLoaded === undefined) {
+    if (vnode.state.profilesPrefetchStarted === undefined) {
       if (proposal.author instanceof Account) {
         app.profiles.getProfile(proposal.author.chain.id, proposal.author.address);
       }
       vnode.state.comments.map((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
-      vnode.state.profilesLoaded = true;
+      vnode.state.profilesPrefetchStarted = true;
+      return m(PageLoading);
     }
-    if (!app.profiles.allLoaded) {
+    if (!app.profiles.allLoaded()) {
       return m(PageLoading);
     }
 
