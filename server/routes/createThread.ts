@@ -1,11 +1,10 @@
 import { Response, NextFunction } from 'express';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { createCommonwealthUrl } from '../util/routeUtils';
-import { ProposalType } from 'client/scripts/identifiers';
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);

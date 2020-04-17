@@ -1,11 +1,13 @@
 import { Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 import { createCommonwealthUrl } from '../util/routeUtils';
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!req.user) {
     return next(new Error('Not logged in'));

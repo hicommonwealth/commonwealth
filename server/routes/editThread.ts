@@ -1,10 +1,12 @@
-import { NotificationCategories, ProposalType } from '../../shared/types';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
-import lookupCommunityIsVisibleToUser from 'server/util/lookupCommunityIsVisibleToUser';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
+  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   const { body, kind, thread_id, version_history } = req.body;
 
