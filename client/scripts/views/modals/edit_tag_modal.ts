@@ -77,7 +77,8 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
             },
             callback: (value) => {
               vnode.state.form.name = value;
-            }
+            },
+            oncreate: (vnode) => $(vnode.dom).find('input[type="text"]').focus().select(),
           }),
           m(TextareaFormField, {
             title: 'Description',

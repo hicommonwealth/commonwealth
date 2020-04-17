@@ -15,11 +15,13 @@ import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-export const LoadingLayout: m.Component<{ activeTag?: string }> = {
+export const LoadingLayout: m.Component<{ activeTag: string }> = {
   view: (vnode) => {
+    const { activeTag } = vnode.attrs;
+
     return m('.mithril-app', [
       app.isLoggedIn() && m(Sidebar),
-      m(Navigation, { activeTag: vnode.attrs.activeTag }),
+      m(Navigation, { activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
       }, [
@@ -80,7 +82,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
 
     return m('.mithril-app', [
       app.isLoggedIn() && m(Sidebar),
-      m(Navigation),
+      m(Navigation, { activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
       }, [

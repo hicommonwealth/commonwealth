@@ -13,10 +13,6 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
-interface ITagSelectorAttrs {
-  activeTag?: string;
-}
-
 interface ITagRowAttrs {
   count: number,
   description: string,
@@ -29,11 +25,7 @@ interface ITagRowAttrs {
   removeFeaturedTag: Function;
 }
 
-interface ITagRowState {
-  hovered?: boolean;
-}
-
-const TagRow: m.Component<ITagRowAttrs, ITagRowState> = {
+const TagRow: m.Component<ITagRowAttrs, {}> = {
   view: (vnode) => {
     const { count, description, id, featured, featured_order, name, selected, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
@@ -47,12 +39,6 @@ const TagRow: m.Component<ITagRowAttrs, ITagRowState> = {
         e.preventDefault();
         m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
       },
-      onmouseenter: (e) => {
-        vnode.state.hovered = true;
-      },
-      onmouseleave: (e) => {
-        vnode.state.hovered = false;
-      }
     }, [
       m('span.tag-name', `${name} (${count})`),
       isCommunityAdmin()
@@ -127,7 +113,6 @@ const getTagListing = (IGetTagListingParams) => {
     });
   });
 
-
   const otherTagListing = Object.keys(otherTags)
     .sort((a, b) => otherTags[b].count - otherTags[a].count)
     .map((name, idx) => m(TagRow, {
@@ -160,7 +145,7 @@ const getTagListing = (IGetTagListingParams) => {
   return ({ featuredTagListing, otherTagListing });
 };
 
-const TagSelector: m.Component<ITagSelectorAttrs, { refreshed, featuredTagIds }> = {
+const TagSelector: m.Component<{ activeTag: string }, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;

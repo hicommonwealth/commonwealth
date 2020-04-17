@@ -12,12 +12,16 @@
         .edit-button {
             display: none;
         }
-        &:hover .edit-button {
+        &:hover a.edit-button {
             display: block;
-            color: rgb(100, 100, 100);
+            color: #999;
+            text-decoration: none;
+        }
+        &:hover a.edit-button:hover {
+            color: #111;
         }
         &.selected {
-            font-weight: 600;
+            background: #f1f3f5;
         }
         .tag-name {
             text-overflow: ellipsis;
