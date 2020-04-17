@@ -131,27 +131,33 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    try {
-      const response = await $.get(`${app.serverUrl()}/viewComments`, {
-        chain: chainId,
-        community: communityId,
-        root_id: encodeURIComponent(proposal.uniqueIdentifier),
-      });
-      if (response.status !== 'Success') {
-        throw new Error(`Unsuccessful status: ${response.status}`);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await $.get(`${app.serverUrl()}/viewComments`, {
+          chain: chainId,
+          community: communityId,
+          root_id: encodeURIComponent(proposal.uniqueIdentifier),
+        });
+        if (response.status !== 'Success') {
+          reject(new Error(`Unsuccessful status: ${response.status}`));
+        }
+        this._store.clearProposal(proposal);
+        Promise.all(response.result.map(async (comment) => {
+          // TODO: Comments should always have a linked Address
+          if (!comment.Address) console.error('Comment missing linked address');
+          const model = modelFromServer(comment);
+          this._store.add(model);
+          return model;
+        })).then((result) => {
+          resolve(result);
+        }).catch((error) => {
+          reject(error);
+        });
+      } catch (err) {
+        console.log('Failed to load comments');
+        reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
-      this._store.clearProposal(proposal);
-      await Promise.all(response.result.map(async (comment) => {
-        // TODO: Comments should always have a linked Address
-        if (!comment.Address) console.error('Comment missing linked address');
-        this._store.add(modelFromServer(comment));
-      }));
-    } catch (err) {
-      console.log('Failed to load comments');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading comments');
-    }
+    });
   }
 
   public async delete(comment) {
