@@ -194,8 +194,8 @@ const ProposalRow: m.Component<IRowAttrs> = {
     console.log(identifier);
 
     const nComments = app.comments.nComments(proposal);
-    const authorComment = app.comments.getByProposal(proposal).sort(byAscendingCreationDate)
-      .find((comment) => comment.author === author.address)
+    const authorComment = author ? app.comments.getByProposal(proposal).sort(byAscendingCreationDate)
+      .find((comment) => comment.author === author.address) : null;
 
     // TODO XXX: Show requirement for referenda
     const hasRequirement = false;
