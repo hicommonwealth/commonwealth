@@ -1,7 +1,9 @@
+import { SubstrateEventKind } from 'shared/events/edgeware/types';
+
 class ChainEventType {
   public readonly id: string;
   public readonly chain: string;
-  public readonly eventName: string;
+  public readonly eventName: SubstrateEventKind;
 
   constructor(id, chain, eventName) {
     this.id = id;

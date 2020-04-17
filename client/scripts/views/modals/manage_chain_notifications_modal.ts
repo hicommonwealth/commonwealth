@@ -6,8 +6,7 @@ import $ from 'jquery';
 import { default as m } from 'mithril';
 import { NotificationSubscription, ChainClass } from 'models';
 
-import { SubstrateEventType } from 'events/edgeware/types';
-import { getEventStrings } from 'events/util';
+import { SubstrateEventKinds } from 'events/edgeware/types';
 import { DropdownFormField } from '../components/forms';
 
 interface ISubscriptionRowAttrs {
@@ -53,7 +52,7 @@ const ChainSubscriptionForm: m.Component<IChainSubscriptionFormAttrs, IChainSubs
     // TODO: we should have an "available check" of some sort here?
     //    or maybe fetch this data from server, to guarantee consistency?
     if (app.chain.class === ChainClass.Edgeware) {
-      const availableSubscriptionTypes = getEventStrings(SubstrateEventType)
+      const availableSubscriptionTypes = SubstrateEventKinds
         // remove chain event subscriptions that already exist
         .filter((eventString) => !vnode.attrs.subscriptions
           .find((s) => s.category === 'chain-event' && s.objectId === objectId(eventString)));

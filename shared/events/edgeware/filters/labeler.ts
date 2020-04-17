@@ -1,4 +1,4 @@
-import { SubstrateEventType } from '../types';
+import { ISubstrateEventType, SubstrateBalanceString } from '../types';
 
 export interface IEventLabel {
   heading: string;
@@ -6,56 +6,80 @@ export interface IEventLabel {
   linkUrl?: string;
 }
 
-export function labelEvent(blockNumber: number, type: SubstrateEventType, data: any): IEventLabel {
-  switch (type) {
-    case SubstrateEventType.Slash:
+function formatAddressShort(addr : string) {
+  if (!addr) return;
+  if (addr.length < 16) return addr;
+  return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
+}
+
+export default function (
+  blockNumber: number,
+  data: ISubstrateEventType,
+  balanceFormatter: (balance: SubstrateBalanceString) => string = (s) => s,
+): IEventLabel {
+  switch (data.kind) {
+    case 'slash': {
+      const { validator, amount } = data;
       return {
         heading: 'Validator Slashed',
-        label: `Validator ${data.validator} was slashed by amount ${data.amount}.`,
+        label: `Validator ${formatAddressShort(validator)} was slashed by amount ${balanceFormatter(amount)}.`,
       };
-    case SubstrateEventType.Reward:
+    }
+    case 'reward': {
+      const { validator, amount } = data;
       return {
         heading: 'Validator Rewarded',
-        label: `Validator ${data.validator} was rewarded by amount ${data.amount}.`,
+        label: `Validator ${formatAddressShort(validator)} was rewarded by amount ${balanceFormatter(amount)}.`,
       };
-    case SubstrateEventType.DemocracyProposed:
+    }
+    case 'democracy-proposed': {
+      const { deposit } = data;
       return {
         heading: 'Democracy Proposal Created',
-        label: `A new Democracy proposal was introduced with deposit ${data.deposit}.`,
+        label: `A new Democracy proposal was introduced with deposit ${balanceFormatter(deposit)}.`,
         linkUrl: null, // TODO
       };
-    case SubstrateEventType.DemocracyStarted:
+    }
+    case 'democracy-started': {
+      const { endBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Started',
-        label: data.endBlock
-          ? `Referendum ${data.referendumIndex} has started, voting until block ${data.endBlock}.`
-          : `Referendum ${data.referendumIndex} has started.`,
+        label: endBlock
+          ? `Referendum ${referendumIndex} has started, voting until block ${endBlock}.`
+          : `Referendum ${referendumIndex} has started.`,
         linkUrl: null, // TODO
       };
-    case SubstrateEventType.DemocracyPassed:
+    }
+    case 'democracy-passed': {
+      const { dispatchBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Passed',
-        label: data.dispatchBlock
-          ? `Referendum ${data.referendumIndex} has passed and will be dispatched on block ${data.dispatchBlock}.`
-          : `Referendum ${data.referendumIndex} has passed was dispatched on block ${blockNumber}`,
+        label: dispatchBlock
+          ? `Referendum ${referendumIndex} has passed and will be dispatched on block ${dispatchBlock}.`
+          : `Referendum ${referendumIndex} has passed was dispatched on block ${blockNumber}`,
         linkUrl: null, // TODO ???
       };
-    case SubstrateEventType.DemocracyNotPassed:
+    }
+    case 'democracy-not-passed': {
+      const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Failed',
         // TODO: include final tally?
-        label: `Referendum ${data.referendumIndex} has failed.`,
+        label: `Referendum ${referendumIndex} has failed.`,
         linkUrl: null, // will this exist?
       };
-    case SubstrateEventType.DemocracyCancelled:
+    }
+    case 'democracy-cancelled': {
+      const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Cancelled',
         // TODO: include cancellation vote?
-        label: `Referendum ${data.referendumIndex} was cancelled.`,
+        label: `Referendum ${referendumIndex} was cancelled.`,
         linkUrl: null, // will this exist?
       };
-    case SubstrateEventType.Unknown:
-    default:
+    }
+    default: {
       throw new Error('unknown event type');
+    }
   }
 }

@@ -24,7 +24,7 @@ export default class extends IEventHandler<SubstrateEvent> {
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
       chain: this._chain,
-      event_name: event.type.toString(),
+      event_name: event.data.kind.toString(),
     } });
     if (!dbEventType) {
       console.error('unknown event type');

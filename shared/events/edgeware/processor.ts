@@ -4,10 +4,9 @@
 import { ApiPromise } from '@polkadot/api';
 
 import { IBlockProcessor } from '../interfaces';
-import { SubstrateBlock, SubstrateEvent, SubstrateEventType } from './types';
-import { decodeSubstrateCodec } from './util';
-import { parseEventType } from './filters/type_parser';
-import { enrichEvent } from './filters/enricher';
+import { SubstrateBlock, SubstrateEvent } from './types';
+import parseEventType from './filters/type_parser';
+import enrichEvent from './filters/enricher';
 
 export default class extends IBlockProcessor<ApiPromise, SubstrateBlock, SubstrateEvent> {
   private _lastBlockNumber: number;
@@ -29,10 +28,10 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock, Substra
 
     const events = await Promise.all(block.events.map(async ({ event }) => {
       // apply filters
-      const type = parseEventType(event);
-      if (type !== SubstrateEventType.Unknown) {
-        const data = await enrichEvent(this._api, type, event);
-        return { type, blockNumber, data };
+      const kind = parseEventType(event);
+      if (kind !== null) {
+        const data = await enrichEvent(this._api, kind, event);
+        return { blockNumber, data };
       } else {
         return null;
       }

@@ -1,24 +1,24 @@
 import { Event } from '@polkadot/types/interfaces';
-import { SubstrateEventType } from '../types';
+import { SubstrateEventKind } from '../types';
 
-export function parseEventType(event: Event): SubstrateEventType {
+export default function (event: Event): SubstrateEventKind | null {
   switch (event.section) {
     case 'staking':
       switch (event.method) {
-        case 'Slash': return SubstrateEventType.Slash;
-        case 'Reward': return SubstrateEventType.Reward;
-        default: return SubstrateEventType.Unknown;
+        case 'Slash': return 'slash';
+        case 'Reward': return 'reward';
+        default: return null;
       }
     case 'democracy':
       switch (event.method) {
-        case 'Proposed': return SubstrateEventType.DemocracyProposed;
-        case 'Started': return SubstrateEventType.DemocracyStarted;
-        case 'Passed': return SubstrateEventType.DemocracyPassed;
-        case 'NotPassed': return SubstrateEventType.DemocracyNotPassed;
-        case 'Cancelled': return SubstrateEventType.DemocracyCancelled;
-        default: return SubstrateEventType.Unknown;
+        case 'Proposed': return 'democracy-proposed';
+        case 'Started': return 'democracy-started';
+        case 'Passed': return 'democracy-passed';
+        case 'NotPassed': return 'democracy-not-passed';
+        case 'Cancelled': return 'democracy-cancelled';
+        default: return null;
       }
     default:
-      return SubstrateEventType.Unknown;
+      return null;
   }
 }

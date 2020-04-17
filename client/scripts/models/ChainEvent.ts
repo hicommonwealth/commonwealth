@@ -1,9 +1,10 @@
+import { ISubstrateEventType } from 'events/edgeware/types';
 import ChainEventType from './ChainEventType';
 
 class ChainEvent {
   public readonly id: number;
   public readonly blockNumber: number;
-  public readonly data: any[];
+  public readonly data: ISubstrateEventType;
   public readonly type: ChainEventType;
 
   constructor(id, blockNumber, data, type) {

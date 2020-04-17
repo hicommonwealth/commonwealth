@@ -4,7 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     chain_event_type_id: { type: DataTypes.STRING, allowNull: false },
     block_number: { type: DataTypes.INTEGER, allowNull: false },
 
-    // we could store this as a raw data blob too if necessary
     event_data: { type: DataTypes.JSONB, allowNull: false },
     created_at: { type: DataTypes.DATE, allowNull: false },
     updated_at: { type: DataTypes.DATE, allowNull: false },

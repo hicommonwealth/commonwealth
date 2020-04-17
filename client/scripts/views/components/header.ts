@@ -5,12 +5,17 @@ import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import BN from 'bn.js';
 
 import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
+
+import { formatCoin } from 'adapters/currency';
+import labelEvent from 'events/edgeware/filters/labeler';
+
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
@@ -37,8 +42,6 @@ import CreateCommunityModal from 'views/modals/create_community_modal';
 import { OffchainCommunitiesStore } from 'stores';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import ManageChainNotificationsModal from 'views/modals/manage_chain_notifications_modal';
-import { labelEvent } from 'events/edgeware/filters/labeler';
-import { SubstrateEventType } from 'events/edgeware/types';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -691,8 +694,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       }
       const label = labelEvent(
         notification.chainEvent.blockNumber,
-        notification.chainEvent.type.eventName as SubstrateEventType,
+        notification.chainEvent.type.eventName,
         notification.chainEvent.data,
+        (bal) => formatCoin(app.chain.chain.coins(new BN(bal, 10)), true),
       );
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',

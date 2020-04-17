@@ -3,8 +3,7 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
-import { SubstrateEventType } from '../../shared/events/edgeware/types';
-import { getEventStrings } from '../../shared/events/util';
+import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
@@ -366,9 +365,9 @@ const resetServer = (models, closeMiddleware) => {
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
     // initialize chain event types
-    const initChainEventTypes = (enumObject, chain) => {
+    const initChainEventTypes = (chain) => {
       return Promise.all(
-        getEventStrings(enumObject).map((event_name) => {
+        SubstrateEventKinds.map((event_name) => {
           return models.ChainEventType.create({
             id: `${chain}-${event_name}`,
             chain,
@@ -378,8 +377,8 @@ const resetServer = (models, closeMiddleware) => {
       );
     };
 
-    await initChainEventTypes(SubstrateEventType, 'edgeware');
-    await initChainEventTypes(SubstrateEventType, 'edgeware-local');
+    await initChainEventTypes('edgeware');
+    await initChainEventTypes('edgeware-local');
 
     closeMiddleware().then(() => {
       console.log('Reset database and initialized default models');

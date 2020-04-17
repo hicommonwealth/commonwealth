@@ -10,24 +10,81 @@ export interface SubstrateBlock {
 }
 
 /**
- * To implement a new form of event, add it to this enum.
+ * To implement a new form of event, add it to this enum, and add its
+ * JSON interface below (ensure it is stringify-able and then parse-able).
  */
-export enum SubstrateEventType {
-  Unknown = 'unknown',
-  Slash = 'slash',
-  Reward = 'reward',
-  DemocracyProposed = 'democracy-proposed',
-  DemocracyStarted = 'democracy-started',
-  DemocracyPassed = 'democracy-passed',
-  DemocracyNotPassed = 'democracy-not-passed',
-  DemocracyCancelled = 'democracy-cancelled',
+
+/** Special types for formatting/labeling purposes */
+export type SubstrateBalanceString = string;
+export type SubstrateBlockNumber = number;
+export type SubstrateAccountId = string;
+
+export interface ISubstrateSlashEvent {
+  kind: 'slash';
+  validator: SubstrateAccountId;
+  amount: SubstrateBalanceString;
 }
+
+export interface ISubstrateRewardEvent {
+  kind: 'reward';
+  validator: SubstrateAccountId;
+  amount: SubstrateBalanceString;
+}
+
+export interface ISubstrateDemocracyProposed {
+  kind: 'democracy-proposed';
+  proposalIndex: number;
+  deposit: SubstrateBalanceString;
+}
+
+export interface ISubstrateDemocracyStarted {
+  kind: 'democracy-started';
+  referendumIndex: number;
+  endBlock: SubstrateBlockNumber | null;
+}
+
+export interface ISubstrateDemocracyPassed {
+  kind: 'democracy-passed';
+  referendumIndex: number;
+  dispatchBlock: SubstrateBlockNumber | null;
+}
+
+export interface ISubstrateDemocracyNotPassed {
+  kind: 'democracy-not-passed';
+  referendumIndex: number;
+}
+
+export interface ISubstrateDemocracyCancelled {
+  kind: 'democracy-cancelled';
+  referendumIndex: number;
+}
+
+export type ISubstrateEventType = ISubstrateSlashEvent
+  | ISubstrateRewardEvent
+  | ISubstrateDemocracyProposed
+  | ISubstrateDemocracyStarted
+  | ISubstrateDemocracyPassed
+  | ISubstrateDemocracyNotPassed
+  | ISubstrateDemocracyCancelled;
+
+export type SubstrateEventKind = ISubstrateEventType[keyof ISubstrateEventType];
+
+export const SubstrateEventKindMap: { [P in SubstrateEventKind]: P } = {
+  'slash': 'slash',
+  'reward': 'reward',
+  'democracy-proposed': 'democracy-proposed',
+  'democracy-started': 'democracy-started',
+  'democracy-passed': 'democracy-passed',
+  'democracy-not-passed': 'democracy-not-passed',
+  'democracy-cancelled': 'democracy-cancelled',
+};
+
+export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKindMap);
 
 /**
  * The full event, including data.
  */
 export interface SubstrateEvent {
   blockNumber: number;
-  type: SubstrateEventType;
-  data: any; // data format specific to event type
+  data: ISubstrateEventType;
 }

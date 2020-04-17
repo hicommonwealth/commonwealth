@@ -1,4 +1,3 @@
-import { Codec } from '@polkadot/types/types';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
 
@@ -29,9 +28,4 @@ export function createApi(provider: WsProvider): ApiPromise {
     },
     registry
   });
-}
-
-export function decodeSubstrateCodec<T extends Codec>(d: T) {
-  // TODO: convert codec types into "regular" types
-  return d.toString();
 }
