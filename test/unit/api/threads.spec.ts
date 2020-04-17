@@ -17,7 +17,7 @@ describe('Thread Tests', () => {
     await resetDatabase();
   });
 
-  describe('Thread Tests', () => {
+  describe('/EditThread Tests', () => {
     const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';
@@ -48,7 +48,35 @@ describe('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it('should pass /editThread', async () => {
+    it('Should turn off privacy', async () => {
+      const thread_id = thread.id;
+      const kind = thread.kind;
+      const body = thread.body;
+      const recentEdit : any = { timestamp: moment(), body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .post('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id, // find index
+          'kind': kind, // find index
+          'body': encodeURIComponent(body),
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.read_only).to.be.equal(true);
+      expect(res.body.result.private).to.be.equal(false);
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('Should turn off read_only', async () => {
       const thread_id = thread.id;
       const kind = thread.kind;
       const body = thread.body;
@@ -71,6 +99,34 @@ describe('Thread Tests', () => {
         });
       expect(res.body.result).to.not.be.null;
       expect(res.body.result.read_only).to.be.equal(false);
+      expect(res.body.result.private).to.be.equal(false);
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('Should turn on read_only again and not turn on privacy', async () => {
+      const thread_id = thread.id;
+      const kind = thread.kind;
+      const body = thread.body;
+      const recentEdit : any = { timestamp: moment(), body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = true;
+      const privacy = true;
+      const res = await chai.request(app)
+        .post('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id, // find index
+          'kind': kind, // find index
+          'body': encodeURIComponent(body),
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.read_only).to.be.equal(true);
       expect(res.body.result.private).to.be.equal(false);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
