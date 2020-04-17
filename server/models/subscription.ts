@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
 
     if (creatorAddress) {
       findOptions[Op.and].push({ [Op.not]: [{ subscriber_id: creatorAddress.user_id }] });
-    } else if (affectedAddresses) {
+    } else if (affectedAddresses && affectedAddresses.length > 0) {
       // fetch user ids of included/affected addresses
       const addressModels = await models.Address.findAll({
         where: {
@@ -62,11 +62,15 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       });
-      const userIds = addressModels.map((a) => a.user_id);
+      if (addressModels && addressModels.length > 0) {
+        console.log(JSON.stringify(addressModels));
+        const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
-      findOptions[Op.and].push({ subscriber_id: { [Op.in]: userIdsDedup } });
+        // remove duplicates
+        const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+        console.log(userIds, userIdsDedup);
+        findOptions[Op.and].push({ subscriber_id: { [Op.in]: userIdsDedup } });
+      }
     }
 
     console.log(findOptions);
