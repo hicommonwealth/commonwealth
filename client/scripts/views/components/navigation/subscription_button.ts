@@ -5,7 +5,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 
-const DiscussionsSubscriptionButton = {
+const SubscriptionButton = {
   view: (vnode) => {
     const subscriptions = app.login.notifications;
     const communitySubscription = subscriptions.subscriptions
@@ -14,16 +14,17 @@ const DiscussionsSubscriptionButton = {
 
     return m(Button, {
       intent: communitySubscription ? 'primary' : 'none',
+      size: 'xs',
       onclick: (e) => {
         e.preventDefault();
         communitySubscription ?
           subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw()) :
           subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => m.redraw());
       },
-      label: communitySubscription ? 'New thread notifications on' : 'New thread notifications off',
+      // label: communitySubscription ? 'New thread notifications on' : 'New thread notifications off',
       iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,
     });
   },
 };
 
-export default DiscussionsSubscriptionButton;
+export default SubscriptionButton;

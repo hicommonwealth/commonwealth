@@ -18,8 +18,6 @@ import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';
 import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import DiscussionsSubscriptionButton from './subscription_button';
-import TagSelector from './tag_selector';
 import ChainOrCommunityRoles from './roles';
 import { Button, Callout, Icons } from 'construct-ui';
 
@@ -231,35 +229,25 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       class: 'DiscussionsPage',
       title: 'Discussions',
       subtitle: 'Discuss proposals and improvements',
-      content: m('.row', [
-        (app.chain || app.community) && m('.col-sm-8.col-md-9', [
-          !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
-            icon: Icons.INFO,
-            header: 'Showing preview',
-            content: m('.callout-content', [
-              m('.callout-left', { style: 'margin-bottom: 8px;'}, [
-                `Join this community to see more.`
-              ]),
-              m('.callout-right', [
-                app.community ?
-                  m(MembershipButton, { community: app.community.meta.id, address: app.vm.activeAccount }) :
-                  m(MembershipButton, { chain: app.chain.id, address: app.vm.activeAccount }),
-              ]),
+      content: (app.chain || app.community) && [
+        !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
+          icon: Icons.INFO,
+          header: 'Showing preview',
+          content: m('.callout-content', [
+            m('.callout-left', { style: 'margin-bottom: 8px;'}, [
+              `Join this community to see more.`
             ]),
-          }),
-          vnode.attrs.tag
-            ? getSingleTagListing(vnode.attrs.tag)
-            : getHomepageListing(),
-        ]),
-        m('.col-sm-4.col-md-3', [
-          m('.discussions-description', [
-            app.isLoggedIn() && [
-              m(DiscussionsSubscriptionButton),
-            ],
-            m(TagSelector, { activeTag: vnode.attrs.tag }),
+            m('.callout-right', [
+              app.community ?
+                m(MembershipButton, { community: app.community.meta.id, address: app.vm.activeAccount }) :
+                m(MembershipButton, { chain: app.chain.id, address: app.vm.activeAccount }),
+            ]),
           ]),
-        ]),
-      ]),
+        }),
+        vnode.attrs.tag
+          ? getSingleTagListing(vnode.attrs.tag)
+          : getHomepageListing(),
+      ],
     });
   },
 };

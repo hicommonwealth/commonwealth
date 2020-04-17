@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import 'pages/discussions/tag_selector.scss';
+import 'components/navigation/tag_selector.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
@@ -9,9 +9,9 @@ import app from 'state';
 import { link } from 'helpers';
 import { OffchainThreadKind } from 'models';
 
-import EditTagModal from '../../modals/edit_tag_modal';
-import PageLoading from '../loading';
-import { isCommunityAdmin } from './roles';
+import EditTagModal from 'views/modals/edit_tag_modal';
+import PageLoading from 'views/pages/loading';
+import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
 interface ITagSelectorAttrs {
   activeTag?: string;

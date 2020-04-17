@@ -1,9 +1,10 @@
+import 'components/navigation/index.scss';
+
 import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading } from 'construct-ui';
 import Infinite from "mithril-infinite"
 import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
 
-import 'components/navigation.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -27,6 +28,8 @@ import AccountBalance from 'views/components/widgets/account_balance';
 import NewProposalButton from 'views/components/new_proposal_button';
 import Login from 'views/components/login';
 import User from 'views/components/widgets/user';
+import TagSelector from 'views/components/navigation/tag_selector';
+import SubscriptionButton from 'views/components/navigation/subscription_button';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
@@ -117,8 +120,9 @@ const NotificationRow: m.Component<{ notification: Notification }> = {
   },
 };
 
-const Navigation: m.Component<{}, {}> = {
-  view: (vnode: m.VnodeDOM<{}, {}>) => {
+const Navigation: m.Component<{ tag: string }, {}> = {
+  view: (vnode) => {
+    const { tag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
     const activeAccount = app.vm.activeAccount;
     const activeNode = app.chain && app.chain.meta;
@@ -196,6 +200,8 @@ const Navigation: m.Component<{}, {}> = {
             link('a.title-selector-link', '/', 'Commonwealth'),
           contentRight: [
             // notifications menu
+            app.isLoggedIn() && (app.community || app.chain) &&
+              m(SubscriptionButton),
             app.isLoggedIn() && m(PopoverMenu, {
               transitionDuration: 50,
               hoverCloseDelay: 0,
@@ -270,6 +276,9 @@ const Navigation: m.Component<{}, {}> = {
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
+        // TODO: tag selector
+        (app.community || app.chain) &&
+          m(TagSelector, { activeTag: vnode.attrs.tag }),
         // members (all communities)
         (app.community || app.chain) &&
           m(ListItem, {
