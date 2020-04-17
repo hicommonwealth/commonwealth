@@ -98,14 +98,12 @@ export const ProposalHeaderLastEdited: m.Component<{ proposal: AnyProposal | Off
   }
 };
 
-
-
-export const ProposalHeaderComments: m.Component<{ proposal: AnyProposal | OffchainThread, nComments: number }> = {
+export const ProposalHeaderComments: m.Component<{ proposal: AnyProposal | OffchainThread, commentCount: number }> = {
   view: (vnode) => {
-    const { proposal, nComments } = vnode.attrs;
+    const { proposal, commentCount } = vnode.attrs;
     if (!proposal) return;
     return m('.ProposalHeaderComments', [
-      nComments,
+      commentCount,
       m(Icon, { name: Icons.MESSAGE_SQUARE }),
     ]);
   }
@@ -196,6 +194,13 @@ export const ProposalHeaderOnchainStatus: m.Component<{ proposal: AnyProposal }>
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     return m('.ProposalHeaderOnchainStatus', { class: getStatusClass(proposal) }, getStatusText(proposal, true));
+  }
+};
+
+export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
+  view: (vnode) => {
+    const { viewCount } = vnode.attrs;
+    return m('.ViewCountBlock', pluralize(viewCount, 'view'));
   }
 };
 

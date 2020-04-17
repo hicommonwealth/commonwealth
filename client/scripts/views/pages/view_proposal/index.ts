@@ -39,7 +39,6 @@ import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import ProfileBlock from 'views/components/widgets/profile_block';
-import ViewCountBlock from 'views/components/widgets/view_count_block';
 import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
@@ -51,13 +50,14 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 
-import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderSubscriptionButton } from './header';
+import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount, ProposalHeaderSubscriptionButton } from './header';
 import { GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
 import CreateComment from './create_comment';
 
 
 interface IProposalHeaderAttrs {
-  nComments: number;
+  commentCount: number;
+  viewCount: number;
   getSetGlobalEditingStatus: CallableFunction;
   getSetGlobalReplyStatus: CallableFunction;
   proposal: AnyProposal | OffchainThread;
@@ -70,7 +70,7 @@ interface IProposalHeaderState {
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
   view: (vnode) => {
-    const { nComments, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus } = vnode.attrs;
+    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
     const isThread = proposal instanceof OffchainThread;
     const description = isThread ? false : (proposal as AnyProposal).description;
     const body = isThread ? (proposal as OffchainThread).body : false;
@@ -94,12 +94,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                                                  (app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
                                                  isRoleOfCommunity(app.vm.activeAccount, app.login.addresses,
                                                                    app.login.roles, 'admin', app.activeId())) && m(ProposalHeaderSpacer),
-          m(ViewCountBlock, { proposal }),
+          m(ProposalHeaderViewCount, { viewCount }),
           m(ProposalHeaderDelete, { proposal }),
         ]),
         m('.proposal-title', [
           m(ProposalHeaderTitle, { proposal }),
-          m(ProposalHeaderComments, { proposal, nComments }),
+          m(ProposalHeaderComments, { proposal, commentCount }),
         ]),
         m('.proposal-subscription-button', [
           m(ProposalHeaderSubscriptionButton, { proposal }),
@@ -357,7 +357,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsLoaded: boolean, comments, viewCountLoaded: boolean, viewCount: number }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -411,7 +411,31 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         });
       vnode.state.commentsLoaded = true;
     }
-    if (!vnode.state.comments) {
+    if (vnode.state.comments === undefined) {
+      return m(PageLoading);
+    }
+
+    // load view count
+    if (!vnode.state.viewCountLoaded) {
+      $.post(`${app.serverUrl()}/viewCount`, {
+        chain: app.activeChainId(),
+        community: app.activeCommunityId(),
+        object_id: (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
+      }).then((response) => {
+        if (response.status !== 'Success') {
+          vnode.state.viewCount = 0;
+          throw new Error('got unsuccessful status: ' + response.status);
+        } else {
+          vnode.state.viewCount = response.result.view_count;
+          m.redraw();
+        }
+      }).catch(() => {
+        vnode.state.viewCount = 0;
+        throw new Error('could not load view count');
+      });
+      vnode.state.viewCountLoaded = true;
+    }
+    if (vnode.state.viewCount === undefined) {
       return m(PageLoading);
     }
 
@@ -420,8 +444,9 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     //   proposal.fetchVotes().then(() => m.redraw());
     // }
 
-    const nComments : number = app.comments.nComments(proposal);
-    const nVoters : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
+    const viewCount : number = vnode.state.viewCount;
+    const commentCount : number = app.comments.nComments(proposal);
+    const voterCount : number = proposal instanceof OffchainThread ? 0 : proposal.getVotes().length;
 
     const hasBody: boolean = proposal instanceof OffchainThread
       ? (proposal as OffchainThread).body && (() => {
@@ -481,7 +506,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     return m(ListingPage, {
       class: 'ViewProposalPage',
       content: [
-        m(ProposalHeader, { proposal, nComments, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+        m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
         m(ProposalComments, { proposal, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
         m(ProposalSidebar, { proposal }),
       ],
