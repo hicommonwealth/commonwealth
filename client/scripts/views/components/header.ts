@@ -44,6 +44,7 @@ import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 import { createCommonwealthUrl } from '../../../../shared/utils';
+import { IPostNotificationData, ICommunityNotificationData } from '../../../../shared/types';
 
 
 interface INavigationMenuAttrs {
@@ -527,15 +528,9 @@ const decodeComment = (comment_text) => {
   return decoded_comment_text;
 };
 
-const getNotificationFields = (category, data) => {
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text, chain_id, community_id,
-    author_address, author_chain } = JSON.parse(data);
-  console.log(JSON.parse(data));
-  if (!created_at || !author_address || !author_chain || !created_at || (!chain_id && !community_id)
-    || !root_id || !root_title || !root_type) {
-    console.error('Notification data is incomplete.');
-    return;
-  }
+const getNotificationFields = (category, data: IPostNotificationData) => {
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text,
+    chain_id, community_id, author_address, author_chain } = data;
 
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
@@ -620,7 +615,7 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       notificationBody,
       path,
       pageJump
-    } = getNotificationFields(category, notification.data);
+    } = getNotificationFields(category, JSON.parse(notification.data));
 
     return getHeaderNotificationRow(
       author,

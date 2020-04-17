@@ -68,8 +68,9 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
 
   const comment = await models.OffchainComment.create(commentContent);
 
+  let parentComment;
   if (parent_id) {
-    const parentComment = await models.OffchainComment.findOne({
+    parentComment = await models.OffchainComment.findOne({
       where: community ? {
         id: parent_id,
         community: community.id,
@@ -123,13 +124,17 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   // craft commonwealth url
   const cwUrl = createCommonwealthUrl(prefix, proposal, finalComment);
 
-  // CHECK THAT SEARCH IS WORKING PROPERLY
-  console.log(proposal);
-
-  // auto-subscribe comment author to reactions
+  // auto-subscribe comment author to reactions & child comments
   await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewReaction,
+    object_id: `comment-${finalComment.id}`,
+    is_active: true,
+  });
+
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
     is_active: true,
   });
@@ -154,7 +159,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     }
   }
 
-  // dispatch notifications
+  // dispatch notifications to root thread
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewComment,
@@ -180,6 +185,37 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     },
     req.wss,
   );
+
+  // if child comment, dispatch notification to parent author
+  if (parent_id && parentComment) {
+    await models.Subscription.emitNotifications(
+      models,
+      NotificationCategories.NewComment,
+      `comment-${parent_id}`,
+      {
+        created_at: new Date(),
+        root_id: Number(proposal.id),
+        root_title: proposal.title || '',
+        root_type: prefix,
+        comment_id: Number(finalComment.id),
+        comment_text: finalComment.text,
+        parent_comment_id: Number(parent_id),
+        parent_comment_text: parentComment.text,
+        chain_id: finalComment.chain,
+        community_id: finalComment.community,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.chain,
+      },
+      {
+        user: finalComment.Address.address,
+        url: cwUrl,
+        title: proposal.title || '',
+        chain: finalComment.chain,
+        community: finalComment.community,
+      },
+      req.wss,
+    );
+  }
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length) {
