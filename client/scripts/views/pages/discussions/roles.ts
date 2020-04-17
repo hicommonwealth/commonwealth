@@ -4,6 +4,7 @@ import 'pages/discussions/index.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import $ from 'jquery';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 import { RolePermission } from 'models';
@@ -56,7 +57,7 @@ const InviteButton = (vnode, account, isCommunity) => {
     && app.community
     && app.vm.activeAccount
     && (app.community.meta.invitesEnabled || isAdminOrModOfChain(vnode, account))
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
@@ -66,25 +67,27 @@ const InviteButton = (vnode, account, isCommunity) => {
           },
         });
       },
-    }, 'Invite members');
+      label: 'Invite members',
+    });
 };
 
 const UpgradeMemberButton = (vnode, account) => {
   return app.vm.activeAccount
     && isAdminOrMod(vnode, account)
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
           modal: UpgradeMemberModal,
         });
       },
-    }, 'Upgrade member');
+      label: 'Upgrade member'
+    });
 };
 
 const ManageCommunityButton = (vnode, account) => {
   return isAdmin(vnode, account)
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
@@ -95,7 +98,8 @@ const ManageCommunityButton = (vnode, account) => {
           }
         });
       },
-    }, 'Manage community');
+      label: 'Manage community'
+    });
 };
 
 interface IChainOrCommunityRolesState {

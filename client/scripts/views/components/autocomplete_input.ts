@@ -49,7 +49,6 @@ export const AutoCompletePureForm: m.Component<IAutoCompleteFormAttrs> = {
           },
           callback: vnode.attrs.onChangeHandler,
         }),
-        m('span.icon-down-open'),
       ]),
       m('.results', [
         results.map(vnode.attrs.rowComponentFunc),
