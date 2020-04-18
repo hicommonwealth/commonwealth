@@ -71,7 +71,6 @@ async function triggerUpdateData() {
   m.redraw();
   try {
     state.participationSummary = await getParticipationSummary(state.network);
-    console.log(state.participationSummary);
   } catch (e) {
     console.error(e);
     state.participationSummary = undefined;
@@ -171,7 +170,6 @@ const EdgewareStatsPage = {
     mixpanel.track('PageVisit', {'Page Name': 'Edgeware Stats Page'});
   },
   view: (vnode) => {
-    console.log(state.addressSummary);
     return m('.EdgewareStatsPage', {
       oncreate: () => triggerUpdateData()
     }, [
@@ -618,7 +616,6 @@ const EdgewareStatsPage = {
                     const addr = formattedAddrs[i];
                     const lockEvents = state.participationSummary.ethAddrToLockEvent[addr];
                     const signalEvents = state.participationSummary.ethAddrToSignalEvent[addr];
-                    console.log(lockEvents, signalEvents);
                     if (lockEvents) resultEvents = [ ...resultEvents, ...lockEvents[0] ];
                     if (signalEvents) resultEvents = [ ...resultEvents, ...signalEvents[0] ];
                   }
@@ -639,7 +636,6 @@ const EdgewareStatsPage = {
                   }, 500);
                 }
               }, state.addressSummary.events.map((event) => {
-                console.log(event);
                 const etherscanNet = state.network === 'mainnet' ? 'https://etherscan.io/' :
                   'https://ropsten.etherscan.io/';
                 return m('li', [
