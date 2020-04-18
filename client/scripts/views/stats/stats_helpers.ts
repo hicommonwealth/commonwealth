@@ -89,6 +89,10 @@ export const getParticipationSummary = async (network) => {
     effectiveETHByBlock,
     blocknumToTime,
     lastBlock,
+    ethAddrToLockEvent,
+    ethAddrToSignalEvent,
+    edgAddrToETHLocks,
+    edgAddrToETHSignals,
   } = ldResults.results;
 
   const lastBlockObj = await web3.eth.getBlock(lastBlock);
@@ -151,5 +155,9 @@ export const getParticipationSummary = async (network) => {
     blocknumToTime,
     lastBlock,
     lastBlockTime,
+    ethAddrToLockEvent,
+    ethAddrToSignalEvent,
+    edgAddrToETHLocks,
+    edgAddrToETHSignals,
   };
 };

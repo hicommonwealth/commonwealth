@@ -13,20 +13,22 @@ export function setupWeb3Provider(network) {
   return new Web3(new Web3.providers.HttpProvider(`https://${network}.infura.io/v3/${INFURA_API_KEY}`));
 }
 
-export const getLocks = (lockdropContract, address?) => {
-  const options = (address)
+export const getLocks = async (lockdropContract, address?) => {
+  const options = (!address)
     ? { fromBlock: 0, toBlock: 'latest' }
     : { fromBlock: 0, toBlock: 'latest', filter: { owner: address } };
 
-  return lockdropContract.getPastEvents('Locked', options);
+  const results = await lockdropContract.getPastEvents('Locked', options);
+  return results;
 };
 
-export const getSignals = (lockdropContract, address?) => {
-  const options = (address)
+export const getSignals = async (lockdropContract, address?) => {
+  const options = (!address)
     ? { fromBlock: 0, toBlock: 'latest' }
     : { fromBlock: 0, toBlock: 'latest', filter: { contractAddr: address } };
 
-  return lockdropContract.getPastEvents('Signaled', options);
+  const results = await lockdropContract.getPastEvents('Signaled', options);
+  return results;
 };
 
 const getCurrentTimestamp = async (web3) => {
@@ -47,12 +49,11 @@ const getLockStorage = async (lockAddress, web3) => {
 };
 
 export const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
-  console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
+  // console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
   const json = JSON.parse(fs.readFileSync('static/contracts/edgeware/Lockdrop.json').toString());
   const contract = new web3.eth.Contract(json.abi, lockdropContractAddress);
   const lockEvents = await getLocks(contract, userAddress);
   const now = await getCurrentTimestamp(web3);
-
   const results = await Promise.all(lockEvents.map(async (event) => {
     const lockStorage = await getLockStorage(event.returnValues.lockAddr, web3);
     return {
@@ -108,8 +109,6 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
     limit: 1,
     order: [ [ 'createdAt', 'DESC' ]]
   });
-
-  console.log(result);
 
   const contracts = (network === 'mainnet')
     ? [MAINNET_LOCKDROP_ORIG, MAINNET_LOCKDROP]

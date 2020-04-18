@@ -4,7 +4,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
-import { getLocks, getSignals, setupWeb3Provider } from './getEdgewareLockdropLookup';
+import { getLocks, getSignals, setupWeb3Provider, getLocksForAddress, getSignalsForAddress } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
 
 const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
@@ -94,7 +94,7 @@ function getEffectiveValue(ethAmount, term, lockTime = undefined, lockStart = un
   }
 }
 
-const calculateEffectiveLocks = async (lockdropContracts) => {
+const calculateEffectiveLocks = async (web3, lockdropContracts) => {
   let totalETHLocked = toBN(0);
   let totalETHLocked3mo = toBN(0);
   let totalETHLocked6mo = toBN(0);
@@ -102,6 +102,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
   let totalEffectiveETHLocked = toBN(0);
   const locks = {};
   const ethAddrToEvent = {};
+  const edgAddrToETH = {};
   const validatingLocks = {};
 
   let lockEvents = [];
@@ -121,8 +122,9 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
     lockdropStartTime = (await lockdropContracts[0].methods.LOCK_START_TIME().call());
   }
   console.log(`Lock events ${lockEvents.length}`);
-  lockEvents.forEach((event, inx) => {
-    if (inx % 500 === 0) console.log(`Processing lock event #${inx + 1}`);
+  for (let i = 0; i < lockEvents.length; i++) {
+    if (i % 500 === 0) console.log(`Processing lock event #${i + 1}`);
+    const event = lockEvents[i];
     const data = event.returnValues;
 
     // allocate locks to first key if multiple submitted or malformed larger key submitted
@@ -132,12 +134,29 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
       keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
     }
 
+    const detailedEvent = await getLocksForAddress(data.owner, event.address, web3);
     if (data.owner in ethAddrToEvent) {
-      if (!ethAddrToEvent[data.owner].includes(event)) {
-        ethAddrToEvent[data.owner].push(event);
+      if (!ethAddrToEvent[data.owner].includes(detailedEvent)) {
+        ethAddrToEvent[data.owner].push(detailedEvent);
       }
     } else {
-      ethAddrToEvent[data.owner] = [event];
+      ethAddrToEvent[data.owner] = [detailedEvent];
+    }
+
+    if (data.lockAddr in ethAddrToEvent) {
+      if (!ethAddrToEvent[data.lockAddr].includes(detailedEvent)) {
+        ethAddrToEvent[data.lockAddr].push(detailedEvent);
+      }
+    } else {
+      ethAddrToEvent[data.lockAddr] = [detailedEvent];
+    }
+
+    if (keys[0] in edgAddrToETH) {
+      if (!edgAddrToETH[keys[0]].includes(data.owner)) {
+        edgAddrToETH[keys[0]].push(data.owner);
+      }
+    } else {
+      edgAddrToETH[keys[0]] = [data.owner];
     }
 
     const value = getEffectiveValue(data.eth, data.term, data.time, lockdropStartTime);
@@ -185,7 +204,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
         lockAddrs: [data.lockAddr],
       };
     }
-  });
+  }
   // Return validating locks, locks, and total ETH locked
   return {
     validatingLocks,
@@ -197,6 +216,7 @@ const calculateEffectiveLocks = async (lockdropContracts) => {
     totalETHLocked12mo,
     numLocks: lockEvents.length,
     ethAddrToLockEvent: ethAddrToEvent,
+    edgAddrToETHLocks: edgAddrToETH,
   };
 };
 
@@ -205,6 +225,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
   let totalEffectiveETHSignaled = toBN(0);
   const signals = {};
   const ethAddrToEvent = {};
+  const edgAddrToETH = {};
   const seenContracts = {};
   let signalEvents = [];
   for (let i = 0; i < lockdropContracts.length; i++) {
@@ -234,13 +255,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
         // console.log(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
       }
     }
-    if (data.owner in ethAddrToEvent) {
-      if (!ethAddrToEvent[data.owner].includes(event)) {
-        ethAddrToEvent[data.owner].push(event);
-      }
-    } else {
-      ethAddrToEvent[data.owner] = [event];
-    }
+
     // if contract address has been seen (it is in a previously processed signal)
     // then we ignore it; this means that we only acknolwedge the first signal
     // for a given address.
@@ -253,6 +268,23 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
       let keys = [data.edgewareAddr];
       if (data.edgewareAddr.length >= 66) {
         keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
+      }
+
+      const detailedEvent = await getSignalsForAddress(data.contractAddr, event.address, web3);
+      if (data.contractAddr in ethAddrToEvent) {
+        if (!ethAddrToEvent[data.contractAddr].includes(detailedEvent)) {
+          ethAddrToEvent[data.contractAddr].push(detailedEvent);
+        }
+      } else {
+        ethAddrToEvent[data.contractAddr] = [detailedEvent];
+      }
+
+      if (keys[0] in edgAddrToETH) {
+        if (!edgAddrToETH[keys[0]].includes(data.contractAddr)) {
+          edgAddrToETH[keys[0]].push(data.contractAddr);
+        }
+      } else {
+        edgAddrToETH[keys[0]] = [data.contractAddr];
       }
 
       // Treat generalized locks as 3 month locks
@@ -280,11 +312,13 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
               .effectiveValue)
               .add(value)
               .toString(),
+            signalAddrs: [ ...signals[keys[0]].signalAddrs, data.contractAddr ],
           };
         } else {
           signals[keys[0]] = {
             signalAmt: toBN(balance).toString(),
             effectiveValue: value.toString(),
+            signalAddrs: [data.contractAddr],
           };
         }
       }
@@ -299,6 +333,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
     genLocks: gLocks,
     numSignals: signalEvents.length,
     ethAddrToSignalEvent: ethAddrToEvent,
+    edgAddrToETHSignals: edgAddrToETH,
   };
 };
 
@@ -407,13 +442,15 @@ export const fetchStats = async (models, net) => {
       totalETHLocked12mo,
       numLocks,
       ethAddrToLockEvent,
-    } = await calculateEffectiveLocks(contracts);
+      edgAddrToETHLocks,
+    } = await calculateEffectiveLocks(web3, contracts);
     const {
       signals,
       totalETHSignaled,
       totalEffectiveETHSignaled,
       numSignals,
       ethAddrToSignalEvent,
+      edgAddrToETHSignals,
     } = await calculateEffectiveSignals(web3, contracts);
     const {
       participantsByBlock,
@@ -437,10 +474,8 @@ export const fetchStats = async (models, net) => {
       totalETHLocked12mo,
       numLocks,
       // addr to event mapping
-      ethAddrToEvent: {
-        ...ethAddrToLockEvent,
-        ...ethAddrToSignalEvent,
-      },
+      ethAddrToLockEvent,
+      ethAddrToSignalEvent,
       // signals
       signals,
       totalETHSignaled,
@@ -455,6 +490,8 @@ export const fetchStats = async (models, net) => {
       effectiveETHByBlock,
       blocknumToTime,
       lastBlock,
+      edgAddrToETHLocks,
+      edgAddrToETHSignals,
     };
 
     await models.EdgewareLockdropEverything.create({
