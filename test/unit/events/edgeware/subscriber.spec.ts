@@ -13,7 +13,7 @@ describe('Edgeware Event Subscriber Tests', () => {
     const hashes = [1 as unknown as Hash, 2 as unknown as Hash];
     const events = [
       [{ event: { data: [1] } }] as unknown as EventRecord[],
-      [{ event: { data: [2] } }, { event: { data: [3, 4] } }] as unknown as EventRecord,
+      [{ event: { data: [2] } }, { event: { data: [3, 4] } }] as unknown as EventRecord[],
     ];
     const api = constructFakeApi({
       subscribeNewHeads: (callback) => {

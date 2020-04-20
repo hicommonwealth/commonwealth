@@ -11,6 +11,9 @@ export function constructFakeApi(callOverrides): ApiPromise {
     },
     query: {
       system: {
+        blockHash: {
+          multi: callOverrides['blockHash.multi'],
+        },
         events: {
           at: callOverrides['events.at'],
         }
