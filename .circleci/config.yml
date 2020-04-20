@@ -10,10 +10,10 @@ jobs:
       - image: circleci/node:12.3.1
       - image: circleci/postgres:9.6.2-alpine
         environment:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: commonwealth
+          POSTGRES_USER: commonwealth-oss
+          POSTGRES_DB: commonwealth-oss
 
-    working_directory: ~/commonwealth
+    working_directory: ~/commonwealth-oss
 
     steps:
       # inital checkout
