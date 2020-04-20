@@ -23,7 +23,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       console.log(`Discovered endBlock: ${range.endBlock}`);
     }
     if ((range.endBlock - range.startBlock) <= 0) {
-      console.error(`End of range (${range.endBlock}) is less than/equal to start (${range.startBlock})! No blocks to fetch.`);
+      console.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
       return;
     }
 

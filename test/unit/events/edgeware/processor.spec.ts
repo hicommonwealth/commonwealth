@@ -36,7 +36,7 @@ describe('Edgeware Event Processor Tests', () => {
       },
       {
         section: 'staking',
-        method: 'Bonded',
+        method: 'Fake',
         data: [ 'Alice', '10000' ],
       },
       {

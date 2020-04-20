@@ -4,11 +4,18 @@
 const substrateEventStrings = [
   'slash',
   'reward',
+  'bonded',
+  'unbonded',
+  'vote-delegated',
   'democracy-proposed',
   'democracy-started',
   'democracy-passed',
   'democracy-not-passed',
   'democracy-cancelled',
+  'democracy-executed',
+  'treasury-proposed',
+  'treasury-awarded',
+  'treasury-rejected',
 ];
 
 const initChainEventTypes = (queryInterface, Sequelize, t) => {

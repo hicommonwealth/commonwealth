@@ -7,6 +7,8 @@ export default function (event: Event): SubstrateEventKind | null {
       switch (event.method) {
         case 'Slash': return 'slash';
         case 'Reward': return 'reward';
+        case 'Bonded': return 'bonded';
+        case 'Unbonded': return 'unbonded';
         default: return null;
       }
     case 'democracy':
@@ -16,6 +18,15 @@ export default function (event: Event): SubstrateEventKind | null {
         case 'Passed': return 'democracy-passed';
         case 'NotPassed': return 'democracy-not-passed';
         case 'Cancelled': return 'democracy-cancelled';
+        case 'Executed': return 'democracy-executed';
+        case 'Delegated': return 'vote-delegated';
+        default: return null;
+      }
+    case 'treasury':
+      switch (event.method) {
+        case 'Proposed': return 'treasury-proposed';
+        case 'Awarded': return 'treasury-awarded';
+        case 'Rejected': return 'treasury-rejected';
         default: return null;
       }
     default:
