@@ -36,9 +36,10 @@ interface ThreadArgs {
   jwt: any;
   title: string;
   body: any;
+  tags?: string[];
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chain, community, address, jwt, title, body } = args;
+  const { chain, community, address, jwt, title, body, tags } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -55,7 +56,7 @@ export const createThread = async (args: ThreadArgs) => {
       'kind': 'forum',
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tags[]': 'tag',
+      'tags[]': tags || 'tag',
       'url': undefined,
       'jwt': jwt,
     });

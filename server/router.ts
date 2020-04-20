@@ -1,8 +1,6 @@
 import express from 'express';
 import webpack from 'webpack';
 import passport from 'passport';
-import Mixpanel from 'mixpanel';
-import { MIXPANEL_TOKEN } from './config';
 
 import status from './routes/status';
 import createGist from './routes/createGist';
@@ -93,18 +91,6 @@ import ViewCountCache from './util/viewCountCache';
 
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
-
-  if (MIXPANEL_TOKEN) {
-    const mixpanel = Mixpanel.init(MIXPANEL_TOKEN, {
-      debug: true,
-    });
-
-    // Mixpanel before any calls
-    router.use((req, res, next) => {
-      mixpanel.track('API Call', { Call: req.path, });
-      next();
-    });
-  }
 
   router.get('/status', status.bind(this, models));
 
