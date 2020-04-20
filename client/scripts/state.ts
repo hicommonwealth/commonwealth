@@ -2,6 +2,7 @@ import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
 import {
   NodeInfo,
   AddressInfo,
+  RoleInfo,
   MembershipInfo,
   SocialAccount,
   OffchainTag,
@@ -10,7 +11,6 @@ import {
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
-  RoleInfo,
 } from 'models';
 
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -60,8 +60,8 @@ export interface IApp {
     email?: string;
     jwt?: string;
     addresses: AddressInfo[];
+    roles: RoleInfo[];
     memberships: MembershipInfo[];
-    roles: any;
     activeAddresses: Array<Account<any>>;
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
@@ -113,8 +113,8 @@ const app: IApp = {
     addresses: [],
     activeAddresses: [],
     socialAccounts: [],
+    roles: [],
     memberships: [],
-    roles: {},
     selectedNode: null,
     isSiteAdmin: false,
     disableRichText: null,

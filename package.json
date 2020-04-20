@@ -4,8 +4,6 @@
   "description": "",
   "private": true,
   "scripts": {
-    "deploy-production": "trap './webhooks.sh --deploy-cancel' SIGINT && (./webhooks.sh --deploy-start-production && git push https://git.heroku.com/commonwealthapp.git master && ./webhooks.sh --deploy-success || ./webhooks.sh --deploy-failure)",
-    "deploy-staging": "trap './webhooks.sh --deploy-cancel' SIGINT && (./webhooks.sh --deploy-start-staging && git push https://git.heroku.com/commonwealthapp-staging.git master && ./webhooks.sh --deploy-success || ./webhooks.sh --deploy-failure)",
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-contracts": "./scripts/build-contracts.sh",
     "stylelint": "stylelint client/styles/*",
