@@ -5,6 +5,7 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 import app from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
+import Tooltip from './tooltip';
 
 export enum ReactionType {
   Like = 'like',
@@ -15,11 +16,12 @@ interface IAttrs {
   post: OffchainThread | OffchainComment<any>;
   type: ReactionType;
   displayAsLink?: boolean;
+  tooltip?: boolean;
 }
 
 const ReactionButton: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
-    const { post, type, displayAsLink } = vnode.attrs;
+    const { post, type, displayAsLink, tooltip } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
     const a = app;
     let dislikes;
@@ -34,9 +36,17 @@ const ReactionButton: m.Component<IAttrs> = {
     let hasReactedType;
     if (hasReacted) hasReactedType = rxn.reaction;
 
-    return m('.ReactionButton', {
-      class: (disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
-        + (displayAsLink ? ' as-link' : ''),
+    const reactors = (likes || dislikes).map((rxn_) => {
+      const reactor = app.profiles.getProfile(app.activeChainId(), rxn_.author);
+      return m('.reacting-user', reactor.displayName);
+    });
+
+    const tooltipPopover = m('.span', reactors);
+
+
+    const rxnButton = m('.ReactionButton', {
+      class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
+        + (displayAsLink ? ' as-link' : '')}`,
       onclick: (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -73,6 +83,8 @@ const ReactionButton: m.Component<IAttrs> = {
       m('span.reactions-count', likes.length),
       m('span.reactions-icon', m.trust('&#x2191;')),
     ]);
+
+    return tooltip ? m(Tooltip, { content: tooltipPopover }, rxnButton) : rxnButton;
   }
 };
 

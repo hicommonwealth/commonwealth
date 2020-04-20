@@ -137,7 +137,6 @@ interface IProposalBodyState {
 const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
   view: (vnode: m.VnodeDOM<IProposalHeaderAttrs>) => {
     const { author, isThread, nComments, proposal } = vnode.attrs;
-    console.log(proposal);
     const subscription = app.isLoggedIn()
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
@@ -164,7 +163,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               ]),
               m(ViewCountBlock, { proposal }),
               m('.proposal-comment-summary', pluralize(nComments, 'comment')),
-              m('.reaction', m(ReactionButton, { post: proposal, type: ReactionType.Like })),
+              m('.reaction', m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true })),
               proposal.kind === OffchainThreadKind.Link
               && m('.discussion-meta-right', [
                 // !getSetGlobalEditingStatus(GlobalStatus.Get)
@@ -613,7 +612,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           editorNamespace: document.location.pathname + '-editing-comment-' + comment.id,
         }),
         m('.lower-meta', [
-          m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like })),
+          m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like, tooltip: true })),
         ])
       ]),
     ]);
