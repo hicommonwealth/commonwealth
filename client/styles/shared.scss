@@ -168,7 +168,10 @@ $switcher-width: 80px;
   @include formfield-base;
   padding: 10px 10px;
   &::placeholder {
-    color: #aaa;
+      color: #aaa;
+  }
+  &:focus::placeholder {
+      color: #999;
   }
 }
 

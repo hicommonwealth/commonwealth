@@ -33,12 +33,11 @@ $sidebar-padding: 16px;
     .cui-list.cui-lg .cui-list-item {
         border: none;
         font-weight: 500;
-        padding: 6px $sidebar-padding;
+        padding: 3px $sidebar-padding 5px;
     }
     .cui-list-item .cui-tag {
         margin-top: -6px;
         margin-bottom: -6px;
-        padding: 2px 9px 1px;
     }
 
     // buttons

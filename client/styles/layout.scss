@@ -251,6 +251,18 @@ body.modal-open {
     }
 }
 
+// Small changes to input styles
+.cui-input input,
+.cui-input textarea {
+    font-size: 15px;
+    &::placeholder {
+        color: #aaa;
+    }
+    &:focus::placeholder {
+        color: #999;
+    }
+}
+
 // The declarative construct-ui toaster doesn't allow
 // position to be set by default, so we just override it here
 .cui-toaster.cui-toaster-top {

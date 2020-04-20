@@ -3,7 +3,7 @@ import 'components/inline_thread_composer.scss';
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { default as $ } from 'jquery';
-import { Button } from 'construct-ui';
+import { Button, Input } from 'construct-ui';
 
 import app from 'state';
 
@@ -71,7 +71,8 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     }, 1);
     const { closed } = vnode.state;
     return closed ? null : m('.LinkPost', [
-      m('input[type="text"].form-field', {
+      m(Input, {
+        fluid: true,
         name: 'link-title',
         oninput: (e) => {
           vnode.state.autoTitleOverride = true;
@@ -285,7 +286,8 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
         ]),
         m('.thread-content', [
           m('.thread-title', [
-            m('input[type="text"].form-field', {
+            m(Input, {
+              fluid: true,
               name: 'thread-composer',
               placeholder: 'Start a thread...',
               autocomplete: 'off',

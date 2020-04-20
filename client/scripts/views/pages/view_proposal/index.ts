@@ -39,7 +39,6 @@ import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import ProfileBlock from 'views/components/widgets/profile_block';
-import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import PreviewModal from 'views/modals/preview_modal';

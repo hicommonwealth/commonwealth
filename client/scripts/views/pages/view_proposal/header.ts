@@ -46,7 +46,6 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
     return m('.ProposalHeaderAuthor', [
       m(User, {
         user: author,
-        hideAvatar: true,
         tooltip: true,
       }),
     ]);
