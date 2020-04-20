@@ -110,6 +110,7 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
     vnode.state.webhooks = [];
   },
   view: (vnode: m.VnodeDOM<{}, IChainOrCommunityRolesState>) => {
+    if (!app.activeId()) return;
     const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = (!app.chain);
 
