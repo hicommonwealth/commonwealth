@@ -135,7 +135,7 @@ interface ITextPostAttrs {
 }
 
 interface ITextPostState {
-  read_only: boolean;
+  readOnly: boolean;
   privacy: boolean;
   tags: string[];
   uploadsInProgress: number;
@@ -148,7 +148,7 @@ interface ITextPostState {
 const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
   oninit: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     vnode.state.privacy = false;
-    vnode.state.read_only = false;
+    vnode.state.readOnly = false;
   },
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
@@ -161,9 +161,9 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
     const createThread = (e?) => {
       if (e) e.preventDefault();
       const { form, quillEditorState } = vnode.state;
-      const read_only = vnode.state.read_only || false;
+      const readOnly = vnode.state.readOnly || false;
       const privacy = vnode.state.privacy || false;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, read_only);
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, readOnly);
       m.redraw();
     };
 
@@ -191,9 +191,9 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               name: 'properties',
               value: 'public',
               id: 'public-thread',
-              checked: (vnode.state.read_only === false && vnode.state.privacy === false),
+              checked: (vnode.state.readOnly === false && vnode.state.privacy === false),
               onclick: () => {
-                vnode.state.read_only = false;
+                vnode.state.readOnly = false;
                 vnode.state.privacy = false;
               }
             }),
@@ -205,7 +205,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               value: 'private',
               id: 'private-thread',
               onclick: () => {
-                vnode.state.read_only = false;
+                vnode.state.readOnly = false;
                 vnode.state.privacy = true;
               }
             }),
@@ -217,7 +217,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               value: 'readOnly',
               id: 'read-only',
               onclick: () => {
-                vnode.state.read_only = true;
+                vnode.state.readOnly = true;
                 vnode.state.privacy = false;
               }
             }),

@@ -83,7 +83,13 @@ class ThreadsController {
     });
   }
 
-  public async edit(proposal: OffchainThread, body?: string, attachments?: string[], readOnly?: boolean, privacy?: boolean) {
+  public async edit(
+    proposal: OffchainThread,
+    body?: string,
+    attachments?: string[],
+    readOnly?: boolean,
+    privacy?: boolean
+  ) {
     const newBody = body || proposal.body;
     const newReadOnly = readOnly || false;
     const newPrivacy = privacy || false;

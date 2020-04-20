@@ -221,14 +221,17 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               [ m('span.icon-bell'), ' Notifications on' ] :
               [ m('span.icon-bell-off'), ' Notifications off' ]
           ]),
-          app.isLoggedIn() && isSameAccount(app.vm.activeAccount, author)
+          app.isLoggedIn() // must be logged in
+            && isSameAccount(app.vm.activeAccount, author) // and must be active as author
             && m('button.read-only-toggle', {
               onclick: (e) => {
                 e.preventDefault();
                 app.threads.edit(proposal, null, null, true).then(() => m.redraw());
               }
             }, (proposal as OffchainThread).readOnly ? 'Make Commentable?' : 'Make Read-Only?'),
-          app.isLoggedIn() && isSameAccount(app.vm.activeAccount, author) && (proposal as OffchainThread).privacy
+          app.isLoggedIn() // must be logged in
+            && isSameAccount(app.vm.activeAccount, author) // as the author
+            && (proposal as OffchainThread).privacy // and the proposal/thread must be private
             && m('button.privacy-to-public-toggle', {
               onclick: (e) => {
                 e.preventDefault();
@@ -840,7 +843,6 @@ interface IProposalCommentsAttrs {
 const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
   oncreate: async (vnode) => {
     const { proposal } = vnode.attrs;
-    console.dir(proposal);
     if (!proposal) return;
     const chainId = app.activeCommunityId() ? null : app.activeChainId();
     const communityId = app.activeCommunityId();

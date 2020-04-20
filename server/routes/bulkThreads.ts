@@ -20,14 +20,12 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
 
   const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
+  const allThreadsQuery = community ? { community: community.id, }
+    : chain ? { chain: chain.id, }
+      : {};
+
   const allThreads = await models.OffchainThread.findAll({
-    where:
-      community
-        ? {
-          community: community.id,
-        } : chain ? {
-          chain: chain.id,
-        } : {},
+    where: allThreadsQuery,
     include: [
       models.Address,
       {

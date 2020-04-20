@@ -35,8 +35,8 @@ module.exports = {
   },
 
   down: async (queryInterface, DataTypes) => {
-    await queryInterface.dropTable('read_only_roles_threads');
-    await queryInterface.dropTable('private_threads_roles');
+    await queryInterface.dropTable('readOnlyRolesThreads');
+    await queryInterface.dropTable('privateThreadsRoles');
     await queryInterface.removeColumn(
       'OffchainThreads',
       'private',
