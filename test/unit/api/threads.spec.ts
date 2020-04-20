@@ -60,8 +60,8 @@ describe('Thread Tests', () => {
         .post('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'thread_id': thread_id, // find index
-          'kind': kind, // find index
+          'thread_id': thread_id,
+          'kind': kind,
           'body': encodeURIComponent(body),
           'version_history': versionHistory,
           'attachments[]': null,
@@ -88,8 +88,8 @@ describe('Thread Tests', () => {
         .post('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'thread_id': thread_id, // find index
-          'kind': kind, // find index
+          'thread_id': thread_id,
+          'kind': kind,
           'body': encodeURIComponent(body),
           'version_history': versionHistory,
           'attachments[]': null,
@@ -116,8 +116,36 @@ describe('Thread Tests', () => {
         .post('/api/editThread')
         .set('Accept', 'application/json')
         .send({
-          'thread_id': thread_id, // find index
-          'kind': kind, // find index
+          'thread_id': thread_id,
+          'kind': kind,
+          'body': encodeURIComponent(body),
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.read_only).to.be.equal(true);
+      expect(res.body.result.private).to.be.equal(false);
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('Should fail to turn a public thread private', async () => {
+      const thread_id = thread.id;
+      const kind = thread.kind;
+      const body = thread.body;
+      const recentEdit : any = { timestamp: moment(), body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .post('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id,
+          'kind': kind,
           'body': encodeURIComponent(body),
           'version_history': versionHistory,
           'attachments[]': null,
