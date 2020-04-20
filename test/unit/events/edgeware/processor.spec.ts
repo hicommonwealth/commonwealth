@@ -79,6 +79,7 @@ describe('Edgeware Event Processor Tests', () => {
     Promise.all(
       fakeBlocks.map((block) => processor.process(block))
     ).then((results) => {
+      assert.equal(processor.lastBlockNumber, 2);
       assert.deepEqual(results[0], [
         {
           /* eslint-disable dot-notation */

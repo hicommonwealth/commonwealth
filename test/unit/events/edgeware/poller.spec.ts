@@ -101,5 +101,19 @@ describe('Edgeware Event Poller Tests', () => {
     assert.deepEqual(blocks[1].events, events[8]);
   });
 
-  // TODO: fail tests
+  it('should not accept invalid start/end blocks', async () => {
+    // setup mock data
+    const api = getMockApi();
+
+    // setup test class
+    const poller = new Poller(api);
+
+    assert.isUndefined(await poller.poll({
+      startBlock: 111,
+    }));
+    assert.isUndefined(await poller.poll({
+      startBlock: 100,
+      endBlock: 99,
+    }));
+  });
 });

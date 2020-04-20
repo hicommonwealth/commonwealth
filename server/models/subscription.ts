@@ -73,7 +73,6 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
 
-    console.log(findOptions);
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
     // create notifications if data exists
