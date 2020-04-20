@@ -1,10 +1,10 @@
-import { ISubstrateEventType } from 'events/edgeware/types';
+import { IChainEventData } from 'events/interfaces';
 import ChainEventType from './ChainEventType';
 
 class ChainEvent {
   public readonly id: number;
   public readonly blockNumber: number;
-  public readonly data: ISubstrateEventType;
+  public readonly data: IChainEventData;
   public readonly type: ChainEventType;
 
   constructor(id, blockNumber, data, type) {

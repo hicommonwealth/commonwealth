@@ -14,7 +14,7 @@ import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 
 import { formatCoin } from 'adapters/currency';
-import labelEvent from 'events/edgeware/filters/labeler';
+import labelEdgewareEvent from 'events/edgeware/filters/labeler';
 
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -693,7 +693,8 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         throw new Error('chain event notification does not have expected data');
       }
       // TODO: fix this balance formatter! header loads before app.chain...
-      const label = labelEvent(
+      // TODO: use different labelers depending on chain
+      const label = labelEdgewareEvent(
         notification.chainEvent.blockNumber,
         app.activeId(),
         notification.chainEvent.data,

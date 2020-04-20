@@ -1,10 +1,5 @@
-import { ISubstrateEventType, SubstrateBalanceString } from '../types';
-
-export interface IEventLabel {
-  heading: string;
-  label: string;
-  linkUrl?: string;
-}
+import { SubstrateBalanceString } from '../types';
+import { IEventLabel, IChainEventData, LabelerFilter } from '../../interfaces';
 
 function formatAddressShort(addr : string) {
   if (!addr) return;
@@ -12,12 +7,12 @@ function formatAddressShort(addr : string) {
   return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
 }
 
-export default function (
+const labelerFunc: LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  data: ISubstrateEventType,
+  data: IChainEventData,
   balanceFormatter: (balance: SubstrateBalanceString) => string = (s) => s,
-): IEventLabel {
+): IEventLabel => {
   switch (data.kind) {
     case 'slash': {
       const { validator, amount } = data;
@@ -80,4 +75,6 @@ export default function (
       throw new Error('unknown event type');
     }
   }
-}
+};
+
+export default labelerFunc;

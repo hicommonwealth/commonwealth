@@ -59,7 +59,7 @@ export interface ISubstrateDemocracyCancelled {
   referendumIndex: number;
 }
 
-export type ISubstrateEventType = ISubstrateSlashEvent
+export type ISubstrateEventData = ISubstrateSlashEvent
   | ISubstrateRewardEvent
   | ISubstrateDemocracyProposed
   | ISubstrateDemocracyStarted
@@ -67,7 +67,7 @@ export type ISubstrateEventType = ISubstrateSlashEvent
   | ISubstrateDemocracyNotPassed
   | ISubstrateDemocracyCancelled;
 
-export type SubstrateEventKind = ISubstrateEventType[keyof ISubstrateEventType];
+export type SubstrateEventKind = ISubstrateEventData[keyof ISubstrateEventData];
 
 export const SubstrateEventKindMap: { [P in SubstrateEventKind]: P } = {
   'slash': 'slash',

@@ -1,7 +1,7 @@
 import { ApiPromise } from '@polkadot/api';
 import { Event, ReferendumInfoTo239 } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
-import { SubstrateEventKind, ISubstrateEventType } from '../types';
+import { SubstrateEventKind, ISubstrateEventData } from '../types';
 import { CWEvent } from '../../interfaces';
 
 // TODO: better balance/BN handling than string
@@ -11,7 +11,7 @@ export default async function (
   kind: SubstrateEventKind,
   event: Event,
 ): Promise<CWEvent> {
-  const extractData = async (): Promise<{ data: ISubstrateEventType, affectedAddresses: string[] }> => {
+  const extractData = async (): Promise<{ data: ISubstrateEventData, affectedAddresses: string[] }> => {
     switch (kind) {
       case 'slash':
       case 'reward': {

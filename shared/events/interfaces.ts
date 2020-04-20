@@ -2,14 +2,16 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventType } from './edgeware/types';
+import { ISubstrateEventData } from './edgeware/types';
+
+// add other events here as union types
+export type IChainEventData = ISubstrateEventData;
 
 export interface CWEvent {
   blockNumber: number;
   affectedAddresses: string[];
 
-  // add other events here as union types
-  data: ISubstrateEventType;
+  data: IChainEventData;
 }
 
 // handles individual events by sending them off to storage/notifying
@@ -55,3 +57,18 @@ export abstract class IBlockPoller<Api, Block> {
   // throws on error
   public abstract async poll(range: IDisconnectedRange): Promise<Block[]>;
 }
+
+// a set of labels used to display notifications
+export interface IEventLabel {
+  heading: string;
+  label: string;
+  linkUrl?: string;
+}
+
+// a function that prepares chain data for user display
+export type LabelerFilter = (
+  blockNumber: number,
+  chainId: string,
+  data: IChainEventData,
+  ...formatters
+) => IEventLabel;
