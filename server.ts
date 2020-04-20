@@ -136,7 +136,15 @@ const templateFile = (() => {
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
-//setupPrerenderServer();
+
+// Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
+// On the other hand, run prerender by default on production.
+if (DEV) {
+  if (process.env.WITH_PRERENDER) setupPrerenderServer();
+} else {
+  setupPrerenderServer();
+}
+
 setupMiddleware();
 setupPassport(models);
 setupAPI(app, models, fetcher, viewCountCache);
