@@ -115,10 +115,12 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('proposal')) {
+  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
     proposal = await models.Proposal.findOne({
-      where: { id }
+      where: { identifier: id, type: prefix }
     });
+  } else {
+    console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
   // craft commonwealth url

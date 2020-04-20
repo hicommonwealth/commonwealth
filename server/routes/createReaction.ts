@@ -51,10 +51,12 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       proposal = await models.OffchainThread.findOne({
         where: { id }
       });
-    } else if (prefix.includes('proposal')) {
+    } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
       proposal = await models.Proposal.findOne({
-        where: { id }
+        where: { identifier: id, type: prefix }
       });
+    } else {
+      console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
     cwUrl = createCommonwealthUrl(prefix, proposal, comment);
     root_type = prefix;

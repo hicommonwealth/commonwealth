@@ -508,7 +508,7 @@ interface IHeaderNotificationRow {
   notification: Notification;
 }
 
-const decodeComment = (comment_text) => {
+const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
@@ -529,8 +529,8 @@ const decodeComment = (comment_text) => {
 };
 
 const getNotificationFields = (category, data: IPostNotificationData) => {
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-    chain_id, community_id, author_address, author_chain } = data;
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
+    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
 
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
@@ -541,14 +541,16 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const decoded_title = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
-    notificationBody = decodeComment(comment_text);
+    notificationBody = getCommentPreview(comment_text);
   } else if (root_type === ProposalType.OffchainThread) {
     notificationBody = decoded_title;
   }
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
-    notificationHeader = m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ]);
+    notificationHeader = parent_comment_id
+      ? m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ 'New response to your comment in ', m('span.commented_obj', decoded_title) ]);
   } else if (category === NotificationCategories.NewThread) {
     notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {

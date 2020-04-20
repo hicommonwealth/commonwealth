@@ -191,7 +191,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const { author, createdAt, slug, identifier, title } = proposal;
-    console.log(identifier);
 
     const nComments = app.comments.nComments(proposal);
     const authorComment = author ? app.comments.getByProposal(proposal).sort(byAscendingCreationDate)

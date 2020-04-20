@@ -137,6 +137,7 @@ interface IProposalBodyState {
 const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
   view: (vnode: m.VnodeDOM<IProposalHeaderAttrs>) => {
     const { author, isThread, nComments, proposal } = vnode.attrs;
+    console.log(proposal);
     const subscription = app.isLoggedIn()
       ? app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier)
       : null;
