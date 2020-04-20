@@ -95,7 +95,7 @@ export function updateActiveUser(data) {
     app.login.email = data.email;
     app.login.jwt = data.jwt;
 
-    app.login.addresses = data.addresses.sort((a, b) => (b.selected ? 1 : 0) - (a.selected ? 1 : 0))
+    app.login.addresses = data.addresses
       .map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype));
     app.login.socialAccounts = data.socialAccounts
       .map((sa) => new SocialAccount(sa.provider, sa.provider_username));
