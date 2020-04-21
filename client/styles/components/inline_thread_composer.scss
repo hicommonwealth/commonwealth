@@ -2,12 +2,10 @@
 
 .InlineThreadComposer {
     background: #fff;
-    margin: 6px 0 22px;
-    border: 1px solid #eee;
-    box-shadow: 1px 1px 3px 0px rgba(0,0,0,0.04);
+    margin: 6px 0;
 
     $small-margin: 10px;
-    $left-margin: 69px;
+    $left-margin: 46px;
 
     .top-panel {
         display: flex;
@@ -19,7 +17,6 @@
         width: $left-margin;
         display: flex;
         align-items: center;
-        justify-content: center;
     }
     .thread-content {
         flex: 1;
