@@ -116,31 +116,6 @@ export const editComment = async (args: EditCommentArgs) => {
   return res.body;
 };
 
-interface CreateReactionArgs {
-  jwt: any;
-  address: any;
-  reaction: string;
-  objectId: string;
-  chain?: string;
-  community?: string;
-}
-
-// export const createReaction = async (args: CreateReactionArgs) => {
-//   const { jwt, community, chain, objectId, reaction, address } = args;
-//   const res = await chai.request.agent(app)
-//     .post('/api/createReaction')
-//     .set('Accept', 'application/json')
-//     .send({
-//       'author_chain': app.vm.activeAccount.chain.id,
-//       'chain': chain,
-//       'community': community,
-//       'address': address,
-//       'object_id': encodeURIComponent(proposal.uniqueIdentifier),
-//       reaction: encodeURIComponent(reaction),
-//       jwt: app.login.jwt,
-//     })
-// };
-
 export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
   const res = await chai.request.agent(app)
     .post('/api/createWebhook')

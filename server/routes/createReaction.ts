@@ -1,6 +1,6 @@
-import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
