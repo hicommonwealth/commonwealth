@@ -1,5 +1,3 @@
-import app from 'state';
-
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import { NearToken } from 'adapters/chain/near/types';

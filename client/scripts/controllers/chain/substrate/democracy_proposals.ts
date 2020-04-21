@@ -1,4 +1,3 @@
-import app from 'state';
 import { Unsubscribable, Observable } from 'rxjs';
 import { map, first } from 'rxjs/operators';
 import { Codec } from '@polkadot/types/types';
@@ -42,7 +41,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   get minimumDeposit() { return this._minimumDeposit; }
 
   get nextLaunchBlock(): number {
-    return (Math.floor(app.chain.block.height / this.launchPeriod) + 1) * this.launchPeriod;
+    return (Math.floor(this.app.chain.block.height / this.launchPeriod) + 1) * this.launchPeriod;
   }
 
   private _lastTabledWasExternal: boolean = null;

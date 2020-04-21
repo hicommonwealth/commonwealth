@@ -3,7 +3,6 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 
-import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { formatAddressShort } from 'helpers';
 import {
@@ -49,7 +48,7 @@ class SubstrateTreasury extends ProposalModule<
   get spendPeriod() { return this._spendPeriod; }
 
   get nextSpendBlock(): number {
-    return (Math.floor(app.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
+    return (Math.floor(this.app.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
   }
 
   public computeBond(amount: SubstrateCoin): SubstrateCoin {

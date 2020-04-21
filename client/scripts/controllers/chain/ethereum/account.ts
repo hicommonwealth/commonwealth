@@ -10,8 +10,7 @@ import { AccountsStore } from 'stores';
 import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import EthereumChain from './chain';
-// tslint:disable-next-line
-const ethUtil = require('ethereumjs-util'); // doesn't import otherwise
+import { toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex, ecsign, toRpcSig } from 'ethereumjs-util';
 
 function addressFromSeed(seed: string): string {
   return getWalletFromSeed(seed).getAddressString();
@@ -205,30 +204,19 @@ export class EthereumAccount extends Account<EthereumCoin> {
     } else {
       throw new Error('Account must have seed or mnemonic to sign messages');
     }
-    const msgHash = ethUtil.hashPersonalMessage(Buffer.from(message));
-    const sig = ethUtil.ecsign(msgHash, Buffer.from(privateKey, 'hex'));
-    return ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+    const msgHash = hashPersonalMessage(Buffer.from(message));
+    const sig = ecsign(msgHash, Buffer.from(privateKey, 'hex'));
+    return toRpcSig(sig.v, sig.r, sig.s);
   }
 
   public recoverSigner(message: string, signature: string): Buffer {
-    const recovered = ethUtil.fromRpcSig(signature);
-    const msgHash = ethUtil.hashPersonalMessage(Buffer.from(message));
-    return ethUtil.ecrecover(Buffer.from(msgHash), recovered.v, recovered.r, recovered.s);
+    const recovered = fromRpcSig(signature);
+    const msgHash = hashPersonalMessage(Buffer.from(message));
+    return ecrecover(Buffer.from(msgHash), recovered.v, recovered.r, recovered.s);
   }
 
   public async isValidSignature(message: string, signature: string): Promise<boolean> {
-    const msgBuffer = ethUtil.toBuffer(message.trim());
-    const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
-    const signatureBuffer = ethUtil.toBuffer(signature.trim());
-    const signatureParams = ethUtil.fromRpcSig(signatureBuffer);
-    const publicKey = ethUtil.ecrecover(
-      msgHash,
-      signatureParams.v,
-      signatureParams.r,
-      signatureParams.s
-    );
-    const addressBuffer = ethUtil.publicToAddress(publicKey);
-    const address = ethUtil.bufferToHex(addressBuffer);
+    const address = bufferToHex(publicToAddress(this.recoverSigner(message, signature)));
     return (address === this.address.toLowerCase()) ? true : false ;
     // Match hex which is not case sensitive, but representation is case sen
   }

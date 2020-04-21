@@ -50,6 +50,7 @@
     "no-trailing-spaces": ["error"],
     "no-useless-constructor": 0,
     "no-empty-function": 0,
-    "import/prefer-default-export": 0
+    "import/prefer-default-export": 0,
+    "dot-notation": 0
   }
 }

@@ -117,7 +117,9 @@ class CommentsController {
         'jwt': app.login.jwt
       });
       const result = modelFromServer(response.result);
-      if (this._store.getById(result.id)) this._store.remove(this._store.getById(result.id));
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
       this._store.add(result);
       return result;
     } catch (err) {

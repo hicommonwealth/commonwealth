@@ -1,5 +1,3 @@
-import app from 'state';
-
 import EdgewareChain from 'controllers/chain/edgeware/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';

@@ -28,7 +28,7 @@ const selectAddress = async (models, req: UserRequest, res: Response, next: Next
   newSelectedAddress[0].selected = true;
   await newSelectedAddress[0].save();
 
-  return res.json({ status: 'Success' });
+  return res.json({ status: 'Success', result: { id: newSelectedAddress[0].id } });
 };
 
 export default selectAddress;

@@ -1,5 +1,3 @@
-import app from 'state';
-
 import { MolochShares } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -29,7 +27,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   get serverLoaded() { return this._serverLoaded; }
 
   public init = async (onServerLoaded?) => {
-    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !app.isProduction();
+    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
     // FIXME: This is breaking for me on moloch default (not local)
     // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
     //   throw new Error('no chain object id found');
@@ -56,7 +54,15 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider, activeAddress);
     await api.init();
 
-    await this.webWallet.web3.givenProvider.on('accountsChanged', function (accounts) {
+    if (this.webWallet) {
+      await this.webWallet.enable();
+      await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        selectLogin(updatedAddress);
+      });
+    }
+
+    await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
       const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
       selectLogin(updatedAddress);
       api.updateSigner(accounts[0]);
