@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  const { body, kind, thread_id, version_history } = req.body;
+  const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
 
   if (!req.user) {
     return next(new Error('Not logged in'));
@@ -47,6 +47,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
+    if (read_only) thread.read_only = !thread.read_only;
+    if (privacy) thread.private = false;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({

@@ -3,11 +3,26 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import { UserRequest } from '../types';
 
 const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
-  const threads = await models.OffchainThread.findAll({
-    where: community ? { community: community.id }
-      : chain ? { chain: chain.id } : {},
+  const userAddresses = await req.user.getAddresses();
+  const userAddressIds = Array.from(userAddresses.map((address) => address.id));
+  const rolesQuery = (community)
+    ? { address_id: { [Op.in]: userAddressIds }, offchain_community_id: community.id, }
+    : { address_id: { [Op.in]: userAddressIds }, chain_id: chain.id };
+  const roles = await models.Role.findAll({
+    where: rolesQuery
+  });
+
+  const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
+
+  const allThreadsQuery = (community)
+    ? { community: community.id, }
+    : { chain: chain.id, };
+
+  const allThreads = await models.OffchainThread.findAll({
+    where: allThreadsQuery,
     include: [
       models.Address,
       {
@@ -21,7 +36,20 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
     ],
     order: [['created_at', 'DESC']],
   });
-  return res.json({ status: 'Success', result: threads.map((c) => c.toJSON()) });
+
+  const filteredThreads = await allThreads.filter((thread) => {
+    if (thread.private === false) {
+      return true;
+    } else if (userAddressIds.includes(thread.author_id)) {
+      return true;
+    } else if (adminRoles.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return res.json({ status: 'Success', result: filteredThreads.map((c) => c.toJSON()) });
 };
 
 export default bulkThreads;
