@@ -132,6 +132,7 @@ interface IProposalBodyAttrs {
 interface IProposalBodyState {
   editing: boolean;
   quillEditorState: any;
+  currentText: any;
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
@@ -321,6 +322,7 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
               href: '#',
               onclick: async (e) => {
                 e.preventDefault();
+                vnode.state.currentText = proposal['body'] || proposal['description'];
                 if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
                   if (activeQuillEditorHasText()) {
                     const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
@@ -353,8 +355,13 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
               href: '#',
               onclick: async (e) => {
                 e.preventDefault();
-                // TODO: Only show confirmation modal if edits have been made
-                const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+                let confirmed = true;
+                const threadText = vnode.state.quillEditorState.markdownMode
+                  ? vnode.state.quillEditorState.editor.getText()
+                  : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
+                if (threadText !== vnode.state.currentText) {
+                  confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+                }
                 if (!confirmed) return;
                 vnode.state.editing = false;
                 getSetGlobalEditingStatus(GlobalStatus.Set, false);
@@ -444,6 +451,7 @@ interface IProposalCommentState {
   editing: boolean;
   replying: boolean;
   quillEditorState: any;
+  currentText: any;
 }
 
 interface IProposalCommentAttrs {
@@ -528,6 +536,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
               onclick: async (e) => {
                 e.preventDefault();
                 vnode.state.editing = true;
+                vnode.state.currentText = comment.text;
                 if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
                   if (activeQuillEditorHasText()) {
                     const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
@@ -559,8 +568,13 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
               href: '#',
               onclick: async (e) => {
                 e.preventDefault();
-                // TODO: Only show confirmation modal if edits have been made
-                const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+                let confirmed = true;
+                const commentText = vnode.state.quillEditorState.markdownMode
+                  ? vnode.state.quillEditorState.editor.getText()
+                  : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
+                if (commentText !== vnode.state.currentText) {
+                  confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+                }
                 if (!confirmed) return;
                 vnode.state.editing = false;
                 getSetGlobalEditingStatus(GlobalStatus.Set, false);
