@@ -1,4 +1,4 @@
-import 'components/sidebar.scss';
+import 'components/community_switcher.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -18,14 +18,14 @@ import FeedbackModal from 'views/modals/feedback_modal';
 
 const avatarSize = 14;
 
-const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
+const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
 
     const active = app.activeChainId() === chain && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
                                                                   address.address === app.vm.activeAccount?.address));
 
-    return m('a.SidebarChain', {
+    return m('a.CommunitySwitcherChain', {
       href: '#',
       class: active ? 'active' : '',
       onclick: (e) => {
@@ -49,13 +49,13 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
   }
 };
 
-const SidebarCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
+const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
   view: (vnode) => {
     const { community, address } = vnode.attrs;
 
     const active = app.activeCommunityId() === community.id && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
                                                                              address.address === app.vm.activeAccount?.address));
-    return m('a.SidebarCommunity', {
+    return m('a.CommunitySwitcherCommunity', {
       href: '#',
       class: active ? 'active' : '',
       onclick: (e) => {
@@ -79,7 +79,7 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
   }
 };
 
-const SidebarSettingsMenu: m.Component<{}> = {
+const CommunitySwitcherSettingsMenu: m.Component<{}> = {
   view: (vnode) => {
 
     return m(PopoverMenu, {
@@ -88,7 +88,7 @@ const SidebarSettingsMenu: m.Component<{}> = {
       trigger: m(Button, {
         iconLeft: Icons.SETTINGS,
         size: 'default',
-        class: 'SidebarSettingsMenu',
+        class: 'CommunitySwitcherSettingsMenu',
       }),
       position: 'right-end',
       closeOnContentClick: true,
@@ -156,7 +156,7 @@ const SidebarSettingsMenu: m.Component<{}> = {
   }
 };
 
-const Sidebar: m.Component<{}> = {
+const CommunitySwitcher: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
 
@@ -165,21 +165,21 @@ const Sidebar: m.Component<{}> = {
       chains[n.chain.id] ? chains[n.chain.id].push(n) : chains[n.chain.id] = [n];
     });
 
-    return m('.Sidebar', [
+    return m('.CommunitySwitcher', [
       m('.sidebar-content', [
         app.login.roles.map((role) => {
           const address = app.login.addresses.find((address) => address.id === role.address_id);
           if (role.offchain_community_id) {
             const community = app.config.communities.getAll().find((community) => community.id === role.offchain_community_id);
-            return m(SidebarCommunity, { community, address });
+            return m(CommunitySwitcherCommunity, { community, address });
           } else {
-            return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+            return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
           }
         }),
       ]),
-      m(SidebarSettingsMenu),
+      m(CommunitySwitcherSettingsMenu),
     ]);
   }
 };
 
-export default Sidebar;
+export default CommunitySwitcher;

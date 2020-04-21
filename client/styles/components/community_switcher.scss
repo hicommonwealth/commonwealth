@@ -1,4 +1,4 @@
-.Sidebar {
+.CommunitySwitcher {
     position: fixed;
     top: 0;
     left: 0;
@@ -20,9 +20,9 @@
 
     $size: 36px;
 
-    a.SidebarChain,
-    a.SidebarCommunity,
-    .SidebarSettingsMenu .trigger {
+    a.CommunitySwitcherChain,
+    a.CommunitySwitcherCommunity,
+    .CommunitySwitcherSettingsMenu .trigger {
         position: relative;
         display: flex;
         height: $size;
@@ -61,7 +61,7 @@
             }
         }
     }
-    a.SidebarCommunity {
+    a.CommunitySwitcherCommunity {
         .icon-inner {
             text-align: center;
             color: #eee;
@@ -80,15 +80,9 @@
             }
         }
     }
-    .SidebarSettingsMenu {
+    .CommunitySwitcherSettingsMenu {
         position: absolute;
         bottom: 0;
         margin: 14px 16px;
     }
-}
-
-.SidebarTooltip {
-    font-weight: 500;
-    margin: 1px 1px 0 4px;
-    line-height: 1.1;
 }

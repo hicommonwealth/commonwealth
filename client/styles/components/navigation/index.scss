@@ -1,17 +1,13 @@
 @import 'client/styles/shared';
 
-$width: 210px;
 $sidebar-padding: 16px;
 
 .Navigation {
     position: fixed;
-    left: 72px;
-    &.logged-out {
-        left: 0;
-    }
+    left: 0;
     top: 0;
     bottom: 0;
-    width: $width;
+    width: $side-width;
     z-index: 9;
     background: #fff !important;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
@@ -90,7 +86,7 @@ $sidebar-padding: 16px;
     .cui-list.cui-lg .login-selector {
         position: fixed;
         bottom: 0;
-        width: $width;
+        width: $side-width;
         background: #fff !important;
         cursor: default !important;
         user-select: none;

@@ -1,6 +1,6 @@
 import 'components/navigation/index.scss';
 
-import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading } from 'construct-ui';
+import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading, Drawer } from 'construct-ui';
 import Infinite from "mithril-infinite"
 import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
@@ -11,7 +11,6 @@ import _ from 'lodash';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
-import { isMember } from 'views/components/membership_button';
 import { ApiStatus, default as app } from 'state';
 import { featherIcon, slugify, link } from 'helpers';
 import { NotificationCategories } from 'types';
@@ -20,6 +19,8 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import { ChainClass, ChainBase, Notification } from 'models';
 
+import CommunitySwitcher from 'views/components/community_switcher';
+import { isMember } from 'views/components/membership_button';
 import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -120,7 +121,7 @@ const NotificationRow: m.Component<{ notification: Notification }> = {
   },
 };
 
-const Navigation: m.Component<{ activeTag: string }, {}> = {
+const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible: boolean }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
@@ -184,6 +185,14 @@ const Navigation: m.Component<{ activeTag: string }, {}> = {
       class: (app.isLoggedIn() ? 'logged-in' : 'logged-out') + ' ' +
         ((app.community || app.chain) ? 'active-community' : 'no-active-community'),
     }, [
+      m(Drawer, {
+        isOpen: vnode.state.communitySwitcherVisible,
+        autofocus: true,
+        content: m(CommunitySwitcher),
+        onClose: () => vnode.state.communitySwitcherVisible = false,
+        closeOnEscapeKey: true,
+        closeOnOutsideClick: true,
+      }),
       m(List, {
         interactive: true,
         size: 'lg',
@@ -199,6 +208,13 @@ const Navigation: m.Component<{ activeTag: string }, {}> = {
               selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
             ]) :
             link('a.title-selector-link', '/', 'Commonwealth'),
+          contentLeft: [
+            app.isLoggedIn() && m(Button, {
+              iconLeft: Icons.CHEVRONS_LEFT,
+              size: 'xs',
+              onclick: () => vnode.state.communitySwitcherVisible = true,
+            }),
+          ],
           contentRight: [
             // notifications menu
             app.isLoggedIn() && (app.community || app.chain) &&
