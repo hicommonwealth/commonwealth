@@ -205,7 +205,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         m(InlineThreadComposer),
         allProposals.length === 0
         && [
-          m('h4', 'This week'),
+          // m('h4', 'This week'),
           m('.no-threads', 'No threads'),
         ],
         allProposals.length !== 0

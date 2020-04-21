@@ -28,8 +28,8 @@
         }
     }
     // content: discussion group
-    .WeeklyDiscussionListing, .tag-forum {
-        margin-bottom: 15px;
+    // .WeeklyDiscussionListing, .tag-forum {
+    //     margin-bottom: 15px;
         .LastSeenDivider {
             display: flex;
             padding: 12px 0 10px;
@@ -49,5 +49,5 @@
                 width: -webkit-fill-available;
             }
         }
-    }
+    // }
 }

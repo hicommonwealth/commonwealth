@@ -82,7 +82,7 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
       return;
     }
     return m('.WeeklyDiscussionListing', [
-      m('h4', heading),
+      // m('h4', heading),
       vnode.attrs.lastVisited
         ? m('div', proposalsByLastViewed())
         : m(threadGroup, proposals.map((proposal) => {
