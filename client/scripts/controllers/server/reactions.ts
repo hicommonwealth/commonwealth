@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';
@@ -8,13 +9,14 @@ import { uniqueIdToProposal } from 'identifiers';
 import { ReactionsStore } from 'stores';
 import { OffchainReaction, IUniqueId } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { ReactionType } from 'client/scripts/views/components/reaction_button';
 
 const modelFromServer = (reaction, proposal?) => {
   return new OffchainReaction(
     reaction.chain,
     reaction.Address.address,
     decodeURIComponent(reaction.reaction),
-    proposal ? proposal : uniqueIdToProposal(decodeURIComponent(reaction.object_id)),
+    proposal || uniqueIdToProposal(decodeURIComponent(reaction.object_id)),
     reaction.id,
     reaction.community,
   );
@@ -28,23 +30,23 @@ class ReactionsController {
     return this._store.getByProposal(proposal);
   }
 
-  public create<T extends IUniqueId>(address: string, proposal: T, reaction: string, chainId: string, communityId: string) {
+  public create<T extends IUniqueId>(address: string, proposal: T, reaction: ReactionType, chainId: string, communityId: string) {
     return $.post(`${app.serverUrl()}/createReaction`, {
       author_chain: app.vm.activeAccount.chain.id,
       chain: chainId,
       community: communityId,
-      address: address,
+      address,
       object_id: encodeURIComponent(proposal.uniqueIdentifier),
       reaction: encodeURIComponent(reaction),
       jwt: app.login.jwt,
     }).then((response) => {
-        console.log('Created reaction');
+      console.log('Created reaction');
       return this.refresh(proposal, chainId, communityId);
-      }, (err) => {
-        console.log('Failed to create reaction');
-        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-          'Failed to create reaction');
-      });
+    }, (err) => {
+      console.log('Failed to create reaction');
+      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+        : 'Failed to create reaction');
+    });
   }
 
   public refresh<T extends IUniqueId>(proposal: T, chainId: string, communityId: string) {
@@ -54,32 +56,31 @@ class ReactionsController {
       object_id: encodeURIComponent(proposal.uniqueIdentifier),
     }).then((response) => {
       if (response.status !== 'Success') {
-        throw new Error('got unsuccessful status: ' + response.status);
+        throw new Error(`got unsuccessful status: ${response.status}`);
       }
       this._store.clearProposal(proposal);
       for (const reaction of response.result) {
         // TODO: Reactions should always have a linked Address
         if (!reaction.Address) {
           console.error('Reaction missing linked address');
-          continue;
         }
         try {
           this._store.add(modelFromServer(reaction, proposal));
         } catch (e) {
-          //console.error(e.message);
+          // console.error(e.message);
         }
       }
     }, (err) => {
       console.log('Failed to load reactions');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-        'Error loading reactions');
+      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+        : 'Error loading reactions');
     });
   }
 
   public async delete(reaction) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(app.serverUrl() + '/deleteReaction', {
+      $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.login.jwt,
         reaction_id: reaction.id,
       }).then((result) => {
@@ -100,7 +101,7 @@ class ReactionsController {
     })
       .then((response) => {
         if (response.status !== 'Success') {
-          throw new Error('got unsuccessful status: ' + response.status);
+          throw new Error(`got unsuccessful status: ${response.status}`);
         }
         if (reset) {
           this._store.clear();
@@ -119,13 +120,13 @@ class ReactionsController {
           try {
             this._store.add(modelFromServer(reaction));
           } catch (e) {
-            //console.error(e.message);
+            // console.error(e.message);
           }
         }
       }, (err) => {
         console.log('failed to load bulk reactions');
-        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-          'Error loading reactions');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Error loading reactions');
       });
   }
 
