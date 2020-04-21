@@ -51,8 +51,20 @@ class ThreadsController {
     return result;
   }
 
-  public create(address: string, kind: string, chainId: string, communityId: string, title: string, body?: string,
-    tags?: string[], url?: string, attachments?: string[], mentions?: string[], privacy?: boolean, readOnly?: boolean) {
+  public create(
+    address: string,
+    kind: string,
+    chainId: string,
+    communityId: string,
+    title: string,
+    body?: string,
+    tags?: string[],
+    url?: string,
+    attachments?: string[],
+    mentions?: string[],
+    privacy?: boolean,
+    readOnly?: boolean
+  ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);

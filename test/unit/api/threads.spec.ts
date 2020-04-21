@@ -17,7 +17,7 @@ describe('Thread Tests', () => {
     await resetDatabase();
   });
 
-  describe('/EditThread Tests', () => {
+  describe('/editThread Tests', () => {
     const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';

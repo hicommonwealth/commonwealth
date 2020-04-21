@@ -8,21 +8,18 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
 
   const userAddresses = await req.user.getAddresses();
   const userAddressIds = Array.from(userAddresses.map((address) => address.id));
+  const rolesQuery = (community)
+    ? { address_id: { [Op.in]: userAddressIds }, offchain_community_id: community.id, }
+    : { address_id: { [Op.in]: userAddressIds }, chain_id: chain.id };
   const roles = await models.Role.findAll({
-    where: community ? {
-      address_id: { [Op.in]: userAddressIds },
-      offchain_community_id: community.id,
-    } : chain ? {
-      address_id: { [Op.in]: userAddressIds },
-      chain_id: chain.id,
-    } : {},
+    where: rolesQuery
   });
 
   const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
-  const allThreadsQuery = community ? { community: community.id, }
-    : chain ? { chain: chain.id, }
-      : {};
+  const allThreadsQuery = (community)
+    ? { community: community.id, }
+    : { chain: chain.id, };
 
   const allThreads = await models.OffchainThread.findAll({
     where: allThreadsQuery,
