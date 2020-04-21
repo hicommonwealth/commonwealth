@@ -201,7 +201,6 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       );
     }));
   }
-
   return res.json({ status: 'Success', result: finalComment.toJSON() });
 };
 

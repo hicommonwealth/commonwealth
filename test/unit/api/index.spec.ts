@@ -68,6 +68,105 @@ describe('API Tests', () => {
     });
   });
 
+  describe('comment route tests', () => {
+    let jwtToken;
+    let loggedInAddr;
+    let proposalIdentifier;
+    let parentCommentId;
+    const chain = 'ethereum';
+    const community = 'staking';
+
+    before(async () => {
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      loggedInAddr = result.address;
+      jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      const res = await modelUtils.createThread({
+        chain,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        title: 'x',
+        body: 'y'
+      });
+      proposalIdentifier = `discussion_${res.result.id}`;
+      const res_ = await modelUtils.createComment({
+        chain,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        proposalIdentifier,
+        text: 'x'
+      });
+      parentCommentId = res.result.id;
+    });
+
+    beforeEach(async () => {
+      // get logged in address/user with JWT
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      loggedInAddr = result.address;
+      jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+    });
+
+    describe('/createComment', () => {
+      it('should create a top-level comment on an community discussion thread', async () => {
+        const text = 'test body';
+        const res = await modelUtils.createComment({
+          community,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          proposalIdentifier,
+          text
+        });
+        if (res.status === 'Success') parentCommentId = res.result.id;
+        expect(res.status).to.equal('Success');
+        expect(res.result).to.not.be.null;
+        expect(res.result.root_id).to.equal(proposalIdentifier);
+        expect(res.result.text).to.equal(encodeURIComponent(text));
+        expect(res.result.Address).to.not.be.null;
+        expect(res.result.Address.address).to.equal(loggedInAddr);
+      });
+    });
+
+    describe('/createComment', () => {
+      it('should create a top-level comment on an chain discussion thread', async () => {
+        const text = 'test body';
+        const res = await modelUtils.createComment({
+          chain,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          proposalIdentifier,
+          text
+        });
+        if (res.status === 'Success') parentCommentId = res.result.id;
+        expect(res.status).to.equal('Success');
+        expect(res.result).to.not.be.null;
+        expect(res.result.root_id).to.equal(proposalIdentifier);
+        expect(res.result.text).to.equal(encodeURIComponent(text));
+        expect(res.result.Address).to.not.be.null;
+        expect(res.result.Address.address).to.equal(loggedInAddr);
+      });
+    });
+
+    describe('/createComment', () => {
+      it('should create a child comment to a parent comment', async () => {
+        const text = 'test body';
+        const res = await modelUtils.createComment({
+          chain,
+          address: loggedInAddr,
+          jwt: jwtToken,
+          proposalIdentifier,
+          parentCommentId,
+          text
+        });
+        expect(res.status).to.equal('Success');
+        expect(res.result).to.not.be.null;
+        expect(res.result.root_id).to.equal(proposalIdentifier);
+        expect(res.result.parent_id).to.equal(parentCommentId);
+        expect(res.result.text).to.equal(encodeURIComponent(text));
+        expect(res.result.Address).to.not.be.null;
+        expect(res.result.Address.address).to.equal(loggedInAddr);
+      });
+    });
+  });
+
   describe('thread route tests', () => {
     let jwtToken;
     let loggedInAddr;
@@ -79,26 +178,6 @@ describe('API Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       loggedInAddr = result.address;
       jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    });
-
-    describe('/createThread', () => {
-      it('should create a discussion thread', async () => {
-        const title = 'test title';
-        const body = 'test body';
-        const res = await modelUtils.createThread({
-          chain,
-          address: loggedInAddr,
-          jwt: jwtToken,
-          title,
-          body,
-        });
-        expect(res.status).to.equal('Success');
-        expect(res.result).to.not.be.null;
-        expect(res.result.title).to.equal(encodeURIComponent(title));
-        expect(res.result.body).to.equal(encodeURIComponent(body));
-        expect(res.result.Address).to.not.be.null;
-        expect(res.result.Address.address).to.equal(loggedInAddr);
-      });
     });
 
     describe('/viewCount', () => {
