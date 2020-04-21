@@ -2,10 +2,12 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventData } from './edgeware/types';
+import { ISubstrateEventData, SubstrateEventKind } from './edgeware/types';
 
 // add other events here as union types
 export type IChainEventData = ISubstrateEventData;
+export type IChainEventKind = SubstrateEventKind;
+export const EventSupportingChains = ['edgeware', 'edgeware-local'];
 
 export interface CWEvent {
   blockNumber: number;
@@ -73,3 +75,12 @@ export type LabelerFilter = (
   data: IChainEventData,
   ...formatters
 ) => IEventLabel;
+
+export interface IEventTitle {
+  title: string;
+  description: string;
+}
+
+export type TitlerFilter = (
+  kind: IChainEventKind,
+) => IEventTitle;
