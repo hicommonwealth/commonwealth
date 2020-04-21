@@ -2,66 +2,77 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 72px;
+    width: 240px;
     bottom: 0;
     background: #e4e4e6;
-    padding: 2px 0;
     z-index: 10;
     user-select: none;
     .sidebar-content {
         position: absolute;
         top: 0;
         bottom: 67px;
+        padding: 6px 0;
         width: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
         border-bottom: 1px solid #d7d7d7;
     }
 
-    $size: 42px;
+    $size: 36px;
 
     a.SidebarChain,
     a.SidebarCommunity,
     .SidebarSettingsMenu .trigger {
         position: relative;
-        display: block;
-        width: $size;
+        display: flex;
         height: $size;
-        border-radius: 8px;
-        margin: 15px;
-        text-align: center;
+        box-sizing: content-box;
+        padding: 11px 15px;
         text-decoration: none;
-        color: #eee;
+        color: #222;
         font-weight: 500;
-        .ChainIcon img {
-            width: $size;
-            height: $size;
+        &:hover {
+            background: #eee;
         }
-        .ChainIcon, .icon-inner {
-            opacity: 0.3;
-        }
-        &:hover, &.active {
-            .ChainIcon, .icon-inner {
-                opacity: 1;
+        .icon-inner {
+            position: relative;
+            .ChainIcon img {
+                width: $size;
+                height: $size;
+            }
+            .User {
+                position: absolute;
+                right: -4px;
+                bottom: -4px;
             }
         }
-        .User {
-            position: absolute;
-            right: -4px;
-            bottom: -4px;
-        }
-        .name {
-            position: relative;
-            top: 11px;
+        .content-inner {
+            margin-left: 12px;
+            line-height: 1.35;
+            .sidebar-user {
+                font-size: 13px;
+                color: #777;
+                .User .user-avatar {
+                    margin-right: 5px;
+                }
+                .User .user-display-name {
+                    color: #777;
+                }
+            }
         }
     }
     a.SidebarCommunity {
         .icon-inner {
+            text-align: center;
+            color: #eee;
             background: #36393f;
-            position: absolute;
-            height: 100%;
-            width: 100%;
+            height: $size;
+            width: $size;
             border-radius: 8px;
+            .name {
+                position: relative;
+                top: 7px;
+            }
         }
         &:hover, &.active {
             .icon-inner {
