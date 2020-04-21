@@ -9,6 +9,8 @@ import { pluralize, slugify, link, externalLink } from 'helpers';
 
 import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind } from 'models';
+import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import QuillFormattedText from 'views/components/quill_formatted_text';
 
 interface IAttrs {
   proposal: OffchainThread;
@@ -38,7 +40,20 @@ const DiscussionRow: m.Component<IAttrs> = {
         ]),
       propType === OffchainThreadKind.Link
         && proposal.url
-        && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url))
+        && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url)),
+      propType === OffchainThreadKind.Forum
+        && (proposal as OffchainThread).body && m('.discussion-excerpt', [
+          (() => {
+            const body = (proposal as OffchainThread).body;
+            try {
+              const doc = JSON.parse(body);
+              doc.ops = doc.ops.slice(0, 3);
+              return m(QuillFormattedText, { doc, hideFormatting: true });
+            } catch (e) {
+              return m(MarkdownFormattedText, { doc: body.slice(0, 200) });
+            }
+          })(),
+        ]),
     ];
 
     return m('.DiscussionRow', { key: proposal.identifier }, [

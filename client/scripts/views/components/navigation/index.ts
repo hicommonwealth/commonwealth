@@ -298,7 +298,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         (app.community || app.chain) &&
           m(ListItem, {
             active: onTagsPage(m.route.get()),
-            label: 'Tags',
+            label: 'Manage Tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
           }),
         (app.community || app.chain) &&

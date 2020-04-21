@@ -90,6 +90,9 @@ $discussion-row-vpadding: 11px;
             text-decoration: underline;
         }
     }
+    .discussion-excerpt {
+        color: #999;
+    }
     .discussion-body-preview {
         font-size: 14px;
         color: $discussion-row-color;
