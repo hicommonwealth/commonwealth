@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('EdgewareLockdropEverything', {
+    return queryInterface.createTable('EdgewareLockdropEverythings', {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       createdAt: { type: DataTypes.DATE, field: 'created_at' },
       data: { type: DataTypes.TEXT, allowNull: true },
@@ -12,6 +12,6 @@ module.exports = {
   },
 
   down: (queryInterface, DataTypes) => {
-    return queryInterface.dropTable('EdgewareLockdropEverything');
+    return queryInterface.dropTable('EdgewareLockdropEverythings');
   }
 };
