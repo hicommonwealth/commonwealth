@@ -70,6 +70,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         community: finalComment.community,
       },
       req.wss,
+      [ finalComment.Address.address ],
     );
 
     return res.json({ status: 'Success', result: finalComment.toJSON() });

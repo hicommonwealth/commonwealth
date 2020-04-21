@@ -31,17 +31,10 @@ module.exports = (sequelize, DataTypes) => {
     notification_data,
     webhook_data: WebhookContent,
     wss?,
+    excludeAddresses?: string[],
+    includeAddresses?: string[],
     chainEventId?: number,
-    affectedAddresses?: string[],
   ) => {
-    // TODO: replace this with "excluded addresses"
-    const creatorAddress = notification_data.author_address
-      ? await models.Address.findOne({
-        where: {
-          address: notification_data.author_address,
-        },
-      })
-      : null;
     // get subscribers to send notifications to
     const findOptions: any = {
       [Op.and]: [
@@ -51,25 +44,36 @@ module.exports = (sequelize, DataTypes) => {
       ],
     };
 
-    if (creatorAddress) {
-      findOptions[Op.and].push({ [Op.not]: [{ subscriber_id: creatorAddress.user_id }] });
-    } else if (affectedAddresses && affectedAddresses.length > 0) {
-      // fetch user ids of included/affected addresses
+    const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
+      // fetch user ids from address models
       const addressModels = await models.Address.findAll({
         where: {
           address: {
-            [Op.in]: affectedAddresses,
+            [Op.in]: addresses,
           },
         },
       });
       if (addressModels && addressModels.length > 0) {
-        console.log(JSON.stringify(addressModels));
         const userIds = addressModels.map((a) => a.user_id);
 
         // remove duplicates
         const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
-        console.log(userIds, userIdsDedup);
-        findOptions[Op.and].push({ subscriber_id: { [Op.in]: userIdsDedup } });
+        return userIdsDedup;
+      } else {
+        return [];
+      }
+    };
+
+    // currently excludes override includes, but we may want to provide the option for both
+    if (excludeAddresses && excludeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(excludeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions[Op.and].push({ subscriber_id: { [Op.notIn]: ids } });
+      }
+    } else if (includeAddresses && includeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(includeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions[Op.and].push({ subscriber_id: { [Op.in]: ids } });
       }
     }
 

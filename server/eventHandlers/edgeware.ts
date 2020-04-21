@@ -51,8 +51,9 @@ export default class extends IEventHandler {
       },
       { }, // TODO: what is webhook data here?
       this._wss,
+      event.excludeAddresses,
+      event.includeAddresses,
       dbEvent.id,
-      event.affectedAddresses,
     );
     console.log(`Emitted ${dbNotifications.length} notifications.`);
   }

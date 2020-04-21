@@ -57,6 +57,9 @@ describe('Edgeware Event Processor Tests', () => {
     ];
 
     const api = constructFakeApi({
+      publicProps: async () => {
+        return [ [ ], [ 4, 'hash', 'Alice' ] ];
+      },
       referendumInfoOf: async (idx) => {
         if (+idx === 5) {
           return {
@@ -71,7 +74,7 @@ describe('Edgeware Event Processor Tests', () => {
         } else {
           throw new Error('bad referendum idx');
         }
-      }
+      },
     });
 
     // run test
@@ -89,16 +92,17 @@ describe('Edgeware Event Processor Tests', () => {
             amount: '10000',
           },
           blockNumber: 1,
-          affectedAddresses: ['Alice'],
+          includeAddresses: ['Alice'],
         },
         {
           data: {
             kind: SubstrateEventKindMap['democracy-proposed'],
             proposalIndex: 4,
             deposit: '100000',
+            proposer: 'Alice',
           },
+          excludeAddresses: ['Alice'],
           blockNumber: 1,
-          affectedAddresses: [],
         },
       ]);
       assert.deepEqual(results[1], [
@@ -109,7 +113,6 @@ describe('Edgeware Event Processor Tests', () => {
             endBlock: 123,
           },
           blockNumber: 2,
-          affectedAddresses: [],
         },
       ]);
       done();

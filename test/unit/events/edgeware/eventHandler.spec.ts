@@ -73,7 +73,6 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
-      affectedAddresses: [],
       data: {
         kind: 'democracy-started',
         referendumIndex: 0,
@@ -111,11 +110,11 @@ describe('Event Handler Tests', () => {
     assert.sameMembers(userEmails, ['alice@gmail.com', 'bob@gmail.com']);
   });
 
-  it('should only emit notification to relevant users', async () => {
+  it('should only include specified users if includeAddresses present', async () => {
     // setup
     const event: CWEvent = {
       blockNumber: 11,
-      affectedAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: 'slash',
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
@@ -155,10 +154,54 @@ describe('Event Handler Tests', () => {
     assert.sameMembers(userEmails, ['bob@gmail.com']);
   });
 
+  it('should only exclude specified users if excludeAddresses present', async () => {
+    // setup
+    const event: CWEvent = {
+      blockNumber: 12,
+      excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+      data: {
+        kind: 'democracy-started',
+        referendumIndex: 1,
+        endBlock: 101,
+      }
+    };
+
+    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+
+    // process event
+    await eventHandler.handle(event);
+
+    // expect results
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-democracy-started',
+        block_number: 12,
+      }
+    });
+    assert.lengthOf(chainEvents, 1);
+    assert.deepEqual(chainEvents[0].event_data, event.data);
+
+    const notifications = await models['Notification'].findAll({
+      where: {
+        chain_event_id: chainEvents[0].id,
+      },
+      include: [{
+        model: models['Subscription'],
+        include: [{
+          model: models['User'],
+        }]
+      }]
+    });
+
+    // should only notify alice, excluding bob
+    const userEmails = notifications.map((n) => n.Subscription.User.email);
+    assert.sameMembers(userEmails, ['alice@gmail.com']);
+  });
+
   it('should not create chain event for unknown event type', async () => {
     const event = {
-      blockNumber: 12,
-      affectedAddresses: [],
+      blockNumber: 13,
+
       data: {
         kind: 'democracy-exploded',
         whoops: true,

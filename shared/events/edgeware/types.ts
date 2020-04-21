@@ -55,6 +55,7 @@ export interface ISubstrateDemocracyProposed {
   kind: 'democracy-proposed';
   proposalIndex: number;
   deposit: SubstrateBalanceString;
+  proposer: SubstrateAccountId;
 }
 
 export interface ISubstrateDemocracyStarted {

@@ -162,6 +162,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       community: finalComment.community,
     },
     req.wss,
+    [ finalComment.Address.address ],
   );
 
   // notify mentioned users if they have permission to view the originating forum
@@ -197,7 +198,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
-        req.wss
+        req.wss,
+        [ finalComment.Address.address ],
       );
     }));
   }

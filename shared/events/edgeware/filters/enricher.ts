@@ -11,13 +11,14 @@ export default async function (
   kind: SubstrateEventKind,
   event: Event,
 ): Promise<CWEvent> {
-  const extractData = async (): Promise<{ data: ISubstrateEventData, affectedAddresses: string[] }> => {
+  const extractData = async (): Promise<CWEvent> => {
     switch (kind) {
       case 'slash':
       case 'reward': {
         const [ validator, amount ] = event.data;
         return {
-          affectedAddresses: [ validator.toString() ],
+          blockNumber,
+          includeAddresses: [ validator.toString() ],
           data: {
             kind,
             validator: validator.toString(),
@@ -34,7 +35,8 @@ export default async function (
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);
         }
         return {
-          affectedAddresses: [ stash.toString() ],
+          blockNumber,
+          includeAddresses: [ stash.toString() ],
           data: {
             kind,
             stash: stash.toString(),
@@ -47,7 +49,8 @@ export default async function (
       case 'vote-delegated': {
         const [ who, target ] = event.data;
         return {
-          affectedAddresses: [ target.toString() ],
+          blockNumber,
+          includeAddresses: [ target.toString() ],
           data: {
             kind,
             who: who.toString(),
@@ -58,12 +61,20 @@ export default async function (
 
       case 'democracy-proposed': {
         const [ proposalIndex, deposit ] = event.data;
+        const props = await api.query.democracy.publicProps();
+        const prop = props.find((p) => p.length > 0 && +p[0] === +proposalIndex);
+        if (!prop) {
+          throw new Error(`could not fetch info for proposal ${+proposalIndex}`);
+        }
+        const [ idx, hash, proposer ] = prop;
         return {
-          affectedAddresses: [],
+          blockNumber,
+          excludeAddresses: [ proposer.toString() ],
           data: {
             kind,
             proposalIndex: +proposalIndex,
             deposit: deposit.toString(),
+            proposer: proposer.toString(),
           }
         };
       }
@@ -74,7 +85,7 @@ export default async function (
         // query for edgeware only -- kusama has different type
         const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             referendumIndex: +referendumIndex,
@@ -90,7 +101,7 @@ export default async function (
         const dispatchQueue = await api.query.democracy.dispatchQueue();
         const dispatchInfo = dispatchQueue.find(([ block, hash, idx ]) => +idx === +referendumIndex);
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             referendumIndex: +referendumIndex,
@@ -103,7 +114,7 @@ export default async function (
       case 'democracy-cancelled': {
         const [ referendumIndex ] = event.data;
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             referendumIndex: +referendumIndex,
@@ -114,7 +125,7 @@ export default async function (
       case 'democracy-executed': {
         const [ referendumIndex, executionOk ] = event.data;
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             referendumIndex: +referendumIndex,
@@ -131,7 +142,8 @@ export default async function (
         }
         const proposal = proposalOpt.unwrap();
         return {
-          affectedAddresses: [],
+          blockNumber,
+          excludeAddresses: [ proposal.proposer.toString() ],
           data: {
             kind,
             proposalIndex: +proposalIndex,
@@ -145,7 +157,7 @@ export default async function (
       case 'treasury-awarded': {
         const [ proposalIndex, amount, beneficiary ] = event.data;
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             proposalIndex: +proposalIndex,
@@ -158,7 +170,7 @@ export default async function (
       case 'treasury-rejected': {
         const [ proposalIndex, slashedBond ] = event.data;
         return {
-          affectedAddresses: [],
+          blockNumber,
           data: {
             kind,
             proposalIndex: +proposalIndex,

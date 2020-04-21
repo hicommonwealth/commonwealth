@@ -20,6 +20,7 @@ export function constructFakeApi(callOverrides): ApiPromise {
       },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
+        publicProps: callOverrides['publicProps'],
       }
     },
     derive: {

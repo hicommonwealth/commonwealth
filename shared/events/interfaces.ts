@@ -9,7 +9,8 @@ export type IChainEventData = ISubstrateEventData;
 
 export interface CWEvent {
   blockNumber: number;
-  affectedAddresses: string[];
+  includeAddresses?: string[];
+  excludeAddresses?: string[];
 
   data: IChainEventData;
 }
