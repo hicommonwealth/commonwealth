@@ -75,7 +75,7 @@ class CommentsController {
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
-      const response = await $.post(`${app.serverUrl()}/createComment`, {
+      const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chain,
         'community': community,
@@ -88,8 +88,7 @@ class CommentsController {
         'versionHistory': versionHistory,
         'jwt': app.login.jwt,
       });
-      const { result } = response;
-      console.log(result);
+      const { result } = res;
       this._store.add(modelFromServer(result));
       // update childComments of parent, if necessary
       if (result.parent_id) {

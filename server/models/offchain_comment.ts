@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: DataTypes.STRING, allowNull: true },
     root_id: { type: DataTypes.STRING, allowNull: false },
-    parent_id: { type: DataTypes.INTEGER, allowNull: true },
+    parent_id: { type: DataTypes.STRING, allowNull: true },
     child_comments: { type: DataTypes.ARRAY(DataTypes.INTEGER), allowNull: false, defaultValue: [] },
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     text: { type: DataTypes.TEXT, allowNull: false },
