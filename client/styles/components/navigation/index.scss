@@ -45,9 +45,12 @@ $sidebar-padding: 16px;
         font-weight: 700;
         padding: 21px $sidebar-padding 18px;
         background: #fff !important;
-        cursor: default !important;
+        cursor: pointer !important;
         user-select: none;
         border-bottom: 1px solid lighten(#c5cdd1, 10%);
+        &:hover {
+            background: #f7f7f7 !important;
+        }
         a.title-selector-link {
             display: flex;
             text-decoration: none;

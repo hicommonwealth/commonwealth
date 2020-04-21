@@ -200,21 +200,19 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         // header
         m(ListItem, {
           class: 'title-selector',
-          label: (app.community || app.chain) ?
-            link('a.title-selector-link', `/${app.activeId()}/`, [
+          onclick: () => {
+            if (app.isLoggedIn()) {
+              vnode.state.communitySwitcherVisible = true;
+            } else {
+              m.route.set('/');
+            }
+          },
+          label: (app.community || app.chain) ? [
               m('.community-name', selectedNode ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : ''),
               !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
               !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
               selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-            ]) :
-            link('a.title-selector-link', '/', 'Commonwealth'),
-          contentLeft: [
-            app.isLoggedIn() && m(Button, {
-              iconLeft: Icons.CHEVRONS_LEFT,
-              size: 'xs',
-              onclick: () => vnode.state.communitySwitcherVisible = true,
-            }),
-          ],
+          ] : 'Commonwealth',
           contentRight: [
             // notifications menu
             app.isLoggedIn() && (app.community || app.chain) &&
