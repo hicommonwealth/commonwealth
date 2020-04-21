@@ -27,13 +27,12 @@ import ViewVotersModal from 'views/modals/view_voters_modal';
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
   title: string;
-  reelection: boolean;
 }
 
 const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
-    const { account, title, reelection } = vnode.attrs;
+    const { account, title } = vnode.attrs;
     const election = (app.chain as Substrate).phragmenElections;
 
     const votes: PhragmenElectionVote[] =
@@ -90,10 +89,6 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
         m('.item', [
           m('.proposal-row-subheading', 'Backing'),
           m('.proposal-row-metadata', (election.isMember(account)) ? election.backing(account).format(true) : votes.length),
-        ]),
-        reelection && m('.item', [
-          m('.proposal-row-subheading', 'Candidate for re-election'),
-          m('.proposal-row-metadata', 'Yes' )
         ]),
       ]),
       m('.proposal-row-xs-clear'),
@@ -225,7 +220,7 @@ const CouncilPage: m.Component<{}> = {
           ? m('.no-proposals', 'No members')
           : m('.councillors', [
             councillors.map(
-              (account) => m(CollectiveMember, { account, title: 'Councillor', reelection: true })
+              (account) => m(CollectiveMember, { account, title: 'Councillor' })
             ),
             m('.clear'),
           ]),
@@ -238,7 +233,7 @@ const CouncilPage: m.Component<{}> = {
         candidates.length === 0
           ? m('.no-proposals', 'No candidates')
           : m('.council-candidates', [
-            candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
+            candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
             m('.clear'),
           ]),
         // voters
