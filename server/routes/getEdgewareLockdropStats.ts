@@ -107,6 +107,7 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
   let totalETHLocked12mo = toBN(0);
   let totalEffectiveETHLocked = toBN(0);
   const locks = {};
+  const seen = {};
   const ethAddrToEvent = {};
   const edgAddrToETH = {};
   const validatingLocks = {};
@@ -140,21 +141,24 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
       keys = data.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`);
     }
 
-    const detailedEvent = await getLocksForAddress(data.owner, event.address, web3);
-    if (data.owner in ethAddrToEvent) {
-      if (!ethAddrToEvent[data.owner].includes(detailedEvent)) {
-        ethAddrToEvent[data.owner].push(detailedEvent);
+    if (!(data.owner in seen)) {
+      seen[data.owner] = true;
+      const detailedEvent = await getLocksForAddress(data.owner, event.address, web3);
+      if (data.owner in ethAddrToEvent) {
+        if (!ethAddrToEvent[data.owner].includes(detailedEvent)) {
+          ethAddrToEvent[data.owner].push(detailedEvent);
+        }
+      } else {
+        ethAddrToEvent[data.owner] = [detailedEvent];
       }
-    } else {
-      ethAddrToEvent[data.owner] = [detailedEvent];
-    }
 
-    if (data.lockAddr in ethAddrToEvent) {
-      if (!ethAddrToEvent[data.lockAddr].includes(detailedEvent)) {
-        ethAddrToEvent[data.lockAddr].push(detailedEvent);
+      if (data.lockAddr in ethAddrToEvent) {
+        if (!ethAddrToEvent[data.lockAddr].includes(detailedEvent)) {
+          ethAddrToEvent[data.lockAddr].push(detailedEvent);
+        }
+      } else {
+        ethAddrToEvent[data.lockAddr] = [detailedEvent];
       }
-    } else {
-      ethAddrToEvent[data.lockAddr] = [detailedEvent];
     }
 
     if (keys[0] in edgAddrToETH) {
