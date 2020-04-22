@@ -1,7 +1,9 @@
 import { default as m } from 'mithril';
 import { default as moment } from 'moment-twitter';
 
-import { formatDuration, blocknumToTime } from 'helpers';
+import { formatDuration } from 'helpers';
+import { blocknumToTime } from 'helpers/blocks';
+
 
 interface ICountdownAttrs {
   time?: moment.Moment;

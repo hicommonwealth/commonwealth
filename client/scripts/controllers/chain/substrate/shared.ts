@@ -15,7 +15,8 @@ import { createType } from '@polkadot/types/create';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { formatCoin, Coin } from 'adapters/currency';
-import { formatAddressShort, BlocktimeHelper } from 'helpers';
+import { formatAddressShort } from 'helpers';
+import { BlocktimeHelper } from 'helpers/blocks';
 import {
   Proposal,
   NodeInfo,

@@ -10,7 +10,7 @@ import * as m from 'mithril';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
-import { BlocktimeHelper } from 'helpers';
+import { BlocktimeHelper } from 'helpers/blocks';
 import { Observable, Subject } from 'rxjs';
 import BN from 'bn.js';
 import { CosmosToken } from 'adapters/chain/cosmos/types';

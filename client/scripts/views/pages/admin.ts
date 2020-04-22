@@ -6,7 +6,9 @@ import { default as mixpanel } from 'mixpanel-browser';
 import app from 'state';
 
 import { SubmittableResult, ApiRx } from '@polkadot/api';
-import { blockperiodToDuration, formatDuration } from 'helpers';
+import { formatDuration } from 'helpers';
+import { blockperiodToDuration } from 'helpers/blocks';
+
 import { formatCoin } from 'adapters/currency';
 import Tabs from 'views/components/widgets/tabs';
 import { ChainInfo, NodeInfo } from 'models';

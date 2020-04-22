@@ -5,7 +5,9 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { formatDuration, blockperiodToDuration } from 'helpers';
+import { formatDuration } from 'helpers';
+import { blockperiodToDuration } from 'helpers/blocks';
+
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';

@@ -6,7 +6,8 @@ import moment from 'moment-twitter';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
+import { pluralize, slugify, formatPercentShort, byAscendingCreationDate } from 'helpers';
+import { blocknumToDuration } from 'helpers/blocks';
 import { ProposalStatus, VotingType, AnyProposal } from 'models';
 
 import Countdown from 'views/components/countdown';

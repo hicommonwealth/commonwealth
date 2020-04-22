@@ -5,7 +5,9 @@ import { default as $ } from 'jquery';
 import { default as mixpanel } from 'mixpanel-browser';
 import app from 'state';
 
-import { symbols, formatDuration, blockperiodToDuration } from 'helpers';
+import { symbols, formatDuration } from 'helpers';
+import { blockperiodToDuration } from 'helpers/blocks';
+
 import { formatCoin } from 'adapters/currency';
 import Edgeware from 'controllers/chain/edgeware/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

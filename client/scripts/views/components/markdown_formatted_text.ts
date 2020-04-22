@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-escape */
-import 'components/markdown_formatted_text.scss';
+// import 'components/markdown_formatted_text.scss';
+// import '../../../../styles/components/markdown_formatted_text.scss';
 
 import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
