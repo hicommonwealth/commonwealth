@@ -6,16 +6,29 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
-  const userAddresses = await req.user.getAddresses();
-  const userAddressIds = Array.from(userAddresses.map((address) => address.id));
-  const rolesQuery = (community)
-    ? { address_id: { [Op.in]: userAddressIds }, offchain_community_id: community.id, }
-    : { address_id: { [Op.in]: userAddressIds }, chain_id: chain.id };
-  const roles = await models.Role.findAll({
-    where: rolesQuery
-  });
+  if (!req.user) { // if not logged in, return public threads
+    const publicThreadsQuery = (community)
+      ? { community: community.id, private: false, }
+      : { chain: chain.id, private: false, };
 
-  const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
+    const publicThreads = await models.OffchainThread.findAll({
+      where: publicThreadsQuery,
+      include: [
+        models.Address,
+        {
+          model: models.OffchainTag,
+          as: 'tags',
+          through: {
+            model: models.TaggedThread,
+            as: 'taggedThreads',
+          },
+        },
+      ],
+      order: [['created_at', 'DESC']],
+    });
+
+    return res.json({ status: 'Success', result: publicThreads.map((c) => c.toJSON()) });
+  }
 
   const allThreadsQuery = (community)
     ? { community: community.id, }
@@ -36,6 +49,17 @@ const bulkThreads = async (models, req: UserRequest, res: Response, next: NextFu
     ],
     order: [['created_at', 'DESC']],
   });
+
+  const userAddresses = await req.user.getAddresses();
+  const userAddressIds = Array.from(userAddresses.map((address) => address.id));
+  const rolesQuery = (community)
+    ? { address_id: { [Op.in]: userAddressIds }, offchain_community_id: community.id, }
+    : { address_id: { [Op.in]: userAddressIds }, chain_id: chain.id };
+  const roles = await models.Role.findAll({
+    where: rolesQuery
+  });
+
+  const adminRoles = roles.filter((r) => r.permission === 'admin' || r.permission === 'moderator');
 
   const filteredThreads = await allThreads.filter((thread) => {
     if (thread.private === false) {
