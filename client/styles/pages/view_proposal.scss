@@ -64,12 +64,15 @@
             padding-left: 22px;
         }
         background-color: #f8f8f8;
+
         .title {
             font-size: 22px;
             font-weight: 500;
             color: #bdbdbd;
             flex: 1;
             line-height: 1.25;
+            display: inline-block;
+            word-break: break-word;
         }
 
     }

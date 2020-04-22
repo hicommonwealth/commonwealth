@@ -262,7 +262,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ]),
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', authorComment ? authorComment.text : 'None')
+            m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
         ],
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
@@ -307,7 +307,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ]),
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', authorComment ? authorComment.text : 'None')
+            m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
         ],
       ]),
