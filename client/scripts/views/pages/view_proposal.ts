@@ -164,7 +164,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
               ]),
               m(ViewCountBlock, { proposal }),
               m('.proposal-comment-summary', pluralize(nComments, 'comment')),
-              m('.reaction', m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true })),
               proposal.kind === OffchainThreadKind.Link
               && m('.discussion-meta-right', [
                 // !getSetGlobalEditingStatus(GlobalStatus.Get)
@@ -294,7 +293,7 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
             }, [
               'Edited ',
               moment(lastEdit.timestamp).fromNow()
-            ]),
+            ])
           ]),
           m('.upper-meta-right', [
             app.vm.activeAccount
@@ -442,7 +441,10 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
           theme: 'snow',
           editorNamespace: document.location.pathname + '-editing-thread',
         }),
-      ])
+        proposal instanceof OffchainThread && m('.lower-meta', [
+          m('.reaction', m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true })),
+        ]),
+      ]),
     ]);
   }
 };
@@ -506,8 +508,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             }, [
               'Edited ',
               moment(lastEdit.timestamp).fromNow()
-            ]),
-            m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like, tooltip: true })),
+            ])
           ]),
           m('.upper-meta-right', [
             app.vm.activeAccount
@@ -645,6 +646,9 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           theme: 'snow',
           editorNamespace: document.location.pathname + '-editing-comment-' + comment.id,
         }),
+        m('.lower-meta', [
+          m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like, tooltip: true })),
+        ])
       ]),
     ]);
   }
