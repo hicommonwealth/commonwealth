@@ -5,7 +5,8 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 import app from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
-import Tooltip from './tooltip';
+import Tooltip from 'views/components/tooltip';
+import User from 'views/components/widgets/user';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -38,17 +39,13 @@ const ReactionButton: m.Component<IAttrs> = {
     if (hasReacted) hasReactedType = rxn.reaction;
 
     const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-      const reactor = app.profiles.getProfile(app.activeChainId(), rxn_.author);
-      return m('.reacting-user', reactor.displayName);
+      return m('.reacting-user', m(User, { user: [rxn_.author, app.activeChainId()], linkify: true }));
     });
-
     if (reactors.length < (likes || dislikes).length) {
       const diff = (likes || dislikes).length - reactors.length;
       reactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
     }
-
-    const tooltipPopover = m('.span', reactors);
-
+    const tooltipPopover = m('.ReactionButtonTooltip', reactors);
 
     const rxnButton = m('.ReactionButton', {
       class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')

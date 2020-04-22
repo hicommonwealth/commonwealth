@@ -32,7 +32,12 @@
     }
 }
 
-.reaction .tippy-content div {
+.reaction .tippy-content .ReactionButtonTooltip {
     font-weight: 400;
     font-size: 15px;
+    padding: 6px 6px 7px;
+    .User a {
+        color: #111;
+        text-decoration: none;
+    }
 }
