@@ -150,7 +150,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   // digest flags
   router.post('/addDigestFlag', passport.authenticate('jwt', { session: false }), addDigestFlag.bind(this, models));
-  router.post('/sendDigestEmail', passport.authenticate('jwt', { session: false }), sendDigestEmail.bind(this, models));
+  router.get('/sendDigestEmail', passport.authenticate('jwt', { session: false }), sendDigestEmail.bind(this, models));
   router.get('/getDigestFlags', passport.authenticate('jwt', { session: false }), getDigestFlags.bind(this, models));
 
   // offchain reactions

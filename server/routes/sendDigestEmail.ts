@@ -62,7 +62,7 @@ const sendDigestEmail = async (models, req, res, next) => {
       console.dir(innerText);
     }
     console.dir(innerText);
-    const link = `${SERVER_URL}/${thread.community}/proposal/discussions/${thread.id}-${slugify(decodeURIComponent(thread.title))}`; // TODO: FIX THIS
+    const link = `${SERVER_URL}/${thread.community}/proposal/discussion/${thread.id}-${slugify(decodeURIComponent(thread.title))}`; // TODO: FIX THIS
     const text = `<li><a href="${link}"><h3>${thread.title}:</h3><p>${innerText}...</p></a></li>`;
     threadTexts.push(text);
   }));
