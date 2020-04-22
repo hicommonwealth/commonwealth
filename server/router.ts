@@ -78,6 +78,9 @@ import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import editTag from './routes/editTag';
 import bulkTags from './routes/bulkTags';
+import addDigestFlag from './routes/addDigestFlag';
+import getDigestFlags from './routes/getDigestFlags';
+import sendDigestEmail from './routes/sendDigestEmail';
 
 import addChainObjectQuery from './routes/addChainObjectQuery';
 import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
@@ -144,6 +147,11 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // offchain tags
   router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
   router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
+
+  // digest flags
+  router.post('/addDigestFlag', passport.authenticate('jwt', { session: false }), addDigestFlag.bind(this, models));
+  router.post('/sendDigestEmail', passport.authenticate('jwt', { session: false }), sendDigestEmail.bind(this, models));
+  router.get('/getDigestFlags', passport.authenticate('jwt', { session: false }), getDigestFlags.bind(this, models));
 
   // offchain reactions
   router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));
