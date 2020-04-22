@@ -7,6 +7,8 @@ import app from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
 import Tooltip from './tooltip';
 
+const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
+
 export enum ReactionType {
   Like = 'like',
   Dislike = 'dislike'
@@ -35,7 +37,7 @@ const ReactionButton: m.Component<IAttrs> = {
     let hasReactedType;
     if (hasReacted) hasReactedType = rxn.reaction;
 
-    const reactors = (likes || dislikes).slice(0, 10).map((rxn_) => {
+    const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
       const reactor = app.profiles.getProfile(app.activeChainId(), rxn_.author);
       return m('.reacting-user', reactor.displayName);
     });
