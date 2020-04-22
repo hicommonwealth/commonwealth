@@ -166,7 +166,7 @@ const ProposalsPage: m.Component<{}> = {
               // (app.chain as Substrate).chain.methodToTitle(
               //   (app.chain as Substrate).democracyProposals.nextExternal[0])
               //) : '--'
-              (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8) + '...' : '--'
+              (app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8) + '...' : '--'
           ]),
           m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
             m('p', 'Hash: ' + (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8) + '...'),

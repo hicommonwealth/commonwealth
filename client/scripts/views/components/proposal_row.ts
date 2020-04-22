@@ -305,7 +305,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
               ]),
             ])
           ]),
-          m('.proposal-row-main-large.item', [
+          m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Proposal Comment'),
             m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
