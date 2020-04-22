@@ -52,6 +52,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
+    this.app.chainModuleReady.next(true);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),

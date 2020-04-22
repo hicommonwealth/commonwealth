@@ -25,6 +25,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public init = async (onServerLoaded?) => {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EthereumChain(this.app);
+    this.app.chainModuleReady.next(true);
     this.accounts = new EthereumAccounts(this.app);
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, true);

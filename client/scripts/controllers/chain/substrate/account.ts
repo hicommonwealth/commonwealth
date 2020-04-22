@@ -326,7 +326,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     if (!ChainInfo) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
-      app.chainReady.pipe(first()).subscribe(() => {
+      app.chainModuleReady.pipe(first()).subscribe(() => {
         if (app.chain.chain instanceof SubstrateChain) {
           this._Chain = app.chain.chain;
           this.setEncoding(this._Chain.ss58Format);

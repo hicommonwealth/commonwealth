@@ -15,6 +15,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
 
   public init = async () => {
     console.log(`Starting ${this.meta.name}`);
+    this.app.chainModuleReady.next(true);
     this.accounts = new OffchainAccounts(this.app);
     await this.app.threads.refreshAll(null, this.id, true);
     await this.app.comments.refreshAll(null, this.id, true);
