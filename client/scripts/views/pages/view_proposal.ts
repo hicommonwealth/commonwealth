@@ -294,7 +294,7 @@ export const ProposalBody: m.Component<IProposalBodyAttrs, IProposalBodyState> =
             }, [
               'Edited ',
               moment(lastEdit.timestamp).fromNow()
-            ])
+            ]),
           ]),
           m('.upper-meta-right', [
             app.vm.activeAccount
@@ -506,7 +506,8 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             }, [
               'Edited ',
               moment(lastEdit.timestamp).fromNow()
-            ])
+            ]),
+            m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like, tooltip: true })),
           ]),
           m('.upper-meta-right', [
             app.vm.activeAccount
@@ -644,9 +645,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           theme: 'snow',
           editorNamespace: document.location.pathname + '-editing-comment-' + comment.id,
         }),
-        m('.lower-meta', [
-          m('.reaction', m(ReactionButton, { post: comment, type: ReactionType.Like, tooltip: true })),
-        ])
       ]),
     ]);
   }
