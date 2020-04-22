@@ -40,8 +40,8 @@ class ReactionsController {
       reaction,
       jwt: app.login.jwt,
     };
-    if ((post as OffchainThread).title) options['thread_id'] = (post as OffchainThread).id;
-    else options['comment_id'] = (post as OffchainComment<any>).id;
+    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
+    else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
@@ -60,8 +60,8 @@ class ReactionsController {
       chain: chainId,
       community: communityId,
     };
-    if ((post as OffchainThread).title) options['thread_id'] = (post as OffchainThread).identifier;
-    else options['comment_id'] = (post as OffchainComment<any>).id;
+    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).identifier;
+    else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       const response = await $.get(`${app.serverUrl()}/viewReactions`, options);

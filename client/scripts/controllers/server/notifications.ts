@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 
@@ -101,7 +102,8 @@ class NotificationsController {
       this._store.clear();
       this._subscriptions = [];
       for (const subscriptionJSON of result) {
-        const subscription = NotificationSubscription.fromJSON(subscriptionJSON);        this._subscriptions.push(subscription);
+        const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+        this._subscriptions.push(subscription);
         for (const notificationJSON of subscriptionJSON.Notifications) {
           const notification = Notification.fromJSON(notificationJSON, subscription);
           this._store.add(notification);

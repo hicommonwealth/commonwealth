@@ -3,7 +3,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
-import { createCommonwealthUrl } from '../../shared/utils';
+import { getProposalUrl } from '../../shared/utils';
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -67,7 +67,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
     } else {
       console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
-    const cwUrl = createCommonwealthUrl(prefix, proposal, comment);
+    const cwUrl = getProposalUrl(prefix, proposal, comment);
 
     // dispatch notifications to subscribers of the comment/thread
     await models.Subscription.emitNotifications(

@@ -4,7 +4,7 @@ import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../../shared/utils';
+import { getProposalUrl } from '../../shared/utils';
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -124,7 +124,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   }
 
   // craft commonwealth url
-  const cwUrl = createCommonwealthUrl(prefix, proposal, finalComment);
+  const cwUrl = getProposalUrl(prefix, proposal, finalComment);
 
   // auto-subscribe comment author to reactions & child comments
   await models.Subscription.create({

@@ -5,7 +5,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { UserRequest } from '../types';
 import { NotificationCategories } from '../../shared/types';
-import { createCommonwealthUrl } from '../../shared/utils';
+import { getProposalUrl } from '../../shared/utils';
 
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -51,18 +51,17 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       proposal = await models.OffchainThread.findOne({
         where: { id }
       });
-    } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
+    } else {
       proposal = await models.Proposal.findOne({
         where: { identifier: id, type: prefix }
       });
-    } else {
-      console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+      if (!proposal) console.error('No matching proposal found.');
     }
-    cwUrl = createCommonwealthUrl(prefix, proposal, comment);
+    cwUrl = getProposalUrl(prefix, proposal, comment);
     root_type = prefix;
   } else {
     proposal = await models.OffchainThread.findByPk(Number(thread_id));
-    cwUrl = createCommonwealthUrl('discussion', proposal, comment);
+    cwUrl = getProposalUrl('discussion', proposal, comment);
     root_type = 'discussion';
   }
 

@@ -23,7 +23,6 @@ const ReactionButton: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
     const { post, type, displayAsLink, tooltip } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
-    const a = app;
     let dislikes;
     let likes;
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
@@ -36,10 +35,15 @@ const ReactionButton: m.Component<IAttrs> = {
     let hasReactedType;
     if (hasReacted) hasReactedType = rxn.reaction;
 
-    const reactors = (likes || dislikes).map((rxn_) => {
+    const reactors = (likes || dislikes).slice(0, 10).map((rxn_) => {
       const reactor = app.profiles.getProfile(app.activeChainId(), rxn_.author);
       return m('.reacting-user', reactor.displayName);
     });
+
+    if (reactors.length < (likes || dislikes).length) {
+      const diff = (likes || dislikes).length - reactors.length;
+      reactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
+    }
 
     const tooltipPopover = m('.span', reactors);
 

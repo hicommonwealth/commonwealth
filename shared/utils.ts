@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-export const createCommonwealthUrl = (type, proposal, comment?) => {
+export const getProposalUrl = (type, proposal, comment?) => {
   const aId = (proposal.community) ? proposal.community : proposal.chain;
   const tId = proposal.id;
   const tTitle = proposal.title || '';

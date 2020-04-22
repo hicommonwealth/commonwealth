@@ -4,7 +4,7 @@ import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../../shared/utils';
+import { getProposalUrl } from '../../shared/utils';
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -176,7 +176,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     },
     {
       user: finalThread.Address.address,
-      url: createCommonwealthUrl('discussion', finalThread),
+      url: getProposalUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
