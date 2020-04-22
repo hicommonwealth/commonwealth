@@ -1,7 +1,11 @@
 import { ApiPromise } from '@polkadot/api';
-import { Event, ReferendumInfoTo239, AccountId, TreasuryProposal } from '@polkadot/types/interfaces';
+import {
+  Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
+  ReferendumIndex, ProposalIndex
+} from '@polkadot/types/interfaces';
 import { Option, bool } from '@polkadot/types';
-import { SubstrateEventKind, ISubstrateEventData } from '../types';
+import { Codec } from '@polkadot/types/types';
+import { SubstrateEventKind } from '../types';
 import { CWEvent } from '../../interfaces';
 
 // TODO: better balance/BN handling than string
@@ -13,9 +17,33 @@ export default async function (
 ): Promise<CWEvent> {
   const extractData = async (): Promise<CWEvent> => {
     switch (kind) {
-      case 'slash':
       case 'reward': {
-        const [ validator, amount ] = event.data;
+        if (event.data.typeDef[0].type === 'Balance') {
+          // edgeware/old event
+          const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
+          return {
+            blockNumber,
+            data: {
+              kind,
+              amount: amount.toString(),
+            }
+          };
+        } else {
+          // kusama/new event
+          const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
+          return {
+            blockNumber,
+            includeAddresses: [ validator.toString() ],
+            data: {
+              kind,
+              validator: validator.toString(),
+              amount: amount.toString(),
+            }
+          };
+        }
+      }
+      case 'slash': {
+        const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         return {
           blockNumber,
           includeAddresses: [ validator.toString() ],
@@ -29,7 +57,7 @@ export default async function (
 
       case 'bonded':
       case 'unbonded': {
-        const [ stash, amount ] = event.data;
+        const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         const controllerOpt = await api.query.staking.bonded<Option<AccountId>>(stash);
         if (!controllerOpt.isSome) {
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);
@@ -47,7 +75,7 @@ export default async function (
       }
 
       case 'vote-delegated': {
-        const [ who, target ] = event.data;
+        const [ who, target ] = event.data as unknown as [ AccountId, AccountId ] & Codec;
         return {
           blockNumber,
           includeAddresses: [ target.toString() ],
@@ -60,7 +88,7 @@ export default async function (
       }
 
       case 'democracy-proposed': {
-        const [ proposalIndex, deposit ] = event.data;
+        const [ proposalIndex, deposit ] = event.data as unknown as [ PropIndex, Balance ] & Codec;
         const props = await api.query.democracy.publicProps();
         const prop = props.find((p) => p.length > 0 && +p[0] === +proposalIndex);
         if (!prop) {
@@ -80,7 +108,7 @@ export default async function (
       }
 
       case 'democracy-started': {
-        const [ referendumIndex ] = event.data;
+        const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
 
         // query for edgeware only -- kusama has different type
         const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
@@ -95,7 +123,7 @@ export default async function (
       }
 
       case 'democracy-passed': {
-        const [ referendumIndex ] = event.data;
+        const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
 
         // dispatch queue -- if not present, it was already executed
         const dispatchQueue = await api.query.democracy.dispatchQueue();
@@ -112,7 +140,7 @@ export default async function (
 
       case 'democracy-not-passed':
       case 'democracy-cancelled': {
-        const [ referendumIndex ] = event.data;
+        const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         return {
           blockNumber,
           data: {
@@ -123,19 +151,19 @@ export default async function (
       }
 
       case 'democracy-executed': {
-        const [ referendumIndex, executionOk ] = event.data;
+        const [ referendumIndex, executionOk ] = event.data as unknown as [ ReferendumIndex, bool ] & Codec;
         return {
           blockNumber,
           data: {
             kind,
             referendumIndex: +referendumIndex,
-            executionOk: (executionOk as bool).isTrue,
+            executionOk: executionOk.isTrue,
           }
         };
       }
 
       case 'treasury-proposed': {
-        const [ proposalIndex ] = event.data;
+        const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
         if (!proposalOpt.isSome) {
           throw new Error(`could not fetch treasury proposal index ${+proposalIndex}`);
@@ -155,7 +183,7 @@ export default async function (
       }
 
       case 'treasury-awarded': {
-        const [ proposalIndex, amount, beneficiary ] = event.data;
+        const [ proposalIndex, amount, beneficiary ] = event.data as unknown as [ ProposalIndex, Balance, AccountId ] & Codec;
         return {
           blockNumber,
           data: {
@@ -168,7 +196,7 @@ export default async function (
       }
 
       case 'treasury-rejected': {
-        const [ proposalIndex, slashedBond ] = event.data;
+        const [ proposalIndex, slashedBond ] = event.data as unknown as [ ProposalIndex, Balance ] & Codec;
         return {
           blockNumber,
           data: {

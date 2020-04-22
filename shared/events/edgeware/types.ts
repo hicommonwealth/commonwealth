@@ -27,7 +27,7 @@ export interface ISubstrateSlash {
 
 export interface ISubstrateReward {
   kind: 'reward';
-  validator: SubstrateAccountId;
+  validator?: SubstrateAccountId;
   amount: SubstrateBalanceString;
 }
 

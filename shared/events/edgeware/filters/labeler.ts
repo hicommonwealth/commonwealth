@@ -1,5 +1,8 @@
+import BN from 'bn.js';
+
 import { SubstrateBalanceString } from '../types';
 import { IEventLabel, IChainEventData, LabelerFilter } from '../../interfaces';
+import { SubstrateCoin } from '../../../adapters/chain/substrate/types';
 
 function fmtAddr(addr : string) {
   if (!addr) return;
@@ -7,13 +10,29 @@ function fmtAddr(addr : string) {
   return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
 }
 
+// ideally we shouldn't hard-code this stuff, but we need the header to appear before the chain loads
+const EDG_DECIMAL = 18;
+
+const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => {
+  const denom = chain === 'edgeware'
+    ? 'EDG'
+    : chain === 'edgeware-local' || chain === 'edgeware-testnet'
+      ? 'tEDG' : null;
+  if (!denom) {
+    throw new Error('unexpected chain');
+  }
+  const dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
+  const coin = new SubstrateCoin(denom, new BN(balance, 10), dollar);
+  return coin.format(true);
+};
+
 /* eslint-disable max-len */
 const labelerFunc: LabelerFilter = (
   blockNumber: number,
   chainId: string,
   data: IChainEventData,
-  balanceFormatter: (balance: SubstrateBalanceString) => string = (s) => s,
 ): IEventLabel => {
+  const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
     case 'slash': {
       const { validator, amount } = data;
@@ -23,10 +42,12 @@ const labelerFunc: LabelerFilter = (
       };
     }
     case 'reward': {
-      const { validator, amount } = data;
+      const { amount } = data;
       return {
         heading: 'Validator Rewarded',
-        label: `Validator ${fmtAddr(validator)} was rewarded by amount ${balanceFormatter(amount)}.`,
+        label: data.validator
+          ? `Validator ${fmtAddr(data.validator)} was rewarded by amount ${balanceFormatter(amount)}.`
+          : `All validators were rewarded by amount ${balanceFormatter(amount)}.`,
       };
     }
     case 'bonded': {

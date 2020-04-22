@@ -695,16 +695,16 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       // TODO: use different labelers depending on chain
       const label = labelEdgewareEvent(
         notification.chainEvent.blockNumber,
-        app.activeId(),
+        notification.chainEvent.type.chain,
         notification.chainEvent.data,
       );
       return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
         onclick: async () => {
-          if (!label.linkUrl) return;
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
           app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          if (!label.linkUrl) return;
           await m.route.set(label.linkUrl);
           m.redraw.sync();
         },
