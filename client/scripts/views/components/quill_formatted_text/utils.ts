@@ -1,44 +1,8 @@
-import 'components/quill_formatted_text.scss';
-
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { stringUpperFirst } from '@polkadot/util';
-import { loadScript } from '../../helpers';
+import { loadScript } from '../../../helpers';
 
-interface IQuillJSON {
-  ops: IQuillOps[];
-}
-
-interface IQuillOps {
-  insert: string;
-  attributes: string;
-}
-
-// Truncate a Quill document to the first `length` characters.
-//
-// If non-text elements are in the document, they will remain by
-// default.
-export const sliceQuill = (json: IQuillJSON, length: number) => {
-  let count = 0;
-  const completeObjects = [];
-  const truncatedObj = [];
-  for (const ele of json.ops) {
-    if (count >= length) break;
-    const text = ele.insert;
-    if (count + text.length > length) {
-      const fullText = text;
-      ele.insert = text.slice(0, length - count) + `\n`;
-      truncatedObj.push(ele);
-      count += fullText.length;
-    } else {
-      completeObjects.push(ele);
-      count += text.length;
-    }
-  }
-  return ({ ops: completeObjects.concat(truncatedObj) });
-};
-
-const preprocessQuillDeltaForRendering = (nodes) => {
+export const preprocessQuillDeltaForRendering = (nodes) => {
   // split up nodes at line boundaries
   const lines = [];
   for (const node of nodes) {
@@ -88,7 +52,7 @@ const preprocessQuillDeltaForRendering = (nodes) => {
   return result;
 };
 
-const renderQuillDelta = (delta, hideFormatting = false) => {
+export const renderQuillDelta = (delta, hideFormatting = false) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
@@ -224,20 +188,3 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
       }));
     });
 };
-
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapsed? }, { suppressFadeout }> = {
-  view: (vnode) => {
-    return m('.QuillFormattedText', {
-      class: (vnode.attrs.collapsed ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
-      oncreate: (vnode2) => {
-        if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
-          .then(() => { console.log('Twitter Widgets loaded'); });
-        const height = $(vnode2.dom).height();
-        vnode.state.suppressFadeout = height < 120;
-        setTimeout(() => m.redraw());
-      }
-    }, renderQuillDelta(vnode.attrs.doc, vnode.attrs.hideFormatting));
-  }
-};
-
-export default QuillFormattedText;

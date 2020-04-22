@@ -1,0 +1,197 @@
+// import '../../../../styles/components/quill_formatted_text.scss';
+
+import { default as $ } from 'jquery';
+import { default as m } from 'mithril';
+const { renderQuillDelta } = require('./utils');
+
+interface IQuillJSON {
+  ops: IQuillOps[];
+}
+
+interface IQuillOps {
+  insert: string;
+  attributes: string;
+}
+
+// Truncate a Quill document to the first `length` characters.
+//
+// If non-text elements are in the document, they will remain by
+// default.
+export const sliceQuill = (json: IQuillJSON, length: number) => {
+  let count = 0;
+  const completeObjects = [];
+  const truncatedObj = [];
+  for (const ele of json.ops) {
+    if (count >= length) break;
+    const text = ele.insert;
+    if (count + text.length > length) {
+      const fullText = text;
+      ele.insert = text.slice(0, length - count) + `\n`;
+      truncatedObj.push(ele);
+      count += fullText.length;
+    } else {
+      completeObjects.push(ele);
+      count += text.length;
+    }
+  }
+  return ({ ops: completeObjects.concat(truncatedObj) });
+};
+
+// const preprocessQuillDeltaForRendering = (nodes) => {
+//   // split up nodes at line boundaries
+//   const lines = [];
+//   for (const node of nodes) {
+//     if (typeof node.insert === 'string') {
+//       node.insert.match(/[^\n]+\n?|\n/g).map((line) => {
+//         lines.push({ attributes: node.attributes, insert: line });
+//       });
+//     } else {
+//       lines.push(node);
+//     }
+//   }
+//   // group nodes under parents
+//   const result = [];
+//   let parent = { children: [], attributes: undefined };
+//   for (const node of lines) {
+//     if (typeof node.insert === 'string' && node.insert.endsWith('\n')) {
+//       parent.attributes = node.attributes;
+//       // concatenate code-block node parents together, keeping newlines
+//       if (result.length > 0 && result[result.length - 1].attributes && parent.attributes &&
+//                  parent.attributes['code-block'] && result[result.length - 1].attributes['code-block']) {
+//         parent.children.push({ insert: node.insert });
+//         result[result.length - 1].children = result[result.length - 1].children.concat(parent.children);
+//       } else {
+//         parent.children.push({ insert: node.insert });
+//         result.push(parent);
+//       }
+//       parent = { children: [], attributes: undefined };
+//     } else {
+//       parent.children.push(node);
+//     }
+//   }
+//   // check for \n at the end of the document
+//   if (parent.children.length > 0) {
+//     console.error('Quill document ended without a newline - this should never happen');
+//     result.push(parent);
+//   }
+
+//   // trim empty newlines at end of document
+//   while (result.length &&
+//          result[result.length - 1].children.length === 1 &&
+//          typeof result[result.length - 1].children[0].insert === 'string' &&
+//          result[result.length - 1].children[0].insert === '\n' &&
+//          result[result.length - 1].children[0].attributes === undefined) {
+//     result.pop();
+//   }
+
+//   return result;
+// };
+
+// const renderQuillDelta = (delta, hideFormatting = false) => {
+//   // convert quill delta into a tree of {block -> parent -> child} nodes
+//   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
+
+//   // first, concatenate parent nodes for <ul> and <ol> into groups
+//   const groups = [];
+//   preprocessQuillDeltaForRendering(delta.ops).map((parent) => {
+//     // if the last parent was a <ul> or <ol> with the same attributes.list,
+//     // concatenate the current parent's children onto the last instead
+//     if (groups.length !== 0 &&
+//         groups[groups.length - 1].parents[0].attributes && parent.attributes &&
+//         parent.attributes.list && groups[groups.length - 1].parents[0].attributes.list &&
+//         parent.attributes.list === groups[groups.length - 1].parents[0].attributes.list) {
+//       groups[groups.length - 1].parents.push(parent);
+//     } else if (parent.attributes && parent.attributes.list) {
+//       groups.push({ listtype: parent.attributes.list, parents: [parent] });
+//     } else {
+//       groups.push({ parents: [parent] });
+//     }
+//   });
+
+//   // then, render each group
+//   return hideFormatting ? groups.map((group) => {
+//     return m('span', group.parents.map((parent) => {
+//       return parent.children.map((child) => {
+//         if (child.insert.image) return;
+//         if (child.insert.mention) return m('span', child.insert.mention.value);
+//         return m('span', child.insert.toString());
+//       });
+//     }));
+//   }) : groups.map((group) => {
+//     const groupTag =
+//       group.listtype === 'bullet' ? 'ul' :
+//       group.listtype === 'ordered' ? 'ol' :
+//       'div';
+//     return m(groupTag, group.parents.map((parent) => {
+//       // render empty parent nodes as .between-paragraphs
+//       if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
+//         return m('.between-paragraphs');
+//       }
+//       // render normal divs with content
+//       const children = parent.children.map((child) => {
+//         // handle images
+//         if (child.insert?.image) {
+//           return m('img', {
+//             src: child.insert?.image,
+//           });
+//         }
+//         // handle text nodes
+//         let result;
+//         if (child.insert?.mention) {
+//           result = m('span.mention', {
+//             onclick: (e) => alert(child.insert.mention.id)
+//           }, child.insert.mention.denotationChar + child.insert.mention.value);
+//         } else if (child.attributes?.link) {
+//           result = m('a', {
+//             href: child.attributes.link,
+//             target: '_blank',
+//             noreferrer: 'noreferrer',
+//             noopener: 'noopener',
+//           }, child.insert?.toString());
+//         } else {
+//           result = m('span', child.insert?.toString());
+//         }
+//         Object.entries(child.attributes || {}).map(([k, v]) => {
+//           if ((k !== 'color' && k !== 'background') && v !== true) return;
+//           switch (k) {
+//           case 'bold': return result = m('strong', result);
+//           case 'italic': return result = m('em', result);
+//           case 'strike': return result = m('s', result);
+//           case 'underline': return result = m('u', result);
+//           case 'code': return result = m('code', result);
+//           case 'added': return result = m('span.added', result);
+//           case 'deleted': return result = m('span.deleted', result);
+//           }
+//         });
+//         return result;
+//       });
+//       return m(parent.attributes && parent.attributes.blockquote ? 'blockquote' :
+//                parent.attributes && parent.attributes['code-block'] ? 'pre' :
+//                parent.attributes && parent.attributes.header === 1 ? 'h1' :
+//                parent.attributes && parent.attributes.header === 2 ? 'h2' :
+//                parent.attributes && parent.attributes.header === 3 ? 'h3' :
+//                parent.attributes && parent.attributes.header === 4 ? 'h4' :
+//                parent.attributes && parent.attributes.header === 5 ? 'h5' :
+//                parent.attributes && parent.attributes.header === 6 ? 'h6' :
+//                parent.attributes && parent.attributes.list === 'bullet' ? 'li' :
+//                parent.attributes && parent.attributes.list === 'ordered' ? 'li' :
+//                'div',
+//                children);
+//     }));
+//   });
+// };
+
+const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapsed? }, { suppressFadeout }> = {
+  view: (vnode) => {
+    return m('.QuillFormattedText', {
+      class: (vnode.attrs.collapsed ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
+      oncreate: (vnode2) => {
+        const height = $(vnode2.dom).height();
+        vnode.state.suppressFadeout = height < 120;
+        setTimeout(() => m.redraw());
+      }
+    }, renderQuillDelta(vnode.attrs.doc, vnode.attrs.hideFormatting));
+  }
+};
+
+export default QuillFormattedText;
