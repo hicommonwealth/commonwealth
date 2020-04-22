@@ -1,4 +1,5 @@
 import request from 'superagent';
+import { NotificationCategories } from '../shared/types';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -9,6 +10,9 @@ export interface WebhookContent {
   url?: string;
   user: any;
 }
+
+// do not send webhook notifications for noisy reaction types
+const SUPPRESSED_NOTIFICATION_TYPES = [NotificationCategories.NewReaction];
 
 const validURL = (str) => {
   const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
@@ -33,6 +37,8 @@ const getFilteredContent = (content) => {
 };
 
 const send = async (models, content: WebhookContent) => {
+  if (SUPPRESSED_NOTIFICATION_TYPES.indexOf(content.notificationCategory) !== -1) return;
+
   // create data for sending
   const data = JSON.stringify({
     text: `\`\`\`${getFilteredContent(content).join('\n')}\`\`\``

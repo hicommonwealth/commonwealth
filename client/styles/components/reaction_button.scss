@@ -9,12 +9,12 @@
     padding: 2px 6px;
     border: 1px solid #eee;
     border-radius: 5px;
-    &:hover {
+    &:hover, &.active {
         color: #4bae6b;
         border-color: #4bae6b;
-    }
-    &.active {
-        color: #4bae6b;
+        span {
+            color: inherit;
+        }
     }
     &.disabled {
         cursor: initial !important;
@@ -29,5 +29,15 @@
     .reactions-icon {
         margin-right: -2px;
         margin-left: 2px;
+    }
+}
+
+.reaction .tippy-content .ReactionButtonTooltip {
+    font-weight: 400;
+    font-size: 15px;
+    padding: 6px 6px 7px;
+    .User a {
+        color: #111;
+        text-decoration: none;
     }
 }

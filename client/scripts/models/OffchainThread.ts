@@ -52,7 +52,7 @@ class OffchainThread implements IUniqueId {
     this.body = body;
     this.attachments = attachments;
     this.id = id;
-    this.identifier = '' + id;
+    this.identifier = `${id}`;
     this.createdAt = createdAt;
     this.tags = tags;
     this.kind = kind;
