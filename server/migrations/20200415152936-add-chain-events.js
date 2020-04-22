@@ -1,4 +1,6 @@
 'use strict';
+const SequelizeLib = require('sequelize');
+const Op = SequelizeLib.Op;
 
 // TODO: replace this with something less manual!!!
 const substrateEventStrings = [
@@ -116,6 +118,14 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.bulkDelete('Notifications', {
+        chain_event_id: {
+          [Op.ne]: null
+        }
+      }, { transaction: t });
+      await queryInterface.bulkDelete('Subscriptions', {
+        category_id: 'chain-event',
+      }, { transaction: t });
       // remove type from NotificationCategories
       await queryInterface.bulkDelete('NotificationCategories', {
         name: 'chain-event',
