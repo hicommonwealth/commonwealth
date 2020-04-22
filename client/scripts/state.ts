@@ -40,7 +40,8 @@ export interface IApp {
   chain: IChainAdapter<any, any>;
   community: ICommunityAdapter<any, any>;
 
-  chainReady: ReplaySubject<boolean>;
+  chainAdapterReady: ReplaySubject<boolean>;
+  chainModuleReady: ReplaySubject<boolean>;
 
   profiles: ProfilesController;
   comments: CommentsController;
@@ -94,7 +95,8 @@ const app: IApp = {
   chain: null,
   community: null,
 
-  chainReady: new ReplaySubject(1),
+  chainAdapterReady: new ReplaySubject(1),
+  chainModuleReady: new ReplaySubject(1),
 
   profiles: new ProfilesController(),
   comments: new CommentsController(),

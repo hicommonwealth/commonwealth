@@ -33,7 +33,7 @@ export const makeDynamicComponent = <
 
   const subscribeObservables = (vnode: m.VnodeDOM<Attrs, State>) => {
     // wait for the chain to become available before initializing dynamic components
-    app.chainReady.pipe(first()).subscribe(() => {
+    app.chainAdapterReady.pipe(first()).subscribe(() => {
       const observables = component.getObservables(vnode.attrs);
 
       // if the group key is set and hasn't changed, do nothing

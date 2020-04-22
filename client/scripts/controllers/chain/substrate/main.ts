@@ -27,13 +27,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   private _loaded: boolean = false;
   public get loaded() { return this._loaded; }
 
-  private _serverLoaded: boolean = false;
-  public get serverLoaded() { return this._serverLoaded; }
-
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Kusama;
 
-  public init = async (onServerLoaded?) => {
+  public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
@@ -44,14 +41,11 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
-    await this.app.reactions.refreshAll(this.id, null, true);
-    this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
 
-    await this.chain.resetApi(this.meta);
-    await this.chain.initMetadata();
+    await super.init(async () => {
+      await this.chain.resetApi(this.meta);
+      await this.chain.initMetadata();
+    }, onServerLoaded);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
