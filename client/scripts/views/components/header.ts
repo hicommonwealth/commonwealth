@@ -486,6 +486,14 @@ const ActionMenu : m.Component<IMenuAttrs> = {
           }, 'New council motion'),
           m('li.divider'),
         ],
+        app.login.isSiteAdmin &&
+          m('li', {
+            onclick: (e) => app.modals.create({
+              modal: DigestFlagsModal,
+            })
+          }, 'Check Email Digest Flags'),
+        app.login.isSiteAdmin &&
+          m('li.divider'),
         //
         // new address or community
         //
