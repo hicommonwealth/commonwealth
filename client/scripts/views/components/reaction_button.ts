@@ -22,8 +22,12 @@ interface IAttrs {
   tooltip?: boolean;
 }
 
-const ReactionButton: m.Component<IAttrs> = {
-  view: (vnode: m.VnodeDOM<IAttrs>) => {
+interface IState {
+  loading: boolean;
+}
+
+const ReactionButton: m.Component<IAttrs, IState> = {
+  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     const { post, type, displayAsLink, tooltip } = vnode.attrs;
     const reactions = app.reactions.getByPost(post);
     let dislikes;
@@ -31,7 +35,7 @@ const ReactionButton: m.Component<IAttrs> = {
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const disabled = !app.vm.activeAccount;
+    const disabled = !app.vm.activeAccount || vnode.state.loading;
     const activeAddress = app.vm.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
@@ -58,15 +62,26 @@ const ReactionButton: m.Component<IAttrs> = {
         const communityId = app.activeCommunityId();
         if (hasReacted) {
           const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
-          app.reactions.delete(reaction).then(() => m.redraw());
-          if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
-            || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-            app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
-              .then(() => m.redraw());
-          }
+          vnode.state.loading = true;
+          app.reactions.delete(reaction).then(() => {
+            if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
+              || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
+              app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId).then(() => {
+                vnode.state.loading = false;
+                m.redraw();
+              });
+            } else {
+              vnode.state.loading = false;
+              m.redraw();
+            }
+          });
         } else {
+          vnode.state.loading = true;
           app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
-            .then(() => m.redraw());
+            .then(() => {
+              vnode.state.loading = false;
+              m.redraw();
+            });
         }
         mixpanel.track('Create Reaction ', {
           'Step No': 1,
