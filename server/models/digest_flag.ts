@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   DigestFlag.associate = (models) => {
-    models.DigestFlag.hasOne(models.OffchainThread, { foreignKey: 'digest_flag', targetKey: 'id' });
+    models.DigestFlag.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
   };
 
   return DigestFlag;

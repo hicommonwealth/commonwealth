@@ -1,4 +1,4 @@
-import 'components/digest_flag.scss';
+// import 'components/digest_flag.scss';
 
 import m from 'mithril';
 import $ from 'jquery';

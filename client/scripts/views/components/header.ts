@@ -41,6 +41,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+import DigestFlagsModal from '../modals/digest_flags_modal';
 
 
 interface INavigationMenuAttrs {

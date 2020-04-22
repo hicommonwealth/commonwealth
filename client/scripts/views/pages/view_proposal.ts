@@ -52,6 +52,7 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
+import DigestFlagButton from '../components/digest_flag_button';
 
 const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
@@ -152,6 +153,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
             m('.title', proposal.title),
+            app.login.isSiteAdmin && app.activeId() && m(DigestFlagButton, { proposalId: proposal.id }),
           ]),
           isThread
             ? m('.discussion-meta', [
