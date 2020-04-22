@@ -8850,6 +8850,11 @@ mississippi@^3.0.0:
     stream-each "^1.1.0"
     through2 "^2.0.0"
 
+mithril-node-render@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/mithril-node-render/-/mithril-node-render-3.0.0.tgz#27fb36225456a118d3e137944096429b62113e99"
+  integrity sha512-aerVhZh6LRHHVhlsxAfxwyTa6KRFKzliAM9AmHkxPI8wLFs62NjwIWKbmeYzpNdtZhp8BKwQ6N3WPctX74OiLA==
+
 mithril@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/mithril/-/mithril-2.0.4.tgz#d125969d992b924c7185d24ff92d997e5c00116b"
