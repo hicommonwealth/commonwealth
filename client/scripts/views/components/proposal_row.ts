@@ -7,7 +7,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { Coin } from 'adapters/currency';
 import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
-import { ProposalStatus, VotingType, AnyProposal } from 'models';
+import { ProposalStatus, VotingType, AnyProposal, ChainBase } from 'models';
 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
@@ -245,7 +245,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug != ProposalType.SubstrateTreasuryProposal
           && slug != ProposalType.SubstrateDemocracyProposal
           && slug != ProposalType.SubstrateCollectiveProposal ) && [
-          m('.proposal-row-title', proposal.title),
+          m('.proposal-row-title', (app.chain.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           m('.proposal-row-metadata', [
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
