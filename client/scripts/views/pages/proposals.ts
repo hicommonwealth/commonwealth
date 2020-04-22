@@ -34,7 +34,8 @@ const ProposalsPage: m.Component<{}> = {
     const visibleMolochProposals = onMoloch && (app.chain as Moloch).governance.store.getAll()
       .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const visibleDispatchQueue = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
+    // do not display the dispatch queue as full proposals for now
+    const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
     const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed);
 
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
