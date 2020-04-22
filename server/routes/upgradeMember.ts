@@ -14,7 +14,7 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: req.user.address,
+      address_id: req.user.id,
       permission: 'admin',
     },
   });
