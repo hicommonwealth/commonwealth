@@ -11,8 +11,6 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
 
-  console.log(chainOrCommObj);
-
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
@@ -21,8 +19,6 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     },
   });
   if (!requesterIsAdmin) return next(new Error('Must be an Admin to upgrade member'));
-
-  console.log('hi');
 
   const memberAddress = await models.Address.findOne({
     where: {
