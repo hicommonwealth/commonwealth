@@ -5,6 +5,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
+import { Button, Callout, Icons } from 'construct-ui';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -18,7 +19,6 @@ import { updateLastVisited } from '../../../controllers/app/login';
 import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
-import { Button, Callout, Icons } from 'construct-ui';
 
 // TODO: refactor all of the below into a controller.
 
@@ -186,9 +186,9 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
               isFirstWeek,
               heading: isCurrentWeek
                 ? 'This week'
-                : isLastWeek
-                ? 'Last week'
-                : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`,
+                : (isLastWeek
+                   ? 'Last week'
+                   : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`),
               proposals
             };
             if (Number(msecAgo) === targetIdx) attrs['lastVisited'] = Number(lastVisited);
@@ -237,9 +237,9 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
               `Join this community to see more.`
             ]),
             m('.callout-right', [
-              app.community ?
-                m(MembershipButton, { community: app.community.meta.id, address: app.vm.activeAccount }) :
-                m(MembershipButton, { chain: app.chain.id, address: app.vm.activeAccount }),
+              app.community
+                ? m(MembershipButton, { community: app.community.meta.id, address: app.vm.activeAccount })
+                : m(MembershipButton, { chain: app.chain.id, address: app.vm.activeAccount }),
             ]),
           ]),
         }),
