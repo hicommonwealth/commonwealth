@@ -33,7 +33,7 @@ import setupPassport from './server/passport';
 import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import { UserRequest } from './server/types.js';
-
+import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -44,6 +44,7 @@ const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
 const SHOULD_UPDATE_SUPERNOVA_STATS = process.env.UPDATE_SUPERNOVA === 'true';
 const SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY = process.env.UPDATE_OBJECTS === 'true';
 const SHOULD_ADD_TEST_QUERIES = process.env.ADD_TEST_QUERIES === 'true';
+const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 
@@ -156,6 +157,13 @@ if (SHOULD_RESET_DB) {
   updateEvents(app, models);
 } else if (SHOULD_UPDATE_BALANCES) {
   updateBalances(app, models);
+} else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
+  // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
+  // This only needs to run once on prod to make the necessary queries.
+  fetchStats(models, 'mainnet').then((result) => {
+    console.log('Finished adding Lockdrop statistics into the DB');
+    process.exit(0);
+  });
 } else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
   // MAINNET Cosmos
   // const cosmosRestUrl = 'http://cosmoshub1.commonwealth.im:1318';
