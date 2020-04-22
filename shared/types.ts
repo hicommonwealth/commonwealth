@@ -8,9 +8,45 @@ export const NotificationCategories = {
   NewCommunity: 'new-community-creation',
   NewRoleCreation: 'new-role-creation',
   NewMention: 'new-mention',
+  NewReaction: 'new-reaction',
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
 };
+
+export enum ProposalType {
+  SubstrateDemocracyReferendum = 'referendum',
+  SubstrateDemocracyProposal = 'democracyproposal',
+  EdgewareSignalingProposal = 'signalingproposal',
+  SubstrateCollectiveProposal = 'councilmotion',
+  PhragmenCandidacy = 'phragmenelection',
+  SubstrateTreasuryProposal = 'treasuryproposal',
+  OffchainThread = 'discussion',
+  CosmosProposal = 'cosmosproposal',
+  MolochProposal = 'molochproposal',
+}
+
+export interface IPostNotificationData {
+  created_at: any;
+  root_id: number;
+  root_title: string;
+  root_type: string;
+  comment_id?: number;
+  comment_text?: string;
+  parent_comment_id?: number;
+  parent_comment_text?: string;
+  chain_id: string;
+  community_id: string;
+  author_address: string;
+  author_chain: string;
+}
+
+export interface ICommunityNotificationData {
+  created_at: any;
+  role_id: string | number;
+  author_address: string;
+  chain: string;
+  community: string;
+}
 
 export const PROFILE_NAME_MAX_CHARS = 40;
 export const PROFILE_HEADLINE_MAX_CHARS = 80;

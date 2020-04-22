@@ -1,3 +1,4 @@
+/* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
 import { default as m } from 'mithril';
@@ -51,30 +52,28 @@ const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstra
       // Polkadot identity judgements. See:
       // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
       // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
-      const isGood = _.some(judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable')
-      const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality')
+      const isGood = _.some(judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable');
+      const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
-      const name = [ m('span.identity-icon' +
-                       (isGood ? '.icon-ok-circled' : '.icon-minus-circled') +
-                       (isGood ? '.green' : isBad ? '.red' : '.gray')), d2s(displayNameHex) ];
+      const name = [ m(`span.identity-icon${
+        isGood ? '.icon-ok-circled' : '.icon-minus-circled'
+      }${isGood ? '.green' : isBad ? '.red' : '.gray'}`), d2s(displayNameHex) ];
 
-      return linkify ?
-        link(
+      return linkify
+        ? link(
           'a.user-display-name.username.onchain-username',
           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
           name
-        ) :
-        m('a.user-display-name.username.onchain-username', name);
+        )
+        : m('a.user-display-name.username.onchain-username', name);
     }
 
     // return offchain name while identity is loading
-    return linkify ?
-      link('a.user-display-name' +
-           ((profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'),
-           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-           profile ? profile.displayName : '--',
-          ) :
-      m('a.user-display-name.username', profile ? profile.displayName : '--');
+    return linkify
+      ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+        profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+        profile ? profile.displayName : '--',)
+      : m('a.user-display-name.username', profile ? profile.displayName : '--');
   }
 });
 
@@ -103,36 +102,35 @@ const User : m.Component<IAttrs> = {
       profile = app.profiles.getProfile(account.chain.id, account.address);
     }
 
-    const userFinal = avatarOnly ?
-      m('.User.avatar-only', {
+    const userFinal = avatarOnly
+      ? m('.User.avatar-only', {
         key: profile?.address || '-',
       }, [
         m('.user-avatar-only', { style: `width: ${avatarSize}px; height: ${avatarSize}px;`, }, [
-          !profile ? null :
-            profile.avatarUrl ?
-            profile.getAvatar(avatarSize) :
-            profile.getAvatar(avatarSize - 4)
+          !profile ? null
+            : profile.avatarUrl
+              ? profile.getAvatar(avatarSize)
+              : profile.getAvatar(avatarSize - 4)
         ]),
-      ]) :
-      m('.User', {
+      ])
+      : m('.User', {
         key: profile?.address || '-',
         class: linkify ? 'linkified' : '',
       }, [
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && account.identity) ?
+        (account instanceof SubstrateAccount && account.identity)
           // substrate name
-          m(SubstrateIdentity, { account, linkify, profile }) : [
+          ? m(SubstrateIdentity, { account, linkify, profile }) : [
             // non-substrate name
-            linkify ?
-              link('a.user-display-name' +
-                   ((profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'),
-                   profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-                   profile ? profile.displayName : '--',
-                  ) :
-              m('a.user-display-name.username', profile ? profile.displayName : '--')
-            ]
+            linkify
+              ? link(`a.user-display-name${
+                (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+              profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+              profile ? profile.displayName : '--',)
+              : m('a.user-display-name.username', profile ? profile.displayName : '--')
+          ]
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -141,19 +139,18 @@ const User : m.Component<IAttrs> = {
       }
     }, [
       m('.user-avatar', [
-          !profile ? null :
-            profile.avatarUrl ?
-            profile.getAvatar(36) :
-            profile.getAvatar(32)
+        !profile ? null
+          : profile.avatarUrl
+            ? profile.getAvatar(36)
+            : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && account.identity) ?
-          m(SubstrateIdentity, { account, linkify: true, profile }) :
-          link('a.user-display-name' +
-               ((profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'),
-               profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-               profile ? profile.displayName : '--',
-              )
+        (account instanceof SubstrateAccount && account.identity)
+          ? m(SubstrateIdentity, { account, linkify: true, profile })
+          : link(`a.user-display-name${
+            (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
+          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+          profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
     ]);

@@ -9,7 +9,7 @@ module.exports = {
         type: DataTypes.TEXT,
         allowNull: true,
       }
-    )
+    );
   },
 
   down: (queryInterface, DataTypes) => {
@@ -20,6 +20,6 @@ module.exports = {
         type: DataTypes.TEXT,
         allowNull: false,
       }
-    )
+    );
   }
 };

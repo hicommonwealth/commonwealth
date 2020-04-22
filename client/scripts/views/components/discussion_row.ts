@@ -27,8 +27,8 @@ const DiscussionRow: m.Component<IAttrs> = {
     const proposal: OffchainThread = vnode.attrs.proposal;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
-    const lastUpdated = app.comments.lastCommented(proposal) ||
-      proposal.createdAt;
+    const lastUpdated = app.comments.lastCommented(proposal)
+      || proposal.createdAt;
     const domainSlice = (url) => {
       const re = new RegExp('^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)');
       return re.exec(url)[1];
@@ -80,13 +80,13 @@ const DiscussionRow: m.Component<IAttrs> = {
           m('a.discussion-updated', formatLastUpdated(lastUpdated)),
         ]),
         m('.discussion-after', [
-            app.comments.nComments(proposal) > 0 &&
-            link('a.discussion-replies',
+          app.comments.nComments(proposal) > 0
+            && link('a.discussion-replies',
               `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                app.comments.nComments(proposal) + ' ',
+                `${app.comments.nComments(proposal)} `,
                 m('span.icon-comment'),
               ]),
-          m(ReactionButton, { proposal, type: ReactionType.Like, displayAsLink: true }),
+          m(ReactionButton, { post: proposal, type: ReactionType.Like, displayAsLink: true }),
         ]),
       ]),
       m('.discussion-content-mobile', getContent(proposal)),

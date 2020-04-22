@@ -84,27 +84,26 @@ export const proposalSlugsFromChain = (chain) => {
   return results;
 };
 
-export const proposalSlugToFriendlyName =
-  new Map<string, string>([
-    ['referendum', 'Democracy Referendum'],
-    ['democracyproposal', 'Democracy Proposal'],
-    ['democracypreimage', 'Democracy Preimage'],
-    ['democracyimminent', 'Democracy Imminent Preimage'],
-    ['signalingproposal', 'Signaling Proposal'],
-    ['councilmotion', 'Council Motion'],
-    ['phragmenelection', 'Phragmen Council Candidacy'],
-    ['treasuryproposal', 'Treasury Proposal'],
-    ['discussion', 'Discussion Thread'],
-    ['cosmosproposal', 'Cosmos Proposal'],
-    ['molochproposal', 'Moloch Proposal']
+export const proposalSlugToFriendlyName = new Map<string, string>([
+  ['referendum', 'Democracy Referendum'],
+  ['democracyproposal', 'Democracy Proposal'],
+  ['democracypreimage', 'Democracy Preimage'],
+  ['democracyimminent', 'Democracy Imminent Preimage'],
+  ['signalingproposal', 'Signaling Proposal'],
+  ['councilmotion', 'Council Motion'],
+  ['phragmenelection', 'Phragmen Council Candidacy'],
+  ['treasuryproposal', 'Treasury Proposal'],
+  ['discussion', 'Discussion Thread'],
+  ['cosmosproposal', 'Cosmos Proposal'],
+  ['molochproposal', 'Moloch Proposal']
 ]);
 
-/// This observable provides access to the stream of created Proposals
-/// once they've been successfully added to their various stores.
-/// This does NOT guarantee that their subscriptions have resolved yet,
-/// but it does guarantee that the object is fully created.
-/// The string returned is the proposal's slug, allowing a listener to tell apart proposal types.
-/// TODO: maybe we should have this as a property of the proposal itself?
+// / This observable provides access to the stream of created Proposals
+// / once they've been successfully added to their various stores.
+// / This does NOT guarantee that their subscriptions have resolved yet,
+// / but it does guarantee that the object is fully created.
+// / The string returned is the proposal's slug, allowing a listener to tell apart proposal types.
+// / TODO: maybe we should have this as a property of the proposal itself?
 export const getProposalObservable = (): Observable<[AnyProposal, string]> => {
   const storeObservables = proposalSlugsFromChain(app.chain).map((s: string): Observable<[AnyProposal, string]> => {
     const store = proposalSlugToStore(s);
@@ -116,17 +115,17 @@ export const getProposalObservable = (): Observable<[AnyProposal, string]> => {
   return merge(...storeObservables).pipe(share());
 };
 
-export const uniqueIdToProposal = (uid) => {
-  const [ slug, id ] = uid.split('_');
-  return idToProposal(slug, id);
-};
-
 export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
-    throw new Error('invalid id: ' + id);
+    throw new Error(`invalid id: ${id}`);
   } else {
     return proposal;
   }
+};
+
+export const uniqueIdToProposal = (uid) => {
+  const [ slug, id ] = uid.split('_');
+  return idToProposal(slug, id);
 };

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 
 const { Op } = Sequelize;
 
@@ -25,11 +25,32 @@ module.exports = (sequelize, DataTypes) => {
     models.Subscription.hasMany(models.Notification);
   };
 
+  interface IPostNotificationData {
+    created_at: any;
+    root_id: number;
+    root_title: string;
+    root_type: ProposalType;
+    comment_id?: number;
+    comment_text?: string;
+    chain_id: string;
+    community_id: string;
+    author_address: string;
+    author_chain: string;
+  }
+
+  interface ICommunityNotificationData {
+    created_at: any;
+    role_id: string | number;
+    author_address: string;
+    chain: string;
+    community: string;
+  }
+
   Subscription.emitNotifications = async (
     models,
-    category_id,
-    object_id,
-    notification_data,
+    category_id: string,
+    object_id: string,
+    notification_data: IPostNotificationData | ICommunityNotificationData,
     webhook_data: WebhookContent,
     wss?,
   ) => {
@@ -38,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         address: notification_data.author_address,
       },
     });
+    console.log(category_id);
     // get subscribers to send notifications to
     const subscribers = await models.Subscription.findAll({
       where: {
@@ -49,7 +71,7 @@ module.exports = (sequelize, DataTypes) => {
         [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
       },
     });
-
+    console.log(subscribers);
     // create notifications if data exists
     if (notification_data) {
       await Promise.all(subscribers.map(async (subscription) => {
