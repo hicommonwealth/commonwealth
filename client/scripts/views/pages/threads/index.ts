@@ -30,7 +30,14 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   }
 };
 
-export const newThread = (form, quillEditorState, author, kind = OffchainThreadKind.Forum) => {
+export const newThread = (
+  form,
+  quillEditorState,
+  author,
+  kind = OffchainThreadKind.Forum,
+  privacy?: boolean,
+  readOnly?: boolean
+) => {
   if (!form.title) {
     return ({ title: 'Title cannot be blank' });
   }
@@ -82,7 +89,9 @@ export const newThread = (form, quillEditorState, author, kind = OffchainThreadK
         tags,
         url,
         attachments,
-        mentions
+        mentions,
+        privacy,
+        readOnly,
       );
     } catch (e) {
       console.error(e);

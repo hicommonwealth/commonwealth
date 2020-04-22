@@ -226,7 +226,7 @@ export class CosmosAccount extends Account<CosmosToken> {
     super(app, app.chain.meta.chain, address);
     if (!ChainInfo) {
       // defer chain initialization
-      app.chainReady.pipe(first()).subscribe(() => {
+      app.chainModuleReady.pipe(first()).subscribe(() => {
         if (app.chain.chain instanceof CosmosChain) this._Chain = app.chain.chain;
         else console.error('Did not successfully initialize account with chain');
       });

@@ -77,12 +77,12 @@ const setupErrorHandlers = () => {
   });
 };
 
-const resetServer = (): Promise<void> => {
-  console.log('Resetting database...');
+const resetServer = (debug=false): Promise<void> => {
+  if (debug) console.log('Resetting database...');
 
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
-      console.log('Initializing default models...');
+      if (debug) console.log('Initializing default models...');
 
       const drew = await models['User'].create({
         email: 'drewstone329@gmail.com',
@@ -192,7 +192,7 @@ const resetServer = (): Promise<void> => {
 
       await initChainEventTypes('edgeware');
 
-      console.log('Database reset!');
+      if (debug) console.log('Database reset!');
       resolve();
     });
   });

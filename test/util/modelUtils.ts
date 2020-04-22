@@ -36,9 +36,12 @@ interface ThreadArgs {
   jwt: any;
   title: string;
   body: any;
+  tags?: string[];
+  privacy?: boolean;
+  readOnly?: boolean;
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chain, community, address, jwt, title, body } = args;
+  const { chain, community, address, jwt, title, body, tags, privacy, readOnly } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -55,8 +58,10 @@ export const createThread = async (args: ThreadArgs) => {
       'kind': 'forum',
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tags[]': 'tag',
+      'tags[]': tags || 'tag',
       'url': undefined,
+      'privacy': privacy || false,
+      'readOnly': readOnly || false,
       'jwt': jwt,
     });
   return res.body;

@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
     pinned: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: DataTypes.STRING, allowNull: true },
     community: { type: DataTypes.STRING, allowNull: true },
+    private: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    read_only: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     version_history: { type: DataTypes.ARRAY(DataTypes.TEXT), defaultValue: [], allowNull: false }
   }, {
     underscored: true,
@@ -32,6 +34,18 @@ module.exports = (sequelize, DataTypes) => {
       as: 'tags',
       foreignKey: 'thread_id',
       otherKey: 'tag_id',
+    });
+    models.OffchainThread.belongsToMany(models.Role, {
+      through: 'read_only_roles_threads',
+      as: 'read_only_roles',
+      foreignKey: 'thread_id',
+      otherKey: 'id',
+    });
+    models.OffchainThread.belongsToMany(models.Role, {
+      through: 'private_thread_roles',
+      as: 'private_roles',
+      foreignKey: 'thread_id',
+      otherKey: 'id',
     });
   };
 

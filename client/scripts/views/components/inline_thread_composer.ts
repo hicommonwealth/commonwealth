@@ -6,11 +6,12 @@ import { default as $ } from 'jquery';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from './autocomplete_tag_form';
+import { isCommunityAdmin } from '../pages/discussions/roles';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -134,6 +135,8 @@ interface ITextPostAttrs {
 }
 
 interface ITextPostState {
+  readOnly: boolean;
+  privacy: boolean;
   tags: string[];
   uploadsInProgress: number;
   closed: boolean;
@@ -143,19 +146,24 @@ interface ITextPostState {
 }
 
 const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
+  oninit: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
+    vnode.state.privacy = false;
+    vnode.state.readOnly = false;
+  },
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
     const { closed } = vnode.state;
     const activeEntity = app.community ? app.community : app.chain;
     if (!vnode.state.error) vnode.state.error = {};
     if (closed) return null;
-
     vnode.state.form = vnode.state.form ? Object.assign(vnode.state.form, { title }) : { title };
 
     const createThread = (e?) => {
       if (e) e.preventDefault();
       const { form, quillEditorState } = vnode.state;
-      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum);
+      const readOnly = vnode.state.readOnly || false;
+      const privacy = vnode.state.privacy || false;
+      vnode.state.error = newThread(form, quillEditorState, author, OffchainThreadKind.Forum, privacy, readOnly);
       m.redraw();
     };
 
@@ -178,10 +186,45 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             onclick: createThread,
             tabindex: 4
           }, 'Create thread'),
-          // m('button', {
-          //   type: 'cancel',
-          //   onclick: closeComposer,
-          // }, 'Cancel'),
+          m('.property-group', [
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'public',
+              id: 'public-thread',
+              checked: (vnode.state.readOnly === false && vnode.state.privacy === false),
+              onclick: () => {
+                vnode.state.readOnly = false;
+                vnode.state.privacy = false;
+              }
+            }),
+            m('label', {
+              for: 'public-thread',
+            }, 'Public'),
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'private',
+              id: 'private-thread',
+              onclick: () => {
+                vnode.state.readOnly = false;
+                vnode.state.privacy = true;
+              }
+            }),
+            m('label', {
+              for: 'private-thread',
+            }, 'Private (Only admins/mods)'),
+            m('input[type="radio"]', {
+              name: 'properties',
+              value: 'readOnly',
+              id: 'read-only',
+              onclick: () => {
+                vnode.state.readOnly = true;
+                vnode.state.privacy = false;
+              }
+            }),
+            m('label', {
+              for: 'read-only',
+            }, 'Read-Only'),
+          ]),
         ]),
         m('.tag-selection', [
           m(AutoCompleteTagForm, {
@@ -197,12 +240,12 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             tabindex: 3,
           }),
         ]),
+        (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
+          && m('.error-message', [
+            (typeof vnode.state.error === 'string') ? m('span', vnode.state.error)
+              : Object.values(vnode.state.error).map((val) => m('span', `${val} `)),
+          ]),
       ]),
-      (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
-        && m('.error-message', [
-          (typeof vnode.state.error === 'string') ? m('span', vnode.state.error)
-            : Object.values(vnode.state.error).map((val) => m('span', `${val} `)),
-        ]),
     ]);
   },
 };

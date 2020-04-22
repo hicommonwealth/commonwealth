@@ -214,7 +214,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   console.log(`${n.chain.network.toUpperCase()} started.`);
 
   // Emit chain as updated
-  app.chainReady.next(true);
+  app.chainAdapterReady.next(true);
   handleInviteLinkRedirect();
 
   // Reset the available addresses only if switching chains

@@ -37,10 +37,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
-  private _serverLoaded: boolean = false;
-  get serverLoaded() { return this._serverLoaded; }
-
-  public init = async (onServerLoaded?) => {
+  public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EdgewareChain(this.app); // edgeware chain this.appid
     this.accounts = new SubstrateAccounts(this.app);
@@ -51,34 +48,30 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.signaling = new EdgewareSignaling(this.app);
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
-    await this.app.reactions.refreshAll(this.id, null, true);
-    // await this.server.proposals.init();
-    this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
 
-    const types = Object.values(edgewareDefinitions)
+    await super.init(async () => {
+      const edgTypes = Object.values(edgewareDefinitions)
       .map((v) => v.default)
       .reduce((res, { types }): object => ({ ...res, ...types }), {});
 
-    await this.chain.resetApi(this.meta, {
-      types: {
-        ...types,
-        // aliases that don't do well as part of interfaces
-        'voting::VoteType': 'VoteType',
-        'voting::TallyType': 'TallyType',
-        // chain-specific overrides
-        Address: 'GenericAddress',
-        Keys: 'SessionKeys4',
-        StakingLedger: 'StakingLedgerTo223',
-        Votes: 'VotesTo230',
-        ReferendumInfo: 'ReferendumInfoTo239',
-      },
-      // override duplicate type name
-      typesAlias: { voting: { Tally: 'VotingTally' } },
-    });
-    await this.chain.initMetadata();
+      await this.chain.resetApi(this.meta, {
+        types: {
+          ...edgTypes,
+          // aliases that don't do well as part of interfaces
+          'voting::VoteType': 'VoteType',
+          'voting::TallyType': 'TallyType',
+          // chain-specific overrides
+          Address: 'GenericAddress',
+          Keys: 'SessionKeys4',
+          StakingLedger: 'StakingLedgerTo223',
+          Votes: 'VotesTo230',
+          ReferendumInfo: 'ReferendumInfoTo239',
+        },
+        // override duplicate type name
+        typesAlias: { voting: { Tally: 'VotingTally' } },
+      });
+      await this.chain.initMetadata();
+    }, onServerLoaded);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
