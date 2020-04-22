@@ -1,5 +1,5 @@
 import request from 'superagent';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from '../shared/types';
 
 export interface WebhookContent {
   notificationCategory: string;
