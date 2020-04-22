@@ -14,6 +14,10 @@ module.exports = {
         delete data.thread_title;
       } else if (data.comment_id) {
         const root = data.object_id || data.root_id;
+        if (!root) {
+          console.error(`Comment without object_id or root_id: ${data.comment_id}`);
+          return;
+        }
         const [prefix, id] = root.split("_");
         data['root_id'] = Number(id);
         data['root_type'] = prefix;
