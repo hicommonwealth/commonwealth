@@ -31,33 +31,7 @@ jobs:
           name: "set env var for no client"
           command: echo 'export NO_CLIENT="true"' >> $BASH_ENV
       - run:
-          name: initialize the db
-          command: yarn reset-server
-      - run:
-          name: add testing chain object queries to db
-          command: yarn add-test-queries
-      - run:
-          name: start mock provider server
-          command: yarn mock-graphql-provider
-          background: true
-      - run:
-          name: wait for mock provider server
-          command: dockerize -wait tcp://localhost:4000 -timeout 1m
-      - run:
-          name: install headless chrome
-          command: ./scripts/install_headless_chrome.sh
-      - run:
-          name: start main server
-          command: yarn start-ci
-          background: true
-      - run:
-          name: wait for main server
-          command: dockerize -wait tcp://localhost:8080 -timeout 3m
-      - run:
-          name: sleep to finish init
-          command: sleep 10
-      - run:
-          name: run tests
-          command: yarn test
+          name: run api tests
+          command: yarn test-api
       - store_artifacts:
           path: coverage

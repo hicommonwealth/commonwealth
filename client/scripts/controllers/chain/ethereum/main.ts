@@ -19,22 +19,15 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
-  private _serverLoaded: boolean = false;
-  get serverLoaded() { return this._serverLoaded; }
-
-  public init = async (onServerLoaded?) => {
+  public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
-    await this.app.reactions.refreshAll(this.id, null, true);
 
-    this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
-
-    await this.chain.resetApi(this.meta);
-    await this.chain.initMetadata();
+    await super.init(async () => {
+      await this.chain.resetApi(this.meta);
+      await this.chain.initMetadata();
+    }, onServerLoaded);
     await this.accounts.init(this.chain);
     await this.chain.initEventLoop();
 

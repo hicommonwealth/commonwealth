@@ -22,6 +22,8 @@ const modelFromServer = (thread) => {
     thread.kind,
     thread.version_history,
     thread.community,
+    thread.private,
+    thread.read_only,
     decodeURIComponent(thread.body),
     thread.url,
     thread.Address.chain,
@@ -49,8 +51,20 @@ class ThreadsController {
     return result;
   }
 
-  public create(address: string, kind: string, chainId: string, communityId: string, title: string, body?: string,
-    tags?: string[], url?: string, attachments?: string[], mentions?: string[]) {
+  public create(
+    address: string,
+    kind: string,
+    chainId: string,
+    communityId: string,
+    title: string,
+    body?: string,
+    tags?: string[],
+    url?: string,
+    attachments?: string[],
+    mentions?: string[],
+    privacy?: boolean,
+    readOnly?: boolean
+  ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
@@ -67,6 +81,8 @@ class ThreadsController {
       'mentions[]': mentions,
       'tags[]': tags,
       'url': url,
+      'privacy': privacy,
+      'readOnly': readOnly,
       'jwt': app.login.jwt,
     }).then((response) => {
       const result = modelFromServer(response.result);
@@ -79,8 +95,16 @@ class ThreadsController {
     });
   }
 
-  public async edit(proposal: OffchainThread, body?: string, attachments?: string[]) {
+  public async edit(
+    proposal: OffchainThread,
+    body?: string,
+    attachments?: string[],
+    readOnly?: boolean,
+    privacy?: boolean
+  ) {
     const newBody = body || proposal.body;
+    const newReadOnly = readOnly || false;
+    const newPrivacy = privacy || false;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
 
@@ -91,6 +115,8 @@ class ThreadsController {
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
+        'read_only': newReadOnly,
+        'privacy': newPrivacy,
         'jwt': app.login.jwt
       });
       const result = modelFromServer(response.result);
@@ -141,7 +167,6 @@ class ThreadsController {
 
         for (const thread of threads) {
           // TODO: OffchainThreads should always have a linked Address
-
           if (!thread.Address) {
             console.error('OffchainThread missing address');
           }

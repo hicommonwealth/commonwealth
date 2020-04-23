@@ -223,6 +223,9 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     updateActiveAddresses(n.chain);
   });
 
+  // Emit chain as updated
+  app.chainAdapterReady.next(true);
+
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 

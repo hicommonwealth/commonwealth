@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import http from 'http';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
@@ -75,12 +76,12 @@ const setupErrorHandlers = () => {
   });
 };
 
-const resetServer = (): Promise<void> => {
-  console.log('Resetting database...');
+const resetServer = (debug=false): Promise<void> => {
+  if (debug) console.log('Resetting database...');
 
   return new Promise((resolve) => {
     models.sequelize.sync({ force: true }).then(async () => {
-      console.log('Initializing default models...');
+      if (debug) console.log('Initializing default models...');
 
       const drew = await models['User'].create({
         email: 'drewstone329@gmail.com',
@@ -147,6 +148,10 @@ const resetServer = (): Promise<void> => {
         name: NotificationCategories.NewMention,
         description: 'someone @ mentions a user',
       });
+      await models['NotificationCategory'].create({
+        name: NotificationCategories.NewReaction,
+        description: 'someone reacts to a post',
+      });
 
       // Admins need to be subscribed to mentions
       await models['Subscription'].create({
@@ -170,7 +175,7 @@ const resetServer = (): Promise<void> => {
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
-      console.log('Database reset!');
+      if (debug) console.log('Database reset!');
       resolve();
     });
   });

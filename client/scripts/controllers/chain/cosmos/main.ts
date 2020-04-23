@@ -15,21 +15,15 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   private _loaded: boolean = false;
   public get loaded() { return this._loaded; }
 
-  private _serverLoaded: boolean = false;
-  public get serverLoaded() { return this._serverLoaded; }
-
-  public init = async (onServerLoaded?) => {
+  public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
-    await this.app.reactions.refreshAll(this.id, null, true);
-    this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
 
-    await this.chain.init(this.meta);
+    await super.init(async () => {
+      await this.chain.init(this.meta);
+    }, onServerLoaded);
     await this.accounts.init(this.chain);
     await this.governance.init(this.chain, this.accounts);
     this._loaded = true;

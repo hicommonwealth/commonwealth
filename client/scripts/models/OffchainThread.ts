@@ -12,6 +12,8 @@ class OffchainThread implements IUniqueId {
   public readonly pinned: boolean;
   public readonly kind: OffchainThreadKind;
   public readonly attachments: OffchainAttachment[];
+  public readonly privacy: boolean;
+  public readonly readOnly: boolean;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
@@ -38,17 +40,19 @@ class OffchainThread implements IUniqueId {
     kind: OffchainThreadKind,
     versionHistory: string[],
     community: number | string,
+    privacy: boolean,
+    readOnly: boolean,
     body?: string,
     url?: string,
     authorChain?: string,
-    pinned?: boolean
+    pinned?: boolean,
   ) {
     this.author = author;
     this.title = title;
     this.body = body;
     this.attachments = attachments;
     this.id = id;
-    this.identifier = '' + id;
+    this.identifier = `${id}`;
     this.createdAt = createdAt;
     this.tags = tags;
     this.kind = kind;
@@ -57,6 +61,8 @@ class OffchainThread implements IUniqueId {
     this.url = url;
     this.versionHistory = versionHistory;
     this.community = community;
+    this.privacy = privacy;
+    this.readOnly = readOnly;
   }
 }
 

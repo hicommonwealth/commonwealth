@@ -1,9 +1,11 @@
-import { NotificationCategories } from '../../shared/types';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  const { body, kind, thread_id, version_history } = req.body;
+  const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
 
   if (!req.user) {
     return next(new Error('Not logged in'));
@@ -47,6 +49,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
+    if (read_only) thread.read_only = !thread.read_only;
+    if (privacy) thread.private = false;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({
@@ -61,7 +65,11 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
       '',
       {
         created_at: new Date(),
-        thread_id: finalThread.id,
+        root_id: Number(finalThread.id),
+        root_type: ProposalType.OffchainThread,
+        root_title: finalThread.title,
+        chain_id: finalThread.chain,
+        community_id: finalThread.community,
         author_address: finalThread.Address.address
       },
       // don't send webhook notifications for edits
@@ -72,6 +80,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
   } catch (e) {
     return next(e);
   }
+
+  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editThread;

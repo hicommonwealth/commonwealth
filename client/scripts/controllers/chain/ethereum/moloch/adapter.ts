@@ -21,12 +21,9 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
-  private _serverLoaded: boolean = false;
-
   get loaded() { return this._loaded; }
-  get serverLoaded() { return this._serverLoaded; }
 
-  public init = async (onServerLoaded?) => {
+  public async init(onServerLoaded?) {
     const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
     // FIXME: This is breaking for me on moloch default (not local)
     // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
@@ -37,15 +34,11 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app);
     this.governance = new MolochGovernance(this.app);
-    await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
-    await this.app.reactions.refreshAll(this.id, null, true);
 
-    this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
-
-    await this.chain.resetApi(this.meta);
-    await this.chain.initMetadata();
+    await super.init(async () => {
+      await this.chain.resetApi(this.meta);
+      await this.chain.initMetadata();
+    }, onServerLoaded);
     await this.ethAccounts.init(this.chain);
     await this.chain.initEventLoop();
     await this.webWallet.enable();

@@ -1,15 +1,15 @@
-import { NotificationCategories } from '../../shared/types';
 import { Response, NextFunction } from 'express';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { getProposalUrl } from '../../shared/utils';
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { title, body, kind, url } = req.body;
+  const { title, body, kind, url, privacy, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -70,6 +70,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     version_history: versionHistory,
     kind,
     url,
+    private: privacy,
+    read_only: readOnly,
   } : {
     chain: chain.id,
     author_id: author.id,
@@ -78,6 +80,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     version_history: versionHistory,
     kind,
     url,
+    private: privacy || false,
+    read_only: readOnly || false,
   };
 
   const thread = await models.OffchainThread.create(threadContent);
@@ -143,13 +147,21 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     return next(err);
   }
 
-  // auto-subscribe thread creator to replies
+  // auto-subscribe thread creator to replies & reactions
   await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewComment,
     object_id: `discussion_${finalThread.id}`,
     is_active: true,
   });
+
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewReaction,
+    object_id: `discussion_${finalThread.id}`,
+    is_active: true,
+  });
+
   const location = finalThread.community || finalThread.chain;
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
@@ -158,8 +170,9 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     location,
     {
       created_at: new Date(),
-      thread_title: finalThread.title,
-      thread_id: finalThread.id,
+      root_id: Number(finalThread.id),
+      root_type: ProposalType.OffchainThread,
+      root_title: finalThread.title,
       chain_id: finalThread.chain,
       community_id: finalThread.community,
       author_address: finalThread.Address.address,
@@ -167,7 +180,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
     },
     {
       user: finalThread.Address.address,
-      url: createCommonwealthUrl(finalThread),
+      url: getProposalUrl('discussion', finalThread),
       title: req.body.title,
       bodyUrl: req.body.url,
       chain: finalThread.chain,
@@ -217,9 +230,9 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       `user-${mentionedAddress.User.id}`,
       {
         created_at: new Date(),
-        mention_context: 'thread',
-        thread_title: finalThread.title,
-        thread_id: finalThread.id,
+        root_id: Number(finalThread.id),
+        root_type: ProposalType.OffchainThread,
+        root_title: finalThread.title,
         chain_id: finalThread.chain,
         community_id: finalThread.community,
         author_address: finalThread.Address.address,
