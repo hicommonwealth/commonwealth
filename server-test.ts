@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import http from 'http';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
@@ -146,6 +147,10 @@ const resetServer = (debug=false): Promise<void> => {
       await models['NotificationCategory'].create({
         name: NotificationCategories.NewMention,
         description: 'someone @ mentions a user',
+      });
+      await models['NotificationCategory'].create({
+        name: NotificationCategories.NewReaction,
+        description: 'someone reacts to a post',
       });
 
       // Admins need to be subscribed to mentions

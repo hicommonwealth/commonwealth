@@ -4,7 +4,7 @@ import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { createCommonwealthUrl } from '../util/routeUtils';
+import { getProposalUrl } from '../../shared/utils';
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -68,8 +68,9 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
 
   const comment = await models.OffchainComment.create(commentContent);
 
+  let parentComment;
   if (parent_id) {
-    const parentComment = await models.OffchainComment.findOne({
+    parentComment = await models.OffchainComment.findOne({
       where: community ? {
         id: parent_id,
         community: community.id,
@@ -105,11 +106,40 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     where: { id: comment.id },
     include: [models.Address, models.OffchainAttachment],
   });
-  const commentedObject = root_id.startsWith('discussion_')
-    ? await models.OffchainThread.findOne({
-      where: { id: root_id.replace('discussion_', '') }
-    })
-    : null;
+
+  // TODO: This isn't a reliable check and may fail. It should never fail.
+  // Comments always need identified parents.
+  let proposal;
+  const [prefix, id] = finalComment.root_id.split('_');
+  if (prefix === 'discussion') {
+    proposal = await models.OffchainThread.findOne({
+      where: { id }
+    });
+  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
+    proposal = await models.Proposal.findOne({
+      where: { identifier: id, type: prefix }
+    });
+  } else {
+    console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+  }
+
+  // craft commonwealth url
+  const cwUrl = getProposalUrl(prefix, proposal, finalComment);
+
+  // auto-subscribe comment author to reactions & child comments
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewReaction,
+    object_id: `comment-${finalComment.id}`,
+    is_active: true,
+  });
+
+  await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewComment,
+    object_id: `comment-${finalComment.id}`,
+    is_active: true,
+  });
 
   // grab mentions to notify tagged users
   let mentionedAddresses;
@@ -131,24 +161,18 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     }
   }
 
-  // craft commonwealth url
-  const thread = await models.OffchainThread.findOne({ where: { id: finalComment.root_id.split('_')[1] } });
-  const activeId = (finalComment.community) ? finalComment.community : finalComment.chain;
-  const cwUrl = (process.env.NODE_ENV === 'production')
-    ? `https://commonwealth.im/${activeId}/proposal/discussion/${thread.id}-${thread.title.toLowerCase()}?comment=${finalComment.id}`
-    : `http://localhost:8080/${activeId}/proposal/discussion/${thread.id}-${thread.title.toLowerCase()}?comment=${finalComment.id}`;
-
-  // dispatch notifications
+  // dispatch notifications to root thread
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewComment,
     root_id,
     {
       created_at: new Date(),
-      object_title: commentedObject?.title,
-      root_id,
+      root_id: Number(proposal.id),
+      root_title: proposal.title || '',
+      root_type: prefix,
+      comment_id: Number(finalComment.id),
       comment_text: finalComment.text,
-      comment_id: finalComment.id,
       chain_id: finalComment.chain,
       community_id: finalComment.community,
       author_address: finalComment.Address.address,
@@ -156,13 +180,44 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     },
     {
       user: finalComment.Address.address,
-      url: createCommonwealthUrl(thread, finalComment),
-      title: thread.title,
+      url: cwUrl,
+      title: proposal.title || '',
       chain: finalComment.chain,
       community: finalComment.community,
     },
     req.wss,
   );
+
+  // if child comment, dispatch notification to parent author
+  if (parent_id && parentComment) {
+    await models.Subscription.emitNotifications(
+      models,
+      NotificationCategories.NewComment,
+      `comment-${parent_id}`,
+      {
+        created_at: new Date(),
+        root_id: Number(proposal.id),
+        root_title: proposal.title || '',
+        root_type: prefix,
+        comment_id: Number(finalComment.id),
+        comment_text: finalComment.text,
+        parent_comment_id: Number(parent_id),
+        parent_comment_text: parentComment.text,
+        chain_id: finalComment.chain,
+        community_id: finalComment.community,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.chain,
+      },
+      {
+        user: finalComment.Address.address,
+        url: cwUrl,
+        title: proposal.title || '',
+        chain: finalComment.chain,
+        community: finalComment.community,
+      },
+      req.wss,
+    );
+  }
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length) {
@@ -186,12 +241,11 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          mention_context: 'comment',
-          thread_title: commentedObject?.title,
-          thread_id: commentedObject?.id,
-          root_id,
+          root_id: Number(proposal.id),
+          root_title: proposal.title || '',
+          root_type: prefix,
+          comment_id: Number(finalComment.id),
           comment_text: finalComment.text,
-          comment_id: finalComment.id,
           chain_id: finalComment.chain,
           community_id: finalComment.community,
           author_address: finalComment.Address.address,

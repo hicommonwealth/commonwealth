@@ -12,12 +12,23 @@ import NodeInfo from './NodeInfo';
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
-  public abstract serverLoaded: boolean;
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public abstract server: IServerControllers;
 
-  public abstract init: (onServerLoaded? : () => void) => Promise<void>;
+  protected _serverLoaded: boolean;
+  get serverLoaded() { return this._serverLoaded; }
+
+  public async init(onServerLoaded? : () => void, initChainModuleFn?: () => Promise<void>): Promise<void> {
+    await this.app.threads.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.reactions.refreshAll(this.id, null, true);
+    this._serverLoaded = true;
+    if (onServerLoaded) await onServerLoaded();
+    await initChainModuleFn();
+    this.app.chainModuleReady.next(true);
+  }
+
   public abstract deinit: () => Promise<void>;
 
   public abstract base: ChainBase;

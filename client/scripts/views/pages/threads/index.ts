@@ -58,7 +58,7 @@ export const newThread = (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const mentions = !quillEditorState ? null
+  const mentions = !quillEditorState ? []
     : quillEditorState.markdownMode
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);

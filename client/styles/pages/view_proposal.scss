@@ -255,6 +255,8 @@
         }
     }
     .lower-meta {
+        display: flex;
+        justify-content: flex-end;
         margin: 12px 0 0;
     }
     .body-text,

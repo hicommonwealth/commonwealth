@@ -1,3 +1,5 @@
+/* eslint-disable dot-notation */
+/* eslint-disable eqeqeq */
 /* eslint-disable no-restricted-globals */
 import 'components/header.scss';
 import m from 'mithril';
@@ -34,13 +36,15 @@ import AddressesModal from 'views/modals/addresses_modal';
 import NewProposalModal from 'views/modals/proposals';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import { OffchainCommunitiesStore } from 'stores';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+import { getProposalUrl } from '../../../../shared/utils';
+import { IPostNotificationData, ICommunityNotificationData } from '../../../../shared/types';
 
 
 interface INavigationMenuAttrs {
@@ -192,8 +196,8 @@ const Navigation: m.Component<IMenuAttrs> = {
     const defaultChainId = (app.activeChainId()) ? app.activeChainId()
       : app.activeCommunityId() ? app.community.meta.defaultChain.id : 'edgeware';
 
-    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
-      ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed).length
+    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate)
+      ? ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
        + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
        + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
        + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
@@ -504,7 +508,7 @@ interface IHeaderNotificationRow {
   notification: Notification;
 }
 
-const decodeComment = (comment_text) => {
+const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
@@ -524,20 +528,9 @@ const decodeComment = (comment_text) => {
   return decoded_comment_text;
 };
 
-const getNotificationFields = (category, data) => {
-  const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-    author_address, author_chain, thread_title, thread_id, mention_context } = JSON.parse(data);
-  if (mention_context) category += `-${mention_context}`;
-  const linksToComment = (category === NotificationCategories.NewComment || category === 'new-mention-comment');
-  const linksToThread = (category === NotificationCategories.NewThread || category === 'new-mention-thread');
-  if (!linksToComment && !linksToThread) {
-    console.error('Missing or invalid notification category.');
-    return;
-  }
-  if (!created_at || !author_address || !author_chain) {
-    console.error('Notification data is incomplete.');
-    return;
-  }
+const getNotificationFields = (category, data: IPostNotificationData) => {
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
+    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
 
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
@@ -545,52 +538,39 @@ const getNotificationFields = (category, data) => {
 
   let notificationHeader;
   let notificationBody;
-  let commented_type;
-  let commented_id;
-  let decoded_title;
+  const decoded_title = decodeURIComponent(root_title).trim();
 
-  if (thread_title) decoded_title = decodeURIComponent(thread_title);
-  if (category === NotificationCategories.NewComment) {
-    if (!object_title || (!object_id && !root_id) || !comment_text || !comment_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    // legacy comments use object_id, new comments use root_id
-    [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-    const commented_title = decodeURIComponent(object_title).trim();
-    const decoded_comment_text = decodeComment(comment_text);
-    notificationHeader = m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]);
-    notificationBody = decoded_comment_text;
-  } else if (category === NotificationCategories.NewThread) {
-    if (!decoded_title || !thread_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
+  if (comment_text) {
+    notificationBody = getCommentPreview(comment_text);
+  } else if (root_type === ProposalType.OffchainThread) {
     notificationBody = decoded_title;
-  } else if (category === 'new-mention-thread') {
-    if (!decoded_title || !thread_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    notificationBody = decoded_title;
-    notificationHeader = m('span', [ 'New mention in ', m('span.commented-obj', community_name) ]);
-  } else if (category === 'new-mention-comment') {
-    if (!comment_text || !comment_id) {
-      console.error('Notification data is incomplete.');
-      return;
-    }
-    const decoded_comment_text = decodeComment(comment_text);
-    notificationBody = decoded_comment_text;
-    notificationHeader = m('span', [
-      'New mention in ', m('span.commented-obj', decoded_title.trim() || community_name)
-    ]);
   }
 
-  const path = linksToComment
-    ? `/${community_id || chain_id}/proposal/discussion/${commented_id || thread_id}?comment=${comment_id}`
-    : `/${community_id || chain_id}/proposal/discussion/${thread_id}-${slugify(decoded_title)}`;
-  const pageJump = linksToComment ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+  if (category === NotificationCategories.NewComment) {
+    // Needs logic for notifications issued to parents of nested comments
+    notificationHeader = parent_comment_id
+      ? m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ 'New response to your comment in ', m('span.commented_obj', decoded_title) ]);
+  } else if (category === NotificationCategories.NewThread) {
+    notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
+  } else if (category === `${NotificationCategories.NewMention}`) {
+    notificationHeader = (!comment_id)
+      ? m('span', ['New mention in ', m('span.commented-obj', community_name) ])
+      : m('span', ['New mention in ', m('span.commented-obj', decoded_title || community_name) ]);
+  } else if (category === `${NotificationCategories.NewReaction}`) {
+    notificationHeader = (!comment_id)
+      ? m('span', ['New reaction to ', m('span.commented-obj', decoded_title) ])
+      : m('span', ['New reaction in ', m('span.commented-obj', decoded_title || community_name) ]);
+  }
+  const pseudoProposal = {
+    id: root_id,
+    title: root_title,
+    chain: chain_id,
+    community: community_id,
+  };
+  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
+  const path = (getProposalUrl as any)(...args);
+  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
     author: [author_address, author_chain],
@@ -630,59 +610,6 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
-    if (category === NotificationCategories.NewComment) {
-      const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !object_title || (!object_id && !root_id)
-          || !comment_text || !comment_id || !author_address || !author_chain) return;
-
-      // legacy comments use object_id, new comments use root_id
-      const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-      const commented_title = decodeURIComponent(object_title).trim();
-      const decoded_comment_text = (() => {
-        try {
-          const doc = JSON.parse(decodeURIComponent(comment_text));
-          return m(QuillFormattedText, {
-            doc: sliceQuill(doc, 140),
-            hideFormatting: true
-          });
-        } catch (e) {
-          return m(MarkdownFormattedText, {
-            doc: decodeURIComponent(comment_text).slice(0, 140),
-            hideFormatting: true
-          });
-        }
-      })();
-      return getHeaderNotificationRow(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
-        decoded_comment_text,
-        `/${community_id || chain_id}/proposal/discussion/`
-        + `${commented_id}?comment=${comment_id}`,
-        () => jumpHighlightComment(comment_id)
-      );
-    } else if (category === NotificationCategories.NewThread) {
-      const { created_at, thread_title, thread_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
-
-      const decoded_title = decodeURIComponent(thread_title);
-      const community_name = community_id
-        ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-        : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
-
-      return getHeaderNotificationRow(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
-        decoded_title,
-        `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
-          + `${slugify(decoded_title)}`,
-        () => jumpHighlightComment('parent')
-      );
-    }
-
     const {
       author,
       createdAt,
@@ -690,7 +617,7 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       notificationBody,
       path,
       pageJump
-    } = getNotificationFields(category, notification.data);
+    } = getNotificationFields(category, JSON.parse(notification.data));
 
     return getHeaderNotificationRow(
       author,
@@ -800,8 +727,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
       }, unreadMessage),
     }, [
       m(Notifications, { notifications }),
-      notifications.length > 0 &&
-        m(NotificationButtons, { notifications }),
+      notifications.length > 0
+        && m(NotificationButtons, { notifications }),
     ]);
   }
 };
