@@ -221,7 +221,7 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
     m(Button, {
       label: 'submit',
       onclick: () => {
-        vnode.attrs.community.updateCommunityData(vnode.state.name, vnode.state.description);
+        vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
         vnode.attrs.onChangeHandler(false);
       },
     }),

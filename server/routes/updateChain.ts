@@ -17,16 +17,16 @@ const updateChain = async (models, req: UserRequest, res: Response, next: NextFu
         chain_id: chain.id,
       },
     });
-    if (userMembership.role.permission !== 'admin') {
+    if (!userMembership && userMembership.role.permission !== 'admin') {
       return next(new Error('Invalid community or chain'));
     }
   }
 
-  if (req.body.name) chain.setName(req.body.name);
-  if (req.body.symbol) chain.setSymbol(req.body.symbol);
-  if (req.body.icon_url) chain.setIconUrl(req.body.icon_url);
-  if (req.body.active !== undefined) chain.setActive(req.body.active);
-  if (req.body.type) chain.setActive(req.body.type);
+  if (req.body.name) chain.name = req.body.name;
+  if (req.body.symbol) chain.symbol = req.body.symbol;
+  if (req.body.icon_url) chain.IconUrl = req.body.icon_url;
+  if (req.body.active !== undefined) chain.active = req.body.active;
+  if (req.body.type) chain.type = req.body.type;
   if (req.body['featured_tags[]']) chain.featured_tags = req.body['featured_tags[]'];
 
   await chain.save();
