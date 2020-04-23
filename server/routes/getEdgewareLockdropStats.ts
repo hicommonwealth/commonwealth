@@ -411,7 +411,8 @@ export const getCountsByBlock = async (web3, contracts) => {
   blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =
     new Date(+web3.utils.toBN(time2) * 1000);
 
-  const lastBlock = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
+  const lastBlockNum = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
+  const lastBlock = await web3.eth.getBlock(lastBlockNum);
 
   return {
     participantsByBlock,

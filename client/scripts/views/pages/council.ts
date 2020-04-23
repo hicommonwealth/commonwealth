@@ -236,22 +236,6 @@ const CouncilPage: m.Component<{}> = {
             candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
             m('.clear'),
           ]),
-        // voters
-        app.chain && app.chain.class !== ChainClass.Kusama && [
-          m('h4.proposals-subheader', 'Voters'),
-          m('.council-election-voters', app.chain && [
-            voters.length === 0
-              ? m('.no-proposals', 'No voters')
-              : m('.council-voters', [
-                voters.map((acct) => m(CouncilElectionVoter, {
-                  vote: (app.chain as Substrate).phragmenElections.activeElection.getVotes(
-                    app.chain.accounts.get(acct)
-                  )[0]
-                })),
-                m('.clear'),
-              ]),
-          ]),
-        ],
       ],
       sidebar: [
         // stats
