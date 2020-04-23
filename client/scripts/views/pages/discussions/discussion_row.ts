@@ -50,7 +50,7 @@ const DiscussionRow: m.Component<IAttrs> = {
               doc.ops = doc.ops.slice(0, 3);
               return m(QuillFormattedText, { doc, hideFormatting: true });
             } catch (e) {
-              return m(MarkdownFormattedText, { doc: body.slice(0, 200) });
+              return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
             }
           })(),
         ]),
@@ -75,31 +75,32 @@ const DiscussionRow: m.Component<IAttrs> = {
           }),
         ]),
         m('.discussion-content', [
-          m('.discussion-content-top', [
-            getContent(proposal),
-          ]),
+          getContent(proposal),
           m('.discussion-meta', [
-            m(User, {
-              user: [proposal.author, proposal.authorChain],
-              linkify: true,
-              tooltip: true,
-            }),
-            app.comments.nComments(proposal) > 0 && [
-              m.trust(' &mdash; '),
-              link(
-                'a.discussion-replies',
-                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                pluralize(app.comments.nComments(proposal), 'comment')
-              ),
-            ],
-            //formatLastUpdated(lastUpdated),
-            m('.discussion-tags', proposal.tags.map((tag) => {
-              return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
-            })),
+            m('.discussion-meta-left', [
+              m(User, {
+                user: [proposal.author, proposal.authorChain],
+                linkify: true,
+                tooltip: true,
+              }),
+              app.comments.nComments(proposal) > 0 && [
+                m.trust(' &mdash; '),
+                link(
+                  'a.discussion-replies',
+                  `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+                  pluralize(app.comments.nComments(proposal), 'comment')
+                ),
+              ],
+            ]),
+            m('.discussion-meta-right', [
+              // formatLastUpdated(lastUpdated),
+              m('.discussion-tags', proposal.tags.map((tag) => {
+                return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
+              })),
+            ]),
           ]),
         ]),
       ]),
-      m('.discussion-content-mobile', getContent(proposal)),
     ]);
   }
 };

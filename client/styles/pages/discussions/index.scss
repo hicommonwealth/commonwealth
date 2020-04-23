@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 .DiscussionsPage {
-    padding: 20px 40px;
+    padding: 20px;
     max-width: 560px;
     h4 {
         font-size: 14px;
@@ -47,5 +47,17 @@
             border-bottom: 1px solid lighten(#ea7a60, 11%);
             width: -webkit-fill-available;
         }
+    }
+
+    a.extra-items {
+        display: block;
+        margin: 12px 0;
+        padding: 5px 0;
+        border: 1px solid #eee;
+        text-align: center;
+        text-decoration: none;
+        color: #444;
+    }
+    .discussion-group-wrap {
     }
 }
