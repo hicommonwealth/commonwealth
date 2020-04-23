@@ -1,0 +1,43 @@
+@import 'client/styles/shared';
+
+.DigestFlagButton {
+  display: inline;
+  margin: 0;
+  padding: 2px 2px;
+  color: darken($color: #eee, $amount: 30%);
+  border: 1px #eee solid;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: #4bae6b;
+    border-color: #4bae6b;
+  }
+
+  &.clicked-state {
+    background-color: #4bae6b;
+    border-color: #4bae6b;
+    color: white;
+  }
+}
+
+.DigestFlagsModal {
+  padding: 30px;
+
+  .flags{
+    margin-bottom: 20px;
+    .titleRow {
+      font-weight: bold;
+      text-align: center;
+    }
+    tr.DigestFlagRow {
+      td {
+        text-align: right;
+      }
+    }
+  }
+  .sendEmail {
+    margin-left: 80%;
+  }
+}

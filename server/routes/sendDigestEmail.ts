@@ -53,14 +53,14 @@ const sendDigestEmail = async (models, req, res, next) => {
     //   console.dir(demarkdowned);
     // }
     const link = `${SERVER_URL}/${thread.community}/proposal/discussion/${thread.id}-${slugify(decodeURIComponent(thread.title))}`;
-    const text = `<li><a href="${link}"><h3>${thread.title}:</h3></a></li>`;
+    const text = `<li><a href="${link}"><h3>${thread.title}</h3></a></li>`;
     threadTexts.push(text);
   }));
 
   // constructing the email:
   let message = '';
   message += '<h1>Weekly Digest from Commonwealth</h1>';
-  message += '<p>Below are a handful of threads we think you might enjoy</p>';
+  message += '<h2>Below are a handful of threads we think you might enjoy!</h2>';
   message += '<ul>';
   threadTexts.map((text) => {
     message += text;
