@@ -355,9 +355,9 @@ interface IEventSubscriptionState {
 
 const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   oninit: (vnode) => {
-    vnode.state.chain = 'edgeware';
+    vnode.state.chain = EventSupportingChains.sort()[0];
     vnode.state.eventKinds = SubstrateEventKinds;
-    vnode.state.allSupportedChains = EventSupportingChains;
+    vnode.state.allSupportedChains = EventSupportingChains.sort();
   },
   view: (vnode) => {
     let titler;
@@ -369,7 +369,7 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       vnode.state.eventKinds = [];
     }
     const supportedChains = app.loginStatusLoaded
-      ? app.config.chains.getAll().filter((c) => vnode.state.allSupportedChains.includes(c.id))
+      ? app.config.chains.getAll().filter((c) => vnode.state.allSupportedChains.includes(c.id)).sort()
       : [];
     return m('.EventSubscriptions', [
       m('h1', 'On-Chain Events'),
