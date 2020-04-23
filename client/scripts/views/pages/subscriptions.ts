@@ -369,7 +369,9 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       vnode.state.eventKinds = [];
     }
     const supportedChains = app.loginStatusLoaded
-      ? app.config.chains.getAll().filter((c) => vnode.state.allSupportedChains.includes(c.id)).sort()
+      ? app.config.chains.getAll()
+        .filter((c) => vnode.state.allSupportedChains.includes(c.id))
+        .sort((a, b) => a.id.localeCompare(b.id))
       : [];
     return m('.EventSubscriptions', [
       m('h1', 'On-Chain Events'),
