@@ -10,11 +10,10 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   if (!req.user) return next(new Error('Not logged in'));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
-
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: req.user.id,
+      address_id: req.user.address,
       permission: 'admin',
     },
   });
