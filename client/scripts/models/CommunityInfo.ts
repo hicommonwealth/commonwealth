@@ -5,8 +5,8 @@ import OffchainTag from './OffchainTag';
 
 class CommunityInfo {
   public readonly id: string;
-  public readonly name: string;
-  public readonly description: string;
+  public name: string;
+  public description: string;
   public readonly defaultChain: ChainInfo;
   public readonly invitesEnabled: boolean;
   public readonly privacyEnabled: boolean;
@@ -43,6 +43,10 @@ class CommunityInfo {
         'name': name,
         'description': description,
         'jwt': app.login.jwt,
+      }).then((r) => {
+        const updatedCommunity: CommunityInfo = r.result;
+        this.name = updatedCommunity.name;
+        this.description = updatedCommunity.description;
       });
     } catch (err) {
       console.log('Failed to update featured tags');
