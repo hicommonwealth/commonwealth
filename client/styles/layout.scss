@@ -241,7 +241,7 @@ body.modal-open {
     padding: 15px 40px;
     padding-left: $side-width + 40px;
     &.logged-out {
-        padding-left: $side-width - $switcher-width;
+        padding-left: $side-width;
     }
 }
 

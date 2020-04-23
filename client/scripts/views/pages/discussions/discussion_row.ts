@@ -86,18 +86,17 @@ const DiscussionRow: m.Component<IAttrs> = {
             }),
             app.comments.nComments(proposal) > 0 && [
               m.trust(' &mdash; '),
-              link('a.discussion-replies',
-                   `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                     pluralize(app.comments.nComments(proposal), 'comment'),
-                   ]),
+              link(
+                'a.discussion-replies',
+                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+                pluralize(app.comments.nComments(proposal), 'comment')
+              ),
             ],
             //formatLastUpdated(lastUpdated),
+            m('.discussion-tags', proposal.tags.map((tag) => {
+              return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
+            })),
           ]),
-        ]),
-        m('.discussion-after', [
-          proposal.tags.map((tag) => {
-            return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
-          }),
         ]),
       ]),
       m('.discussion-content-mobile', getContent(proposal)),

@@ -92,6 +92,10 @@ $discussion-row-vpadding: 11px;
     }
     .discussion-excerpt {
         color: #999;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
     .discussion-body-preview {
         font-size: 14px;
