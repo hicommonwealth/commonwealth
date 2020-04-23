@@ -101,8 +101,13 @@ const sendDigestEmail = async (models, req, res, next) => {
     }
   });
 
+  // clean up flags after emails sent
   await selectedFlags.map(async (flag) => {
-    await flag.update({ active: false, selected: false, });
+    await flag.update({
+      active: false,
+      selected: false,
+      votes: 0,
+    });
   });
 
   return res.json({ status: 'Success', result: threadTexts });
