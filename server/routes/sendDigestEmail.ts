@@ -101,6 +101,10 @@ const sendDigestEmail = async (models, req, res, next) => {
     }
   });
 
+  await selectedFlags.map(async (flag) => {
+    await flag.update({ active: false, selected: false, });
+  });
+
   return res.json({ status: 'Success', result: threadTexts });
 };
 
