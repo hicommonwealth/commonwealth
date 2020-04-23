@@ -24,7 +24,7 @@ interface ICommunityMetadataState {
     mods;
 }
 
-const CommunityMetadata: m.Component<{community: CommunityInfo}, ICommunityMetadataState> = {
+const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler: Function}, ICommunityMetadataState> = {
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
     vnode.state.description = vnode.attrs.community.description;
@@ -45,6 +45,7 @@ const CommunityMetadata: m.Component<{community: CommunityInfo}, ICommunityMetad
             defaultValue: vnode.state.name,
             fluid: true,
             value: vnode.state.name,
+            onchange: (e) => { vnode.state.name = (e.target as any).value; },
           }),
         ]),
       ]),
@@ -55,6 +56,7 @@ const CommunityMetadata: m.Component<{community: CommunityInfo}, ICommunityMetad
             defaultValue: vnode.state.description,
             fluid: true,
             value: vnode.state.description,
+            onchange: (e) => { vnode.state.description = (e.target as any).value; },
           }),
         ]),
       ]),
@@ -77,7 +79,7 @@ const CommunityMetadata: m.Component<{community: CommunityInfo}, ICommunityMetad
       label: 'submit',
       onclick: () => {
         vnode.attrs.community.updateCommunityData(vnode.state.name, vnode.state.description);
-        console.dir('updated community');
+        vnode.attrs.onChangeHandler(false);
       },
     }),
     ]);
@@ -95,13 +97,13 @@ const ChainMetadata: m.Component = {
   },
 };
 
-const Panel: m.Component = {
+const Panel: m.Component<{onChangeHandler: Function}> = {
   view: (vnode) => {
     const isCommunity = !!app.activeCommunityId();
     return m('.Panel', [
       m('.panel-left', { style: 'width: 70%;' }, [
         (isCommunity)
-          ? m(CommunityMetadata, { community: app.community.meta })
+          ? m(CommunityMetadata, { community: app.community.meta, onChangeHandler: vnode.attrs.onChangeHandler })
           : m(ChainMetadata),
       ]),
       m('.panel-right', []),
@@ -127,7 +129,9 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
-        content: m(Panel),
+        content: m(Panel, {
+          onChangeHandler: (v) => { vnode.state.isOpen = v; },
+        }),
         hasBackdrop: true,
         isOpen: vnode.state.isOpen,
         inline: false,

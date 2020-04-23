@@ -5,6 +5,7 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.id) return next(new Error('Must provide community id'));
   if (req.body.network) return next(new Error('Cannot change community network'));
+  console.dir(req.body);
 
   const community = await models.OffchainCommunity.findOne({
     where: { id: req.body.id }
@@ -46,6 +47,7 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
   }
 
   await community.save();
+  console.dir(community);
 
   return res.json({ status: 'Success', result: community.toJSON() });
 };

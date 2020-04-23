@@ -58,6 +58,9 @@ class CommunityInfo {
         'id': app.activeCommunityId(),
         'featured_tags[]': tags,
         'jwt': app.login.jwt
+      }).then((result) => {
+        console.dir(result);
+        console.dir(result.result);
       });
     } catch (err) {
       console.log('Failed to update featured tags');
