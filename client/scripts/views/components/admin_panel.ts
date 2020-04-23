@@ -11,11 +11,17 @@ const RoleRow: m.Component<{ roledata? }> = {
     return (vnode.attrs.roledata?.length > 0) ?
       m('RoleData', [
           vnode.attrs.roledata?.map((role) => {
-            return m('.role-item', [
+            return m('.role-item', { style: 'display: inline-block; padding-right: 6px;' }, [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
                 linkify: true,
                 tooltip: true,
+              }),
+              m(Icon, {
+                name: Icons.X,
+                size: 'xs',
+                style: 'padding-left: 2px;',
+                onclick: () => { console.dir('demote admin to member'); }, // TODO: Remove from local roles and db
               }),
             ]);
           }),
@@ -115,12 +121,13 @@ const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler:
       ]),
       m('tr', [
         m('td', 'Admins'),
-        m('td', [ m(RoleRow, { roledata: admins }) ])
+        m('td', [ m(RoleRow, { roledata: admins }), ])
       ]),
-      // m('tr', [
-      //   m('td', 'Moderators'),
-      //   m('td', [ m(RoleRow, { roledata: mods }) ])
-      // ]),
+      mods.length > 0 &&
+        m('tr', [
+          m('td', 'Moderators'),
+          m('td', [ m(RoleRow, { roledata: mods }), ])
+        ]),
     ]),
     m(Button, {
       label: 'submit',
