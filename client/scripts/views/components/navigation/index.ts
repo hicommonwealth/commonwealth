@@ -292,9 +292,6 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
-        // admin panel (all communities)
-        (app.community || app.chain) &&
-          m(AdminPanel),
         // TODO: tag selector
         (app.community || app.chain) &&
           m(TagSelector, { activeTag, showFullListing: false }),
@@ -305,6 +302,9 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             label: 'Manage Tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
           }),
+        // admin panel (all communities)
+        (app.community || app.chain) &&
+          m(AdminPanel),
         (app.community || app.chain) &&
           m(ListItem, {
             active: onMembersPage(m.route.get()),
