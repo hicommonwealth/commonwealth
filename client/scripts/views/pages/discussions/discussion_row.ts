@@ -6,6 +6,7 @@ import { default as moment } from 'moment-twitter';
 
 import app from 'state';
 import { pluralize, slugify, link, externalLink } from 'helpers';
+import { Icon, Icons } from 'construct-ui';
 
 import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind } from 'models';
@@ -33,28 +34,6 @@ const DiscussionRow: m.Component<IAttrs> = {
       const re = new RegExp('^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)');
       return re.exec(url)[1];
     };
-    const getContent = (proposal) => [
-      link('a.discussion-title',
-        `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-          proposal.title
-        ]),
-      propType === OffchainThreadKind.Link
-        && proposal.url
-        && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url)),
-      propType === OffchainThreadKind.Forum
-        && (proposal as OffchainThread).body && m('.discussion-excerpt', [
-          (() => {
-            const body = (proposal as OffchainThread).body;
-            try {
-              const doc = JSON.parse(body);
-              doc.ops = doc.ops.slice(0, 3);
-              return m(QuillFormattedText, { doc, hideFormatting: true });
-            } catch (e) {
-              return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
-            }
-          })(),
-        ]),
-    ];
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
@@ -75,7 +54,34 @@ const DiscussionRow: m.Component<IAttrs> = {
           }),
         ]),
         m('.discussion-content', [
-          getContent(proposal),
+          m('.discussion-title', [
+            link('a',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
+                proposal.title
+              ]),
+            app.comments.nComments(proposal) > 0
+              && link(
+                'a.discussion-replies',
+                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
+              ),
+          ]),
+          propType === OffchainThreadKind.Link
+            && proposal.url
+            && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url)),
+          propType === OffchainThreadKind.Forum
+            && (proposal as OffchainThread).body && m('.discussion-excerpt', [
+              (() => {
+                const body = (proposal as OffchainThread).body;
+                try {
+                  const doc = JSON.parse(body);
+                  doc.ops = doc.ops.slice(0, 3);
+                  return m(QuillFormattedText, { doc, hideFormatting: true });
+                } catch (e) {
+                  return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+                }
+              })(),
+            ]),
           m('.discussion-meta', [
             m('.discussion-meta-left', [
               m(User, {
@@ -83,14 +89,6 @@ const DiscussionRow: m.Component<IAttrs> = {
                 linkify: true,
                 tooltip: true,
               }),
-              app.comments.nComments(proposal) > 0 && [
-                m.trust(' &mdash; '),
-                link(
-                  'a.discussion-replies',
-                  `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                  pluralize(app.comments.nComments(proposal), 'comment')
-                ),
-              ],
             ]),
             m('.discussion-meta-right', [
               // formatLastUpdated(lastUpdated),

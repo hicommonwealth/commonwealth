@@ -83,13 +83,26 @@ $discussion-row-vpadding: 34px;
             text-decoration: underline;
         }
     }
-    a.discussion-title {
+    .discussion-title a {
         color: #111;
         font-size: 15px;
         text-decoration: none;
         font-weight: 600;
         &:hover {
             text-decoration: underline;
+        }
+    }
+    .discussion-title a.discussion-replies {
+        text-decoration: none;
+        margin-left: 8px;
+        color: #888;
+        user-select: none;
+        white-space: nowrap;
+        .cui-icon {
+            position: relative;
+            top: -1px;
+            color: #888;
+            margin-left: 3px;
         }
     }
     .discussion-excerpt {
