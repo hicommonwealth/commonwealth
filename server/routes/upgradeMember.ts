@@ -29,7 +29,7 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   let member = await models.Role.findOne({
     where: {
       ...chainOrCommObj,
-      address_id: memberAddress.address,
+      address_id: memberAddress.id,
       permission: ['moderator', 'member'],
     },
   });
