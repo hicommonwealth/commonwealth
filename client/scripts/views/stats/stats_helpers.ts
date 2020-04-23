@@ -95,9 +95,7 @@ export const getParticipationSummary = async (network) => {
     edgAddrToETHSignals,
   } = ldResults.results;
 
-  const lastBlockObj = await web3.eth.getBlock(lastBlock);
-
-  const lastBlockTime = lastBlockObj.timestamp;
+  const lastBlockTime = lastBlock.timestamp;
   // Calculate some metrics with the lock and signal data
   const totalETH = toBN(totalETHLocked).add(toBN(totalETHSignaled));
   const totalEffectiveETH = toBN(totalEffectiveETHLocked).add(toBN(totalEffectiveETHSignaled));

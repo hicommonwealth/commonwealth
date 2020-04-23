@@ -202,7 +202,7 @@ const EdgewareStatsPage = {
                 m('h3', 'Last lock or signal'),
                 m('p', state.participationSummary ? [
                   moment(state.participationSummary.lastBlockTime * 1000).twitterLong(true),
-                  ` (Block ${formatNumberRound(state.participationSummary.lastBlock)})`
+                  ` (Block ${formatNumberRound(state.participationSummary.lastBlock.number)})`
                 ] : '--'),
               ]),
             ]),
