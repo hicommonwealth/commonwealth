@@ -83,7 +83,8 @@ import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
 import viewChainObjectQueries from './routes/viewChainObjectQueries';
 import viewChainObjects from './routes/viewChainObjects';
 import refreshChainObjects from './routes/refreshChainObjects';
-import edgewareLockdrop from './routes/getEdgewareLockdrop';
+import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
+import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
@@ -232,7 +233,8 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/viewChainObjects', viewChainObjects.bind(this, models));
   router.get('/refreshChainObjects', refreshChainObjects.bind(this, models, fetcher));
 
-  router.get('/edgewareLockdrop', edgewareLockdrop.bind(this, models));
+  router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
+  router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));
 
   app.use('/api', router);
 }

@@ -12,8 +12,7 @@ import { pluralize } from 'helpers';
 import Tabs from 'views/components/widgets/tabs';
 import {
   isHex, formatDate, formatNumber, formatNumberRound,
-  MAINNET_LOCKDROP, ROPSTEN_LOCKDROP,
-  getParticipationSummary, getAddressSummary, MAINNET_LOCKDROP_ORIG
+  MAINNET_LOCKDROP, ROPSTEN_LOCKDROP, getParticipationSummary,
 } from './stats_helpers';
 
 
@@ -77,7 +76,6 @@ async function triggerUpdateData() {
     state.participationSummary = undefined;
   }
 
-  console.log(state.participationSummary);
   state.loading = false;
   if (!state.participationSummary) {
     console.log('No data');
@@ -231,7 +229,7 @@ const EdgewareStatsPage = {
                         data: summary.participantsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }, {
                         label: 'Lock events',
                         backgroundColor: '#ff9f40',
@@ -241,7 +239,7 @@ const EdgewareStatsPage = {
                         data: summary.lockEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }, {
                         label: 'Signal events',
                         backgroundColor: '#ffcd56',
@@ -251,7 +249,7 @@ const EdgewareStatsPage = {
                         data: summary.signalEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }]
                     }
                   };
@@ -273,7 +271,7 @@ const EdgewareStatsPage = {
                         data: summary.ethLockedByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y.toFixed(2)} ETH`,
-                                           formatDate(summary.blocknumToTime[d.x]) + ' (approx.)'],
+                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
                       }]
                     }
                   };
@@ -366,10 +364,12 @@ const EdgewareStatsPage = {
                 getData: () => {
                   const summary = state.participationSummary;
                   const effectiveLocksDistribution = Object.keys(summary.locks)
-                    .map((addr) => ({
-                      lockAddrs: summary.locks[addr].lockAddrs,
-                      value: summary.locks[addr].effectiveValue,
-                    }))
+                    .map((addr) => {
+                      return {
+                        lockAddrs: summary.edgAddrToETHLocks[addr],
+                        value: summary.locks[addr].effectiveValue,
+                      };
+                    })
                     .sort((a, b) => a.value - b.value);
                   return {
                     title: `Lockers Effective ETH - ${formatNumberRound(summary.totalEffectiveETHLocked)} ETH`,
@@ -611,19 +611,21 @@ const EdgewareStatsPage = {
                   state.addressSummary = null;
                   vnode.state.lookupLoading = true;
                   vnode.state.lookupCount = formattedAddrs.length;
-
-                  const results = await $.get(`${app.serverUrl()}/edgewareLockdrop`, {
-                    address: addrText,
-                    network: state.network,
-                  });
-
-                  state.addressSummary = { events: results.results };
+                  let resultEvents = [];
+                  for (let i = 0; i < formattedAddrs.length; i++) {
+                    const addr = formattedAddrs[i];
+                    const lockEvents = state.participationSummary.ethAddrToLockEvent[addr];
+                    const signalEvents = state.participationSummary.ethAddrToSignalEvent[addr];
+                    if (lockEvents) resultEvents = [ ...resultEvents, ...lockEvents[0] ];
+                    if (signalEvents) resultEvents = [ ...resultEvents, ...signalEvents[0] ];
+                  }
+                  state.addressSummary = { events: resultEvents };
                   vnode.state.lookupLoading = false;
                   m.redraw();
                 }
-              }, vnode.state.lookupLoading ?
-                `Looking up ${pluralize(vnode.state.lookupCount, 'address')}...` :
-                'Lookup'),
+              }, vnode.state.lookupLoading
+                ? `Looking up ${pluralize(vnode.state.lookupCount, 'address')}...`
+                : 'Lookup'),
             ]),
             state.addressSummary && m('.lock-lookup-results', [
               m('h3', `Found ${pluralize(state.addressSummary.events.length, 'participation event')}`),
@@ -641,9 +643,9 @@ const EdgewareStatsPage = {
                     m('h3', 'Signaled') :
                     m('h3', [
                       `Locked ${formatNumber(event.eth)} ETH - `,
-                      event.term.toString() === '0' && '3 months',
-                      event.term.toString() === '1' && '6 months',
-                      event.term.toString() === '2' && '12 months',
+                      event.returnValues.term.toString() === '0' && '3 months',
+                      event.returnValues.term.toString() === '1' && '6 months',
+                      event.returnValues.term.toString() === '2' && '12 months',
                     ]),
                   (event.type === 'signal') && m('p', [
                     'Tx Hash: ',
@@ -660,7 +662,7 @@ const EdgewareStatsPage = {
                         target: '_blank',
                       }, event.contractAddr),
                     ]),
-                    m('p', `EDG Public Keys: ${event.edgewareAddr}`),
+                    m('p', `EDG Public Key: ${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`)[0]}`),
                     m('p', `ETH counted from signal: ${formatNumber(event.eth)}`),
                   ] : [
                     m('p', [
@@ -673,11 +675,11 @@ const EdgewareStatsPage = {
                     m('p', [
                       'Lockdrop User Contract Address: ',
                       m('a', {
-                        href: `${etherscanNet}address/${event.lockAddr}`,
+                        href: `${etherscanNet}address/${event.returnValues.lockAddr}`,
                         target: '_blank',
-                      }, event.lockAddr),
+                      }, event.returnValues.lockAddr),
                     ]),
-                    m('p', `EDG Public Keys: ${event.edgewareAddr}`),
+                    m('p', `EDG Public Key: ${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`)[0]}`),
                     m('p', [
                       'Unlocks In: ',
                       Math.round(event.unlockTimeMinutes),
