@@ -57,7 +57,6 @@ module.exports = (sequelize, DataTypes) => {
     includeAddresses?: string[],
     chainEventId?: number,
   ) => {
-<<<<<<< HEAD
     // get subscribers to send notifications to
     const findOptions: any = {
       [Op.and]: [
@@ -102,26 +101,6 @@ module.exports = (sequelize, DataTypes) => {
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
-=======
-    const creatorAddress = await models.Address.findOne({
-      where: {
-        address: notification_data.author_address,
-      },
-    });
-    console.log(category_id);
-    // get subscribers to send notifications to
-    const subscribers = await models.Subscription.findAll({
-      where: {
-        [Op.and]: [
-          { category_id },
-          { object_id },
-          { is_active: true },
-        ],
-        [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
-      },
-    });
-    console.log(subscribers);
->>>>>>> master
     // create notifications if data exists
     let notifications = [];
     if (notification_data) {
