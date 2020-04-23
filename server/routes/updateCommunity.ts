@@ -19,13 +19,13 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
       },
     });
     console.log(userMembership);
-    if (userMembership.role.permission !== 'admin') {
-      return next(new Error('Invalid community or chain'));
+    if (userMembership.permission !== 'admin') {
+      return next(new Error('Invalid Permission to Update Community'));
     }
   }
 
-  if (req.body.name) community.setName(req.body.name);
-  if (req.body.title) community.setDescription(req.body.description);
+  if (req.body.name) community.name = req.body.name;
+  if (req.body.description) community.description = req.body.description;
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached

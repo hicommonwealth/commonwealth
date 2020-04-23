@@ -75,7 +75,10 @@ const CommunityMetadata: m.Component<{community: CommunityInfo}, ICommunityMetad
     m('mods'),
     m(Button, {
       label: 'submit',
-      onclick: () => console.dir('hi'),
+      onclick: () => {
+        vnode.attrs.community.updateCommunityData(vnode.state.name, vnode.state.description);
+        console.dir('updated community');
+      },
     }),
     ]);
   },

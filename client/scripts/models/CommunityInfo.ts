@@ -36,6 +36,21 @@ class CommunityInfo {
       json.tags
     );
   }
+  public async updateCommunityData(name: string, description: string,) {
+    try {
+      await $.post(`${app.serverUrl()}/updateCommunity`, {
+        'id': app.activeCommunityId(),
+        'name': name,
+        'description': description,
+        'jwt': app.login.jwt,
+      });
+    } catch (err) {
+      console.log('Failed to update featured tags');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to update featured tags');
+    }
+  }
 
   public async updateFeaturedTags(tags: string[]) {
     try {
