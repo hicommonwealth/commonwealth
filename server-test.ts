@@ -153,6 +153,10 @@ const resetServer = (debug=false): Promise<void> => {
         name: NotificationCategories.ChainEvent,
         description: 'a chain event occurs',
       });
+      await models['NotificationCategory'].create({
+        name: NotificationCategories.NewReaction,
+        description: 'someone reacts to a post',
+      });
 
       // Admins need to be subscribed to mentions
       await models['Subscription'].create({

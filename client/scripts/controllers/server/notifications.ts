@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 

@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 
 const { Op } = Sequelize;
 
@@ -24,17 +25,39 @@ module.exports = (sequelize, DataTypes) => {
     models.Subscription.hasMany(models.Notification);
   };
 
+  interface IPostNotificationData {
+    created_at: any;
+    root_id: number;
+    root_title: string;
+    root_type: ProposalType;
+    comment_id?: number;
+    comment_text?: string;
+    chain_id: string;
+    community_id: string;
+    author_address: string;
+    author_chain: string;
+  }
+
+  interface ICommunityNotificationData {
+    created_at: any;
+    role_id: string | number;
+    author_address: string;
+    chain: string;
+    community: string;
+  }
+
   Subscription.emitNotifications = async (
     models,
-    category_id,
-    object_id,
-    notification_data,
+    category_id: string,
+    object_id: string,
+    notification_data: IPostNotificationData | ICommunityNotificationData,
     webhook_data: WebhookContent,
     wss?,
     excludeAddresses?: string[],
     includeAddresses?: string[],
     chainEventId?: number,
   ) => {
+<<<<<<< HEAD
     // get subscribers to send notifications to
     const findOptions: any = {
       [Op.and]: [
@@ -79,6 +102,26 @@ module.exports = (sequelize, DataTypes) => {
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
+=======
+    const creatorAddress = await models.Address.findOne({
+      where: {
+        address: notification_data.author_address,
+      },
+    });
+    console.log(category_id);
+    // get subscribers to send notifications to
+    const subscribers = await models.Subscription.findAll({
+      where: {
+        [Op.and]: [
+          { category_id },
+          { object_id },
+          { is_active: true },
+        ],
+        [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
+      },
+    });
+    console.log(subscribers);
+>>>>>>> master
     // create notifications if data exists
     let notifications = [];
     if (notification_data) {

@@ -1,5 +1,7 @@
-import { NotificationCategories } from '../../shared/types';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
@@ -63,7 +65,11 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
       '',
       {
         created_at: new Date(),
-        thread_id: finalThread.id,
+        root_id: Number(finalThread.id),
+        root_type: ProposalType.OffchainThread,
+        root_title: finalThread.title,
+        chain_id: finalThread.chain,
+        community_id: finalThread.community,
         author_address: finalThread.Address.address
       },
       // don't send webhook notifications for edits
@@ -75,6 +81,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
   } catch (e) {
     return next(e);
   }
+
+  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default editThread;

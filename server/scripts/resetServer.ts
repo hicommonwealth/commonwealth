@@ -291,6 +291,10 @@ const resetServer = (models, closeMiddleware) => {
       description: 'someone @ mentions a user',
     });
     await models.NotificationCategory.create({
+      name: NotificationCategories.NewReaction,
+      description: 'someone reacts to a post',
+    });
+    await models.NotificationCategory.create({
       name: NotificationCategories.ChainEvent,
       description: 'a chain event occurs',
     });
