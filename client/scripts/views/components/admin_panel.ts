@@ -1,17 +1,26 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { OffchainThread, OffchainTag, CommunityInfo } from 'models';
+import { OffchainThread, OffchainTag, CommunityInfo, RolePermission } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea } from 'construct-ui';
 import app from 'state';
+import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
+import User from './widgets/user';
 
-interface ITagEditorAttrs {
-  thread: OffchainThread;
-  onChangeHandler: Function;
-}
-
-const CreatorField: m.Component = {
+const RoleRow: m.Component<{ roledata? }> = {
   view: (vnode) => {
-    return m('creator');
+    return (vnode.attrs.roledata?.length > 0) ?
+      m('RoleData', [
+          vnode.attrs.roledata?.map((role) => {
+            return m('.role-item', [
+              m(User, {
+                user: [role.Address.address, role.Address.chain],
+                linkify: true,
+                tooltip: true,
+              }),
+            ]);
+          }),
+      ])
+      : m('div');
   }
 };
 
@@ -22,6 +31,9 @@ interface ICommunityMetadataState {
     creator;
     admins;
     mods;
+    loadingFinished: boolean;
+    loadingStarted: boolean;
+    roleData;
 }
 
 const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler: Function}, ICommunityMetadataState> = {
@@ -31,15 +43,45 @@ const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler:
     vnode.state.url = vnode.attrs.community.id;
   },
   view: (vnode) => {
+    const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    const loadRoles = async () => {
+      try {
+        const bulkMembers = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
+        if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
+        vnode.state.roleData = bulkMembers.result;
+        vnode.state.loadingFinished = true;
+        m.redraw();
+      } catch (err) {
+        vnode.state.roleData = [];
+        vnode.state.loadingFinished = true;
+        m.redraw();
+        console.error(err);
+      }
+    };
+
+    if (!vnode.state.loadingStarted) {
+      vnode.state.loadingStarted = true;
+      loadRoles();
+    }
+
+    const admins = [];
+    const mods = [];
+    if (vnode.state.roleData?.length > 0) {
+      vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
+        if (role.permission === RolePermission.admin) admins.push(role);
+        else if (role.permission === RolePermission.moderator) mods.push(role);
+      });
+    }
+
     return m('div', [m(Table, {
       bordered: false,
-      interactive: true,
+      interactive: false,
       striped: false,
       class: '.community.metadata',
       style: 'table-layout: fixed;'
     }, [
       m('tr', [
-        m('td', { style: 'width: 100px' }, 'name:'),
+        m('td', { style: 'width: 100px' }, 'Name'),
         m('td', [
           m(Input, {
             defaultValue: vnode.state.name,
@@ -50,7 +92,7 @@ const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler:
         ]),
       ]),
       m('tr', [
-        m('td', 'Description:'),
+        m('td', 'Description'),
         m('td', [
           m(Input, {
             defaultValue: vnode.state.description,
@@ -61,7 +103,7 @@ const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler:
         ]),
       ]),
       m('tr', [
-        m('td', 'URL:'),
+        m('td', 'URL'),
         m('td', [
           m(Input, {
             defaultValue: `commonwealth.im/${vnode.state.url}`,
@@ -71,10 +113,15 @@ const CommunityMetadata: m.Component<{community: CommunityInfo, onChangeHandler:
           }),
         ]),
       ]),
+      m('tr', [
+        m('td', 'Admins'),
+        m('td', [ m(RoleRow, { roledata: admins }) ])
+      ]),
+      // m('tr', [
+      //   m('td', 'Moderators'),
+      //   m('td', [ m(RoleRow, { roledata: mods }) ])
+      // ]),
     ]),
-    m(CreatorField),
-    m('admins'),
-    m('mods'),
     m(Button, {
       label: 'submit',
       onclick: () => {
@@ -99,6 +146,7 @@ const ChainMetadata: m.Component = {
 
 const Panel: m.Component<{onChangeHandler: Function}> = {
   view: (vnode) => {
+    const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
     return m('.Panel', [
       m('.panel-left', { style: 'width: 70%;' }, [
