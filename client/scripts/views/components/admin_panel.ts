@@ -1,4 +1,4 @@
-import m from 'mithril';
+import m, { Vnode } from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea } from 'construct-ui';
@@ -46,6 +46,22 @@ interface IChainCommunityAttrs {
   mods;
 }
 
+const TableRow: m.Component<{title: string, defaultValue: string, disabled?: boolean, onChangeHandler: Function}> = {
+  view: (vnode) => {
+    return m('tr', [
+      m('td', { style: 'width: 100px' }, vnode.attrs.title),
+      m('td', [
+        m(Input, {
+          defaultValue: vnode.attrs.defaultValue,
+          fluid: true,
+          disabled: vnode.attrs.disabled || false,
+          onkeyup: (e) => { vnode.attrs.onChangeHandler((e.target as any).value); },
+        }),
+      ]),
+    ]);
+  }
+};
+
 const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataState> = {
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
@@ -60,39 +76,22 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
       class: '.community.metadata',
       style: 'table-layout: fixed;'
     }, [
-      m('tr', [
-        m('td', { style: 'width: 100px' }, 'Name'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.name,
-            fluid: true,
-            value: vnode.state.name,
-            onchange: (e) => { vnode.state.name = (e.target as any).value; },
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Description'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.description,
-            fluid: true,
-            value: vnode.state.description,
-            onchange: (e) => { vnode.state.description = (e.target as any).value; },
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'URL'),
-        m('td', [
-          m(Input, {
-            defaultValue: `commonwealth.im/${vnode.state.url}`,
-            fluid: true,
-            disabled: true,
-            value: `commonwealth.im/${vnode.state.url}`,
-          }),
-        ]),
-      ]),
+      m(TableRow, {
+        title: 'Name',
+        defaultValue: vnode.state.name,
+        onChangeHandler: (v) => { vnode.state.name = v; },
+      }),
+      m(TableRow, {
+        title: 'Description',
+        defaultValue: vnode.state.description,
+        onChangeHandler: (v) => { vnode.state.description = v; },
+      }),
+      m(TableRow, {
+        title: 'URL',
+        defaultValue: `commonwealth.im/${vnode.state.url}`,
+        disabled: true,
+        onChangeHandler: (v) => { vnode.state.url = v; },
+      }),
       m('tr', [
         m('td', 'Admins'),
         m('td', [ m(RoleRow, { roledata: vnode.attrs.admins }), ])
@@ -135,96 +134,65 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
     vnode.state.symbol = vnode.attrs.chain.symbol;
   },
   view: (vnode) => {
-    return m('ChainMetadata', [m(Table, {
-      bordered: false,
-      interactive: false,
-      striped: false,
-      class: '.chain.metadata',
-      style: 'table-layout: fixed;'
-    }, [
-      m('tr', [
-        m('td', { style: 'width: 100px' }, 'Name'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.name,
-            fluid: true,
-            value: vnode.state.name,
-            onchange: (e) => { vnode.state.name = (e.target as any).value; },
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Description'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.description,
-            fluid: true,
-            value: vnode.state.description,
-            onchange: (e) => { vnode.state.description = (e.target as any).value; },
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'URL'),
-        m('td', [
-          m(Input, {
-            defaultValue: `commonwealth.im/${vnode.state.url}`,
-            fluid: true,
-            disabled: true,
-            value: `commonwealth.im/${vnode.state.url}`,
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Network'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.network,
-            fluid: true,
-            disabled: true,
-            value: vnode.state.network,
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Symbol'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.symbol,
-            fluid: true,
-            disabled: true,
-            value: vnode.state.symbol,
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Icon'),
-        m('td', [
-          m(Input, {
-            defaultValue: vnode.state.iconUrl,
-            fluid: true,
-            disabled: true,
-            value: vnode.state.iconUrl,
-          }),
-        ]),
-      ]),
-      m('tr', [
-        m('td', 'Admins'),
-        m('td', [ m(RoleRow, { roledata: vnode.attrs.admins }), ])
-      ]),
-      vnode.attrs.mods.length > 0 &&
+    return m('ChainMetadata', [
+      m(Table, {
+        bordered: false,
+        interactive: false,
+        striped: false,
+        class: '.chain.metadata',
+        style: 'table-layout: fixed;'
+      }, [
+        m(TableRow, {
+          title: 'Name',
+          defaultValue: vnode.state.name,
+          onChangeHandler: (v) => { vnode.state.name = v; },
+        }),
+        m(TableRow, {
+          title: 'Description',
+          defaultValue: vnode.state.description,
+          onChangeHandler: (v) => { vnode.state.description = v; },
+        }),
+        m(TableRow, {
+          title: 'URL',
+          defaultValue: `commonwealth.im/${vnode.state.url}`,
+          disabled: true,
+          onChangeHandler: (v) => { vnode.state.url = v; },
+        }),
+        m(TableRow, {
+          title: 'Network',
+          defaultValue: vnode.state.network,
+          disabled: true,
+          onChangeHandler: (v) => { vnode.state.network = v; },
+        }),
+        m(TableRow, {
+          title: 'Symbol',
+          defaultValue: vnode.state.symbol,
+          disabled: true,
+          onChangeHandler: (v) => { vnode.state.symbol = v; },
+        }),
+        m(TableRow, {
+          title: 'Icon',
+          defaultValue: vnode.state.iconUrl,
+          disabled: true,
+          onChangeHandler: (v) => { vnode.state.iconUrl = v; },
+        }),
         m('tr', [
-          m('td', 'Moderators'),
-          m('td', [ m(RoleRow, { roledata: vnode.attrs.mods }), ])
+          m('td', 'Admins'),
+          m('td', [ m(RoleRow, { roledata: vnode.attrs.admins }), ])
         ]),
-    ]),
-    m(Button, {
-      label: 'submit',
-      onclick: () => {
-        vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
-        vnode.attrs.onChangeHandler(false);
-      },
-    }),
+        vnode.attrs.mods.length > 0 &&
+          m('tr', [
+            m('td', 'Moderators'),
+            m('td', [ m(RoleRow, { roledata: vnode.attrs.mods }), ])
+          ]),
+      ]),
+      m(Button, {
+        label: 'submit',
+        onclick: () => {
+          vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
+          vnode.attrs.onChangeHandler(false);
+        },
+      }),
     ]);
   },
 };
