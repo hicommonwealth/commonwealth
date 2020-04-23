@@ -37,6 +37,7 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { OffchainCommunitiesStore } from 'stores';
+import AdminPanel from 'views/components/admin_panel';
 
 const NotificationRow: m.Component<{ notification: Notification }> = {
   view: (vnode) => {
@@ -291,6 +292,9 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
+        // admin panel (all communities)
+        (app.community || app.chain) &&
+          m(AdminPanel),
         // TODO: tag selector
         (app.community || app.chain) &&
           m(TagSelector, { activeTag, showFullListing: false }),

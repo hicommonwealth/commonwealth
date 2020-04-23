@@ -1,7 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem } from 'construct-ui';
 import app from 'state';
 
 interface ITagEditorAttrs {
@@ -37,12 +37,11 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
   },
   view: (vnode) => {
     return m('AdminPanel', [
-      m('a', {
+      m(ListItem, {
         href: '#',
-        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; }
-      }, [
-        'Manage Community'
-      ]),
+        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        label: 'Manage Community',
+      }),
       m(Dialog, {
         autofocus: true,
         basic: false,
