@@ -19,6 +19,7 @@ import { CWEvent } from '../../interfaces';
 export default async function (
   api: ApiPromise,
   blockNumber: number,
+  version: number,
   kind: SubstrateEventKind,
   event: Event,
 ): Promise<CWEvent> {
@@ -32,6 +33,7 @@ export default async function (
             blockNumber,
             data: {
               kind,
+              version,
               amount: amount.toString(),
             }
           };
@@ -43,6 +45,7 @@ export default async function (
             includeAddresses: [ validator.toString() ],
             data: {
               kind,
+              version,
               validator: validator.toString(),
               amount: amount.toString(),
             }
@@ -56,6 +59,7 @@ export default async function (
           includeAddresses: [ validator.toString() ],
           data: {
             kind,
+            version,
             validator: validator.toString(),
             amount: amount.toString(),
           }
@@ -74,6 +78,7 @@ export default async function (
           includeAddresses: [ stash.toString() ],
           data: {
             kind,
+            version,
             stash: stash.toString(),
             amount: amount.toString(),
             controller: controllerOpt.unwrap().toString(),
@@ -88,6 +93,7 @@ export default async function (
           includeAddresses: [ target.toString() ],
           data: {
             kind,
+            version,
             who: who.toString(),
             target: target.toString(),
           }
@@ -107,6 +113,7 @@ export default async function (
           excludeAddresses: [ proposer.toString() ],
           data: {
             kind,
+            version,
             proposalIndex: +proposalIndex,
             deposit: deposit.toString(),
             proposer: proposer.toString(),
@@ -123,6 +130,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             referendumIndex: +referendumIndex,
             endBlock: info.isSome ? (+info.unwrap().end) : null,
           }
@@ -139,6 +147,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             referendumIndex: +referendumIndex,
             dispatchBlock: dispatchInfo ? +dispatchInfo[0] : null,
           }
@@ -152,6 +161,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             referendumIndex: +referendumIndex,
           }
         };
@@ -163,6 +173,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             referendumIndex: +referendumIndex,
             executionOk: executionOk.isTrue,
           }
@@ -181,6 +192,7 @@ export default async function (
           excludeAddresses: [ proposal.proposer.toString() ],
           data: {
             kind,
+            version,
             proposalIndex: +proposalIndex,
             proposer: proposal.proposer.toString(),
             value: proposal.value.toString(),
@@ -199,6 +211,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             proposalIndex: +proposalIndex,
             value: amount.toString(),
             beneficiary: beneficiary.toString(),
@@ -212,6 +225,7 @@ export default async function (
           blockNumber,
           data: {
             kind,
+            version,
             proposalIndex: +proposalIndex,
           }
         };

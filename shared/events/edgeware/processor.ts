@@ -30,7 +30,7 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
       // apply filters
       const kind = parseEventType(event);
       if (kind !== null) {
-        return enrichEvent(this._api, blockNumber, kind, event);
+        return enrichEvent(this._api, blockNumber, block.version, kind, event);
       } else {
         return null;
       }

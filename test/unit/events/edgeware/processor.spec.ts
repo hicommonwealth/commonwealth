@@ -22,6 +22,7 @@ const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
     events: events.map(
       (event) => ({ event } as unknown as EventRecord)
     ),
+    version: 10,
   };
 };
 
@@ -88,6 +89,7 @@ describe('Edgeware Event Processor Tests', () => {
           /* eslint-disable dot-notation */
           data: {
             kind: SubstrateEventKind.Slash,
+            version: 10,
             validator: 'Alice',
             amount: '10000',
           },
@@ -97,6 +99,7 @@ describe('Edgeware Event Processor Tests', () => {
         {
           data: {
             kind: SubstrateEventKind.DemocracyProposed,
+            version: 10,
             proposalIndex: 4,
             deposit: '100000',
             proposer: 'Alice',
@@ -109,6 +112,7 @@ describe('Edgeware Event Processor Tests', () => {
         {
           data: {
             kind: SubstrateEventKind.DemocracyStarted,
+            version: 10,
             referendumIndex: 5,
             endBlock: 123,
           },

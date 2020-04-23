@@ -6,6 +6,8 @@ import { SubstrateEventKind } from '../types';
  * and determines which of our local event kinds it belongs to.
  */
 export default function (event: Event): SubstrateEventKind | null {
+  // TODO: we can unify this with the enricher file: parse out the kind, and then
+  //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (event.section) {
     case 'staking':
       switch (event.method) {

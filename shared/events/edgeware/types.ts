@@ -1,15 +1,6 @@
 import { Header, EventRecord } from '@polkadot/types/interfaces';
 
 /**
- * Substrate lacks a block type that includes events as well, so we synthesize a type
- * from the combination of headers and events.
- */
-export interface SubstrateBlock {
-  header: Header;
-  events: EventRecord[];
-}
-
-/**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).
  */
@@ -18,6 +9,17 @@ export interface SubstrateBlock {
 export type SubstrateBalanceString = string;
 export type SubstrateBlockNumber = number;
 export type SubstrateAccountId = string;
+export type SubstrateRuntimeVersion = number;
+
+/**
+ * Substrate lacks a block type that includes events as well, so we synthesize a type
+ * from the combination of headers and events.
+ */
+export interface SubstrateBlock {
+  header: Header;
+  events: EventRecord[];
+  version: SubstrateRuntimeVersion;
+}
 
 export enum SubstrateEventKind {
   Slash = 'slash',
@@ -36,74 +38,79 @@ export enum SubstrateEventKind {
   TreasuryRejected = 'treasury-rejected',
 }
 
-export interface ISubstrateSlash {
+interface ISubstrateEvent {
+  kind: SubstrateEventKind;
+  version: SubstrateRuntimeVersion;
+}
+
+export interface ISubstrateSlash extends ISubstrateEvent {
   kind: SubstrateEventKind.Slash;
   validator: SubstrateAccountId;
   amount: SubstrateBalanceString;
 }
 
-export interface ISubstrateReward {
+export interface ISubstrateReward extends ISubstrateEvent {
   kind: SubstrateEventKind.Reward;
   validator?: SubstrateAccountId;
   amount: SubstrateBalanceString;
 }
 
-export interface ISubstrateBonded {
+export interface ISubstrateBonded extends ISubstrateEvent {
   kind: SubstrateEventKind.Bonded;
   stash: SubstrateAccountId;
   amount: SubstrateBalanceString;
   controller: SubstrateAccountId;
 }
 
-export interface ISubstrateUnbonded {
+export interface ISubstrateUnbonded extends ISubstrateEvent {
   kind: SubstrateEventKind.Unbonded;
   stash: SubstrateAccountId;
   amount: SubstrateBalanceString;
   controller: SubstrateAccountId;
 }
 
-export interface ISubstrateVoteDelegated {
+export interface ISubstrateVoteDelegated extends ISubstrateEvent {
   kind: SubstrateEventKind.VoteDelegated;
   who: SubstrateAccountId;
   target: SubstrateAccountId;
 }
 
-export interface ISubstrateDemocracyProposed {
+export interface ISubstrateDemocracyProposed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyProposed;
   proposalIndex: number;
   deposit: SubstrateBalanceString;
   proposer: SubstrateAccountId;
 }
 
-export interface ISubstrateDemocracyStarted {
+export interface ISubstrateDemocracyStarted extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyStarted;
   referendumIndex: number;
   endBlock: SubstrateBlockNumber | null;
 }
 
-export interface ISubstrateDemocracyPassed {
+export interface ISubstrateDemocracyPassed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyPassed;
   referendumIndex: number;
   dispatchBlock: SubstrateBlockNumber | null;
 }
 
-export interface ISubstrateDemocracyNotPassed {
+export interface ISubstrateDemocracyNotPassed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyNotPassed;
   referendumIndex: number;
 }
 
-export interface ISubstrateDemocracyCancelled {
+export interface ISubstrateDemocracyCancelled extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyCancelled;
   referendumIndex: number;
 }
 
-export interface ISubstrateDemocracyExecuted {
+export interface ISubstrateDemocracyExecuted extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyExecuted;
   referendumIndex: number;
   executionOk: boolean;
 }
 
-export interface ISubstrateTreasuryProposed {
+export interface ISubstrateTreasuryProposed extends ISubstrateEvent {
   kind: SubstrateEventKind.TreasuryProposed;
   proposalIndex: number;
   proposer: SubstrateAccountId;
@@ -112,14 +119,14 @@ export interface ISubstrateTreasuryProposed {
   // can also fetch bond if needed
 }
 
-export interface ISubstrateTreasuryAwarded {
+export interface ISubstrateTreasuryAwarded extends ISubstrateEvent {
   kind: SubstrateEventKind.TreasuryAwarded;
   proposalIndex: number;
   value: SubstrateBalanceString;
   beneficiary: SubstrateAccountId;
 }
 
-export interface ISubstrateTreasuryRejected {
+export interface ISubstrateTreasuryRejected extends ISubstrateEvent {
   kind: SubstrateEventKind.TreasuryRejected;
   proposalIndex: number;
   // can also fetch slashed bond value if needed

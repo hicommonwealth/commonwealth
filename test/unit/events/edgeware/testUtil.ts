@@ -7,6 +7,10 @@ export function constructFakeApi(callOverrides): ApiPromise {
       chain: {
         subscribeNewHeads: callOverrides['subscribeNewHeads'],
         getHeader: callOverrides['getHeader'],
+      },
+      state: {
+        getRuntimeVersion: callOverrides['getRuntimeVersion'],
+        subscribeRuntimeVersion: callOverrides['subscribeRuntimeVersion'],
       }
     },
     query: {

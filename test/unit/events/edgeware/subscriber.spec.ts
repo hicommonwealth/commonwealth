@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { Hash, EventRecord } from '@polkadot/types/interfaces';
+import { Hash, EventRecord, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { constructFakeApi } from './testUtil';
 import Subscriber from '../../../../shared/events/edgeware/subscriber';
@@ -23,6 +23,9 @@ const getApi = () => {
       if (hash === hashes[0]) return events[0];
       if (hash === hashes[1]) return events[1];
       assert.fail('events.at called with invalid hash');
+    },
+    subscribeRuntimeVersion: (callback) => {
+      callback({ specVersion: 10 } as unknown as RuntimeVersion);
     }
   });
 };
@@ -50,6 +53,7 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.equal(+block.header.number, 1);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
+            assert.equal(block.version, 10);
           } else if (seenBlocks === 1) {
             // second block
             assert.deepEqual(block.header.hash, hashes[1]);
@@ -57,6 +61,7 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.lengthOf(block.events, 2);
             assert.deepEqual(block.events[0], events[1][0]);
             assert.deepEqual(block.events[1], events[1][1]);
+            assert.equal(block.version, 10);
           } else {
             assert.fail('invalid hash');
           }
@@ -89,6 +94,7 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.equal(+block.header.number, 1);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
+            assert.equal(block.version, 10);
           } else if (seenBlocks === 1) {
             // second block
             assert.fail('should only process one block');

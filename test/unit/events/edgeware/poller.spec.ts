@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { Hash, EventRecord, Header } from '@polkadot/types/interfaces';
+import { Hash, EventRecord, Header, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { constructFakeApi } from './testUtil';
 import Poller from '../../../../shared/events/edgeware/poller';
@@ -47,6 +47,11 @@ const getMockApi = () => {
     'blockHash.multi': (blockNumbers: number[]) => {
       return blockNumbers.map((n) => hashes[n - 100]);
     },
+    getRuntimeVersion: () => {
+      return {
+        specVersion: 10,
+      } as unknown as RuntimeVersion;
+    }
   });
 };
 
@@ -64,10 +69,13 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 3);
     assert.equal(+blocks[0].header.number, 105);
     assert.deepEqual(blocks[0].events, []);
+    assert.equal(blocks[0].version, 10);
     assert.equal(+blocks[1].header.number, 106);
     assert.deepEqual(blocks[1].events, events[6]);
+    assert.equal(blocks[1].version, 10);
     assert.equal(+blocks[2].header.number, 107);
     assert.deepEqual(blocks[2].events, []);
+    assert.equal(blocks[2].version, 10);
   });
 
   it('should skip zeroed hashes', async () => {
@@ -82,6 +90,7 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 1);
     assert.equal(+blocks[0].header.number, 105);
     assert.deepEqual(blocks[0].events, []);
+    assert.equal(blocks[0].version, 10);
   });
 
 
@@ -97,8 +106,10 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 2);
     assert.equal(+blocks[0].header.number, 107);
     assert.deepEqual(blocks[0].events, []);
+    assert.equal(blocks[0].version, 10);
     assert.equal(+blocks[1].header.number, 108);
     assert.deepEqual(blocks[1].events, events[8]);
+    assert.equal(blocks[1].version, 10);
   });
 
   it('should not accept invalid start/end blocks', async () => {

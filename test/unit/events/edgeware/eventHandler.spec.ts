@@ -76,6 +76,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 10,
       data: {
         kind: SubstrateEventKind.DemocracyStarted,
+        version: 10,
         referendumIndex: 0,
         endBlock: 100,
       }
@@ -118,6 +119,7 @@ describe('Event Handler Tests', () => {
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: SubstrateEventKind.Slash,
+        version: 10,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
@@ -162,6 +164,7 @@ describe('Event Handler Tests', () => {
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: SubstrateEventKind.DemocracyStarted,
+        version: 10,
         referendumIndex: 1,
         endBlock: 101,
       }

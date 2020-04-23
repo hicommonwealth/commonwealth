@@ -16,7 +16,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
    * @param endBlock last block to fetch, omit to fetch to latest
    */
   public async poll(range: IDisconnectedRange): Promise<SubstrateBlock[]> {
-    // discovery current block if no end block provided
+    // discover current block if no end block provided
     if (!range.endBlock) {
       const header = await this._api.rpc.chain.getHeader();
       range.endBlock = +header.number;
@@ -26,6 +26,14 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       console.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
       return;
     }
+
+    // discover current version
+    const version = await this._api.rpc.state.getRuntimeVersion();
+    const versionNumber = +version.specVersion;
+    // TODO: on newer versions of Substrate, a "system.lastRuntimeUpgrade" query is exposed,
+    //   which will tell us if we hit an upgrade during the polling period. But for now, we
+    //   can assume that the chain has not been upgraded during the offline polling period
+    //   (which for a non-archive node, is only the most recent 250 blocks anyway).
 
     // fetch blocks from start to end
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
@@ -41,7 +49,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
       console.log(`Poller fetched Block: ${+header.number}`);
-      return { header, events };
+      return { header, events, version: versionNumber };
     }));
     console.log('Finished polling past blocks!');
 
