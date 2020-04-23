@@ -3,7 +3,7 @@ import 'components/inline_thread_composer.scss';
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { default as $ } from 'jquery';
-import { Button, Input } from 'construct-ui';
+import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
@@ -213,8 +213,8 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             label: 'Cancel',
             tabindex: 4
           }),
-          m('.property-group', [
-            m('input[type="radio"]', {
+          m('.privacy-selection', [
+            m(Radio, {
               name: 'properties',
               value: 'public',
               id: 'public-thread',
@@ -222,50 +222,30 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               onclick: () => {
                 vnode.state.readOnly = false;
                 vnode.state.privacy = false;
-              }
+              },
+              label: 'Public',
             }),
-            m('label', {
-              for: 'public-thread',
-            }, 'Public'),
-            m('input[type="radio"]', {
+            m(Radio, {
               name: 'properties',
               value: 'private',
               id: 'private-thread',
               onclick: () => {
                 vnode.state.readOnly = false;
                 vnode.state.privacy = true;
-              }
+              },
+              label: 'Private (Only admins/mods)',
             }),
-            m('label', {
-              for: 'private-thread',
-            }, 'Private (Only admins/mods)'),
-            m('input[type="radio"]', {
+            m(Radio, {
               name: 'properties',
               value: 'readOnly',
               id: 'read-only',
               onclick: () => {
                 vnode.state.readOnly = true;
                 vnode.state.privacy = false;
-              }
+              },
+              label: 'Read-Only',
             }),
-            m('label', {
-              for: 'read-only',
-            }, 'Read-Only'),
           ]),
-        ]),
-        m('.tag-selection', [
-          m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
-          }),
         ]),
         (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
           && m('.error-message', [
