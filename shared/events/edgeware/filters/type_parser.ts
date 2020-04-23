@@ -1,32 +1,36 @@
 import { Event } from '@polkadot/types/interfaces';
 import { SubstrateEventKind } from '../types';
 
+/**
+ * This is the Type Parser function, which takes a raw Substrate chain Event
+ * and determines which of our local event kinds it belongs to.
+ */
 export default function (event: Event): SubstrateEventKind | null {
   switch (event.section) {
     case 'staking':
       switch (event.method) {
-        case 'Slash': return 'slash';
-        case 'Reward': return 'reward';
-        case 'Bonded': return 'bonded';
-        case 'Unbonded': return 'unbonded';
+        case 'Slash': return SubstrateEventKind.Slash;
+        case 'Reward': return SubstrateEventKind.Reward;
+        case 'Bonded': return SubstrateEventKind.Bonded;
+        case 'Unbonded': return SubstrateEventKind.Unbonded;
         default: return null;
       }
     case 'democracy':
       switch (event.method) {
-        case 'Proposed': return 'democracy-proposed';
-        case 'Started': return 'democracy-started';
-        case 'Passed': return 'democracy-passed';
-        case 'NotPassed': return 'democracy-not-passed';
-        case 'Cancelled': return 'democracy-cancelled';
-        case 'Executed': return 'democracy-executed';
-        case 'Delegated': return 'vote-delegated';
+        case 'Proposed': return SubstrateEventKind.DemocracyProposed;
+        case 'Started': return SubstrateEventKind.DemocracyStarted;
+        case 'Passed': return SubstrateEventKind.DemocracyPassed;
+        case 'NotPassed': return SubstrateEventKind.DemocracyNotPassed;
+        case 'Cancelled': return SubstrateEventKind.DemocracyCancelled;
+        case 'Executed': return SubstrateEventKind.DemocracyExecuted;
+        case 'Delegated': return SubstrateEventKind.VoteDelegated;
         default: return null;
       }
     case 'treasury':
       switch (event.method) {
-        case 'Proposed': return 'treasury-proposed';
-        case 'Awarded': return 'treasury-awarded';
-        case 'Rejected': return 'treasury-rejected';
+        case 'Proposed': return SubstrateEventKind.TreasuryProposed;
+        case 'Awarded': return SubstrateEventKind.TreasuryAwarded;
+        case 'Rejected': return SubstrateEventKind.TreasuryRejected;
         default: return null;
       }
     default:

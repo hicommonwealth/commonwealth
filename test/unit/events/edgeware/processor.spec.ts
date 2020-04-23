@@ -2,7 +2,7 @@ import chai from 'chai';
 import { Header, EventRecord } from '@polkadot/types/interfaces';
 
 import Processor from '../../../../shared/events/edgeware/processor';
-import { SubstrateEventKindMap } from '../../../../shared/events/edgeware/types';
+import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
 import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;
@@ -87,7 +87,7 @@ describe('Edgeware Event Processor Tests', () => {
         {
           /* eslint-disable dot-notation */
           data: {
-            kind: SubstrateEventKindMap['slash'],
+            kind: SubstrateEventKind.Slash,
             validator: 'Alice',
             amount: '10000',
           },
@@ -96,7 +96,7 @@ describe('Edgeware Event Processor Tests', () => {
         },
         {
           data: {
-            kind: SubstrateEventKindMap['democracy-proposed'],
+            kind: SubstrateEventKind.DemocracyProposed,
             proposalIndex: 4,
             deposit: '100000',
             proposer: 'Alice',
@@ -108,7 +108,7 @@ describe('Edgeware Event Processor Tests', () => {
       assert.deepEqual(results[1], [
         {
           data: {
-            kind: SubstrateEventKindMap['democracy-started'],
+            kind: SubstrateEventKind.DemocracyStarted,
             referendumIndex: 5,
             endBlock: 123,
           },

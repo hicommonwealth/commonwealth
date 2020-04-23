@@ -9,6 +9,7 @@ import models from '../../../../server/database';
 import { NotificationCategories } from '../../../../shared/types';
 import EdgewareEventHandler from '../../../../server/eventHandlers/edgeware';
 import { CWEvent } from '../../../../shared/events/interfaces';
+import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -74,7 +75,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 10,
       data: {
-        kind: 'democracy-started',
+        kind: SubstrateEventKind.DemocracyStarted,
         referendumIndex: 0,
         endBlock: 100,
       }
@@ -116,7 +117,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: 'slash',
+        kind: SubstrateEventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
@@ -160,7 +161,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: 'democracy-started',
+        kind: SubstrateEventKind.DemocracyStarted,
         referendumIndex: 1,
         endBlock: 101,
       }

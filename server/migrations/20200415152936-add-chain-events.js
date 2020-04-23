@@ -2,7 +2,8 @@
 const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
-// TODO: replace this with something less manual!!!
+// TODO: if we can use typescript in migrations, we can simply get these
+//   from the shared/events/edgeware/types file.
 const substrateEventStrings = [
   'slash',
   'reward',

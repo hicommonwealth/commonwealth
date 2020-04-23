@@ -8,7 +8,14 @@ import { Codec } from '@polkadot/types/types';
 import { SubstrateEventKind } from '../types';
 import { CWEvent } from '../../interfaces';
 
-// TODO: better balance/BN handling than string
+/**
+ * This is an "enricher" function, whose goal is to augment the initial event data
+ * received from the "system.events" query with additional useful information, as
+ * described in the event's interface in our "types.ts" file.
+ *
+ * Once fetched, the function marshalls the event data and the additional information
+ * into the interface, and returns a fully-formed event, ready for database storage.
+ */
 export default async function (
   api: ApiPromise,
   blockNumber: number,
@@ -17,7 +24,7 @@ export default async function (
 ): Promise<CWEvent> {
   const extractData = async (): Promise<CWEvent> => {
     switch (kind) {
-      case 'reward': {
+      case SubstrateEventKind.Reward: {
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
           const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
@@ -42,7 +49,7 @@ export default async function (
           };
         }
       }
-      case 'slash': {
+      case SubstrateEventKind.Slash: {
         const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         return {
           blockNumber,
@@ -55,8 +62,8 @@ export default async function (
         };
       }
 
-      case 'bonded':
-      case 'unbonded': {
+      case SubstrateEventKind.Bonded:
+      case SubstrateEventKind.Unbonded: {
         const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         const controllerOpt = await api.query.staking.bonded<Option<AccountId>>(stash);
         if (!controllerOpt.isSome) {
@@ -74,7 +81,7 @@ export default async function (
         };
       }
 
-      case 'vote-delegated': {
+      case SubstrateEventKind.VoteDelegated: {
         const [ who, target ] = event.data as unknown as [ AccountId, AccountId ] & Codec;
         return {
           blockNumber,
@@ -87,7 +94,7 @@ export default async function (
         };
       }
 
-      case 'democracy-proposed': {
+      case SubstrateEventKind.DemocracyProposed: {
         const [ proposalIndex, deposit ] = event.data as unknown as [ PropIndex, Balance ] & Codec;
         const props = await api.query.democracy.publicProps();
         const prop = props.find((p) => p.length > 0 && +p[0] === +proposalIndex);
@@ -107,7 +114,7 @@ export default async function (
         };
       }
 
-      case 'democracy-started': {
+      case SubstrateEventKind.DemocracyStarted: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
 
         // query for edgeware only -- kusama has different type
@@ -122,7 +129,7 @@ export default async function (
         };
       }
 
-      case 'democracy-passed': {
+      case SubstrateEventKind.DemocracyPassed: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
 
         // dispatch queue -- if not present, it was already executed
@@ -138,8 +145,8 @@ export default async function (
         };
       }
 
-      case 'democracy-not-passed':
-      case 'democracy-cancelled': {
+      case SubstrateEventKind.DemocracyNotPassed:
+      case SubstrateEventKind.DemocracyCancelled: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         return {
           blockNumber,
@@ -150,7 +157,7 @@ export default async function (
         };
       }
 
-      case 'democracy-executed': {
+      case SubstrateEventKind.DemocracyExecuted: {
         const [ referendumIndex, executionOk ] = event.data as unknown as [ ReferendumIndex, bool ] & Codec;
         return {
           blockNumber,
@@ -162,7 +169,7 @@ export default async function (
         };
       }
 
-      case 'treasury-proposed': {
+      case SubstrateEventKind.TreasuryProposed: {
         const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
         if (!proposalOpt.isSome) {
@@ -182,8 +189,12 @@ export default async function (
         };
       }
 
-      case 'treasury-awarded': {
-        const [ proposalIndex, amount, beneficiary ] = event.data as unknown as [ ProposalIndex, Balance, AccountId ] & Codec;
+      case SubstrateEventKind.TreasuryAwarded: {
+        const [
+          proposalIndex,
+          amount,
+          beneficiary,
+        ] = event.data as unknown as [ ProposalIndex, Balance, AccountId ] & Codec;
         return {
           blockNumber,
           data: {
@@ -195,7 +206,7 @@ export default async function (
         };
       }
 
-      case 'treasury-rejected': {
+      case SubstrateEventKind.TreasuryRejected: {
         const [ proposalIndex, slashedBond ] = event.data as unknown as [ ProposalIndex, Balance ] & Codec;
         return {
           blockNumber,

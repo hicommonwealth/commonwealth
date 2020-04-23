@@ -45,7 +45,6 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
       process.on('SIGTERM', () => {
         subscriber.unsubscribe();
       });
-      // TODO: how to handle error cases?
       return subscriber;
     });
 };

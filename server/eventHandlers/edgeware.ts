@@ -49,7 +49,7 @@ export default class extends IEventHandler {
       {
         created_at: new Date(),
       },
-      { }, // TODO: what is webhook data here?
+      { }, // TODO: add webhook data once specced out
       this._wss,
       event.excludeAddresses,
       event.includeAddresses,

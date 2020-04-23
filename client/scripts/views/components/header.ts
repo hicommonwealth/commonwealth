@@ -687,11 +687,9 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         () => jumpHighlightComment('parent')
       );
     } else if (category === NotificationCategories.ChainEvent) {
-      // TODO: this needs to be improved a lot lol
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      // TODO: fix this balance formatter! header loads before app.chain...
       // TODO: use different labelers depending on chain
       const label = labelEdgewareEvent(
         notification.chainEvent.blockNumber,

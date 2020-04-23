@@ -36,6 +36,17 @@ export function createApi(provider: WsProvider): ApiPromise {
   });
 }
 
+/**
+ * This is the main function for edgeware event handling. It constructs a connection
+ * to the chain, connects all event-related modules, and initializes event handling.
+ *
+ * @param url The edgeware chain endpoint to connect to.
+ * @param handler An event handler object for processing received events.
+ * @param skipCatchup If true, skip all fetching of "historical" chain data that may have been
+ *                    emitted during downtime.
+ * @param discoverReconnectRange A function to determine how long we were offline upon reconnection.
+ * @returns An active block subscriber.
+ */
 export default function (
   url = 'ws://localhost:9944',
   handler: IEventHandler,
@@ -111,7 +122,6 @@ export default function (
           // handle reconnects with poller
           api.on('connected', pollMissedBlocksFn);
         } catch (e) {
-          // TODO: get real failure handling esp for disconnections
           console.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
         }
 

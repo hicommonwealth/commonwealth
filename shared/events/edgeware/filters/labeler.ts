@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import { SubstrateBalanceString } from '../types';
+import { SubstrateBalanceString, SubstrateEventKind } from '../types';
 import { IEventLabel, IChainEventData, LabelerFilter } from '../../interfaces';
 import { SubstrateCoin } from '../../../adapters/chain/substrate/types';
 
@@ -27,6 +27,10 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
 };
 
 /* eslint-disable max-len */
+/**
+ * This a labeler function, which takes event data and describes it in "plain english",
+ * such that we can display a notification regarding its contents.
+ */
 const labelerFunc: LabelerFilter = (
   blockNumber: number,
   chainId: string,
@@ -34,14 +38,14 @@ const labelerFunc: LabelerFilter = (
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
-    case 'slash': {
+    case SubstrateEventKind.Slash: {
       const { validator, amount } = data;
       return {
         heading: 'Validator Slashed',
         label: `Validator ${fmtAddr(validator)} was slashed by amount ${balanceFormatter(amount)}.`,
       };
     }
-    case 'reward': {
+    case SubstrateEventKind.Reward: {
       const { amount } = data;
       return {
         heading: 'Validator Rewarded',
@@ -50,28 +54,28 @@ const labelerFunc: LabelerFilter = (
           : `All validators were rewarded by amount ${balanceFormatter(amount)}.`,
       };
     }
-    case 'bonded': {
+    case SubstrateEventKind.Bonded: {
       const { stash, controller, amount } = data;
       return {
         heading: 'Bonded',
         label: `You bonded ${balanceFormatter(amount)} from controller ${fmtAddr(controller)} to stash ${fmtAddr(stash)}.`,
       };
     }
-    case 'unbonded': {
+    case SubstrateEventKind.Unbonded: {
       const { stash, controller, amount } = data;
       return {
         heading: 'Bonded',
         label: `You unbonded ${balanceFormatter(amount)} from controller ${fmtAddr(controller)} to stash ${fmtAddr(stash)}.`,
       };
     }
-    case 'vote-delegated': {
+    case SubstrateEventKind.VoteDelegated: {
       const { who, target } = data;
       return {
         heading: 'Vote Delegated',
         label: `Your account ${fmtAddr(target)} received a voting delegation from ${fmtAddr(who)}.`
       };
     }
-    case 'democracy-proposed': {
+    case SubstrateEventKind.DemocracyProposed: {
       const { deposit, proposalIndex } = data;
       return {
         heading: 'Democracy Proposal Created',
@@ -79,7 +83,7 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
-    case 'democracy-started': {
+    case SubstrateEventKind.DemocracyStarted: {
       const { endBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Started',
@@ -89,7 +93,7 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case 'democracy-passed': {
+    case SubstrateEventKind.DemocracyPassed: {
       const { dispatchBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Passed',
@@ -98,7 +102,7 @@ const labelerFunc: LabelerFilter = (
           : `Referendum ${referendumIndex} passed was dispatched on block ${blockNumber}.`,
       };
     }
-    case 'democracy-not-passed': {
+    case SubstrateEventKind.DemocracyNotPassed: {
       const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Failed',
@@ -106,7 +110,7 @@ const labelerFunc: LabelerFilter = (
         label: `Referendum ${referendumIndex} has failed.`,
       };
     }
-    case 'democracy-cancelled': {
+    case SubstrateEventKind.DemocracyCancelled: {
       const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Cancelled',
@@ -114,14 +118,14 @@ const labelerFunc: LabelerFilter = (
         label: `Referendum ${referendumIndex} was cancelled.`,
       };
     }
-    case 'democracy-executed': {
+    case SubstrateEventKind.DemocracyExecuted: {
       const { referendumIndex, executionOk } = data;
       return {
         heading: 'Democracy Referendum Executed',
         label: `Referendum ${referendumIndex} was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
       };
     }
-    case 'treasury-proposed': {
+    case SubstrateEventKind.TreasuryProposed: {
       const { proposalIndex, proposer, value } = data;
       return {
         heading: 'Treasury Proposal Created',
@@ -129,14 +133,14 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/treasuryproposal/${proposalIndex}` : null,
       };
     }
-    case 'treasury-awarded': {
+    case SubstrateEventKind.TreasuryAwarded: {
       const { proposalIndex, value, beneficiary } = data;
       return {
         heading: 'Treasury Proposal Awarded',
         label: `Treasury proposal ${proposalIndex} of ${balanceFormatter(value)} was awarded to ${fmtAddr(beneficiary)}.`,
       };
     }
-    case 'treasury-rejected': {
+    case SubstrateEventKind.TreasuryRejected: {
       const { proposalIndex } = data;
       return {
         heading: 'Treasury Proposal Rejected',

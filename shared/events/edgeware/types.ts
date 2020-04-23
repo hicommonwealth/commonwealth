@@ -19,75 +19,92 @@ export type SubstrateBalanceString = string;
 export type SubstrateBlockNumber = number;
 export type SubstrateAccountId = string;
 
+export enum SubstrateEventKind {
+  Slash = 'slash',
+  Reward = 'reward',
+  Bonded = 'bonded',
+  Unbonded = 'unbonded',
+  VoteDelegated = 'vote-delegated',
+  DemocracyProposed = 'democracy-proposed',
+  DemocracyStarted = 'democracy-started',
+  DemocracyPassed = 'democracy-passed',
+  DemocracyNotPassed = 'democracy-not-passed',
+  DemocracyCancelled = 'democracy-cancelled',
+  DemocracyExecuted = 'democracy-executed',
+  TreasuryProposed = 'treasury-proposed',
+  TreasuryAwarded = 'treasury-awarded',
+  TreasuryRejected = 'treasury-rejected',
+}
+
 export interface ISubstrateSlash {
-  kind: 'slash';
+  kind: SubstrateEventKind.Slash;
   validator: SubstrateAccountId;
   amount: SubstrateBalanceString;
 }
 
 export interface ISubstrateReward {
-  kind: 'reward';
+  kind: SubstrateEventKind.Reward;
   validator?: SubstrateAccountId;
   amount: SubstrateBalanceString;
 }
 
 export interface ISubstrateBonded {
-  kind: 'bonded';
+  kind: SubstrateEventKind.Bonded;
   stash: SubstrateAccountId;
   amount: SubstrateBalanceString;
   controller: SubstrateAccountId;
 }
 
 export interface ISubstrateUnbonded {
-  kind: 'unbonded';
+  kind: SubstrateEventKind.Unbonded;
   stash: SubstrateAccountId;
   amount: SubstrateBalanceString;
   controller: SubstrateAccountId;
 }
 
 export interface ISubstrateVoteDelegated {
-  kind: 'vote-delegated';
+  kind: SubstrateEventKind.VoteDelegated;
   who: SubstrateAccountId;
   target: SubstrateAccountId;
 }
 
 export interface ISubstrateDemocracyProposed {
-  kind: 'democracy-proposed';
+  kind: SubstrateEventKind.DemocracyProposed;
   proposalIndex: number;
   deposit: SubstrateBalanceString;
   proposer: SubstrateAccountId;
 }
 
 export interface ISubstrateDemocracyStarted {
-  kind: 'democracy-started';
+  kind: SubstrateEventKind.DemocracyStarted;
   referendumIndex: number;
   endBlock: SubstrateBlockNumber | null;
 }
 
 export interface ISubstrateDemocracyPassed {
-  kind: 'democracy-passed';
+  kind: SubstrateEventKind.DemocracyPassed;
   referendumIndex: number;
   dispatchBlock: SubstrateBlockNumber | null;
 }
 
 export interface ISubstrateDemocracyNotPassed {
-  kind: 'democracy-not-passed';
+  kind: SubstrateEventKind.DemocracyNotPassed;
   referendumIndex: number;
 }
 
 export interface ISubstrateDemocracyCancelled {
-  kind: 'democracy-cancelled';
+  kind: SubstrateEventKind.DemocracyCancelled;
   referendumIndex: number;
 }
 
 export interface ISubstrateDemocracyExecuted {
-  kind: 'democracy-executed';
+  kind: SubstrateEventKind.DemocracyExecuted;
   referendumIndex: number;
   executionOk: boolean;
 }
 
 export interface ISubstrateTreasuryProposed {
-  kind: 'treasury-proposed';
+  kind: SubstrateEventKind.TreasuryProposed;
   proposalIndex: number;
   proposer: SubstrateAccountId;
   value: SubstrateBalanceString;
@@ -96,14 +113,14 @@ export interface ISubstrateTreasuryProposed {
 }
 
 export interface ISubstrateTreasuryAwarded {
-  kind: 'treasury-awarded';
+  kind: SubstrateEventKind.TreasuryAwarded;
   proposalIndex: number;
   value: SubstrateBalanceString;
   beneficiary: SubstrateAccountId;
 }
 
 export interface ISubstrateTreasuryRejected {
-  kind: 'treasury-rejected';
+  kind: SubstrateEventKind.TreasuryRejected;
   proposalIndex: number;
   // can also fetch slashed bond value if needed
   // cannot fetch other data because proposal data disappears on rejection
@@ -127,23 +144,4 @@ export type ISubstrateEventData =
 // eslint-disable-next-line semi-style
 ;
 
-export type SubstrateEventKind = ISubstrateEventData[keyof ISubstrateEventData];
-
-export const SubstrateEventKindMap: { [P in SubstrateEventKind]: P } = {
-  'slash': 'slash',
-  'reward': 'reward',
-  'bonded': 'bonded',
-  'unbonded': 'unbonded',
-  'vote-delegated': 'vote-delegated',
-  'democracy-proposed': 'democracy-proposed',
-  'democracy-started': 'democracy-started',
-  'democracy-passed': 'democracy-passed',
-  'democracy-not-passed': 'democracy-not-passed',
-  'democracy-cancelled': 'democracy-cancelled',
-  'democracy-executed': 'democracy-executed',
-  'treasury-proposed': 'treasury-proposed',
-  'treasury-awarded': 'treasury-awarded',
-  'treasury-rejected': 'treasury-rejected',
-};
-
-export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKindMap);
+export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKind);
