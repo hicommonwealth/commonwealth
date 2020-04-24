@@ -8,8 +8,9 @@ class OffchainReaction<T extends IUniqueId> {
   public readonly reaction: string;
   public readonly threadId: number | string;
   public readonly commentId: number | string;
+  public readonly author_chain: string;
 
-  constructor(id, author, chain, community, reaction, threadId, communityId) {
+  constructor(id, author, chain, community, reaction, threadId, communityId, author_chain) {
     this.id = id;
     this.author = author;
     this.chain = chain;
@@ -17,6 +18,7 @@ class OffchainReaction<T extends IUniqueId> {
     this.reaction = reaction;
     this.threadId = threadId;
     this.commentId = communityId;
+    this.author_chain = author_chain;
   }
 }
 
