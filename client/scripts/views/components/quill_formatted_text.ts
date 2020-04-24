@@ -121,7 +121,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
             const embedType = Object.keys(child.insert)[0];
             return m('span', `[${stringUpperFirst(embedType)} embed]`);
           }
-          return m('span', child.insert.toString());
+          return m('span', `${child.insert} `);
         });
       }));
     })
@@ -191,9 +191,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
-            }, child.insert?.toString());
+            }, `${child.insert} `);
           } else {
-            result = m('span', child.insert?.toString());
+            result = m('span', `${child.insert} `);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if ((k !== 'color' && k !== 'background') && v !== true) return;

@@ -165,7 +165,7 @@ function applyBlockFormatters(parentText, hideFormatting) {
         // if we are in the same group, keep appending to it
         lastGroup.push(
           (blockFormatters[thisLineFormat] && !hideFormatting)
-            ? blockFormatters[thisLineFormat].formatOne(line, match[0]) : line
+            ? blockFormatters[thisLineFormat].formatOne(line, match[0]) : `${line} `
         );
       } else {
         // otherwise, push the previous group onto `results` and start anew
@@ -178,7 +178,7 @@ function applyBlockFormatters(parentText, hideFormatting) {
         lastGroup = [
           (blockFormatters[thisLineFormat] && !hideFormatting)
             ? blockFormatters[thisLineFormat].formatOne(line, match[0])
-            : line
+            : `${line} `
         ];
       }
     });
