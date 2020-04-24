@@ -5,7 +5,7 @@ import {
 } from '@polkadot/types/interfaces';
 import { Option, bool } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
-import { SubstrateEventKind } from '../types';
+import { SubstrateEventKind, ISubstrateEventData } from '../types';
 import { CWEvent } from '../../interfaces';
 
 /**
@@ -23,17 +23,19 @@ export default async function (
   kind: SubstrateEventKind,
   event: Event,
 ): Promise<CWEvent> {
-  const extractData = async (): Promise<CWEvent> => {
+  const extractData = async (): Promise<{
+    data: ISubstrateEventData,
+    includeAddresses?: string[],
+    excludeAddresses?: string[],
+  }> => {
     switch (kind) {
       case SubstrateEventKind.Reward: {
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
           const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
           return {
-            blockNumber,
             data: {
               kind,
-              version,
               amount: amount.toString(),
             }
           };
@@ -41,11 +43,9 @@ export default async function (
           // kusama/new event
           const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
           return {
-            blockNumber,
             includeAddresses: [ validator.toString() ],
             data: {
               kind,
-              version,
               validator: validator.toString(),
               amount: amount.toString(),
             }
@@ -55,11 +55,9 @@ export default async function (
       case SubstrateEventKind.Slash: {
         const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         return {
-          blockNumber,
           includeAddresses: [ validator.toString() ],
           data: {
             kind,
-            version,
             validator: validator.toString(),
             amount: amount.toString(),
           }
@@ -74,11 +72,9 @@ export default async function (
           throw new Error(`could not fetch staking controller for ${stash.toString()}`);
         }
         return {
-          blockNumber,
           includeAddresses: [ stash.toString() ],
           data: {
             kind,
-            version,
             stash: stash.toString(),
             amount: amount.toString(),
             controller: controllerOpt.unwrap().toString(),
@@ -89,11 +85,9 @@ export default async function (
       case SubstrateEventKind.VoteDelegated: {
         const [ who, target ] = event.data as unknown as [ AccountId, AccountId ] & Codec;
         return {
-          blockNumber,
           includeAddresses: [ target.toString() ],
           data: {
             kind,
-            version,
             who: who.toString(),
             target: target.toString(),
           }
@@ -109,11 +103,9 @@ export default async function (
         }
         const [ idx, hash, proposer ] = prop;
         return {
-          blockNumber,
           excludeAddresses: [ proposer.toString() ],
           data: {
             kind,
-            version,
             proposalIndex: +proposalIndex,
             deposit: deposit.toString(),
             proposer: proposer.toString(),
@@ -127,10 +119,8 @@ export default async function (
         // query for edgeware only -- kusama has different type
         const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             referendumIndex: +referendumIndex,
             endBlock: info.isSome ? (+info.unwrap().end) : null,
           }
@@ -144,10 +134,8 @@ export default async function (
         const dispatchQueue = await api.query.democracy.dispatchQueue();
         const dispatchInfo = dispatchQueue.find(([ block, hash, idx ]) => +idx === +referendumIndex);
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             referendumIndex: +referendumIndex,
             dispatchBlock: dispatchInfo ? +dispatchInfo[0] : null,
           }
@@ -158,10 +146,8 @@ export default async function (
       case SubstrateEventKind.DemocracyCancelled: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             referendumIndex: +referendumIndex,
           }
         };
@@ -170,10 +156,8 @@ export default async function (
       case SubstrateEventKind.DemocracyExecuted: {
         const [ referendumIndex, executionOk ] = event.data as unknown as [ ReferendumIndex, bool ] & Codec;
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             referendumIndex: +referendumIndex,
             executionOk: executionOk.isTrue,
           }
@@ -188,11 +172,9 @@ export default async function (
         }
         const proposal = proposalOpt.unwrap();
         return {
-          blockNumber,
           excludeAddresses: [ proposal.proposer.toString() ],
           data: {
             kind,
-            version,
             proposalIndex: +proposalIndex,
             proposer: proposal.proposer.toString(),
             value: proposal.value.toString(),
@@ -208,10 +190,8 @@ export default async function (
           beneficiary,
         ] = event.data as unknown as [ ProposalIndex, Balance, AccountId ] & Codec;
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             proposalIndex: +proposalIndex,
             value: amount.toString(),
             beneficiary: beneficiary.toString(),
@@ -222,10 +202,8 @@ export default async function (
       case SubstrateEventKind.TreasuryRejected: {
         const [ proposalIndex, slashedBond ] = event.data as unknown as [ ProposalIndex, Balance ] & Codec;
         return {
-          blockNumber,
           data: {
             kind,
-            version,
             proposalIndex: +proposalIndex,
           }
         };
@@ -238,5 +216,5 @@ export default async function (
 
   // construct CWEvent
   const eventData = await extractData();
-  return { ...eventData, blockNumber };
+  return { ...eventData, version: version.toString(), blockNumber };
 }

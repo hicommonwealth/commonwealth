@@ -34,6 +34,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
 const labelerFunc: LabelerFilter = (
   blockNumber: number,
   chainId: string,
+  version: string,
   data: IChainEventData,
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);

@@ -40,7 +40,6 @@ export enum SubstrateEventKind {
 
 interface ISubstrateEvent {
   kind: SubstrateEventKind;
-  version: SubstrateRuntimeVersion;
 }
 
 export interface ISubstrateSlash extends ISubstrateEvent {
