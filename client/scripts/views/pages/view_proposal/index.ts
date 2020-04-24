@@ -52,11 +52,13 @@ import {
   ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete,
   ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
-  ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons } from './header';
+  ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons
+} from './header';
 import {
   GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply,
   ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer,
-  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
+  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction
+} from './body';
 import CreateComment from './create_comment';
 
 
@@ -164,6 +166,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           vnode.state.editing
             && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
         ]),
+        m('.proposal-body-reactions', [
+          m(ProposalBodyReaction, { item: proposal }),
+        ]),
       ]),
     ]);
   }
@@ -253,6 +258,9 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 
         vnode.state.editing
           && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
+      ]),
+      m('.comment-body-reactions', [
+        m(ProposalBodyReaction, { item: comment }),
       ]),
     ]);
   }

@@ -26,6 +26,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
+import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -334,6 +335,17 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         editorNamespace: document.location.pathname
           + (isThread ? `-editing-comment-${item.id}` : '-editing-thread'),
       })
+    ]);
+  }
+};
+
+export const ProposalBodyReaction: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+  view: (vnode) => {
+    const { item } = vnode.attrs;
+    if (!item) return;
+
+    return m('.ProposalBodyReaction', [
+      m(ReactionButton, { post: item, type: ReactionType.Like, tooltip: true })
     ]);
   }
 };
