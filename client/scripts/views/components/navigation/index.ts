@@ -334,64 +334,14 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
                 ])
               ]),
             ],
-            label: [
-              app.login.activeAddresses.length === 0
-                // no address on the active chain
-                ? m(Button, {
-                  intent: 'none',
-                  iconLeft: Icons.USER_PLUS,
-                  size: 'sm',
-                  fluid: true,
-                  label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
-                  onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-                })
-                // at least one address on the active chain
-                : m(PopoverMenu, {
-                  class: 'switch-user-button',
-                  transitionDuration: 50,
-                  hoverCloseDelay: 0,
-                  trigger: app.vm.activeAccount
-                    ? m(Button, {
-                      iconRight: Icons.CHEVRON_UP,
-                      size: 'xs'
-                    })
-                    : m(Button, {
-                      intent: 'none',
-                      iconRight: Icons.CHEVRON_UP,
-                      size: 'sm',
-                      fluid: true,
-                      label: 'Select address',
-                    }),
-                  position: 'bottom-end',
-                  closeOnContentClick: true,
-                  menuAttrs: {
-                    align: 'left',
-                  },
-                  content: [
-                    // link new address
-                    m(MenuItem, {
-                      onclick: () => {
-                        app.modals.create({ modal: LinkNewAddressModal });
-                      },
-                      contentLeft: m(Icon, { name: Icons.USER_PLUS }),
-                      label: `Link new ${(app.chain?.chain?.denom) || ''} address`
-                    }),
-                    m(MenuDivider),
-                    // existing addresses that have a Role in the community
-                    app.login.activeAddresses
-                      .filter((account) => isMember(app.chain?.meta.chain.id, app.community?.id, account))
-                      .map((account) => m(MenuItem, {
-                        key: `${account.chain.id}-${account.address}`,
-                        disabled: account === activeAccount,
-                        class: account === activeAccount ? 'selected' : '',
-                        onclick: () => setActiveAccount(account),
-                        label: [
-                          m(User, { user: account }),
-                        ],
-                      })),
-                  ],
-                }),
-            ],
+            label: app.login.activeAddresses.length === 0 && m(Button, {
+              intent: 'none',
+              iconLeft: Icons.USER_PLUS,
+              size: 'sm',
+              fluid: true,
+              label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+              onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+            }),
           }),
       ]),
     ]);
