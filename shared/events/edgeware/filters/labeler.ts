@@ -91,6 +91,19 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
+    case SubstrateEventKind.DemocracyTabled: {
+      const { proposalIndex } = data;
+      return {
+        heading: 'Democracy Proposal Tabled',
+        label: `Democracy proposal ${proposalIndex} has been tabled as a referendum.`,
+        linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
+        // TODO: the only way to get the linkUrl here for the new referendum is to fetch the hash
+        //    from the Proposed event, and then use that to discover the Started event which occurs
+        //    *after* this, or else to fetch the not-yet-created referendum from storage.
+        //    Once we have the referendum, we can use *that* index to generate a link. Or, we can
+        //    just link to the completed proposal, as we do now.
+      };
+    }
     case SubstrateEventKind.DemocracyStarted: {
       const { endBlock, referendumIndex } = data;
       return {
@@ -108,6 +121,7 @@ const labelerFunc: LabelerFilter = (
         label: dispatchBlock
           ? `Referendum ${referendumIndex} passed and will be dispatched on block ${dispatchBlock}.`
           : `Referendum ${referendumIndex} passed was dispatched on block ${blockNumber}.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.DemocracyNotPassed: {
@@ -116,6 +130,7 @@ const labelerFunc: LabelerFilter = (
         heading: 'Democracy Referendum Failed',
         // TODO: include final tally?
         label: `Referendum ${referendumIndex} has failed.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.DemocracyCancelled: {
@@ -124,6 +139,7 @@ const labelerFunc: LabelerFilter = (
         heading: 'Democracy Referendum Cancelled',
         // TODO: include cancellation vote?
         label: `Referendum ${referendumIndex} was cancelled.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.DemocracyExecuted: {
@@ -131,12 +147,57 @@ const labelerFunc: LabelerFilter = (
       return {
         heading: 'Democracy Referendum Executed',
         label: `Referendum ${referendumIndex} was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
 
     /**
      * Preimage Events
      */
+    case SubstrateEventKind.PreimageNoted: {
+      const { proposalHash, noter } = data;
+      return {
+        heading: 'Preimage Noted',
+        label: `A new preimage was noted by ${fmtAddr(noter)}.`,
+        // TODO: the only way to get a link to (or text regarding) the related proposal here
+        //    requires back-referencing the proposalHash with the index we use to identify the
+        //    proposal.
+        //  Alternatively, if we have a preimage-specific page (which would be nice, as we could
+        //    display info about its corresponding Call), we can link to that, or we could instead
+        //    link to the noter's profile.
+      };
+    }
+    case SubstrateEventKind.PreimageUsed: {
+      const { proposalHash, noter } = data;
+      return {
+        heading: 'Preimage Used',
+        label: `A preimage noted by ${fmtAddr(noter)} was used.`,
+        // TODO: see linkUrl comment above, on PreimageNoted.
+      };
+    }
+    case SubstrateEventKind.PreimageInvalid: {
+      const { proposalHash, referendumIndex } = data;
+      return {
+        heading: 'Preimage Invalid',
+        label: `Preimage for referendum ${referendumIndex} was invalid.`,
+        // TODO: once we have proposal archiving, add linkUrl here
+      };
+    }
+    case SubstrateEventKind.PreimageMissing: {
+      const { proposalHash, referendumIndex } = data;
+      return {
+        heading: 'Preimage Missing',
+        label: `Preimage for referendum ${referendumIndex} not found.`,
+        // TODO: once we have proposal archiving, add linkUrl here
+      };
+    }
+    case SubstrateEventKind.PreimageReaped: {
+      const { proposalHash, noter, reaper } = data;
+      return {
+        heading: 'Preimage Reaped',
+        label: `A preimage noted by ${fmtAddr(noter)} was reaped by ${fmtAddr(reaper)}.`,
+      };
+    }
 
     /**
      * Treasury Events
@@ -154,6 +215,7 @@ const labelerFunc: LabelerFilter = (
       return {
         heading: 'Treasury Proposal Awarded',
         label: `Treasury proposal ${proposalIndex} of ${balanceFormatter(value)} was awarded to ${fmtAddr(beneficiary)}.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.TreasuryRejected: {
@@ -161,23 +223,134 @@ const labelerFunc: LabelerFilter = (
       return {
         heading: 'Treasury Proposal Rejected',
         label: `Treasury proposal ${proposalIndex} was rejected.`,
+        // TODO: once we have proposal archiving, add linkUrl here
       };
     }
 
     /**
      * Elections Events
+     *
+     * Note: all election events simply link to the council page.
+     *   We may want to change this if deemed unnecessary.
      */
+    case SubstrateEventKind.ElectionNewTerm: {
+      const { newMembers } = data;
+      return {
+        heading: 'New Election Term Started',
+        label: `A new election term started with ${newMembers.length} new members.`,
+        // we just link to the council page here, so they can see the new members/results
+        linkUrl: chainId ? `/${chainId}/council/` : null,
+      };
+    }
+    case SubstrateEventKind.ElectionEmptyTerm: {
+      return {
+        heading: 'New Election Term Started',
+        label: 'A new election term started with no new members.',
+        linkUrl: chainId ? `/${chainId}/council/` : null,
+      };
+    }
+    case SubstrateEventKind.ElectionMemberKicked: {
+      const { who } = data;
+      return {
+        heading: 'Council Member Kicked',
+        label: `Council member ${fmtAddr(who)} was kicked at end of term.`,
+        // TODO: this could also link to the member's page
+        linkUrl: chainId ? `/${chainId}/council/` : null,
+      };
+    }
+    case SubstrateEventKind.ElectionMemberRenounced: {
+      const { who } = data;
+      return {
+        heading: 'Council Member Renounced',
+        label: `Candidate ${fmtAddr(who)} renounced their candidacy.`,
+        // TODO: this could also link to the member's page
+        linkUrl: chainId ? `/${chainId}/council/` : null,
+      };
+    }
 
     /**
      * Collective Events
      */
+    case SubstrateEventKind.CollectiveProposed: {
+      const { proposer, proposalIndex, threshold } = data;
+      return {
+        heading: 'New Council Proposal',
+        label: `${fmtAddr(proposer)} introduced a new council proposal, requiring ${threshold} approvals to pass.`,
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalIndex}` : null,
+      };
+    }
+    case SubstrateEventKind.CollectiveApproved: {
+      const { proposalIndex, ayes, nays } = data;
+      return {
+        heading: 'Council Proposal Approved',
+        label: `Council proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
+        // TODO: once we have proposal archiving, add linkUrl here
+      };
+    }
+    case SubstrateEventKind.CollectiveDisapproved: {
+      const { proposalIndex, ayes, nays } = data;
+      return {
+        heading: 'Council Proposal Disapproved',
+        label: `Council proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
+        // TODO: once we have proposal archiving, add linkUrl here
+      };
+    }
+    case SubstrateEventKind.CollectiveExecuted: {
+      const { executionOk } = data;
+      return {
+        heading: 'Council Proposal Executed',
+        label: `Approved council proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
+        // no way to recover the index here besides checking the db for proposed event
+      };
+    }
+    case SubstrateEventKind.CollectiveMemberExecuted: {
+      const { executionOk } = data;
+      return {
+        heading: 'Council Proposal Executed',
+        label: `A member-executed council proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
+        // no way to recover the index here besides checking the db for proposed event
+        // ...and for member-exectured proposals, that might not even exist, depending on logic
+      };
+    }
 
     /**
      * Signaling Events
      */
+    case SubstrateEventKind.SignalingNewProposal: {
+      const { proposer, voteId } = data;
+      return {
+        heading: 'New Signaling Proposal',
+        label: `A new signaling proposal was created by ${fmtAddr(proposer)}.`,
+        linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
+      };
+    }
+    case SubstrateEventKind.SignalingCommitStarted: {
+      const { endBlock, voteId } = data;
+      return {
+        heading: 'Signaling Proposal Commit Started',
+        label: `A signaling proposal's commit phase has started, lasting until block ${endBlock}.`,
+        linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
+      };
+    }
+    case SubstrateEventKind.SignalingVotingStarted: {
+      const { endBlock, voteId } = data;
+      return {
+        heading: 'Signaling Proposal Voting Started',
+        label: `A signaling proposal's voting phase has started, lasting until block ${endBlock}.`,
+        linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
+      };
+    }
+    case SubstrateEventKind.SignalingVotingCompleted: {
+      const { voteId } = data;
+      return {
+        heading: 'Signaling Proposal Completed',
+        label: 'A signaling proposal\'s voting phase has completed.',
+        linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
+      };
+    }
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
-      const _exhaustiveMatch: never = data.kind;
+      const _exhaustiveMatch: never = data;
       throw new Error('unknown event type');
     }
   }

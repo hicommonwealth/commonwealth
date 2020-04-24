@@ -7,6 +7,7 @@ import { Header, EventRecord } from '@polkadot/types/interfaces';
 
 /** Special types for formatting/labeling purposes */
 export type SubstrateBalanceString = string;
+export type SubstrateBigIntString = string;
 export type SubstrateBlockNumber = number;
 export type SubstrateAccountId = string;
 export type SubstrateRuntimeVersion = number;
@@ -37,8 +38,7 @@ export enum SubstrateEventKind {
   DemocracyExecuted = 'democracy-executed',
 
   PreimageNoted = 'preimage-noted',
-  // XXX
-  // PreimageUsed = 'preimage-used',
+  PreimageUsed = 'preimage-used',
   PreimageInvalid = 'preimage-invalid',
   PreimageMissing = 'preimage-missing',
   PreimageReaped = 'preimage-reaped',
@@ -54,6 +54,7 @@ export enum SubstrateEventKind {
 
   CollectiveProposed = 'collective-proposed',
   CollectiveApproved = 'collective-approved',
+  CollectiveDisapproved = 'collective-disapproved',
   CollectiveExecuted = 'collective-executed',
   CollectiveMemberExecuted = 'collective-member-executed',
   // TODO: do we want to track votes as events, in collective?
@@ -110,18 +111,22 @@ export interface ISubstrateVoteDelegated extends ISubstrateEvent {
 export interface ISubstrateDemocracyProposed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyProposed;
   proposalIndex: number;
+  proposalHash: string;
   deposit: SubstrateBalanceString;
   proposer: SubstrateAccountId;
 }
 
 export interface ISubstrateDemocracyTabled extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyTabled;
-  // TODO
+  proposalIndex: number;
+  // TODO: do we want to store depositors?
 }
 
 export interface ISubstrateDemocracyStarted extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyStarted;
   referendumIndex: number;
+  proposalHash: string;
+  voteThreshold: string;
   endBlock: SubstrateBlockNumber | null;
 }
 
@@ -129,11 +134,13 @@ export interface ISubstrateDemocracyPassed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyPassed;
   referendumIndex: number;
   dispatchBlock: SubstrateBlockNumber | null;
+  // TODO: worth enriching with tally?
 }
 
 export interface ISubstrateDemocracyNotPassed extends ISubstrateEvent {
   kind: SubstrateEventKind.DemocracyNotPassed;
   referendumIndex: number;
+  // TODO: worth enriching with tally?
 }
 
 export interface ISubstrateDemocracyCancelled extends ISubstrateEvent {
@@ -149,25 +156,37 @@ export interface ISubstrateDemocracyExecuted extends ISubstrateEvent {
 
 /**
  * Preimage Events
+ * TODO: do we want to track depositors and deposit amounts?
  */
 export interface ISubstratePreimageNoted extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageNoted;
-  // TODO
+  proposalHash: string;
+  noter: SubstrateAccountId;
+}
+
+export interface ISubstratePreimageUsed extends ISubstrateEvent {
+  kind: SubstrateEventKind.PreimageUsed;
+  proposalHash: string;
+  noter: SubstrateAccountId;
 }
 
 export interface ISubstratePreimageInvalid extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageInvalid;
-  // TODO
+  proposalHash: string;
+  referendumIndex: number;
 }
 
 export interface ISubstratePreimageMissing extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageMissing;
-  // TODO
+  proposalHash: string;
+  referendumIndex: number;
 }
 
 export interface ISubstratePreimageReaped extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageReaped;
-  // TODO
+  proposalHash: string;
+  noter: SubstrateAccountId;
+  reaper: SubstrateAccountId;
 }
 
 /**
@@ -201,22 +220,21 @@ export interface ISubstrateTreasuryRejected extends ISubstrateEvent {
  */
 export interface ISubstrateElectionNewTerm extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionNewTerm;
-  // TODO
+  newMembers: SubstrateAccountId[];
 }
 
 export interface ISubstrateElectionEmptyTerm extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionEmptyTerm;
-  // TODO
 }
 
 export interface ISubstrateElectionMemberKicked extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionMemberKicked;
-  // TODO
+  who: SubstrateAccountId;
 }
 
 export interface ISubstrateElectionMemberRenounced extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionMemberRenounced;
-  // TODO
+  who: SubstrateAccountId;
 }
 
 /**
@@ -224,22 +242,40 @@ export interface ISubstrateElectionMemberRenounced extends ISubstrateEvent {
  */
 export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveProposed;
-  // TODO
+  proposer: SubstrateAccountId;
+  proposalIndex: number;
+  proposalHash: string;
+  threshold: number;
 }
 
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveApproved;
-  // TODO
+  proposalHash: string;
+  proposalIndex: number;
+  threshold: number;
+  ayes: SubstrateAccountId[];
+  nays: SubstrateAccountId[];
+}
+
+export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
+  kind: SubstrateEventKind.CollectiveDisapproved;
+  proposalHash: string;
+  proposalIndex: number;
+  threshold: number;
+  ayes: SubstrateAccountId[];
+  nays: SubstrateAccountId[];
 }
 
 export interface ISubstrateCollectiveExecuted extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveExecuted;
-  // TODO
+  proposalHash: string;
+  executionOk: boolean;
 }
 
 export interface ISubstrateCollectiveMemberExecuted extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveMemberExecuted;
-  // TODO
+  proposalHash: string;
+  executionOk: boolean;
 }
 
 /**
@@ -247,22 +283,30 @@ export interface ISubstrateCollectiveMemberExecuted extends ISubstrateEvent {
  */
 export interface ISubstrateSignalingNewProposal extends ISubstrateEvent {
   kind: SubstrateEventKind.SignalingNewProposal;
-  // TODO
+  proposer: SubstrateAccountId;
+  proposalHash: string;
+  voteId: SubstrateBigIntString;
 }
 
 export interface ISubstrateSignalingCommitStarted extends ISubstrateEvent {
   kind: SubstrateEventKind.SignalingCommitStarted;
-  // TODO
+  proposalHash: string;
+  voteId: SubstrateBigIntString;
+  endBlock: number;
 }
 
 export interface ISubstrateSignalingVotingStarted extends ISubstrateEvent {
   kind: SubstrateEventKind.SignalingVotingStarted;
-  // TODO
+  proposalHash: string;
+  voteId: SubstrateBigIntString;
+  endBlock: number;
 }
 
 export interface ISubstrateSignalingVotingCompleted extends ISubstrateEvent {
   kind: SubstrateEventKind.SignalingVotingCompleted;
-  // TODO
+  proposalHash: string;
+  voteId: SubstrateBigIntString;
+  // TODO: worth enriching with tally?
 }
 
 export type ISubstrateEventData =
@@ -279,6 +323,7 @@ export type ISubstrateEventData =
   | ISubstrateDemocracyCancelled
   | ISubstrateDemocracyExecuted
   | ISubstratePreimageNoted
+  | ISubstratePreimageUsed
   | ISubstratePreimageInvalid
   | ISubstratePreimageMissing
   | ISubstratePreimageReaped
@@ -291,6 +336,7 @@ export type ISubstrateEventData =
   | ISubstrateElectionMemberRenounced
   | ISubstrateCollectiveProposed
   | ISubstrateCollectiveApproved
+  | ISubstrateCollectiveDisapproved
   | ISubstrateCollectiveExecuted
   | ISubstrateCollectiveMemberExecuted
   | ISubstrateSignalingNewProposal

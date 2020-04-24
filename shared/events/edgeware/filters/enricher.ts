@@ -1,9 +1,10 @@
 import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
-  ReferendumIndex, ProposalIndex
+  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes,
 } from '@polkadot/types/interfaces';
-import { Option, bool } from '@polkadot/types';
+import { ProposalRecord } from 'edgeware-node-types/dist/types';
+import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateEventKind, ISubstrateEventData } from '../types';
 import { CWEvent } from '../../interfaces';
@@ -113,6 +114,7 @@ export default async function (
           data: {
             kind,
             proposalIndex: +proposalIndex,
+            proposalHash: hash.toString(),
             deposit: deposit.toString(),
             proposer: proposer.toString(),
           }
@@ -120,16 +122,17 @@ export default async function (
       }
 
       case SubstrateEventKind.DemocracyTabled: {
-        // TODO
+        const [ proposalIndex ] = event.data as unknown as [ PropIndex, Balance, Vec<AccountId> ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalIndex: +proposalIndex,
           }
         };
       }
 
       case SubstrateEventKind.DemocracyStarted: {
-        const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
+        const [ referendumIndex, voteThreshold ] = event.data as unknown as [ ReferendumIndex, VoteThreshold ] & Codec;
 
         // query for edgeware only -- kusama has different type
         const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
@@ -137,6 +140,8 @@ export default async function (
           data: {
             kind,
             referendumIndex: +referendumIndex,
+            proposalHash: info.hash.toString(),
+            voteThreshold: voteThreshold.toString(),
             endBlock: info.isSome ? (+info.unwrap().end) : null,
           }
         };
@@ -183,34 +188,51 @@ export default async function (
        * Preimage Events
        */
       case SubstrateEventKind.PreimageNoted: {
-        // TODO
+        const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
         return {
+          excludeAddresses: [ noter.toString() ],
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            noter: noter.toString(),
           }
         };
       }
-      case SubstrateEventKind.PreimageInvalid: {
-        // TODO
+      case SubstrateEventKind.PreimageUsed: {
+        const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            noter: noter.toString(),
           }
         };
       }
+      case SubstrateEventKind.PreimageInvalid:
       case SubstrateEventKind.PreimageMissing: {
-        // TODO
+        const [ hash, referendumIndex ] = event.data as unknown as [ Hash, ReferendumIndex ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            referendumIndex: +referendumIndex,
           }
         };
       }
       case SubstrateEventKind.PreimageReaped: {
-        // TODO
+        const [
+          hash,
+          noter,
+          deposit,
+          reaper,
+        ] = event.data as unknown as [ Hash, AccountId, Balance, AccountId ] & Codec;
         return {
+          excludeAddresses: [ reaper.toString() ],
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            noter: noter.toString(),
+            reaper: reaper.toString(),
           }
         };
       }
@@ -267,34 +289,24 @@ export default async function (
        * Elections Events
        */
       case SubstrateEventKind.ElectionNewTerm: {
-        // TODO
+        const [ newMembers ] = event.data as unknown as [ Vec<[ AccountId, Balance ] & Codec> ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            newMembers: newMembers.map(([ who ]) => who.toString()),
           }
         };
       }
       case SubstrateEventKind.ElectionEmptyTerm: {
-        // TODO
-        return {
-          data: {
-            kind
-          }
-        };
+        return { data: { kind } };
       }
-      case SubstrateEventKind.ElectionMemberKicked: {
-        // TODO
-        return {
-          data: {
-            kind
-          }
-        };
-      }
+      case SubstrateEventKind.ElectionMemberKicked:
       case SubstrateEventKind.ElectionMemberRenounced: {
-        // TODO
+        const [ who ] = event.data as unknown as [ AccountId ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            who: who.toString(),
           }
         };
       }
@@ -303,34 +315,50 @@ export default async function (
        * Collective Events
        */
       case SubstrateEventKind.CollectiveProposed: {
-        // TODO
+        const [
+          proposer,
+          index,
+          hash,
+          threshold,
+        ] = event.data as unknown as [ AccountId, ProposalIndex, Hash, u32 ] & Codec;
         return {
+          excludeAddresses: [ proposer.toString() ],
           data: {
-            kind
+            kind,
+            proposer: proposer.toString(),
+            proposalIndex: +index,
+            proposalHash: hash.toString(),
+            threshold: +threshold,
           }
         };
       }
-      case SubstrateEventKind.CollectiveApproved: {
-        // TODO
+      case SubstrateEventKind.CollectiveApproved:
+      case SubstrateEventKind.CollectiveDisapproved: {
+        const [ hash ] = event.data as unknown as [ Hash ] & Codec;
+        const infoOpt = await api.query.council.voting<Option<Votes>>(hash);
+        if (!infoOpt.isSome) {
+          throw new Error('could not fetch info for collective proposal');
+        }
+        const { index, threshold, ayes, nays } = infoOpt.unwrap();
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            proposalIndex: +index,
+            threshold: +threshold,
+            ayes: ayes.map((v) => v.toString()),
+            nays: nays.map((v) => v.toString()),
           }
         };
       }
-      case SubstrateEventKind.CollectiveExecuted: {
-        // TODO
-        return {
-          data: {
-            kind
-          }
-        };
-      }
+      case SubstrateEventKind.CollectiveExecuted:
       case SubstrateEventKind.CollectiveMemberExecuted: {
-        // TODO
+        const [ hash, executionOk ] = event.data as unknown as [ Hash, bool ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            executionOk: executionOk.isTrue,
           }
         };
       }
@@ -339,34 +367,40 @@ export default async function (
        * Signaling Events
        */
       case SubstrateEventKind.SignalingNewProposal: {
-        // TODO
+        const [ proposer, hash ] = event.data as unknown as [ AccountId, Hash ] & Codec;
+        const proposalInfoOpt = await api.query.signaling.proposalOf<Option<ProposalRecord>>(hash);
+        if (!proposalInfoOpt.isSome) {
+          throw new Error('unable to fetch signaling proposal info');
+        }
         return {
+          excludeAddresses: [ proposer.toString() ],
           data: {
-            kind
+            kind,
+            proposer: proposer.toString(),
+            proposalHash: hash.toString(),
+            voteId: proposalInfoOpt.unwrap().vote_id.toString(),
           }
         };
       }
-      case SubstrateEventKind.SignalingCommitStarted: {
-        // TODO
-        return {
-          data: {
-            kind
-          }
-        };
-      }
+      case SubstrateEventKind.SignalingCommitStarted:
       case SubstrateEventKind.SignalingVotingStarted: {
-        // TODO
+        const [ hash, voteId, endBlock ] = event.data as unknown as [ Hash, u64, BlockNumber ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            voteId: voteId.toString(),
+            endBlock: +endBlock,
           }
         };
       }
       case SubstrateEventKind.SignalingVotingCompleted: {
-        // TODO
+        const [ hash, voteId ] = event.data as unknown as [ Hash, u64 ] & Codec;
         return {
           data: {
-            kind
+            kind,
+            proposalHash: hash.toString(),
+            voteId: voteId.toString(),
           }
         };
       }

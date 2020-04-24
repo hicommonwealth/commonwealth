@@ -97,16 +97,22 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A preimage is noted for a democracy referendum.',
       };
     }
+    case SubstrateEventKind.PreimageUsed: {
+      return {
+        title: 'Preimage Used',
+        description: 'A democracy referendum\'s execution uses a preimage.',
+      };
+    }
     case SubstrateEventKind.PreimageInvalid: {
       return {
         title: 'Preimage Invalid',
-        description: 'A referendum\'s execution was attempted but the preimage is invalid.',
+        description: 'A democracy referendum\'s execution was attempted but the preimage is invalid.',
       };
     }
     case SubstrateEventKind.PreimageMissing: {
       return {
         title: 'Preimage Missing',
-        description: 'A referendum\'s execution was attempted but the preimage is missing.',
+        description: 'A democracy referendum\'s execution was attempted but the preimage is missing.',
       };
     }
     case SubstrateEventKind.PreimageReaped: {
@@ -181,6 +187,12 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A collective proposal is approved.',
       };
     }
+    case SubstrateEventKind.CollectiveDisapproved: {
+      return {
+        title: 'Collective Proposal Disapproved',
+        description: 'A collective proposal is disapproved.',
+      };
+    }
     case SubstrateEventKind.CollectiveExecuted: {
       return {
         title: 'Collective Proposal Executed',
@@ -190,7 +202,7 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
     case SubstrateEventKind.CollectiveMemberExecuted: {
       return {
         title: 'Collective Member Execution',
-        description: 'A collective member executes a function.',
+        description: 'A collective member directly executes a proposal.',
       };
     }
 

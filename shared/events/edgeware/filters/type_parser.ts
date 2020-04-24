@@ -28,6 +28,7 @@ export default function (event: Event): SubstrateEventKind | null {
         case 'Executed': return SubstrateEventKind.DemocracyExecuted;
         case 'Delegated': return SubstrateEventKind.VoteDelegated;
         case 'PreimageNoted': return SubstrateEventKind.PreimageNoted;
+        case 'PreimageUsed': return SubstrateEventKind.PreimageUsed;
         case 'PreimageInvalid': return SubstrateEventKind.PreimageInvalid;
         case 'PreimageMissing': return SubstrateEventKind.PreimageMissing;
         case 'PreimageReaped': return SubstrateEventKind.PreimageReaped;
@@ -52,6 +53,7 @@ export default function (event: Event): SubstrateEventKind | null {
       switch (event.method) {
         case 'Proposed': return SubstrateEventKind.CollectiveProposed;
         case 'Approved': return SubstrateEventKind.CollectiveApproved;
+        case 'Disapproved': return SubstrateEventKind.CollectiveDisapproved;
         case 'Executed': return SubstrateEventKind.CollectiveExecuted;
         case 'MemberExecuted': return SubstrateEventKind.CollectiveMemberExecuted;
         default: return null;
