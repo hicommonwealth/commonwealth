@@ -3,7 +3,6 @@ import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const upgradeMember = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  console.dir(req.body);
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const { address, new_role } = req.body;
   if (!address) return next(new Error('Invalid Address'));
@@ -11,7 +10,6 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   if (!req.user) return next(new Error('Not logged in'));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
-  console.dir(chainOrCommObj);
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
@@ -27,21 +25,18 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     },
   });
 
-  console.dir(memberAddress);
-  let member = await models.Role.findOne({
+  const member = await models.Role.findOne({
     where: {
       ...chainOrCommObj,
       address_id: memberAddress.id,
       // permission: ['moderator', 'member'],
     },
   });
-  console.dir(new_role);
   if (!member) return next(new Error('Cannot find member to upgrade!'));
   // if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
-  member = await member.update({
-    permission: new_role,
-  });
-  console.dir(member);
+
+  member.permission = new_role;
+  await member.save();
 
   return res.json({ status: 'Success', result: member.toJSON() });
 };
