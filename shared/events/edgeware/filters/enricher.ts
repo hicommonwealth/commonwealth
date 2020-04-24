@@ -140,7 +140,7 @@ export default async function (
           data: {
             kind,
             referendumIndex: +referendumIndex,
-            proposalHash: info.hash.toString(),
+            proposalHash: info.unwrap().hash.toString(),
             voteThreshold: voteThreshold.toString(),
             endBlock: info.isSome ? (+info.unwrap().end) : null,
           }

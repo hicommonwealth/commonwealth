@@ -2,7 +2,7 @@ import chai from 'chai';
 import { Header, EventRecord } from '@polkadot/types/interfaces';
 
 import Processor from '../../../../shared/events/edgeware/processor';
-import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
+import { SubstrateEventKind, ISubstrateSlash } from '../../../../shared/events/edgeware/types';
 import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;
@@ -48,7 +48,7 @@ describe('Edgeware Event Processor Tests', () => {
       {
         section: 'democracy',
         method: 'Started',
-        data: [ '5' ],
+        data: [ '5', 'Supermajorityapproval' ],
       },
     ];
 
@@ -69,6 +69,7 @@ describe('Edgeware Event Processor Tests', () => {
             unwrap: () => {
               return {
                 end: '123',
+                hash: 'hash',
               };
             },
           };
@@ -89,22 +90,23 @@ describe('Edgeware Event Processor Tests', () => {
           /* eslint-disable dot-notation */
           data: {
             kind: SubstrateEventKind.Slash,
-            version: 10,
             validator: 'Alice',
             amount: '10000',
-          },
+          } as ISubstrateSlash,
           blockNumber: 1,
+          version: '10',
           includeAddresses: ['Alice'],
         },
         {
           data: {
             kind: SubstrateEventKind.DemocracyProposed,
-            version: 10,
             proposalIndex: 4,
+            proposalHash: 'hash',
             deposit: '100000',
             proposer: 'Alice',
           },
           excludeAddresses: ['Alice'],
+          version: '10',
           blockNumber: 1,
         },
       ]);
@@ -112,10 +114,12 @@ describe('Edgeware Event Processor Tests', () => {
         {
           data: {
             kind: SubstrateEventKind.DemocracyStarted,
-            version: 10,
             referendumIndex: 5,
+            proposalHash: 'hash',
+            voteThreshold: 'Supermajorityapproval',
             endBlock: 123,
           },
+          version: '10',
           blockNumber: 2,
         },
       ]);

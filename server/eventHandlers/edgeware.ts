@@ -36,6 +36,7 @@ export default class extends IEventHandler {
     const dbEvent = await this._models.ChainEvent.create({
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
+      version: event.version,
       event_data: event.data,
     });
 
