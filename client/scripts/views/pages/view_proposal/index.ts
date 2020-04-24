@@ -14,6 +14,7 @@ import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 
+import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';

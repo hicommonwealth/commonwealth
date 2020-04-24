@@ -85,7 +85,8 @@
         margin-left: $left-margin;
     }
 
-    .property-group {
+    // TODO: remove when privacy selection is turned back on
+    .privacy-selection {
         display: none;
     }
 }
