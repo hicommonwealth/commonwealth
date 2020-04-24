@@ -8,9 +8,10 @@ import User from './widgets/user';
 
 const RoleRow: m.Component<{ roledata? }> = {
   view: (vnode) => {
-    return (vnode.attrs.roledata?.length > 0) ?
+    return (vnode.attrs.roledata?.length > 0) &&
       m('RoleData', [
           vnode.attrs.roledata?.map((role) => {
+            const chainOrCommObj = (app.activeChainId()) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
             return m('.role-item', { style: 'display: inline-block; padding-right: 6px;' }, [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
@@ -21,12 +22,24 @@ const RoleRow: m.Component<{ roledata? }> = {
                 name: Icons.X,
                 size: 'xs',
                 style: 'padding-left: 2px;',
-                onclick: () => { console.dir('demote admin to member'); }, // TODO: Remove from local roles and db
+                onclick: () => {
+                  console.dir('demote admin to member');
+                  console.dir(chainOrCommObj);
+                  $.post(`${app.serverUrl()}/upgradeMember`, {
+                    ...chainOrCommObj,
+                    new_role: 'member',
+                    address: role.Address.address,
+                    jwt: app.login.jwt,
+                  }).then((res) => {
+                    if (res.status !== 'Success') {
+                      throw new Error(`got unsuccessful status: ${res.status}`);
+                    }
+                  }).catch((e) => console.error('Failed To demote admin'));
+                },
               }),
             ]);
-          }),
-      ])
-      : m('div');
+          })
+      ]);
   }
 };
 
