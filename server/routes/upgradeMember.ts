@@ -20,8 +20,8 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
       permission: 'admin',
     },
   });
-  if (!requesterIsAdmin) return next(new Error('Must be an Admin to upgrade member'));
-  console.dir(requesterIsAdmin);
+  if (requesterIsAdmin.length < 1) return next(new Error('Must be an Admin to upgrade member'));
+
   const memberAddress = await models.Address.findOne({
     where: {
       address,
@@ -36,7 +36,7 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     },
   });
   if (!member) return next(new Error('Cannot find member to upgrade!'));
-  if (requesterIsAdmin.includes(member)) return next(new Error('Cannot demote self.'));
+  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error('Cannot demote self.'));
   // if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
 
   member.permission = new_role;
