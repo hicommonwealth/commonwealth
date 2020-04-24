@@ -66,6 +66,11 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         case 'VotingCompleted': return SubstrateEventKind.SignalingVotingCompleted;
         default: return null;
       }
+    case 'treasuryReward':
+      switch (event.method) {
+        case 'TreasuryMinting': return SubstrateEventKind.TreasuryRewardMinting;
+        default: return null;
+      }
     default:
       return null;
   }

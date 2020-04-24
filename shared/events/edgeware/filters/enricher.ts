@@ -405,6 +405,20 @@ export default async function (
         };
       }
 
+      /**
+       * TreasuryReward events
+       */
+      case SubstrateEventKind.TreasuryRewardMinting: {
+        const [ pot, reward, blockNum ] = event.data as unknown as [ Balance, Balance, BlockNumber ] & Codec;
+        return {
+          data: {
+            kind,
+            pot: pot.toString(),
+            reward: reward.toString(),
+          }
+        };
+      }
+
       default: {
         // ensure exhaustive matching -- gives ts error if missing cases
         const _exhaustiveMatch: never = kind;

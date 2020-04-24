@@ -120,6 +120,10 @@ describe('Edgeware Event Processor Tests', () => {
     });
   });
 
+  it('should process old and new versions differently', (done) => {
+    done();
+  });
+
   it('should fail gracefully to find a kind', (done) => {
     // setup fake data
     const fakeEvents: IFakeEvent[] = [

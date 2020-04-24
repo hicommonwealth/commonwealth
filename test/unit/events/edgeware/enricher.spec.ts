@@ -172,6 +172,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   it('should enrich signaling-voting-completed event', async () => {
 
   });
+  it('should enrich treasury-reward-minted event', async () => {
+
+  });
 
   /** other */
   it('should not enrich invalid event', (done) => {

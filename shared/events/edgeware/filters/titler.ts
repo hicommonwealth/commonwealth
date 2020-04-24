@@ -234,6 +234,16 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
       };
     }
 
+    /**
+     * TreasuryReward events
+     */
+    case SubstrateEventKind.TreasuryRewardMinting: {
+      return {
+        title: 'Treasury Reward Minted',
+        description: 'A reward is added to the treasury pot.',
+      };
+    }
+
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
       const _exhaustiveMatch: never = kind;

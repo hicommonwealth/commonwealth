@@ -347,6 +347,18 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
       };
     }
+
+    /**
+     * TreasuryReward events
+     */
+    case SubstrateEventKind.TreasuryRewardMinting: {
+      const { pot, reward } = data;
+      return {
+        heading: 'Treasury Reward Minted',
+        label: `A reward of size ${balanceFormatter(reward)} was minted. Treasury pot now of size ${balanceFormatter(pot)}.`
+      };
+    }
+
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
       const _exhaustiveMatch: never = data;
