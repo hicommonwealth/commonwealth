@@ -140,9 +140,8 @@ $sidebar-padding: 16px;
 // notifications menu (outside Navigation, displayed in a cui-portal)
 .notification-menu {
     .notification-list {
-        max-height: 420px;
+        height: 420px;
         background: #fff;
-        overflow-y: scroll;
     }
     .cui-menu {
         max-width: 250px;
