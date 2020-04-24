@@ -41,6 +41,7 @@ const instantiateEditor = (
   const Delta = Quill.import('delta');
   const Keyboard = Quill.import('modules/keyboard');
   const Clipboard = Quill.import('modules/clipboard');
+  let quill;
 
   // Remove existing editor, if there is one
   $editor.empty();
@@ -314,8 +315,11 @@ const instantiateEditor = (
         }
         quill.insertText(range.index, ' ', 'user');
         quill.history.cutoff();
-        const delta = new Delta().retain(range.index - offset).delete(length + 1)
-          .retain(line.length() - 2 - offset).retain(1, { list: value });
+        const delta = new Delta()
+          .retain(range.index - offset)
+          .delete(length + 1)
+          .retain(line.length() - 2 - offset)
+          .retain(1, { list: value });
         quill.updateContents(delta, 'user');
         quill.history.cutoff();
         quill.setSelection(range.index - length, 'silent');
@@ -339,6 +343,20 @@ const instantiateEditor = (
     }
   };
 
+  const createSpinner = () => {
+    const ele = document.createElement('div');
+    ele.classList.add('spinner-wrap');
+    ele.classList.add('img-spinner');
+    const firstChild = document.createElement('div');
+    const secondChild = document.createElement('span');
+    firstChild.innerText = 'Uploading';
+    secondChild.classList.add('icon-spinner2');
+    secondChild.classList.add('animate-spin');
+    firstChild.appendChild(secondChild);
+    ele.appendChild(firstChild);
+    return ele;
+  };
+
   const dataURLtoFile = (dataurl: string, type: string) => {
     const arr = dataurl.split(',');
     const bstr = atob(arr[1]);
@@ -352,16 +370,16 @@ const instantiateEditor = (
   const uploadImg = async (file) => {
     return new Promise((resolve, reject) => {
       document.getElementsByClassName('ql-container')[0].appendChild(createSpinner());
-      $.post(app.serverUrl() + '/getUploadSignature', {
+      $.post(`${app.serverUrl()}/getUploadSignature`, {
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png
         auth: true,
         jwt: app.login.jwt,
       }).then((response) => {
         if (response.status !== 'Success') {
-          return reject(`Failed to get an S3 signed upload URL: ${response.error}`);
           document.getElementsByClassName('spinner-wrap')[0].remove();
           alert('Upload failed');
+          return reject(new Error(`Failed to get an S3 signed upload URL: ${response.error}`));
         }
         $.ajax({
           type: 'PUT',
@@ -374,17 +392,17 @@ const instantiateEditor = (
           const trimmedURL = response.result.slice(0, response.result.indexOf('?'));
           document.getElementsByClassName('spinner-wrap')[0].remove();
           resolve(trimmedURL);
-          console.log('Upload succeeded: ' + trimmedURL);
+          console.log(`Upload succeeded: ${trimmedURL}`);
         }).catch((err) => {
           // file not uploaded
           document.getElementsByClassName('spinner-wrap')[0].remove();
           alert('Upload failed');
-          console.log('Upload failed: ' + response.result);
-          reject('Upload failed: ' + err);
+          console.log(`Upload failed: ${response.result}`);
+          reject(new Error(`Upload failed: ${err}`));
         });
       }).catch((err : any) => {
         err = err.responseJSON ? err.responseJSON.error : err.responseText;
-        reject(`Failed to get an S3 signed upload URL: ${err}`);
+        reject(new Error(`Failed to get an S3 signed upload URL: ${err}`));
       });
     });
   };
@@ -397,20 +415,6 @@ const instantiateEditor = (
       const index = (quill.getSelection() || {}).index || quill.getLength();
       if (index) quill.insertEmbed(index, 'image', response, 'user');
     }
-  };
-
-  const createSpinner = () => {
-    const ele = document.createElement('div');
-    ele.classList.add('spinner-wrap');
-    ele.classList.add('img-spinner');
-    const firstChild = document.createElement('div');
-    const secondChild = document.createElement('span');
-    firstChild.innerText = 'Uploading';
-    secondChild.classList.add('icon-spinner2');
-    secondChild.classList.add('animate-spin');
-    firstChild.appendChild(secondChild);
-    ele.appendChild(firstChild);
-    return ele;
   };
 
   const searchMentionableAddresses = async (searchTerm: string) => {
@@ -449,7 +453,8 @@ const instantiateEditor = (
     if (mentionChar !== '@') return;
     // Optional code for tagging roles:
     // if (app.activeCommunityId()) roleData = await searchRoles();
-    // const truncRoles = roleData.filter((role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
+    // const truncRoles = roleData.filter(
+    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
 
     let members = [];
     let formattedMatches;
@@ -533,7 +538,7 @@ const instantiateEditor = (
     }
   };
 
-  const quill = new Quill($editor[0], {
+  quill = new Quill($editor[0], {
     debug: 'error',
     modules: {
       toolbar: hasFormats ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
@@ -551,7 +556,7 @@ const instantiateEditor = (
       },
       keyboard: { bindings },
       mention: {
-        allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-\_\.]*$/,
+        allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_\.]*$/,
         mentionDenotationChars: ['@'],
         dataAttributes: ['name', 'link', 'component'],
         renderItem: (item) => item.component,
@@ -630,11 +635,13 @@ const instantiateEditor = (
         // If there is a selection, insert (newline + fmt) before the selection
         // Then set the selection at the end of the line
         quill.setText(
-          text.slice(0, index) +
-            addFmt(fmt, text.slice(index, index + length)) + text.slice(index + length).trimRight()
+          text.slice(0, index)
+            + addFmt(fmt, text.slice(index, index + length)) + text.slice(index + length).trimRight()
         );
-        quill.setSelection(text.slice(0, index).length +
-                           addFmt(fmt, text.slice(index, index + length)).length);
+        quill.setSelection(
+          text.slice(0, index).length
+            + addFmt(fmt, text.slice(index, index + length)).length
+        );
       } else {
         // If there is no selection, backtrack to the beginning of the current line
         // Then insert the current line, formatted using the block formatter
@@ -646,11 +653,9 @@ const instantiateEditor = (
 
         const textBefore = linesBefore.join('\n');
         const textAfter = linesAfter.join('\n');
-        const formattedLine = (linesBefore.length === 0 ? '' : '\n') +
-          addFmt(fmt,
-                 (thisBefore.length > 0 ? thisBefore[0] : '') +
-                 (thisAfter.length > 0 ? thisAfter[0] : '')) +
-          (linesAfter.length === 0 ? '' : '\n');
+        const formattedLine = (linesBefore.length === 0 ? '' : '\n')
+          + addFmt(fmt, (thisBefore.length > 0 ? thisBefore[0] : '') + (thisAfter.length > 0 ? thisAfter[0] : ''))
+          + (linesAfter.length === 0 ? '' : '\n');
         const result = textBefore + formattedLine + textAfter;
         quill.setText(result);
         quill.setSelection(textBefore.length + formattedLine.length - 1);
@@ -674,8 +679,9 @@ const instantiateEditor = (
       if (selectedText.indexOf('\n') !== -1) return;
       const linkPre = '[';
       const linkBetween = '](';
-      const linkHref = (selectedText.startsWith('https://') || selectedText.startsWith('http://')) ? selectedText :
-        'https://';
+      const linkHref = (selectedText.startsWith('https://') || selectedText.startsWith('http://'))
+        ? selectedText
+        : 'https://';
       const linkPost = ')';
       quill.deleteText(index, length);
       quill.insertText(index, linkPre + selectedText + linkBetween + linkHref + linkPost);
@@ -782,8 +788,9 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    if (vnode.state.markdownMode === undefined && contentsDoc === undefined &&
-        localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
+    if (vnode.state.markdownMode === undefined
+        && contentsDoc === undefined
+        && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
       try {
         contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
         if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
@@ -812,8 +819,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       class: vnode.state.markdownMode ? 'markdown-mode' : 'richtext-mode',
       oncreate: (childVnode) => {
         const $editor = $(vnode.dom).find('.quill-editor');
-        vnode.state.editor = instantiateEditor($editor, theme, true, imageUploader, placeholder, editorNamespace,
-                                               vnode.state, onkeyboardSubmit);
+        vnode.state.editor = instantiateEditor(
+          $editor, theme, true, imageUploader, placeholder, editorNamespace,
+          vnode.state, onkeyboardSubmit
+        );
         if (tabindex) setTabIndex(tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
@@ -828,8 +837,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }, [
       m('.quill-editor'),
       theme !== 'bubble' && m('.type-selector', [
-        vnode.state.markdownMode ?
-          m(Tag, {
+        vnode.state.markdownMode
+          ? m(Tag, {
             label: 'Markdown',
             size: 'sm',
             onclick: (e) => {
@@ -838,8 +847,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
               // switch editor to rich text
               vnode.state.markdownMode = false;
               const $editor = $(vnode.dom).find('.quill-editor');
-              vnode.state.editor = instantiateEditor($editor, theme, true, imageUploader, placeholder, editorNamespace,
-                                                     vnode.state, onkeyboardSubmit);
+              vnode.state.editor = instantiateEditor(
+                $editor, theme, true, imageUploader, placeholder, editorNamespace,
+                vnode.state, onkeyboardSubmit
+              );
               vnode.state.editor.setContents(cachedContents);
               vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
               if (tabindex) setTabIndex(tabindex);
@@ -868,7 +879,9 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
               }
-              if (!confirmed) confirmed = await confirmationModalWithText('All formatting and images will be lost. Continue?')();
+              if (!confirmed) {
+                confirmed = await confirmationModalWithText('All formatting and images will be lost. Continue?')();
+              }
               if (!confirmed) return;
 
               // remove formatting, switch editor to markdown
@@ -876,8 +889,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
               cachedContents = vnode.state.editor.getContents();
               vnode.state.markdownMode = true;
               const $editor = $(vnode.dom).find('.quill-editor');
-              vnode.state.editor = instantiateEditor($editor, theme, true, imageUploader, placeholder, editorNamespace,
-                                                     vnode.state, onkeyboardSubmit);
+              vnode.state.editor = instantiateEditor(
+                $editor, theme, true, imageUploader, placeholder, editorNamespace,
+                vnode.state, onkeyboardSubmit
+              );
               vnode.state.editor.setContents(cachedContents);
               vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
               if (tabindex) setTabIndex(tabindex);
