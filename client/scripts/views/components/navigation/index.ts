@@ -1,7 +1,7 @@
 import 'components/navigation/index.scss';
 
 import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading, Drawer } from 'construct-ui';
-import Infinite from "mithril-infinite"
+import Infinite from 'mithril-infinite';
 import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
 
@@ -31,7 +31,6 @@ import Login from 'views/components/login';
 import User from 'views/components/widgets/user';
 import TagSelector from 'views/components/navigation/tag_selector';
 import SubscriptionButton from 'views/components/navigation/subscription_button';
-import ProfileBlock from 'views/components/widgets/profile_block';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
@@ -68,24 +67,28 @@ const NotificationRow: m.Component<{ notification: Notification }> = {
             excerpt && m('.comment-body-excerpt', excerpt),
           ]),
         ]
-      })
+      });
     };
 
     if (category === NotificationCategories.NewComment) {
-      const { created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-              author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !object_title || (!object_id && !root_id) ||
-          !comment_text || !comment_id || !author_address || !author_chain) return;
+      const {
+        created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
+        author_address, author_chain } = JSON.parse(notification.data);
+      if (!created_at || !object_title || (!object_id && !root_id)
+          || !comment_text || !comment_id || !author_address || !author_chain) return;
 
       // legacy comments use object_id, new comments use root_id
-      const [ commented_type, commented_id ] = decodeURIComponent(object_id ? object_id : root_id).split('_');
+      const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
       const commented_title = decodeURIComponent(object_title).trim();
       const decoded_comment_text = (() => {
         try {
           const doc = JSON.parse(decodeURIComponent(comment_text));
           return m(QuillFormattedText, { doc: sliceQuill(doc, 140), hideFormatting: true });
         } catch (e) {
-          return m(MarkdownFormattedText, { doc: decodeURIComponent(comment_text).slice(0, 140), hideFormatting: true });;
+          return m(MarkdownFormattedText, {
+            doc: decodeURIComponent(comment_text).slice(0, 140),
+            hideFormatting: true
+          });
         }
       })();
 
@@ -94,29 +97,30 @@ const NotificationRow: m.Component<{ notification: Notification }> = {
         moment.utc(created_at),
         m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
         decoded_comment_text,
-        `/${community_id ? community_id : chain_id}/proposal/discussion/` +
-          `${commented_id}?comment=${comment_id}`,
-        () => jumpHighlightComment(comment_id));
-
+        `/${community_id || chain_id}/proposal/discussion/`
+          + `${commented_id}?comment=${comment_id}`,
+        () => jumpHighlightComment(comment_id)
+      );
     } else if (category === NotificationCategories.NewThread) {
-      const { created_at, thread_title, thread_id, chain_id, community_id,
-              author_address, author_chain } = JSON.parse(notification.data);
+      const {
+        created_at, thread_title, thread_id, chain_id, community_id,
+        author_address, author_chain } = JSON.parse(notification.data);
       if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
 
       const decoded_title = decodeURIComponent(thread_title);
-      const community_name = community_id ?
-        (app.config.communities.getById(community_id)?.name || 'Unknown community') :
-        (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+      const community_name = community_id
+        ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
+        : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
 
       return getNotification(
         [author_address, author_chain],
         moment.utc(created_at),
         m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
         decoded_title,
-        `/${community_id ? community_id : chain_id}/proposal/discussion/${thread_id}-` +
-          `${slugify(decoded_title)}`,
-        () => jumpHighlightComment('parent'));
-
+        `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
+          + `${slugify(decoded_title)}`,
+        () => jumpHighlightComment('parent')
+      );
     }
   },
 };
@@ -127,69 +131,75 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
     const nodes = app.config.nodes.getAll();
     const activeAccount = app.vm.activeAccount;
     const activeNode = app.chain && app.chain.meta;
-    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url &&
-                                       n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
     // chain menu
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
-      chains[n.chain.network] ? chains[n.chain.network].push(n) : chains[n.chain.network] = [n];
+      if (chains[n.chain.network]) {
+        chains[n.chain.network].push(n);
+      } else {
+        chains[n.chain.network] = [n];
+      }
     });
     const myChains = Object.entries(chains).filter(([c, nodeList]) => isMember(c, null));
     const myCommunities = app.config.communities.getAll().filter((c) => isMember(null, c.id));
 
     // user menu
     const notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
-    const unreadNotifications = notifications.filter((n) => !n.isRead).length; // TODO: display number of unread notifications
+    const unreadNotifications = notifications.filter((n) => !n.isRead).length;
+    // TODO: display number of unread notifications
 
     // navigation menu
-    const substrateGovernanceProposals = (app.chain && app.chain.base === ChainBase.Substrate) ?
-      ((app.chain as Substrate).democracy.store.getAll().length +
-       (app.chain as Substrate).democracyProposals.store.getAll().length +
-       (app.chain as Substrate).council.store.getAll().length +
-       (app.chain as Substrate).treasury.store.getAll().length) : 0;
-    const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware) ?
-      (app.chain as Edgeware).signaling.store.getAll().length : 0;
+    const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
+      ? ((app.chain as Substrate).democracy.store.getAll().length
+         + (app.chain as Substrate).democracyProposals.store.getAll().length
+         + (app.chain as Substrate).council.store.getAll().length
+         + (app.chain as Substrate).treasury.store.getAll().length) : 0;
+    const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      ? (app.chain as Edgeware).signaling.store.getAll().length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
-    const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK) ?
-      (app.chain as Cosmos).governance.store.getAll().length : 0;
+    const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      ? (app.chain as Cosmos).governance.store.getAll().length : 0;
 
-    const hasProposals =
-      app.chain && !app.community && [
-        ChainBase.CosmosSDK, ChainBase.Substrate
-      ].indexOf(app.chain.base) !== -1;
+    const hasProposals = app.chain && !app.community && [
+      ChainBase.CosmosSDK, ChainBase.Substrate
+    ].indexOf(app.chain.base) !== -1;
 
-    const onDiscussionsPage = (p) =>
-      (p === `/${app.activeId()}/` ||
-       p.startsWith(`/${app.activeId()}/?`) ||
-       p.startsWith(`/${app.activeId()}/proposal/discussion`) ||
-       p.startsWith(`/${app.activeId()}/discussions`));
+    const onDiscussionsPage = (p) => (
+      p === `/${app.activeId()}/`
+        || p.startsWith(`/${app.activeId()}/?`)
+        || p.startsWith(`/${app.activeId()}/proposal/discussion`)
+        || p.startsWith(`/${app.activeId()}/discussions`));
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
-    const onProposalPage = (p) =>
-      (p.startsWith(`/${app.activeChainId()}/proposals`) ||
-       p.startsWith(`/${app.activeChainId()}/signaling`) ||
-       p.startsWith(`/${app.activeChainId()}/treasury`) ||
-       p.startsWith(`/${app.activeChainId()}/proposal/referendum`) ||
-       p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`) ||
-       p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`) ||
-       p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`) ||
-       p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
+    const onProposalPage = (p) => (
+      p.startsWith(`/${app.activeChainId()}/proposals`)
+        || p.startsWith(`/${app.activeChainId()}/signaling`)
+        || p.startsWith(`/${app.activeChainId()}/treasury`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/referendum`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/councilmotion`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/democracyproposal`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
+        || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
 
     return m('.Navigation', {
-      class: (app.isLoggedIn() ? 'logged-in' : 'logged-out') + ' ' +
-        ((app.community || app.chain) ? 'active-community' : 'no-active-community'),
+      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
+        + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
     }, [
       m(Drawer, {
         isOpen: vnode.state.communitySwitcherVisible,
         autofocus: true,
         content: m(CommunitySwitcher),
-        onClose: () => vnode.state.communitySwitcherVisible = false,
+        onClose: () => {
+          vnode.state.communitySwitcherVisible = false;
+        },
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
       }),
@@ -208,15 +218,17 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             }
           },
           label: (app.community || app.chain) ? [
-              m('.community-name', selectedNode ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : ''),
-              !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-              !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-              selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
+            m('.community-name', selectedNode
+              ? selectedNode.chain.name
+              : selectedCommunity ? selectedCommunity.meta.name : ''),
+            !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
+            !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
+            selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
           ] : 'Commonwealth',
           contentRight: [
             // notifications menu
-            app.isLoggedIn() && (app.community || app.chain) &&
-              m(SubscriptionButton),
+            app.isLoggedIn() && (app.community || app.chain)
+              && m(SubscriptionButton),
             app.isLoggedIn() && m(PopoverMenu, {
               transitionDuration: 50,
               hoverCloseDelay: 0,
@@ -285,24 +297,24 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           label: m(NewProposalButton, { fluid: true }),
         }),
         // discussions (all communities)
-        (app.community || app.chain) &&
-          m(ListItem, {
+        (app.community || app.chain)
+          && m(ListItem, {
             active: onDiscussionsPage(m.route.get()),
             label: 'Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
           }),
         // TODO: tag selector
-        (app.community || app.chain) &&
-          m(TagSelector, { activeTag, showFullListing: false }),
+        (app.community || app.chain)
+          && m(TagSelector, { activeTag, showFullListing: false }),
         // members (all communities)
-        (app.community || app.chain) &&
-          m(ListItem, {
+        (app.community || app.chain)
+          && m(ListItem, {
             active: onTagsPage(m.route.get()),
             label: 'Manage Tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
           }),
-        (app.community || app.chain) &&
-          m(ListItem, {
+        (app.community || app.chain)
+          && m(ListItem, {
             active: onMembersPage(m.route.get()),
             label: 'Members',
             onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
@@ -315,11 +327,11 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
         //   }),
         // governance (substrate and cosmos only)
-        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-          m('h4', 'On-chain'),
+        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+          && m('h4', 'On-chain'),
         // proposals (substrate and cosmos only)
-        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-          m(ListItem, {
+        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+          && m(ListItem, {
             active: onProposalPage(m.route.get()),
             label: 'Proposals',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
@@ -329,8 +341,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             ],
           }),
         // council (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate &&
-          m(ListItem, {
+        !app.community && app.chain?.base === ChainBase.Substrate
+          && m(ListItem, {
             active: onCouncilPage(m.route.get()),
             label: 'Council',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
@@ -345,8 +357,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         //     contentLeft: m(Icon, { name: 'settings' }), // ?
         //   }),
 
-        !app.isLoggedIn() ?
-          m(ListItem, {
+        !app.isLoggedIn()
+          ? m(ListItem, {
             class: 'login-selector',
             label: m('.login-selector-user', [
               m(Button, {
@@ -358,8 +370,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
                 onclick: () => app.modals.create({ modal: LoginModal }),
               }),
             ]),
-          }) :
-          m(ListItem, {
+          })
+          : m(ListItem, {
             class: 'login-selector',
             contentLeft: app.vm.activeAccount && [
               m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
@@ -373,32 +385,32 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
               ]),
             ],
             label: [
-              app.login.activeAddresses.length === 0 ?
+              app.login.activeAddresses.length === 0
                 // no address on the active chain
-                m(Button, {
+                ? m(Button, {
                   intent: 'none',
                   iconLeft: Icons.USER_PLUS,
                   size: 'sm',
                   fluid: true,
                   label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`,
                   onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-                }) :
+                })
                 // at least one address on the active chain
-                m(PopoverMenu, {
+                : m(PopoverMenu, {
                   class: 'switch-user-button',
                   transitionDuration: 50,
                   hoverCloseDelay: 0,
-                  trigger: app.vm.activeAccount ?
-                    m(Button, {
+                  trigger: app.vm.activeAccount
+                    ? m(Button, {
                       iconRight: Icons.CHEVRON_UP,
                       size: 'xs'
-                    }) :
-                    m(Button, {
+                    })
+                    : m(Button, {
                       intent: 'none',
                       iconRight: Icons.CHEVRON_UP,
                       size: 'sm',
                       fluid: true,
-                      label: `Select address`,
+                      label: 'Select address',
                     }),
                   position: 'bottom-end',
                   closeOnContentClick: true,
