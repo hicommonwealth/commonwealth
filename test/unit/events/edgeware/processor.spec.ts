@@ -36,11 +36,6 @@ describe('Edgeware Event Processor Tests', () => {
         data: [ 'Alice', '10000' ],
       },
       {
-        section: 'staking',
-        method: 'Fake',
-        data: [ 'Alice', '10000' ],
-      },
-      {
         section: 'democracy',
         method: 'Proposed',
         data: [ '4', '100000' ],
@@ -53,8 +48,8 @@ describe('Edgeware Event Processor Tests', () => {
     ];
 
     const fakeBlocks = [
-      constructFakeBlock(1, fakeEvents.slice(0, 3)),
-      constructFakeBlock(2, fakeEvents.slice(3, 4)),
+      constructFakeBlock(1, fakeEvents.slice(0, 2)),
+      constructFakeBlock(2, fakeEvents.slice(2, 3)),
     ];
 
     const api = constructFakeApi({
@@ -127,5 +122,90 @@ describe('Edgeware Event Processor Tests', () => {
     });
   });
 
-  // TODO: fail tests
+  it('should fail gracefully to find a kind', (done) => {
+    // setup fake data
+    const fakeEvents: IFakeEvent[] = [
+      {
+        section: 'staking',
+        method: 'Fake',
+        data: [ 'Alice', '10000' ],
+      },
+    ];
+
+    const block = constructFakeBlock(1, fakeEvents);
+    const api = constructFakeApi({});
+
+    // run test
+    const processor = new Processor(api);
+    processor.process(block).then((results) => {
+      try {
+        assert.equal(processor.lastBlockNumber, 1);
+        assert.deepEqual(results, []);
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+  });
+
+  it('should fail gracefully on invalid option during enrichment', (done) => {
+    // setup fake data
+    const fakeEvents: IFakeEvent[] = [
+      {
+        section: 'staking',
+        method: 'Bonded',
+        data: [ 'Alice', '10000' ],
+      },
+    ];
+
+    const block = constructFakeBlock(1, fakeEvents);
+
+    const api = constructFakeApi({
+      bonded: async () => {
+        return {
+          isNone: true,
+          isEmpty: true,
+          isSome: false,
+          value: null,
+          unwrap: () => { throw new Error('no value'); },
+        };
+      },
+    });
+
+    const processor = new Processor(api);
+    processor.process(block).then((results) => {
+      try {
+        assert.equal(processor.lastBlockNumber, 1);
+        assert.deepEqual(results, []);
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+  });
+
+  it('should fail gracefully on invalid api call during enrichment', (done) => {
+    // setup fake data
+    const fakeEvents: IFakeEvent[] = [
+      {
+        section: 'staking',
+        method: 'Bonded',
+        data: [ 'Alice', '10000' ],
+      },
+    ];
+
+    const block = constructFakeBlock(1, fakeEvents);
+    const api = constructFakeApi({ });
+
+    const processor = new Processor(api);
+    processor.process(block).then((results) => {
+      try {
+        assert.equal(processor.lastBlockNumber, 1);
+        assert.deepEqual(results, []);
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+  });
 });

@@ -109,7 +109,7 @@ describe('Edgeware Event Subscriber Tests', () => {
     );
     setTimeout(() => {
       subscriber.unsubscribe();
-      setTimeout(() => done(), 100);
+      setTimeout(() => done(), 50);
     }, 10);
   });
   // TODO: fail tests

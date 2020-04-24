@@ -30,7 +30,13 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
       // apply filters
       const kind = parseEventType(event);
       if (kind !== null) {
-        return enrichEvent(this._api, blockNumber, block.version, kind, event);
+        try {
+          const result = await enrichEvent(this._api, blockNumber, block.version, kind, event);
+          return result;
+        } catch (e) {
+          console.error(`Event enriching failed for ${kind}`);
+          return null;
+        }
       } else {
         return null;
       }
