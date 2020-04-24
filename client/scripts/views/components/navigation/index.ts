@@ -323,25 +323,29 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           })
           : m(ListItem, {
             class: 'login-selector',
-            contentLeft: app.vm.activeAccount && [
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+            },
+            label: app.vm.activeAccount ? [
               m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
               m('.login-selector-user', [
                 m('.user-info', [
                   m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
                   m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                    ? app.vm.activeAccount.address
+                    ? `@${app.vm.activeAccount.address}`
                     : `${app.vm.activeAccount.address.slice(0, 6)}...`)
                 ])
               ]),
-            ],
-            label: app.login.activeAddresses.length === 0 && m(Button, {
+            ] : app.login.activeAddresses.length === 0 ? m(Button, {
               intent: 'none',
               iconLeft: Icons.USER_PLUS,
               size: 'sm',
               fluid: true,
               label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
               onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-            }),
+            }) : null,
           }),
       ]),
     ]);
