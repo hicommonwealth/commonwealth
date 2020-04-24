@@ -38,10 +38,10 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
     if (!proposal.author) return;
 
     const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community)
-      ? app.chain.accounts.get(proposal.author)
-      : app.community.accounts.get(proposal.author, proposal.authorChain)
-    : proposal.author;
+      ? (!app.community
+        ? app.chain.accounts.get(proposal.author)
+        : app.community.accounts.get(proposal.author, proposal.authorChain))
+      : proposal.author;
 
     return m('.ProposalHeaderAuthor', [
       m(User, {
@@ -54,16 +54,17 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
 
 export const ProposalHeaderCreated: m.Component<{ proposal: AnyProposal | OffchainThread, link: string }> = {
   view: (vnode) => {
-    const { proposal, link } = vnode.attrs;
+    const { proposal } = vnode.attrs;
+    const proposalLink = vnode.attrs.link;
     if (!proposal) return;
     if (!proposal.createdAt) return;
 
     return m('.ProposalHeaderCreated', [
       m('a', {
-        href: `${link}?comment=body`,
+        href: `${proposalLink}?comment=body`,
         onclick: (e) => {
           e.preventDefault();
-          updateRoute(`${link}?comment=body`);
+          updateRoute(`${proposalLink}?comment=body`);
           jumpHighlightComment('body', false, 500);
         }
       }, proposal.createdAt.format('MMM D, YYYY'))
@@ -129,7 +130,7 @@ export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | Offchai
       }, 'Delete')
     ]);
   }
-}
+};
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -155,7 +156,8 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
-    const canEdit = (app.vm.activeAccount?.address === proposal.author)
+    const canEdit = (app.vm.activeAccount?.address === proposal.author
+                     && app.vm.activeAccount?.chain.id === proposal.authorChain)
       || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId());
 
     return m('.ProposalHeaderTags', [
@@ -185,7 +187,9 @@ export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    return m('.ProposalHeaderOnchainId', `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`);
+    return m(
+      '.ProposalHeaderOnchainId',
+      `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`);
   }
 };
 
@@ -226,9 +230,44 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
           ).then(() => m.redraw());
         }
       },
-      label: subscription?.isActive ?
-        [ m('span.icon-bell'), ' Notifications on' ] :
-        [ m('span.icon-bell-off'), ' Notifications off' ]
+      label: subscription?.isActive
+        ? [ m('span.icon-bell'), ' Notifications on' ]
+        : [ m('span.icon-bell-off'), ' Notifications off' ]
     });
+  }
+};
+
+export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    if (!proposal) return;
+    if (!(proposal instanceof OffchainThread)) return;
+    if (!app.isLoggedIn()) return;
+
+    const canEdit = app.vm.activeAccount?.address === proposal.author
+      && app.vm.activeAccount?.chain.id === proposal.authorChain;
+    if (!canEdit) return;
+
+    return m('.ProposalHeaderPrivacyButtons', [
+      // read only toggle
+      m(Button, {
+        class: 'read-only-toggle',
+        onclick: (e) => {
+          e.preventDefault();
+          app.threads.edit(proposal, null, null, true).then(() => m.redraw());
+        },
+        label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
+      }),
+      // privacy toggle, show only if thread is private
+      (proposal as OffchainThread).privacy
+        && m(Button, {
+          class: 'privacy-to-public-toggle',
+          onclick: (e) => {
+            e.preventDefault();
+            app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
+          },
+          label: 'Make Thread Public',
+        }),
+    ]);
   }
 };

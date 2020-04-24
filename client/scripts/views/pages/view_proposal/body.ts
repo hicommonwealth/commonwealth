@@ -36,7 +36,7 @@ const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
   // However, threading is overdue for a refactor anyway, so we'll handle this then
-  return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1
+  return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1;
 };
 
 export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> = {
@@ -132,6 +132,7 @@ export const ProposalBodyEdit: m.Component<{ item: OffchainThread | OffchainComm
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
     if (!item) return;
+    if (item instanceof OffchainThread && item.readOnly) return;
     const isThread = item instanceof OffchainThread;
 
     return m('.ProposalBodyEdit', [
@@ -166,7 +167,8 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
         href: '#',
         onclick: async (e) => {
           e.preventDefault();
-          const confirmed = await confirmationModalWithText(isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
+          const confirmed = await confirmationModalWithText(
+            isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
           if (!confirmed) return;
           (isThread ? app.threads : app.comments).delete(item).then(() => {
             if (isThread) m.route.set(`/${app.activeId()}/`);
@@ -200,7 +202,9 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
   }
 };
 
-export const ProposalBodySaveEdit: m.Component<{ item: OffchainThread | OffchainComment<any>, getSetGlobalEditingStatus, parentState }> = {
+export const ProposalBodySaveEdit: m.Component<{
+  item: OffchainThread | OffchainComment<any>, getSetGlobalEditingStatus, parentState
+}> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
     if (!item) return;
@@ -248,10 +252,11 @@ export const ProposalBodyText: m.Component<{ item: AnyProposal | OffchainThread 
     if (!item) return;
 
     const isThread = item instanceof OffchainThread;
-    const body =
-      item instanceof OffchainComment ? item.text
-      : item instanceof OffchainThread ? item.body
-      : item.description;
+    const body = item instanceof OffchainComment
+      ? item.text
+      : (item instanceof OffchainThread
+        ? item.body
+        : item.description);
     if (!body) return;
 
     return m('.ProposalBodyText', (() => {
@@ -297,10 +302,11 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
     const { item, parentState } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
-    const body =
-      item instanceof OffchainComment ? item.text
-      : item instanceof OffchainThread ? item.body
-      : null;
+    const body = item instanceof OffchainComment
+      ? item.text
+      : (item instanceof OffchainThread
+        ? item.body
+        : null);
     if (!body) return;
 
     return m('.ProposalBodyEditor', [
@@ -319,8 +325,8 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
         },
         tabindex: 1,
         theme: 'snow',
-        editorNamespace: document.location.pathname +
-          (isThread ? `-editing-comment-${item.id}` : '-editing-thread'),
+        editorNamespace: document.location.pathname
+          + (isThread ? `-editing-comment-${item.id}` : '-editing-thread'),
       })
     ]);
   }
