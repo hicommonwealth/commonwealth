@@ -43,7 +43,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
     if (hasReacted) hasReactedType = rxn.reaction;
 
     const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-      return m('.reacting-user', m(User, { user: [rxn_.author, app.activeChainId()], linkify: true }));
+      return m('.reacting-user', m(User, { user: [rxn_.author, rxn_.author_chain], linkify: true }));
     });
     if (reactors.length < (likes || dislikes).length) {
       const diff = (likes || dislikes).length - reactors.length;
@@ -58,6 +58,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
+        // if it's a community use the app.vm.activeAccount.chain.id instead of author chain
         const chainId = app.activeCommunityId() ? null : app.activeChainId();
         const communityId = app.activeCommunityId();
         if (hasReacted) {

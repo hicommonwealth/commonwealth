@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     reaction: { type: DataTypes.STRING, allowNull: false },
     community: { type: DataTypes.STRING, allowNull: true },
+    author_chain: { type: DataTypes.STRING, allowNull: true },
   }, {
     underscored: true,
     indexes: [
