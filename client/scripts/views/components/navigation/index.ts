@@ -1,6 +1,8 @@
 import 'components/navigation/index.scss';
 
-import { List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider, Button, Tag, Menu, MenuHeading, Drawer } from 'construct-ui';
+import {
+  List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
+  Button, Tag, Menu, MenuHeading, Drawer } from 'construct-ui';
 import Infinite from 'mithril-infinite';
 import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
@@ -14,9 +16,11 @@ import mixpanel from 'mixpanel-browser';
 import { ApiStatus, default as app } from 'state';
 import { featherIcon, slugify, link } from 'helpers';
 import { NotificationCategories } from 'types';
+import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { ChainClass, ChainBase, Notification } from 'models';
 
 import CommunitySwitcher from 'views/components/community_switcher';
@@ -35,7 +39,16 @@ import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import NewProposalModal from 'views/modals/proposals';
 import { OffchainCommunitiesStore } from 'stores';
+
+// Moloch specific
+import UpdateDelegateModal from 'views/modals/update_delegate_modal';
+import RagequitModal from 'views/modals/ragequit_modal';
+import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+import { getProposalUrl } from 'shared/utils';
+import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 
 const NotificationRow: m.Component<{ notification: Notification }> = {
   view: (vnode) => {
@@ -130,7 +143,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
     const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
     const activeAccount = app.vm.activeAccount;
-    const activeNode = app.chain && app.chain.meta;
+    const activeNode = app.chain?.meta;
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
@@ -155,19 +168,21 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
 
     // navigation menu
     const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
-      ? ((app.chain as Substrate).democracy.store.getAll().length
-         + (app.chain as Substrate).democracyProposals.store.getAll().length
-         + (app.chain as Substrate).council.store.getAll().length
-         + (app.chain as Substrate).treasury.store.getAll().length) : 0;
-    const edgewareSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      ? (app.chain as Edgeware).signaling.store.getAll().length : 0;
+      ? ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
+         + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
+         + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
+         + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
+    const edgewareSignalingProposals = (app.chain?.class === ChainClass.Edgeware)
+      ? (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
-    const cosmosGovernanceProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      ? (app.chain as Cosmos).governance.store.getAll().length : 0;
+    const cosmosGovernanceProposals = (app.chain?.base === ChainBase.CosmosSDK)
+      ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
-    const hasProposals = app.chain && !app.community && [
-      ChainBase.CosmosSDK, ChainBase.Substrate
-    ].indexOf(app.chain.base) !== -1;
+    const hasProposals = app.chain && !app.community && (
+      app.chain.base === ChainBase.CosmosSDK
+        || app.chain.base === ChainBase.Substrate
+        || app.chain.class === ChainClass.Moloch);
+    const showMolochMenuOptions = app.chain?.class === ChainClass.Moloch;
 
     const onDiscussionsPage = (p) => (
       p === `/${app.activeId()}/`
@@ -356,6 +371,32 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
         //     contentLeft: m(Icon, { name: 'settings' }), // ?
         //   }),
+        showMolochMenuOptions && m(ListItem, {
+          onclick: (e) => app.modals.create({
+            modal: NewProposalModal,
+            data: { typeEnum: ProposalType.MolochProposal }
+          }),
+          label: 'New proposal'
+        }),
+        showMolochMenuOptions && m(ListItem, {
+          onclick: (e) => app.modals.create({
+            modal: UpdateDelegateModal,
+          }),
+          label: 'Update delegate key'
+        }),
+        showMolochMenuOptions && m(ListItem, {
+          onclick: (e) => app.modals.create({
+            modal: RagequitModal,
+          }),
+          label: 'Rage quit'
+        }),
+        showMolochMenuOptions && m(ListItem, {
+          onclick: (e) => app.modals.create({
+            modal: TokenApprovalModal,
+          }),
+          label: 'Approve tokens'
+        }),
+        // TODO: add a "reserve tokens" option here, to apply to DAO?
 
         !app.isLoggedIn()
           ? m(ListItem, {
@@ -392,7 +433,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
                   iconLeft: Icons.USER_PLUS,
                   size: 'sm',
                   fluid: true,
-                  label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`,
+                  label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
                   onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
                 })
                 // at least one address on the active chain
@@ -424,7 +465,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
                         app.modals.create({ modal: LinkNewAddressModal });
                       },
                       contentLeft: m(Icon, { name: Icons.USER_PLUS }),
-                      label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
+                      label: `Link new ${(app.chain?.chain?.denom) || ''} address`
                     }),
                     m(MenuDivider),
                     // existing addresses that have a Role in the community
