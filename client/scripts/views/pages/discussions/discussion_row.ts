@@ -6,7 +6,7 @@ import { default as moment } from 'moment-twitter';
 
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Tag } from 'construct-ui';
 
 import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind } from 'models';
@@ -88,11 +88,16 @@ const DiscussionRow: m.Component<IAttrs> = {
                 linkify: true,
                 tooltip: true,
               }),
+              m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
             m('.discussion-meta-right', [
-              // formatLastUpdated(lastUpdated),
               m('.discussion-tags', proposal.tags.map((tag) => {
-                return link('a.discussion-tag', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
+                return m(Tag, {
+                  intent: 'primary',
+                  label: tag.name,
+                  size: 'xs',
+                  onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
+                }, 'goo');
               })),
             ]),
           ]),

@@ -268,7 +268,7 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
-    future : 'in %s',
+    future : 'just now',
     past   : '%s ago',
     s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
     m  : '1 min',
