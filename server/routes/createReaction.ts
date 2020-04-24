@@ -10,7 +10,7 @@ import { getProposalUrl } from '../../shared/utils';
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { reaction, comment_id, thread_id, author_chain } = req.body;
+  const { reaction, comment_id, thread_id } = req.body;
 
   if (!thread_id && !comment_id) {
     return next(new Error('Must provide a comment or thread id'));
@@ -22,7 +22,6 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
   const options = {
     reaction,
     address_id: author.id,
-    author_chain: author_chain,
   };
 
   if (community) options['community'] = community.id;

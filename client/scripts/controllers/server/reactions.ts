@@ -20,7 +20,7 @@ const modelFromServer = (reaction) => {
     reaction.reaction,
     reaction.thread_id,
     reaction.comment_id,
-    reaction.author_chain,
+    reaction.Address.chain,
   );
 };
 
