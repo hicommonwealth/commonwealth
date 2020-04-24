@@ -48,6 +48,7 @@
     "max-classes-per-file": ["error", 5],
     "max-len": ["error", {"code": 120, "tabWidth": 2}],
     "dot-notation": 0,
-    "no-constant-condition": ["error", {"checkLoops": false}]
+    "no-constant-condition": ["error", {"checkLoops": false}],
+    "no-restricted-syntax": 0
   }
 }

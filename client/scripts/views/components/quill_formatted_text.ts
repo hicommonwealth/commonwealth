@@ -27,7 +27,7 @@ export const sliceQuill = (json: IQuillJSON, length: number) => {
     const text = ele.insert;
     if (count + text.length > length) {
       const fullText = text;
-      ele.insert = text.slice(0, length - count) + `\n`;
+      ele.insert = `${text.slice(0, length - count)}\n`;
       truncatedObj.push(ele);
       count += fullText.length;
     } else {
@@ -43,7 +43,7 @@ const preprocessQuillDeltaForRendering = (nodes) => {
   const lines = [];
   for (const node of nodes) {
     if (typeof node.insert === 'string') {
-      node.insert.match(/[^\n]+\n?|\n/g).map((line) => {
+      node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
         lines.push({ attributes: node.attributes, insert: line });
       });
     } else {
@@ -94,7 +94,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
 
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
-  preprocessQuillDeltaForRendering(delta.ops).map((parent) => {
+  preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
     // if the last parent was a <ul> or <ol> with the same attributes.list,
     // concatenate the current parent's children onto the last instead
     if (groups.length !== 0
@@ -195,16 +195,17 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           } else {
             result = m('span', child.insert?.toString());
           }
-          Object.entries(child.attributes || {}).map(([k, v]) => {
+          Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if ((k !== 'color' && k !== 'background') && v !== true) return;
             switch (k) {
-              case 'bold': return result = m('strong', result);
-              case 'italic': return result = m('em', result);
-              case 'strike': return result = m('s', result);
-              case 'underline': return result = m('u', result);
-              case 'code': return result = m('code', result);
-              case 'added': return result = m('span.added', result);
-              case 'deleted': return result = m('span.deleted', result);
+              case 'bold': result = m('strong', result); return;
+              case 'italic': result = m('em', result); return;
+              case 'strike': result = m('s', result); return;
+              case 'underline': result = m('u', result); return;
+              case 'code': result = m('code', result); return;
+              case 'added': result = m('span.added', result); return;
+              case 'deleted': result = m('span.deleted', result); return;
+              default: result = m('span', result);
             }
           });
           return result;
