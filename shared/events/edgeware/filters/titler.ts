@@ -8,6 +8,9 @@ import { IEventTitle, TitlerFilter } from '../../interfaces';
  */
 const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
   switch (kind) {
+    /**
+     * Staking Events
+     */
     case SubstrateEventKind.Slash: {
       return {
         title: 'Validator Slash',
@@ -32,6 +35,10 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'Your controller account unbonds from a stash account.',
       };
     }
+
+    /**
+     * Democracy Events
+     */
     case SubstrateEventKind.VoteDelegated: {
       return {
         title: 'Vote Delegated',
@@ -42,6 +49,12 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
       return {
         title: 'Democracy Proposed',
         description: 'A new community democracy proposal is introduced.',
+      };
+    }
+    case SubstrateEventKind.DemocracyTabled: {
+      return {
+        title: 'Democracy Proposal Tabled',
+        description: 'A public democracy proposal is tabled to a referendum.',
       };
     }
     case SubstrateEventKind.DemocracyStarted: {
@@ -74,6 +87,38 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A passed democracy referendum is executed on chain.',
       };
     }
+
+    /**
+     * Preimage Events
+     */
+    case SubstrateEventKind.PreimageNoted: {
+      return {
+        title: 'Preimage Noted',
+        description: 'A preimage is noted for a democracy referendum.',
+      };
+    }
+    case SubstrateEventKind.PreimageInvalid: {
+      return {
+        title: 'Preimage Invalid',
+        description: 'A referendum\'s execution was attempted but the preimage is invalid.',
+      };
+    }
+    case SubstrateEventKind.PreimageMissing: {
+      return {
+        title: 'Preimage Missing',
+        description: 'A referendum\'s execution was attempted but the preimage is missing.',
+      };
+    }
+    case SubstrateEventKind.PreimageReaped: {
+      return {
+        title: 'Preimage Reaped',
+        description: 'A registered preimage is removed and the deposit is collected.',
+      };
+    }
+
+    /**
+     * Treasury Events
+     */
     case SubstrateEventKind.TreasuryProposed: {
       return {
         title: 'Treasury Proposed',
@@ -92,7 +137,94 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A treasury spend is rejected.',
       };
     }
+
+    /**
+     * Elections Events
+     */
+    case SubstrateEventKind.ElectionNewTerm: {
+      return {
+        title: 'New Election Term',
+        description: 'A new election term begins with new members.',
+      };
+    }
+    case SubstrateEventKind.ElectionEmptyTerm: {
+      return {
+        title: 'Empty Election Term',
+        description: 'A new election term begins with no member changes.',
+      };
+    }
+    case SubstrateEventKind.ElectionMemberKicked: {
+      return {
+        title: 'Member Kicked',
+        description: 'A member is kicked at end of term.',
+      };
+    }
+    case SubstrateEventKind.ElectionMemberRenounced: {
+      return {
+        title: 'Member Renounced',
+        description: 'A member renounces their candidacy for the next round.',
+      };
+    }
+
+    /**
+     * Collective Events
+     */
+    case SubstrateEventKind.CollectiveProposed: {
+      return {
+        title: 'New Collective Proposal',
+        description: 'A new collective proposal is introduced.',
+      };
+    }
+    case SubstrateEventKind.CollectiveApproved: {
+      return {
+        title: 'Collective Proposal Approved',
+        description: 'A collective proposal is approved.',
+      };
+    }
+    case SubstrateEventKind.CollectiveExecuted: {
+      return {
+        title: 'Collective Proposal Executed',
+        description: 'A collective proposal is executed.',
+      };
+    }
+    case SubstrateEventKind.CollectiveMemberExecuted: {
+      return {
+        title: 'Collective Member Execution',
+        description: 'A collective member executes a function.',
+      };
+    }
+
+    /**
+     * Signaling Events
+     */
+    case SubstrateEventKind.SignalingNewProposal: {
+      return {
+        title: 'New Signaling Proposal',
+        description: 'A new signaling proposal is introduced.',
+      };
+    }
+    case SubstrateEventKind.SignalingCommitStarted: {
+      return {
+        title: 'Signaling Proposal Commit Started',
+        description: 'A signaling proposal\'s commit phase begins.',
+      };
+    }
+    case SubstrateEventKind.SignalingVotingStarted: {
+      return {
+        title: 'Signaling Proposal Voting Started',
+        description: 'A signaling proposal\'s voting phase begins.',
+      };
+    }
+    case SubstrateEventKind.SignalingVotingCompleted: {
+      return {
+        title: 'Signaling Proposal Voting Completed',
+        description: 'A signaling proposal is completed.',
+      };
+    }
+
     default: {
+      // ensure exhaustive matching -- gives ts error if missing cases
+      const _exhaustiveMatch: never = kind;
       throw new Error('unknown event type');
     }
   }

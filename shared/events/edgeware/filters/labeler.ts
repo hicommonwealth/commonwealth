@@ -39,6 +39,9 @@ const labelerFunc: LabelerFilter = (
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
+    /**
+     * Staking Events
+     */
     case SubstrateEventKind.Slash: {
       const { validator, amount } = data;
       return {
@@ -69,6 +72,10 @@ const labelerFunc: LabelerFilter = (
         label: `You unbonded ${balanceFormatter(amount)} from controller ${fmtAddr(controller)} to stash ${fmtAddr(stash)}.`,
       };
     }
+
+    /**
+     * Democracy Events
+     */
     case SubstrateEventKind.VoteDelegated: {
       const { who, target } = data;
       return {
@@ -126,6 +133,14 @@ const labelerFunc: LabelerFilter = (
         label: `Referendum ${referendumIndex} was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
       };
     }
+
+    /**
+     * Preimage Events
+     */
+
+    /**
+     * Treasury Events
+     */
     case SubstrateEventKind.TreasuryProposed: {
       const { proposalIndex, proposer, value } = data;
       return {
@@ -148,7 +163,21 @@ const labelerFunc: LabelerFilter = (
         label: `Treasury proposal ${proposalIndex} was rejected.`,
       };
     }
+
+    /**
+     * Elections Events
+     */
+
+    /**
+     * Collective Events
+     */
+
+    /**
+     * Signaling Events
+     */
     default: {
+      // ensure exhaustive matching -- gives ts error if missing cases
+      const _exhaustiveMatch: never = data.kind;
       throw new Error('unknown event type');
     }
   }

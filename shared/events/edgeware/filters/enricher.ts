@@ -29,6 +29,9 @@ export default async function (
     excludeAddresses?: string[],
   }> => {
     switch (kind) {
+      /**
+       * Staking Events
+       */
       case SubstrateEventKind.Reward: {
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
@@ -82,6 +85,9 @@ export default async function (
         };
       }
 
+      /**
+       * Democracy Events
+       */
       case SubstrateEventKind.VoteDelegated: {
         const [ who, target ] = event.data as unknown as [ AccountId, AccountId ] & Codec;
         return {
@@ -109,6 +115,15 @@ export default async function (
             proposalIndex: +proposalIndex,
             deposit: deposit.toString(),
             proposer: proposer.toString(),
+          }
+        };
+      }
+
+      case SubstrateEventKind.DemocracyTabled: {
+        // TODO
+        return {
+          data: {
+            kind
           }
         };
       }
@@ -164,6 +179,45 @@ export default async function (
         };
       }
 
+      /**
+       * Preimage Events
+       */
+      case SubstrateEventKind.PreimageNoted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.PreimageInvalid: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.PreimageMissing: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.PreimageReaped: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+
+      /**
+       * Treasury Events
+       */
       case SubstrateEventKind.TreasuryProposed: {
         const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
@@ -209,8 +263,119 @@ export default async function (
         };
       }
 
-      default:
+      /**
+       * Elections Events
+       */
+      case SubstrateEventKind.ElectionNewTerm: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.ElectionEmptyTerm: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.ElectionMemberKicked: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.ElectionMemberRenounced: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+
+      /**
+       * Collective Events
+       */
+      case SubstrateEventKind.CollectiveProposed: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.CollectiveApproved: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.CollectiveExecuted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.CollectiveMemberExecuted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+
+      /**
+       * Signaling Events
+       */
+      case SubstrateEventKind.SignalingNewProposal: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.SignalingCommitStarted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.SignalingVotingStarted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+      case SubstrateEventKind.SignalingVotingCompleted: {
+        // TODO
+        return {
+          data: {
+            kind
+          }
+        };
+      }
+
+      default: {
+        // ensure exhaustive matching -- gives ts error if missing cases
+        const _exhaustiveMatch: never = kind;
         throw new Error('unknown event type');
+      }
     }
   };
 
