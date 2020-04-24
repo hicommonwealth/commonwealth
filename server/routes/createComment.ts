@@ -34,6 +34,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   if (!root_id) {
     return next(new Error('Must provide root_id'));
   }
+
   if ((!text || !text.trim())
       && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
     return next(new Error('Must provide text or attachment'));
@@ -121,6 +122,13 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     });
   } else {
     console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+  }
+
+  console.dir(proposal);
+  if (!proposal || proposal.read_only) {
+    console.dir('destroying comment');
+    await finalComment.destroy();
+    return next(new Error('Cannot comment when thread is read_only'));
   }
 
   // craft commonwealth url
