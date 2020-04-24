@@ -358,6 +358,13 @@ const labelerFunc: LabelerFilter = (
         label: `A reward of size ${balanceFormatter(reward)} was minted. Treasury pot now of size ${balanceFormatter(pot)}.`
       };
     }
+    case SubstrateEventKind.TreasuryRewardMintingV2: {
+      const { pot, potAddress } = data;
+      return {
+        heading: 'Treasury Reward Minted',
+        label: `A treasury reward was minted, pot now of size ${balanceFormatter(pot)}.`
+      };
+    }
 
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases

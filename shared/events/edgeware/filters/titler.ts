@@ -237,7 +237,8 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
     /**
      * TreasuryReward events
      */
-    case SubstrateEventKind.TreasuryRewardMinting: {
+    case SubstrateEventKind.TreasuryRewardMinting:
+    case SubstrateEventKind.TreasuryRewardMintingV2: {
       return {
         title: 'Treasury Reward Minted',
         description: 'A reward is added to the treasury pot.',

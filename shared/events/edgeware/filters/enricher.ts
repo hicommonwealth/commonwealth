@@ -418,6 +418,16 @@ export default async function (
           }
         };
       }
+      case SubstrateEventKind.TreasuryRewardMintingV2: {
+        const [ pot, blockNum, potAddress ] = event.data as unknown as [ Balance, BlockNumber, AccountId ] & Codec;
+        return {
+          data: {
+            kind,
+            pot: pot.toString(),
+            potAddress: potAddress.toString(),
+          }
+        };
+      }
 
       default: {
         // ensure exhaustive matching -- gives ts error if missing cases

@@ -67,6 +67,7 @@ export enum SubstrateEventKind {
   // TODO: do we want to track votes for signaling?
 
   TreasuryRewardMinting = 'treasury-reward-minting',
+  TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 }
 
 interface ISubstrateEvent {
@@ -320,6 +321,11 @@ export interface ISubstrateTreasuryRewardMinting extends ISubstrateEvent {
   pot: SubstrateBalanceString;
   reward: SubstrateBalanceString;
 }
+export interface ISubstrateTreasuryRewardMintingV2 extends ISubstrateEvent {
+  kind: SubstrateEventKind.TreasuryRewardMintingV2;
+  pot: SubstrateBalanceString;
+  potAddress: SubstrateAccountId;
+}
 
 export type ISubstrateEventData =
   ISubstrateSlash
@@ -356,6 +362,7 @@ export type ISubstrateEventData =
   | ISubstrateSignalingVotingStarted
   | ISubstrateSignalingVotingCompleted
   | ISubstrateTreasuryRewardMinting
+  | ISubstrateTreasuryRewardMintingV2
 // eslint-disable-next-line semi-style
 ;
 

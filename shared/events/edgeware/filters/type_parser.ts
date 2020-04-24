@@ -68,7 +68,13 @@ export default function (event: Event, versionName: string, versionNumber: numbe
       }
     case 'treasuryReward':
       switch (event.method) {
-        case 'TreasuryMinting': return SubstrateEventKind.TreasuryRewardMinting;
+        case 'TreasuryMinting': {
+          if (versionNumber < 34) {
+            return SubstrateEventKind.TreasuryRewardMinting;
+          } else {
+            return SubstrateEventKind.TreasuryRewardMintingV2;
+          }
+        }
         default: return null;
       }
     default:
