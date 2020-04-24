@@ -36,7 +36,13 @@ class CommunityInfo {
       json.tags
     );
   }
-  public async updateCommunityData(name: string, description: string, privacyEnabled: boolean, invitesEnabled: boolean) {
+
+  public async updateCommunityData(
+    name: string,
+    description: string,
+    privacyEnabled: boolean,
+    invitesEnabled: boolean
+  ) {
     try {
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),

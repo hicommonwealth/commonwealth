@@ -13,7 +13,9 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
     return (vnode.attrs.roledata?.length > 0) &&
       m('RoleData', [
           vnode.attrs.roledata?.map((role) => {
-            const chainOrCommObj = (app.activeChainId()) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+            const chainOrCommObj = (app.activeChainId())
+              ? { chain: app.activeChainId() }
+              : { community: app.activeCommunityId() };
             return m('.role-item', { style: 'display: inline-block; padding-right: 6px;' }, [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
@@ -61,7 +63,14 @@ interface IChainCommunityAttrs {
   mods;
 }
 
-const TableRow: m.Component<{title: string, defaultValue: string, disabled?: boolean, onChangeHandler: Function}> = {
+interface ITableRowAttrs {
+  title: string;
+  defaultValue: string;
+  disabled?: boolean;
+  onChangeHandler: Function;
+}
+
+const TableRow: m.Component<ITableRowAttrs> = {
   view: (vnode) => {
     return m('tr', [
       m('td', { style: 'width: 100px' }, vnode.attrs.title),
@@ -77,7 +86,14 @@ const TableRow: m.Component<{title: string, defaultValue: string, disabled?: boo
   }
 };
 
-const ToggleRow: m.Component<{title: string, defaultValue: boolean, disabled?: boolean, onToggle: Function}, {toggled: boolean, checked: boolean}> = {
+interface IToggleRowAttrs {
+  title: string;
+  defaultValue: boolean;
+  disabled?: boolean;
+  onToggle: Function;
+}
+
+const ToggleRow: m.Component<IToggleRowAttrs, {toggled: boolean, checked: boolean}> = {
   oninit: (vnode) => {
     vnode.state.toggled = false;
     vnode.state.checked = vnode.attrs.defaultValue;
