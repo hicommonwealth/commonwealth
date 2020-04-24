@@ -106,9 +106,9 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
   }
 };
 
-export const ProposalBodyReply: m.Component<{ item: OffchainComment<any>, getSetGlobalReplyStatus, parentType? }> = {
+export const ProposalBodyReply: m.Component<{ item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState }> = {
   view: (vnode) => {
-    const { item, parentType, getSetGlobalReplyStatus } = vnode.attrs;
+    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
     if (!item) return;
 
     return m('.ProposalBodyReply', [
@@ -141,6 +141,7 @@ export const ProposalBodyEdit: m.Component<{ item: OffchainThread | OffchainComm
         href: '#',
         onclick: async (e) => {
           e.preventDefault();
+          parentState.currentText = item instanceof OffchainThread ? item.body : item.text;
           if (getSetGlobalReplyStatus(GlobalStatus.Get)) {
             if (activeQuillEditorHasText()) {
               const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
@@ -190,8 +191,13 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
         href: '#',
         onclick: async (e) => {
           e.preventDefault();
-          // TODO: Only show confirmation modal if edits have been made
-          const confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+          let confirmed = true;
+          const threadText = parentState.quillEditorState.markdownMode
+            ? parentState.quillEditorState.editor.getText()
+            : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          if (threadText !== parentState.currentText) {
+            confirmed = await confirmationModalWithText('Cancel editing? Changes will not be saved.')();
+          }
           if (!confirmed) return;
           parentState.editing = false;
           getSetGlobalEditingStatus(GlobalStatus.Set, false);

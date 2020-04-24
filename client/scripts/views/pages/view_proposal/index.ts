@@ -204,7 +204,8 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         !vnode.state.editing
           && app.vm.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && isSameAccount(app.vm.activeAccount, comment.author)
+          && app.vm.activeAccount?.chain.id === comment.authorChain
+          && app.vm.activeAccount?.address === comment.author
           && [
             m(ProposalBodySpacer),
             m(ProposalBodyEdit, {
@@ -213,6 +214,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
               getSetGlobalEditingStatus,
               parentState: vnode.state
             }),
+            m(ProposalBodySpacer),
             m(ProposalBodyDelete, { item: comment }),
           ],
 
@@ -224,7 +226,12 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           && parentType === CommentParent.Proposal
           && [
             m(ProposalBodySpacer),
-            m(ProposalBodyReply, { item: comment, getSetGlobalReplyStatus, parentType }),
+            m(ProposalBodyReply, {
+              item: comment,
+              getSetGlobalReplyStatus,
+              parentType,
+              parentState: vnode.state,
+            }),
           ],
 
         vnode.state.editing && [
@@ -471,7 +478,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       } else if (proposal.author instanceof Account) { // AnyProposal
         app.profiles.getProfile(proposal.author.chain.id, proposal.author.address);
       }
-      vnode.state.comments.map((comment) => {
+      vnode.state.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
       vnode.state.profilesPrefetchStarted = true;
