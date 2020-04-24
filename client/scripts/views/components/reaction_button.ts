@@ -103,7 +103,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
       m('span.reactions-icon', m.trust('&#x2191;')),
     ]);
 
-    return tooltip ? m(Tooltip, { content: tooltipPopover }, rxnButton) : rxnButton;
+    return (tooltip && reactors.length) ? m(Tooltip, { content: tooltipPopover }, rxnButton) : rxnButton;
   }
 };
 
