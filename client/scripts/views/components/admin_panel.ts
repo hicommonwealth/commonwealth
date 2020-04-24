@@ -1,7 +1,7 @@
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
@@ -48,8 +48,8 @@ interface ICommunityMetadataState {
     name: string;
     description: string;
     url: string;
-    loadingFinished: boolean;
-    loadingStarted: boolean;
+    privacyToggled: boolean;
+    invitesToggled: boolean;
 }
 
 interface IChainCommunityAttrs {
@@ -75,6 +75,29 @@ const TableRow: m.Component<{title: string, defaultValue: string, disabled?: boo
       ]),
     ]);
   }
+};
+
+const ToggleRow: m.Component<{title: string, defaultValue: boolean, disabled?: boolean, onToggle: Function}, {toggled: boolean, checked: boolean}> = {
+  oninit: (vnode) => {
+    vnode.state.toggled = false;
+    vnode.state.checked = vnode.attrs.defaultValue;
+  },
+  view: (vnode) => {
+    return m('tr', [
+      m('td', vnode.attrs.title),
+      m('td', [
+        m(Switch, {
+          checked: vnode.state.checked,
+          disabled: vnode.attrs.disabled || false,
+          onchange: () => {
+            vnode.state.toggled = !vnode.state.toggled;
+            vnode.state.checked = !vnode.state.checked;
+            vnode.attrs.onToggle(vnode.state.toggled);
+          },
+        })
+      ])
+    ]);
+  },
 };
 
 const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataState> = {
@@ -107,6 +130,16 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
         disabled: true,
         onChangeHandler: (v) => { vnode.state.url = v; },
       }),
+      m(ToggleRow, {
+        title: 'Private Community?',
+        defaultValue: vnode.attrs.community.privacyEnabled,
+        onToggle: (v) => { vnode.state.privacyToggled = !vnode.state.privacyToggled; },
+      }),
+      m(ToggleRow, {
+        title: 'Invites Enabled?',
+        defaultValue: vnode.attrs.community.invitesEnabled,
+        onToggle: (v) => { vnode.state.invitesToggled = !vnode.state.invitesToggled; },
+      }),
       m('tr', [
         m('td', 'Admins'),
         m('td', [ m(RoleRow, {
@@ -127,7 +160,12 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
     m(Button, {
       label: 'submit',
       onclick: () => {
-        vnode.attrs.community.updateCommunityData(vnode.state.name, vnode.state.description);
+        vnode.attrs.community.updateCommunityData(
+          vnode.state.name,
+          vnode.state.description,
+          vnode.state.privacyToggled,
+          vnode.state.invitesToggled,
+        );
         vnode.attrs.onChangeHandler(false);
       },
     }),
@@ -259,7 +297,9 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
     }
 
     return m('.Panel', [
-      m('.panel-left', { style: 'width: 70%;' }, [
+      m('.panel-left', {
+        // style: 'width: 70%;'
+      }, [
         (isCommunity)
           ? vnode.state.loadingFinished
             && m(CommunityMetadata, {

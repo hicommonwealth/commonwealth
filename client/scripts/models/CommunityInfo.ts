@@ -8,8 +8,8 @@ class CommunityInfo {
   public name: string;
   public description: string;
   public readonly defaultChain: ChainInfo;
-  public readonly invitesEnabled: boolean;
-  public readonly privacyEnabled: boolean;
+  public invitesEnabled: boolean;
+  public privacyEnabled: boolean;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
 
@@ -36,17 +36,21 @@ class CommunityInfo {
       json.tags
     );
   }
-  public async updateCommunityData(name: string, description: string,) {
+  public async updateCommunityData(name: string, description: string, privacyEnabled: boolean, invitesEnabled: boolean) {
     try {
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
         'name': name,
         'description': description,
+        'privacy': privacyEnabled,
+        'invites': invitesEnabled,
         'jwt': app.login.jwt,
       }).then((r) => {
         const updatedCommunity: CommunityInfo = r.result;
         this.name = updatedCommunity.name;
         this.description = updatedCommunity.description;
+        this.privacyEnabled = updatedCommunity.privacyEnabled;
+        this.invitesEnabled = updatedCommunity.invitesEnabled;
       });
     } catch (err) {
       console.log('Failed to update featured tags');
