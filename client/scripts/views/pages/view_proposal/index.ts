@@ -130,6 +130,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
             && !vnode.state.editing
+            && !proposal.readOnly
             && [
               m(ProposalHeaderSpacer),
               m(ProposalBodyEdit, {
@@ -471,7 +472,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     }
 
     // load profiles
-    // TODO: recursively fetch child comments as well (this will also prevent a reloading flash for threads with child comments)
+    // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
     if (vnode.state.profilesPrefetchStarted === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
@@ -528,9 +529,9 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
         // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
         setTimeout(() => {
-          const $reply = parentId ?
-            $(`.comment-${parentId}`).nextAll('.CreateComment') :
-            $('.ProposalComments > .CreateComment');
+          const $reply = parentId
+            ? $(`.comment-${parentId}`).nextAll('.CreateComment')
+            : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
           const scrollTop = $('body').scrollTop();
@@ -553,8 +554,14 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
     const { replyParent } = vnode.state;
     return m('.ViewProposalPage', [
-      m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-      m(ProposalComments, { proposal, comments, createdCommentCallback, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+      m(ProposalHeader, {
+        proposal, commentCount, viewCount, getSetGlobalEditingStatus,
+        getSetGlobalReplyStatus
+      }),
+      m(ProposalComments, {
+        proposal, comments, createdCommentCallback, replyParent,
+        getSetGlobalEditingStatus, getSetGlobalReplyStatus
+      }),
       m(ProposalSidebar, { proposal }),
     ]);
   }
