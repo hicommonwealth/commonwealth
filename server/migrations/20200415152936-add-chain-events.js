@@ -4,22 +4,50 @@ const Op = SequelizeLib.Op;
 
 // TODO: if we can use typescript in migrations, we can simply get these
 //   from the shared/events/edgeware/types file.
-const substrateEventStrings = [
-  'slash',
-  'reward',
-  'bonded',
-  'unbonded',
-  'vote-delegated',
-  'democracy-proposed',
-  'democracy-started',
-  'democracy-passed',
-  'democracy-not-passed',
-  'democracy-cancelled',
-  'democracy-executed',
-  'treasury-proposed',
-  'treasury-awarded',
-  'treasury-rejected',
-];
+
+const SubstrateEventKinds = {
+  Slash: 'slash',
+  Reward: 'reward',
+  Bonded: 'bonded',
+  Unbonded: 'unbonded',
+
+  VoteDelegated: 'vote-delegated',
+  DemocracyProposed: 'democracy-proposed',
+  DemocracyTabled: 'democracy-tabled',
+  DemocracyStarted: 'democracy-started',
+  DemocracyPassed: 'democracy-passed',
+  DemocracyNotPassed: 'democracy-not-passed',
+  DemocracyCancelled: 'democracy-cancelled',
+  DemocracyExecuted: 'democracy-executed',
+
+  PreimageNoted: 'preimage-noted',
+  PreimageUsed: 'preimage-used',
+  PreimageInvalid: 'preimage-invalid',
+  PreimageMissing: 'preimage-missing',
+  PreimageReaped: 'preimage-reaped',
+
+  TreasuryProposed: 'treasury-proposed',
+  TreasuryAwarded: 'treasury-awarded',
+  TreasuryRejected: 'treasury-rejected',
+
+  ElectionNewTerm: 'election-new-term',
+  ElectionEmptyTerm: 'election-empty-term',
+  ElectionMemberKicked: 'election-member-kicked',
+  ElectionMemberRenounced: 'election-member-renounced',
+
+  CollectiveProposed: 'collective-proposed',
+  CollectiveApproved: 'collective-approved',
+  CollectiveDisapproved: 'collective-disapproved',
+  CollectiveExecuted: 'collective-executed',
+  CollectiveMemberExecuted: 'collective-member-executed',
+  // TODO: do we want to track votes as events, in collective?
+
+  SignalingNewProposal: 'signaling-new-proposal',
+  SignalingCommitStarted: 'signaling-commit-started',
+  SignalingVotingStarted: 'signaling-voting-started',
+  SignalingVotingCompleted: 'signaling-voting-completed',
+  // TODO: do we want to track votes for signaling?
+};
 
 const initChainEventTypes = (queryInterface, Sequelize, t) => {
   const buildObject = (event_name, chain) => ({
@@ -27,10 +55,10 @@ const initChainEventTypes = (queryInterface, Sequelize, t) => {
     chain,
     event_name,
   });
-  const edgewareObjs = substrateEventStrings.map((s) => buildObject(s, 'edgeware'));
+  const edgewareObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware'));
 
   // TODO: somehow switch this on for testing purposes?
-  // const edgewareLocalObjs = substrateEventStrings.map((s) => buildObject(s, 'edgeware-local'));
+  // const edgewareLocalObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'edgeware-local'));
   return queryInterface.bulkInsert(
     'ChainEventTypes',
     [
@@ -95,7 +123,9 @@ module.exports = {
       // add type to NotificationCategories
       await queryInterface.bulkInsert('NotificationCategories', [{
         name: 'chain-event',
-        description: 'a chain event occurs'
+        description: 'a chain event occurs',
+        created_at: new Date(),
+        updated_at: new Date(),
       }], { transaction: t });
 
       // TODO: TESTING ONLY
