@@ -70,9 +70,9 @@ const preprocessQuillDeltaForRendering = (nodes) => {
       parent.children.push(node);
     }
   }
-  // check for \n at the end of the document
+  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
+  // onto the result. This may happen if we are rendering a truncated Quill document
   if (parent.children.length > 0) {
-    console.error('Quill document ended without a newline - this should never happen');
     result.push(parent);
   }
 
