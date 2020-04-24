@@ -50,6 +50,7 @@ const getMockApi = () => {
     getRuntimeVersion: () => {
       return {
         specVersion: 10,
+        specName: 'edgeware',
       } as unknown as RuntimeVersion;
     }
   });
@@ -69,13 +70,16 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 3);
     assert.equal(+blocks[0].header.number, 105);
     assert.deepEqual(blocks[0].events, []);
-    assert.equal(blocks[0].version, 10);
+    assert.equal(blocks[0].versionNumber, 10);
+    assert.equal(blocks[0].versionName, 'edgeware');
     assert.equal(+blocks[1].header.number, 106);
     assert.deepEqual(blocks[1].events, events[6]);
-    assert.equal(blocks[1].version, 10);
+    assert.equal(blocks[1].versionNumber, 10);
+    assert.equal(blocks[1].versionName, 'edgeware');
     assert.equal(+blocks[2].header.number, 107);
     assert.deepEqual(blocks[2].events, []);
-    assert.equal(blocks[2].version, 10);
+    assert.equal(blocks[2].versionNumber, 10);
+    assert.equal(blocks[2].versionName, 'edgeware');
   });
 
   it('should skip zeroed hashes', async () => {
@@ -90,7 +94,8 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 1);
     assert.equal(+blocks[0].header.number, 105);
     assert.deepEqual(blocks[0].events, []);
-    assert.equal(blocks[0].version, 10);
+    assert.equal(blocks[0].versionNumber, 10);
+    assert.equal(blocks[0].versionName, 'edgeware');
   });
 
 
@@ -106,10 +111,12 @@ describe('Edgeware Event Poller Tests', () => {
     assert.lengthOf(blocks, 2);
     assert.equal(+blocks[0].header.number, 107);
     assert.deepEqual(blocks[0].events, []);
-    assert.equal(blocks[0].version, 10);
+    assert.equal(blocks[0].versionNumber, 10);
+    assert.equal(blocks[0].versionName, 'edgeware');
     assert.equal(+blocks[1].header.number, 108);
     assert.deepEqual(blocks[1].events, events[8]);
-    assert.equal(blocks[1].version, 10);
+    assert.equal(blocks[1].versionNumber, 10);
+    assert.equal(blocks[1].versionName, 'edgeware');
   });
 
   it('should not accept invalid start/end blocks', async () => {

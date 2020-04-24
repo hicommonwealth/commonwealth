@@ -20,7 +20,6 @@ import { CWEvent } from '../../interfaces';
 export default async function (
   api: ApiPromise,
   blockNumber: number,
-  version: number,
   kind: SubstrateEventKind,
   event: Event,
 ): Promise<CWEvent> {
@@ -379,6 +378,7 @@ export default async function (
             proposer: proposer.toString(),
             proposalHash: hash.toString(),
             voteId: proposalInfoOpt.unwrap().vote_id.toString(),
+            // TODO: add title/contents?
           }
         };
       }
@@ -415,5 +415,5 @@ export default async function (
 
   // construct CWEvent
   const eventData = await extractData();
-  return { ...eventData, version: version.toString(), blockNumber };
+  return { ...eventData, blockNumber };
 }

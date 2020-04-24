@@ -19,7 +19,8 @@ export type SubstrateRuntimeVersion = number;
 export interface SubstrateBlock {
   header: Header;
   events: EventRecord[];
-  version: SubstrateRuntimeVersion;
+  versionNumber: number;
+  versionName: string;
 }
 
 export enum SubstrateEventKind {

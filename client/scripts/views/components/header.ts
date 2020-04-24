@@ -623,7 +623,6 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       const label = labelEdgewareEvent(
         notification.chainEvent.blockNumber,
         notification.chainEvent.type.chain,
-        notification.chainEvent.version,
         notification.chainEvent.data,
       );
       return m('li.HeaderNotificationRow', {

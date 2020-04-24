@@ -1,9 +1,62 @@
 import chai from 'chai';
+import {
+  AccountId, PropIndex, Hash, ReferendumInfoTo239, BlockNumber,
+  ReferendumIndex, TreasuryProposal, Votes
+} from '@polkadot/types/interfaces';
+import { Vec } from '@polkadot/types';
+import { ITuple } from '@polkadot/types/types';
+import { ProposalRecord } from 'edgeware-node-types/dist';
 
 import EdgewareEnricherFunc from '../../../../shared/events/edgeware/filters/enricher';
-import { constructFakeApi } from './testUtil';
+import { constructFakeApi, constructOption } from './testUtil';
 
 const { assert } = chai;
+
+const blockNumber = 10;
+const version = 10;
+const api = constructFakeApi({
+  bonded: async (stash) => stash !== 'alice-stash'
+    ? constructOption()
+    : constructOption('alice' as unknown as AccountId),
+  publicProps: async () => [
+    [ 1, 'hash1', 'charlie' ],
+    [ 2, 'hash2', 'dave' ]
+  ] as unknown as Vec<ITuple<[PropIndex, Hash, AccountId]>>,
+  referendumInfoOf: async (idx) => idx !== 1
+    ? constructOption()
+    : constructOption({
+      end: 20,
+      proposalHash: 'hash',
+      threshold: 'Supermajorityapproval',
+      delay: 10,
+    } as unknown as ReferendumInfoTo239),
+  dispatchQueue: async () => [
+    [ 20, 'hash1', 1 ],
+    [ 30, 'hash2', 2 ],
+  ] as unknown as Vec<ITuple<[BlockNumber, Hash, ReferendumIndex]>>,
+  proposals: (idx) => idx !== 1
+    ? constructOption()
+    : constructOption({} as unknown as TreasuryProposal),
+  voting: (hash) => hash !== 'hash1'
+    ? constructOption()
+    : constructOption({
+      proposer: 'charlie',
+      value: 1000,
+      beneficiary: 'dave',
+      bond: 100,
+    } as unknown as Votes),
+  proposalOf: (hash) => hash !== 'hash1'
+    ? constructOption()
+    : constructOption({
+      index: 1,
+      author: 'charlie',
+      stage: 'Voting',
+      transition_time: 20,
+      title: 'test proposal',
+      contents: 'this is a test proposal',
+      vote_id: 101,
+    } as unknown as ProposalRecord),
+});
 
 /* eslint-disable: dot-notation */
 describe('Edgeware Event Enricher Filter Tests', () => {
@@ -121,10 +174,10 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
 
   /** other */
-  it('should not enrich invalid event', async () => {
-
+  it('should not enrich invalid event', (done) => {
+    done();
   });
-  it('should not enrich with invalid API query', async () => {
-
+  it('should not enrich with invalid API query', (done) => {
+    done();
   });
 });

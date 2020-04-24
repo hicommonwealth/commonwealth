@@ -25,7 +25,7 @@ const getApi = () => {
       assert.fail('events.at called with invalid hash');
     },
     subscribeRuntimeVersion: (callback) => {
-      callback({ specVersion: 10 } as unknown as RuntimeVersion);
+      callback({ specVersion: 10, specName: 'edgeware' } as unknown as RuntimeVersion);
     }
   });
 };
@@ -53,7 +53,8 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.equal(+block.header.number, 1);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
-            assert.equal(block.version, 10);
+            assert.equal(block.versionNumber, 10);
+            assert.equal(block.versionName, 'edgeware');
           } else if (seenBlocks === 1) {
             // second block
             assert.deepEqual(block.header.hash, hashes[1]);
@@ -61,7 +62,8 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.lengthOf(block.events, 2);
             assert.deepEqual(block.events[0], events[1][0]);
             assert.deepEqual(block.events[1], events[1][1]);
-            assert.equal(block.version, 10);
+            assert.equal(block.versionNumber, 10);
+            assert.equal(block.versionName, 'edgeware');
           } else {
             assert.fail('invalid hash');
           }
@@ -94,7 +96,8 @@ describe('Edgeware Event Subscriber Tests', () => {
             assert.equal(+block.header.number, 1);
             assert.lengthOf(block.events, 1);
             assert.deepEqual(block.events[0], events[0][0]);
-            assert.equal(block.version, 10);
+            assert.equal(block.versionNumber, 10);
+            assert.equal(block.versionName, 'edgeware');
           } else if (seenBlocks === 1) {
             // second block
             assert.fail('should only process one block');

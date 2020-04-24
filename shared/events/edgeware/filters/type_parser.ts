@@ -5,7 +5,7 @@ import { SubstrateEventKind } from '../types';
  * This is the Type Parser function, which takes a raw Substrate chain Event
  * and determines which of our local event kinds it belongs to.
  */
-export default function (event: Event): SubstrateEventKind | null {
+export default function (event: Event, versionName: string, versionNumber: number): SubstrateEventKind | null {
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (event.section) {

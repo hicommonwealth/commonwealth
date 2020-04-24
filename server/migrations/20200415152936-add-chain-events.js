@@ -99,7 +99,6 @@ module.exports = {
           references: { model: 'ChainEventTypes', key: 'id' },
         },
         block_number: { type: Sequelize.INTEGER, allowNull: false },
-        version: { type: Sequelize.STRING, allowNull: false },
         event_data: { type: Sequelize.JSONB, allowNull: false },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },

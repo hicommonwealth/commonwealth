@@ -11,7 +11,6 @@ export const EventSupportingChains = ['edgeware', 'edgeware-local'];
 
 export interface CWEvent {
   blockNumber: number;
-  version: string;
   includeAddresses?: string[];
   excludeAddresses?: string[];
 
@@ -73,7 +72,6 @@ export interface IEventLabel {
 export type LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  version: string,
   data: IChainEventData,
   ...formatters
 ) => IEventLabel;

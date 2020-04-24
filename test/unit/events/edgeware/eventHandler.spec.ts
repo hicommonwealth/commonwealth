@@ -74,7 +74,6 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
-      version: '10',
       data: {
         kind: SubstrateEventKind.DemocracyStarted,
         referendumIndex: 0,
@@ -118,7 +117,6 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 11,
-      version: '10',
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: SubstrateEventKind.Slash,
@@ -163,7 +161,6 @@ describe('Event Handler Tests', () => {
     // setup
     const event: CWEvent = {
       blockNumber: 12,
-      version: '10',
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
         kind: SubstrateEventKind.DemocracyStarted,

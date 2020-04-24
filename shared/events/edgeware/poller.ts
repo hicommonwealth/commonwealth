@@ -30,6 +30,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
     // discover current version
     const version = await this._api.rpc.state.getRuntimeVersion();
     const versionNumber = +version.specVersion;
+    const versionName = version.specName.toString();
     // TODO: on newer versions of Substrate, a "system.lastRuntimeUpgrade" query is exposed,
     //   which will tell us if we hit an upgrade during the polling period. But for now, we
     //   can assume that the chain has not been upgraded during the offline polling period
@@ -49,7 +50,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
       console.log(`Poller fetched Block: ${+header.number}`);
-      return { header, events, version: versionNumber };
+      return { header, events, versionNumber, versionName };
     }));
     console.log('Finished polling past blocks!');
 

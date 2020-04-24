@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain_event_type_id: { type: DataTypes.STRING, allowNull: false },
     block_number: { type: DataTypes.INTEGER, allowNull: false },
-    version: { type: DataTypes.STRING, allowNull: false },
 
     event_data: { type: DataTypes.JSONB, allowNull: false },
     created_at: { type: DataTypes.DATE, allowNull: false },

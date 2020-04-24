@@ -22,7 +22,8 @@ const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
     events: events.map(
       (event) => ({ event } as unknown as EventRecord)
     ),
-    version: 10,
+    versionNumber: 10,
+    versionName: 'edgeware',
   };
 };
 
@@ -89,7 +90,6 @@ describe('Edgeware Event Processor Tests', () => {
             amount: '10000',
           } as ISubstrateSlash,
           blockNumber: 1,
-          version: '10',
           includeAddresses: ['Alice'],
         },
         {
@@ -101,7 +101,6 @@ describe('Edgeware Event Processor Tests', () => {
             proposer: 'Alice',
           },
           excludeAddresses: ['Alice'],
-          version: '10',
           blockNumber: 1,
         },
       ]);
@@ -114,7 +113,6 @@ describe('Edgeware Event Processor Tests', () => {
             voteThreshold: 'Supermajorityapproval',
             endBlock: 123,
           },
-          version: '10',
           blockNumber: 2,
         },
       ]);
