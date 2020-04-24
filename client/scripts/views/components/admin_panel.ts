@@ -5,6 +5,8 @@ import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, I
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
+import 'components/admin_panel.scss';
+
 
 const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {

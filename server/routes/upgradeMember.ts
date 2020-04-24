@@ -3,6 +3,7 @@ import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const upgradeMember = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const { address, new_role } = req.body;
   if (!address) return next(new Error('Invalid Address'));
@@ -10,15 +11,17 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   if (!req.user) return next(new Error('Not logged in'));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
+  const adminAddresses = await req.user.getAddresses();
+  const adminAddressIds = Array.from(adminAddresses.map((a) => a.id));
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: req.user.address,
+      address_id: { [Op.in]: adminAddressIds },
       permission: 'admin',
     },
   });
   if (!requesterIsAdmin) return next(new Error('Must be an Admin to upgrade member'));
-
+  console.dir(requesterIsAdmin);
   const memberAddress = await models.Address.findOne({
     where: {
       address,
@@ -33,6 +36,7 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     },
   });
   if (!member) return next(new Error('Cannot find member to upgrade!'));
+  if (requesterIsAdmin.includes(member)) return next(new Error('Cannot demote self.'));
   // if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
 
   member.permission = new_role;
