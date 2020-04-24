@@ -10,24 +10,21 @@ import LoginModal from 'views/modals/login_modal';
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 
 import { ApiStatus, default as app } from 'state';
-import { featherIcon, slugify, link } from 'helpers';
-import { NotificationCategories } from 'types';
+import { featherIcon, link } from 'helpers';
 import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { ChainClass, ChainBase, Notification } from 'models';
+import { OffchainCommunitiesStore } from 'stores';
 
 import CommunitySwitcher from 'views/components/community_switcher';
 import { isMember } from 'views/components/membership_button';
-import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
-import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+
 import ChainIcon from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import NewProposalButton from 'views/components/new_proposal_button';
@@ -40,7 +37,7 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NewProposalModal from 'views/modals/proposals';
-import { OffchainCommunitiesStore } from 'stores';
+import NotificationRow from 'views/components/navigation/notification_row';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -49,94 +46,6 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
-
-const NotificationRow: m.Component<{ notification: Notification }> = {
-  view: (vnode) => {
-    const { notification } = vnode.attrs;
-    const { category } = notification.subscription;
-
-    // set up notificationTitle, notificationFrom, notificationExcerpt
-    const getNotification = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
-      return m(ListItem, {
-        class: notification.isRead ? '' : 'active',
-        onclick: async () => {
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(target);
-          m.redraw.sync();
-          if (next) setTimeout(() => next(), 1);
-        },
-        contentLeft: [
-        ],
-        label: [
-          m(User, { user: userAccount, avatarOnly: true, avatarSize: 24 }),
-          m('.comment-body', [
-            m('.comment-body-top', title),
-            m('.comment-body-bottom', [
-              m(User, { user: userAccount, hideAvatar: true }),
-              m('span.created-at', createdAt.twitterShort()),
-            ]),
-            excerpt && m('.comment-body-excerpt', excerpt),
-          ]),
-        ]
-      });
-    };
-
-    if (category === NotificationCategories.NewComment) {
-      const {
-        created_at, object_title, object_id, root_id, comment_text, comment_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !object_title || (!object_id && !root_id)
-          || !comment_text || !comment_id || !author_address || !author_chain) return;
-
-      // legacy comments use object_id, new comments use root_id
-      const [ commented_type, commented_id ] = decodeURIComponent(object_id || root_id).split('_');
-      const commented_title = decodeURIComponent(object_title).trim();
-      const decoded_comment_text = (() => {
-        try {
-          const doc = JSON.parse(decodeURIComponent(comment_text));
-          return m(QuillFormattedText, { doc: sliceQuill(doc, 140), hideFormatting: true });
-        } catch (e) {
-          return m(MarkdownFormattedText, {
-            doc: decodeURIComponent(comment_text).slice(0, 140),
-            hideFormatting: true
-          });
-        }
-      })();
-
-      return getNotification(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New comment on ', m('span.commented-obj', commented_title) ]),
-        decoded_comment_text,
-        `/${community_id || chain_id}/proposal/discussion/`
-          + `${commented_id}?comment=${comment_id}`,
-        () => jumpHighlightComment(comment_id)
-      );
-    } else if (category === NotificationCategories.NewThread) {
-      const {
-        created_at, thread_title, thread_id, chain_id, community_id,
-        author_address, author_chain } = JSON.parse(notification.data);
-      if (!created_at || !thread_title || !thread_id || !author_address || !author_chain) return;
-
-      const decoded_title = decodeURIComponent(thread_title);
-      const community_name = community_id
-        ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
-        : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
-
-      return getNotification(
-        [author_address, author_chain],
-        moment.utc(created_at),
-        m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]),
-        decoded_title,
-        `/${community_id || chain_id}/proposal/discussion/${thread_id}-`
-          + `${slugify(decoded_title)}`,
-        () => jumpHighlightComment('parent')
-      );
-    }
-  },
-};
 
 const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible: boolean }> = {
   view: (vnode) => {
