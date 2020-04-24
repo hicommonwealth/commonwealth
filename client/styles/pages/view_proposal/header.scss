@@ -105,10 +105,15 @@
             color: #888;
         }
     }
-    .ProposalHeaderExternalLink a {
-        color: $primary-green;
-        text-decoration: none;
-        &:hover {
+    .ProposalHeaderExternalLink {
+        margin-top: 5px;
+        font-weight: 600;
+        a:link,
+        a:visited {
+            color: $primary-green;
+            text-decoration: none;
+        }
+        a:hover {
             text-decoration: underline;
         }
     }

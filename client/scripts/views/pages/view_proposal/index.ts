@@ -111,6 +111,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderTitle, { proposal }),
           m(ProposalHeaderComments, { proposal, commentCount }),
         ]),
+        proposal instanceof OffchainThread
+          && proposal.kind === OffchainThreadKind.Link
+          && m(ProposalHeaderExternalLink, { proposal }),
         m('.proposal-subscription-button', [
           m(ProposalHeaderSubscriptionButton, { proposal }),
           m(ProposalHeaderPrivacyButtons, { proposal }),
@@ -142,9 +145,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalHeaderSpacer),
             m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
           ],
-
-          proposal instanceof OffchainThread && proposal.kind === OffchainThreadKind.Link && m(ProposalHeaderSpacer),
-          m(ProposalHeaderExternalLink, { proposal }),
         ] : [
           m(ProposalHeaderOnchainId, { proposal }),
           m(ProposalHeaderOnchainStatus, { proposal }),

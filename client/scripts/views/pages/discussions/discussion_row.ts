@@ -5,7 +5,7 @@ import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';
 
 import app from 'state';
-import { pluralize, slugify, link, externalLink } from 'helpers';
+import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
 import { Icon, Icons } from 'construct-ui';
 
 import User from 'views/components/widgets/user';
@@ -30,10 +30,6 @@ const DiscussionRow: m.Component<IAttrs> = {
     const propType: OffchainThreadKind = proposal.kind;
     const lastUpdated = app.comments.lastCommented(proposal)
       || proposal.createdAt;
-    const domainSlice = (url) => {
-      const re = new RegExp('^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)');
-      return re.exec(url)[1];
-    };
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
@@ -68,20 +64,23 @@ const DiscussionRow: m.Component<IAttrs> = {
           ]),
           propType === OffchainThreadKind.Link
             && proposal.url
-            && externalLink('a.discussion-link', proposal.url, domainSlice(proposal.url)),
+            && externalLink('a.discussion-link', proposal.url, [
+              extractDomain(proposal.url),
+              m.trust(' &rarr;'),
+            ]),
           propType === OffchainThreadKind.Forum
             && (proposal as OffchainThread).body && m('.discussion-excerpt', [
-              (() => {
-                const body = (proposal as OffchainThread).body;
-                try {
-                  const doc = JSON.parse(body);
-                  doc.ops = doc.ops.slice(0, 3);
-                  return m(QuillFormattedText, { doc, hideFormatting: true });
-                } catch (e) {
-                  return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
-                }
-              })(),
-            ]),
+            (() => {
+              const body = (proposal as OffchainThread).body;
+              try {
+                const doc = JSON.parse(body);
+                doc.ops = doc.ops.slice(0, 3);
+                return m(QuillFormattedText, { doc, hideFormatting: true });
+              } catch (e) {
+                return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+              }
+            })(),
+          ]),
           m('.discussion-meta', [
             m('.discussion-meta-left', [
               m(User, {

@@ -32,6 +32,11 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
   return m(selector, attrs, children);
 }
 
+export function extractDomain(url) {
+  const re = new RegExp('^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)');
+  return re.exec(url)[1];
+}
+
 /*
  * icons
  */

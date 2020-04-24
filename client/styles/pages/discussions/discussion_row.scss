@@ -74,11 +74,12 @@ $discussion-row-vpadding: 34px;
         }
     }
     a.discussion-link {
+        display: inline-block;
         color: $primary-green;
         text-decoration: none;
-        margin-left: 5px;
         font-size: 13px;
         font-weight: 600;
+        margin-bottom: 9px;
         &:hover {
             text-decoration: underline;
         }

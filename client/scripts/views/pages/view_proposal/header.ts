@@ -7,7 +7,7 @@ import app from 'state';
 import { Button, Icon, Icons } from 'construct-ui';
 
 import { updateRoute } from 'app';
-import { pluralize, link, externalLink, isSameAccount } from 'helpers';
+import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
@@ -139,7 +139,7 @@ export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | O
     if (!(proposal instanceof OffchainThread)) return;
     if (proposal.kind !== OffchainThreadKind.Link) return;
     return m('.ProposalHeaderExternalLink', [
-      externalLink('a.external-link', proposal.url, [ 'Open ', m.trust('&rarr;') ]),
+      externalLink('a.external-link', proposal.url, [ extractDomain(proposal.url), m.trust(' &rarr;') ]),
     ]);
   }
 };
