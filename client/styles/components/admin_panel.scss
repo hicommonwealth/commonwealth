@@ -1,3 +1,45 @@
-.cui-dialog-content {
-  width: 800px; // style override: default 600px
+.adminDialog {
+  .cui-dialog-content {
+    width: 800px; // style override: default 600px
+  
+    .cui-dialog-header {
+    } // .cui-dialog-header
+  
+    .cui-dialog-body {
+      .Panel {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        @media (min-width: 800px) {
+          flex-direction: row;
+        }
+
+        .panel-left {
+          width: 100%;
+          border-right: 1px grey solid;
+          @media (min-width: 800px) {
+            width: 60%;
+          }
+        } // .panel-left
+
+        .panel-right {
+          width: 100%;
+          @media (min-width: 800px) {
+            width: 40%;
+          }
+
+          .TabPanel {
+            .UpgradeRoles, .Webhooks {
+              padding: 0 20px 10px;
+            }
+          }
+        } // .panel-right
+
+      } // .Panel
+    } // .cui-dialog-body
+  
+  } // .cui-dialog-content
+  
+
 }
+

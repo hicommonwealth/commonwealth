@@ -1,7 +1,7 @@
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
@@ -110,6 +110,7 @@ const ToggleRow: m.Component<IToggleRowAttrs, {toggled: boolean, checked: boolea
             vnode.state.checked = !vnode.state.checked;
             vnode.attrs.onToggle(vnode.state.toggled);
           },
+          // style: 'margin-left: 20px;',
         })
       ])
     ]);
@@ -273,6 +274,87 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
   },
 };
 
+const UpgradeRoles: m.Component<{roleData: any[], onRoleUpgrade: Function, }, {role: string, user: string, }> = {
+  view: (vnode) => {
+    const { roleData, onRoleUpgrade } = vnode.attrs;
+    const noAdmins = roleData.filter((role) => {
+      return role.permission === RolePermission.member || (role.permission === RolePermission.moderator);
+    });
+    const names: string[] = noAdmins.map((role) => {
+      const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
+      const roletext = (role.permission === 'moderator') ? '(moderator)' : '';
+      return `${displayName}: ${role.Address.address.slice(0, 6)}...${roletext}`;
+    });
+    return m('.UpgradeRoles', [
+      m('h3', 'Select Member:'),
+      m(RadioGroup, {
+        name: 'members/mods',
+        options: names,
+        value: vnode.state.user,
+        onchange: (e: Event) => { vnode.state.user = (e.currentTarget as HTMLInputElement).value; },
+      }),
+      m('h3', 'Role Type:'),
+      m(RadioGroup, {
+        name: 'roles',
+        options: ['Admin', 'Moderator'],
+        value: vnode.state.role,
+        onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
+      }),
+      m(Button, {
+        label: 'Upgrade Member',
+        onclick: () => {
+          const indexOfName = names.indexOf(vnode.state.user);
+          const user = noAdmins[indexOfName];
+          const newRole = (vnode.state.role === 'Admin') ? 'admin'
+            : (vnode.state.role === 'Moderator') ? 'moderator' : '';
+          $.post(`${app.serverUrl()}/upgradeMember`, {
+            new_role: newRole,
+            address: user.Address.address,
+            community: app.activeCommunityId(),
+            jwt: app.login.jwt,
+          }).then((r) => {
+            onRoleUpgrade(user, r.result);
+          });
+        },
+      }),
+    ]);
+  }
+};
+
+const TabPanel: m.Component<{defaultTab: number, roleData: any[], onRoleUpgrade: Function }, {index: number, }> = {
+  oninit: (vnode) => {
+    vnode.state.index = vnode.attrs.defaultTab;
+  },
+  view: (vnode) => {
+    return m('.TabPanel', [
+      m(Tabs, {
+        align: 'center',
+        bordered: true,
+        fluid: true,
+        size: 'xs',
+      }, [
+        m(TabItem, {
+          label: 'Roles',
+          active: vnode.state.index === 1,
+          onclick: () => { vnode.state.index = 1; },
+        }),
+        m(TabItem, {
+          label: 'Webhooks',
+          active: vnode.state.index === 2,
+          onclick: () => { vnode.state.index = 2; },
+        }),
+      ]),
+      (vnode.state.index === 1) &&
+        m(UpgradeRoles, {
+          roleData: vnode.attrs.roleData,
+          onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
+        }),
+      (vnode.state.index === 2) &&
+        m('.Webhooks', 'nothing yet!'),
+    ]);
+  },
+};
+
 interface IPanelState {
   roleData: RoleInfo[];
   loadingFinished: boolean;
@@ -313,9 +395,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
     }
 
     return m('.Panel', [
-      m('.panel-left', {
-        // style: 'width: 70%;'
-      }, [
+      m('.panel-left', [
         (isCommunity)
           ? vnode.state.loadingFinished
             && m(CommunityMetadata, {
@@ -324,8 +404,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
               mods,
               onRoleUpdate: (x, y) => {
                 y.Address = x.Address;
-                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1);
-                vnode.state.roleData.push(y);
+                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
                 m.redraw();
               },
               onChangeHandler: vnode.attrs.onChangeHandler,
@@ -338,13 +417,23 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
               onChangeHandler: vnode.attrs.onChangeHandler,
               onRoleUpdate: (x, y) => {
                 y.Address = x.Address;
-                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1);
-                vnode.state.roleData.push(y);
+                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
                 m.redraw();
               },
             }),
       ]),
-      m('.panel-right', []),
+      m('.panel-right', [
+        vnode.state.loadingFinished &&
+          m(TabPanel, {
+            roleData: vnode.state.roleData,
+            defaultTab: 1,
+            onRoleUpgrade: (x, y) => {
+              y.Address = x.Address;
+              vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
+              m.redraw();
+            },
+          }),
+      ]),
     ]);
   }
 };
@@ -356,7 +445,7 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
   oncreate: (vnode) => {
   },
   view: (vnode) => {
-    return m('AdminPanel', [
+    return m('.AdminPanel', [
       m(ListItem, {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
@@ -367,6 +456,7 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
+        class: 'adminDialog',
         content: m(Panel, {
           onChangeHandler: (v) => { vnode.state.isOpen = v; },
         }),

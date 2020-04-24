@@ -32,7 +32,6 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     where: {
       ...chainOrCommObj,
       address_id: memberAddress.id,
-      // permission: ['moderator', 'member'],
     },
   });
   if (!member) return next(new Error('Cannot find member to upgrade!'));
