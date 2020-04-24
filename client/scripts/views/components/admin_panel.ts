@@ -1,12 +1,12 @@
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
-import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork } from 'models';
+import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
 
-const RoleRow: m.Component<{ roledata? }> = {
+const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     return (vnode.attrs.roledata?.length > 0) &&
       m('RoleData', [
@@ -23,8 +23,6 @@ const RoleRow: m.Component<{ roledata? }> = {
                 size: 'xs',
                 style: 'padding-left: 2px;',
                 onclick: () => {
-                  console.dir('demote admin to member');
-                  console.dir(chainOrCommObj);
                   $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,
                     new_role: 'member',
@@ -34,6 +32,7 @@ const RoleRow: m.Component<{ roledata? }> = {
                     if (res.status !== 'Success') {
                       throw new Error(`got unsuccessful status: ${res.status}`);
                     }
+                    vnode.attrs.onRoleUpdate(role, res.result);
                   }).catch((e) => console.error('Failed To demote admin'));
                 },
               }),
@@ -55,6 +54,7 @@ interface IChainCommunityAttrs {
   community?: CommunityInfo;
   chain?: ChainInfo;
   onChangeHandler: Function;
+  onRoleUpdate: Function;
   admins;
   mods;
 }
@@ -107,12 +107,19 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
       }),
       m('tr', [
         m('td', 'Admins'),
-        m('td', [ m(RoleRow, { roledata: vnode.attrs.admins }), ])
+        m('td', [ m(RoleRow, {
+          roledata: vnode.attrs.admins,
+          onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+
+        }), ])
       ]),
       vnode.attrs.mods.length > 0 &&
         m('tr', [
           m('td', 'Moderators'),
-          m('td', [ m(RoleRow, { roledata: vnode.attrs.mods }), ])
+          m('td', [ m(RoleRow, {
+            roledata: vnode.attrs.mods,
+            onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+          }), ])
         ]),
     ]),
     m(Button, {
@@ -211,7 +218,7 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
 };
 
 interface IPanelState {
-  roleData;
+  roleData: RoleInfo[];
   loadingFinished: boolean;
   loadingStarted: boolean;
 }
@@ -252,8 +259,32 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
     return m('.Panel', [
       m('.panel-left', { style: 'width: 70%;' }, [
         (isCommunity)
-          ? vnode.state.loadingFinished && m(CommunityMetadata, { community: app.community.meta, admins, mods, onChangeHandler: vnode.attrs.onChangeHandler })
-          : vnode.state.loadingFinished && m(ChainMetadata, { chain: app.config.chains.getById(app.activeChainId()), admins, mods, onChangeHandler: vnode.attrs.onChangeHandler }),
+          ? vnode.state.loadingFinished
+            && m(CommunityMetadata, {
+              community: app.community.meta,
+              admins,
+              mods,
+              onRoleUpdate: (x, y) => {
+                y.Address = x.Address;
+                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1);
+                vnode.state.roleData.push(y);
+                m.redraw();
+              },
+              onChangeHandler: vnode.attrs.onChangeHandler,
+            })
+          : vnode.state.loadingFinished
+            && m(ChainMetadata, {
+              chain: app.config.chains.getById(app.activeChainId()),
+              admins,
+              mods,
+              onChangeHandler: vnode.attrs.onChangeHandler,
+              onRoleUpdate: (x, y) => {
+                y.Address = x.Address;
+                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1);
+                vnode.state.roleData.push(y);
+                m.redraw();
+              },
+            }),
       ]),
       m('.panel-right', []),
     ]);
