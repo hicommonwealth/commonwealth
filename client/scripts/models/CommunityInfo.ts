@@ -53,10 +53,10 @@ class CommunityInfo {
         this.invitesEnabled = updatedCommunity.invitesEnabled;
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update Community Data');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update Community Data');
     }
   }
 
