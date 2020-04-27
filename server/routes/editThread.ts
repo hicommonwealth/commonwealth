@@ -75,7 +75,6 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
       // don't send webhook notifications for edits
       null,
       req.wss,
-      [ finalThread.Address.address ],
     );
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {

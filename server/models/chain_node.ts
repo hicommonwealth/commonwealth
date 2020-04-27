@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 
   ChainNode.associate = (models) => {
     models.ChainNode.belongsTo(models.Chain, { foreignKey: 'chain' });
-  };
+};
 
   return ChainNode;
 };

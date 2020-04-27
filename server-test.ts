@@ -18,7 +18,6 @@ import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import ViewCountCache from './server/util/viewCountCache';
-import { SubstrateEventKinds } from './shared/events/edgeware/types';
 
 require('express-async-errors');
 
@@ -150,10 +149,6 @@ const resetServer = (debug=false): Promise<void> => {
         description: 'someone @ mentions a user',
       });
       await models['NotificationCategory'].create({
-        name: NotificationCategories.ChainEvent,
-        description: 'a chain event occurs',
-      });
-      await models['NotificationCategory'].create({
         name: NotificationCategories.NewReaction,
         description: 'someone reacts to a post',
       });
@@ -180,22 +175,6 @@ const resetServer = (debug=false): Promise<void> => {
         [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
       ];
       await Promise.all(nodes.map(([ url, chain, address ]) => (models['ChainNode'].create({ chain, url, address }))));
-
-      // initialize chain event types
-      const initChainEventTypes = (chain) => {
-        return Promise.all(
-          SubstrateEventKinds.map((event_name) => {
-            return models['ChainEventType'].create({
-              id: `${chain}-${event_name}`,
-              chain,
-              event_name,
-            });
-          })
-        );
-      };
-
-      await initChainEventTypes('edgeware');
-
       if (debug) console.log('Database reset!');
       resolve();
     });
