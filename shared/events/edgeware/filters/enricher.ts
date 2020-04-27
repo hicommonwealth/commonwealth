@@ -134,21 +134,25 @@ export default async function (
         const [ referendumIndex, voteThreshold ] = event.data as unknown as [ ReferendumIndex, VoteThreshold ] & Codec;
 
         // query for edgeware only -- kusama has different type
-        const info = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
+        const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
+        if (!infoOpt.isSome) {
+          throw new Error(`could not find info for referendum ${+referendumIndex}`);
+        }
         return {
           data: {
             kind,
             referendumIndex: +referendumIndex,
-            proposalHash: info.unwrap().hash.toString(),
+            proposalHash: infoOpt.unwrap().hash.toString(),
             voteThreshold: voteThreshold.toString(),
-            endBlock: info.isSome ? (+info.unwrap().end) : null,
+            endBlock: +infoOpt.unwrap().end,
           }
         };
       }
 
       case SubstrateEventKind.DemocracyPassed: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
-
+        console.log(referendumIndex);
+        console.log(+referendumIndex);
         // dispatch queue -- if not present, it was already executed
         const dispatchQueue = await api.query.democracy.dispatchQueue();
         const dispatchInfo = dispatchQueue.find(([ block, hash, idx ]) => +idx === +referendumIndex);

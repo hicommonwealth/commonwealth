@@ -131,7 +131,7 @@ export interface ISubstrateDemocracyStarted extends ISubstrateEvent {
   referendumIndex: number;
   proposalHash: string;
   voteThreshold: string;
-  endBlock: SubstrateBlockNumber | null;
+  endBlock: SubstrateBlockNumber;
 }
 
 export interface ISubstrateDemocracyPassed extends ISubstrateEvent {
