@@ -14,13 +14,16 @@ $sidebar-padding: 16px;
     // dark styles
     background: #2f3136 !important;
     color: #fff;
-    .cui-list.cui-list-dark {
+    .cui-list.cui-list-dark,
+    .TagSelector .cui-list {
         background: #2f3136 !important;
     }
-    .cui-list.cui-list-dark > h4 {
+    .cui-list.cui-list-dark > h4,
+    .TagSelector .cui-list > h4 {
         color: #fff;
     }
-    .cui-list.cui-list-dark > .cui-list-item {
+    .cui-list.cui-list-dark > .cui-list-item,
+    .TagSelector .cui-list > .cui-list-item {
         color: #828386;
         .cui-icon {
             color: #828386;
@@ -40,12 +43,12 @@ $sidebar-padding: 16px;
     // list styles
     .cui-list {
         max-height: 100%;
-        padding-bottom: 80px;
+        padding-bottom: 20px;
         user-select: none;
     }
 
     // individual menu items
-    .cui-list.cui-lg > h4 {
+    .cui-list > h4 {
         margin: 0;
         padding: 20px 0 6px $sidebar-padding;
         font-weight: 500;
@@ -53,7 +56,7 @@ $sidebar-padding: 16px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
     }
-    .cui-list.cui-lg > .cui-list-item {
+    .cui-list > .cui-list-item {
         font-size: 16px;
         border: none;
         font-weight: 500;
@@ -72,11 +75,11 @@ $sidebar-padding: 16px;
     }
 
     // buttons
-    .cui-list.cui-lg .cui-list-item-content-right .cui-button + .cui-button {
+    .cui-list .cui-list-item-content-right .cui-button + .cui-button {
         margin-left: 4px;
     }
     // top
-    .cui-list.cui-lg .title-selector {
+    .cui-list .title-selector {
         font-weight: 700;
         padding: 21px $sidebar-padding 18px;
         // background: #fff !important;
@@ -112,7 +115,7 @@ $sidebar-padding: 16px;
             margin-right: -3px;
         }
     }
-    .cui-list.cui-lg .action-selector {
+    .cui-list .action-selector {
         padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
         // background: #fff !important;
         cursor: default !important;
@@ -124,7 +127,7 @@ $sidebar-padding: 16px;
         }
     }
     // bottom
-    .cui-list.cui-lg .login-selector {
+    .cui-list .login-selector {
         position: fixed;
         display: flex;
         bottom: 0;
@@ -166,10 +169,10 @@ $sidebar-padding: 16px;
             }
         }
     }
-    &.no-active-community .cui-list.cui-lg .title-selector {
+    &.no-active-community .cui-list .title-selector {
         border-bottom: none;
     }
-    &.no-active-community .cui-list.cui-lg .login-selector {
+    &.no-active-community .cui-list .login-selector {
         border-top: none;
     }
 }

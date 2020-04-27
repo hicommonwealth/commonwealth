@@ -232,7 +232,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           }),
         // TODO: tag selector
         (app.community || app.chain)
-          && m(TagSelector, { activeTag, showFullListing: false }),
+          && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
         // members (all communities)
         (app.community || app.chain)
           && m(ListItem, {

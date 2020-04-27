@@ -135,7 +135,7 @@ const User : m.Component<IAttrs> = {
               profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
-          ]
+          ],
       ]);
 
     const tooltipPopover = m('.UserTooltip', {

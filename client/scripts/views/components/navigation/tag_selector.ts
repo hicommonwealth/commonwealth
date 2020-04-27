@@ -4,7 +4,7 @@ import 'components/navigation/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
-import { List, ListItem, Icon, Icons } from 'construct-ui';
+import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { link } from 'helpers';
@@ -18,11 +18,12 @@ interface IGetTagListingParams {
   activeTag: string,
   featuredTagIds: string[],
   addFeaturedTag: Function,
-  removeFeaturedTag: Function
+  removeFeaturedTag: Function,
+  hideEditButton: boolean,
 }
 
 export const getTagListing = (params: IGetTagListingParams) => {
-  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag } = params;
+  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag, hideEditButton } = params;
   const otherTags = {};
   const featuredTags = {};
 
@@ -72,7 +73,8 @@ export const getTagListing = (params: IGetTagListingParams) => {
       name: otherTags[name].name,
       selected: otherTags[name].selected,
       addFeaturedTag,
-      removeFeaturedTag
+      removeFeaturedTag,
+      hideEditButton
     }));
 
   const featuredTagListing = featuredTagIds.length
@@ -87,7 +89,8 @@ export const getTagListing = (params: IGetTagListingParams) => {
         name: featuredTags[name].name,
         selected: featuredTags[name].selected,
         addFeaturedTag,
-        removeFeaturedTag
+        removeFeaturedTag,
+        hideEditButton
       }))
     : [];
 
@@ -104,13 +107,15 @@ interface ITagRowAttrs {
   selected: boolean;
   addFeaturedTag: Function;
   removeFeaturedTag: Function;
+  hideEditButton: boolean;
 }
 
 const TagRow: m.Component<ITagRowAttrs, {}> = {
   view: (vnode) => {
     const {
       count, description, id, featured, featured_order,
-      name, selected, addFeaturedTag, removeFeaturedTag
+      name, selected, addFeaturedTag, removeFeaturedTag,
+      hideEditButton
     } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
 
@@ -124,36 +129,35 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
         m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
       },
       contentLeft: m(Icon, { name: Icons.TAG }),
-      label: [
-        m('span.tag-name', `${name} (${count})`),
-        isCommunityAdmin()
-          && m('a.edit-button', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              app.modals.create({
-                modal: EditTagModal,
-                data: {
-                  description,
-                  featured,
-                  featured_order,
-                  id,
-                  name,
-                  addFeaturedTag,
-                  removeFeaturedTag
-                }
-              });
+      label: m('span.tag-name', `${name} (${count})`),
+      contentRight: isCommunityAdmin() && !hideEditButton && m(Button, {
+        class: 'edit-button',
+        size: 'xs',
+        onclick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          app.modals.create({
+            modal: EditTagModal,
+            data: {
+              description,
+              featured,
+              featured_order,
+              id,
+              name,
+              addFeaturedTag,
+              removeFeaturedTag
             }
-          }, 'Edit')
-      ]
+          });
+        },
+        label: 'Edit',
+      })
     });
   }
 };
 
-const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean }, { refreshed, featuredTagIds }> = {
+const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hideEditButton?: boolean }, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
-    const { activeTag, showFullListing } = vnode.attrs;
+    const { activeTag, showFullListing, hideEditButton } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
 
@@ -170,7 +174,7 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean }, 
       m.redraw();
     };
 
-    const params = { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag };
+    const params = { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag, hideEditButton };
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
