@@ -7,7 +7,7 @@ import dragula from 'dragula';
 import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { link } from 'helpers';
+import { link, pluralize } from 'helpers';
 import { OffchainThreadKind } from 'models';
 
 import EditTagModal from 'views/modals/edit_tag_modal';
@@ -129,28 +129,33 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
         m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
       },
       contentLeft: m(Icon, { name: Icons.TAG }),
-      label: m('span.tag-name', `${name} (${count})`),
-      contentRight: isCommunityAdmin() && !hideEditButton && m(Button, {
-        class: 'edit-button',
-        size: 'xs',
-        onclick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          app.modals.create({
-            modal: EditTagModal,
-            data: {
-              description,
-              featured,
-              featured_order,
-              id,
-              name,
-              addFeaturedTag,
-              removeFeaturedTag
-            }
-          });
-        },
-        label: 'Edit',
-      })
+      label: [
+        m('span.tag-name', name),
+      ],
+      contentRight: [
+        !hideEditButton && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton && isCommunityAdmin() && m(Button, {
+          class: 'edit-button',
+          size: 'xs',
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.modals.create({
+              modal: EditTagModal,
+              data: {
+                description,
+                featured,
+                featured_order,
+                id,
+                name,
+                addFeaturedTag,
+                removeFeaturedTag
+              }
+            });
+          },
+          label: 'Edit',
+        })
+      ]
     });
   }
 };
@@ -178,8 +183,8 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hi
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
-      showFullListing && m('h4', 'Featured tags'),
-      !!featuredTagListing.length && m(List, {
+      featuredTagListing.length > 0 && showFullListing && m('h4', 'Pinned to sidebar'),
+      featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
           if (isCommunityAdmin()) {
@@ -194,7 +199,7 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hi
           }
         }
       }, featuredTagListing),
-      showFullListing && m('h4', 'Other tags'),
+      showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
     ]);
   },

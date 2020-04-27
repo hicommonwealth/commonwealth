@@ -2,4 +2,8 @@
 
 .TagSelector {
     @include dragula;
+    .tag-count {
+        display: inline-block;
+        width: 140px;
+    }
 }

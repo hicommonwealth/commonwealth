@@ -48,6 +48,9 @@ $sidebar-padding: 16px;
     }
 
     // individual menu items
+    .TagSelector {
+        margin-bottom: 10px;
+    }
     .cui-list > h4 {
         margin: 0;
         padding: 20px 0 6px $sidebar-padding;
@@ -61,7 +64,7 @@ $sidebar-padding: 16px;
         border: none;
         font-weight: 500;
         padding: 4px $sidebar-padding;
-        .cui-icon {
+        .cui-icon svg {
             height: 16px;
             width: 16px;
             min-height: 16px;
@@ -182,6 +185,7 @@ $sidebar-padding: 16px;
     .notification-list {
         height: 420px;
         background: #fff;
+        width: 250px;
     }
     .cui-menu {
         max-width: 250px;
