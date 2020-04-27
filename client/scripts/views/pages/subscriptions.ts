@@ -351,6 +351,7 @@ interface IEventSubscriptionState {
   chain: string;
   eventKinds: IChainEventKind[];
   allSupportedChains: string[];
+  isSubscribedAll: boolean;
 }
 
 const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
@@ -358,6 +359,7 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
     vnode.state.chain = EventSupportingChains.sort()[0];
     vnode.state.eventKinds = SubstrateEventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
+    vnode.state.isSubscribedAll = false;
   },
   view: (vnode) => {
     let titler;
@@ -368,6 +370,13 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       titler = null;
       vnode.state.eventKinds = [];
     }
+
+    const allSubscriptions = app.login.notifications.subscriptions
+      .filter((sub) => sub.category === NotificationCategories.ChainEvent
+        && vnode.state.eventKinds.find((kind) => sub.objectId === `${vnode.state.chain}-${kind}`));
+    const allActiveSubscriptions = allSubscriptions.filter((sub) => sub.isActive);
+    vnode.state.isSubscribedAll = allActiveSubscriptions.length === vnode.state.eventKinds.length;
+
     const supportedChains = app.loginStatusLoaded
       ? app.config.chains.getAll()
         .filter((c) => vnode.state.allSupportedChains.includes(c.id))
@@ -384,6 +393,31 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
         },
       }),
       m('h2', 'Subscribe to New Events:'),
+      m('.EventSubscriptionRow', [
+        m('h3', 'Subscribe All'),
+        app.loginStatusLoaded && m('button.activeSubscriptionButton', {
+          class: vnode.state.isSubscribedAll ? 'formular-button-primary' : '',
+          onclick: async (e) => {
+            e.preventDefault();
+            if (vnode.state.isSubscribedAll) {
+              await app.login.notifications.disableSubscriptions(allActiveSubscriptions);
+            } else {
+              await Promise.all(
+                vnode.state.eventKinds.map((kind) => {
+                  return app.login.notifications.subscribe(
+                    NotificationCategories.ChainEvent,
+                    `${vnode.state.chain}-${kind.toString()}`
+                  );
+                })
+              );
+            }
+            setTimeout(() => { m.redraw(); }, 0);
+          }
+        }, vnode.state.isSubscribedAll
+          ? [ m('span.icon-bell'), ' Notifications on' ]
+          : [ m('span.icon-bell-off'), ' Notifications off' ]),
+        m('span', 'Subscribe to all notifications on chain.'),
+      ]),
       supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
         ? vnode.state.eventKinds.map((kind) => m(
           EventSubscriptionRow,
