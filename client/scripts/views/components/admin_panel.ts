@@ -1,12 +1,11 @@
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup, Form } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
 import 'components/admin_panel.scss';
-
 
 const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
@@ -274,7 +273,140 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
   },
 };
 
-const UpgradeRoles: m.Component<{roleData: any[], onRoleUpgrade: Function, }, {role: string, user: string, }> = {
+interface IWebhookData {
+  url: string;
+}
+
+interface IWebhooksFormAttrs {
+  webhooks: IWebhookData[];
+}
+
+interface IWebhooksFormState {
+  success: boolean;
+  successMsg: string;
+  failure: boolean;
+  disabled: boolean;
+  error: string;
+}
+
+const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
+  view: (vnode) => {
+    const { webhooks } = vnode.attrs;
+    const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+
+    const createWebhook = (e) => {
+      e.preventDefault();
+      const $webhookInput = $(e.target).closest('form').find('[name="webhookUrl"]');
+      const webhookUrl = $webhookInput.val();
+      if (webhookUrl === null) return;
+
+      vnode.state.disabled = true;
+      vnode.state.success = false;
+      vnode.state.failure = false;
+
+      $.post(`${app.serverUrl()}/createWebhook`, {
+        ...chainOrCommObj,
+        webhookUrl,
+        address: app.vm.activeAccount.address,
+        auth: true,
+        jwt: app.login.jwt,
+      }).then((result) => {
+        vnode.state.disabled = false;
+        if (result.status === 'Success') {
+          vnode.state.success = true;
+          vnode.state.successMsg = 'Success! Webhook created';
+          vnode.attrs.webhooks.push({
+            url: `${webhookUrl}`
+          });
+          $webhookInput.val('');
+        } else {
+          vnode.state.failure = true;
+          vnode.state.error = result.message;
+        }
+        m.redraw();
+      }, (err) => {
+        vnode.state.failure = true;
+        vnode.state.disabled = false;
+        if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+        m.redraw();
+      });
+    };
+
+
+    return m(Form, [
+      m('h3', 'Webhooks'),
+      webhooks.map((webhook) => {
+        return m('.webhook', [
+          m('.webhook-url', webhook.url),
+          m('a', {
+            href: '#',
+            class: vnode.state.disabled ? 'disabled' : '',
+            type: 'submit',
+            onclick: (e) => {
+              e.preventDefault();
+
+              vnode.state.disabled = true;
+              vnode.state.success = false;
+              vnode.state.failure = false;
+
+              $.post(`${app.serverUrl()}/deleteWebhook`, {
+                ...chainOrCommObj,
+                webhookUrl: webhook.url,
+                auth: true,
+                jwt: app.login.jwt,
+              }).then((result) => {
+                vnode.state.disabled = false;
+                if (result.status === 'Success') {
+                  const idx = vnode.attrs.webhooks.findIndex((webhook) => webhook.url === `${webhook.url}`);
+                  if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
+                  vnode.state.success = true;
+                  vnode.state.successMsg = 'Webhook deleted!';
+                } else {
+                  vnode.state.failure = true;
+                  vnode.state.error = result.message;
+                }
+                m.redraw();
+              }, (err) => {
+                vnode.state.failure = true;
+                vnode.state.disabled = false;
+                if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+                m.redraw();
+              });
+            }
+          }, 'Remove')
+        ]);
+      }),
+      webhooks.length === 0 && m('.no-webhooks', 'None'),
+      m('label', {
+        for: 'webhookUrl',
+      }, 'Add new webhook'),
+      m('input[type="text"].form-field', {
+        name: 'webhookUrl',
+        id: 'webhookUrl',
+        autocomplete: 'off',
+        placeholder: 'https://hooks.slack.com/services/',
+      }),
+      m('button', {
+        class: vnode.state.disabled ? 'disabled' : '',
+        type: 'submit',
+        onclick: createWebhook,
+      }, 'Add webhook'),
+      vnode.state.success && m('.success-message', vnode.state.successMsg),
+      vnode.state.failure && m('.error-message', [
+        vnode.state.error || 'An error occurred'
+      ]),
+    ]);
+  }
+};
+
+const WebhooksTab: m.Component<{webhooks: IWebhookData[]}> = {
+  view: (vnode) => {
+    const { webhooks } = vnode.attrs;
+    return m(WebhooksForm, { webhooks });
+  }
+};
+
+const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, }, {role: string, user: string, }> = {
   view: (vnode) => {
     const { roleData, onRoleUpgrade } = vnode.attrs;
     const noAdmins = roleData.filter((role) => {
@@ -321,7 +453,14 @@ const UpgradeRoles: m.Component<{roleData: any[], onRoleUpgrade: Function, }, {r
   }
 };
 
-const TabPanel: m.Component<{defaultTab: number, roleData: any[], onRoleUpgrade: Function }, {index: number, }> = {
+interface ITabPanelAttrs {
+  defaultTab: number;
+  roleData: any[];
+  onRoleUpgrade: Function;
+  webhooks;
+}
+
+const TabPanel: m.Component<ITabPanelAttrs, {index: number, }> = {
   oninit: (vnode) => {
     vnode.state.index = vnode.attrs.defaultTab;
   },
@@ -345,18 +484,19 @@ const TabPanel: m.Component<{defaultTab: number, roleData: any[], onRoleUpgrade:
         }),
       ]),
       (vnode.state.index === 1) &&
-        m(UpgradeRoles, {
+        m(UpgradeRolesTab, {
           roleData: vnode.attrs.roleData,
           onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
         }),
       (vnode.state.index === 2) &&
-        m('.Webhooks', 'nothing yet!'),
+        m(WebhooksTab, { webhooks: vnode.attrs.webhooks }),
     ]);
   },
 };
 
 interface IPanelState {
   roleData: RoleInfo[];
+  webhooks;
   loadingFinished: boolean;
   loadingStarted: boolean;
 }
@@ -369,6 +509,10 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
       try {
         const bulkMembers = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
+        const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
+                                       { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+        if (webhooks.status !== 'Success') throw new Error(`Could not fetch community webhooks`);
+        vnode.state.webhooks = webhooks.result;
         vnode.state.roleData = bulkMembers.result;
         vnode.state.loadingFinished = true;
         m.redraw();
@@ -432,6 +576,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
               vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
               m.redraw();
             },
+            webhooks: vnode.state.webhooks,
           }),
       ]),
     ]);
