@@ -35,7 +35,6 @@ export const getTagListing = (params: IGetTagListingParams) => {
       const existing = app.tags.getByIdentifier(tag.id);
       if (!existing) app.tags.addToStore(tag);
       const { id, name, description } = existing || tag;
-      const selected = name === activeTag;
 
       if (featuredTagIds.includes(`${id}`)) {
         if (featuredTags[name]) featuredTags[name].count += 1;
@@ -46,7 +45,6 @@ export const getTagListing = (params: IGetTagListingParams) => {
             featured_order: featuredTagIds.indexOf(`${id}`),
             id,
             name,
-            selected,
           };
         }
       } else if (otherTags[name]) {
@@ -57,7 +55,6 @@ export const getTagListing = (params: IGetTagListingParams) => {
           description,
           id,
           name,
-          selected,
         };
       }
     });
@@ -71,7 +68,6 @@ export const getTagListing = (params: IGetTagListingParams) => {
       featured: false,
       id: otherTags[name].id,
       name: otherTags[name].name,
-      selected: otherTags[name].selected,
       addFeaturedTag,
       removeFeaturedTag,
       hideEditButton
@@ -87,7 +83,6 @@ export const getTagListing = (params: IGetTagListingParams) => {
         featured_order: Number(featuredTags[name].featured_order),
         id: featuredTags[name].id,
         name: featuredTags[name].name,
-        selected: featuredTags[name].selected,
         addFeaturedTag,
         removeFeaturedTag,
         hideEditButton
@@ -104,7 +99,6 @@ interface ITagRowAttrs {
   featured: boolean;
   featured_order?: number,
   name: string;
-  selected: boolean;
   addFeaturedTag: Function;
   removeFeaturedTag: Function;
   hideEditButton: boolean;
@@ -114,10 +108,11 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
   view: (vnode) => {
     const {
       count, description, id, featured, featured_order,
-      name, selected, addFeaturedTag, removeFeaturedTag,
+      name, addFeaturedTag, removeFeaturedTag,
       hideEditButton
     } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
+    const selected = m.route.get() === `/${app.activeId()}/discussions/${name}`;
 
     return m(ListItem, {
       class: 'TagRow',
@@ -126,7 +121,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       selected,
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
       },
       contentLeft: m(Icon, { name: Icons.TAG }),
       label: [

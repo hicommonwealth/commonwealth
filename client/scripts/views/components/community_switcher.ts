@@ -22,8 +22,9 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
 
-    const active = app.activeChainId() === chain && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
-                                                                  address.address === app.vm.activeAccount?.address));
+    const active = app.activeChainId() === chain
+      && (!address
+          || (address.chain === app.vm.activeAccount?.chain.id && address.address === app.vm.activeAccount?.address));
 
     return m('a.CommunitySwitcherChain', {
       href: '#',
@@ -43,7 +44,10 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
       ]),
       m('.content-inner', [
         m('.sidebar-name', nodeList[0].chain.name),
-        m('.sidebar-user', [ 'Joined as ', m(User, { user: [address.address, address.chain], avatarSize: avatarSize, hideAvatar: true }) ]),
+        m('.sidebar-user', [
+          'Joined as ',
+          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+        ]),
       ]),
     ]);
   }
@@ -52,9 +56,10 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
 const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
   view: (vnode) => {
     const { community, address } = vnode.attrs;
+    const active = app.activeCommunityId() === community.id
+      && (!address
+          || (address.chain === app.vm.activeAccount?.chain.id && address.address === app.vm.activeAccount?.address));
 
-    const active = app.activeCommunityId() === community.id && (!address || (address.chain === app.vm.activeAccount?.chain.id &&
-                                                                             address.address === app.vm.activeAccount?.address));
     return m('a.CommunitySwitcherCommunity', {
       href: '#',
       class: active ? 'active' : '',
@@ -73,86 +78,26 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
       ]),
       m('.content-inner', [
         m('.sidebar-name', community.name),
-        m('.sidebar-user', [ 'Joined as ', m(User, { user: [address.address, address.chain], avatarSize: avatarSize, hideAvatar: true }) ]),
+        m('.sidebar-user', [
+          'Joined as ',
+          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+        ]),
       ]),
     ]);
   }
 };
 
-const CommunitySwitcherSettingsMenu: m.Component<{}> = {
+const CommunitySwitcherMenuOption: m.Component<{ onclick, icon, label }> = {
   view: (vnode) => {
+    const { icon, label, onclick } = vnode.attrs;
 
-    return m(PopoverMenu, {
-      transitionDuration: 50,
-      hoverCloseDelay: 0,
-      trigger: m(Button, {
-        iconLeft: Icons.SETTINGS,
-        size: 'default',
-        class: 'CommunitySwitcherSettingsMenu',
-      }),
-      position: 'right-end',
-      closeOnContentClick: true,
-      menuAttrs: {
-        align: 'left',
-      },
-      content: [
-        // settings
-        m(MenuItem, {
-          onclick: () => {
-            m.route.set('/');
-          },
-          contentLeft: m(Icon, { name: Icons.HOME }),
-          label: 'Home'
-        }),
-        // settings
-        m(MenuItem, {
-          onclick: () => {
-            m.route.set('/settings');
-          },
-          contentLeft: m(Icon, { name: Icons.SETTINGS }),
-          label: 'Settings'
-        }),
-        // admin
-        app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
-          onclick: () => {
-            m.route.set(`/${app.activeChainId()}/admin`);
-          },
-          contentLeft: m(Icon, { name: Icons.USER }),
-          label: 'Admin'
-        }),
-        //
-        m(MenuItem, {
-          label: 'Privacy',
-          onclick: () => { m.route.set('/privacy'); }
-        }),
-        m(MenuItem, {
-          label: 'Terms',
-          onclick: () => { m.route.set('/terms'); }
-        }),
-        m(MenuItem, {
-          label: 'Send feedback',
-          onclick: () => {
-            app.modals.create({ modal: FeedbackModal });
-          }
-        }),
-        // logout
-        app.isLoggedIn() && m(MenuItem, {
-          onclick: () => {
-            $.get(app.serverUrl() + '/logout').then(async () => {
-              await initAppState();
-              notifySuccess('Logged out');
-              m.route.set('/');
-              m.redraw();
-            }).catch((err) => {
-              location.reload();
-            });
-            mixpanel.reset();
-          },
-          contentLeft: m(Icon, { name: Icons.X_SQUARE }),
-          label: 'Logout'
-        }),
-      ]
-    });
+    return m('a.CommunitySwitcherMenuOption', {
+      onclick,
+      href: '#',
+    }, [
+      icon && m(Icon, { name: icon }),
+      m('.menu-option-label', label),
+    ]);
   }
 };
 
@@ -162,22 +107,60 @@ const CommunitySwitcher: m.Component<{}> = {
 
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
-      chains[n.chain.id] ? chains[n.chain.id].push(n) : chains[n.chain.id] = [n];
+      if (chains[n.chain.id]) {
+        chains[n.chain.id].push(n);
+      } else {
+        chains[n.chain.id] = [n];
+      }
     });
 
     return m('.CommunitySwitcher', [
-      m('.sidebar-content', [
-        app.login.roles.map((role) => {
-          const address = app.login.addresses.find((address) => address.id === role.address_id);
-          if (role.offchain_community_id) {
-            const community = app.config.communities.getAll().find((community) => community.id === role.offchain_community_id);
-            return m(CommunitySwitcherCommunity, { community, address });
-          } else {
-            return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
-          }
-        }),
-      ]),
-      m(CommunitySwitcherSettingsMenu),
+      app.login.roles.map((role) => {
+        const address = app.login.addresses.find((a) => a.id === role.address_id);
+        if (role.offchain_community_id) {
+          const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
+          return m(CommunitySwitcherCommunity, { community, address });
+        } else {
+          return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+        }
+      }),
+      app.login.roles.length > 0 && m('hr'),
+      m(CommunitySwitcherMenuOption, {
+        onclick: () => m.route.set('/'),
+        icon: Icons.HOME,
+        label: 'Home'
+      }),
+      m(CommunitySwitcherMenuOption, {
+        onclick: () => m.route.set('/settings'),
+        icon: Icons.SETTINGS,
+        label: 'Settings'
+      }),
+      app.login?.isSiteAdmin && app.activeChainId() && m(CommunitySwitcherMenuOption, {
+        onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
+        icon: Icons.USER,
+        label: 'Admin'
+      }),
+      m(CommunitySwitcherMenuOption, {
+        onclick: () => app.modals.create({ modal: FeedbackModal }),
+        icon: Icons.SEND,
+        label: 'Send feedback',
+      }),
+      app.isLoggedIn() && m(CommunitySwitcherMenuOption, {
+        onclick: () => {
+          $.get(`${app.serverUrl()}/logout`).then(async () => {
+            await initAppState();
+            notifySuccess('Logged out');
+            m.route.set('/');
+            m.redraw();
+          }).catch((err) => {
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+          });
+          mixpanel.reset();
+        },
+        icon: Icons.X_SQUARE,
+        label: 'Logout'
+      }),
     ]);
   }
 };

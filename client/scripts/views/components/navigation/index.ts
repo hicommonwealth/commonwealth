@@ -2,7 +2,7 @@ import 'components/navigation/index.scss';
 
 import {
   List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  Button, Tag, Menu, MenuHeading, Drawer } from 'construct-ui';
+  Button, Tag, Menu, MenuHeading, Popover } from 'construct-ui';
 import Infinite from 'mithril-infinite';
 import { setActiveAccount } from 'controllers/app/login';
 import LoginModal from 'views/modals/login_modal';
@@ -93,11 +93,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         || app.chain.class === ChainClass.Moloch);
     const showMolochMenuOptions = app.chain?.class === ChainClass.Moloch;
 
-    const onDiscussionsPage = (p) => (
-      p === `/${app.activeId()}/`
-        || p.startsWith(`/${app.activeId()}/?`)
-        || p.startsWith(`/${app.activeId()}/proposal/discussion`)
-        || p.startsWith(`/${app.activeId()}/discussions`));
+    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
@@ -117,243 +113,203 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
     }, [
-      m(Drawer, {
-        isOpen: vnode.state.communitySwitcherVisible,
-        autofocus: true,
-        content: m(CommunitySwitcher),
-        onClose: () => {
-          vnode.state.communitySwitcherVisible = false;
-        },
-        closeOnEscapeKey: true,
-        closeOnOutsideClick: true,
-      }),
-      m(List, {
-        interactive: true,
-        size: 'lg',
-        class: 'cui-list-dark',
-      }, [
-        // header
-        m(ListItem, {
-          class: 'title-selector',
-          onclick: () => {
-            if (app.isLoggedIn()) {
-              vnode.state.communitySwitcherVisible = true;
-            } else {
-              m.route.set('/');
-            }
-          },
-          label: (app.community || app.chain) ? [
-            m('.community-name', selectedNode
-              ? selectedNode.chain.name
-              : selectedCommunity ? selectedCommunity.meta.name : ''),
-            !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-            !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-            selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-          ] : 'Commonwealth',
-          contentRight: [
-            // notifications menu
-            app.isLoggedIn() && (app.community || app.chain)
-              && m(SubscriptionButton),
-            app.isLoggedIn() && m(PopoverMenu, {
-              transitionDuration: 50,
-              hoverCloseDelay: 0,
-              trigger: m(Button, {
-                iconLeft: Icons.BELL,
-                size: 'xs'
-              }),
-              position: 'bottom-end',
-              closeOnContentClick: true,
-              menuAttrs: {
-                align: 'left',
-              },
-              class: 'notification-menu',
-              content: m('.notification-list', [
-                notifications.length > 0
-                  ? m(Infinite, {
-                    maxPages: 8,
-                    pageData: () => notifications,
-                    item: (data, opts, index) => m(NotificationRow, { notification: data }),
-                  })
-                  : m('li.no-notifications', 'No Notifications'),
-              ]),
+      m('.NavigationMenu', [
+        m(List, {
+          interactive: true,
+          size: 'lg',
+        }, [
+          // header
+          // TODO: remove (app.community || app.chain)
+          m(Popover, {
+            class: 'community-switcher-popover',
+            isOpen: vnode.state.communitySwitcherVisible,
+            autofocus: true,
+            content: m(CommunitySwitcher),
+            onClose: () => {
+              vnode.state.communitySwitcherVisible = false;
+            },
+            hasArrow: false,
+            closeOnEscapeKey: true,
+            closeOnContentClick: true,
+            trigger: m('.title-selector', (app.community || app.chain) ? [
+              m('.community-name', selectedNode
+                ? selectedNode.chain.name
+                : selectedCommunity ? selectedCommunity.meta.name : ''),
+              !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
+              !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
+              selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
+            ] : 'Commonwealth'),
+          }),
+          //   [
+          //     // new proposal
+          //     m(NewProposalButton, { fluid: true }),
+          //     // notifications menu
+          //     app.isLoggedIn() && (app.community || app.chain)
+          //       && m(SubscriptionButton),
+          //     app.isLoggedIn() && m(PopoverMenu, {
+          //       transitionDuration: 50,
+          //       hoverCloseDelay: 0,
+          //       trigger: m(Button, {
+          //         iconLeft: Icons.BELL,
+          //         size: 'xs'
+          //       }),
+          //       position: 'bottom-end',
+          //       closeOnContentClick: true,
+          //       menuAttrs: {
+          //         align: 'left',
+          //       },
+          //       class: 'notification-menu',
+          //       content: m('.notification-list', [
+          //         notifications.length > 0
+          //           ? m(Infinite, {
+          //             maxPages: 8,
+          //             pageData: () => notifications,
+          //             item: (data, opts, index) => m(NotificationRow, { notification: data }),
+          //           })
+          //           : m('li.no-notifications', 'No Notifications'),
+          //       ]),
+          //     }),
+          //     // invites menu
+          //     app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
+          //       iconLeft: Icons.MAIL,
+          //       size: 'xs',
+          //       onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+          //     }),
+          // ],
+          // discussions (all communities)
+          m('h4', 'Discussions'),
+          (app.community || app.chain)
+            && m(ListItem, {
+              active: onDiscussionsPage(m.route.get()),
+              label: 'All Discussions',
+              onclick: (e) => m.route.set(`/${app.activeId()}/`),
+              contentLeft: m(Icon, { name: Icons.TAG }),
             }),
-            // invites menu
-            app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
-              iconLeft: Icons.MAIL,
-              size: 'xs',
-              onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+          // TODO: tag selector
+          (app.community || app.chain)
+            && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
+          // members (all communities)
+          (app.community || app.chain)
+            && m(ListItem, {
+              active: onTagsPage(m.route.get()),
+              label: 'Manage Tags',
+              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+              contentLeft: m(Icon, { name: Icons.SETTINGS }),
             }),
-            // app.isLoggedIn() && m(PopoverMenu, {
-            //   trigger: m(Button, {
-            //     iconLeft: Icons.CHEVRON_DOWN,
-            //     size: 'xs'
-            //   }),
-            //   position: 'bottom-end',
-            //   closeOnContentClick: true,
-            //   menuAttrs: {
-            //     align: 'left',
-            //   },
-            //   content: [
-            //     myChains.map(([chainID, nodeList]) => {
-            //       return m(MenuItem, {
-            //         label: nodeList[0].chain.name,
-            //         onclick: () => m.route.set(`/${chainID}/`)
-            //       });
-            //     }),
-            //     myCommunities.map((c) => {
-            //       return m(MenuItem, {
-            //         label: c.name,
-            //         onclick: () => m.route.set(`/${c.id}/`)
-            //       });
-            //     }),
-            //     m(MenuDivider),
-            //     // new community
-            //     app.login?.isSiteAdmin && m(MenuItem, {
-            //       onclick: (e) => app.modals.create({ modal: CreateCommunityModal }),
-            //       contentLeft: m(Icon, { name: Icons.PLUS }),
-            //       label: 'New community'
-            //     }),
-            //   ]
-            // }),
-          ]
-        }),
-        app.isLoggedIn() && (app.community || app.chain) && m(ListItem, {
-          class: 'action-selector',
-          label: m(NewProposalButton, { fluid: true }),
-        }),
-        // discussions (all communities)
-        m('h4', 'Discussions'),
-        (app.community || app.chain)
-          && m(ListItem, {
-            active: onDiscussionsPage(m.route.get()),
-            label: 'All Discussions',
-            onclick: (e) => m.route.set(`/${app.activeId()}/`),
-            contentLeft: m(Icon, { name: Icons.TAG }),
+          (app.community || app.chain)
+            && m(ListItem, {
+              active: onMembersPage(m.route.get()),
+              label: 'Members',
+              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+              contentLeft: m(Icon, { name: Icons.USERS }),
+            }),
+          // // chat (all communities)
+          // (app.community || app.chain) &&
+          //   m(ListItem, {
+          //     active: onChatPage(m.route.get()),
+          //     label: 'Chat',
+          //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+          //   }),
+          // governance (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+            && m('h4', 'On-chain'),
+          // proposals (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
+            && m(ListItem, {
+              active: onProposalPage(m.route.get()),
+              label: 'Proposals',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+              contentLeft: m(Icon, { name: Icons.BOX }),
+              contentRight: [
+                allSubstrateGovernanceProposals > 0 && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+                cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
+              ],
+            }),
+          // council (substrate only)
+          !app.community && app.chain?.base === ChainBase.Substrate
+            && m(ListItem, {
+              active: onCouncilPage(m.route.get()),
+              label: 'Council',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
+              contentLeft: m(Icon, { name: Icons.BOX }),
+              contentRight: [], // TODO
+            }),
+          // validators (substrate and cosmos only)
+          // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+          //   m(ListItem, {
+          //     active: onValidatorsPage(m.route.get()),
+          //     label: 'Validators',
+          //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+          //     contentLeft: m(Icon, { name: Icons.BOX }),
+          //   }),
+          showMolochMenuOptions && m(ListItem, {
+            onclick: (e) => app.modals.create({
+              modal: NewProposalModal,
+              data: { typeEnum: ProposalType.MolochProposal }
+            }),
+            label: 'New proposal'
           }),
-        // TODO: tag selector
-        (app.community || app.chain)
-          && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
-        // members (all communities)
-        (app.community || app.chain)
-          && m(ListItem, {
-            active: onTagsPage(m.route.get()),
-            label: 'Manage Tags',
-            onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.SETTINGS }),
+          showMolochMenuOptions && m(ListItem, {
+            onclick: (e) => app.modals.create({
+              modal: UpdateDelegateModal,
+            }),
+            label: 'Update delegate key'
           }),
-        (app.community || app.chain)
-          && m(ListItem, {
-            active: onMembersPage(m.route.get()),
-            label: 'Members',
-            onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-            contentLeft: m(Icon, { name: Icons.USERS }),
+          showMolochMenuOptions && m(ListItem, {
+            onclick: (e) => app.modals.create({
+              modal: RagequitModal,
+            }),
+            label: 'Rage quit'
           }),
-        // // chat (all communities)
-        // (app.community || app.chain) &&
-        //   m(ListItem, {
-        //     active: onChatPage(m.route.get()),
-        //     label: 'Chat',
-        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-        //   }),
-        // governance (substrate and cosmos only)
-        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-          && m('h4', 'On-chain'),
-        // proposals (substrate and cosmos only)
-        !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-          && m(ListItem, {
-            active: onProposalPage(m.route.get()),
-            label: 'Proposals',
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-            contentLeft: m(Icon, { name: Icons.BOX }),
-            contentRight: [
-              allSubstrateGovernanceProposals > 0 && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
-              cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
-            ],
+          showMolochMenuOptions && m(ListItem, {
+            onclick: (e) => app.modals.create({
+              modal: TokenApprovalModal,
+            }),
+            label: 'Approve tokens'
           }),
-        // council (substrate only)
-        !app.community && app.chain?.base === ChainBase.Substrate
-          && m(ListItem, {
-            active: onCouncilPage(m.route.get()),
-            label: 'Council',
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
-            contentLeft: m(Icon, { name: Icons.BOX }),
-            contentRight: [], // TODO
-          }),
-        // validators (substrate and cosmos only)
-        // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-        //   m(ListItem, {
-        //     active: onValidatorsPage(m.route.get()),
-        //     label: 'Validators',
-        //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-        //     contentLeft: m(Icon, { name: Icons.BOX }),
-        //   }),
-        showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => app.modals.create({
-            modal: NewProposalModal,
-            data: { typeEnum: ProposalType.MolochProposal }
-          }),
-          label: 'New proposal'
-        }),
-        showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => app.modals.create({
-            modal: UpdateDelegateModal,
-          }),
-          label: 'Update delegate key'
-        }),
-        showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => app.modals.create({
-            modal: RagequitModal,
-          }),
-          label: 'Rage quit'
-        }),
-        showMolochMenuOptions && m(ListItem, {
-          onclick: (e) => app.modals.create({
-            modal: TokenApprovalModal,
-          }),
-          label: 'Approve tokens'
-        }),
-        // TODO: add a "reserve tokens" option here, to apply to DAO?
+          // TODO: add a "reserve tokens" option here, to apply to DAO?
 
-        !app.isLoggedIn()
-          ? m(ListItem, {
-            class: 'login-selector',
-            label: m('.login-selector-user', [
-              m(Button, {
-                intent: 'primary',
-                iconLeft: Icons.USER,
+          !app.isLoggedIn()
+            ? m(ListItem, {
+              class: 'login-selector',
+              label: m('.login-selector-user', [
+                m(Button, {
+                  intent: 'primary',
+                  iconLeft: Icons.USER,
+                  size: 'sm',
+                  fluid: true,
+                  label: 'Log in',
+                  onclick: () => app.modals.create({ modal: LoginModal }),
+                }),
+              ]),
+            })
+            : m(ListItem, {
+              class: 'login-selector',
+              onclick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+              },
+              label: app.vm.activeAccount ? [
+                m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
+                m('.login-selector-user', [
+                  m('.user-info', [
+                    m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
+                    m('.user-address', app.vm.activeAccount.chain.id === 'near'
+                      ? `@${app.vm.activeAccount.address}`
+                      : `${app.vm.activeAccount.address.slice(0, 6)}...`)
+                  ])
+                ]),
+              ] : app.login.activeAddresses.length === 0 ? m(Button, {
+                intent: 'none',
+                iconLeft: Icons.USER_PLUS,
                 size: 'sm',
                 fluid: true,
-                label: 'Log in',
-                onclick: () => app.modals.create({ modal: LoginModal }),
-              }),
-            ]),
-          })
-          : m(ListItem, {
-            class: 'login-selector',
-            onclick: (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-            },
-            label: app.vm.activeAccount ? [
-              m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-              m('.login-selector-user', [
-                m('.user-info', [
-                  m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-                  m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                    ? `@${app.vm.activeAccount.address}`
-                    : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-                ])
-              ]),
-            ] : app.login.activeAddresses.length === 0 ? m(Button, {
-              intent: 'none',
-              iconLeft: Icons.USER_PLUS,
-              size: 'sm',
-              fluid: true,
-              label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
-              onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-            }) : null,
-          }),
+                label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+                onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+              }) : null,
+            }),
+        ]),
       ]),
     ]);
   },
