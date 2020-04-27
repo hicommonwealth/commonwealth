@@ -191,6 +191,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       community: finalComment.community,
     },
     req.wss,
+    [ finalComment.Address.address ],
   );
 
   // if child comment, dispatch notification to parent author
@@ -256,7 +257,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
-        req.wss
+        req.wss,
+        [ finalComment.Address.address ],
       );
     }));
   }

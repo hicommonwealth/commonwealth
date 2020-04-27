@@ -3,6 +3,7 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
+import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
@@ -10,7 +11,7 @@ const nodes = [
   [ 'berlin2.edgewa.re', 'edgeware-testnet' ],
   [ 'berlin3.edgewa.re', 'edgeware-testnet' ],
   [ 'mainnet1.edgewa.re', 'edgeware' ],
-  //[ 'localhost:9944', 'kusama-local' ],
+  // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
@@ -293,6 +294,10 @@ const resetServer = (models, closeMiddleware) => {
       name: NotificationCategories.NewReaction,
       description: 'someone reacts to a post',
     });
+    await models.NotificationCategory.create({
+      name: NotificationCategories.ChainEvent,
+      description: 'a chain event occurs',
+    });
 
     // Admins need to be subscribed to mentions
     await models.Subscription.create({
@@ -362,6 +367,22 @@ const resetServer = (models, closeMiddleware) => {
     });
 
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
+
+    // initialize chain event types
+    const initChainEventTypes = (chain) => {
+      return Promise.all(
+        SubstrateEventKinds.map((event_name) => {
+          return models.ChainEventType.create({
+            id: `${chain}-${event_name}`,
+            chain,
+            event_name,
+          });
+        })
+      );
+    };
+
+    await initChainEventTypes('edgeware');
+    await initChainEventTypes('edgeware-local');
 
     closeMiddleware().then(() => {
       console.log('Reset database and initialized default models');
