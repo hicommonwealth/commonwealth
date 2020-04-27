@@ -2,9 +2,7 @@
 
 Discussions and governance for blockchain networks.
 
-We're moving our development over to open source over the first half of April 2020; this repo will be updated with PRs, license, and other materials soon. In the meantime, please feel free to file issues here: https://github.com/hicommonwealth/commonwealth-oss/issues
-
-[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master)
+[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth-oss/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth-oss/tree/master)
 
 ## Quickstart
 

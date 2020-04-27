@@ -47,6 +47,9 @@ const SubstrateEventKinds = {
   SignalingVotingStarted: 'signaling-voting-started',
   SignalingVotingCompleted: 'signaling-voting-completed',
   // TODO: do we want to track votes for signaling?
+
+  TreasuryRewardMinting: 'treasury-reward-minting',
+  TreasuryRewardMintingV2: 'treasury-reward-minting-v2',
 };
 
 const initChainEventTypes = (queryInterface, Sequelize, t) => {

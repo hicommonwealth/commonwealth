@@ -184,7 +184,7 @@
     // right
     .proposal-row-right-text {
         padding-top: 4px;
-        @include proposal-stats-data()
+        @include proposal-stats-data();
     }
     .proposal-row-right-chart {
         padding-top: 2px;

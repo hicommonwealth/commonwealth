@@ -151,8 +151,6 @@ export default async function (
 
       case SubstrateEventKind.DemocracyPassed: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
-        console.log(referendumIndex);
-        console.log(+referendumIndex);
         // dispatch queue -- if not present, it was already executed
         const dispatchQueue = await api.query.democracy.dispatchQueue();
         const dispatchInfo = dispatchQueue.find(([ block, hash, idx ]) => +idx === +referendumIndex);
@@ -436,7 +434,7 @@ export default async function (
       default: {
         // ensure exhaustive matching -- gives ts error if missing cases
         const _exhaustiveMatch: never = kind;
-        throw new Error('unknown event type');
+        throw new Error(`unknown event type: ${kind}`);
       }
     }
   };

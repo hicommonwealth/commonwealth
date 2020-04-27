@@ -31,6 +31,7 @@ export function createApi(provider: WsProvider): ApiPromise {
       StakingLedger: 'StakingLedgerTo223',
       Votes: 'VotesTo230',
       ReferendumInfo: 'ReferendumInfoTo239',
+      Weight: 'u32',
     },
     registry
   });

@@ -26,7 +26,7 @@ export default class extends IEventHandler {
       event_name: event.data.kind.toString(),
     } });
     if (!dbEventType) {
-      console.error('unknown event type');
+      console.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
       console.log(`found chain event type: ${dbEventType.id}`);
