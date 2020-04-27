@@ -123,6 +123,11 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
+  if (!proposal || proposal.read_only) {
+    await finalComment.destroy();
+    return next(new Error('Cannot comment when thread is read_only'));
+  }
+
   // craft commonwealth url
   const cwUrl = getProposalUrl(prefix, proposal, finalComment);
 
