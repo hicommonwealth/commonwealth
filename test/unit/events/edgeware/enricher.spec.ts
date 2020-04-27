@@ -3,6 +3,7 @@ import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, BlockNumber,
   ReferendumIndex, TreasuryProposal, Votes, Event
 } from '@polkadot/types/interfaces';
+import { DeriveDispatch } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord } from 'edgeware-node-types/dist';
@@ -31,9 +32,9 @@ const api = constructFakeApi({
       delay: 10,
     } as unknown as ReferendumInfoTo239),
   dispatchQueue: async () => [
-    [ 20, 'hash1', 1 ],
-    [ 30, 'hash2', 2 ],
-  ] as unknown as Vec<ITuple<[BlockNumber, Hash, ReferendumIndex]>>,
+    { index: 1, imageHash: 'hash1', at: 20 },
+    { index: 2, imageHash: 'hash2', at: 30 },
+  ] as unknown as DeriveDispatch[],
   proposals: (idx) => +idx !== 1
     ? constructOption()
     : constructOption({

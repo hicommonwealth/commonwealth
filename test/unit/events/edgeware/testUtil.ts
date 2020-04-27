@@ -50,7 +50,6 @@ export function constructFakeApi(callOverrides): ApiPromise {
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
         publicProps: callOverrides['publicProps'],
-        dispatchQueue: callOverrides['dispatchQueue'],
       },
       treasury: {
         proposals: callOverrides['proposals'],
@@ -65,6 +64,9 @@ export function constructFakeApi(callOverrides): ApiPromise {
     derive: {
       chain: {
         bestNumber: callOverrides['bestNumber'],
+      },
+      democracy: {
+        dispatchQueue: callOverrides['dispatchQueue'],
       }
     }
   } as ApiPromise;

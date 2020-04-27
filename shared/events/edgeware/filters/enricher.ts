@@ -152,13 +152,13 @@ export default async function (
       case SubstrateEventKind.DemocracyPassed: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         // dispatch queue -- if not present, it was already executed
-        const dispatchQueue = await api.query.democracy.dispatchQueue();
-        const dispatchInfo = dispatchQueue.find(([ block, hash, idx ]) => +idx === +referendumIndex);
+        const dispatchQueue = await api.derive.democracy.dispatchQueue();
+        const dispatchInfo = dispatchQueue.find(({ index }) => +index === +referendumIndex);
         return {
           data: {
             kind,
             referendumIndex: +referendumIndex,
-            dispatchBlock: dispatchInfo ? +dispatchInfo[0] : null,
+            dispatchBlock: dispatchInfo ? +dispatchInfo.at : null,
           }
         };
       }
