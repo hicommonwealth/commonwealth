@@ -346,7 +346,7 @@ $(() => {
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
-        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}}`
+        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
