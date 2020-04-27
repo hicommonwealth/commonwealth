@@ -33,8 +33,5 @@ jobs:
       - run:
           name: run api tests
           command: yarn test-api
-      - run:
-          name: run event tests
-          command: yarn test-events
       - store_artifacts:
           path: coverage

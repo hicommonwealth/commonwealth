@@ -1,19 +1,6 @@
 import { ApiRx } from '@polkadot/api';
 import BN from 'bn.js';
 import {
-  Call, BalanceOf, ReferendumInfoTo239, Hash, ProposalIndex,
-  TreasuryProposal, VoteIndex, AccountId, PropIndex, ReferendumIndex, Votes,
-  VoterInfo, BlockNumber, ReferendumInfo
-} from '@polkadot/types/interfaces';
-import { Vec, Option, bool, u32, Bytes } from '@polkadot/types';
-import { createType } from '@polkadot/types/create';
-import { Codec } from '@polkadot/types/types';
-import { default as _ } from 'lodash';
-import { of, combineLatest, never, merge, concat } from 'rxjs';
-import { flatMap, first, map, takeWhile, startWith, auditTime, switchMap } from 'rxjs/operators';
-import { DeriveReferendum, DeriveReferendumVotes, DeriveDispatch } from '@polkadot/api-derive/types';
-import { EventData } from '@polkadot/types/generic/Event';
-import {
   ISubstrateDemocracyProposal, ISubstrateDemocracyReferendum,
   ISubstrateCollectiveProposal,
   ISubstrateTreasuryProposal,
@@ -22,6 +9,19 @@ import {
   ISubstrateCollectiveProposalState,
   ISubstratePhragmenElection, ISubstratePhragmenElectionState, DemocracyThreshold
 } from './types';
+import {
+  Call, BalanceOf, ReferendumInfoTo239, Hash, ProposalIndex,
+  TreasuryProposal, VoteIndex, AccountId, PropIndex, ReferendumIndex, Votes,
+  VoterInfo, BlockNumber, ReferendumInfo, ReferendumStatus
+} from '@polkadot/types/interfaces';
+import { Vec, Option, bool, u32, Bytes } from '@polkadot/types';
+import { createType } from '@polkadot/types/create';
+import { Codec } from '@polkadot/types/types';
+import { default as _ } from 'lodash';
+import { of, combineLatest, never, merge, concat } from 'rxjs';
+import { flatMap, first, map, takeWhile, startWith, auditTime, switchMap } from 'rxjs/operators';
+import { DeriveReferendum, DeriveReferendumVotes } from '@polkadot/api-derive/types';
+import { EventData } from '@polkadot/types/generic/Event';
 import { ProposalAdapter } from '../../shared';
 import { marshallMethod, waitEvent, IMethod } from './shared';
 
@@ -233,23 +233,24 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
       ),
       this._useRedesignLogic ? api.query.democracy.referendumInfoOf(new BN(proposal.identifier)) : of(null),
       // returns if proposal is passed and waiting
-      api.derive.democracy.dispatchQueue(),
+      api.query.democracy.dispatchQueue(),
     ).pipe(
       flatMap(([ votes, refInfo, dispatchQueue ]:
-          [ DeriveReferendumVotes, Option<ReferendumInfo>, DeriveDispatch[] ]) => {
+          [ DeriveReferendumVotes, Option<ReferendumInfo>, Array<[BlockNumber, Hash, ReferendumIndex] & Codec> ]) => {
         if (votes) {
           votes.votes.forEach((v) => {
             state.votes[v.accountId.toString()] = [v.vote.isAye, v.vote.conviction.index, v.balance];
           });
         }
-        const dispatchData = dispatchQueue.find(({ index }) => +index === proposal.index);
+        const dispatchData = dispatchQueue.find(([executionBlock, hash, idx]) => +idx === proposal.index);
         let hash = proposal.hash;
         if (dispatchData) {
+          const [ executionBlock, proposalHash ] = dispatchData;
           state.passed = true;
-          state.executionBlock = +dispatchData.at;
+          state.executionBlock = +executionBlock;
 
           // now we can fetch the preimage without knowing the hash in the beginning
-          hash = hash || dispatchData.imageHash;
+          hash = hash || proposalHash;
         } else if (refInfo && refInfo.isSome) {
           // This only happens on kusama -- we use it to check whether a finished referendum passed
           //   on edgeware, the finished referendum will just disappear.

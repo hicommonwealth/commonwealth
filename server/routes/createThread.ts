@@ -187,7 +187,6 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       community: finalThread.community,
     },
     req.wss,
-    [ finalThread.Address.address ],
   );
 
   // grab mentions to notify tagged users
@@ -239,8 +238,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
-      req.wss,
-      [ finalThread.Address.address ],
+      req.wss
     );
   }));
 
