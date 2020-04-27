@@ -9,9 +9,35 @@ $sidebar-padding: 16px;
     bottom: 0;
     width: $side-width;
     z-index: 9;
-    background: #fff !important;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
 
+    // dark styles
+    background: #2f3136 !important;
+    color: #fff;
+    .cui-list.cui-list-dark {
+        background: #2f3136 !important;
+    }
+    .cui-list.cui-list-dark > h4 {
+        color: #fff;
+    }
+    .cui-list.cui-list-dark > .cui-list-item {
+        color: #828386;
+        .cui-icon {
+            color: #828386;
+        }
+        &.cui-active,
+        &:hover {
+            background: #36393f;
+        }
+        &.cui-active {
+            color: #fff;
+            .cui-icon {
+                color: #fff;
+            }
+        }
+    }
+
+    // list styles
     .cui-list {
         max-height: 100%;
         padding-bottom: 80px;
@@ -23,13 +49,22 @@ $sidebar-padding: 16px;
         margin: 0;
         padding: 20px 0 6px $sidebar-padding;
         font-weight: 500;
-        font-size: 13px;
-        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
-    .cui-list.cui-lg .cui-list-item {
+    .cui-list.cui-lg > .cui-list-item {
+        font-size: 16px;
         border: none;
         font-weight: 500;
-        padding: 3px $sidebar-padding 5px;
+        padding: 4px $sidebar-padding;
+        .cui-icon {
+            height: 16px;
+            width: 16px;
+            min-height: 16px;
+            min-width: 16px;
+            margin-right: -2px;
+        }
     }
     .cui-list-item .cui-tag {
         margin-top: -6px;
@@ -44,12 +79,12 @@ $sidebar-padding: 16px;
     .cui-list.cui-lg .title-selector {
         font-weight: 700;
         padding: 21px $sidebar-padding 18px;
-        background: #fff !important;
+        // background: #fff !important;
         cursor: pointer !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#c5cdd1, 10%);
+        border-bottom: 1px solid lighten(#333, 10%);
         &:hover {
-            background: #f7f7f7 !important;
+            // background: #f7f7f7 !important;
         }
         a.title-selector-link {
             display: flex;
@@ -79,11 +114,14 @@ $sidebar-padding: 16px;
     }
     .cui-list.cui-lg .action-selector {
         padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
-        background: #fff !important;
+        // background: #fff !important;
         cursor: default !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#c5cdd1, 10%);
+        border-bottom: 1px solid lighten(#333, 10%);
         margin-bottom: 10px;
+        &:hover {
+            background: initial;
+        }
     }
     // bottom
     .cui-list.cui-lg .login-selector {
@@ -91,28 +129,25 @@ $sidebar-padding: 16px;
         display: flex;
         bottom: 0;
         width: $side-width;
-        background: #fff !important;
+        /// background: #fff !important;
         user-select: none;
-        padding: 20px $sidebar-padding 15px;
-        border-top: 1px solid lighten(#c5cdd1, 10%);
+        padding: 17px $sidebar-padding 18px;
+        border-top: 1px solid lighten(#333, 10%);
         &:hover {
-            background: #f7f7f7 !important;
+            /// background: #f7f7f7 !important;
         }
         button.cui-button {
             position: relative;
-            top: -2px;
         }
         .User.avatar-only {
             overflow: visible;
             padding-right: 11px;
             position: relative;
-            top: -2px;
         }
         .login-selector-user {
             line-height: 1.1;
             .user-info {
                 position: relative;
-                top: -4px;
                 .User {
                     //white-space: normal; // prevent long usernames from overflowing
                     white-space: nowrap;
@@ -120,6 +155,9 @@ $sidebar-padding: 16px;
                     text-overflow: ellipsis;
                     max-width: 110px;
                     font-size: 14px;
+                    a {
+                        color: #fff;
+                    }
                 }
                 .user-address {
                     font-size: 12px;

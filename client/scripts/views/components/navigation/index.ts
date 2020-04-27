@@ -130,6 +130,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
       m(List, {
         interactive: true,
         size: 'lg',
+        class: 'cui-list-dark',
       }, [
         // header
         m(ListItem, {
@@ -221,11 +222,13 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           label: m(NewProposalButton, { fluid: true }),
         }),
         // discussions (all communities)
+        m('h4', 'Discussions'),
         (app.community || app.chain)
           && m(ListItem, {
             active: onDiscussionsPage(m.route.get()),
-            label: 'Discussions',
+            label: 'All Discussions',
             onclick: (e) => m.route.set(`/${app.activeId()}/`),
+            contentLeft: m(Icon, { name: Icons.TAG }),
           }),
         // TODO: tag selector
         (app.community || app.chain)
@@ -236,12 +239,14 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             active: onTagsPage(m.route.get()),
             label: 'Manage Tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+            contentLeft: m(Icon, { name: Icons.SETTINGS }),
           }),
         (app.community || app.chain)
           && m(ListItem, {
             active: onMembersPage(m.route.get()),
             label: 'Members',
             onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+            contentLeft: m(Icon, { name: Icons.USERS }),
           }),
         // // chat (all communities)
         // (app.community || app.chain) &&
@@ -259,6 +264,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             active: onProposalPage(m.route.get()),
             label: 'Proposals',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+            contentLeft: m(Icon, { name: Icons.BOX }),
             contentRight: [
               allSubstrateGovernanceProposals > 0 && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
               cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
@@ -270,6 +276,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             active: onCouncilPage(m.route.get()),
             label: 'Council',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
+            contentLeft: m(Icon, { name: Icons.BOX }),
             contentRight: [], // TODO
           }),
         // validators (substrate and cosmos only)
@@ -278,7 +285,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
         //     active: onValidatorsPage(m.route.get()),
         //     label: 'Validators',
         //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-        //     contentLeft: m(Icon, { name: 'settings' }), // ?
+        //     contentLeft: m(Icon, { name: Icons.BOX }),
         //   }),
         showMolochMenuOptions && m(ListItem, {
           onclick: (e) => app.modals.create({

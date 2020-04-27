@@ -1,33 +1,5 @@
 @import 'client/styles/shared';
 
 .TagSelector {
-    padding: 8px 0;
-    a.TagRow {
-        padding: 4px 17px;
-        display: flex;
-        justify-content: space-between;
-        color: $lighttextgrey;
-        text-decoration: none;
-        line-height: 1.25;
-        .edit-button {
-            display: none;
-        }
-        &:hover a.edit-button {
-            display: block;
-            color: #999;
-            text-decoration: none;
-        }
-        &:hover a.edit-button:hover {
-            color: #111;
-        }
-        &.selected {
-            background: #f1f3f5;
-        }
-        .tag-name {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-    }
     @include dragula;
 }

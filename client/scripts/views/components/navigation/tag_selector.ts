@@ -4,6 +4,7 @@ import 'components/navigation/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
+import { List, ListItem, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { link } from 'helpers';
@@ -107,41 +108,46 @@ interface ITagRowAttrs {
 
 const TagRow: m.Component<ITagRowAttrs, {}> = {
   view: (vnode) => {
-    const { count, description, id, featured, featured_order, name, selected, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
+    const {
+      count, description, id, featured, featured_order,
+      name, selected, addFeaturedTag, removeFeaturedTag
+    } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
 
-    return m('a.TagRow', {
+    return m(ListItem, {
+      class: 'TagRow',
       key: id,
       id,
-      class: selected ? 'selected' : '',
-      href: '#',
+      selected,
       onclick: (e) => {
         e.preventDefault();
         m.route.set(selected ? `/${app.activeId()}/` : `/${app.activeId()}/discussions/${name}`);
       },
-    }, [
-      m('span.tag-name', `${name} (${count})`),
-      isCommunityAdmin()
-        && m('a.edit-button', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            app.modals.create({
-              modal: EditTagModal,
-              data: {
-                description,
-                featured,
-                featured_order,
-                id,
-                name,
-                addFeaturedTag,
-                removeFeaturedTag
-              }
-            });
-          }
-        }, 'Edit')
-    ]);
+      contentLeft: m(Icon, { name: Icons.TAG }),
+      label: [
+        m('span.tag-name', `${name} (${count})`),
+        isCommunityAdmin()
+          && m('a.edit-button', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              app.modals.create({
+                modal: EditTagModal,
+                data: {
+                  description,
+                  featured,
+                  featured_order,
+                  id,
+                  name,
+                  addFeaturedTag,
+                  removeFeaturedTag
+                }
+              });
+            }
+          }, 'Edit')
+      ]
+    });
   }
 };
 
@@ -169,7 +175,8 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean }, 
 
     return m('.TagSelector', [
       showFullListing && m('h4', 'Featured tags'),
-      !!featuredTagListing.length && m('.featured-tag-list', {
+      !!featuredTagListing.length && m(List, {
+        class: 'featured-tag-list',
         oncreate: () => {
           if (isCommunityAdmin()) {
             dragula([document.querySelector('.featured-tag-list')])
@@ -184,7 +191,7 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean }, 
         }
       }, featuredTagListing),
       showFullListing && m('h4', 'Other tags'),
-      showFullListing && !!otherTagListing.length && m('.other-tag-list', otherTagListing),
+      showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
     ]);
   },
 };
