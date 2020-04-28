@@ -31,11 +31,11 @@ export default class extends IEventHandler {
      * We should determine, using the event's type, what action to take, based
      * on whether it is a creation, modification, or unrelated event.
      */
-    const createEntityFn = async (type: string, type_id: string) => {
+    const createEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
       const dbEntity = await this._models.ChainEntity.create({
-        type, type_id, chain: this._chain,
+        type: type.toString(), type_id, chain: this._chain,
       });
-      console.log(`Created db entity, ${type}: ${type_id}.`);
+      console.log(`Created db entity, ${type.toString()}: ${type_id}.`);
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
@@ -50,6 +50,10 @@ export default class extends IEventHandler {
           type: type.toString(), type_id, chain: this._chain,
         }
       });
+      if (!dbEntity) {
+        console.error(`no relevant db entity found for ${type}: ${type_id}`);
+        return;
+      }
       console.log(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
