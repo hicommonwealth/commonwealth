@@ -14,6 +14,7 @@ import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 
+import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -39,7 +40,6 @@ import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import ProfileBlock from 'views/components/widgets/profile_block';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import PageLoading from 'views/pages/loading';
@@ -48,8 +48,17 @@ import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury'
 import { formatCoin } from 'adapters/currency';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 
-import { ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete, ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle, ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount, ProposalHeaderSubscriptionButton } from './header';
-import { GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor } from './body';
+import {
+  ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete,
+  ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle,
+  ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
+  ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons
+} from './header';
+import {
+  GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply,
+  ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer,
+  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction
+} from './body';
 import CreateComment from './create_comment';
 
 
@@ -64,6 +73,7 @@ interface IProposalHeaderAttrs {
 interface IProposalHeaderState {
   editing: boolean;
   quillEditorState: any;
+  currentText: any;
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
@@ -75,12 +85,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     const attachments = isThread ? (proposal as OffchainThread).attachments : false;
     const versionHistory = (proposal as OffchainThread).versionHistory;
     const lastEdit = versionHistory?.length > 1 ? JSON.parse(versionHistory[0]) : null;
-    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`;
+    const proposalLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+      + `${slugify(proposal.title)}`;
     const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community)
-      ? app.chain.accounts.get(proposal.author)
-      : app.community.accounts.get(proposal.author, proposal.authorChain)
-    : proposal.author;
+      ? (!app.community
+        ? app.chain.accounts.get(proposal.author)
+        : app.community.accounts.get(proposal.author, proposal.authorChain))
+      : proposal.author;
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -88,10 +99,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
       m('.proposal-header', [
         m('.proposal-header-meta', [
           m(ProposalHeaderTags, { proposal }),
-          proposal instanceof OffchainThread && (proposal.tags?.length > 0 ||
-                                                 (app.vm.activeAccount?.address === (proposal as OffchainThread).author) ||
-                                                 isRoleOfCommunity(app.vm.activeAccount, app.login.addresses,
-                                                                   app.login.roles, 'admin', app.activeId())) && m(ProposalHeaderSpacer),
+          proposal instanceof OffchainThread
+            && (proposal.tags?.length > 0
+                || (app.vm.activeAccount?.address === (proposal as OffchainThread).author)
+                || isRoleOfCommunity(
+                  app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()
+                ))
+            && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
           m(ProposalHeaderDelete, { proposal }),
         ]),
@@ -99,8 +113,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderTitle, { proposal }),
           m(ProposalHeaderComments, { proposal, commentCount }),
         ]),
+        proposal instanceof OffchainThread
+          && proposal.kind === OffchainThreadKind.Link
+          && m(ProposalHeaderExternalLink, { proposal }),
         m('.proposal-subscription-button', [
           m(ProposalHeaderSubscriptionButton, { proposal }),
+          m(ProposalHeaderPrivacyButtons, { proposal }),
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-body', [
@@ -114,9 +132,12 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
             && !vnode.state.editing
+            && !proposal.readOnly
             && [
               m(ProposalHeaderSpacer),
-              m(ProposalBodyEdit, { item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodyEdit, {
+                item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state
+              }),
               m(ProposalHeaderSpacer),
               m(ProposalBodyDelete, { item: proposal }),
             ],
@@ -127,9 +148,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalHeaderSpacer),
             m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
           ],
-
-          proposal instanceof OffchainThread && proposal.kind === OffchainThreadKind.Link && m(ProposalHeaderSpacer),
-          m(ProposalHeaderExternalLink, { proposal }),
         ] : [
           m(ProposalHeaderOnchainId, { proposal }),
           m(ProposalHeaderOnchainStatus, { proposal }),
@@ -147,6 +165,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
           vnode.state.editing
             && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
+        ]),
+        m('.proposal-body-reactions', [
+          m(ProposalBodyReaction, { item: proposal }),
         ]),
       ]),
     ]);
@@ -189,20 +210,34 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         !vnode.state.editing
           && app.vm.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && isSameAccount(app.vm.activeAccount, comment.author)
+          && app.vm.activeAccount?.chain.id === comment.authorChain
+          && app.vm.activeAccount?.address === comment.author
           && [
             m(ProposalBodySpacer),
-            m(ProposalBodyEdit, { item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodyEdit, {
+              item: comment,
+              getSetGlobalReplyStatus,
+              getSetGlobalEditingStatus,
+              parentState: vnode.state
+            }),
+            m(ProposalBodySpacer),
             m(ProposalBodyDelete, { item: comment }),
           ],
 
-        // For now, we are limiting threading to 1 level deep, so comments whose parents are other comments do not display the option to reply
+        // For now, we are limiting threading to 1 level deep
+        // Comments whose parents are other comments should not display the reply option
         !vnode.state.editing
           && app.vm.activeAccount
           && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && parentType === CommentParent.Proposal && [
+          && parentType === CommentParent.Proposal
+          && [
             m(ProposalBodySpacer),
-            m(ProposalBodyReply, { item: comment, getSetGlobalReplyStatus, parentType }),
+            m(ProposalBodyReply, {
+              item: comment,
+              getSetGlobalReplyStatus,
+              parentType,
+              parentState: vnode.state,
+            }),
           ],
 
         vnode.state.editing && [
@@ -223,6 +258,9 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 
         vnode.state.editing
           && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
+      ]),
+      m('.comment-body-reactions', [
+        m(ProposalBodyReaction, { item: comment }),
       ]),
     ]);
   }
@@ -247,7 +285,10 @@ interface IProposalCommentsAttrs {
 // TODO: clarify that 'user' = user who is commenting
 const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsState> = {
   view: (vnode) => {
-    const { proposal, comments, createdCommentCallback, getSetGlobalEditingStatus, getSetGlobalReplyStatus, replyParent } = vnode.attrs;
+    const {
+      proposal, comments, createdCommentCallback, getSetGlobalEditingStatus,
+      getSetGlobalReplyStatus, replyParent
+    } = vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
@@ -389,13 +430,13 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     // load comments
     if (!vnode.state.commentsPrefetchStarted) {
       (app.activeCommunityId()
-       ? app.comments.refresh(proposal, null, app.activeCommunityId())
-       : app.comments.refresh(proposal, app.activeChainId(), null))
+        ? app.comments.refresh(proposal, null, app.activeCommunityId())
+        : app.comments.refresh(proposal, app.activeChainId(), null))
         .then((result) => {
           vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
           m.redraw();
         }).catch((err) => {
-          throw new Error('Failed to load comments');
+          notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();
         });
@@ -415,7 +456,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       }).then((response) => {
         if (response.status !== 'Success') {
           vnode.state.viewCount = 0;
-          throw new Error('got unsuccessful status: ' + response.status);
+          throw new Error(`got unsuccessful status: ${response.status}`);
         } else {
           vnode.state.viewCount = response.result.view_count;
           m.redraw();
@@ -439,14 +480,14 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     }
 
     // load profiles
-    // TODO: recursively fetch child comments as well (this will also prevent a reloading flash for threads with child comments)
+    // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
     if (vnode.state.profilesPrefetchStarted === undefined) {
       if (proposal instanceof OffchainThread) {
         app.profiles.getProfile(proposal.authorChain, proposal.author);
       } else if (proposal.author instanceof Account) { // AnyProposal
         app.profiles.getProfile(proposal.author.chain.id, proposal.author.address);
       }
-      vnode.state.comments.map((comment) => {
+      vnode.state.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
       vnode.state.profilesPrefetchStarted = true;
@@ -496,9 +537,9 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
         // scroll to new reply form if parentId is available, scroll to proposal-level comment form otherwise
         setTimeout(() => {
-          const $reply = parentId ?
-            $(`.comment-${parentId}`).nextAll('.CreateComment') :
-            $('.ProposalComments > .CreateComment');
+          const $reply = parentId
+            ? $(`.comment-${parentId}`).nextAll('.CreateComment')
+            : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
           const scrollTop = $('body').scrollTop();
@@ -521,8 +562,14 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
 
     const { replyParent } = vnode.state;
     return m('.ViewProposalPage', [
-      m(ProposalHeader, { proposal, commentCount, viewCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
-      m(ProposalComments, { proposal, comments, createdCommentCallback, replyParent, getSetGlobalEditingStatus, getSetGlobalReplyStatus }),
+      m(ProposalHeader, {
+        proposal, commentCount, viewCount, getSetGlobalEditingStatus,
+        getSetGlobalReplyStatus
+      }),
+      m(ProposalComments, {
+        proposal, comments, createdCommentCallback, replyParent,
+        getSetGlobalEditingStatus, getSetGlobalReplyStatus
+      }),
       m(ProposalSidebar, { proposal }),
     ]);
   }

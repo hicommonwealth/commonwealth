@@ -22,8 +22,8 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       return m(Button, {
         class: 'NewProposalButton',
         iconLeft: Icons.PLUS,
+        size: 'xs',
         intent: 'primary',
-        label: 'New post',
         fluid,
         disabled: !activeAccount,
         onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
@@ -35,15 +35,15 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       class: 'NewProposalButton',
       trigger: activeAccount ? m(Button, {
         iconLeft: Icons.CHEVRON_DOWN,
+        size: 'xs',
         intent: 'primary',
-        label: 'New post or proposal',
         fluid,
       }) : m(Tooltip, {
         content: 'Link an address to post',
         trigger: m(Button, {
           iconLeft: Icons.CHEVRON_DOWN,
+          size: 'xs',
           intent: 'primary',
-          label: 'New post or proposal',
           class: 'cui-disabled',
           style: 'cursor: pointer !important',
           fluid,

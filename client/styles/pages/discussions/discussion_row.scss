@@ -2,12 +2,23 @@
 
 $discussion-row-color: #999;
 $discussion-row-hpadding: 0;
-$discussion-row-vpadding: 34px;
+$discussion-row-vpadding: 40px;
 
 .DiscussionRow {
     display: block;
     padding: 0 $discussion-row-hpadding $discussion-row-vpadding;
 
+    a.discussion-tag {
+        display: inline-block;
+        font-size: 14px;
+        text-decoration: none;
+        margin-right: 10px;
+        color: $discussion-row-color;
+        &:hover {
+            color: darken($discussion-row-color, 8%);
+            text-decoration: underline;
+        }
+    }
     .discussion-row {
         display: flex;
     }
@@ -57,14 +68,15 @@ $discussion-row-vpadding: 34px;
                     text-decoration: underline;
                 }
             }
+            .discussion-last-updated {
+                display: inline;
+                margin-left: 12px;
+            }
         }
         .discussion-meta-right {
             text-align: right;
-            a.discussion-tag {
-                margin-left: 6px;
-            }
         }
-        a.discussion-tag, a.discussion-created, a.discussion-replies {
+        a.discussion-created, a.discussion-replies {
             text-decoration: none;
             color: $discussion-row-color;
             &:hover {
@@ -74,11 +86,12 @@ $discussion-row-vpadding: 34px;
         }
     }
     a.discussion-link {
+        display: inline-block;
         color: $primary-green;
         text-decoration: none;
-        margin-left: 5px;
         font-size: 13px;
         font-weight: 600;
+        margin-bottom: 9px;
         &:hover {
             text-decoration: underline;
         }
@@ -112,7 +125,7 @@ $discussion-row-vpadding: 34px;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         font-size: 14px;
-        margin: 3px 0 7px;
+        margin: 6px 0 8px;
     }
     .discussion-body-preview {
         font-size: 14px;

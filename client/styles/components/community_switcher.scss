@@ -1,24 +1,14 @@
 .CommunitySwitcher {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 240px;
-    bottom: 0;
-    background: #e4e4e6;
-    z-index: 10;
+    width: 250px;
+    padding-bottom: 8px;
     user-select: none;
-    .sidebar-content {
-        position: absolute;
-        top: 0;
-        bottom: 67px;
-        padding: 6px 0;
-        width: 100%;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        border-bottom: 1px solid #d7d7d7;
-    }
 
     $size: 36px;
+
+    hr {
+        border-top: none;
+        border-bottom: 1px solid #eee;
+    }
 
     a.CommunitySwitcherChain,
     a.CommunitySwitcherCommunity,
@@ -84,5 +74,38 @@
         position: absolute;
         bottom: 0;
         margin: 14px 16px;
+    }
+
+    a.CommunitySwitcherMenuOption {
+        position: relative;
+        display: block;
+        //display: flex;
+        text-decoration: none;
+        padding: 11px 15px;
+        color: #222;
+        font-weight: 500;
+        text-align: center;
+        &:hover {
+            background: #eee;
+        }
+        .cui-icon {
+            display: inline-block;
+            color: #111;
+            position: relative;
+            top: -2px;
+            margin-right: 6px;
+        }
+        .menu-option-label {
+            display: inline-block;
+        }
+    }
+}
+
+.community-switcher-popover {
+    .cui-popover-content {
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
     }
 }

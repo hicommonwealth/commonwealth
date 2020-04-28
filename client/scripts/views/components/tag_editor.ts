@@ -13,9 +13,12 @@ const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
   view: (vnode) => {
     const { onChangeHandler, tags } = vnode.attrs;
     return m(TagInput, {
+      oncreate: (vnode) => {
+        $(vnode.dom).find('input').focus();
+      },
       contentLeft: m(Icon, { name: Icons.TAG }),
-      tags: tags && (tags.length !== 0) &&
-        vnode.attrs.tags.map((tag) => {
+      tags: tags && (tags.length !== 0)
+        && vnode.attrs.tags.map((tag) => {
           return m(Tag, {
             label: `#${tag}`,
             onRemove: () => {
@@ -53,7 +56,6 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
         'Edit tags'
       ]),
       m(Dialog, {
-        autofocus: true,
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,

@@ -9,53 +9,94 @@ $sidebar-padding: 16px;
     bottom: 0;
     width: $side-width;
     z-index: 9;
-    background: #fff !important;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
 
+    // dark styles
+    background: #2f3136 !important;
+    color: #fff;
+    .NavigationMenu .cui-list,
+    .TagSelector .cui-list {
+        background: #2f3136 !important;
+    }
+    .NavigationMenu .cui-list > h4,
+    .TagSelector .cui-list > h4 {
+        color: #7c7e81;
+    }
+    .NavigationMenu .cui-list > .cui-list-item,
+    .TagSelector .cui-list > .cui-list-item {
+        color: #828386;
+        .cui-icon {
+            color: #828386;
+        }
+        &.cui-active,
+        &:hover {
+            background: #36393f;
+        }
+        &.cui-active {
+            color: #fff;
+            .cui-icon {
+                color: #fff;
+            }
+        }
+    }
+
+    // list styles
     .cui-list {
         max-height: 100%;
-        padding-bottom: 80px;
+        padding-bottom: 20px;
         user-select: none;
     }
 
     // individual menu items
-    .cui-list.cui-lg > h4 {
+    .TagSelector {
+        margin-bottom: 10px;
+    }
+    .cui-list > h4 {
         margin: 0;
         padding: 20px 0 6px $sidebar-padding;
         font-weight: 500;
-        font-size: 13px;
-        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
-    .cui-list.cui-lg .cui-list-item {
+    .cui-list > .cui-list-item {
+        font-size: 16px;
         border: none;
         font-weight: 500;
-        padding: 3px $sidebar-padding 5px;
+        padding: 4px $sidebar-padding;
+        .cui-icon svg {
+            height: 16px;
+            width: 16px;
+            min-height: 16px;
+            min-width: 16px;
+            margin-right: -2px;
+        }
     }
     .cui-list-item .cui-tag {
-        margin-top: -6px;
-        margin-bottom: -6px;
+        margin: -6px 2px;
+        font-size: 13px;
+        background: #5b5e63;
+        border: none;
+        color: #fff;
     }
 
     // buttons
-    .cui-list.cui-lg .cui-list-item-content-right .cui-button + .cui-button {
+    .cui-list .cui-list-item-content-right .cui-button + .cui-button {
         margin-left: 4px;
     }
     // top
-    .cui-list.cui-lg .title-selector {
+    .cui-list .title-selector {
+        display: flex;
         font-weight: 700;
-        padding: 21px $sidebar-padding 18px;
-        background: #fff !important;
+        padding: 21px $sidebar-padding 19px;
         cursor: pointer !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#c5cdd1, 10%);
+        border-bottom: 1px solid lighten(#333, 10%);
+        color: #fff !important;
+        // text
+        font-weight: 500;
         &:hover {
-            background: #f7f7f7 !important;
-        }
-        a.title-selector-link {
-            display: flex;
-            text-decoration: none;
-            color: #111;
-            max-width: 140px;
+            background: #36393f;
         }
         // prevent long names from overflowing
         .community-name {
@@ -72,67 +113,67 @@ $sidebar-padding: 16px;
             top: -1px;
         }
         .icon-lock {
-            font-size: 13px;
-            opacity: 0.4;
-            margin-right: -3px;
+            margin-left: 2px;
         }
     }
-    .cui-list.cui-lg .action-selector {
+    .cui-list .action-selector {
         padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
-        background: #fff !important;
+        // background: #fff !important;
         cursor: default !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#c5cdd1, 10%);
+        border-bottom: 1px solid lighten(#333, 10%);
         margin-bottom: 10px;
+        &:hover {
+            background: initial;
+        }
     }
     // bottom
-    .cui-list.cui-lg .login-selector {
+    .cui-list .login-selector {
         position: fixed;
+        display: flex;
         bottom: 0;
         width: $side-width;
-        background: #fff !important;
-        cursor: default !important;
+        /// background: #fff !important;
         user-select: none;
-        padding: 21px $sidebar-padding 15px;
-        border-top: 1px solid lighten(#c5cdd1, 10%);
+        padding: 17px $sidebar-padding 18px;
+        border-top: 1px solid lighten(#333, 10%);
+        &:hover {
+            /// background: #f7f7f7 !important;
+        }
         button.cui-button {
             position: relative;
-            top: -2px;
         }
-        .cui-list-item-content-left {
-            display: flex;
-            flex: 1;
-            .User.avatar-only {
-                overflow: visible;
-                padding-right: 11px;
+        .User.avatar-only {
+            overflow: visible;
+            padding-right: 11px;
+            position: relative;
+        }
+        .login-selector-user {
+            line-height: 1.1;
+            .user-info {
                 position: relative;
-                top: -2px;
-            }
-            .login-selector-user {
-                line-height: 1.1;
-                .user-info {
-                    position: relative;
-                    top: -4px;
-                    .User {
-                        //white-space: normal; // prevent long usernames from overflowing
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        max-width: 110px;
-                        font-size: 14px;
+                .User {
+                    //white-space: normal; // prevent long usernames from overflowing
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 110px;
+                    font-size: 14px;
+                    a {
+                        color: #fff;
                     }
-                    .user-address {
-                        font-size: 12px;
-                        margin: 0;
-                    }
+                }
+                .user-address {
+                    font-size: 12px;
+                    margin: 0;
                 }
             }
         }
     }
-    &.no-active-community .cui-list.cui-lg .title-selector {
+    &.no-active-community .cui-list .title-selector {
         border-bottom: none;
     }
-    &.no-active-community .cui-list.cui-lg .login-selector {
+    &.no-active-community .cui-list .login-selector {
         border-top: none;
     }
 }
@@ -140,9 +181,9 @@ $sidebar-padding: 16px;
 // notifications menu (outside Navigation, displayed in a cui-portal)
 .notification-menu {
     .notification-list {
-        max-height: 420px;
+        height: 420px;
         background: #fff;
-        overflow-y: scroll;
+        width: 250px;
     }
     .cui-menu {
         max-width: 250px;

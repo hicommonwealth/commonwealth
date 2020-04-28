@@ -2,7 +2,7 @@
 
 .InlineThreadComposer {
     background: #fff;
-    margin: 6px 0;
+    margin: 6px 0 36px;
 
     $small-margin: 10px;
     $left-margin: 46px;
@@ -73,11 +73,20 @@
         }
     }
 
+    .privacy-selection {
+        margin: 14px 0;
+    }
+
     .error-message {
         color: $error-red;
         font-size: 14px;
         font-weight: 700;
         margin-bottom: 20px;
         margin-left: $left-margin;
+    }
+
+    // TODO: remove when privacy selection is turned back on
+    .privacy-selection {
+        display: none;
     }
 }

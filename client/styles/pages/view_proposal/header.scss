@@ -105,10 +105,15 @@
             color: #888;
         }
     }
-    .ProposalHeaderExternalLink a {
-        color: $primary-green;
-        text-decoration: none;
-        &:hover {
+    .ProposalHeaderExternalLink {
+        margin-top: 5px;
+        font-weight: 600;
+        a:link,
+        a:visited {
+            color: $primary-green;
+            text-decoration: none;
+        }
+        a:hover {
             text-decoration: underline;
         }
     }
@@ -121,5 +126,15 @@
         position: absolute;
         right: 20px;
         top: 20px;
+    }
+
+    .ProposalHeaderPrivacyButtons {
+        position: absolute;
+        right: 20px;
+        top: 70px;
+    }
+
+    .ProposalBodyReaction {
+        margin-top: 18px;
     }
 }
