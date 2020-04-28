@@ -19,6 +19,7 @@ function capitalizeFirstLetter(string) {
 const editIdentityAction = (account: Account<any>, currentIdentity?: IdentityInfo) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
+    class: app.chain.loaded ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
