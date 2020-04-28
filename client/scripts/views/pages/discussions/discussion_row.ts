@@ -31,6 +31,16 @@ const DiscussionRow: m.Component<IAttrs> = {
     const lastUpdated = app.comments.lastCommented(proposal)
       || proposal.createdAt;
 
+    const tagSortByName = (a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      } else if (a.name < b.name) {
+        return -1;
+      } else {
+        return 0;
+      }
+    };
+
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
         m('.discussion-pre', [
@@ -91,7 +101,7 @@ const DiscussionRow: m.Component<IAttrs> = {
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
             m('.discussion-meta-right', [
-              m('.discussion-tags', proposal.tags.map((tag) => {
+              m('.discussion-tags', proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
                 return m(Tag, {
                   intent: 'primary',
                   label: tag.name,
