@@ -1,0 +1,78 @@
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 62px;
+    bottom: 0;
+    background: #e4e4e6;
+    z-index: 10;
+    user-select: none;
+    .sidebar-content {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        padding: 6px 0;
+        width: 100%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    $size: 36px;
+
+    a.SidebarChain,
+    a.SidebarCommunity {
+        position: relative;
+        display: flex;
+        height: $size;
+        box-sizing: content-box;
+        padding: 8px 13px;
+        text-decoration: none;
+        color: #222;
+        font-weight: 500;
+        .icon-inner {
+            position: relative;
+            opacity: 0.4;
+            .ChainIcon img {
+                width: $size;
+                height: $size;
+            }
+            .User {
+                position: absolute;
+                right: -4px;
+                bottom: -4px;
+            }
+        }
+        &.active .icon-inner,
+        &:hover .icon-inner {
+            opacity: 1;
+        }
+    }
+    a.SidebarCommunity {
+        .icon-inner {
+            text-align: center;
+            color: #eee;
+            background: #36393f;
+            height: $size;
+            width: $size;
+            border-radius: 8px;
+            .name {
+                position: relative;
+                top: 8px;
+            }
+        }
+        &:hover, &.active {
+            .icon-inner {
+                background: darken(#36393f, 7%);
+            }
+        }
+    }
+}
+
+.SidebarTooltip {
+    font-weight: 500;
+    margin: 1px 1px 0 2px;
+    line-height: 1.1;
+    > * {
+        display: inline;
+    }
+}

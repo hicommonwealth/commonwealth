@@ -114,15 +114,20 @@ const CommunitySwitcher: m.Component<{}> = {
       }
     });
 
+    const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
+    const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
+
     return m('.CommunitySwitcher', [
-      app.login.roles.map((role) => {
+      chainRoles.length > 0 && m('h4', 'Chains'),
+      chainRoles.map((role) => {
         const address = app.login.addresses.find((a) => a.id === role.address_id);
-        if (role.offchain_community_id) {
-          const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
-          return m(CommunitySwitcherCommunity, { community, address });
-        } else {
-          return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
-        }
+        return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+      }),
+      chainRoles.length > 0 && m('h4', 'Communities'),
+      communityRoles.map((role) => {
+        const address = app.login.addresses.find((a) => a.id === role.address_id);
+        const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
+        return m(CommunitySwitcherCommunity, { community, address });
       }),
       app.login.roles.length > 0 && m('hr'),
       m(CommunitySwitcherMenuOption, {

@@ -4,56 +4,33 @@ $sidebar-padding: 16px;
 
 .Navigation {
     position: fixed;
-    left: 0;
+    left: 63px;
     top: 0;
     bottom: 0;
-    width: $side-width;
+    width: $side-width - 63px;
     z-index: 9;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
-
-    // dark styles
-    background: #2f3136 !important;
-    color: #fff;
-    .NavigationMenu .cui-list,
-    .TagSelector .cui-list {
-        background: #2f3136 !important;
+    .NavigationMenu {
+        height: 100%;
     }
-    .NavigationMenu .cui-list > h4,
-    .TagSelector .cui-list > h4 {
-        color: #7c7e81;
-    }
-    .NavigationMenu .cui-list > .cui-list-item,
-    .TagSelector .cui-list > .cui-list-item {
-        color: #828386;
-        .cui-icon {
-            color: #828386;
-        }
-        &.cui-active,
-        &:hover {
-            background: #36393f;
-        }
-        &.cui-active {
-            color: #fff;
-            .cui-icon {
-                color: #fff;
-            }
-        }
+    .NavigationMenu .cui-list {
+        height: 100%;
     }
 
     // list styles
     .cui-list {
         max-height: 100%;
-        padding-bottom: 20px;
         user-select: none;
+    }
+    .TagSelector {
+        margin-bottom: 10px;
+        margin-left: 22px;
     }
 
     // individual menu items
-    .TagSelector {
-        margin-bottom: 10px;
-    }
     .cui-list > h4 {
         margin: 0;
-        padding: 20px 0 6px $sidebar-padding;
+        padding: 24px 0 6px $sidebar-padding;
         font-weight: 500;
         font-size: 12px;
         text-transform: uppercase;
@@ -74,10 +51,8 @@ $sidebar-padding: 16px;
     }
     .cui-list-item .cui-tag {
         margin: -6px 2px;
-        font-size: 13px;
-        background: #5b5e63;
+        font-size: 13.5px;
         border: none;
-        color: #fff;
     }
 
     // buttons
@@ -88,22 +63,22 @@ $sidebar-padding: 16px;
     .cui-list .title-selector {
         display: flex;
         font-weight: 700;
-        padding: 21px $sidebar-padding 19px;
+        padding: 1px $sidebar-padding 0;
         cursor: pointer !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#333, 10%);
-        color: #fff !important;
-        // text
-        font-weight: 500;
+        border-bottom: 2px solid #eee;
+        color: #222 !important;
+        font-weight: 700;
+        min-height: 64px;
+        align-items: center;
         &:hover {
-            background: #36393f;
+            background: #f8f8f8;
         }
-        // prevent long names from overflowing
         .community-name {
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            line-height: 1.3;
         }
         .ChainStatusIndicator {
             display: inline-block;
@@ -121,7 +96,7 @@ $sidebar-padding: 16px;
         // background: #fff !important;
         cursor: default !important;
         user-select: none;
-        border-bottom: 1px solid lighten(#333, 10%);
+        border-bottom: 1px solid #eee;
         margin-bottom: 10px;
         &:hover {
             background: initial;
@@ -129,16 +104,17 @@ $sidebar-padding: 16px;
     }
     // bottom
     .cui-list .login-selector {
-        position: fixed;
+        position: absolute;
         display: flex;
         bottom: 0;
         width: $side-width;
+        z-index: 1;
         /// background: #fff !important;
         user-select: none;
         padding: 17px $sidebar-padding 18px;
-        border-top: 1px solid lighten(#333, 10%);
+        border-top: 1px solid #eee;
         &:hover {
-            /// background: #f7f7f7 !important;
+            background: #f7f7f7 !important;
         }
         button.cui-button {
             position: relative;
@@ -159,9 +135,6 @@ $sidebar-padding: 16px;
                     text-overflow: ellipsis;
                     max-width: 110px;
                     font-size: 14px;
-                    a {
-                        color: #fff;
-                    }
                 }
                 .user-address {
                     font-size: 12px;
@@ -191,4 +164,9 @@ $sidebar-padding: 16px;
     .cui-list-item {
         padding: 11px;
     }
+}
+
+// TODO: use non-generic CSS here
+.cui-portal .cui-overlay-backdrop {
+    background: rgba(47, 49, 54, 0.65);
 }

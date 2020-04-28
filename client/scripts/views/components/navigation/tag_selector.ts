@@ -123,7 +123,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
         e.preventDefault();
         m.route.set(`/${app.activeId()}/discussions/${name}`);
       },
-      contentLeft: m(Icon, { name: Icons.TAG }),
+      contentLeft: m(Icon, { name: Icons.HASH }),
       label: [
         m('span.tag-name', name),
       ],
@@ -196,6 +196,17 @@ const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hi
       }, featuredTagListing),
       showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
+      !showFullListing
+        && (app.community || app.chain)
+        && m(List, [
+          m(ListItem, {
+            class: 'TagRow',
+            active: m.route.get() === `/${app.activeId()}/tags/`,
+            label: 'Browse tags',
+            onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
+          }),
+        ]),
     ]);
   },
 };

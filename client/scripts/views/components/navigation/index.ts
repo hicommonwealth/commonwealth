@@ -125,7 +125,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           m(Popover, {
             class: 'community-switcher-popover',
             isOpen: vnode.state.communitySwitcherVisible,
-            autofocus: true,
+            hasBackdrop: true,
             content: m(CommunitySwitcher),
             onClose: () => {
               vnode.state.communitySwitcherVisible = false;
@@ -179,36 +179,26 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           //     }),
           // ],
           // discussions (all communities)
-          m('h4', 'Discussions'),
           (app.community || app.chain)
             && m(ListItem, {
               active: onDiscussionsPage(m.route.get()),
-              label: 'All Discussions',
+              label: 'Discussions',
               onclick: (e) => m.route.set(`/${app.activeId()}/`),
-              contentLeft: m(Icon, { name: Icons.TAG }),
+              contentLeft: m(Icon, { name: Icons.BOX }),
             }),
-          // TODO: tag selector
           (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
-          // members (all communities)
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onTagsPage(m.route.get()),
-              label: 'Manage Tags',
-              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-              contentLeft: m(Icon, { name: Icons.SETTINGS }),
-            }),
-          // admin panel (all communities)
-          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
-            (app.community || app.chain) &&
-            m(AdminPanel),
           (app.community || app.chain)
             && m(ListItem, {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.USERS }),
+              contentLeft: m(Icon, { name: Icons.BOX }),
             }),
+          // admin panel (all communities)
+          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
+          (app.community || app.chain) &&
+          m(AdminPanel),
           // // chat (all communities)
           // (app.community || app.chain) &&
           //   m(ListItem, {
@@ -216,9 +206,6 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           //     label: 'Chat',
           //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
           //   }),
-          // governance (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && m('h4', 'On-chain'),
           // proposals (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
@@ -227,7 +214,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
               contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [
-                allSubstrateGovernanceProposals > 0 && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+                allSubstrateGovernanceProposals > 0
+                  && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
                 cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
               ],
             }),
@@ -254,12 +242,6 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
               data: { typeEnum: ProposalType.MolochProposal }
             }),
             label: 'New proposal'
-          }),
-          (app.community || app.chain) &&
-          m(ListItem, {
-            active: onMembersPage(m.route.get()),
-            label: 'Members',
-            onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({

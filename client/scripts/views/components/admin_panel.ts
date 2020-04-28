@@ -607,6 +607,8 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
         label: 'Manage Community',
+        contentLeft: m(Icon, { name: Icons.SETTINGS, }),
+        style: 'font-weight: 500;',
       }),
       m(Dialog, {
         autofocus: true,
