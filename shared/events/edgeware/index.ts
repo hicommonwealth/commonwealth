@@ -50,7 +50,7 @@ export function createApi(provider: WsProvider): ApiPromise {
  */
 export default function (
   url = 'ws://localhost:9944',
-  handler: IEventHandler,
+  handlers: IEventHandler[],
   skipCatchup: boolean,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
@@ -68,7 +68,7 @@ export default function (
         const processor = new Processor(api);
         const processBlockFn = async (block: SubstrateBlock) => {
           const events: CWEvent[] = await processor.process(block);
-          events.map((event) => handler.handle(event));
+          events.map((event) => handlers.forEach((handler) => handler.handle(event)));
         };
 
         const pollMissedBlocksFn = async () => {
