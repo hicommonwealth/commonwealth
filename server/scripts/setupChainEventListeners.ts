@@ -1,4 +1,5 @@
 import EdgewareNotificationHandler from '../eventHandlers/edgeware/notifications';
+import EdgewareArchivalHandler from '../eventHandlers/edgeware/archival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
 import { IDisconnectedRange } from '../../shared/events/interfaces';
 
@@ -33,11 +34,12 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
   nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
     .map(async (node) => {
       const notificationHandler = new EdgewareNotificationHandler(models, wss, node.chain);
+      const archivalHandler = new EdgewareArchivalHandler(models, wss, node.chain);
       let url = node.url.substr(0, 2) === 'ws' ? node.url : `ws://${node.url}`;
       url = (url.indexOf(':9944') !== -1) ? url : `${url}:9944`;
       const subscriber = await subscribeEdgewareEvents(
         url,
-        [ notificationHandler ],
+        [ notificationHandler, archivalHandler ],
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
       );

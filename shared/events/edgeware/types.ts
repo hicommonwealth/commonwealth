@@ -23,6 +23,17 @@ export interface SubstrateBlock {
   versionName: string;
 }
 
+// Used for grouping EventKinds together for archival purposes
+export enum SubstrateEntityKind {
+  DemocracyProposal = 'democracy-proposal',
+  DemocracyReferendum = 'democracy-referendum',
+  DemocracyPreimage = 'democracy-preimage',
+  TreasuryProposal = 'treasury-proposal',
+  CollectiveProposal = 'collective-proposal',
+  SignalingProposal = 'signaling-proposal',
+}
+
+// Each kind of event we handle
 export enum SubstrateEventKind {
   Slash = 'slash',
   Reward = 'reward',

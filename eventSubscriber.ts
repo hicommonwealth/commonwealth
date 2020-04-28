@@ -11,4 +11,4 @@ class StandaloneSubstrateEventHandler extends IEventHandler {
 }
 
 const skipCatchup = false;
-subscribeEdgewareEvents(url, new StandaloneSubstrateEventHandler(), skipCatchup);
+subscribeEdgewareEvents(url, [ new StandaloneSubstrateEventHandler() ], skipCatchup);
