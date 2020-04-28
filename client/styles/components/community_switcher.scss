@@ -6,6 +6,8 @@
     min-height: 100vh;
     z-index: 2;
 
+    $padding: 11px 18px;
+
     background: #2f3136;
     color: #fff;
 
@@ -23,12 +25,12 @@
     h4 {
         font-size: 14px;
         font-weight: 400;
-        margin: 20px 15px 6px;
+        margin: 20px 18px 6px;
         padding-bottom: 6px;
         border-bottom: 1px solid #444;
     }
     hr {
-        border-top: none;
+        border: none;
         border-bottom: 1px solid #444;
         margin: 12px 15px 10px;
     }
@@ -40,7 +42,7 @@
         display: flex;
         height: $size;
         box-sizing: content-box;
-        padding: 11px 15px;
+        padding: $padding;
         text-decoration: none;
         font-weight: 500;
         color: #fff;
@@ -104,7 +106,7 @@
         display: block;
         //display: flex;
         text-decoration: none;
-        padding: 11px 15px;
+        padding: $padding;
         font-weight: 500;
         color: #fff;
         &:hover {
@@ -126,6 +128,7 @@
 
 .community-switcher-popover {
     .cui-popover-content {
+        margin-left: -64px;
         border: none;
         border-radius: 0;
         padding: 0;

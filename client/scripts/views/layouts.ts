@@ -7,6 +7,7 @@ import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import Navigation from 'views/components/navigation';
+import Sidebar from 'views/components/sidebar';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
 import { AppToasts } from 'views/toast';
@@ -19,6 +20,7 @@ export const LoadingLayout: m.Component<{ activeTag: string }> = {
     const { activeTag } = vnode.attrs;
 
     return m('.mithril-app', [
+      m(Sidebar),
       m(Navigation, { activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
@@ -44,6 +46,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.mithril-app', [
+        m(Sidebar),
         m(Navigation, { activeTag }),
         m('.layout-content', {
           class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
@@ -75,6 +78,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
     }
 
     return m('.mithril-app', [
+      m(Sidebar),
       m(Navigation, { activeTag }),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
