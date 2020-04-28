@@ -57,9 +57,10 @@ import {
 import {
   GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply,
   ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer,
-  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction
+  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
+import { PopoverMenu, Icon, Icons } from 'construct-ui';
 
 
 interface IProposalHeaderAttrs {
@@ -129,18 +130,34 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread && proposal.versionHistory?.length > 1 && m(ProposalHeaderSpacer),
           m(ProposalHeaderLastEdited, { proposal }),
 
+          // !getSetGlobalEditingStatus(GlobalStatus.Get)
+          //   && isSameAccount(app.vm.activeAccount, author)
+          //   && !vnode.state.editing
+          //   && !proposal.readOnly
+          //   && [
+          //     m(ProposalHeaderSpacer),
+          //     m(ProposalBodyEdit, {
+          //       item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state
+          //     }),
+          //     m(ProposalHeaderSpacer),
+          //     m(ProposalBodyDelete, { item: proposal }),
+          //   ],
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
             && !vnode.state.editing
             && !proposal.readOnly
             && [
               m(ProposalHeaderSpacer),
-              m(ProposalBodyEdit, {
-                item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state
-              }),
-              m(ProposalHeaderSpacer),
-              m(ProposalBodyDelete, { item: proposal }),
-            ],
+              m(PopoverMenu, {
+                closeOnContentClick: true,
+                content: [
+                  m(ProposalBodyEditMenuItem, {
+                    item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                  }),
+                  m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                ],
+                trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
+              })],
 
           vnode.state.editing && [
             m(ProposalHeaderSpacer),
@@ -207,38 +224,64 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         comment.versionHistory?.length > 1 && m(ProposalBodySpacer),
         m(ProposalBodyLastEdited, { item: comment }),
 
+        // !vnode.state.editing
+        //   && app.vm.activeAccount
+        //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
+        //   && app.vm.activeAccount?.chain.id === comment.authorChain
+        //   && app.vm.activeAccount?.address === comment.author
+        //   && [
+        //     m(ProposalBodySpacer),
+        //     m(ProposalBodyEdit, {
+        //       item: comment,
+        //       getSetGlobalReplyStatus,
+        //       getSetGlobalEditingStatus,
+        //       parentState: vnode.state
+        //     }),
+        //     m(ProposalBodySpacer),
+        //     m(ProposalBodyDelete, { item: comment }),
+        //   ],
+
         !vnode.state.editing
-          && app.vm.activeAccount
-          && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && app.vm.activeAccount?.chain.id === comment.authorChain
-          && app.vm.activeAccount?.address === comment.author
-          && [
-            m(ProposalBodySpacer),
-            m(ProposalBodyEdit, {
-              item: comment,
-              getSetGlobalReplyStatus,
-              getSetGlobalEditingStatus,
-              parentState: vnode.state
-            }),
-            m(ProposalBodySpacer),
-            m(ProposalBodyDelete, { item: comment }),
-          ],
+        && app.vm.activeAccount
+        && !getSetGlobalEditingStatus(GlobalStatus.Get)
+        && app.vm.activeAccount?.chain.id === comment.authorChain
+        && app.vm.activeAccount?.address === comment.author
+        && [
+          m(ProposalBodySpacer),
+          m(PopoverMenu, {
+            closeOnContentClick: true,
+            content: [
+              m(ProposalBodyEditMenuItem, {
+                item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+              }),
+              m(ProposalBodyDeleteMenuItem, { item: comment }),
+              parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+              && m(ProposalBodyReplyMenuItem, {
+                item: comment,
+                getSetGlobalReplyStatus,
+                parentType,
+                parentState: vnode.state,
+              }),
+            ],
+            trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
+          })
+        ],
 
         // For now, we are limiting threading to 1 level deep
         // Comments whose parents are other comments should not display the reply option
-        !vnode.state.editing
-          && app.vm.activeAccount
-          && !getSetGlobalEditingStatus(GlobalStatus.Get)
-          && parentType === CommentParent.Proposal
-          && [
-            m(ProposalBodySpacer),
-            m(ProposalBodyReply, {
-              item: comment,
-              getSetGlobalReplyStatus,
-              parentType,
-              parentState: vnode.state,
-            }),
-          ],
+        // !vnode.state.editing
+        //   && app.vm.activeAccount
+        //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
+        //   && parentType === CommentParent.Proposal
+        //   && [
+        //     m(ProposalBodySpacer),
+        //     m(ProposalBodyReply, {
+        //       item: comment,
+        //       getSetGlobalReplyStatus,
+        //       parentType,
+        //       parentState: vnode.state,
+        //     }),
+        //   ],
 
         vnode.state.editing && [
           m(ProposalBodySpacer),
