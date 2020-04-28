@@ -115,10 +115,16 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           }
         });
       }
+      const tags = app.tags.getByCommunity(activeEntity.meta.id);
+      const tagObj = tags.find((t) => t.name === tag);
       return m('.discussions-listing.tag-listing', [
         m('h4.tag-name', [
           tag,
           getBackHomeButton(),
+        ]),
+        tagObj.description &&
+        m('h4', [
+          tagObj.description,
         ]),
         list.length === 0
           ? m('.no-threads', 'No threads')
