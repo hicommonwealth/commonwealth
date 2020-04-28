@@ -12,7 +12,8 @@ import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind, OffchainTag } from 'models';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import TagEditor from '../../components/tag_editor';
+import TagEditor from 'views/components/tag_editor';
+import { isRoleOfCommunity } from 'helpers/roles';
 
 interface IAttrs {
   proposal: OffchainThread;
@@ -93,7 +94,10 @@ const DiscussionRow: m.Component<IAttrs> = {
             ]),
             m('.discussion-meta-right', [
               m('.discussion-tags', [
-                m(PopoverMenu, {
+                (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+                || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
+                || proposal.author === app.vm.activeAccount.address)
+                && m(PopoverMenu, {
                   // class: '.discussion-tags',
                   // style: 'display: inline-block; background-color: #222222;',
                   closeOnContentClick: false,
