@@ -178,8 +178,6 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           // ],
           // discussions (all communities)
           (app.community || app.chain)
-            && m('h4', 'Off-chain'),
-          (app.community || app.chain)
             && m(ListItem, {
               active: onDiscussionsPage(m.route.get()),
               label: 'Discussions',
@@ -202,9 +200,6 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           //     label: 'Chat',
           //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
           //   }),
-          // governance (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && m('h4', 'On-chain'),
           // proposals (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
@@ -213,7 +208,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
               contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [
-                allSubstrateGovernanceProposals > 0 && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+                allSubstrateGovernanceProposals > 0
+                  && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
                 cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
               ],
             }),

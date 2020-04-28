@@ -2,7 +2,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 63px;
+    width: 62px;
     bottom: 0;
     background: #e4e4e6;
     z-index: 10;
@@ -20,21 +20,18 @@
     $size: 36px;
 
     a.SidebarChain,
-    a.SidebarCommunity,
-    .SidebarSettingsMenu .trigger {
+    a.SidebarCommunity {
         position: relative;
         display: flex;
         height: $size;
         box-sizing: content-box;
-        padding: 11px 13px;
+        padding: 8px 13px;
         text-decoration: none;
         color: #222;
         font-weight: 500;
-        &:hover {
-            background: #eee;
-        }
         .icon-inner {
             position: relative;
+            opacity: 0.4;
             .ChainIcon img {
                 width: $size;
                 height: $size;
@@ -45,19 +42,8 @@
                 bottom: -4px;
             }
         }
-        .content-inner {
-            margin-left: 12px;
-            line-height: 1.35;
-            .sidebar-user {
-                font-size: 13px;
-                color: #777;
-                .User .user-avatar {
-                    margin-right: 5px;
-                }
-                .User .user-display-name {
-                    color: #777;
-                }
-            }
+        &:hover .icon-inner {
+            opacity: 1;
         }
     }
     a.SidebarCommunity {
@@ -70,7 +56,7 @@
             border-radius: 8px;
             .name {
                 position: relative;
-                top: 7px;
+                top: 8px;
             }
         }
         &:hover, &.active {

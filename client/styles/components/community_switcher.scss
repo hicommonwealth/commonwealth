@@ -4,7 +4,9 @@
     padding-bottom: 8px;
     user-select: none;
     min-height: 100vh;
+    max-height: 100vh;
     z-index: 2;
+    overflow-y: auto;
 
     $padding: 11px 18px;
 

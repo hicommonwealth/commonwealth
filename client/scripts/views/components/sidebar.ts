@@ -87,16 +87,19 @@ const Sidebar: m.Component<{}> = {
       }
     });
 
+    const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
+    const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
+
     return m('.Sidebar', [
       m('.sidebar-content', [
-        app.login.roles.map((role) => {
+        chainRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);
-          if (role.offchain_community_id) {
-            const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
-            return m(SidebarCommunity, { community, address });
-          } else {
-            return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
-          }
+          return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+        }),
+        communityRoles.map((role) => {
+          const address = app.login.addresses.find((a) => a.id === role.address_id);
+          const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
+          return m(SidebarCommunity, { community, address });
         }),
       ]),
     ]);
