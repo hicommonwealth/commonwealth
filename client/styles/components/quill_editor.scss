@@ -286,6 +286,24 @@
     .ql-editor ol li.ql-indent-9:before {
         content: counter(list-9, decimal) '. ';
     }
+    // Checklist styling
+    .ql-editor ul[data-checked=true], .ql-editor ul[data-checked=false] {
+        pointer-events: none;
+    }
+    .ql-editor ul[data-checked=true] > li::before, .ql-editor ul[data-checked=false] > li::before {
+        color: #777;
+        cursor: pointer;
+        pointer-events: all;
+    }
+    .ql-editor ul[data-checked="true"] li {
+        text-decoration: line-through;
+    }
+    .ql-editor ul[data-checked=true] > li::before {
+        content: '\2611';
+    }
+    .ql-editor ul[data-checked=false] > li::before {
+        content: '\2610';
+    }
     .ql-editor .ql-indent-1:not(.ql-direction-rtl) {
         padding-left: 3em;
     }

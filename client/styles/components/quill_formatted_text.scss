@@ -73,6 +73,20 @@
             margin: 6px 0;
         }
     }
+    ul.checklist {
+        padding-left: 1em;
+        li.checked {
+            list-style: '\2611';
+            padding-left: 9px;
+        }
+        li.unchecked { 
+            list-style: '\2610';
+            padding-left: 9px;
+        }
+    }
+    ul.checklist + ul.checklist {
+        margin-top: -10px;
+    }
     p:first-child {
         padding-top: 0;
         margin-top: 0;
