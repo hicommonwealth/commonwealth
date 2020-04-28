@@ -46,7 +46,9 @@ export default class extends IEventHandler {
 
     const updateEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
       const dbEntity = await this._models.ChainEntity.findOne({
-        type: type.toString(), type_id, chain: this._chain,
+        where: {
+          type: type.toString(), type_id, chain: this._chain,
+        }
       });
       console.log(`Updated db entity, ${type}: ${type_id}.`);
 
