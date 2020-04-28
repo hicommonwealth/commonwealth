@@ -144,7 +144,6 @@ function applyBlockFormatters(text, hideFormatting) {
       pattern: /^\[([ x])\] /,
       formatMany: (text) => m('ul.checklist', text),
       formatOne: (text, match) => {
-        debugger
         return m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, applyInlineFormatters(text.replace(match, ''), hideFormatting));
       }
     }];

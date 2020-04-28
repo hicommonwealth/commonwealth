@@ -621,7 +621,6 @@ const instantiateEditor = (
 
   const makeMarkdownToolbarHandler = (handler, fmtOption) => {
     toolbar.addHandler(handler, (value) => {
-      debugger
       if (value === 'check') value = 'unchecked';
       if (!isMarkdownMode()) return quill.format(handler, value);
 
