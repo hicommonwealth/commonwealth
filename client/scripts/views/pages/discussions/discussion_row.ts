@@ -6,12 +6,14 @@ import { default as moment } from 'moment-twitter';
 
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
-import { Icon, Icons, Tag } from 'construct-ui';
+import { Icon, Icons, Tag, PopoverMenu } from 'construct-ui';
 
 import User from 'views/components/widgets/user';
-import { OffchainThread, OffchainThreadKind } from 'models';
+import { OffchainThread, OffchainThreadKind, OffchainTag } from 'models';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
+import TagEditor from 'views/components/tag_editor';
+import { isRoleOfCommunity } from 'helpers/roles';
 
 interface IAttrs {
   proposal: OffchainThread;
@@ -101,14 +103,35 @@ const DiscussionRow: m.Component<IAttrs> = {
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
             m('.discussion-meta-right', [
-              m('.discussion-tags', proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
-                return m(Tag, {
-                  intent: 'primary',
-                  label: tag.name,
-                  size: 'xs',
-                  onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
-                }, 'goo');
-              })),
+              m('.discussion-tags', [
+                (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+                || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
+                || proposal.author === app.vm.activeAccount.address)
+                && m(PopoverMenu, {
+                  // class: '.discussion-tags',
+                  // style: 'display: inline-block; background-color: #222222;',
+                  closeOnContentClick: false,
+                  menuAttrs: { size: 'sm', },
+                  content: m(TagEditor, {
+                    thread: proposal,
+                    popoverMenu: true,
+                    onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); },
+                  }),
+                  trigger: m(Icon, {
+                    name: Icons.SETTINGS,
+                    class: 'discussion-tags',
+                    style: 'margin-right: 6px;'
+                  }),
+                }),
+                proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
+                  return m(Tag, {
+                    intent: 'primary',
+                    label: tag.name,
+                    size: 'xs',
+                    onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
+                  });
+                }),
+              ]),
             ]),
           ]),
         ]),

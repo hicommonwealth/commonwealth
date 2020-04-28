@@ -42,6 +42,7 @@
                 bottom: -4px;
             }
         }
+        &.active .icon-inner,
         &:hover .icon-inner {
             opacity: 1;
         }
@@ -69,6 +70,9 @@
 
 .SidebarTooltip {
     font-weight: 500;
-    margin: 1px 1px 0 4px;
+    margin: 1px 1px 0 2px;
     line-height: 1.1;
+    > * {
+        display: inline;
+    }
 }
