@@ -117,7 +117,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       }
       return m('.discussions-listing.tag-listing', [
         m('h4.tag-name', [
-          tag.name,
+          tag,
           getBackHomeButton(),
         ]),
         list.length === 0
