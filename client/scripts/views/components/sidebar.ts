@@ -26,23 +26,30 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
                        && address.address === app.vm.activeAccount?.address));
 
-    return m('a.SidebarChain', {
-      href: '#',
-      class: active ? 'active' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        if (address) {
-          localStorage.setItem('initAddress', address.address);
-          localStorage.setItem('initChain', address.chain);
-        }
-        m.route.set(`/${chain}/`);
-      }
-    }, [
-      m('.icon-inner', [
-        m(ChainIcon, { chain: nodeList[0].chain }),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+    return m(Tooltip, {
+      position: 'right',
+      size: 'lg',
+      content: m('.SidebarTooltip', [
+        m('.sidebar-tooltip-name', nodeList[0].chain.name),
       ]),
-    ]);
+      trigger: m('a.SidebarChain', {
+        href: '#',
+        class: active ? 'active' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          if (address) {
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
+          }
+          m.route.set(`/${chain}/`);
+        }
+      }, [
+        m('.icon-inner', [
+          m(ChainIcon, { chain: nodeList[0].chain }),
+          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        ]),
+      ])
+    });
   }
 };
 
@@ -54,23 +61,30 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
                        && address.address === app.vm.activeAccount?.address));
 
-    return m('a.SidebarCommunity', {
-      href: '#',
-      class: active ? 'active' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        if (address) {
-          localStorage.setItem('initAddress', address.address);
-          localStorage.setItem('initChain', address.chain);
-        }
-        m.route.set(`/${community.id}/`);
-      },
-    }, [
-      m('.icon-inner', [
-        m('.name', community.name.slice(0, 2).toLowerCase()),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+    return m(Tooltip, {
+      position: 'right',
+      size: 'lg',
+      content: m('.SidebarTooltip', [
+        m('.sidebar-tooltip-name', community.name),
       ]),
-    ]);
+      trigger: m('a.SidebarCommunity', {
+        href: '#',
+        class: active ? 'active' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          if (address) {
+            localStorage.setItem('initAddress', address.address);
+            localStorage.setItem('initChain', address.chain);
+          }
+          m.route.set(`/${community.id}/`);
+        },
+      }, [
+        m('.icon-inner', [
+          m('.name', community.name.slice(0, 2).toLowerCase()),
+          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        ]),
+      ])
+    });
   }
 };
 
