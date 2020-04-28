@@ -1,12 +1,13 @@
 import m from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
 import app from 'state';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
   onChangeHandler: Function;
+  popoverMenu?: boolean;
 }
 
 const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
@@ -48,13 +49,16 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
   },
   view: (vnode) => {
     return m('TagEditor', [
-      m('a', {
-        href: '#',
-        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; }
-      }, [
-        // m(Icon, { size: 'xs', name: Icons.TAG, style: 'color: #999;' }),
-        'Edit tags'
-      ]),
+      vnode.attrs.popoverMenu
+        ? m(MenuItem, {
+          label: 'Edit Tags',
+          iconLeft: Icons.TAG,
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        })
+        : m('a', {
+          href: '#',
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        }, [ 'Edit tags' ]),
       m(Dialog, {
         basic: false,
         closeOnEscapeKey: true,
