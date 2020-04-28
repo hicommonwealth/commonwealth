@@ -10,6 +10,12 @@ $sidebar-padding: 16px;
     width: $side-width;
     z-index: 9;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+    .NavigationMenu {
+        height: 100%;
+    }
+    .NavigationMenu .cui-list {
+        height: 100%;
+    }
 
     // dark styles
     background: #2f3136 !important;
@@ -129,7 +135,7 @@ $sidebar-padding: 16px;
     }
     // bottom
     .cui-list .login-selector {
-        position: fixed;
+        position: absolute;
         display: flex;
         bottom: 0;
         width: $side-width;
