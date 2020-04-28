@@ -63,22 +63,22 @@ $sidebar-padding: 16px;
     .cui-list .title-selector {
         display: flex;
         font-weight: 700;
-        padding: 22px $sidebar-padding 19px;
+        padding: 1px $sidebar-padding 0;
         cursor: pointer !important;
         user-select: none;
-        border-bottom: 1px solid #eee;
+        border-bottom: 2px solid #eee;
         color: #222 !important;
-        // text
         font-weight: 700;
+        min-height: 64px;
+        align-items: center;
         &:hover {
             background: #f8f8f8;
         }
-        // prevent long names from overflowing
         .community-name {
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            line-height: 1.3;
         }
         .ChainStatusIndicator {
             display: inline-block;
