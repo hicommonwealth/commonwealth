@@ -7,7 +7,7 @@ import 'chai/register-should';
 import { resetDatabase, closeServer } from '../../../../server-test';
 import models from '../../../../server/database';
 import { NotificationCategories } from '../../../../shared/types';
-import EdgewareEventHandler from '../../../../server/eventHandlers/edgeware';
+import EdgewareNotificationHandler from '../../../../server/eventHandlers/edgeware/notifications';
 import { CWEvent } from '../../../../shared/events/interfaces';
 import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
 
@@ -83,7 +83,7 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
     await eventHandler.handle(event);
@@ -125,7 +125,7 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
     await eventHandler.handle(event);
@@ -171,7 +171,7 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
     await eventHandler.handle(event);
@@ -213,7 +213,7 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
     await eventHandler.handle(event as unknown as CWEvent);

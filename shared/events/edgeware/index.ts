@@ -67,8 +67,23 @@ export default function (
         const poller = new Poller(api);
         const processor = new Processor(api);
         const processBlockFn = async (block: SubstrateBlock) => {
+          // retrieve events from block
           const events: CWEvent[] = await processor.process(block);
-          events.map((event) => handlers.forEach((handler) => handler.handle(event)));
+
+          // send all events through event-handlers in sequence
+          await Promise.all(events.map(async (event) => {
+            let prevResult = null;
+            /* eslint-disable-next-line no-restricted-syntax */
+            for (const handler of handlers) {
+              try {
+                // pass result of last handler into next one (chaining db events)
+                prevResult = handler.handle(event, prevResult);
+              } catch (err) {
+                console.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
+                break;
+              }
+            }
+          }));
         };
 
         const pollMissedBlocksFn = async () => {

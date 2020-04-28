@@ -1,8 +1,8 @@
 /**
- * Transforms raw edgeware events into the final form for storage
+ * Transforms raw edgeware events into notifications, and stores them in the db as ChainEvents.
  */
-import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
-import { NotificationCategories } from '../../shared/types';
+import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
+import { NotificationCategories } from '../../../shared/types';
 
 export default class extends IEventHandler {
   constructor(
@@ -14,9 +14,8 @@ export default class extends IEventHandler {
   }
 
   /**
-   * Handles an event by transforming it as needed.
-   * @param event the raw event from chain
-   * @returns the processed event
+   * Handles an event by creating a ChainEvent in the database, and emitting
+   * notifications as needed.
    */
   public async handle(event: CWEvent) {
     console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
@@ -56,5 +55,6 @@ export default class extends IEventHandler {
       dbEvent.id,
     );
     console.log(`Emitted ${dbNotifications.length} notifications.`);
+    return dbEvent;
   }
 }

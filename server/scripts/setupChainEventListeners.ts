@@ -1,4 +1,4 @@
-import EdgewareNotificationHandler from '../eventHandlers/edgeware';
+import EdgewareNotificationHandler from '../eventHandlers/edgeware/notifications';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
 import { IDisconnectedRange } from '../../shared/events/interfaces';
 
