@@ -51,8 +51,9 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
     return m('TagEditor', [
       vnode.attrs.popoverMenu
         ? m(MenuItem, {
-          label: 'Edit Tags',
           iconLeft: Icons.TAG,
+          fluid: true,
+          label: 'Edit Tags',
           onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
         })
         : m('a', {
