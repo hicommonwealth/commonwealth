@@ -33,6 +33,16 @@ const DiscussionRow: m.Component<IAttrs> = {
     const lastUpdated = app.comments.lastCommented(proposal)
       || proposal.createdAt;
 
+    const tagSortByName = (a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      } else if (a.name < b.name) {
+        return -1;
+      } else {
+        return 0;
+      }
+    };
+
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
         m('.discussion-pre', [
@@ -113,13 +123,13 @@ const DiscussionRow: m.Component<IAttrs> = {
                     style: 'margin-right: 6px;'
                   }),
                 }),
-                proposal.tags.map((tag) => {
+                proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
                   return m(Tag, {
                     intent: 'primary',
                     label: tag.name,
                     size: 'xs',
                     onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
-                  }, 'goo');
+                  });
                 }),
               ]),
             ]),
