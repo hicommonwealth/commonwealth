@@ -177,31 +177,23 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           //     }),
           // ],
           // discussions (all communities)
-          m('h4', 'Discussions'),
+          (app.community || app.chain)
+            && m('h4', 'Off-chain'),
           (app.community || app.chain)
             && m(ListItem, {
               active: onDiscussionsPage(m.route.get()),
-              label: 'All Discussions',
+              label: 'Discussions',
               onclick: (e) => m.route.set(`/${app.activeId()}/`),
-              contentLeft: m(Icon, { name: Icons.TAG }),
+              contentLeft: m(Icon, { name: Icons.BOX }),
             }),
-          // TODO: tag selector
           (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
-          // members (all communities)
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onTagsPage(m.route.get()),
-              label: 'Manage Tags',
-              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-              contentLeft: m(Icon, { name: Icons.SETTINGS }),
-            }),
           (app.community || app.chain)
             && m(ListItem, {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.USERS }),
+              contentLeft: m(Icon, { name: Icons.BOX }),
             }),
           // // chat (all communities)
           // (app.community || app.chain) &&
