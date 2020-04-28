@@ -133,6 +133,7 @@ $sidebar-padding: 16px;
         display: flex;
         bottom: 0;
         width: $side-width;
+        z-index: 1;
         /// background: #fff !important;
         user-select: none;
         padding: 17px $sidebar-padding 18px;

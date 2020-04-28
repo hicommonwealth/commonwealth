@@ -123,8 +123,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
           m(Popover, {
             class: 'community-switcher-popover',
             isOpen: vnode.state.communitySwitcherVisible,
-            autofocus: true,
             content: m(CommunitySwitcher),
+            hasBackdrop: true,
             onClose: () => {
               vnode.state.communitySwitcherVisible = false;
             },
