@@ -1,7 +1,7 @@
 import m, { Vnode } from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup, Form } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup, Form, FormGroup, FormLabel } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from './widgets/user';
@@ -333,67 +333,78 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
     };
 
 
-    return m(Form, [
-      m('h3', 'Webhooks'),
-      webhooks.map((webhook) => {
-        return m('.webhook', [
-          m('.webhook-url', webhook.url),
-          m('a', {
-            href: '#',
-            class: vnode.state.disabled ? 'disabled' : '',
-            type: 'submit',
-            onclick: (e) => {
-              e.preventDefault();
-
-              vnode.state.disabled = true;
-              vnode.state.success = false;
-              vnode.state.failure = false;
-
-              $.post(`${app.serverUrl()}/deleteWebhook`, {
-                ...chainOrCommObj,
-                webhookUrl: webhook.url,
-                auth: true,
-                jwt: app.login.jwt,
-              }).then((result) => {
-                vnode.state.disabled = false;
-                if (result.status === 'Success') {
-                  const idx = vnode.attrs.webhooks.findIndex((webhook) => webhook.url === `${webhook.url}`);
-                  if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
-                  vnode.state.success = true;
-                  vnode.state.successMsg = 'Webhook deleted!';
-                } else {
-                  vnode.state.failure = true;
-                  vnode.state.error = result.message;
+    return m(Form, {
+      class: 'Webhooks',
+    }, [
+      m(FormGroup, [
+        m('h3', 'Active webhooks:'),
+        m(List, {
+          interactive: false,
+          class: 'ActiveWebhooks'
+        }, [
+          webhooks.map((webhook) => {
+            return m(ListItem, {
+              contentLeft: webhook.url,
+              contentRight: m(Icon, {
+                name: Icons.X,
+                class: vnode.state.disabled ? 'disabled' : '',
+                onclick: (e) => {
+                  e.preventDefault();
+    
+                  vnode.state.disabled = true;
+                  vnode.state.success = false;
+                  vnode.state.failure = false;
+    
+                  $.post(`${app.serverUrl()}/deleteWebhook`, {
+                    ...chainOrCommObj,
+                    webhookUrl: webhook.url,
+                    auth: true,
+                    jwt: app.login.jwt,
+                  }).then((result) => {
+                    vnode.state.disabled = false;
+                    if (result.status === 'Success') {
+                      const idx = vnode.attrs.webhooks.findIndex((webhook) => webhook.url === `${webhook.url}`);
+                      if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
+                      vnode.state.success = true;
+                      vnode.state.successMsg = 'Webhook deleted!';
+                    } else {
+                      vnode.state.failure = true;
+                      vnode.state.error = result.message;
+                    }
+                    m.redraw();
+                  }, (err) => {
+                    vnode.state.failure = true;
+                    vnode.state.disabled = false;
+                    if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+                    m.redraw();
+                  });
                 }
-                m.redraw();
-              }, (err) => {
-                vnode.state.failure = true;
-                vnode.state.disabled = false;
-                if (err.responseJSON) vnode.state.error = err.responseJSON.error;
-                m.redraw();
-              });
-            }
-          }, 'Remove')
-        ]);
-      }),
-      webhooks.length === 0 && m('.no-webhooks', 'None'),
-      m('label', {
-        for: 'webhookUrl',
-      }, 'Add new webhook'),
-      m('input[type="text"].form-field', {
-        name: 'webhookUrl',
-        id: 'webhookUrl',
-        autocomplete: 'off',
-        placeholder: 'https://hooks.slack.com/services/',
-      }),
-      m('button', {
-        class: vnode.state.disabled ? 'disabled' : '',
-        type: 'submit',
-        onclick: createWebhook,
-      }, 'Add webhook'),
-      vnode.state.success && m('.success-message', vnode.state.successMsg),
-      vnode.state.failure && m('.error-message', [
-        vnode.state.error || 'An error occurred'
+              }),
+            });
+          }),
+          webhooks.length === 0 && m(ListItem, {
+            contentLeft: 'No webhooks yet.'
+          }),
+        ]),
+      ]),
+      m(FormGroup, [
+        m('h3', { for: 'webhookUrl', }, 'Add new webhook:'),
+        m(Input, {
+          name: 'webhookUrl',
+          id: 'webhookUrl',
+          autocomplete: 'off',
+          placeholder: 'https://hooks.slack.com/services/',
+        }),
+        m(Button, {
+          class: 'AddWebhookButton',
+          type: 'submit',
+          label: 'Add webhook',
+          onclick: createWebhook,
+        }),
+        // vnode.state.success && m('h3.success-message', vnode.state.successMsg),
+        // vnode.state.failure && m('h3.error-message', [
+        //   vnode.state.error || 'An error occurred'
+        // ]),
       ]),
     ]);
   }

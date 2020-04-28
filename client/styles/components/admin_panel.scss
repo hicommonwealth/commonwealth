@@ -16,7 +16,7 @@
 
         .panel-left {
           width: 100%;
-          border-right: 1px grey solid;
+          border-right: 1px#c5cdd1 solid;
           @media (min-width: 800px) {
             width: 60%;
           }
@@ -31,6 +31,16 @@
           .TabPanel {
             .UpgradeRoles, .Webhooks {
               padding: 0 20px 10px;
+            }
+
+            .AddWebhookButton {
+              margin-top: 20px;
+            }
+
+            .ActiveWebhooks {
+              min-height: 180px;
+              max-height: 180px;
+              overflow-y: scroll;
             }
           }
         } // .panel-right
