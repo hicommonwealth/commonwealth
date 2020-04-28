@@ -38,6 +38,7 @@ import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { OffchainCommunitiesStore } from 'stores';
 import AdminPanel from 'views/components/admin_panel';
+import { isRoleOfCommunity } from 'helpers/roles';
 
 const NotificationRow: m.Component<{ notification: Notification }> = {
   view: (vnode) => {
@@ -303,7 +304,8 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
           }),
         // admin panel (all communities)
-        (app.community || app.chain) &&
+        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
+          (app.community || app.chain) &&
           m(AdminPanel),
         (app.community || app.chain) &&
           m(ListItem, {

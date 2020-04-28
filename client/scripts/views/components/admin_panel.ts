@@ -396,7 +396,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           placeholder: 'https://hooks.slack.com/services/',
         }),
         m(Button, {
-          class: 'AddWebhookButton',
+          class: 'PanelButton',
           type: 'submit',
           label: 'Add webhook',
           onclick: createWebhook,
@@ -444,6 +444,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
         onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
       }),
       m(Button, {
+        class: 'PanelButton',
         label: 'Upgrade Member',
         onclick: () => {
           const indexOfName = names.indexOf(vnode.state.user);
