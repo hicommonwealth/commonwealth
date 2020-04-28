@@ -77,7 +77,8 @@ export default function (
             for (const handler of handlers) {
               try {
                 // pass result of last handler into next one (chaining db events)
-                prevResult = handler.handle(event, prevResult);
+                /* eslint-disable-next-line no-await-in-loop */
+                prevResult = await handler.handle(event, prevResult);
               } catch (err) {
                 console.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
                 break;

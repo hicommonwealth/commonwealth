@@ -35,6 +35,7 @@ export default class extends IEventHandler {
       const dbEntity = await this._models.ChainEntity.create({
         type, type_id, chain: this._chain,
       });
+      console.log(`Created db entity, ${type}: ${type_id}.`);
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
@@ -47,6 +48,7 @@ export default class extends IEventHandler {
       const dbEntity = await this._models.ChainEntity.findOne({
         type: type.toString(), type_id, chain: this._chain,
       });
+      console.log(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
@@ -137,7 +139,7 @@ export default class extends IEventHandler {
       }
 
       default: {
-        console.log(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+        // console.log(`no archival action needed for event of kind ${event.data.kind.toString()}`);
       }
     }
   }

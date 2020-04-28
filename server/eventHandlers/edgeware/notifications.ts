@@ -28,7 +28,7 @@ export default class extends IEventHandler {
       console.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
-      console.log(`found chain event type: ${dbEventType.id}`);
+      // console.log(`found chain event type: ${dbEventType.id}`);
     }
 
     // create event in db
@@ -38,7 +38,7 @@ export default class extends IEventHandler {
       event_data: event.data,
     });
 
-    console.log(`created db event: ${dbEvent.id}`);
+    // console.log(`created db event: ${dbEvent.id}`);
 
     // locate subscriptions generate notifications as needed
     const dbNotifications = await this._models.Subscription.emitNotifications(

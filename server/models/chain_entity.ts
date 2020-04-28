@@ -23,4 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     models.ChainEntity.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };
+
+  return ChainEntity;
 };
