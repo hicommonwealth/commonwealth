@@ -5,15 +5,14 @@ import { NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const lookupAddressIsOwnedByUser = async (models, req: UserRequest, next: NextFunction) => {
-  console.log(req.body);
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
-  if (!req.body.author_chain || !req.body.address) {
+  if (!req.body.chain || !req.body.address) {
     return next(new Error('Invalid public key/chain'));
   }
   const author = await models.Address.findOne({ where: {
-    chain: req.body.author_chain,
+    chain: req.body.chain,
     address: req.body.address,
     user_id: req.user.id,
   } });

@@ -103,9 +103,13 @@ interface EditCommentArgs {
   jwt: any;
   comment_id: Number;
   text: any;
+  address?: string;
+  chain?: string;
+  community?: string;
 }
+
 export const editComment = async (args: EditCommentArgs) => {
-  const { jwt, text, comment_id } = args;
+  const { jwt, text, comment_id, chain, community, address } = args;
   const recentEdit : any = { timestamp: moment(), body: text };
   const versionHistory = JSON.stringify(recentEdit);
   const res = await chai.request.agent(app)
@@ -113,10 +117,13 @@ export const editComment = async (args: EditCommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       'id': comment_id,
+      'address': address,
       'body': encodeURIComponent(text),
       'version_history': versionHistory,
       'attachments[]': undefined,
       'jwt': jwt,
+      'chain': community ? undefined : chain,
+      'community': community,
     });
   return res.body;
 };
