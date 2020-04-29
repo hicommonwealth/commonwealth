@@ -53,6 +53,8 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'collective':
+    case 'council':
+    case 'technicalCollective':
       switch (event.method) {
         case 'Proposed': return SubstrateEventKind.CollectiveProposed;
         case 'Approved': return SubstrateEventKind.CollectiveApproved;

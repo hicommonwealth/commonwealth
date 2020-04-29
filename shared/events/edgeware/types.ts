@@ -266,6 +266,11 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   proposalIndex: number;
   proposalHash: string;
   threshold: number;
+  call: {
+    method: string;
+    section: string;
+    args: string[];
+  };
 }
 
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {

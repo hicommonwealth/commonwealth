@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes,
-  ReferendumInfo,
+  ReferendumInfo, Proposal,
 } from '@polkadot/types/interfaces';
 import { ProposalRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
@@ -351,6 +351,10 @@ export default async function (
           hash,
           threshold,
         ] = event.data as unknown as [ AccountId, ProposalIndex, Hash, u32 ] & Codec;
+        const proposalOpt = await api.query[event.section].proposalOf<Option<Proposal>>(hash);
+        if (!proposalOpt.isSome) {
+          throw new Error('could not fetch method for collective proposal');
+        }
         return {
           excludeAddresses: [ proposer.toString() ],
           data: {
@@ -359,13 +363,18 @@ export default async function (
             proposalIndex: +index,
             proposalHash: hash.toString(),
             threshold: +threshold,
+            call: {
+              method: proposalOpt.unwrap().methodName,
+              section: proposalOpt.unwrap().sectionName,
+              args: proposalOpt.unwrap().args.map((c) => c.toString()),
+            }
           }
         };
       }
       case SubstrateEventKind.CollectiveApproved:
       case SubstrateEventKind.CollectiveDisapproved: {
         const [ hash ] = event.data as unknown as [ Hash ] & Codec;
-        const infoOpt = await api.query.council.voting<Option<Votes>>(hash);
+        const infoOpt = await api.query[event.section].voting<Option<Votes>>(hash);
         if (!infoOpt.isSome) {
           throw new Error('could not fetch info for collective proposal');
         }

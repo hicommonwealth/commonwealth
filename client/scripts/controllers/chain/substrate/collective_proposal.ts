@@ -1,12 +1,14 @@
 import { takeWhile } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
-import { Call } from '@polkadot/types/interfaces';
+import { Votes } from '@polkadot/types/interfaces';
+import { Option } from '@polkadot/types';
+import { ISubstrateCollectiveProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  ISubstrateCollectiveProposal, ISubstrateCollectiveProposalState, SubstrateCoin
-} from 'adapters/chain/substrate/types';
-import { Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit } from 'models';
-import { ProposalStore } from 'stores';
-import { BehaviorSubject } from 'rxjs';
+  Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
+  VotingUnit, ChainEntity, ChainEvent
+} from 'models';
+import { BehaviorSubject, Unsubscribable } from 'rxjs';
+import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
@@ -21,9 +23,19 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   }
 }
 
+const backportEventToAdapter = (event: ISubstrateCollectiveProposed): ISubstrateCollectiveProposal => {
+  return {
+    identifier: event.proposalIndex.toString(),
+    index: event.proposalIndex,
+    threshold: event.threshold,
+    hash: event.proposalHash,
+    method: null,
+  };
+};
+
 export class SubstrateCollectiveProposal
   extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateCollectiveProposal, ISubstrateCollectiveProposalState, SubstrateCollectiveVote
+  ApiRx, SubstrateCoin, ISubstrateCollectiveProposal, any, SubstrateCollectiveVote
 > {
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
@@ -37,7 +49,6 @@ export class SubstrateCollectiveProposal
     return this._Collective.isMember(account);
   }
   private readonly _title: string;
-  public readonly method: Call;
   private _approved: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private _Chain: SubstrateChain;
@@ -47,25 +58,76 @@ export class SubstrateCollectiveProposal
     return this._Collective.moduleName;
   }
 
+  private _voterSubscription: Unsubscribable;
+
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Collective: SubstrateCollective,
-    data: ISubstrateCollectiveProposal
+    entity: ChainEntity,
   ) {
-    super('councilmotion', data);
-    this.method = ChainInfo.findCall(data.method.callIndex)(...data.method.args);
+    super('councilmotion', backportEventToAdapter(
+      entity.chainEvents
+        .find((e) => e.data.kind === SubstrateEventKind.CollectiveProposed).data as ISubstrateCollectiveProposed
+    ));
+    const eventData = entity.chainEvents
+      .find((e) => e.data.kind === SubstrateEventKind.CollectiveProposed).data as ISubstrateCollectiveProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;
-    this._title = this._Chain.methodToTitle(data.method);
-    this.subscribe(
-      this._Chain.api,
-      this._Collective.store,
-      this._Collective.adapter
-    );
+    this._title = `${eventData.call.section}.${eventData.call.method}(${eventData.call.args.join(', ')})`;
+
+    this._voterSubscription = this._subscribeVoters();
     this._Collective.store.add(this);
+  }
+
+  protected complete() {
+    super.updateState(this._Collective.store, { completed: true });
+    if (this._voterSubscription) {
+      this._voterSubscription.unsubscribe();
+    }
+  }
+
+  public update(e: ChainEvent) {
+    switch (e.data.kind) {
+      case SubstrateEventKind.CollectiveDisapproved: {
+        this._approved.next(false);
+        this.complete();
+        break;
+      }
+      case SubstrateEventKind.CollectiveApproved: {
+        this._approved.next(true);
+        break;
+      }
+      case SubstrateEventKind.CollectiveExecuted: {
+        this.complete();
+        break;
+      }
+      default: {
+        throw new Error('invalid event update');
+      }
+    }
+  }
+
+  private _subscribeVoters(): Unsubscribable {
+    return this._Chain.query((api) => api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash))
+      .pipe(takeWhile((v) => v.isSome))
+      .subscribe((votesOpt) => {
+        const votes = votesOpt.unwrap();
+        const ayes = votes.ayes;
+        const nays = votes.nays;
+        // eslint-disable-next-line no-restricted-syntax
+        for (const voter of ayes) {
+          const acct = this._Accounts.fromAddress(voter.toString());
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, true));
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const voter of nays) {
+          const acct = this._Accounts.fromAddress(voter.toString());
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, false));
+        }
+      });
   }
 
   // GETTERS AND SETTERS
@@ -169,13 +231,7 @@ export class SubstrateCollectiveProposal
     );
   }
 
-  protected updateState(store: ProposalStore<SubstrateCollectiveProposal>, state: ISubstrateCollectiveProposalState) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const voter of Object.keys(state.votes)) {
-      const acct = this._Accounts.fromAddress(voter);
-      this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, state.votes[voter]));
-    }
-    this._approved.next(state.approved);
-    super.updateState(store, state);
+  protected updateState() {
+    throw new Error('not implemented');
   }
 }

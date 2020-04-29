@@ -1,10 +1,8 @@
 import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
-import {
-  ISubstrateCollectiveProposal, ISubstrateCollectiveProposalState
-} from 'adapters/chain/substrate/types';
-import { SubstrateCollectiveAdapter } from 'adapters/chain/substrate/subscriptions';
+import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
+import { SubstrateEntityKind } from 'events/edgeware/types';
 import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
@@ -15,9 +13,9 @@ import { SubstrateCollectiveProposal } from './collective_proposal';
 class SubstrateCollective extends ProposalModule<
   ApiRx,
   ISubstrateCollectiveProposal,
-  ISubstrateCollectiveProposalState,
+  any,
   SubstrateCollectiveProposal,
-  SubstrateCollectiveAdapter
+  any
 > {
   private _memberSubscription: Unsubscribable; // init in each overriden init() call
   private _members: SubstrateAccount[];
@@ -38,21 +36,17 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstrateCollectiveAdapter(moduleName);
+      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
+      const proposals = entities
+        .map(async (e) => new SubstrateCollectiveProposal(ChainInfo, Accounts, this, e));
+
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         const memberP = new Promise((memberResolve) => {
           this._memberSubscription = api.query[moduleName].members().subscribe((members: Vec<AccountId>) => {
             this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
             memberResolve();
           });
-        });
-
-        const subP = this.initSubscription(
-          api,
-          (ps) => ps.map((p) => new SubstrateCollectiveProposal(ChainInfo, Accounts, this, p))
-        );
-
-        Promise.all([subP, memberP]).then(() => {
+        }).then(() => {
           this._initialized = true;
           resolve();
         }).catch((err) => {
