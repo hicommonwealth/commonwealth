@@ -178,14 +178,15 @@ $active-color: #f4f4f9;
     .notification-list {
         height: 640px;
         background: #fff;
-        width: 320px;
+        width: 340px;
     }
     .cui-menu {
-        max-width: 322px;
+        max-width: 342px;
         margin: 0;
         padding: 0;
-        border-radius: 0;
+        border-color: #d8dee0;
         background: none;
+        overflow: hidden;
     }
     .cui-popover-arrow {
         background: white;
