@@ -218,7 +218,7 @@ export interface ISubstrateTreasuryProposed extends ISubstrateEvent {
   proposer: SubstrateAccountId;
   value: SubstrateBalanceString;
   beneficiary: SubstrateAccountId;
-  // can also fetch bond if needed
+  bond: SubstrateBalanceString;
 }
 
 export interface ISubstrateTreasuryAwarded extends ISubstrateEvent {

@@ -10,6 +10,7 @@ import {
 } from 'adapters/chain/substrate/types';
 import { SubstrateTreasuryProposalAdapter } from 'adapters/chain/substrate/subscriptions';
 import { ProposalModule } from 'models';
+import { SubstrateEntityKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
@@ -80,17 +81,12 @@ class SubstrateTreasury extends ProposalModule<
           this._pot.next(this._Chain.coins(pot));
         });
         */
+        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
+        const proposals = entities
+          .map(async (e) => new SubstrateTreasuryProposal(ChainInfo, Accounts, this, e));
 
-        // Open subscriptions
-        this.initSubscription(
-          api,
-          (ps) => ps.map((p) => new SubstrateTreasuryProposal(ChainInfo, Accounts, this, p))
-        ).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
-        });
+        this._initialized = true;
+        resolve();
       },
       (err) => reject(new Error(err)));
     });

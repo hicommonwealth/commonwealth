@@ -16,6 +16,20 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
 
+const backportEventToAdapter = (
+  ChainInfo: SubstrateChain,
+  event: ISubstrateDemocracyProposed,
+): ISubstrateDemocracyProposal => {
+  const enc = new TextEncoder();
+  return {
+    identifier: event.proposalIndex.toString(),
+    index: event.proposalIndex,
+    hash: enc.encode(event.proposalHash),
+    deposit: ChainInfo.createType('u128', event.deposit),
+    author: event.proposer,
+  };
+};
+
 class SubstrateDemocracyProposal extends ProposalModel<
   ApiRx,
   SubstrateCoin,
@@ -80,21 +94,14 @@ class SubstrateDemocracyProposal extends ProposalModel<
     Proposals: SubstrateDemocracyProposals,
     entity: ChainEntity,
   ) {
-    // find the initial creation event
-    const creationEvent = entity.chainEvents.find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed);
-    const eventData = creationEvent.data as ISubstrateDemocracyProposed;
-
     // fake adapter data
-    const enc = new TextEncoder();
-    const data: ISubstrateDemocracyProposal = {
-      identifier: eventData.proposalIndex.toString(),
-      index: eventData.proposalIndex,
-      hash: enc.encode(eventData.proposalHash),
-      deposit: ChainInfo.createType('u128', eventData.deposit),
-      author: eventData.proposer,
-    };
-    super('democracyproposal', data);
-
+    super('democracyproposal', backportEventToAdapter(
+      ChainInfo,
+      entity.chainEvents
+        .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed
+    ));
+    const eventData = entity.chainEvents
+      .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;

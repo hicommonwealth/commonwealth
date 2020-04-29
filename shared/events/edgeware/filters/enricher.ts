@@ -285,6 +285,7 @@ export default async function (
             proposer: proposal.proposer.toString(),
             value: proposal.value.toString(),
             beneficiary: proposal.beneficiary.toString(),
+            bond: proposal.bond.toString(),
           }
         };
       }
