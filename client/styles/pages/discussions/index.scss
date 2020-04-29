@@ -1,6 +1,30 @@
 @import 'client/styles/shared';
 
+.discussions-page-header {
+    position: fixed;
+    top: 0;
+    left: 250px;
+    right: 0;
+    height: 64px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #e7e7e7;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+    z-index: 10;
+
+    .placeholder,
+    .header-breadcrumb {
+        flex: 1;
+    }
+    .user-button {
+        margin-left: 10px;
+    }
+}
+
 .DiscussionsPage {
+    padding-top: 70px;
     max-width: 640px;
     h4 {
         font-size: 14px;
