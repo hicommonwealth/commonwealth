@@ -18,7 +18,7 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
         offchain_community_id: community.id,
       },
     });
-    console.log(userMembership);
+
     if (userMembership.role.permission !== 'admin') {
       return next(new Error('Invalid community or chain'));
     }

@@ -5,7 +5,7 @@ import { UserRequest } from '../types';
 
 const viewReactions = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
-  console.log(req.query);
+
   if (!req.query.thread_id && !req.query.comment_id) {
     return next(new Error('Must provide a comment or thread id'));
   }

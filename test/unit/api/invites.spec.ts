@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-
+require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -45,6 +45,8 @@ describe('Invite Tests', () => {
     });
 
     it('/createInvite as admin', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const res = await chai.request(app)
         .post('/api/createInvite')
         .set('Accept', 'application/json')
@@ -62,6 +64,8 @@ describe('Invite Tests', () => {
     });
 
     it('/createInvite as user', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const res = await modelUtils.createAndVerifyAddress({ chain });
       const newUserAddress = res.address;
       const newUserEmail = 'zak2@commonwealth.im';
@@ -84,6 +88,8 @@ describe('Invite Tests', () => {
     });
 
     it('/acceptInvite', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const invite = await chai.request(app)
         .post('/api/createInvite')
         .set('Accept', 'application/json')
