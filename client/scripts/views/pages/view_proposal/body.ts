@@ -221,6 +221,7 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
           if (!confirmed) return;
           (isThread ? app.threads : app.comments).delete(item).then(() => {
             if (isThread) m.route.set(`/${app.activeId()}/`);
+            m.redraw();
             // TODO: set notification bar for 'thread deleted/comment deleted'
           });
         },
@@ -244,6 +245,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
+          m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
         });
       },
@@ -279,7 +281,9 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
 };
 
 export const ProposalBodySaveEdit: m.Component<{
-  item: OffchainThread | OffchainComment<any>, getSetGlobalEditingStatus, parentState
+  item: OffchainThread | OffchainComment<any>,
+  getSetGlobalEditingStatus,
+  parentState,
 }> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
@@ -303,7 +307,7 @@ export const ProposalBodySaveEdit: m.Component<{
               // TODO: set notification bar for 'thread edited' (?)
             });
           } else if (item instanceof OffchainComment) {
-            app.comments.edit(item, itemText).then(() => {
+            app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();

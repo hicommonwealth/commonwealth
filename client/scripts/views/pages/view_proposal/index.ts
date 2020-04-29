@@ -93,7 +93,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         ? app.chain.accounts.get(proposal.author)
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
-    console.dir(getSetGlobalEditingStatus(GlobalStatus.Get));
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -131,18 +130,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread && proposal.versionHistory?.length > 1 && m(ProposalHeaderSpacer),
           m(ProposalHeaderLastEdited, { proposal }),
 
-          // !getSetGlobalEditingStatus(GlobalStatus.Get)
-          //   && isSameAccount(app.vm.activeAccount, author)
-          //   && !vnode.state.editing
-          //   && !proposal.readOnly
-          //   && [
-          //     m(ProposalHeaderSpacer),
-          //     m(ProposalBodyEdit, {
-          //       item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state
-          //     }),
-          //     m(ProposalHeaderSpacer),
-          //     m(ProposalBodyDelete, { item: proposal }),
-          //   ],
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
             && !vnode.state.editing
@@ -156,6 +143,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   }),
                   m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 ],
+                transitionDuration: 0,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
               })],
 
@@ -203,11 +191,12 @@ interface IProposalCommentAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   parent: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
+  callback?: Function;
 }
 
 const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
   view: (vnode) => {
-    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal } = vnode.attrs;
+    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal, callback } = vnode.attrs;
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
@@ -215,7 +204,8 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
       + `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
 
     return m('.ProposalComment', {
-      class: `${parentType}-child comment-${comment.id}`
+      class: `${parentType}-child comment-${comment.id}`,
+      onchange: () => m.redraw(),
     }, [
       m('.comment-body-meta', [
         m(ProposalBodyAuthor, { comment }),
@@ -263,6 +253,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 parentState: vnode.state,
               }),
             ],
+            transitionDuration: 0,
             trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
           })
         ],
@@ -287,7 +278,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           m(ProposalBodySpacer),
           m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
           m(ProposalBodySpacer),
-          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state }),
+          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, }),
         ],
       ]),
       m('.comment-body-content', [
@@ -397,7 +388,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     };
 
     return m('.ProposalComments', {
-      oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; }
+      oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; },
     }, [
       // show comments
       comments
