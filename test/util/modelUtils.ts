@@ -117,6 +117,7 @@ export const editComment = async (args: EditCommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       'id': comment_id,
+      'author_chain': chain,
       'address': address,
       'body': encodeURIComponent(text),
       'version_history': versionHistory,

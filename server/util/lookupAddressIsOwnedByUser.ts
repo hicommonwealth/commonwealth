@@ -9,13 +9,12 @@ const lookupAddressIsOwnedByUser = async (models, req: UserRequest, next: NextFu
     return next(new Error('Not logged in'));
   }
 
-  const noChain = !req.body.chain && !req.body.author_chain;
-  if (noChain || !req.body.address) {
+  if (!req.body.author_chain || !req.body.address) {
     return next(new Error('Invalid public key/chain'));
   }
 
   const author = await models.Address.findOne({ where: {
-    chain: req.body.chain || req.body.author_chain,
+    chain: req.body.author_chain,
     address: req.body.address,
     user_id: req.user.id,
   } });
