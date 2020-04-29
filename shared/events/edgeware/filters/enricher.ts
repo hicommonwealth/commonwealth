@@ -2,6 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes,
+  ReferendumInfo,
 } from '@polkadot/types/interfaces';
 import { ProposalRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
@@ -132,21 +133,40 @@ export default async function (
 
       case SubstrateEventKind.DemocracyStarted: {
         const [ referendumIndex, voteThreshold ] = event.data as unknown as [ ReferendumIndex, VoteThreshold ] & Codec;
-
-        // query for edgeware only -- kusama has different type
-        const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
+        const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239 | ReferendumInfo>>(
+          referendumIndex
+        );
         if (!infoOpt.isSome) {
           throw new Error(`could not find info for referendum ${+referendumIndex}`);
         }
-        return {
-          data: {
-            kind,
-            referendumIndex: +referendumIndex,
-            proposalHash: infoOpt.unwrap().hash.toString(),
-            voteThreshold: voteThreshold.toString(),
-            endBlock: +infoOpt.unwrap().end,
+        if ((infoOpt.unwrap() as any).tally) {
+          // kusama
+          const info = infoOpt.unwrap() as ReferendumInfo;
+          if (!info.isOngoing) {
+            throw new Error(`kusama referendum ${+referendumIndex} not in ongoing state`);
           }
-        };
+          return {
+            data: {
+              kind,
+              referendumIndex: +referendumIndex,
+              proposalHash: info.asOngoing.proposalHash.toString(),
+              voteThreshold: voteThreshold.toString(),
+              endBlock: +info.asOngoing.end,
+            }
+          };
+        } else {
+          // edgeware
+          const info = infoOpt.unwrap() as ReferendumInfoTo239;
+          return {
+            data: {
+              kind,
+              referendumIndex: +referendumIndex,
+              proposalHash: info.proposalHash.toString(),
+              voteThreshold: voteThreshold.toString(),
+              endBlock: +info.end,
+            }
+          };
+        }
       }
 
       case SubstrateEventKind.DemocracyPassed: {

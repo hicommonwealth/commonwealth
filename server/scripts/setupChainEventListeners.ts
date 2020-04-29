@@ -1,7 +1,7 @@
 import EdgewareNotificationHandler from '../eventHandlers/edgeware/notifications';
 import EdgewareArchivalHandler from '../eventHandlers/edgeware/archival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import { IDisconnectedRange } from '../../shared/events/interfaces';
+import { IDisconnectedRange, EventSupportingChains } from '../../shared/events/interfaces';
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -26,12 +26,10 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
-  // TODO: add a flag to the db for this filter, but for now
-  //    just take edgeware and edgeware-local
   console.log('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   console.log('Setting up event listeners...');
-  nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
+  nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
       const notificationHandler = new EdgewareNotificationHandler(models, wss, node.chain);
       const archivalHandler = new EdgewareArchivalHandler(models, wss, node.chain);

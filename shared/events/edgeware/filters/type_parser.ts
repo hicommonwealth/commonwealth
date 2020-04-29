@@ -13,6 +13,8 @@ export default function (event: Event, versionName: string, versionNumber: numbe
       switch (event.method) {
         case 'Slash': return SubstrateEventKind.Slash;
         case 'Reward': return SubstrateEventKind.Reward;
+
+        // NOTE: these are not supported yet on Edgeware, only kusama and edgeware-develop
         case 'Bonded': return SubstrateEventKind.Bonded;
         case 'Unbonded': return SubstrateEventKind.Unbonded;
         default: return null;
@@ -42,6 +44,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'elections':
+    case 'elections-phragmen':
       switch (event.method) {
         case 'NewTerm': return SubstrateEventKind.ElectionNewTerm;
         case 'EmptyTerm': return SubstrateEventKind.ElectionEmptyTerm;

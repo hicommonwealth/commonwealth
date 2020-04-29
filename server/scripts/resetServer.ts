@@ -4,6 +4,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { EventSupportingChains } from '../../shared/events/interfaces';
 
 const nodes = [
   [ 'localhost:9944', 'edgeware-local' ],
@@ -381,8 +382,7 @@ const resetServer = (models, closeMiddleware) => {
       );
     };
 
-    await initChainEventTypes('edgeware');
-    await initChainEventTypes('edgeware-local');
+    await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
 
     closeMiddleware().then(() => {
       console.log('Reset database and initialized default models');

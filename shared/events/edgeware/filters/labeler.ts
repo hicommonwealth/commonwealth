@@ -12,16 +12,28 @@ function fmtAddr(addr : string) {
 
 // ideally we shouldn't hard-code this stuff, but we need the header to appear before the chain loads
 const EDG_DECIMAL = 18;
+const KUSAMA_DECIMAL = 15;
 
 const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => {
   const denom = chain === 'edgeware'
     ? 'EDG'
     : chain === 'edgeware-local' || chain === 'edgeware-testnet'
-      ? 'tEDG' : null;
+      ? 'tEDG'
+      : chain === 'kusama'
+        ? 'KSM'
+        : chain === 'kusama-local'
+          ? 'tKSM' : null;
   if (!denom) {
     throw new Error('unexpected chain');
   }
-  const dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
+  let dollar;
+  if (chain.startsWith('edgeware')) {
+    dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
+  } else if (chain.startsWith('kusama')) {
+    dollar = (new BN(10)).pow(new BN(KUSAMA_DECIMAL));
+  } else {
+    throw new Error('unexpected chain');
+  }
   const coin = new SubstrateCoin(denom, new BN(balance, 10), dollar);
   return coin.format(true);
 };
