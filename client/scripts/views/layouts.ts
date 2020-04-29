@@ -6,6 +6,7 @@ import $ from 'jquery';
 import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import Header from 'views/components/header';
 import Sidebar from 'views/components/sidebar';
 import CommunitySwitcher from 'views/components/community_switcher';
 import PageNotFound from 'views/pages/404';
@@ -22,6 +23,7 @@ export const LoadingLayout: m.Component<{ activeTag: string }> = {
     return m('.mithril-app', [
       m(CommunitySwitcher),
       m(Sidebar),
+      m(Header),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
       }, [
@@ -48,6 +50,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
       return m('.mithril-app', [
         m(CommunitySwitcher),
         m(Sidebar),
+        m(Header),
         m('.layout-content', {
           class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
         }, m(PageNotFound)),
@@ -78,6 +81,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string }, { loadin
     return m('.mithril-app', [
       m(CommunitySwitcher),
       m(Sidebar),
+      m(Header),
       m('.layout-content', {
         class: app.isLoggedIn() ? 'logged-in' : 'logged-out'
       }, vnode.children),

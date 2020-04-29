@@ -8,7 +8,6 @@ import moment from 'moment-twitter';
 import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'construct-ui';
 
 import app from 'state';
-import Header from 'views/components/header';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
 import PageLoading from 'views/pages/loading';
@@ -237,7 +236,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
     return m('.DiscussionsPage', [
-      m(Header),
       (app.chain || app.community) && [
         !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
           icon: Icons.INFO,
