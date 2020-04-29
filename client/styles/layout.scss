@@ -275,4 +275,11 @@ body.modal-open {
     border-color: #f1f3f5;
     padding-top: 0;
     padding-bottom: 0;
+    cursor: pointer;
+    position: relative;
+    top: -1px;
+    &:hover {
+        border-color: darken(#f1f3f5, 2%);
+        background: darken(#f1f3f5, 2%);
+    }
 }
