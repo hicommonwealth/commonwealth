@@ -51,7 +51,7 @@ npx sequelize db:migrate
 At this point you should be ready to go!
 
 The app is compiled into a bundle and pushed to Heroku, which
-serves it at commonwealthapp.herokuapp.com. **Migrations are
+serves it at <app>.herokuapp.com. **Migrations are
 automatically executed.** If migrations do not complete successfully,
 the new backend does not get served.
 
@@ -62,6 +62,18 @@ To run the production server locally:
 ```
 NODE_ENV=production yarn build
 NODE_ENV=production yarn start
+```
+
+To copy the production database to the staging database for testing purposes, ensuring migrations will work:
+```
+# turn off the web dynos in staging
+heroku maintenance:on -a <STAGING_APP>
+# backup the staging database in case of an error
+heroku pg:backups capture -a <STAGING_APP>
+# copy db from production app database url to staging url
+heroku pg:copy <PRODUCTION_APP>::<PRODUCTION_DB_URL> <STAGING_DB_URL> -a <STAGING_APP>
+# turn on the web dynos in staging
+heroku maintenance:off -a <STAGING_APP>
 ```
 
 ## Environment Variables
@@ -113,7 +125,7 @@ brew tap heroku/brew && brew install heroku
 Setting up a server environment:
 
 ```
-heroku git:remote --app commonwealthapp
+heroku git:remote --app <PRODUCTION_APP>
 heroku config:set [Set up session secrets, API keys, OAuth tokens, etc.]
 yarn deploy
 ```

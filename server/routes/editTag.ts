@@ -11,8 +11,23 @@ const editTag = async (models, req: UserRequest, res: Response, next: NextFuncti
   if (!req.body.id) {
     return next(new Error('Must supply tag ID'));
   }
-  if (req.body.featured_order && !req.user.isAdmin) {
-    return next(new Error('Only admins can edit tags'));
+  if (req.body.featured_order) {
+    const adminAddress = await models.Address.findOne({
+      where: {
+        address: req.body.address,
+        user_id: req.user.id,
+      },
+    });
+    const roleWhere = {
+      address_id: adminAddress.id,
+      permission: 'admin',
+    };
+    if (community) roleWhere['offchain_community_id'] = community.id;
+    else if (chain) roleWhere['chain_id'] = chain.id;
+    const requesterIsAdminOrMod = await models.Role.findAll({
+      where: roleWhere,
+    });
+    if (!requesterIsAdminOrMod) return next(new Error('Must be an admin to feature tags.'));
   }
 
   const { description, featured_order, id, name } = req.body;
