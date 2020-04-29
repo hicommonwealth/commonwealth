@@ -18,7 +18,7 @@ import FeedbackModal from 'views/modals/feedback_modal';
 
 const avatarSize = 14;
 
-const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
+const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
 
@@ -29,10 +29,10 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
     return m(Tooltip, {
       position: 'right',
       size: 'lg',
-      content: m('.SidebarTooltip', [
+      content: m('.CommunitySwitcherTooltip', [
         m('.sidebar-tooltip-name', nodeList[0].chain.name),
       ]),
-      trigger: m('a.SidebarChain', {
+      trigger: m('a.CommunitySwitcherChain', {
         href: '#',
         class: active ? 'active' : '',
         onclick: (e) => {
@@ -53,7 +53,7 @@ const SidebarChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: 
   }
 };
 
-const SidebarCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
+const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
   view: (vnode) => {
     const { community, address } = vnode.attrs;
 
@@ -64,10 +64,10 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
     return m(Tooltip, {
       position: 'right',
       size: 'lg',
-      content: m('.SidebarTooltip', [
+      content: m('.CommunitySwitcherTooltip', [
         m('.sidebar-tooltip-name', community.name),
       ]),
-      trigger: m('a.SidebarCommunity', {
+      trigger: m('a.CommunitySwitcherCommunity', {
         href: '#',
         class: active ? 'active' : '',
         onclick: (e) => {
@@ -88,7 +88,7 @@ const SidebarCommunity: m.Component<{ community: CommunityInfo, address: Address
   }
 };
 
-const Sidebar: m.Component<{}> = {
+const CommunitySwitcher: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
 
@@ -104,20 +104,20 @@ const Sidebar: m.Component<{}> = {
     const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
     const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
 
-    return m('.Sidebar', [
+    return m('.CommunitySwitcher', [
       m('.sidebar-content', [
         chainRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);
-          return m(SidebarChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
+          return m(CommunitySwitcherChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
         }),
         communityRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);
           const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
-          return m(SidebarCommunity, { community, address });
+          return m(CommunitySwitcherCommunity, { community, address });
         }),
       ]),
     ]);
   }
 };
 
-export default Sidebar;
+export default CommunitySwitcher;

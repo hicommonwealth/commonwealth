@@ -22,14 +22,13 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { ChainClass, ChainBase, Notification } from 'models';
 import { OffchainCommunitiesStore } from 'stores';
 
-import CommunitySwitcher from 'views/components/community_switcher';
 import { isMember } from 'views/components/membership_button';
-
 import ChainIcon from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import NewProposalButton from 'views/components/new_proposal_button';
 import Login from 'views/components/login';
 import User from 'views/components/widgets/user';
+import CommunityMenu from 'views/components/sidebar/community_menu';
 import TagSelector from 'views/components/sidebar/tag_selector';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
@@ -47,7 +46,7 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 
-const Sidebar: m.Component<{ activeTag: string }, { communitySwitcherVisible: boolean }> = {
+const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolean }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
@@ -121,12 +120,12 @@ const Sidebar: m.Component<{ activeTag: string }, { communitySwitcherVisible: bo
           // header
           // TODO: remove (app.community || app.chain)
           m(Popover, {
-            class: 'community-switcher-popover',
-            isOpen: vnode.state.communitySwitcherVisible,
+            class: 'community-menu-popover',
+            isOpen: vnode.state.communityMenuVisible,
             hasBackdrop: true,
-            content: m(CommunitySwitcher),
+            content: m(CommunityMenu),
             onClose: () => {
-              vnode.state.communitySwitcherVisible = false;
+              vnode.state.communityMenuVisible = false;
             },
             hasArrow: false,
             closeOnEscapeKey: true,

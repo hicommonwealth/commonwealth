@@ -1,4 +1,4 @@
-.Sidebar {
+.CommunitySwitcher {
     position: fixed;
     top: 0;
     left: 0;
@@ -19,8 +19,8 @@
 
     $size: 36px;
 
-    a.SidebarChain,
-    a.SidebarCommunity {
+    a.CommunitySwitcherChain,
+    a.CommunitySwitcherCommunity {
         position: relative;
         display: flex;
         height: $size;
@@ -47,7 +47,7 @@
             opacity: 1;
         }
     }
-    a.SidebarCommunity {
+    a.CommunitySwitcherCommunity {
         .icon-inner {
             text-align: center;
             color: #eee;
@@ -68,7 +68,7 @@
     }
 }
 
-.SidebarTooltip {
+.CommunitySwitcherTooltip {
     font-weight: 500;
     margin: 1px 1px 0 2px;
     line-height: 1.1;
