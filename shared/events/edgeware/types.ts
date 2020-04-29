@@ -311,6 +311,11 @@ export interface ISubstrateSignalingNewProposal extends ISubstrateEvent {
   proposer: SubstrateAccountId;
   proposalHash: string;
   voteId: SubstrateBigIntString;
+  title: string;
+  description: string;
+  tallyType: string;
+  voteType: string;
+  choices: string[];
 }
 
 export interface ISubstrateSignalingCommitStarted extends ISubstrateEvent {

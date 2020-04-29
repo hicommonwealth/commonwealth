@@ -1,32 +1,43 @@
 import { takeWhile } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
-import { IEdgewareSignalingProposal, IEdgewareSignalingProposalState } from 'adapters/chain/edgeware/types';
-import { Account, Proposal, ProposalStatus, ProposalEndTime, IVote, VotingType, VotingUnit, ChainClass } from 'models';
+import { Option } from '@polkadot/types';
+import { VoteRecord } from 'edgeware-node-types/dist/types';
+import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
+import {
+  Account, Proposal, ProposalStatus, ProposalEndTime, IVote, VotingType,
+  VotingUnit, ChainClass, ChainEntity, ChainEvent
+} from 'models';
 import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { ProposalStore } from 'stores';
-import { BehaviorSubject } from 'rxjs';
-import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
+import { BehaviorSubject, Unsubscribable } from 'rxjs';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'events/edgeware/types';
 import { VoteOutcome } from 'edgeware-node-types/dist';
 import EdgewareSignaling from './signaling';
 
 export enum SignalingProposalStage {
   PreVoting = 'prevoting',
+  Commit = 'commit',
   Voting = 'voting',
   Completed = 'completed',
 }
 
-function getStage(stage) {
-  if (stage === 'prevoting') {
-    return SignalingProposalStage.PreVoting;
-  } else if (stage === 'voting') {
-    return SignalingProposalStage.Voting;
-  } else if (stage === 'completed') {
-    return SignalingProposalStage.Completed;
-  } else {
-    throw new Error('invalid stage');
-  }
-}
+const backportEventToAdapter = (
+  ChainInfo: SubstrateChain,
+  event: ISubstrateSignalingNewProposal,
+): IEdgewareSignalingProposal => {
+  return {
+    identifier: event.voteId.toString(),
+    voteIndex: +event.voteId,
+    hash: event.proposalHash,
+    author: event.proposer,
+    title: event.title,
+    description: event.description,
+    tallyType: ChainInfo.createType('TallyType', event.tallyType),
+    voteType: ChainInfo.createType('VoteType', event.voteType),
+    choices: event.choices.map((c) => ChainInfo.createType('VoteOutcome', c)),
+  };
+};
 
 export class SignalingVote implements IVote<SubstrateCoin> {
   public readonly account: SubstrateAccount;
@@ -42,7 +53,7 @@ export class SignalingVote implements IVote<SubstrateCoin> {
 }
 
 export class EdgewareSignalingProposal
-  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, IEdgewareSignalingProposalState, SignalingVote> {
+  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, any, SignalingVote> {
   public get shortIdentifier() {
     return `#${this.data.voteIndex.toString()}`;
   }
@@ -121,22 +132,76 @@ export class EdgewareSignalingProposal
   private _Accounts: SubstrateAccounts;
   private _Signaling: EdgewareSignaling;
 
+  private _voterSubscription: Unsubscribable;
+
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Signaling: EdgewareSignaling,
-    data: IEdgewareSignalingProposal
+    entity: ChainEntity,
   ) {
-    super('signalingproposal', data);
+    super('signalingproposal', backportEventToAdapter(
+      ChainInfo,
+      entity.chainEvents
+        .find((e) => e.data.kind === SubstrateEventKind.SignalingNewProposal).data as ISubstrateSignalingNewProposal
+    ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Signaling = Signaling;
-    this.subscribe(
-      this._Chain.api,
-      this._Signaling.store,
-      this._Signaling.adapter
-    );
+    this._voterSubscription = this._subscribeVoters();
     this._Signaling.store.add(this);
+  }
+
+  protected complete() {
+    super.updateState(this._Signaling.store, { completed: true });
+    if (this._voterSubscription) {
+      this._voterSubscription.unsubscribe();
+    }
+  }
+
+  public update(e: ChainEvent) {
+    switch (e.data.kind) {
+      case SubstrateEventKind.SignalingCommitStarted: {
+        if (this.stage !== SignalingProposalStage.PreVoting) {
+          throw new Error('signaling stage out of order!');
+        }
+        this._stage.next(SignalingProposalStage.Commit);
+        this._endBlock.next(e.data.endBlock);
+        break;
+      }
+      case SubstrateEventKind.SignalingVotingStarted: {
+        if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
+          throw new Error('signaling stage out of order!');
+        }
+        this._stage.next(SignalingProposalStage.Voting);
+        this._endBlock.next(e.data.endBlock);
+        break;
+      }
+      case SubstrateEventKind.SignalingVotingCompleted: {
+        if (this.stage !== SignalingProposalStage.Voting) {
+          throw new Error('signaling stage out of order!');
+        }
+        this._stage.next(SignalingProposalStage.Completed);
+        this.complete();
+        break;
+      }
+      default: {
+        throw new Error('invalid event update');
+      }
+    }
+  }
+
+  private _subscribeVoters(): Unsubscribable {
+    return this._Chain.query((api) => api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex))
+      .pipe(takeWhile((v) => v.isSome))
+      .subscribe((v) => {
+        const record = v.unwrap();
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [ voter, reveals ] of record.reveals) {
+          const acct = this._Accounts.fromAddress(voter.toString());
+          this.addOrUpdateVote(new SignalingVote(this, acct, reveals));
+        }
+      });
   }
 
   public submitVoteTx(vote: SignalingVote) {
@@ -163,14 +228,7 @@ export class EdgewareSignalingProposal
     );
   }
 
-  protected updateState(store: ProposalStore<EdgewareSignalingProposal>, state: IEdgewareSignalingProposalState) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const voter of Object.keys(state.votes)) {
-      const acct = this._Accounts.fromAddress(voter);
-      this.addOrUpdateVote(new SignalingVote(this, acct, state.votes[voter]));
-    }
-    this._endBlock.next(state.endBlock === 0 ? undefined : state.endBlock);
-    this._stage.next(getStage(state.stage));
-    super.updateState(store, state);
+  protected updateState() {
+    throw new Error('not implemented');
   }
 }

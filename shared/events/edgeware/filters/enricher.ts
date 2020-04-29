@@ -4,7 +4,7 @@ import {
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes,
   ReferendumInfo, Proposal,
 } from '@polkadot/types/interfaces';
-import { ProposalRecord } from 'edgeware-node-types/dist/types';
+import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateEventKind, ISubstrateEventData } from '../types';
@@ -412,6 +412,10 @@ export default async function (
         if (!proposalInfoOpt.isSome) {
           throw new Error('unable to fetch signaling proposal info');
         }
+        const voteInfoOpt = await api.query.voting.voteRecords<Option<VoteRecord>>(proposalInfoOpt.unwrap().vote_id);
+        if (!voteInfoOpt.isSome) {
+          throw new Error('unable to fetch signaling proposal voting info');
+        }
         return {
           excludeAddresses: [ proposer.toString() ],
           data: {
@@ -419,7 +423,11 @@ export default async function (
             proposer: proposer.toString(),
             proposalHash: hash.toString(),
             voteId: proposalInfoOpt.unwrap().vote_id.toString(),
-            // TODO: add title/contents?
+            title: proposalInfoOpt.unwrap().title.toString(),
+            description: proposalInfoOpt.unwrap().contents.toString(),
+            tallyType: voteInfoOpt.unwrap().data.tally_type.toString(),
+            voteType: voteInfoOpt.unwrap().data.vote_type.toString(),
+            choices: voteInfoOpt.unwrap().outcomes.map((outcome) => outcome.toString()),
           }
         };
       }

@@ -2,20 +2,20 @@ import { switchMap, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
-import { IEdgewareSignalingProposal, IEdgewareSignalingProposalState } from 'adapters/chain/edgeware/types';
-import { EdgewareSignalingProposalAdapter } from 'adapters/chain/edgeware/subscriptions';
+import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import { ProposalModule, } from 'models';
 import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { SubstrateEntityKind } from 'events/edgeware/types';
 import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<
   ApiRx,
   IEdgewareSignalingProposal,
-  IEdgewareSignalingProposalState,
+  any,
   EdgewareSignalingProposal,
-  EdgewareSignalingProposalAdapter
+  any
 > {
   // How many EDG are bonded in reserve to create a signaling proposal.
   // The bond is returned after voting is moved to the 'completed' stage.
@@ -37,7 +37,6 @@ class EdgewareSignaling extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      this._adapter = new EdgewareSignalingProposalAdapter();
       this._Chain.api.pipe(
         switchMap((api: ApiRx) => api.queryMulti([
           api.query.signaling.proposalCreationBond,
@@ -49,17 +48,12 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
-          this.initSubscription(
-            api,
-            (ps) => ps.map((p) => new EdgewareSignalingProposal(ChainInfo, Accounts, this, p))
-          ).then(() => {
-            this._initialized = true;
-            resolve();
-          }).catch((err) => {
-            reject(err);
-          });
-        });
+        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
+        const proposals = entities
+          .map(async (e) => new EdgewareSignalingProposal(ChainInfo, Accounts, this, e));
+
+        this._initialized = true;
+        resolve();
       },
       (err) => reject(new Error(err)));
     });
