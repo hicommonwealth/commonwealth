@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import 'components/navigation/tag_selector.scss';
+import 'components/sidebar/tag_selector.scss';
 
 import _ from 'lodash';
 import m from 'mithril';

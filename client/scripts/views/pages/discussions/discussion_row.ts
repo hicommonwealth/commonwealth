@@ -61,7 +61,9 @@ const DiscussionRow: m.Component<IAttrs> = {
             tooltip: true,
           }),
         ]),
-        m('.discussion-content', [
+        m('.discussion-content', {
+          class: proposal.title === '--' ? 'no-title' : ''
+        }, [
           m('.discussion-title', [
             link('a',
               `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [

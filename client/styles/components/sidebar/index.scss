@@ -2,7 +2,7 @@
 
 $sidebar-padding: 16px;
 
-.Navigation {
+.Sidebar {
     position: fixed;
     left: 63px;
     top: 0;
@@ -10,10 +10,10 @@ $sidebar-padding: 16px;
     width: $side-width - 63px;
     z-index: 9;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
-    .NavigationMenu {
+    .SidebarMenu {
         height: 100%;
     }
-    .NavigationMenu .cui-list {
+    .SidebarMenu .cui-list {
         height: 100%;
     }
 
@@ -24,7 +24,6 @@ $sidebar-padding: 16px;
     }
     .TagSelector {
         margin-bottom: 10px;
-        margin-left: 22px;
     }
 
     // individual menu items
@@ -63,10 +62,11 @@ $sidebar-padding: 16px;
     .cui-list .title-selector {
         display: flex;
         font-weight: 700;
-        padding: 1px $sidebar-padding 0;
+        padding: 3px $sidebar-padding 0;
+        margin-bottom: 12px;
         cursor: pointer !important;
         user-select: none;
-        border-bottom: 2px solid #eee;
+        border-bottom: 1px solid #eee;
         color: #222 !important;
         font-weight: 700;
         min-height: 64px;
@@ -151,7 +151,7 @@ $sidebar-padding: 16px;
     }
 }
 
-// notifications menu (outside Navigation, displayed in a cui-portal)
+// notifications menu (outside Sidebar, displayed in a cui-portal)
 .notification-menu {
     .notification-list {
         height: 420px;

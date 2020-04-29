@@ -1,4 +1,4 @@
-import 'components/navigation/index.scss';
+import 'components/sidebar/index.scss';
 
 import {
   List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
@@ -30,14 +30,14 @@ import AccountBalance from 'views/components/widgets/account_balance';
 import NewProposalButton from 'views/components/new_proposal_button';
 import Login from 'views/components/login';
 import User from 'views/components/widgets/user';
-import TagSelector from 'views/components/navigation/tag_selector';
-import SubscriptionButton from 'views/components/navigation/subscription_button';
+import TagSelector from 'views/components/sidebar/tag_selector';
+import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NewProposalModal from 'views/modals/proposals';
-import NotificationRow from 'views/components/navigation/notification_row';
+import NotificationRow from 'views/components/sidebar/notification_row';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -47,7 +47,7 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 
-const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible: boolean }> = {
+const Sidebar: m.Component<{ activeTag: string }, { communitySwitcherVisible: boolean }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
@@ -75,7 +75,7 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     // TODO: display number of unread notifications
 
-    // navigation menu
+    // sidebar menu
     const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
       ? ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
          + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
@@ -109,11 +109,11 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
 
-    return m('.Navigation', {
+    return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
     }, [
-      m('.NavigationMenu', [
+      m('.SidebarMenu', [
         m(List, {
           interactive: true,
           size: 'lg',
@@ -303,4 +303,4 @@ const Navigation: m.Component<{ activeTag: string }, { communitySwitcherVisible:
   },
 };
 
-export default Navigation;
+export default Sidebar;
