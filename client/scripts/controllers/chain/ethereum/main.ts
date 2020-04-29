@@ -44,10 +44,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
 
   public deinit = async () => {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

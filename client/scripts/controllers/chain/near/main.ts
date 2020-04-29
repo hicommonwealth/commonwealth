@@ -28,10 +28,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
   }
   public deinit = async () => {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
 
     await this.accounts.deinit();
     await this.chain.deinit();

@@ -89,6 +89,8 @@ import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 
+import bulkEntities from './routes/bulkEntities';
+
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
 
@@ -233,6 +235,8 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));
+
+  router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   app.use('/api', router);
 }

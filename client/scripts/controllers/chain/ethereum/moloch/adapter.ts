@@ -68,15 +68,13 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   }
 
   public deinit = async () => {
+    super.deinit();
     this.governance.deinit();
     this.ethAccounts.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
     console.log('Ethereum/Moloch stopped.');
 
     return Promise.resolve();

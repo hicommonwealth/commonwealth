@@ -31,10 +31,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   public deinit = async (): Promise<void> => {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
 
     await this.governance.deinit();
     await this.accounts.deinit();

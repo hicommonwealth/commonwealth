@@ -2,9 +2,10 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventData, SubstrateEventKind } from './edgeware/types';
+import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind } from './edgeware/types';
 
 // add other events here as union types
+export type IChainEntityKind = SubstrateEntityKind;
 export type IChainEventData = ISubstrateEventData;
 export type IChainEventKind = SubstrateEventKind;
 export const EventSupportingChains = ['edgeware', 'edgeware-local'];
