@@ -13,7 +13,7 @@ import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
 import { ProposalType } from 'identifiers';
-import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury';
+import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';

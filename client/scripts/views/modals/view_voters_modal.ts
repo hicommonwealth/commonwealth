@@ -5,7 +5,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
 import User from '../components/widgets/user';
 import app from 'state';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { formatAddressShort } from 'helpers';
 
 interface IViewVotersModalAttrs {

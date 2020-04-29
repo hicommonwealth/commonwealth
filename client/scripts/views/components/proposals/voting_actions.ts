@@ -11,7 +11,7 @@ import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { EdgewareSignalingProposal, SignalingProposalStage, SignalingVote } from 'controllers/chain/edgeware/signaling';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CountdownUntilBlock } from 'views/components/countdown';
@@ -20,7 +20,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_elections';
+import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import { hexToUtf8 } from 'web3-utils';
 import MolochProposal, {
   MolochProposalVote,
