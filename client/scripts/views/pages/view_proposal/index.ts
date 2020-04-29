@@ -93,6 +93,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         ? app.chain.accounts.get(proposal.author)
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
+    console.dir(getSetGlobalEditingStatus(GlobalStatus.Get));
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -145,7 +146,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           !getSetGlobalEditingStatus(GlobalStatus.Get)
             && isSameAccount(app.vm.activeAccount, author)
             && !vnode.state.editing
-            && !proposal.readOnly
             && [
               m(ProposalHeaderSpacer),
               m(PopoverMenu, {

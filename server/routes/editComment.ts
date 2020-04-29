@@ -6,8 +6,6 @@ import { UserRequest } from '../types';
 import { getProposalUrl } from '../../shared/utils';
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!req.user) {
     return next(new Error('Not logged in'));

@@ -186,6 +186,7 @@ export const ProposalBodyEditMenuItem: m.Component<{ item: OffchainThread | Offc
     const isThread = item instanceof OffchainThread;
 
     return m(MenuItem, {
+      label: 'Edit',
       class: isThread ? 'edit-proposal' : 'edit-comment',
       onclick: async (e) => {
         e.preventDefault();
@@ -200,7 +201,6 @@ export const ProposalBodyEditMenuItem: m.Component<{ item: OffchainThread | Offc
         parentState.editing = true;
         getSetGlobalEditingStatus(GlobalStatus.Set, true);
       },
-      label: 'Edit',
     });
   }
 };
@@ -307,7 +307,6 @@ export const ProposalBodySaveEdit: m.Component<{
               parentState.editing = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
-              // TODO: set notification bar for 'comment edited' (?)
             });
           }
         }
