@@ -44,7 +44,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'elections':
-    case 'elections-phragmen':
+    case 'electionsPhragmen':
       switch (event.method) {
         case 'NewTerm': return SubstrateEventKind.ElectionNewTerm;
         case 'EmptyTerm': return SubstrateEventKind.ElectionEmptyTerm;

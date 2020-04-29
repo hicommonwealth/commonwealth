@@ -23,7 +23,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   ISubstrateDemocracyProposal,
   any,
   SubstrateDemocracyProposal,
-  SubstrateDemocracyProposalAdapter
+  any
 > {
   // SubstrateDemocracyProposals DATA
   // How often (in blocks) new public referenda are launched.
