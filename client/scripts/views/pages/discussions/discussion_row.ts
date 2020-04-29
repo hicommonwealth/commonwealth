@@ -43,6 +43,11 @@ const DiscussionRow: m.Component<IAttrs> = {
       }
     };
 
+    const canEditTags = (
+      (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+       || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
+       || proposal.author === app.vm.activeAccount.address));
+
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
         m('.discussion-pre', [
@@ -75,6 +80,22 @@ const DiscussionRow: m.Component<IAttrs> = {
                 `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
                 [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
               ),
+            canEditTags
+              && m(PopoverMenu, {
+                transitionDuration: 0,
+                closeOnOutsideClick: true,
+                menuAttrs: { size: 'sm', },
+                content: m(TagEditor, {
+                  thread: proposal,
+                  popoverMenu: true,
+                  onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); },
+                }),
+                trigger: m(Icon, {
+                  name: Icons.CHEVRON_DOWN,
+                  class: 'discussion-edit-tags',
+                  style: 'margin-right: 6px;'
+                }),
+              }),
           ]),
           propType === OffchainThreadKind.Link
             && proposal.url
@@ -106,25 +127,6 @@ const DiscussionRow: m.Component<IAttrs> = {
             ]),
             m('.discussion-meta-right', [
               m('.discussion-tags', [
-                (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-                || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-                || proposal.author === app.vm.activeAccount.address)
-                && m(PopoverMenu, {
-                  // class: '.discussion-tags',
-                  // style: 'display: inline-block; background-color: #222222;',
-                  closeOnContentClick: false,
-                  menuAttrs: { size: 'sm', },
-                  content: m(TagEditor, {
-                    thread: proposal,
-                    popoverMenu: true,
-                    onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); },
-                  }),
-                  trigger: m(Icon, {
-                    name: Icons.SETTINGS,
-                    class: 'discussion-tags',
-                    style: 'margin-right: 6px;'
-                  }),
-                }),
                 proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
                   return m(Tag, {
                     intent: 'primary',

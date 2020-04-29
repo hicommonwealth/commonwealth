@@ -52,7 +52,14 @@ $discussion-row-color: #999;
         display: none;
     }
     .discussion-content {
+        position: relative;
         flex: 1;
+        .discussion-title {
+            .discussion-edit-tags {
+                position: absolute;
+                right: -7px;
+            }
+        }
     }
 
     // content left
