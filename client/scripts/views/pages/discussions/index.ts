@@ -118,6 +118,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       }
       const tags = app.tags.getByCommunity(activeEntity.meta.id);
       const tagObj = tags.find((t) => t.name === tag);
+      if (tagObj) return;
+
       return m('.discussions-listing.tag-listing', [
         m('h4.tag-name', [
           tag,
