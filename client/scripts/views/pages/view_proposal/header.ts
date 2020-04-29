@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons } from 'construct-ui';
+import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
@@ -162,9 +162,13 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
 
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
-        proposal.tags?.map((tag) => {
-          return link('a', `/${app.activeId()}/discussions/${tag.name}`, `#${tag.name}`);
-        }),
+        proposal.tags?.map((tag) => m(Tag, {
+          rounded: true,
+          intent: 'none',
+          size: 'xs',
+          onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
+          label: `#${tag.name}`
+        }))
       ]),
       canEdit && proposal.tags?.length > 0 && m(ProposalHeaderSpacer),
       canEdit && m(TagEditor, {

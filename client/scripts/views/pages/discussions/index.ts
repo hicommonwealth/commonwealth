@@ -5,7 +5,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icons } from 'construct-ui';
+import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'construct-ui';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -16,7 +16,7 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';
-import InlineThreadComposer from '../../components/inline_thread_composer';
+// import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 
@@ -115,8 +115,10 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           }
         });
       }
-      const tags = app.tags.getByCommunity(activeEntity.meta.id);
+      const tags = app.tags.getByCommunity(app.activeId());
       const tagObj = tags.find((t) => t.name === tag);
+      if (!tagObj) return;
+
       return m('.discussions-listing.tag-listing', [
         m('h4.tag-name', [
           tag,
@@ -193,8 +195,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
               heading: isCurrentWeek
                 ? 'This week'
                 : (isLastWeek
-                   ? 'Last week'
-                   : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`),
+                  ? 'Last week'
+                  : `Week ending ${moment(now - +msecAgo).format('MMM D, YYYY')}`),
               proposals
             };
             if (Number(msecAgo) === targetIdx) attrs['lastVisited'] = Number(lastVisited);
@@ -208,7 +210,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         return arr;
       };
       return m('.discussions-listing', [
-        m(InlineThreadComposer),
+        // m(InlineThreadComposer),
         allProposals.length === 0
         && [
           // m('h4', 'This week'),
@@ -239,7 +241,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           icon: Icons.INFO,
           header: 'Showing preview',
           content: m('.callout-content', [
-            m('.callout-left', { style: 'margin-bottom: 8px;'}, [
+            m('.callout-left', { style: 'margin-bottom: 8px;' }, [
               `Join this community to see more.`
             ]),
             m('.callout-right', [

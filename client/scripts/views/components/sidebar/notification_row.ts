@@ -1,3 +1,5 @@
+import 'components/sidebar/notification_row.scss';
+
 import m from 'mithril';
 import moment from 'moment';
 import { ListItem } from 'construct-ui';
@@ -15,7 +17,7 @@ import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment'
 import User from 'views/components/widgets/user';
 import { getProposalUrl } from '../../../../../shared/utils';
 
-interface INotificationRow {
+interface IHeaderNotificationRow {
   notification: Notification;
 }
 
@@ -23,7 +25,7 @@ const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc: sliceQuill(doc, 140) });
+    decoded_comment_text = m(QuillFormattedText, { doc: sliceQuill(doc, 140), hideFormatting: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -31,10 +33,7 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, {
-      doc: doc.slice(0, 140),
-      hideFormatting: true
-    });
+    decoded_comment_text = m(MarkdownFormattedText, { doc: doc.slice(0, 140), hideFormatting: true });
   }
   return decoded_comment_text;
 };
@@ -54,24 +53,26 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
   } else if (root_type === ProposalType.OffchainThread) {
-    notificationBody = decoded_title;
+    notificationBody = null;
   }
+
+  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [ 'New comment on ', m('span.commented-obj', decoded_title) ])
-      : m('span', [ 'New response to your comment in ', m('span.commented_obj', decoded_title) ]);
+      ? m('span', [ actorName, ' commented on ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ' responded in ', m('span.commented-obj', decoded_title) ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [ 'New thread in ', m('span.commented-obj', community_name) ]);
+    notificationHeader = m('span', [ actorName, ' created a new thread ', m('span.commented-obj', decoded_title) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = (!comment_id)
-      ? m('span', ['New mention in ', m('span.commented-obj', community_name) ])
-      : m('span', ['New mention in ', m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', community_name) ])
+      : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', ['New reaction to ', m('span.commented-obj', decoded_title) ])
-      : m('span', ['New reaction in ', m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ' reacted to your post ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ' reacted to your post in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -93,12 +94,12 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   });
 };
 
-const NotificationRow: m.Component<INotificationRow> = {
+const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
   view: (vnode) => {
     const { notification } = vnode.attrs;
     const { category } = notification.subscription;
-    const getNotificationRow = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
-      return m('li.NotificationRow', {
+    const getHeaderNotificationRow = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
+      return m('li.HeaderNotificationRow', {
         class: notification.isRead ? '' : 'active',
         onclick: async () => {
           const notificationArray: Notification[] = [];
@@ -111,12 +112,9 @@ const NotificationRow: m.Component<INotificationRow> = {
       }, [
         m(User, { user: userAccount, avatarOnly: true, avatarSize: 36 }),
         m('.comment-body', [
-          m('.comment-body-top', title),
-          m('.comment-body-bottom', [
-            m(User, { user: userAccount, hideAvatar: true }),
-            m('span.created-at', createdAt.twitterShort()),
-          ]),
+          m('.comment-body-title', title),
           excerpt && m('.comment-body-excerpt', excerpt),
+          m('.comment-body-created', createdAt.fromNow()),
         ]),
       ]);
     };
@@ -130,7 +128,7 @@ const NotificationRow: m.Component<INotificationRow> = {
       pageJump
     } = getNotificationFields(category, JSON.parse(notification.data));
 
-    return getNotificationRow(
+    return getHeaderNotificationRow(
       author,
       createdAt,
       notificationHeader,
@@ -144,7 +142,7 @@ const NotificationRow: m.Component<INotificationRow> = {
     //   //const thread = app.threads.store.getByIdentifier(proposal_id);
     //   const community = app.activeId();
 
-    //   return getHeaderNotificationRow(
+    //   return getHeaderHeaderNotificationRow(
     //     moment.utc(created_at),
     //     null,
     //     `New community created`,
@@ -154,4 +152,4 @@ const NotificationRow: m.Component<INotificationRow> = {
   },
 };
 
-export default NotificationRow;
+export default HeaderNotificationRow;

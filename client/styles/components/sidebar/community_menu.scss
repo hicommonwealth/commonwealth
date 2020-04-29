@@ -1,5 +1,7 @@
+@import 'client/styles/shared';
+
 .CommunityMenu {
-    width: 250px;
+    width: $side-width;
     padding-top: 2px;
     padding-bottom: 8px;
     user-select: none;
