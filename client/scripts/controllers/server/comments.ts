@@ -167,7 +167,8 @@ class CommentsController {
         jwt: app.login.jwt,
         comment_id: comment.id,
       }).then((result) => {
-        this._store.remove(comment);
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
         resolve(result);
       }).catch((e) => {
         console.error(e);

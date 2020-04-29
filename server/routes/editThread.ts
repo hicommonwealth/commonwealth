@@ -49,8 +49,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
-    if (read_only) thread.read_only = !thread.read_only;
-    if (privacy) thread.private = false;
+    if (read_only !== 'false') thread.read_only = !thread.read_only;
+    if (privacy !== 'false') thread.private = false;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({
