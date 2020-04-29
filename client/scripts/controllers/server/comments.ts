@@ -110,7 +110,11 @@ class CommentsController {
     try {
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         'address': app.vm.activeAccount.address,
+        'author_chain': app.vm.activeAccount.chain.id,
         'id': comment.id,
+        'chain': comment.chain,
+        'community': comment.community,
+        'address': comment.author,
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
