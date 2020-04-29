@@ -177,6 +177,11 @@ export interface ISubstratePreimageNoted extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageNoted;
   proposalHash: string;
   noter: SubstrateAccountId;
+  preimage: {
+    method: string;
+    section: string;
+    args: string[];
+  };
 }
 
 export interface ISubstratePreimageUsed extends ISubstrateEvent {

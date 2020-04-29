@@ -190,12 +190,21 @@ export default async function (
        */
       case SubstrateEventKind.PreimageNoted: {
         const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
+        const image = await api.derive.democracy.preimage(hash);
+        if (!image || !image.proposal) {
+          throw new Error(`could not find info for preimage ${hash.toString()}`);
+        }
         return {
           excludeAddresses: [ noter.toString() ],
           data: {
             kind,
             proposalHash: hash.toString(),
             noter: noter.toString(),
+            preimage: {
+              method: image.proposal.methodName,
+              section: image.proposal.sectionName,
+              args: image.proposal.args.map((a) => a.toString()),
+            }
           }
         };
       }

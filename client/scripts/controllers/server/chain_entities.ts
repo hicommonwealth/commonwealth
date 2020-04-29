@@ -7,7 +7,6 @@ import { ChainEntity } from 'models';
 import app from 'state';
 
 const get = (route, args, callback) => {
-  args['jwt'] = app.login.jwt;
   return $.get(app.serverUrl() + route, args).then((resp) => {
     if (resp.status === 'Success') {
       callback(resp.result);

@@ -1,50 +1,41 @@
-import { map } from 'rxjs/operators';
+import _ from 'underscore';
+import { takeWhile } from 'rxjs/operators';
+import { Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
-import { ProposalStore } from 'stores';
-import { Call, Proposal } from '@polkadot/types/interfaces';
-import { GenericCall, getTypeDef } from '@polkadot/types';
-import { Codec, TypeDef } from '@polkadot/types/types';
 import { ApiRx } from '@polkadot/api';
-import {
-  ISubstrateDemocracyProposal,
-  ISubstrateDemocracyProposalState,
-  SubstrateCoin
-} from 'adapters/chain/substrate/types';
+import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal as ProposalModel, ProposalStatus, ProposalEndTime, DepositVote,
-  VotingType, VotingUnit, ChainBase, Account
+  VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
+import {
+  SubstrateEventKind, ISubstrateDemocracyProposed,
+  SubstrateEntityKind, ISubstratePreimageNoted,
+} from 'events/edgeware/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
-
-interface Param {
-  name: string;
-  type: TypeDef;
-}
-
-interface Value {
-  isValid: boolean;
-  value: Codec;
-}
 
 class SubstrateDemocracyProposal extends ProposalModel<
   ApiRx,
   SubstrateCoin,
   ISubstrateDemocracyProposal,
-  ISubstrateDemocracyProposalState,
+  any,
   DepositVote<SubstrateCoin>
 > {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
 
+  private _title: string;
   public get title() { return this._title; }
 
   public get description() { return null; }
 
+  private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
+  private _hash: string;
   public get hash() { return this._hash; }
 
   public get votingType() {
@@ -59,33 +50,13 @@ class SubstrateDemocracyProposal extends ProposalModel<
     return account.chainBase === ChainBase.Substrate;
   }
 
-  private _title: string;
-
-  private readonly _author: SubstrateAccount;
-
-  private _hash: string;
-
   public readonly deposit: SubstrateCoin;
 
-  public _methodCall: Call;
-
-  get methodCall() { return this._methodCall; }
-
   public _method: string;
-
   get method() { return this._method; }
 
   public _section: string;
-
   get section() { return this._section; }
-
-  public _params: Param[];
-
-  get params() { return this._params; }
-
-  public _values: Value[];
-
-  get values() { return this._values; }
 
   public get support(): SubstrateCoin {
     return this._Chain.coins(this.getVotes()
@@ -97,62 +68,103 @@ class SubstrateDemocracyProposal extends ProposalModel<
   }
 
   private _Chain: SubstrateChain;
-
   private _Accounts: SubstrateAccounts;
-
   private _Proposals: SubstrateDemocracyProposals;
+
+  private _depositSubscription: Unsubscribable;
 
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Proposals: SubstrateDemocracyProposals,
-    data: ISubstrateDemocracyProposal
+    entity: ChainEntity,
   ) {
+    // find the initial creation event
+    const creationEvent = entity.chainEvents.find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted);
+    const eventData = creationEvent.data as ISubstrateDemocracyProposed;
+
+    // fake adapter data
+    const enc = new TextEncoder();
+    const data: ISubstrateDemocracyProposal = {
+      identifier: eventData.proposalIndex.toString(),
+      index: eventData.proposalIndex,
+      hash: enc.encode(eventData.proposalHash),
+      deposit: ChainInfo.createType('u128', eventData.deposit),
+      author: eventData.proposer,
+    };
     super('democracyproposal', data);
+
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;
-    this._title = data.hash.toString();
-    this.deposit = this._Chain.coins(data.deposit);
-    this._author = this._Accounts.fromAddress(data.author);
-    this._hash = data.hash.toString();
-    this.subscribe(
-      this._Chain.api,
-      this._Proposals.store,
-      this._Proposals.adapter
-    );
+    this._title = eventData.proposalHash;
+    this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
+    this._author = this._Accounts.fromAddress(eventData.proposer);
+    this._hash = eventData.proposalHash;
+
+    // see if preimage exists and populate data if it does
+    const preimage = this._Proposals.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyPreimage)
+      .find((preimageEntity) => preimageEntity.typeId === eventData.proposalHash);
+    if (preimage) {
+      const notedEvent = preimage.chainEvents.find((event) => event.data.kind === SubstrateEventKind.PreimageNoted);
+      const preimageData = (notedEvent.data as ISubstratePreimageNoted).preimage;
+      this._method = preimageData.method;
+      this._section = preimageData.section;
+      this._title = `${this._section}.${this.method}(${preimageData.args.join(', ')})`;
+    }
+
+    this._depositSubscription = this.subscribeDepositors();
     this._Proposals.store.add(this);
-    // grabs the proposal given a preimage hash and processes different parts of the proposal call
-    (async () => {
-      await this._Proposals.getProposal(this._hash).pipe(map((proposal: Proposal) => {
-        if (proposal) {
-          const { method, section } = this._Chain.registry.findMetaCall(proposal.callIndex);
-          this._method = method;
-          this._section = section;
-          this._params = GenericCall.filterOrigin(proposal.meta).map(({ name, type }): Param => ({
-            name: name.toString(),
-            type: getTypeDef(type.toString())
-          }));
-          this._values = proposal.args.map((value): Value => ({
-            isValid: true,
-            value
-          }));
-          this._title = `${this._section}.${this.method}(${this._values.map((v) => {
-            return v.value.toString();
-          }).join(', ')})`;
+  }
+
+  // TODO: add complete() and update() calls to all proposals
+  public complete() {
+    super.updateState(this._Proposals.store, { completed: true });
+    if (this._depositSubscription) {
+      this._depositSubscription.unsubscribe();
+    }
+  }
+
+  public update(e: ChainEvent) {
+    switch (e.data.kind) {
+      case SubstrateEventKind.DemocracyTabled: {
+        this.complete();
+        break;
+      }
+      default: {
+        throw new Error('invalid event update');
+      }
+    }
+  }
+
+  public subscribeDepositors(): Unsubscribable {
+    return this._Chain.query((api) => api.query.democracy.depositOf(this.data.index))
+      .pipe(takeWhile((v) => v.isSome))
+      .subscribe((depositOpt) => {
+        const [ deposit, depositors ] = depositOpt.unwrap();
+        // eslint-disable-next-line no-restricted-syntax
+        for (const depositor of depositors) {
+          const acct = this._Accounts.fromAddress(depositor.toString());
+          const votes = this.getVotes(acct);
+          if (!votes.length) {
+            this.addOrUpdateVote(new DepositVote(acct, this._Chain.coins(this.data.deposit)));
+          } else {
+            // if they second a proposal multiple times, sum up the vote weight
+            const vote = new DepositVote(acct, this._Chain.coins(votes[0].deposit.add(this.data.deposit)));
+            this.addOrUpdateVote(vote);
+          }
         }
-      })).toPromise();
-    })();
+      });
   }
 
   // GETTERS AND SETTERS
   get endTime() : ProposalEndTime {
     if (!this._Proposals.lastTabledWasExternal && this._Proposals.nextExternal)
       return { kind: 'queued' };
-    return this.isPassing === ProposalStatus.Passing ?
-      { kind: 'dynamic', getBlocknum: () => this._Proposals.nextLaunchBlock } :
-      this.isPassing === ProposalStatus.Failing
+    return this.isPassing === ProposalStatus.Passing
+      ? { kind: 'dynamic', getBlocknum: () => this._Proposals.nextLaunchBlock }
+      : this.isPassing === ProposalStatus.Failing
         ? { kind: 'queued' }
         : { kind: 'unavailable' };
   }
@@ -183,25 +195,8 @@ class SubstrateDemocracyProposal extends ProposalModel<
   }
 
   // SUBSCRIPTIONS
-  protected updateState(store: ProposalStore<SubstrateDemocracyProposal>, state: ISubstrateDemocracyProposalState) {
-    if (state.method) {
-      this._title = this._Chain.methodToTitle(state.method);
-      this._methodCall = this._Chain.findCall(state.method.callIndex)(...state.method.args);
-    }
-    this.clearVotes();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const depositor of state.depositors) {
-      const acct = this._Accounts.fromAddress(depositor);
-      const votes = this.getVotes(acct);
-      if (!votes.length) {
-        this.addOrUpdateVote(new DepositVote(acct, this._Chain.coins(this.data.deposit)));
-      } else {
-        // if they second a proposal multiple times, sum up the vote weight
-        const vote = new DepositVote(acct, this._Chain.coins(votes[0].deposit.add(this.data.deposit)));
-        this.addOrUpdateVote(vote);
-      }
-    }
-    super.updateState(store, state);
+  protected updateState() {
+    throw new Error('not implemented');
   }
 }
 
