@@ -1,4 +1,4 @@
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
 //import { EdgewareCandidacy } from 'controllers/chain/substrate/elections';

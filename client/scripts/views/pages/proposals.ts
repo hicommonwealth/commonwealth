@@ -16,7 +16,7 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { orderProposalsByAmountVoted } from 'views/components/proposals/ordering';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy';
+import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
