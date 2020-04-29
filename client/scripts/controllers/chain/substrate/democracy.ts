@@ -1,6 +1,7 @@
-import { first, map, takeWhile } from 'rxjs/operators';
+import { first, map, takeWhile, switchMap } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, Conviction, Vote as SrmlVote, BlockNumber } from '@polkadot/types/interfaces';
+import { DeriveReferendum, DeriveReferendumVotes } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
 import {
   ISubstrateDemocracyReferendum,
@@ -11,13 +12,14 @@ import {
 import { SubstrateDemocracyReferendumAdapter } from 'adapters/chain/substrate/subscriptions';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
-  ITXModalData, ProposalModule, ChainBase, Account
+  ITXModalData, ProposalModule, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { ProposalStore } from 'stores';
-import { GenericCall } from '@polkadot/types';
-import { BehaviorSubject, Unsubscribable } from 'rxjs';
+import {
+  SubstrateEventKind, ISubstrateDemocracyStarted,
+  SubstrateEntityKind,
+} from 'events/edgeware/types';
+import { BehaviorSubject, Unsubscribable, of } from 'rxjs';
 import { Coin } from 'adapters/currency';
-import SubstrateDemocracyProposal from './democracy_proposal';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 
@@ -84,6 +86,17 @@ export const weightToConviction = (weight: number): DemocracyConviction => {
   }
 };
 
+const backportEventToAdapter = (event: ISubstrateDemocracyStarted): ISubstrateDemocracyReferendum => {
+  const enc = new TextEncoder();
+  return {
+    identifier: event.referendumIndex.toString(),
+    index: event.referendumIndex,
+    endBlock: event.endBlock,
+    threshold: event.voteThreshold as DemocracyThreshold,
+    hash: enc.encode(event.proposalHash),
+  };
+};
+
 class SubstrateDemocracy extends ProposalModule<
   ApiRx,
   ISubstrateDemocracyReferendum,
@@ -113,7 +126,10 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
     this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstrateDemocracyReferendumAdapter(useRedesignLogic);
+      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
+      const proposals = entities
+        .map(async (e) => new SubstrateDemocracyReferendum(ChainInfo, Accounts, this, e));
+
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters
         this._enactmentPeriod = +(api.consts.democracy.enactmentPeriod as BlockNumber);
@@ -122,16 +138,8 @@ class SubstrateDemocracy extends ProposalModule<
         this._emergencyVotingPeriod = +(api.consts.democracy.emergencyVotingPeriod as BlockNumber);
         this._preimageByteDeposit = this._Chain.coins(api.consts.democracy.preimageByteDeposit);
 
-        // Open subscriptions
-        this.initSubscription(
-          api,
-          (ps) => ps.map((p) => new SubstrateDemocracyReferendum(ChainInfo, Accounts, this, p))
-        ).then(() => {
-          this._initialized = true;
-          resolve();
-        }).catch((err) => {
-          reject(err);
-        });
+        this._initialized = true;
+        resolve();
       });
     });
   }
@@ -142,11 +150,11 @@ class SubstrateDemocracy extends ProposalModule<
       author,
       (api: ApiRx) => api.tx.democracy.reapPreimage(hash),
       'reapPreimage',
-      'Preimage hash: ' + hash,
+      `Preimage hash: ${hash}`,
     );
   }
 
- /*
+  /*
   * Proxying and Delegation currently unsupported...
   * If we decide to support them, we'll update the controllers.
 
@@ -221,24 +229,30 @@ export default SubstrateDemocracy;
 export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
   public readonly balance: SubstrateCoin;
 
-  constructor(proposal: SubstrateDemocracyReferendum, account: SubstrateAccount, choice: boolean, balance: SubstrateCoin, weight: number) {
+  constructor(
+    proposal: SubstrateDemocracyReferendum,
+    account: SubstrateAccount,
+    choice: boolean,
+    balance: SubstrateCoin,
+    weight: number
+  ) {
     super(account, choice, weight);
     this.balance = balance;
   }
 
   public get coinWeight(): Coin {
-    return this.weight < 1 ?
-        new Coin(this.balance.denom, this.balance.divn(1 / this.weight)) :
-        new Coin(this.balance.denom, this.balance.muln(this.weight));
+    return this.weight < 1
+      ? new Coin(this.balance.denom, this.balance.divn(1 / this.weight))
+      : new Coin(this.balance.denom, this.balance.muln(this.weight));
   }
 }
 
 export class SubstrateDemocracyReferendum
-extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateDemocracyReferendum, ISubstrateDemocracyReferendumState, SubstrateDemocracyVote
+  extends Proposal<
+  ApiRx, SubstrateCoin, ISubstrateDemocracyReferendum, any, SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
-    return '#' + this.identifier.toString();
+    return `#${this.identifier.toString()}`;
   }
   public get title() { return this._title; }
   public get description() { return null; }
@@ -255,6 +269,7 @@ extends Proposal<
   }
   private _title: string;
   private readonly _endBlock: number;
+  private readonly _proposalHash: string;
 
   private _passed: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public get passed() { return this._passed.value; }
@@ -262,32 +277,105 @@ extends Proposal<
   private _executionBlock: number;
   public get executionBlock() { return this._executionBlock; }
 
-  public _method: Call;
-  get method() { return this._method; }
-
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
   private _Democracy: SubstrateDemocracy;
+
+  private _voterSubscription: Unsubscribable;
 
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Democracy: SubstrateDemocracy,
-    data: ISubstrateDemocracyReferendum
+    entity: ChainEntity,
   ) {
-    super('referendum', data);
+    super('referendum', backportEventToAdapter(
+      entity.chainEvents
+        .find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted).data as ISubstrateDemocracyStarted
+    ));
+
+    const eventData = entity.chainEvents
+      .find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted).data as ISubstrateDemocracyStarted;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Democracy = Democracy;
-    this._endBlock = data.endBlock;
-    this._title = `Referendum #${data.index}`;
-    this.subscribe(
-      this._Chain.api,
-      this._Democracy.store,
-      this._Democracy.adapter
-    );
+    this._endBlock = this.data.endBlock;
+    this._proposalHash = eventData.proposalHash;
+
+    // see if preimage exists and populate data if it does
+    const preimage = this._Democracy.app.chainEntities.getPreimage(eventData.proposalHash);
+    if (preimage) {
+      this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+    } else {
+      this._title = `Referendum #${this.data.index}`;
+    }
+
+    this._voterSubscription = this._subscribeVoters();
     this._Democracy.store.add(this);
+  }
+
+  protected complete() {
+    super.updateState(this._Democracy.store, { completed: true });
+    if (this._voterSubscription) {
+      this._voterSubscription.unsubscribe();
+    }
+  }
+
+  public update(e: ChainEvent) {
+    switch (e.data.kind) {
+      case SubstrateEventKind.DemocracyCancelled:
+      case SubstrateEventKind.DemocracyNotPassed: {
+        this._passed.next(false);
+        this.complete();
+        break;
+      }
+      case SubstrateEventKind.DemocracyPassed: {
+        this._passed.next(true);
+        this._executionBlock = e.data.dispatchBlock;
+        break;
+      }
+      case SubstrateEventKind.DemocracyExecuted: {
+        this.complete();
+        break;
+      }
+      case SubstrateEventKind.PreimageNoted: {
+        const preimage = this._Democracy.app.chainEntities.getPreimage(this._proposalHash);
+        if (preimage) {
+          this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+        }
+        break;
+      }
+      default: {
+        throw new Error('invalid event update');
+      }
+    }
+  }
+
+  private _subscribeVoters(): Unsubscribable {
+    return this._Chain.query((api) => api.derive.democracy.referendumsInfo([ new BN(this.data.index) ])
+      .pipe(
+        switchMap((referenda: DeriveReferendum[]) => {
+          if (referenda.length) {
+            // we can fetch the data, so grab the votes too
+            return api.derive.democracy._referendumVotes(referenda[0]);
+          } else {
+            return of(null);
+          }
+        }),
+        takeWhile((v) => !!v),
+      ))
+      .subscribe((votes: DeriveReferendumVotes) => {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { accountId, balance, vote } of votes.votes) {
+          const acct = this._Accounts.fromAddress(accountId.toString());
+          if (!this.hasVoted(acct)) {
+            this.addOrUpdateVote(new SubstrateDemocracyVote(
+              this, acct, vote.isAye, this._Chain.coins(balance), convictionToWeight(vote.conviction.index)
+            ));
+          }
+        }
+      });
   }
 
   // GETTERS AND SETTERS
@@ -356,12 +444,14 @@ extends Proposal<
     switch (this.data.threshold) {
       case DemocracyThreshold.Supermajorityapproval:
         passing = this.edgVotedYes.sqr().div(this._Chain.totalbalance).gt(
-          this.edgVotedNo.sqr().div(this.edgVoted));
+          this.edgVotedNo.sqr().div(this.edgVoted)
+        );
         break;
 
       case DemocracyThreshold.Supermajorityrejection:
         passing = this.edgVotedYes.sqr().div(this.edgVoted).gt(
-          this.edgVotedNo.sqr().div(this._Chain.totalbalance));
+          this.edgVotedNo.sqr().div(this._Chain.totalbalance)
+        );
         break;
 
       case DemocracyThreshold.Simplemajority:
@@ -369,7 +459,7 @@ extends Proposal<
         break;
 
       default:
-        throw new Error('invalid threshold field: ' + this.data.threshold);
+        throw new Error(`invalid threshold field: ${this.data.threshold}`);
     }
     return passing ? ProposalStatus.Passing : ProposalStatus.Failing;
   }
@@ -393,7 +483,7 @@ extends Proposal<
           },
           balance: balance.asBN,
         }
-      }
+      };
 
       // even though voting balance is specifiable, we pre-populate the voting balance as "all funds"
       //   to align with old voting behavior -- we should change this soon.
@@ -491,22 +581,7 @@ extends Proposal<
     );
   }
 
-  protected updateState(store: ProposalStore<SubstrateDemocracyReferendum>, state: ISubstrateDemocracyReferendumState) {
-    if (state.method) {
-      this._title = this._Chain.methodToTitle(state.method);
-      this._method = this._Chain.findCall(state.method.callIndex)(...state.method.args);
-    }
-    for (const voter of Object.keys(state.votes)) {
-      const acct = this._Accounts.fromAddress(voter);
-      const [ vote, conviction, balance ] = state.votes[voter];
-      if (!this.hasVoted(acct)) {
-        this.addOrUpdateVote(new SubstrateDemocracyVote(
-          this, acct, vote, this._Chain.coins(balance), convictionToWeight(conviction)
-        ));
-      }
-    }
-    this._passed.next(state.passed);
-    this._executionBlock = state.executionBlock;
-    super.updateState(store, state);
+  protected updateState() {
+    throw new Error('not implemented');
   }
 }

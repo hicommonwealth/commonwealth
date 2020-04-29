@@ -81,7 +81,7 @@ class SubstrateDemocracyProposal extends ProposalModel<
     entity: ChainEntity,
   ) {
     // find the initial creation event
-    const creationEvent = entity.chainEvents.find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted);
+    const creationEvent = entity.chainEvents.find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed);
     const eventData = creationEvent.data as ISubstrateDemocracyProposed;
 
     // fake adapter data
@@ -98,28 +98,26 @@ class SubstrateDemocracyProposal extends ProposalModel<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;
-    this._title = eventData.proposalHash;
     this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
     this._author = this._Accounts.fromAddress(eventData.proposer);
     this._hash = eventData.proposalHash;
 
     // see if preimage exists and populate data if it does
-    const preimage = this._Proposals.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyPreimage)
-      .find((preimageEntity) => preimageEntity.typeId === eventData.proposalHash);
+    const preimage = this._Proposals.app.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
-      const notedEvent = preimage.chainEvents.find((event) => event.data.kind === SubstrateEventKind.PreimageNoted);
-      const preimageData = (notedEvent.data as ISubstratePreimageNoted).preimage;
-      this._method = preimageData.method;
-      this._section = preimageData.section;
-      this._title = `${this._section}.${this.method}(${preimageData.args.join(', ')})`;
+      this._method = preimage.method;
+      this._section = preimage.section;
+      this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+    } else {
+      this._title = eventData.proposalHash;
     }
 
-    this._depositSubscription = this.subscribeDepositors();
+    this._depositSubscription = this._subscribeDepositors();
     this._Proposals.store.add(this);
   }
 
   // TODO: add complete() and update() calls to all proposals
-  public complete() {
+  protected complete() {
     super.updateState(this._Proposals.store, { completed: true });
     if (this._depositSubscription) {
       this._depositSubscription.unsubscribe();
@@ -132,13 +130,22 @@ class SubstrateDemocracyProposal extends ProposalModel<
         this.complete();
         break;
       }
+      case SubstrateEventKind.PreimageNoted: {
+        const preimage = this._Proposals.app.chainEntities.getPreimage(this._hash);
+        if (preimage) {
+          this._method = preimage.method;
+          this._section = preimage.section;
+          this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+        }
+        break;
+      }
       default: {
         throw new Error('invalid event update');
       }
     }
   }
 
-  public subscribeDepositors(): Unsubscribable {
+  private _subscribeDepositors(): Unsubscribable {
     return this._Chain.query((api) => api.query.democracy.depositOf(this.data.index))
       .pipe(takeWhile((v) => v.isSome))
       .subscribe((depositOpt) => {

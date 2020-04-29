@@ -5,6 +5,7 @@ import { default as _ } from 'lodash';
 import { ChainEntityStore } from 'stores';
 import { ChainEntity } from 'models';
 import app from 'state';
+import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
 
 const get = (route, args, callback) => {
   return $.get(app.serverUrl() + route, args).then((resp) => {
@@ -22,6 +23,17 @@ class ChainEntityController {
 
   public constructor() {
     // do nothing
+  }
+
+  public getPreimage(hash: string) {
+    const preimage = this.store.getByType(SubstrateEntityKind.DemocracyPreimage)
+      .find((preimageEntity) => preimageEntity.typeId === hash);
+    if (preimage) {
+      const notedEvent = preimage.chainEvents.find((event) => event.data.kind === SubstrateEventKind.PreimageNoted);
+      return (notedEvent.data as ISubstratePreimageNoted).preimage;
+    } else {
+      return null;
+    }
   }
 
   public refresh(chain) {
