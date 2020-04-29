@@ -8,6 +8,7 @@ import moment from 'moment-twitter';
 import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'construct-ui';
 
 import app from 'state';
+import Header from 'views/components/header';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
 import PageLoading from 'views/pages/loading';
@@ -16,7 +17,7 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
 import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';
-import InlineThreadComposer from '../../components/inline_thread_composer';
+// import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 
@@ -208,7 +209,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         return arr;
       };
       return m('.discussions-listing', [
-        m(InlineThreadComposer),
+        // m(InlineThreadComposer),
         allProposals.length === 0
         && [
           // m('h4', 'This week'),
@@ -234,35 +235,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
     return m('.DiscussionsPage', [
-      m('.discussions-page-header', [
-        m('.placeholder'),
-        // m(Breadcrumb, {
-        //   class: 'header-breadcrumb',
-        //   seperator: m(Icon, { name: Icons.CHEVRON_RIGHT }),
-        // }, [
-        //   m(BreadcrumbItem, { href: '#' }, m(Icon, { name: Icons.HOME })),
-        //   m(BreadcrumbItem, 'Discussions'),
-        // ]),
-        m(Button, {
-          class: 'user-button',
-          intent: 'primary',
-          label: 'New post',
-          size: 'sm',
-          compact: true,
-          onclick: (e) => {
-          }
-        }),
-        m(Button, {
-          class: 'user-button',
-          intent: 'none',
-          label: 'Configure user',
-          size: 'sm',
-          compact: true,
-          onclick: (e) => {
-
-          }
-        })
-      ]),
+      m(Header),
       (app.chain || app.community) && [
         !isMember((app.community ? null : app.chain.meta.chain.id), app.community?.id, activeAddressInfo) && m(Callout, {
           icon: Icons.INFO,

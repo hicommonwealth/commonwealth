@@ -21,8 +21,9 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     if (app.community) {
       return m(Button, {
         class: 'NewProposalButton',
+        label: 'New post',
         iconLeft: Icons.PLUS,
-        size: 'xs',
+        size: 'sm',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
@@ -33,9 +34,11 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     // a button with popover menu for chains
     return m(PopoverMenu, {
       class: 'NewProposalButton',
+      transitionDuration: 0,
       trigger: activeAccount ? m(Button, {
         iconLeft: Icons.CHEVRON_DOWN,
-        size: 'xs',
+        label: 'New post',
+        size: 'sm',
         intent: 'primary',
         fluid,
       }) : m(Tooltip, {
