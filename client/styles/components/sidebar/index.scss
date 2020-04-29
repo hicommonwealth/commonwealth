@@ -176,12 +176,19 @@ $active-color: #f4f4f9;
 // notifications menu (outside Sidebar, displayed in a cui-portal)
 .notification-menu {
     .notification-list {
-        height: 420px;
+        height: 640px;
         background: #fff;
-        width: 250px;
+        width: 320px;
     }
     .cui-menu {
-        max-width: 250px;
+        max-width: 322px;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        background: none;
+    }
+    .cui-popover-arrow {
+        background: white;
     }
     .cui-list-item {
         padding: 11px;
