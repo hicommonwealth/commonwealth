@@ -75,13 +75,26 @@
     }
     ul.checklist {
         padding-left: 1em;
-        li.checked {
-            list-style: '\2611';
+        list-style: none;
+        li {
+            text-indent: -1.4em;
+            list-style: inherit;
             padding-left: 9px;
         }
-        li.unchecked { 
-            list-style: '\2610';
-            padding-left: 9px;
+        li::before {
+            width: 1.4em;
+            font-family: "fontello";
+            padding-right: 10px;
+            position: relative;
+            padding-right: 11px;
+        }
+        li.checked:before {
+            content: '\f14a';
+            color: #5c6bc0;
+        }
+        li.unchecked:before {
+            content: '\f096';
+            color: #b0bec5;
         }
     }
     ul.checklist + ul.checklist {
@@ -131,7 +144,7 @@
     }
     code:before,
     code:after {
-        content: "\A0";
+        content: '\A0';
         letter-spacing: -2px;
     }
     small {
