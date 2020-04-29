@@ -1,7 +1,7 @@
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
-//import { EdgewareCandidacy } from 'controllers/chain/substrate/elections';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+// import { EdgewareCandidacy } from 'controllers/chain/substrate/elections';
 
 // Proposal ordering helpers. These should be in helpers, but
 // there seems to be a circular dependency issue.

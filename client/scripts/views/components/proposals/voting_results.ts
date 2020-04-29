@@ -8,7 +8,7 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models';
-import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling';
+import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
 import { first } from 'rxjs/operators';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';

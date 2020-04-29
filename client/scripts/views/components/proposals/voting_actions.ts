@@ -10,9 +10,11 @@ import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance'
 import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { EdgewareSignalingProposal, SignalingProposalStage, SignalingVote } from 'controllers/chain/edgeware/signaling';
+import {
+  EdgewareSignalingProposal, SignalingProposalStage, SignalingVote
+} from 'controllers/chain/edgeware/signaling_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { ConvictionsChooser } from 'views/components/proposals/convictions_table';
