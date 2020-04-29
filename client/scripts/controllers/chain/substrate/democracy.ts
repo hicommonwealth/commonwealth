@@ -11,9 +11,7 @@ import { SubstrateDemocracyReferendum } from './democracy_referendum';
 class SubstrateDemocracy extends ProposalModule<
   ApiRx,
   ISubstrateDemocracyReferendum,
-  any,
-  SubstrateDemocracyReferendum,
-  any
+  SubstrateDemocracyReferendum
 > {
   private _enactmentPeriod: number = null;
   private _cooloffPeriod: number = null;

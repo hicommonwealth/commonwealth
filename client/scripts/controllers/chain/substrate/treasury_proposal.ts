@@ -28,7 +28,7 @@ const backportEventToAdapter = (
 };
 
 export class SubstrateTreasuryProposal
-  extends Proposal<ApiRx, SubstrateCoin, ISubstrateTreasuryProposal, any, null> {
+  extends Proposal<ApiRx, SubstrateCoin, ISubstrateTreasuryProposal, null> {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
@@ -97,11 +97,12 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
+    this._initialized.next(true);
     this._Treasury.store.add(this);
   }
 
   protected complete() {
-    super.updateState(this._Treasury.store, { completed: true });
+    super.complete(this._Treasury.store);
   }
 
   public update(e: ChainEvent) {
@@ -131,8 +132,5 @@ export class SubstrateTreasuryProposal
   }
   get awarded() {
     return this._awarded.getValue();
-  }
-  protected updateState() {
-    throw new Error('not implemented');
   }
 }

@@ -4,12 +4,7 @@ import { Codec } from '@polkadot/types/types';
 import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal } from '@polkadot/types/interfaces';
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
-import {
-  ISubstrateDemocracyProposal,
-  ISubstrateDemocracyProposalState,
-  SubstrateCoin
-} from 'adapters/chain/substrate/types';
-import { SubstrateDemocracyProposalAdapter } from 'adapters/chain/substrate/subscriptions';
+import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateEntityKind } from 'events/edgeware/types';
 import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
@@ -21,9 +16,7 @@ type NextExternal = [Hash, VoteThreshold] & Codec;
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiRx,
   ISubstrateDemocracyProposal,
-  any,
-  SubstrateDemocracyProposal,
-  any
+  SubstrateDemocracyProposal
 > {
   // SubstrateDemocracyProposals DATA
   // How often (in blocks) new public referenda are launched.

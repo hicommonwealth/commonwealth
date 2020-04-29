@@ -116,7 +116,7 @@ const backportEventToAdapter = (event: ISubstrateDemocracyStarted): ISubstrateDe
 
 export class SubstrateDemocracyReferendum
   extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateDemocracyReferendum, any, SubstrateDemocracyVote
+  ApiRx, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
@@ -148,8 +148,6 @@ export class SubstrateDemocracyReferendum
   private _Accounts: SubstrateAccounts;
   private _Democracy: SubstrateDemocracy;
 
-  private _voterSubscription: Unsubscribable;
-
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
@@ -177,16 +175,13 @@ export class SubstrateDemocracyReferendum
     } else {
       this._title = `Referendum #${this.data.index}`;
     }
-
-    this._voterSubscription = this._subscribeVoters();
+    this._initialized.next(true);
+    this._subscribeVoters();
     this._Democracy.store.add(this);
   }
 
   protected complete() {
-    super.updateState(this._Democracy.store, { completed: true });
-    if (this._voterSubscription) {
-      this._voterSubscription.unsubscribe();
-    }
+    super.complete(this._Democracy.store);
   }
 
   public update(e: ChainEvent) {
@@ -230,7 +225,7 @@ export class SubstrateDemocracyReferendum
             return of(null);
           }
         }),
-        takeWhile((v) => !!v),
+        takeWhile((v) => !!v && this.initialized && !this.completed),
       ))
       .subscribe((votes: DeriveReferendumVotes) => {
         // eslint-disable-next-line no-restricted-syntax
@@ -446,9 +441,5 @@ export class SubstrateDemocracyReferendum
       'noteImminentPreimage',
       this._Chain.methodToTitle(action),
     );
-  }
-
-  protected updateState() {
-    throw new Error('not implemented');
   }
 }

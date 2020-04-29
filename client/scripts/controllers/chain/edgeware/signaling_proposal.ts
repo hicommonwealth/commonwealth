@@ -53,7 +53,7 @@ export class SignalingVote implements IVote<SubstrateCoin> {
 }
 
 export class EdgewareSignalingProposal
-  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, any, SignalingVote> {
+  extends Proposal<ApiRx, SubstrateCoin, IEdgewareSignalingProposal, SignalingVote> {
   public get shortIdentifier() {
     return `#${this.data.voteIndex.toString()}`;
   }
@@ -132,8 +132,6 @@ export class EdgewareSignalingProposal
   private _Accounts: SubstrateAccounts;
   private _Signaling: EdgewareSignaling;
 
-  private _voterSubscription: Unsubscribable;
-
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
@@ -148,15 +146,13 @@ export class EdgewareSignalingProposal
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Signaling = Signaling;
-    this._voterSubscription = this._subscribeVoters();
+    this._initialized.next(true);
+    this._subscribeVoters();
     this._Signaling.store.add(this);
   }
 
   protected complete() {
-    super.updateState(this._Signaling.store, { completed: true });
-    if (this._voterSubscription) {
-      this._voterSubscription.unsubscribe();
-    }
+    super.complete(this._Signaling.store);
   }
 
   public update(e: ChainEvent) {
@@ -193,7 +189,7 @@ export class EdgewareSignalingProposal
 
   private _subscribeVoters(): Unsubscribable {
     return this._Chain.query((api) => api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex))
-      .pipe(takeWhile((v) => v.isSome))
+      .pipe(takeWhile((v) => v.isSome && this.initialized && !this.completed))
       .subscribe((v) => {
         const record = v.unwrap();
         // eslint-disable-next-line no-restricted-syntax
@@ -226,9 +222,5 @@ export class EdgewareSignalingProposal
       'submitSignalingVote',
       this.title
     );
-  }
-
-  protected updateState() {
-    throw new Error('not implemented');
   }
 }

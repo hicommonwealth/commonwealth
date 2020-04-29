@@ -19,7 +19,8 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
 
   constructor(proposal: SubstrateCollectiveProposal, account: SubstrateAccount, choice: boolean) {
     super(account, choice);
-    this.account.balance.pipe(takeWhile(() => !proposal.completed)).subscribe((bal) => { this._balance = bal; });
+    this.account.balance.pipe(takeWhile(() => proposal.initialized && !proposal.completed))
+      .subscribe((bal) => { this._balance = bal; });
   }
 }
 
@@ -29,13 +30,12 @@ const backportEventToAdapter = (event: ISubstrateCollectiveProposed): ISubstrate
     index: event.proposalIndex,
     threshold: event.threshold,
     hash: event.proposalHash,
-    method: null,
   };
 };
 
 export class SubstrateCollectiveProposal
   extends Proposal<
-  ApiRx, SubstrateCoin, ISubstrateCollectiveProposal, any, SubstrateCollectiveVote
+  ApiRx, SubstrateCoin, ISubstrateCollectiveProposal, SubstrateCollectiveVote
 > {
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
@@ -58,8 +58,6 @@ export class SubstrateCollectiveProposal
     return this._Collective.moduleName;
   }
 
-  private _voterSubscription: Unsubscribable;
-
   // CONSTRUCTORS
   constructor(
     ChainInfo: SubstrateChain,
@@ -78,15 +76,13 @@ export class SubstrateCollectiveProposal
     this._Collective = Collective;
     this._title = `${eventData.call.section}.${eventData.call.method}(${eventData.call.args.join(', ')})`;
 
-    this._voterSubscription = this._subscribeVoters();
+    this._initialized.next(true);
+    this._subscribeVoters();
     this._Collective.store.add(this);
   }
 
   protected complete() {
-    super.updateState(this._Collective.store, { completed: true });
-    if (this._voterSubscription) {
-      this._voterSubscription.unsubscribe();
-    }
+    super.complete(this._Collective.store);
   }
 
   public update(e: ChainEvent) {
@@ -112,7 +108,7 @@ export class SubstrateCollectiveProposal
 
   private _subscribeVoters(): Unsubscribable {
     return this._Chain.query((api) => api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash))
-      .pipe(takeWhile((v) => v.isSome))
+      .pipe(takeWhile((v) => v.isSome && this.initialized && !this.completed))
       .subscribe((votesOpt) => {
         const votes = votesOpt.unwrap();
         const ayes = votes.ayes;
@@ -229,9 +225,5 @@ export class SubstrateCollectiveProposal
       'voteCouncilMotions',
       this.title
     );
-  }
-
-  protected updateState() {
-    throw new Error('not implemented');
   }
 }

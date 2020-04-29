@@ -34,7 +34,6 @@ class SubstrateDemocracyProposal extends ProposalModel<
   ApiRx,
   SubstrateCoin,
   ISubstrateDemocracyProposal,
-  any,
   DepositVote<SubstrateCoin>
 > {
   public get shortIdentifier() {
@@ -123,9 +122,8 @@ class SubstrateDemocracyProposal extends ProposalModel<
     this._Proposals.store.add(this);
   }
 
-  // TODO: add complete() and update() calls to all proposals
   protected complete() {
-    super.updateState(this._Proposals.store, { completed: true });
+    super.complete(this._Proposals.store);
     if (this._depositSubscription) {
       this._depositSubscription.unsubscribe();
     }
@@ -206,11 +204,6 @@ class SubstrateDemocracyProposal extends ProposalModel<
       'secondDemocracyProposal',
       this.title
     );
-  }
-
-  // SUBSCRIPTIONS
-  protected updateState() {
-    throw new Error('not implemented');
   }
 }
 

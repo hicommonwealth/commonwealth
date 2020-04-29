@@ -5,10 +5,8 @@ import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
 import { formatAddressShort } from 'helpers';
 import {
   ISubstrateTreasuryProposal,
-  ISubstrateTreasuryProposalState,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import { SubstrateTreasuryProposalAdapter } from 'adapters/chain/substrate/subscriptions';
 import { ProposalModule } from 'models';
 import { SubstrateEntityKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
@@ -18,9 +16,7 @@ import { SubstrateTreasuryProposal } from './treasury_proposal';
 class SubstrateTreasury extends ProposalModule<
   ApiRx,
   ISubstrateTreasuryProposal,
-  ISubstrateTreasuryProposalState,
-  SubstrateTreasuryProposal,
-  SubstrateTreasuryProposalAdapter
+  SubstrateTreasuryProposal
 > {
   // TODO: understand Pot behavior
   private _pot = new BehaviorSubject<SubstrateCoin>(null);
@@ -66,7 +62,6 @@ class SubstrateTreasury extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstrateTreasuryProposalAdapter();
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters
         this._bondPct = +(api.consts.treasury.proposalBond as Permill) / 1_000_000;

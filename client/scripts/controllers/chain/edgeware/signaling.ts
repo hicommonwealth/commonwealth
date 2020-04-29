@@ -13,9 +13,7 @@ import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_p
 class EdgewareSignaling extends ProposalModule<
   ApiRx,
   IEdgewareSignalingProposal,
-  any,
-  EdgewareSignalingProposal,
-  any
+  EdgewareSignalingProposal
 > {
   // How many EDG are bonded in reserve to create a signaling proposal.
   // The bond is returned after voting is moved to the 'completed' stage.
@@ -51,7 +49,6 @@ class EdgewareSignaling extends ProposalModule<
         const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
         const proposals = entities
           .map(async (e) => new EdgewareSignalingProposal(ChainInfo, Accounts, this, e));
-
         this._initialized = true;
         resolve();
       },

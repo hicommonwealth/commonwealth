@@ -6,12 +6,12 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { SubstratePhragmenElectionAdapter } from 'adapters/chain/substrate/subscriptions';
-import { first } from 'rxjs/operators';
+import { first, flatMap, map } from 'rxjs/operators';
 import { Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
+import { BalanceOf, AccountId, BlockNumber } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
-import { Vec } from '@polkadot/types';
+import { Vec, u32 } from '@polkadot/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstratePhragmenElection } from './phragmen_election';
@@ -21,9 +21,7 @@ type ElectionResultCodec = [ AccountId, BalanceOf ] & Codec;
 class SubstratePhragmenElections extends ProposalModule<
   ApiRx,
   ISubstratePhragmenElection,
-  ISubstratePhragmenElectionState,
-  SubstratePhragmenElection,
-  SubstratePhragmenElectionAdapter
+  SubstratePhragmenElection
 > {
   private _candidacyBond: SubstrateCoin = null;
   private _votingBond: SubstrateCoin = null;
@@ -75,7 +73,6 @@ class SubstratePhragmenElections extends ProposalModule<
               ? 'phragmenElections'
               : 'electionsPhragmen';
         }
-        this._adapter = new SubstratePhragmenElectionAdapter(moduleName);
 
         this._candidacyBond = this._Chain.coins(api.consts[moduleName].candidacyBond as BalanceOf);
         this._votingBond = this._Chain.coins(api.consts[moduleName].votingBond as BalanceOf);
@@ -97,15 +94,32 @@ class SubstratePhragmenElections extends ProposalModule<
           });
         });
 
-        const subP = this.initSubscription(
-          api,
-          ([ p ]) => {
+        let currentIndex: number;
+        const roundP = new Promise((roundResolve) => {
+          return api.query[moduleName].electionRounds().pipe(
+            // take current block number to determine when round ends
+            flatMap((voteIndex: u32) => {
+              currentIndex = +voteIndex;
+              return api.derive.chain.bestNumber();
+            }),
+            first(),
+            map((blockNumber: BlockNumber) => {
+              const termDuration = +api.consts[moduleName].termDuration;
+              const roundStartBlock = Math.floor((+blockNumber) / termDuration) * termDuration;
+              const endBlock = roundStartBlock + termDuration;
+              return [{
+                identifier: `${currentIndex}`,
+                round: currentIndex,
+                endBlock,
+              }];
+            }),
+          ).subscribe(([ p ]) => {
             this._activeElection = new SubstratePhragmenElection(ChainInfo, Accounts, this, p, moduleName);
-            return [ this._activeElection ];
-          }
-        );
+            roundResolve();
+          });
+        });
 
-        Promise.all([subP, memberP]).then(() => {
+        Promise.all([roundP, memberP]).then(() => {
           this._initialized = true;
           resolve();
         }).catch((err) => {

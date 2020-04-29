@@ -108,7 +108,7 @@ const NewProposalForm = {
         callback(result);
       };
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(

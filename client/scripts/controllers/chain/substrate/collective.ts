@@ -13,9 +13,7 @@ import { SubstrateCollectiveProposal } from './collective_proposal';
 class SubstrateCollective extends ProposalModule<
   ApiRx,
   ISubstrateCollectiveProposal,
-  any,
-  SubstrateCollectiveProposal,
-  any
+  SubstrateCollectiveProposal
 > {
   private _memberSubscription: Unsubscribable; // init in each overriden init() call
   private _members: SubstrateAccount[];

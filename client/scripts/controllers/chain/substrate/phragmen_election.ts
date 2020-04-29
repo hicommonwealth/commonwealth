@@ -16,7 +16,7 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { takeWhile, first, switchMap, flatMap, map } from 'rxjs/operators';
-import { combineLatest, of } from 'rxjs';
+import { combineLatest, of, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
@@ -40,7 +40,7 @@ export class PhragmenElectionVote implements IVote<SubstrateCoin> {
 }
 
 export class SubstratePhragmenElection extends Proposal<
-  ApiRx, SubstrateCoin, ISubstratePhragmenElection, ISubstratePhragmenElectionState, PhragmenElectionVote
+  ApiRx, SubstrateCoin, ISubstratePhragmenElection, PhragmenElectionVote
 > {
   get shortIdentifier() {
     return `PELEC-${this.identifier.toString()}`;
@@ -89,6 +89,9 @@ export class SubstratePhragmenElection extends Proposal<
   private _Elections: SubstratePhragmenElections;
   private readonly moduleName: string;
 
+  private _voteSubscription: Unsubscribable;
+  private _candidateSubscription: Unsubscribable;
+
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
@@ -103,12 +106,31 @@ export class SubstratePhragmenElection extends Proposal<
     this._title = `Election ${data.round}`;
     this.moduleName = moduleName;
 
-    // don't use this.subscribe() bc we need to pass moduleName
-    this._subscription = this._Chain.api.pipe(
-      switchMap((api: ApiRx) => this._Elections.adapter.subscribeState(api, this.data))
-    ).subscribe((s) => this.updateState(this._Elections.store, s));
-    this.subscribeVotes();
+    this._initialized.next(true);
+    this._subscribeCandidates();
+    this._subscribeVotes();
     this._Elections.store.add(this);
+  }
+
+  protected complete() {
+    super.complete(this._Elections.store);
+  }
+
+  public update() {
+    throw new Error('unimplemented');
+  }
+
+  private _subscribeCandidates(): Unsubscribable {
+    return this._Chain.query((api) => api.query[this.moduleName].candidates()).pipe(
+      map((candidates: Vec<AccountId>) => {
+        const completed = this !== this._Elections.activeElection;
+        return { completed, candidates: candidates.map((c) => c.toString()) };
+      }),
+      takeWhile(({ completed }) => !completed && this.initialized, true),
+    ).subscribe(({ completed, candidates }) => {
+      this._exposedCandidates = candidates;
+      this.complete();
+    });
   }
 
   // This call listens for and updates the election's voter list. We perform this logic
@@ -116,8 +138,8 @@ export class SubstratePhragmenElection extends Proposal<
   // the logic becomes simpler and more efficient, thanks to direct access to the
   // addOrUpdateVote call. If implemented in adapters, we'd need costly diffs or unneccessary
   // updates, as voters would be returned in a single array or map.
-  private subscribeVotes() {
-    this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
+  private _subscribeVotes(): Unsubscribable {
+    return this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
       (api.query[this.moduleName].voting
         // this branch is for kusama
         ? api.query[this.moduleName].voting.entries().pipe(
@@ -163,7 +185,7 @@ export class SubstratePhragmenElection extends Proposal<
         ))
         .pipe(
           // automatically close on complete
-          takeWhile(() => !this.completed),
+          takeWhile(() => !this.completed && this.initialized),
         ).subscribe((votes: { [voter: string]: PhragmenElectionVote }) => {
           // first, remove all retracted voters
           // eslint-disable-next-line no-restricted-syntax
@@ -194,11 +216,6 @@ export class SubstratePhragmenElection extends Proposal<
       }
     }
     return true;
-  }
-
-  protected updateState(store: ProposalStore<SubstratePhragmenElection>, state: ISubstratePhragmenElectionState) {
-    this._exposedCandidates = state.candidates;
-    super.updateState(store, state);
   }
 
   public submitVoteTx(vote: PhragmenElectionVote) {
