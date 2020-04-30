@@ -26,7 +26,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
 
     this._loaded = true;
   }
-  public deinit = async () => {
+  public async deinit() {
     this._loaded = false;
     super.deinit();
 

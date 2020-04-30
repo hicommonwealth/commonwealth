@@ -50,13 +50,13 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     if (this.webWallet) {
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
         selectLogin(updatedAddress);
       });
     }
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
       selectLogin(updatedAddress);
       api.updateSigner(accounts[0]);
     });
@@ -67,7 +67,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     this._loaded = true;
   }
 
-  public deinit = async () => {
+  public async deinit() {
     super.deinit();
     this.governance.deinit();
     this.ethAccounts.deinit();

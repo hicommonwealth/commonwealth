@@ -35,7 +35,11 @@ class ChainEntityStore extends IdStore<ChainEntity> {
   }
 
   public getByType(type: IChainEntityKind) {
-    return Object.values(this._storeType[type]);
+    if (this._storeType[type]) {
+      return Object.values(this._storeType[type]);
+    } else {
+      return [];
+    }
   }
 }
 

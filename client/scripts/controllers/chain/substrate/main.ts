@@ -61,7 +61,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
     super.deinit();
     this.chain.deinitEventLoop();
