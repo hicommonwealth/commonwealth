@@ -11,7 +11,7 @@ import Sidebar from 'views/components/sidebar';
 import CommunitySwitcher from 'views/components/community_switcher';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
-import { AppToasts } from 'views/toast';
+import AppToasts from 'views/toast';
 import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;

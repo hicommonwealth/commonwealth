@@ -92,8 +92,8 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
 const Modal = {
   view: (vnode) => {
     const spec = vnode.attrs.spec;
-    const completeCallback = spec.completeCallback || Function();
-    const exitCallback = spec.exitCallback || Function();
+    const completeCallback = spec.completeCallback || (() => undefined);
+    const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
 
     return m('.Modal', {
