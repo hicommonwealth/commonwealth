@@ -239,12 +239,16 @@ body.modal-open {
 
 .layout-content {
     padding: 15px 40px;
+    padding-top: $header-height + 15px;
     padding-left: $sidebar-width + 40px;
     &.logged-out {
         padding-left: $sidebar-width;
     }
     &.hidden-sidebar {
         padding-left: 40px;
+    }
+    &.hidden-header {
+        padding-top: 15px;
     }
 }
 

@@ -12,7 +12,7 @@ import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
 
-import { Layout, LoadingLayout } from 'views/layouts';
+import { Layout, LoadingLayout } from 'views/layout';
 import { ChainInfo, CommunityInfo, NodeInfo,
   OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
