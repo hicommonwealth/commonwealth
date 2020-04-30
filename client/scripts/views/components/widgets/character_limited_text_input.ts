@@ -39,7 +39,7 @@ const CharacterLimitedTextInput: m.Component<IAttrs, IState> = {
     };
 
     return m('.CharacterLimitedTextInput', {
-      oncreate: (vnode) => setTimeout((() => $(vnode.dom).find('input[type="text"]').trigger('keyup')), 0)
+      oncreate: (vvnode) => setTimeout((() => $(vvnode.dom).find('input[type="text"]').trigger('keyup')), 0)
     }, [
       m('input[type="text"]', attrs),
       m('.character-limit-remaining', {

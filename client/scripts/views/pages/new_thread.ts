@@ -133,18 +133,6 @@ const NewThreadPage = {
             }, 'Add comment'),
           ]),
           m(FormGroup, [
-            m(Button, {
-              intent: 'primary',
-              label: 'Create link',
-              onclick: () => {
-                if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
-                  vnode.state.error.url = 'Must provide a valid URL.';
-                }
-                if (!Object.values(vnode.state.error).length) {
-                  Object.assign(vnode.state.error, newLink(vnode.state.form, vnode.state.quillEditorState, author));
-                }
-              },
-            }),
             m(AutoCompleteTagForm, {
               results: activeEntity.meta.tags || [],
               updateFormData: (tags: string[]) => {
@@ -156,6 +144,20 @@ const NewThreadPage = {
                 m.redraw();
               },
               tabindex: 4,
+            }),
+          ]),
+          m(FormGroup, [
+            m(Button, {
+              intent: 'primary',
+              label: 'Create link',
+              onclick: () => {
+                if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
+                  vnode.state.error.url = 'Must provide a valid URL.';
+                }
+                if (!Object.values(vnode.state.error).length) {
+                  Object.assign(vnode.state.error, newLink(vnode.state.form, vnode.state.quillEditorState, author));
+                }
+              },
             }),
           ]),
           error
@@ -190,14 +192,6 @@ const NewThreadPage = {
             }),
           ]),
           m(FormGroup, [
-            m(Button, {
-              disabled: !author || vnode.state.uploadsInProgress > 0,
-              intent: 'primary',
-              onclick: () => {
-                vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
-              },
-              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
-            }),
             m(AutoCompleteTagForm, {
               results: activeEntity.meta.tags || [],
               updateFormData: (tags: string[]) => {
@@ -209,6 +203,16 @@ const NewThreadPage = {
                 m.redraw();
               },
               tabindex: 3,
+            }),
+          ]),
+          m(FormGroup, [
+            m(Button, {
+              disabled: !author || vnode.state.uploadsInProgress > 0,
+              intent: 'primary',
+              onclick: () => {
+                vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              },
+              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
             }),
           ]),
           error

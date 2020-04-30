@@ -11,15 +11,16 @@ $success-green: green;
 
 $primary-green: #41a360;
 
-$form-border-radius: 4px;
-$form-border-color: #e4e4e4;
+$form-border-radius: 3px;
+$form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
 $lighttextgrey: #999;
 $electricblue: #229bd6;
 
-$side-width: 250px;
-$switcher-width: 80px;
+$header-height: 60px;
+$sidebar-width: 280px;
+$switcher-width: 62px;
 
 @mixin popout {
   animation: popout 0.05s ease;

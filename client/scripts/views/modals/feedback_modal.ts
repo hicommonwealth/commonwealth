@@ -14,8 +14,8 @@ const FeedbackModal = {
           m(FormGroup, [
             m(TextArea, {
               placeholder: 'Report a bug, or suggest an improvement',
-              oncreate: (vnode) => {
-                $(vnode.dom).focus();
+              oncreate: (vvnode) => {
+                $(vvnode.dom).focus();
               }
             }),
           ]),
@@ -35,7 +35,7 @@ const FeedbackModal = {
                 vnode.state.success = null;
 
                 // send feedback
-                $.post(app.serverUrl() + '/sendFeedback', { text, url }).then((result) => {
+                $.post(`${app.serverUrl()}/sendFeedback`, { text, url }).then((result) => {
                   $text.val('');
                   vnode.state.sending = false;
                   vnode.state.success = 'Sent successfully!';

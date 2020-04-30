@@ -83,6 +83,7 @@ const applyInlineFormatters = (text, hideFormatting) => {
     // check which exact pattern was matched, and push the matched text
     for (const inlineFormatter of inlineFormatters) {
       const matched = match[0].match(inlineFormatter.pattern);
+      // eslint-disable-next-line
       if (!matched) continue;
       if (matched.length < 2) {
         console.error('RegExp got empty match content - this should never happen:', match[0]);
@@ -136,6 +137,12 @@ function applyBlockFormatters(parentText, hideFormatting) {
       pattern: /^ {3,4}(- |\* |• |· )/,
       formatMany: (text) => m('ul', m('ul', m('ul', text))),
       formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+    }, {
+      pattern: /^\[([ x])\] /,
+      formatMany: (text) => m('ul.checklist', text),
+      formatOne: (text, match) => m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
+        m('span', applyInlineFormatters(text.replace(match, ''), hideFormatting))
+      ]),
     }];
 
     // Lines which don't match any of the above groups are assigned an

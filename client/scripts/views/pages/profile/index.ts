@@ -164,14 +164,16 @@ import ProfileBio from './profile_bio';
 //       isSubstrate && vnode.state.dynamic.proxyFor && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account is a proxy for: '),
-//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id],
+//                     showSecondaryName: true, linkify: true }),
 //           // TODO: resign proxy button
 //         ]),
 //       ]),
 //       isSubstrate && vnode.state.dynamic.delegation && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account has assigned a delegate: '),
-//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id]
+//                     showSecondaryName: true, linkify: true }),
 //         ]),
 //       ]),
 //     ]);

@@ -32,7 +32,7 @@ class CommunityInfo {
       json.default_chain,
       json.invitesEnabled,
       json.privacyEnabled,
-      json.featured_tags,
+      json.featuredTags,
       json.tags
     );
   }

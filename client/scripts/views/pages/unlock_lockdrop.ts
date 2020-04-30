@@ -48,6 +48,16 @@ const unlock = async (lockContractAddress, userAddress, web3) => {
   });
 };
 
+const getLocks = async (lockdropContract, address) => {
+  return lockdropContract.getPastEvents('Locked', {
+    fromBlock: 0,
+    toBlock: 'latest',
+    filter: {
+      owner: address,
+    }
+  });
+};
+
 const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
   console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
   const json = await $.getJSON('/static/contracts/edgeware/Lockdrop.json');
@@ -67,17 +77,7 @@ const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) =>
     };
   });
 
-  return await Promise.all(promises);
-};
-
-const getLocks = async (lockdropContract, address) => {
-  return await lockdropContract.getPastEvents('Locked', {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      owner: address,
-    }
-  });
+  return Promise.all(promises);
 };
 
 const fetchUnlocks = async (network = 'mainnet', remoteUrl = undefined) => {
@@ -165,8 +165,8 @@ const LockContractComponent = {
               state.web3
             );
             vnode.state.success = 'Transaction sent!';
-          } catch (e) {
-            vnode.state.error = e.toString();
+          } catch (err) {
+            vnode.state.error = err.toString();
           }
           m.redraw();
         }
@@ -178,7 +178,7 @@ const LockContractComponent = {
 
 const UnlockPage = {
   oncreate: async (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'UnlockPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'UnlockPage' });
     state.web3 = getWeb3('mainnet', undefined);
 
     // if an injected web3 provider e.g. Metamask is found, enable it

@@ -28,8 +28,8 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
           subtitle: 'Update your selected delegate.',
           options: {
             value: vnode.state.newDelegateKey,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           },
           callback: (val) => {
@@ -41,11 +41,11 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
           onclick: (e) => {
             e.preventDefault();
             vnode.attrs.account.updateDelegateKeyTx(vnode.state.newDelegateKey)
-            .then((result) => {
-              $(vnode.dom).trigger('modalforceexit');
-              m.redraw();
-            })
-            .catch((err) => notifyError(err.toString()));
+              .then((result) => {
+                $(vnode.dom).trigger('modalforceexit');
+                m.redraw();
+              })
+              .catch((err) => notifyError(err.toString()));
           }
         }, 'Update Delegate'),
       ]),

@@ -14,15 +14,15 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
     return m('.ProfileProposal', [
       m('.summary', [
         m(User, { user: [author, proposal.authorChain], linkify: true, hideAvatar: true }),
-        proposal.kind === OffchainThreadKind.Question ? ' added a question' :
-          proposal.kind === OffchainThreadKind.Request ? ' added a task' :
-            ' created a new thread',
+        proposal.kind === OffchainThreadKind.Question ? ' added a question'
+          : proposal.kind === OffchainThreadKind.Request ? ' added a task'
+            : ' created a new thread',
         ` ${createdAt.fromNow()}`
       ]),
       m('.activity.proposal', [
-        proposal.kind === OffchainThreadKind.Forum ?
-          link('a.proposal-title', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title) :
-          m('a.proposal-title', title),
+        proposal.kind === OffchainThreadKind.Forum
+          ? link('a.proposal-title', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title)
+          : m('a.proposal-title', title),
         // TODO: show a truncated thread once we have a good formatting stripping helper
         // proposal.kind === OffchainThreadKind.Forum && body && vnode.state.revealThread &&
         //   m('.proposal-description', (() => {

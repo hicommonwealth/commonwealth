@@ -24,7 +24,7 @@ export const ConvictionsChooser = {
           e.preventDefault();
           vnode.state.selectedConviction = c.toString();
           vnode.attrs.callback(c.toString());
-        }).bind(c)
+        })
       }, [
         `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x locktime)`
       ]))

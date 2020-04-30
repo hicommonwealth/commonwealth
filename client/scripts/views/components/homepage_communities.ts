@@ -7,27 +7,6 @@ import MembershipButton, { isMember } from 'views/components/membership_button';
 import app from 'state';
 import { Button, Card, Icons } from 'construct-ui';
 
-const VisitButton: m.Component<{ chain?, community? }> = {
-  view: (vnode) => {
-    const { chain, community } = vnode.attrs;
-    if (!chain && !community) return;
-
-    return m(Button, {
-      class: 'VisitButton',
-      onclick: (e) => {
-        if (community) {
-          m.route.set(community);
-        } else {
-          m.route.set(chain);
-        }
-      },
-      iconLeft: Icons.CHEVRON_RIGHT,
-      label: isMember(chain, community) ? 'Visit' : 'Preview',
-      size: 'xs',
-    });
-  }
-};
-
 const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
@@ -38,17 +17,18 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
       class: 'home-card',
       fluid: true,
       elevation: 1,
+      interactive: true,
+      onclick: (e) => m.route.set(`/${chain}`)
     }, [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
       isMember(chain, null) && justJoinedChains.indexOf(chain) === -1 && [
-        app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', `New`)),
+        app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
         newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
       ],
       app.isLoggedIn() && m('.chain-membership', [
-        m(VisitButton, { chain }),
         m(MembershipButton, {
-          chain: chain,
+          chain,
           onMembershipChanged: (created) => {
             if (created && !isMember(chain, null)) justJoinedChains.push(chain);
           }
@@ -68,17 +48,18 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
       class: 'home-card',
       fluid: true,
       elevation: 1,
+      interactive: true,
+      onclick: (e) => m.route.set(`/${c.id}`)
     }, [
       m('h3', [
         c.name,
         c.privacyEnabled && m('span.icon-lock'),
       ]),
       isMember(null, c.id) && justJoinedCommunities.indexOf(c.id) === -1 && [
-        app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', `New`)),
+        app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
         newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
       ],
       app.isLoggedIn() && [
-        m(VisitButton, { community: c.id }),
         m(MembershipButton, {
           community: c.id,
           onMembershipChanged: (created) => {
@@ -113,7 +94,11 @@ const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommuni
     const { justJoinedChains, justJoinedCommunities } = vnode.state;
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
-      chains[n.chain.network] ? chains[n.chain.network].push(n) : chains[n.chain.network] = [n];
+      if (chains[n.chain.network]) {
+        chains[n.chain.network].push(n);
+      } else {
+        chains[n.chain.network] = [n];
+      }
     });
 
     let myChains;
@@ -155,6 +140,7 @@ const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommuni
       // other
       m(LinkCard, { title: 'Edgeware Lockdrop Statistics', target: '/edgeware/stats' }),
       m(LinkCard, { title: 'Edgeware Lockdrop Unlock', target: '/unlock', }),
+      m('.clear'),
     ]);
   }
 };

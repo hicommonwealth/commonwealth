@@ -16,33 +16,37 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     const fluid = !!vnode.attrs.fluid;
 
     if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
 
     // just a button for communities, or chains without governance
     if (app.community) {
       return m(Button, {
         class: 'NewProposalButton',
+        label: 'New post',
         iconLeft: Icons.PLUS,
-        size: 'xs',
+        size: 'sm',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       });
     }
 
     // a button with popover menu for chains
     return m(PopoverMenu, {
       class: 'NewProposalButton',
+      transitionDuration: 0,
       trigger: activeAccount ? m(Button, {
         iconLeft: Icons.CHEVRON_DOWN,
-        size: 'xs',
+        label: 'New post',
+        size: 'sm',
         intent: 'primary',
         fluid,
       }) : m(Tooltip, {
         content: 'Link an address to post',
         trigger: m(Button, {
           iconLeft: Icons.CHEVRON_DOWN,
-          size: 'xs',
+          size: 'sm',
           intent: 'primary',
           class: 'cui-disabled',
           style: 'cursor: pointer !important',
@@ -56,7 +60,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       },
       content: [
         app.activeId() && m(MenuItem, {
-          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
           label: 'New thread',
         }),
 

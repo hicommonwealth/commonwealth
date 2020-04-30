@@ -16,15 +16,15 @@ const Countdown: m.Component<ICountdownAttrs> = {
     const durationForDisplay = time ? moment.duration(moment(time).diff(moment())) : duration;
 
     return m('span.Countdown', {
-      oncreate: (vnode) => {
-        vnode.state.timerHandle = setInterval(() => {
-          vnode.state.timer++;
+      oncreate: (vvnode) => {
+        vvnode.state.timerHandle = setInterval(() => {
+          vvnode.state.timer++;
           m.redraw();
         }, 1000);
       },
-      onremove: (vnode) => {
-        if (vnode.state.timerHandle) {
-          clearInterval(vnode.state.timerHandle);
+      onremove: (vvnode) => {
+        if (vvnode.state.timerHandle) {
+          clearInterval(vvnode.state.timerHandle);
         }
       },
     }, formatDuration(durationForDisplay));

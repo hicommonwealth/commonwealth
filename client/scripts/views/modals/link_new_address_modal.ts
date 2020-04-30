@@ -107,8 +107,8 @@ const accountVerifiedCallback = async (account, vnode) => {
     if (app.community) {
       updateActiveAddresses();
     } else if (app.chain) {
-      updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain :
-                            app.config.nodes.getByChain(app.activeChainId())[0].chain);
+      updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain
+        : app.config.nodes.getByChain(app.activeChainId())[0].chain);
     } else {
       notifyError('Signed in, but no chain or community found');
     }
@@ -170,7 +170,7 @@ const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, 
             nonce: undefined,
           };
           const signedPayload = new ExtrinsicPayload((app.chain.chain as SubstrateChain).registry,
-                                                     signedPayloadParams);
+            signedPayloadParams);
           // drop the first byte of the signature, which just represents the crypto version used
           const webWalletSignature = hexToU8a((await signer.signPayload(outgoingPayload)).signature).slice(1);
           const verified = signerKeyring.verify(signedPayload.toU8a(true), webWalletSignature);
@@ -213,13 +213,13 @@ const LinkNewAddressModal = {
       return m('.LinkNewAddressModal', [
         m('.link-address-step', [
           m('.link-address-step-header', [
-            m('h3', `Select a network`)
+            m('h3', 'Select a network')
           ]),
           m('.chains', [
             Object.entries(chains).map(([chain, nodeList] : [string, any]) => m('.chain-card', {
-              class: (nodeList[0].chain.network === ChainNetwork.Cosmos ||
-                      nodeList[0].chain.network === ChainNetwork.Edgeware ||
-                      nodeList[0].chain.network === ChainNetwork.Kusama) ? 'hidden-mobile' : '',
+              class: (nodeList[0].chain.network === ChainNetwork.Cosmos
+                      || nodeList[0].chain.network === ChainNetwork.Edgeware
+                      || nodeList[0].chain.network === ChainNetwork.Kusama) ? 'hidden-mobile' : '',
               onclick: async (e) => {
                 e.preventDefault();
                 // Overwrite the current path to force a switch to another chain.
@@ -234,10 +234,10 @@ const LinkNewAddressModal = {
               m('.chain-info', [
                 m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
                 m('p', [
-                  nodeList[0].chain.network === ChainNetwork.NEAR ? 'Hosted wallet at nearprotocol.com' :
-                    nodeList[0].chain.network === ChainNetwork.Ethereum ? 'Browser extension or password' :
-                    nodeList[0].chain.network === ChainNetwork.Cosmos ? 'Command line only' :
-                    'Command line or browser extension'
+                  nodeList[0].chain.network === ChainNetwork.NEAR ? 'Hosted wallet at nearprotocol.com'
+                    : nodeList[0].chain.network === ChainNetwork.Ethereum ? 'Browser extension or password'
+                      : nodeList[0].chain.network === ChainNetwork.Cosmos ? 'Command line only'
+                        : 'Command line or browser extension'
                 ]),
               ]),
             ])),
@@ -258,9 +258,9 @@ const LinkNewAddressModal = {
     }
 
     const linkAddressHeader = m('.link-address-step-header', [
-      vnode.attrs.loggingInWithAddress ?
-        m('h3', `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`) :
-        m('h3', `New ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+      vnode.attrs.loggingInWithAddress
+        ? m('h3', `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`)
+        : m('h3', `New ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
     ]);
 
     const isMobile = $(window).width() <= 440;
@@ -293,15 +293,15 @@ const LinkNewAddressModal = {
         // wallet options
         m('.link-address-options', [
           // mobile error message -- if not Ethereum or NEAR
-          isMobile && app.chain.base !== ChainBase.Ethereum && app.chain.base !== ChainBase.NEAR &&
-            m('.mobile-error-message', [
+          isMobile && app.chain.base !== ChainBase.Ethereum && app.chain.base !== ChainBase.NEAR
+            && m('.mobile-error-message', [
               m('p', 'No mobile wallet available.'),
               m('p', 'Link an address on desktop first.'),
             ]),
           // browser extension -- for Substrate chains
           !isMobile && app.chain.base === ChainBase.Substrate && m('.link-address-option', {
-            class: (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS ? 'selected ' : ' ') +
-              (((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available) ? '' : 'disabled'),
+            class: (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS ? 'selected ' : ' ')
+              + (((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available) ? '' : 'disabled'),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.PolkadotJS;
               $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
@@ -318,11 +318,13 @@ const LinkNewAddressModal = {
                 'Browser extension by the developers of Polkadot'
               ]),
               (app.chain.base === ChainBase.Substrate) && m('.link-address-link', [
-                m('a', { href: 'https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/' +
-                         'mopnmbcafieddcagagdcbnhejhlodfdd', target: '_blank' }, 'Chrome'),
+                m('a', { href: 'https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/'
+                         + 'mopnmbcafieddcagagdcbnhejhlodfdd',
+                target: '_blank' }, 'Chrome'),
                 m.trust(' &middot; '),
-                m('a', { href: 'https://addons.mozilla.org/en-US/firefox/' +
-                         'addon/polkadot-js-extension/', target: '_blank' }, 'Firefox'),
+                m('a', { href: 'https://addons.mozilla.org/en-US/firefox/'
+                         + 'addon/polkadot-js-extension/',
+                target: '_blank' }, 'Firefox'),
                 m.trust(' &middot; '),
                 m('a', { href: 'https://github.com/polkadot-js/extension', target: '_blank' }, 'Github'),
               ]),
@@ -331,8 +333,8 @@ const LinkNewAddressModal = {
 
           // browser extension -- for Ethereum option
           app.chain.base === ChainBase.Ethereum && m('.link-address-option', {
-            class: (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask ? 'selected ' : ' ') +
-              (((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available) ? '' : 'disabled'),
+            class: (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask ? 'selected ' : ' ')
+              + (((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available) ? '' : 'disabled'),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.Metamask;
               if (!(app.chain as Ethereum).webWallet || !(app.chain as Ethereum).webWallet.available) return;
@@ -347,15 +349,16 @@ const LinkNewAddressModal = {
                 m('.link-address-title', 'Metamask'),
               ]),
               m('.link-address-description', [
-                'Use a Metamask-compatible ' + (isMobile ? 'mobile app' : 'browser extension'),
+                `Use a Metamask-compatible ${isMobile ? 'mobile app' : 'browser extension'}`,
               ]),
               m('.link-address-link', isMobile ? [
                 m('a', { href: 'https://wallet.coinbase.com/', target: '_blank' }, 'Coinbase Wallet'),
                 m.trust(' &middot; '),
                 m('a', { href: 'https://trustwallet.com/', target: '_blank' }, 'Trust Wallet'),
               ] : [
-                m('a', { href: 'https://chrome.google.com/webstore/detail/metamask/' +
-                          'nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en', target: '_blank' }, 'Get Metamask'),
+                m('a', { href: 'https://chrome.google.com/webstore/detail/metamask/'
+                          + 'nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en',
+                target: '_blank' }, 'Get Metamask'),
                 m.trust(' &middot; '),
                 m('a', { href: 'https://brave.com/download/', target: '_blank' }, 'Get Brave'),
               ]),
@@ -403,7 +406,7 @@ const LinkNewAddressModal = {
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.NEARWallet;
               // Don't proceed to next immediately, because NEAR login redirects to an external site
-              //$(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              // $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
             }
           }, [
             m('.link-address-option-inner', [
@@ -455,15 +458,15 @@ const LinkNewAddressModal = {
 
         ]),
         m('button.link-address-options-continue.formular-button-primary', {
-          class: vnode.state.selectedWallet === undefined ? 'disabled' :
-            (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS &&
-             !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'disabled' :
-            (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask &&
-             !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'disabled' : '',
+          class: vnode.state.selectedWallet === undefined ? 'disabled'
+            : (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
+             && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'disabled'
+              : (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask
+             && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'disabled' : '',
           onclick: async (e) => {
             e.preventDefault();
-            if (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS ||
-                vnode.state.selectedWallet === LinkNewAddressWallets.Metamask) {
+            if (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
+                || vnode.state.selectedWallet === LinkNewAddressWallets.Metamask) {
               vnode.state.step = LinkNewAddressSteps.Step2VerifyWithWebWallet;
             } else if (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet) {
               vnode.state.step = LinkNewAddressSteps.Step2VerifyWithCLI;
@@ -483,12 +486,12 @@ const LinkNewAddressModal = {
               throw new Error('Unexpected wallet, we should never get here');
             }
           }
-        }, vnode.state.selectedWallet === undefined ? 'Select a wallet' :
-          (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS &&
-           !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'Wallet not found' :
-          (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask &&
-           !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'Wallet not found' :
-          'Continue'),
+        }, vnode.state.selectedWallet === undefined ? 'Select a wallet'
+          : (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
+           && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'Wallet not found'
+            : (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask
+           && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'Wallet not found'
+              : 'Continue'),
         m.route.get().endsWith('/web3login') && m('.link-address-options-back', [
           m('a.back-text', {
             href: '#',
@@ -501,32 +504,32 @@ const LinkNewAddressModal = {
       ]) : vnode.state.step === LinkNewAddressSteps.Step2VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          (app.chain as Substrate || app.chain as Ethereum).webWallet &&
-            (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts &&
-            (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length === 0 && [
-              m('button.account-adder', {
-                type: 'submit',
-                class: (app.chain as Substrate || app.chain as Ethereum).webWallet.available ? '' : 'disabled',
-                oncreate: (e) => {
-                  (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
-                },
-                onclick: (e) => {
-                  (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
-                }
-              }, [
-                (app.chain as Substrate || app.chain as Ethereum).webWallet.available ?
-                  'Connect to extension' : 'No extension detected',
-              ]),
-            ],
-          (app.chain as Substrate || app.chain as Ethereum).webWallet &&
-            (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
-              (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
-                m('p', 'Wallet connected! Select an account to link.'),
-                m('p.small-text', 'If a popup does not appear, click your browser extension.'),
-              ] : [
-                m('p', 'Wallet connected, but no accounts were found.'),
-              ],
+          (app.chain as Substrate || app.chain as Ethereum).webWallet
+            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts
+            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length === 0 && [
+            m('button.account-adder', {
+              type: 'submit',
+              class: (app.chain as Substrate || app.chain as Ethereum).webWallet.available ? '' : 'disabled',
+              oncreate: (e) => {
+                (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
+              },
+              onclick: (e) => {
+                (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
+              }
+            }, [
+              (app.chain as Substrate || app.chain as Ethereum).webWallet.available
+                ? 'Connect to extension' : 'No extension detected',
             ]),
+          ],
+          (app.chain as Substrate || app.chain as Ethereum).webWallet
+            && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
+            (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
+              m('p', 'Wallet connected! Select an account to link.'),
+              m('p.small-text', 'If a popup does not appear, click your browser extension.'),
+            ] : [
+              m('p', 'Wallet connected, but no accounts were found.'),
+            ],
+          ]),
           m('.accounts-list', app.chain.networkStatus !== ApiStatus.Connected ? [
             m('.accounts-list-unavailable', 'Must be connected to chain')
           ] : [
@@ -544,12 +547,12 @@ const LinkNewAddressModal = {
                 signerAccount.validate(webWalletSignature).then(() => {
                   return accountVerifiedCallback(signerAccount, vnode);
                 })
-                .then(() => m.redraw())
-                .catch((err) => {
-                  vnode.state.error = 'Verification failed. There was an inconsistency error; ' +
-                  'please report this to the developers.';
-                  m.redraw();
-                });
+                  .then(() => m.redraw())
+                  .catch((err) => {
+                    vnode.state.error = 'Verification failed. There was an inconsistency error; '
+                  + 'please report this to the developers.';
+                    m.redraw();
+                  });
               },
             }, [
               m('.account-user', [
@@ -563,7 +566,8 @@ const LinkNewAddressModal = {
                 accountVerifiedCallback,
                 errorCallback: (error) => { vnode.state.error = error; m.redraw(); },
                 parentVnode: vnode,
-              })),
+              })
+            ),
           ]),
           vnode.state.error && m('.error-message', vnode.state.error),
           m('a.back-text', {
@@ -584,7 +588,7 @@ const LinkNewAddressModal = {
             ]),
             vnode.state.error && !vnode.state.newAddress && m('.error-message', vnode.state.error),
             m(CodeBlock, { clickToSelect: true }, [
-              vnode.state.isEd25519 ? `subkey -e generate` : `subkey generate`,
+              vnode.state.isEd25519 ? 'subkey -e generate' : 'subkey generate',
             ]),
           ],
           app.chain.base === ChainBase.CosmosSDK && [
@@ -594,7 +598,7 @@ const LinkNewAddressModal = {
               m('code', 'gaiacli keys list'),
             ]),
             m(CodeBlock, { clickToSelect: true }, [
-              `gaiacli keys add `,
+              'gaiacli keys add ',
               m('span.no-select', '<name>'),
             ]),
           ],
@@ -623,9 +627,9 @@ const LinkNewAddressModal = {
           m(TextInputFormField, {
             options: {
               name: 'Address',
-              placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...' :
-                app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...' :
-                'Paste the address here',
+              placeholder: app.chain.base === ChainBase.Substrate ? 'Paste the address here: 5Dvq...'
+                : app.chain.base === ChainBase.CosmosSDK ? 'Paste the address here: cosmos123...'
+                  : 'Paste the address here',
             },
             callback: async (address) => {
               vnode.state.error = null;
@@ -653,7 +657,7 @@ const LinkNewAddressModal = {
               if (!vnode.state.error) {
                 try {
                   vnode.state.newAddress = await createUserWithAddress(AddressSwapper({
-                    address: address,
+                    address,
                     currentPrefix: (app.chain as Substrate).chain.ss58Format,
                   }), vnode.state.isEd25519 ? 'ed25519' : undefined);
                 } catch (e) {
@@ -676,10 +680,10 @@ const LinkNewAddressModal = {
             ],
             app.chain.base === ChainBase.CosmosSDK && m('p', [
               'Use the following command to save the JSON to a file: ',
-              m(CodeBlock, { clickToSelect: true }, 'echo \'' + JSON.stringify({
+              m(CodeBlock, { clickToSelect: true }, `echo '${JSON.stringify({
                 type: 'cosmos-sdk/StdTx',
                 value: vnode.state.cosmosStdTx,
-              }) + '\' > tx.json'),
+              })}' > tx.json`),
               m('p', 'Sign the saved transaction, using your keys in gaiacli: '),
               m(CodeBlock, { clickToSelect: true }, [
                 `gaiacli tx sign --offline --chain-id=${VALIDATION_CHAIN_DATA.chainId} --sequence=${VALIDATION_CHAIN_DATA.sequence} --account-number=${VALIDATION_CHAIN_DATA.accountNumber} --signature-only --from=`,
@@ -696,7 +700,7 @@ const LinkNewAddressModal = {
                 const validationToken = unverifiedAcct.validationToken;
                 vnode.state.error = null;
                 try {
-                  if (await unverifiedAcct.isValidSignature(validationToken + '\n', signature)) {
+                  if (await unverifiedAcct.isValidSignature(`${validationToken}\n`, signature)) {
                     vnode.state.validSig = signature;
                   } else {
                     vnode.state.error = 'Invalid signature';
@@ -715,30 +719,30 @@ const LinkNewAddressModal = {
                 vnode.state.secretPhraseSaved = result;
               },
             }),
-            (vnode.state.validSig &&
-             (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved)
+            (vnode.state.validSig
+             && (app.chain.base !== ChainBase.Substrate || vnode.state.secretPhraseSaved)
             ) ? [
-              m('button.formular-button-primary', {
-                onclick: async (e) => {
-                  e.preventDefault();
-                  const unverifiedAcct: Account<any> = vnode.state.newAddress;
-                  unverifiedAcct.validate(vnode.state.validSig).then(() => {
+                m('button.formular-button-primary', {
+                  onclick: async (e) => {
+                    e.preventDefault();
+                    const unverifiedAcct: Account<any> = vnode.state.newAddress;
+                    unverifiedAcct.validate(vnode.state.validSig).then(() => {
                     // if no exception was raised, account must be valid
-                    accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
-                  }, (err) => {
-                    vnode.state.error = 'Verification failed. There was an inconsistency error; ' +
-                      'please report this to the developers.';
-                    m.redraw();
-                  });
-                }
-              }, 'Continue'),
-            ] : [
-              m('button.disabled', {
-                onclick: (e) => {
-                  e.preventDefault();
-                }
-              }, 'Continue'),
-            ],
+                      accountVerifiedCallback(app.chain.accounts.get(unverifiedAcct.address), vnode);
+                    }, (err) => {
+                      vnode.state.error = 'Verification failed. There was an inconsistency error; '
+                      + 'please report this to the developers.';
+                      m.redraw();
+                    });
+                  }
+                }, 'Continue'),
+              ] : [
+                m('button.disabled', {
+                  onclick: (e) => {
+                    e.preventDefault();
+                  }
+                }, 'Continue'),
+              ],
           ]),
           m('a.back-text', {
             href: '#',
@@ -767,9 +771,9 @@ const LinkNewAddressModal = {
       ]) : vnode.state.step === LinkNewAddressSteps.Step3CreateProfile ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
-          m('.create-profile-instructions', vnode.state.isNewLogin ?
-            'Logged in! Now, create a profile:' :
-            'Address verified! Now, create a profile:'),
+          m('.create-profile-instructions', vnode.state.isNewLogin
+            ? 'Logged in! Now, create a profile:'
+            : 'Address verified! Now, create a profile:'),
           m('.avatar-wrap', [
             m(AvatarUpload, {
               uploadStartedCallback: () => {
@@ -842,10 +846,10 @@ const LinkNewAddressModal = {
               onclick: async (e) => {
                 e.preventDefault();
                 const data = {
-                  name: '' + $(vnode.dom).find('input[name=name]').val(),
-                  headline: '' + $(vnode.dom).find('input[name=headline]').val(),
-                  bio: '' + $(vnode.dom).find('textarea[name=bio]').val(),
-                  avatarUrl: '' + $(vnode.dom).find('input[name=avatarUrl]').val(),
+                  name: `${$(vnode.dom).find('input[name=name]').val()}`,
+                  headline: `${$(vnode.dom).find('input[name=headline]').val()}`,
+                  bio: `${$(vnode.dom).find('textarea[name=bio]').val()}`,
+                  avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
                 };
                 app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
                   vnode.state.step = LinkNewAddressSteps.Step4Complete;
@@ -865,9 +869,9 @@ const LinkNewAddressModal = {
         m('.link-address-step-narrow', [
           m('p', vnode.state.isNewLogin ? 'Logged in:' : 'Profile created:'),
           m('.profile-block-preview', [
-            vnode.state.newAddress ?
-              m(ProfileBlock, { account: vnode.state.newAddress }) :
-              m('.error-message', 'There was an issue fetching your new account'),
+            vnode.state.newAddress
+              ? m(ProfileBlock, { account: vnode.state.newAddress })
+              : m('.error-message', 'There was an issue fetching your new account'),
           ]),
           m('br'),
           m('button.btn-finished-action', {

@@ -21,10 +21,9 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
     const { account } = vnode.attrs;
-    const isActiveAccount =
-      app.vm.activeAccount &&
-      app.vm.activeAccount.chain.id === account.chain &&
-      app.vm.activeAccount.address === account.address;
+    const isActiveAccount = app.vm.activeAccount
+      && app.vm.activeAccount.chain.id === account.chain
+      && app.vm.activeAccount.address === account.address;
 
     return m('.AccountRow', {
       key: `${account.chain}#${account.address}`,
@@ -89,7 +88,7 @@ const AccountsWell: m.Component<{}> = {
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
       ])),
       app.login.addresses.length === 0
-        && m('.no-accounts', `No addresses`),
+        && m('.no-accounts', 'No addresses'),
       m('button.formular-button-primary.add-account', {
         onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
       }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),

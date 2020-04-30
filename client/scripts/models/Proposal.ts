@@ -43,8 +43,8 @@ abstract class Proposal<
   // TODO: these should be observables
   public abstract get support(): Coin | number;
   public abstract get turnout(): number;
-  //public abstract get requirementName(): string;
-  //public abstract get requirementExplanation(): string;
+  // public abstract get requirementName(): string;
+  // public abstract get requirementExplanation(): string;
 
   // adapter logic
   protected _subscription: Unsubscribable;
@@ -85,8 +85,7 @@ abstract class Proposal<
     adapter: ProposalAdapter<ApiT, ConstructorT, UpdateT>
   ): void {
     this._subscription = api.pipe(
-      switchMap((api: ApiT) =>
-        adapter.subscribeState(api, this.data))
+      switchMap((api2: ApiT) => adapter.subscribeState(api2, this.data))
     ).subscribe((s) => this.updateState(store, s));
   }
   public unsubscribe(): void {
@@ -117,8 +116,8 @@ abstract class Proposal<
   }
   public getVotes(fromAccount?: Account<C>) {
     if (fromAccount) {
-      return this.votes.getValue()[fromAccount.address] !== undefined ?
-        [this.votes.getValue()[fromAccount.address]] : [];
+      return this.votes.getValue()[fromAccount.address] !== undefined
+        ? [this.votes.getValue()[fromAccount.address]] : [];
     } else {
       return Object.values(this.votes.getValue());
     }

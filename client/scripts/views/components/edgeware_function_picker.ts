@@ -6,13 +6,14 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 
 const EdgewareFunctionPicker = {
   form: { module: '', function: '', args: [] },
-  getMethod: function() {
+  getMethod() {
     const mod = this.form.module;
     const func = this.form.function;
     const args = this.form.args;
     try {
       return (app.chain as Substrate).chain.getTxMethod(mod, func)(...args);
     } catch (error) {
+      // eslint-disable-next-line
       return;
     }
   },

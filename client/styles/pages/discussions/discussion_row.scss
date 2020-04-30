@@ -1,12 +1,11 @@
 @import 'client/styles/shared';
 
 $discussion-row-color: #999;
-$discussion-row-hpadding: 0;
-$discussion-row-vpadding: 40px;
 
 .DiscussionRow {
     display: block;
-    padding: 0 $discussion-row-hpadding $discussion-row-vpadding;
+    display: block;
+    margin: 20px 0 40px;
 
     a.discussion-tag {
         display: inline-block;
@@ -48,7 +47,14 @@ $discussion-row-vpadding: 40px;
         display: none;
     }
     .discussion-content {
+        position: relative;
         flex: 1;
+        .discussion-title {
+            .discussion-edit-tags {
+                position: absolute;
+                right: -7px;
+            }
+        }
     }
 
     // content left
@@ -130,6 +136,18 @@ $discussion-row-vpadding: 40px;
     .discussion-body-preview {
         font-size: 14px;
         color: $discussion-row-color;
+    }
+
+    .no-title {
+        padding-top: 0;
+        margin-top: -6px;
+    }
+    .no-title .discussion-excerpt {
+        color: #111;
+        font-size: 16px;
+    }
+    .no-title .discussion-title {
+        display: none;
     }
 
     @include xs-max {

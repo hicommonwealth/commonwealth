@@ -8,7 +8,7 @@ import { default as mixpanel } from 'mixpanel-browser';
 import { default as app } from 'state';
 import { inputModalWithText } from 'views/modals/input_modal';
 
-//import User from 'views/components/widgets/user';
+// import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import { CommunityInfo } from 'models';
 
@@ -31,14 +31,14 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
   },
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     return m('.CreateCommunityModal', [
-      m('h3', `New Commonwealth community`),
+      m('h3', 'New Commonwealth community'),
       m(CompactModalExitButton),
       m('form.login-option', [
         m('input[type="text"]', {
           name: 'name',
           placeholder: 'Community name',
-          oncreate: (vnode) => {
-            $(vnode.dom).focus();
+          oncreate: (vvnode) => {
+            $(vvnode.dom).focus();
           },
           autocomplete: 'off',
         }),
@@ -60,14 +60,14 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               name: 'invites',
               id: 'invites',
             }),
-            m('label', { for: 'invites' } , 'Allow members to invite others'),
+            m('label', { for: 'invites' }, 'Allow members to invite others'),
           ]),
           m('.form-field', [
             m('input[type="checkbox"]', {
               name: 'private_forum',
               id: 'private_forum',
             }),
-            m('label', { for: 'private_forum' } , 'Private: Only visible to members'),
+            m('label', { for: 'private_forum' }, 'Private: Only visible to members'),
           ]),
           m('br'),
           m('h4', 'Select an admin'),
@@ -86,7 +86,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               }),
               m('label', { for: `addr_select_${addr.address}_${addr.chain}` }, [
                 `${addr.address.slice(0, 6)}${addr.address.length > 6 ? '...' : ''} (${addr.chain})`,
-                //m(User, { user: [addr.address, addr.chain] }),
+                // m(User, { user: [addr.address, addr.chain] }),
               ]),
             ]);
           }),
@@ -107,7 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
-            $.post(app.serverUrl() + '/createCommunity', {
+            $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
               creator_chain: vnode.state.selectedChain,
               name,

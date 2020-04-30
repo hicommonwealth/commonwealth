@@ -78,15 +78,15 @@ export const SubstrateActionForm: m.Component<IActionFormAttrs, IActionFormState
                   vnode.state.sending = false;
                   m.redraw();
                 })
-                .catch(e => {
+                .catch((err) => {
                   vnode.state.sending = false;
                   m.redraw();
                 });
             } else {
               throw new Error(vnode.attrs.errorMsg);
             }
-          } catch (e) {
-            vnode.state.error = e.message;
+          } catch (err) {
+            vnode.state.error = err.message;
             vnode.state.sending = false;
             m.redraw();
           }
@@ -162,7 +162,7 @@ export const ControllerAccountForm: m.Component<{ stashes, stash }, {}> = {
         m('h5', 'Free'),
         m('.stash-stat-text', [
           // XXX: this needs to be fixed!
-          m('.stash-balance', app.chain.chain.coins(0/*balance*/).format(true)),
+          m('.stash-balance', app.chain.chain.coins(0/* balance */).format(true)),
         ]),
       ]),
       m('.clear'),
@@ -305,8 +305,8 @@ export const ManageSubstrateStakingModal = makeDynamicComponent<{ account }, IMa
     } else {
       accountForm = [
         m('h4', 'Set up a stash'),
-        stashes.length > 0 ?
-          m('.well.not-available', 'Not available - accounts cannot be both stash and controller') : [
+        stashes.length > 0
+          ? m('.well.not-available', 'Not available - accounts cannot be both stash and controller') : [
             m('p', 'For maximum security, stash keys should be kept offline on an air-gapped device.'),
             m(NewSubstrateStashForm, {}),
           ],
@@ -359,7 +359,7 @@ export const SubstrateValidatorRow: m.Component<IValidatorAttrs, ISubstrateValid
           ')',
         ],
       ]),
-      //m('td.val-age', '--'),
+      // m('td.val-age', '--'),
       m('td.val-action', [
         m('button.nominate-validator.formular-button-primary', {
           class: app.vm.activeAccount ? '' : 'disabled',
@@ -424,7 +424,7 @@ export const ValidationPreHeader = (vnode, chain: Substrate, sender: SubstrateAc
               : sender.nominateTx(vnode.state.nominations)).then(() => {
               // vnode.attrs.sending = false;
               m.redraw();
-            }, (e) => {
+            }, (err) => {
               // vnode.attrs.sending = false;
               m.redraw();
             });
@@ -511,4 +511,4 @@ export const ValidatorPresentationComponent = (vnode, chain: Substrate) => {
         }),
     ])
   }]);
-}
+};

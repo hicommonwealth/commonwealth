@@ -18,8 +18,8 @@ const ETHInstructions: m.Component<IAttrs> = {
   view: (vnode: m.VnodeDOM<IAttrs>) => {
     return m('.ETHInstructions', {
       key: vnode.attrs.method,
-      oncreate: (vnode) => {
-        $('.mithril-app').animate({ scrollTop: $(vnode.dom).position().top }, 500);
+      oncreate: (vvnode) => {
+        $('.mithril-app').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
       }
     }, [
       (vnode.attrs.method === 'myCrypto') ? [
@@ -89,7 +89,7 @@ const ETHInstructions: m.Component<IAttrs> = {
               ', and enter the amount of ETH you are locking.'
             ]),
             m(CodeBlock, 'Value: 1')]),
-          m('p', `Uncheck 'Automatically Calculate Gas Limit' and set your gas limit to 150000.`),
+          m('p', 'Uncheck \'Automatically Calculate Gas Limit\' and set your gas limit to 150000.'),
           m('p', 'Sign and send the transaction.')
         ]),
         m(SocialShare),
@@ -106,13 +106,13 @@ const ETHInstructions: m.Component<IAttrs> = {
           ]),
           m(CodeBlock, 'git clone https://github.com/hicommonwealth/supernova-lockdrop'),
           m('p', [
-            `You will need to install Node v11.6 to run the lockdrop scripts. If you don't `,
-            `have it installed, we recommend using NVM to install Node:`,
+            'You will need to install Node v11.6 to run the lockdrop scripts. If you don\'t ',
+            'have it installed, we recommend using NVM to install Node:',
           ]),
           m(CodeBlock, [
-            `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n`,
-            `nvm install 11.6.0\n`,
-            `nvm use 11.6.0\n`,
+            'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n',
+            'nvm install 11.6.0\n',
+            'nvm use 11.6.0\n',
           ]),
           m('p', [
             'Then, run ',
@@ -147,16 +147,16 @@ const ETHInstructions: m.Component<IAttrs> = {
             'file in the root directory of the repository, containing the following data.'
           ]),
           m(CodeBlock, [
-            `# ETH config \n`,
-            `ETH_PRIVATE_KEY=<ENTER_PRIVATE_KEY_HEX_HERE>\n`,
-            `\n`,
-            `# Node/provider config\n`,
-            `INFURA_PATH=<ENTER_INFURA_PATH_HERE>\n`,
-            `\n`,
-            `# Lockdrop config\n`,
+            '# ETH config \n',
+            'ETH_PRIVATE_KEY=<ENTER_PRIVATE_KEY_HEX_HERE>\n',
+            '\n',
+            '# Node/provider config\n',
+            'INFURA_PATH=<ENTER_INFURA_PATH_HERE>\n',
+            '\n',
+            '# Lockdrop config\n',
             `LOCKDROP_CONTRACT_ADDRESS=${vnode.attrs.lockdropContractAddress}\n`,
-            `\n`,
-            `# Supernova address to lock to\n`,
+            '\n',
+            '# Supernova address to lock to\n',
             `SUPERNOVA_ADDRESS=${vnode.attrs.supernovaAddress}`
           ]),
           m('p', [

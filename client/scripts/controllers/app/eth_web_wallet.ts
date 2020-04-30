@@ -20,7 +20,7 @@ class EthWebWalletController {
   }
 
   public get available() {
-    return (window.ethereum) ? true : false;
+    return !!(window.ethereum);
   }
   public get enabled() {
     return this.available && this._enabled;

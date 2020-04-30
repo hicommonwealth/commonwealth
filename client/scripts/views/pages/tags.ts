@@ -7,7 +7,7 @@ import $ from 'jquery';
 import { Card } from 'construct-ui';
 
 import app from 'state';
-import TagSelector from 'views/components/navigation/tag_selector';
+import TagSelector from 'views/components/sidebar/tag_selector';
 
 const TagsPage = {
   view: (vnode) => {

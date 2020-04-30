@@ -141,11 +141,6 @@
         text-align: left;
         white-space: pre-wrap;
         word-break: break-word;
-
-        // construct-ui input styles
-        color: #37474f;
-        box-shadow: 0px 1px 0px #eef1f2;
-        transition: border 200ms cubic-bezier(0.4, 1, 0.75, 0.9), background 200ms cubic-bezier(0.4, 1, 0.75, 0.9), color 200ms cubic-bezier(0.4, 1, 0.75, 0.9)
     }
     .ql-editor p,
     .ql-editor ol,
@@ -277,6 +272,30 @@
     }
     .ql-editor ol li.ql-indent-9:before {
         content: counter(list-9, decimal) '. ';
+    }
+    // Checklist styling
+    .ql-editor ul[data-checked=true], .ql-editor ul[data-checked=false] {
+        pointer-events: none;
+    }
+    .ql-editor ul[data-checked=true] > li::before, .ql-editor ul[data-checked=false] > li::before {
+        cursor: pointer;
+        pointer-events: all;
+        font-family: "fontello";
+    }
+    .ql-editor ul[data-checked="true"] li {
+        text-decoration: line-through;
+    }
+    .ql-editor ul[data-checked=true] > li::before {
+        content: '\f14a';
+        color: #777;
+        position: relative;
+        top: 1px;
+    }
+    .ql-editor ul[data-checked=false] > li::before {
+        content: '\f096';
+        color: #b0bec5;
+        position: relative;
+        top: 1px;
     }
     .ql-editor .ql-indent-1:not(.ql-direction-rtl) {
         padding-left: 3em;
@@ -1004,7 +1023,11 @@
     }
     .ql-container.ql-snow {
         border: 1px solid $form-border-color;
-        border-radius: 0 0 $form-border-radius $form-border-radius;
+        border-radius: 0 0 3px 3px;
+        // construct-ui input styles
+        color: #37474f;
+        box-shadow: 0px 1px 0px #eef1f2;
+        transition: border 200ms cubic-bezier(0.4, 1, 0.75, 0.9), background 200ms cubic-bezier(0.4, 1, 0.75, 0.9), color 200ms cubic-bezier(0.4, 1, 0.75, 0.9);
     }
 
     .ql-bubble.ql-toolbar:after,

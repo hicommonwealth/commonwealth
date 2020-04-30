@@ -100,7 +100,7 @@ const TXSigningCLIOption = {
       const obs = vnode.attrs.txData.transact(...args);
       obs.subscribe((txData: ITransactionResult) => {
         if (txData.status === TransactionStatus.Ready) {
-          vnode.attrs.next('WaitingToConfirmTransaction', { obs: obs });
+          vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
           vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
         }
@@ -115,7 +115,7 @@ const TXSigningCLIOption = {
       const calldata: ICosmosTXData = vnode.state.calldata;
       instructions = m('.instructions', [
         'Save the transaction\'s JSON data to a file: ',
-        m(CodeBlock, { clickToSelect: true }, 'echo \'' + calldata.call + '\' > tx.json'),
+        m(CodeBlock, { clickToSelect: true }, `echo '${calldata.call}' > tx.json`),
         ' and then sign the transaction, using the appropriate account:'
       ]);
       signBlock = m('.gaiacli-codeblock', [
@@ -132,13 +132,14 @@ const TXSigningCLIOption = {
       submitAction = m('button[type="submit"]', {
         onclick: (e) => {
           e.preventDefault();
-          //try {
-          const signedBlob = $(vnode.dom).find('textarea.signedtx').val().toString().trim();
+          // try {
+          const signedBlob = $(vnode.dom).find('textarea.signedtx').val().toString()
+            .trim();
           const signature = JSON.parse(signedBlob);
           transact(signature, calldata.gas);
-          //} catch (e) {
+          // } catch (e) {
           //  throw new Error('Failed to execute signed transaction');
-          //}
+          // }
         },
       }, 'Send transaction');
     } else if (vnode.state.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
@@ -162,9 +163,10 @@ const TXSigningCLIOption = {
         onclick: (e) => {
           e.preventDefault();
           try {
-            const signedTx = $(vnode.dom).find('textarea.signedtx').val().toString().trim();
+            const signedTx = $(vnode.dom).find('textarea.signedtx').val().toString()
+              .trim();
             transact(signedTx);
-          } catch (e) {
+          } catch (err) {
             throw new Error('Failed to execute signed transaction');
           }
         },
@@ -197,7 +199,7 @@ const TXSigningWebWalletOption = {
     const transact = async () => {
       const acct = vnode.attrs.author;
       try {
-        const signer = await (app.chain as Substrate).webWallet.getSigner(acct.address)
+        const signer = await (app.chain as Substrate).webWallet.getSigner(acct.address);
         const obs = vnode.attrs.txData.transact(acct.address, signer);
         obs.subscribe((txData: ITransactionResult) => {
           if (txData.status === TransactionStatus.Ready) {
@@ -210,8 +212,8 @@ const TXSigningWebWalletOption = {
     };
     const isWebWalletAvailable = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available;
     const isWebWalletEnabled = (app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.enabled;
-    const isAuthorInWebWallet = (app.chain as Substrate).webWallet &&
-      !!(app.chain as Substrate).webWallet.accounts.find((v) => {
+    const isAuthorInWebWallet = (app.chain as Substrate).webWallet
+      && !!(app.chain as Substrate).webWallet.accounts.find((v) => {
         return AddressSwapper({
           address: v.address,
           currentPrefix: (app.chain as Substrate).chain.ss58Format,
@@ -222,14 +224,14 @@ const TXSigningWebWalletOption = {
       m('button[type="submit"]', {
         disabled: !isWebWalletEnabled || !isAuthorInWebWallet,
         onclick: async (e) => { await transact(); },
-        oncreate: (vnode) => $(vnode.dom).focus(),
+        oncreate: (vvnode) => $(vvnode.dom).focus(),
       }, !isWebWalletAvailable
-        ? 'No extension detected' :
-          !isWebWalletEnabled
-            ? 'Connect to extension' :
-            !isAuthorInWebWallet ?
-              'Signer not in web wallet' :
-              'Sign and send transaction'),
+        ? 'No extension detected'
+        : !isWebWalletEnabled
+          ? 'Connect to extension'
+          : !isAuthorInWebWallet
+            ? 'Signer not in web wallet'
+            : 'Sign and send transaction'),
       m(SendingFrom, { author: vnode.attrs.author }),
     ]);
   }
@@ -241,7 +243,7 @@ const TXSigningSeedOrMnemonicOption = {
       const obs = vnode.attrs.txData.transact();
       obs.subscribe((txData: ITransactionResult) => {
         if (txData.status === TransactionStatus.Ready) {
-          vnode.attrs.next('WaitingToConfirmTransaction', { obs: obs });
+          vnode.attrs.next('WaitingToConfirmTransaction', { obs });
         } else {
           vnode.attrs.next('SentTransactionRejected', { error: new Error('Transaction Failed'), hash: null });
         }
@@ -253,17 +255,21 @@ const TXSigningSeedOrMnemonicOption = {
         m('.warn', 'This is insecure. Only use key phrases for testnets or throwaway accounts.'),
         m('textarea.mnemonic', {
           placeholder: 'Key phrase or seed',
-          oncreate: (vnode) => $(vnode.dom).focus()
+          oncreate: (vvnode) => $(vvnode.dom).focus()
         }),
         m('button[type="submit"]', {
           onclick: (e) => {
             e.preventDefault();
-            const newKey = '' + $(vnode.dom).find('textarea.mnemonic').val().toString().trim();
+            const newKey = `${$(vnode.dom).find('textarea.mnemonic').val().toString()
+              .trim()}`;
             try {
-              mnemonicValidate(newKey) ?
-                vnode.attrs.author.setMnemonic(newKey) : vnode.attrs.author.setSeed(newKey);
+              if (mnemonicValidate(newKey)) {
+                vnode.attrs.author.setMnemonic(newKey);
+              } else {
+                vnode.attrs.author.setSeed(newKey);
+              }
               transact();
-            } catch (e) {
+            } catch (err) {
               throw new Error('Key phrase or seed did not match this account');
             }
           },
@@ -276,7 +282,7 @@ const TXSigningSeedOrMnemonicOption = {
             e.preventDefault();
             transact();
           },
-          oncreate: (vnode) => $(vnode.dom).focus()
+          oncreate: (vvnode) => $(vvnode.dom).focus()
         }, 'Send transaction'),
         m(SendingFrom, { author: vnode.attrs.author }),
       ],
@@ -304,12 +310,12 @@ const TXSigningModalStates = {
               author: vnode.attrs.author,
               next: vnode.attrs.next,
             }),
-            selected: app.chain.base === ChainBase.Substrate &&
-              !(vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic()) &&
-              (app.chain as Substrate).webWallet &&
-              (app.chain as Substrate).webWallet.available &&
-              (app.chain as Substrate).webWallet.enabled &&
-              (app.chain as Substrate).webWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
+            selected: app.chain.base === ChainBase.Substrate
+              && !(vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic())
+              && (app.chain as Substrate).webWallet
+              && (app.chain as Substrate).webWallet.available
+              && (app.chain as Substrate).webWallet.enabled
+              && (app.chain as Substrate).webWallet.accounts.find((v) => v.address === vnode.attrs.author.address),
             disabled: app.chain.base !== ChainBase.Substrate,
           }, {
             name: 'Command line',
@@ -326,8 +332,8 @@ const TXSigningModalStates = {
               next: vnode.attrs.next,
             }),
             // select mnemonic if the account is already unlocked
-            selected: app.chain.base === ChainBase.Substrate &&
-              (vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic()),
+            selected: app.chain.base === ChainBase.Substrate
+              && (vnode.attrs.author.getSeed() || vnode.attrs.author.getMnemonic()),
             disabled: app.chain.base !== ChainBase.Substrate,
           }]),
         ])
@@ -383,7 +389,7 @@ const TXSigningModalStates = {
             type: 'submit',
             disabled: true,
             onclick: (e) => (undefined),
-          }, 'Waiting ' + (vnode.state.timer || 0) + 's...'),
+          }, `Waiting ${vnode.state.timer || 0}s...`),
         ]),
       ]);
     }
@@ -396,13 +402,13 @@ const TXSigningModalStates = {
           m(TXSigningTransactionBox, {
             success: true,
             status: 'Success',
-            blockHash: '' + vnode.attrs.stateData.hash,
-            blockNum: '' + vnode.attrs.stateData.blocknum,
-            timestamp: vnode.attrs.stateData.timestamp ? '' + vnode.attrs.stateData.timestamp.format() : '--',
+            blockHash: `${vnode.attrs.stateData.hash}`,
+            blockNum: `${vnode.attrs.stateData.blocknum}`,
+            timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
           }),
           m('button', {
             type: 'submit',
-            oncreate: (vnode) => $(vnode.dom).focus(),
+            oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
@@ -420,9 +426,9 @@ const TXSigningModalStates = {
           m(TXSigningTransactionBox, {
             success: false,
             status: 'Fail',
-            blockHash: vnode.attrs.stateData.hash ? '' + vnode.attrs.stateData.hash : '--',
-            blockNum: vnode.attrs.stateData.blocknum ? '' + vnode.attrs.stateData.blocknum : '--',
-            timestamp: vnode.attrs.stateData.timestamp ? '' + vnode.attrs.stateData.timestamp.format() : '--',
+            blockHash: vnode.attrs.stateData.hash ? `${vnode.attrs.stateData.hash}` : '--',
+            blockNum: vnode.attrs.stateData.blocknum ? `${vnode.attrs.stateData.blocknum}` : '--',
+            timestamp: vnode.attrs.stateData.timestamp ? `${vnode.attrs.stateData.timestamp.format()}` : '--',
           }),
           m('button', {
             type: 'submit',
@@ -432,7 +438,7 @@ const TXSigningModalStates = {
             }
           }, 'Done'),
           m('button', {
-            oncreate: (vnode) => $(vnode.dom).focus(),
+            oncreate: (vvnode) => $(vvnode.dom).focus(),
             onclick: (e) => { vnode.attrs.next('Intro'); }
           }, 'Try again'),
         ]),
@@ -481,11 +487,11 @@ export const createTXModal = async (dataP: ITXModalData | Promise<ITXModalData>)
           }
           return complete ? resolve(data) : reject(data);
         },
-        data: data,
+        data,
       });
       m.redraw();
     });
-    return await modalP;
+    return modalP;
   }
 };
 

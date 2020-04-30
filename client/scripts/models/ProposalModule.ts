@@ -45,7 +45,7 @@ export abstract class ProposalModule<
             }
           })
         ).subscribe((props: ProposalT[]) => {
-        //console.log('fetched proposals for: ' + this.constructor.name);
+        // console.log('fetched proposals for: ' + this.constructor.name);
           resolve(props);
         }, (err) => {
           console.error(`${this.constructor.name}: proposal error: ${JSON.stringify(err)}`);

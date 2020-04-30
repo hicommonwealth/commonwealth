@@ -35,7 +35,7 @@ const Tooltip : m.Component<ITooltipAttrs, { tippy, renderedElement }> = {
       oncreate: (vvnode) => {
         vnode.state.tippy = tippy(vvnode.dom, {
           content: isString ? content : vnode.state.renderedElement,
-          allowHTML: isString ? false : true,
+          allowHTML: !isString,
           theme: 'light',
           animation: 'shift-away-subtle',
           delay: [150, 0],

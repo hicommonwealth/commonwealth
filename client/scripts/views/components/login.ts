@@ -77,8 +77,8 @@ const Login: m.Component<IAttrs, IState> = {
           onclick: (e) => {
             e.stopPropagation();
           },
-          oncreate: (vnode) => {
-            $(vnode.dom).focus();
+          oncreate: (vvnode) => {
+            $(vvnode.dom).focus();
           }
         }),
         m(Button, {
@@ -95,7 +95,7 @@ const Login: m.Component<IAttrs, IState> = {
             vnode.state.disabled = true;
             vnode.state.success = false;
             vnode.state.failure = false;
-            $.post(app.serverUrl() + '/login', { email, path }).then((response) => {
+            $.post(`${app.serverUrl()}/login`, { email, path }).then((response) => {
               vnode.state.disabled = false;
               if (response.status === 'Success') {
                 vnode.state.success = true;
@@ -111,14 +111,14 @@ const Login: m.Component<IAttrs, IState> = {
               m.redraw();
             });
           },
-          label: creatingAccount ?
-            (vnode.state.disabled ? 'Creating account...' : 'Sign up') :
-            (vnode.state.disabled ? 'Logging in...' : 'Log in with email')
+          label: creatingAccount
+            ? (vnode.state.disabled ? 'Creating account...' : 'Sign up')
+            : (vnode.state.disabled ? 'Logging in...' : 'Log in with email')
         }),
         vnode.state.success && m('.login-message.success', [
-          creatingAccount ?
-            'Check your email to finish creating your account.' :
-            'Check your email to finish logging in.'
+          creatingAccount
+            ? 'Check your email to finish creating your account.'
+            : 'Check your email to finish logging in.'
         ]),
         vnode.state.failure && m('.login-message.failure', [
           vnode.state.error || 'An error occurred.'
@@ -128,7 +128,7 @@ const Login: m.Component<IAttrs, IState> = {
         m(Button, {
           intent: 'primary',
           fluid: true,
-          href: app.serverUrl() + '/auth/github',
+          href: `${app.serverUrl()}/auth/github`,
           class: 'login-with-github',
           onclick: (e) => {
             localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
@@ -147,9 +147,9 @@ const Login: m.Component<IAttrs, IState> = {
             $(e.target).trigger('menuclose');
             app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
           },
-          label: creatingAccount ?
-            `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet` :
-            `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
+          label: creatingAccount
+            ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`
+            : `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
         }),
       ])
     ]);

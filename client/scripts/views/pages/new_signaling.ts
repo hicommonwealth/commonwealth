@@ -50,13 +50,13 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
       return m(PageLoading);
     }
-    if (!app.chain?.loaded) {
+    if (!app.chain || !app.chain.loaded) {
       return m(PageLoading);
     }
-    if (app.chain.class !== ChainClass.Edgeware) {
-      notifyInfo('Not supported');
+    if (app.chain && app.chain.class !== ChainClass.Edgeware) {
+      notifyInfo('Can only create signaling proposals on Edgeware');
       m.route.set(`/${app.activeChainId()}/discussions`);
-      return m(PageLoading);
+      return;
     }
 
     const author = app.vm.activeAccount;

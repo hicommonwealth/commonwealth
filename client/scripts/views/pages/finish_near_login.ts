@@ -68,7 +68,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
         subtitle: 'Error!',
         sidebar: [],
         content: [
-          m('h3', 'NEAR account log in error: ' + vnode.state.validationError),
+          m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
           m('button.formular-button-primary', {
             onclick: async (e) => {
               e.preventDefault();
@@ -90,7 +90,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
                 app.modals.create({
                   modal: LinkNewAddressModal,
                   data: { alreadyInitializedAccount: vnode.state.validatedAccount },
-                  exitCallback: (e) => {
+                  exitCallback: () => {
                     redirectToNextPage();
                   }
                 });
@@ -114,29 +114,29 @@ const FinishNearLogin: m.Component<{}, IState> = {
             }
             return createUserWithAddress(acct.address);
           })
-          .then(() => {
-            return acct.validate();
-          })
-          .then(async () => {
-            if (!app.isLoggedIn()) {
-              await initAppState();
-              updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain :
-                                    app.config.nodes.getByChain(app.activeChainId())[0].chain);
-            }
-            setActiveAccount(acct, true);
-          })
-          .then(() => {
-            vnode.state.validationCompleted = true;
-            vnode.state.validating = false;
-            vnode.state.validatedAccount = acct;
-            m.redraw();
-          })
-          .catch((err) => {
-            vnode.state.validationCompleted = true;
-            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
-            vnode.state.validating = false;
-            m.redraw();
-          });
+            .then(() => {
+              return acct.validate();
+            })
+            .then(async () => {
+              if (!app.isLoggedIn()) {
+                await initAppState();
+                updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain
+                  : app.config.nodes.getByChain(app.activeChainId())[0].chain);
+              }
+              setActiveAccount(acct, true);
+            })
+            .then(() => {
+              vnode.state.validationCompleted = true;
+              vnode.state.validating = false;
+              vnode.state.validatedAccount = acct;
+              m.redraw();
+            })
+            .catch((err) => {
+              vnode.state.validationCompleted = true;
+              vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
+              vnode.state.validating = false;
+              m.redraw();
+            });
         } else {
           vnode.state.validationError = 'Sign-in failed.';
           vnode.state.validating = false;

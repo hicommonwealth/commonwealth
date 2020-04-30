@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-import 'components/navigation/tag_selector.scss';
+import 'components/sidebar/tag_selector.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
@@ -13,84 +13,6 @@ import { OffchainThreadKind } from 'models';
 import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
-
-interface IGetTagListingParams {
-  activeTag: string,
-  featuredTagIds: string[],
-  addFeaturedTag: Function,
-  removeFeaturedTag: Function,
-  hideEditButton: boolean,
-}
-
-export const getTagListing = (params: IGetTagListingParams) => {
-  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag, hideEditButton } = params;
-  const otherTags = {};
-  const featuredTags = {};
-
-  app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
-    const { tags } = thread;
-    tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will excluded from
-      // addition to the TagStore, since said store will be more up-to-date
-      const existing = app.tags.getByIdentifier(tag.id);
-      if (!existing) app.tags.addToStore(tag);
-      const { id, name, description } = existing || tag;
-
-      if (featuredTagIds.includes(`${id}`)) {
-        if (featuredTags[name]) featuredTags[name].count += 1;
-        else {
-          featuredTags[name] = {
-            count: 1,
-            description,
-            featured_order: featuredTagIds.indexOf(`${id}`),
-            id,
-            name,
-          };
-        }
-      } else if (otherTags[name]) {
-        otherTags[name].count += 1;
-      } else {
-        otherTags[name] = {
-          count: 1,
-          description,
-          id,
-          name,
-        };
-      }
-    });
-  });
-
-  const otherTagListing = Object.keys(otherTags)
-    .sort((a, b) => otherTags[b].count - otherTags[a].count)
-    .map((name, idx) => m(TagRow, {
-      count: otherTags[name].count,
-      description: otherTags[name].description,
-      featured: false,
-      id: otherTags[name].id,
-      name: otherTags[name].name,
-      addFeaturedTag,
-      removeFeaturedTag,
-      hideEditButton
-    }));
-
-  const featuredTagListing = featuredTagIds.length
-    ? Object.keys(featuredTags)
-      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
-      .map((name, idx) => m(TagRow, {
-        count: featuredTags[name].count,
-        description: featuredTags[name].description,
-        featured: true,
-        featured_order: Number(featuredTags[name].featured_order),
-        id: featuredTags[name].id,
-        name: featuredTags[name].name,
-        addFeaturedTag,
-        removeFeaturedTag,
-        hideEditButton
-      }))
-    : [];
-
-  return ({ featuredTagListing, otherTagListing });
-};
 
 interface ITagRowAttrs {
   count: number,
@@ -155,7 +77,87 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
   }
 };
 
-const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hideEditButton?: boolean }, { refreshed, featuredTagIds }> = {
+interface IGetTagListingParams {
+  activeTag: string,
+  featuredTagIds: string[],
+  addFeaturedTag: Function,
+  removeFeaturedTag: Function,
+  hideEditButton: boolean,
+}
+
+export const getTagListing = (params: IGetTagListingParams) => {
+  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag, hideEditButton } = params;
+  const otherTags = {};
+  const featuredTags = {};
+
+  app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
+    const { tags } = thread;
+    tags.forEach((tag) => {
+      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
+      // addition to the TagStore, since said store will be more up-to-date
+      const existing = app.tags.getByIdentifier(tag.id);
+      if (!existing) app.tags.addToStore(tag);
+      const { id, name, description } = existing || tag;
+
+      if (featuredTagIds.includes(`${id}`)) {
+        if (featuredTags[name]) featuredTags[name].count += 1;
+        else {
+          featuredTags[name] = {
+            count: 1,
+            description,
+            featured_order: featuredTagIds.indexOf(`${id}`),
+            id,
+            name,
+          };
+        }
+      } else if (otherTags[name]) {
+        otherTags[name].count += 1;
+      } else {
+        otherTags[name] = {
+          count: 1,
+          description,
+          id,
+          name,
+        };
+      }
+    });
+  });
+
+  const otherTagListing = Object.keys(otherTags)
+    .sort((a, b) => otherTags[b].count - otherTags[a].count)
+    .map((name, idx) => m(TagRow, {
+      count: otherTags[name].count,
+      description: otherTags[name].description,
+      featured: false,
+      id: otherTags[name].id,
+      name: otherTags[name].name,
+      addFeaturedTag,
+      removeFeaturedTag,
+      hideEditButton
+    }));
+
+  const featuredTagListing = featuredTagIds.length
+    ? Object.keys(featuredTags)
+      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
+      .map((name, idx) => m(TagRow, {
+        count: featuredTags[name].count,
+        description: featuredTags[name].description,
+        featured: true,
+        featured_order: Number(featuredTags[name].featured_order),
+        id: featuredTags[name].id,
+        name: featuredTags[name].name,
+        addFeaturedTag,
+        removeFeaturedTag,
+        hideEditButton
+      }))
+    : [];
+
+  return ({ featuredTagListing, otherTagListing });
+};
+
+const TagSelector: m.Component<{
+  activeTag: string, showFullListing: boolean, hideEditButton?: boolean
+}, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
     const { activeTag, showFullListing, hideEditButton } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
