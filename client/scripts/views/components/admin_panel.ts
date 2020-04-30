@@ -109,7 +109,6 @@ const ToggleRow: m.Component<IToggleRowAttrs, {toggled: boolean, checked: boolea
             vnode.state.checked = !vnode.state.checked;
             vnode.attrs.onToggle(vnode.state.toggled);
           },
-          // style: 'margin-left: 20px;',
         })
       ])
     ]);

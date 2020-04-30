@@ -38,7 +38,6 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   });
   if (!member) return next(new Error('Cannot find member to upgrade!'));
   if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error('Cannot demote self'));
-  // if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
 
   member.permission = new_role;
   await member.save();
