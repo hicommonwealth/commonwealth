@@ -328,6 +328,9 @@ $(() => {
     '/about':                    importRoute(import('views/pages/landing/about'), false),
     '/terms':                    importRoute(import('views/pages/landing/terms'), false),
     '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/action':                   importRoute(import('views/pages/landing/action'), false),
+    '/why':                      importRoute(import('views/pages/landing/why'), false),
+    '/users':                    importRoute(import('views/pages/landing/users'), false),
 
     // Login page
     '/login':                    importRoute(import('views/pages/login'), false),

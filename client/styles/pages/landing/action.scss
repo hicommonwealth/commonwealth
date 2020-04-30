@@ -1,0 +1,80 @@
+@import 'client/styles/shared';
+
+.layout-content {
+    padding-right: 0 !important;
+}
+
+.ActionPage {
+    position: relative;
+    // padding: 0 20px 64px;
+    width: 100%;
+    @include xs-max {
+        padding: 0 10px;
+        margin: 0;
+        width: 100%;
+    }
+
+    p.lead-title {
+        font-weight: 600;
+        font-size: 28px;
+        line-height: 1.25;
+        margin: 42px 0 0;
+        color: #feffff;
+        font-family: 'Inter';
+    }
+    p.lead-description {
+        font-size: 16px;
+        line-height: 1.25;
+        margin: 6px 0 42px;
+        color: #feffff;
+        font-family: 'Inter';
+        font-weight: 400;
+    }
+
+    img {
+        width: 180px;
+        height: 50px;
+    }
+
+    .action.container {
+        display: flex;
+        @include xs-max {
+            padding-top: 20px;
+        }
+
+        .action.item {
+            flex: 1 0 auto;
+        }
+    
+        .action.item-large {
+            flex: 2 0 auto;
+        }
+    }
+
+    .div.near {
+       background-color: #4b4f54;
+    }
+    .div.edgeware {
+        background-color: #2a2423;
+    }
+    .div.kusama {
+        background-color: rgba(230, 0, 122, 0.9);
+    }
+    .div.moloch {
+        background-color: #000000;
+    }
+    .div.roll {
+        background-color: #fff3db;
+        p.lead-title {
+            color: #273355;
+        }
+        p.lead-description {
+            color: #273355;
+        }
+
+    }
+    .div.own {
+        background-color: #f8f8f8;
+    }   
+ 
+}

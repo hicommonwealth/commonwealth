@@ -1,0 +1,95 @@
+@import 'client/styles/shared';
+
+.layout-content {
+    padding-top: 0 !important;
+}
+
+.WhyPage {
+    position: relative;
+    width: 100%;
+    @include xs-max {
+        padding: 0 10px;
+        margin: 0;
+        width: 100%;
+    }
+
+    h2.lead-title {
+        padding: 10px 0 10px;
+        font-weight: 600;
+        font-size: 28px;
+        line-height: 1.25;
+        margin: 42px 0 0;
+        text-align: center;
+    }
+    p.lead-description {
+        font-size: 16px;
+        line-height: 1.25;
+        margin: 6px 0 42px;
+        /* Style for "Crypto-nat" */
+        color: #2e2928;
+        font-family: 'Inter';
+        font-weight: 500;
+    }
+
+    .div.features {
+        background: #f8f8f8;
+    }
+
+    .div.top {
+        background: #272524;
+        height: 400px;
+
+        h2.lead-title {
+            padding-top: 20px !important;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 1.25;
+            margin: 42px 0 0;
+            text-align: left;
+            color: #feffff;
+        }
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            text-align: left;
+            /* Style for "Crypto-nat" */
+            color: #2e2928;
+            font-family: 'Inter';
+            font-weight: 400;
+            color: #feffff;
+        }
+    }
+
+    .div.comparison {
+        padding-bottom: 20px;
+
+        h2.lead-title {
+            padding-bottom: 20px;
+        }
+    }
+
+    .div.own {
+        background: #272524;
+        padding: 20px 0 20px;
+
+        h2.lead-title {
+            // padding: 0 0 10px;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 1.25;
+            margin: 0 0 0;
+            text-align: center;
+            color: #feffff;
+        }
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            /* Style for "Crypto-nat" */
+            color: #2e2928;
+            font-family: 'Inter';
+            font-weight: 500;
+        }
+    }
+}

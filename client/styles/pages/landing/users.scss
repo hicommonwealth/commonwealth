@@ -1,0 +1,57 @@
+@import 'client/styles/shared';
+
+.WhyPage {
+    .home-content {
+        background: #rgba4;
+        position: relative;
+        padding: 0 20px 64px;
+        width: 100%;
+        @include xs-max {
+            padding: 0 10px;
+            margin: 0;
+            width: 100%;
+        }
+
+        h2.lead-title {
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 1.25;
+            margin: 42px 0 0;
+        }
+    }
+
+    div.community {
+      background: #f8f8f8;
+    }
+
+    div.validators {
+        background: #f8f8f8;
+      }
+    div.developers {
+        background: #f8f8f8;
+    }
+    div.tokenholders {
+        background: #f8f8f8;
+    }
+    div.leaders {
+        background: #272524;
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        p.lead-bold {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+    }
+}
