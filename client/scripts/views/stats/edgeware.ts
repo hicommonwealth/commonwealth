@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-operators */
 import 'stats/edgeware.scss';
 
 import $ from 'jquery';
@@ -42,10 +43,9 @@ const colorWheel = [
   '#f37020', '#f68e1f', '#ffc212', '#ffcd56', '#00a88f',
   '#0191cd', '#0256a6', '#7044a0', '#a64499', '#ff3d64',
 ];
-const getColors = (num) =>
-  num > colorWheel.length ?
-  colorWheel.concat(getColors(num - colorWheel.length)) :
-  colorWheel.slice(0, num);
+const getColors = (num) => num > colorWheel.length
+  ? colorWheel.concat(getColors(num - colorWheel.length))
+  : colorWheel.slice(0, num);
 
 // page global state stored here
 const state = {
@@ -96,7 +96,7 @@ const Pie = {
           const ctx = canvas.dom['getContext']('2d');
           vnode.state.chart = new Chart(ctx, {
             type: 'pie',
-            data: data,
+            data,
             options: {
               animation: { duration: 0 },
               responsive: true,
@@ -104,8 +104,8 @@ const Pie = {
               title: { display: true, text: title, fontSize: 14 },
               tooltips: {
                 callbacks: {
-                  label: (tooltipItem, data) => {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
+                  label: (tooltipItem, data2) => {
+                    const dataset = data2.datasets[tooltipItem.datasetIndex];
                     const item = dataset.data[tooltipItem.index];
                     return dataset.formatter ? dataset.formatter(item, tooltipItem.index) : item.toString();
                   }
@@ -139,14 +139,14 @@ const Line = {
           const ctx = canvas.dom['getContext']('2d');
           vnode.state.chart = new Chart(ctx, {
             type: 'scatter',
-            data: data,
+            data,
             options: {
               responsive: true,
               title: { display: true, text: title, fontSize: 14 },
               tooltips: {
                 callbacks: {
-                  label: (tooltipItem, data) => {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
+                  label: (tooltipItem, data2) => {
+                    const dataset = data2.datasets[tooltipItem.datasetIndex];
                     const item = dataset.data[tooltipItem.index];
                     return dataset.formatter ? dataset.formatter(item) : item.toString();
                   }
@@ -167,7 +167,7 @@ const Line = {
 
 const EdgewareStatsPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'Edgeware Stats Page'});
+    mixpanel.track('PageVisit', { 'Page Name': 'Edgeware Stats Page' });
   },
   view: (vnode) => {
     return m('.EdgewareStatsPage', {
@@ -190,13 +190,13 @@ const EdgewareStatsPage = {
             m('.top-line-summary.row', [
               m('.col-sm-4', [
                 m('h3', 'Total Locked'),
-                m('p', state.participationSummary ?
-                  `${formatNumberRound(state.participationSummary.totalETHLocked)} ETH` : '--'),
+                m('p', state.participationSummary
+                  ? `${formatNumberRound(state.participationSummary.totalETHLocked)} ETH` : '--'),
               ]),
               m('.col-sm-4', [
                 m('h3', 'Total Signaled'),
-                m('p', state.participationSummary ?
-                  `${formatNumberRound(state.participationSummary.totalETHSignaled)} ETH` : '--'),
+                m('p', state.participationSummary
+                  ? `${formatNumberRound(state.participationSummary.totalETHSignaled)} ETH` : '--'),
               ]),
               m('.col-sm-4', [
                 m('h3', 'Last lock or signal'),
@@ -229,7 +229,7 @@ const EdgewareStatsPage = {
                         data: summary.participantsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
+                          `${formatDate(new Date(summary.blocknumToTime[d.x]))} (approx.)`],
                       }, {
                         label: 'Lock events',
                         backgroundColor: '#ff9f40',
@@ -239,7 +239,7 @@ const EdgewareStatsPage = {
                         data: summary.lockEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
+                          `${formatDate(new Date(summary.blocknumToTime[d.x]))} (approx.)`],
                       }, {
                         label: 'Signal events',
                         backgroundColor: '#ffcd56',
@@ -249,7 +249,7 @@ const EdgewareStatsPage = {
                         data: summary.signalEventsByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y} ${d.y === 1 ? 'participant' : 'participants'}`,
-                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
+                          `${formatDate(new Date(summary.blocknumToTime[d.x]))} (approx.)`],
                       }]
                     }
                   };
@@ -271,7 +271,7 @@ const EdgewareStatsPage = {
                         data: summary.ethLockedByBlock,
                         fill: false,
                         formatter: (d) => [`${d.y.toFixed(2)} ETH`,
-                                           formatDate(new Date(summary.blocknumToTime[d.x])) + ' (approx.)'],
+                          `${formatDate(new Date(summary.blocknumToTime[d.x]))} (approx.)`],
                       }]
                     }
                   };
@@ -282,14 +282,14 @@ const EdgewareStatsPage = {
                 getData: () => {
                   const summary = state.participationSummary;
                   const ethDistribution = [ summary.totalETHLocked3mo,
-                                            summary.totalETHLocked6mo,
-                                            summary.totalETHLocked12mo,
-                                            summary.totalETHSignaled ].reverse();
+                    summary.totalETHLocked6mo,
+                    summary.totalETHLocked12mo,
+                    summary.totalETHSignaled ].reverse();
                   const ethDistributionLabels = [
-                    'Locked 3mo: ' + formatNumber(summary.totalETHLocked3mo) + ' ETH',
-                    'Locked 6mo: ' + formatNumber(summary.totalETHLocked6mo) + ' ETH',
-                    'Locked 12mo: ' + formatNumber(summary.totalETHLocked12mo) + ' ETH',
-                    'Signaled: ' + formatNumber(summary.totalETHSignaled) + ' ETH',
+                    `Locked 3mo: ${formatNumber(summary.totalETHLocked3mo)} ETH`,
+                    `Locked 6mo: ${formatNumber(summary.totalETHLocked6mo)} ETH`,
+                    `Locked 12mo: ${formatNumber(summary.totalETHLocked12mo)} ETH`,
+                    `Signaled: ${formatNumber(summary.totalETHSignaled)} ETH`,
                   ].reverse();
                   return {
                     title: 'ETH locked or signaled',
@@ -298,7 +298,7 @@ const EdgewareStatsPage = {
                         data: ethDistribution,
                         backgroundColor: colorWheel.slice(0, 3).concat(['#ff6383']).reverse(),
                         borderWidth: 1,
-                        formatter: (d, index) => [formatNumber(d) + ' ETH'],
+                        formatter: (d, index) => [`${formatNumber(d)} ETH`],
                       }],
                       labels: ethDistributionLabels,
                     }
@@ -316,9 +316,9 @@ const EdgewareStatsPage = {
                   const totalEDG = 5000000000;
                   const edgDistribution = [ lockersEDG, signalersEDG, otherEDG ].reverse();
                   const edgDistributionLabels = [
-                    'Lockers: ' + (100 * lockersEDG / totalEDG).toFixed(1) + '%',
-                    'Signalers: ' + (100 * signalersEDG / totalEDG).toFixed(1) + '%',
-                    'Other: ' + (100 * otherEDG / totalEDG).toFixed(1) + '%',
+                    `Lockers: ${(100 * lockersEDG / totalEDG).toFixed(1)}%`,
+                    `Signalers: ${(100 * signalersEDG / totalEDG).toFixed(1)}%`,
+                    `Other: ${(100 * otherEDG / totalEDG).toFixed(1)}%`,
                   ].reverse();
                   return {
                     title: 'EDG distribution',
@@ -327,7 +327,7 @@ const EdgewareStatsPage = {
                         data: edgDistribution,
                         backgroundColor: colorWheel.slice(0, 3).reverse(),
                         borderWidth: 1,
-                        formatter: (d, index) => [formatNumber(d) + ' EDG'],
+                        formatter: (d, index) => [`${formatNumber(d)} EDG`],
                       }],
                       labels: edgDistributionLabels,
                     }
@@ -352,7 +352,7 @@ const EdgewareStatsPage = {
                         data: lockDistribution.map((d) => d.value),
                         backgroundColor: getColors(lockDistribution.length).reverse(),
                         borderWidth: 1,
-                        formatter: (d, index) => [formatNumber(d) + ' ETH'],
+                        formatter: (d, index) => [`${formatNumber(d)} ETH`],
                         onclick: (index) => lookupAddrs(lockDistribution[index].lockAddrs)
                       }],
                     },
@@ -379,10 +379,10 @@ const EdgewareStatsPage = {
                         backgroundColor: getColors(effectiveLocksDistribution.length).reverse(),
                         borderWidth: 1,
                         formatter: (d, index) => {
-                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked +
-                                                      summary.totalEffectiveETHSignaled) * 0.9 * 100;
-                          return [formatNumber(d) + ' ETH',
-                                  pct.toFixed(4) + '%'];
+                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked
+                                                      + summary.totalEffectiveETHSignaled) * 0.9 * 100;
+                          return [`${formatNumber(d)} ETH`,
+                            `${pct.toFixed(4)}%`];
                         },
                         onclick: (index) => lookupAddrs(effectiveLocksDistribution[index].lockAddrs),
                       }],
@@ -404,14 +404,15 @@ const EdgewareStatsPage = {
                   const totalValidatingLockedETH = validatingDistribution.map((d) => d.value)
                     .reduce(((a, b) => a + b), 0);
                   return {
-                    title: `Validating Lockers - ` +
-                      `${formatNumberRound(totalValidatingLockedETH)} ETH (${validatingDistribution.length} addresses)`,
+                    title: 'Validating Lockers - '
+                      + `${formatNumberRound(totalValidatingLockedETH)} ETH `
+                      + `(${validatingDistribution.length} addresses)`,
                     data: {
                       datasets: [{
                         data: validatingDistribution.map((d) => d.value),
                         backgroundColor: getColors(validatingDistribution.length).reverse(),
                         borderWidth: 1,
-                        formatter: (d, index) => [formatNumber(d) + ' ETH'],
+                        formatter: (d, index) => [`${formatNumber(d)} ETH`],
                         onclick: (index) => lookupAddrs(validatingDistribution[index].lockAddrs),
                       }],
                     }
@@ -438,10 +439,10 @@ const EdgewareStatsPage = {
                         backgroundColor: getColors(effectiveValDistribution.length).reverse(),
                         borderWidth: 1,
                         formatter: (d, index) => {
-                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked +
-                                                      summary.totalEffectiveETHSignaled) * 0.9 * 100;
-                          return [formatNumber(d) + ' ETH',
-                                  pct.toFixed(4) + '%'];
+                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked
+                                                      + summary.totalEffectiveETHSignaled) * 0.9 * 100;
+                          return [`${formatNumber(d)} ETH`,
+                            `${pct.toFixed(4)}%`];
                         },
                         onclick: (index) => lookupAddrs(effectiveValDistribution[index].lockAddrs),
                       }],
@@ -461,14 +462,14 @@ const EdgewareStatsPage = {
                     .sort((a, b) => a.value - b.value);
                   const totalSignaledETH = signalDistribution.map((d) => d.value).reduce(((a, b) => a + b), 0);
                   return {
-                    title: `Signalers - ` +
-                      `${formatNumberRound(totalSignaledETH)} ETH (${signalDistribution.length} addresses)`,
+                    title: 'Signalers - '
+                      + `${formatNumberRound(totalSignaledETH)} ETH (${signalDistribution.length} addresses)`,
                     data: {
                       datasets: [{
                         data: signalDistribution.map((d) => d.value),
                         backgroundColor: getColors(signalDistribution.length).reverse(),
                         borderWidth: 1,
-                        formatter: (d, index) => [formatNumber(d) + ' ETH'],
+                        formatter: (d, index) => [`${formatNumber(d)} ETH`],
                         onclick: (index) => lookupAddrs(signalDistribution[index].signalAddrs),
                       }],
                     }
@@ -486,18 +487,18 @@ const EdgewareStatsPage = {
                     }))
                     .sort((a, b) => a.value - b.value);
                   return {
-                    title: `Signalers Effective ETH - ` +
-                      `${formatNumberRound(summary.totalEffectiveETHSignaled)} ETH`,
+                    title: 'Signalers Effective ETH - '
+                      + `${formatNumberRound(summary.totalEffectiveETHSignaled)} ETH`,
                     data: {
                       datasets: [{
                         data: effectiveSignalDistribution.map((d) => d.value),
                         backgroundColor: getColors(effectiveSignalDistribution.length).reverse(),
                         borderWidth: 1,
                         formatter: (d, index) => {
-                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked +
-                                                      summary.totalEffectiveETHSignaled) * 0.9 * 100;
-                          return [formatNumber(d) + ' ETH',
-                                  pct.toFixed(4) + '%'];
+                          const pct = d / adjustForGL(summary.totalEffectiveETHLocked
+                                                      + summary.totalEffectiveETHSignaled) * 0.9 * 100;
+                          return [`${formatNumber(d)} ETH`,
+                            `${pct.toFixed(4)}%`];
                         },
                         onclick: (index) => lookupAddrs(effectiveSignalDistribution[index].signalAddrs),
                       }],
@@ -542,7 +543,7 @@ const EdgewareStatsPage = {
                         }
                         m.redraw();
                       },
-                      oncreate: (vnode) => {
+                      oncreate: (vvnode) => {
                         // tslint:disable-next-line:no-string-literal
                         vnode.dom['checked'] = true;
                       },
@@ -570,9 +571,9 @@ const EdgewareStatsPage = {
               m('.explanation', [
                 'You can view the latest transactions on ',
                 m('a#ETHERSCAN_LINK', {
-                  href: state.network === 'mainnet' ?
-                    'https://etherscan.io/address/' + MAINNET_LOCKDROP :
-                    'https://ropsten.etherscan.io/address/' + ROPSTEN_LOCKDROP,
+                  href: state.network === 'mainnet'
+                    ? `https://etherscan.io/address/${MAINNET_LOCKDROP}`
+                    : `https://ropsten.etherscan.io/address/${ROPSTEN_LOCKDROP}`,
                   target: '_blank'
                 }, 'Etherscan'),
                 '.'
@@ -593,7 +594,7 @@ const EdgewareStatsPage = {
                 class: vnode.state.lookupLoading ? 'disabled' : '',
                 onclick: async (e) => {
                   e.preventDefault();
-                  const addrText = '' + $('#LOCKDROP_PARTICIPANT_ADDRESS').val();
+                  const addrText = `${$('#LOCKDROP_PARTICIPANT_ADDRESS').val()}`;
                   if (!addrText || !addrText.split) return;
                   const addrs = addrText.split(',').map((a) => a.trim());
                   for (const addr of addrs) {
@@ -601,8 +602,8 @@ const EdgewareStatsPage = {
                     if (!isHex(addr)) {
                       alert('You must input a valid hex encoded Ethereum address');
                       return;
-                    } else if ((addr.length !== 42 && addr.indexOf('0x') !== -1) ||
-                               (addr.length !== 40 && addr.indexOf('0x') === -1)) {
+                    } else if ((addr.length !== 42 && addr.indexOf('0x') !== -1)
+                               || (addr.length !== 40 && addr.indexOf('0x') === -1)) {
                       alert('You must input a valid length Ethereum address');
                       return;
                     }
@@ -630,18 +631,18 @@ const EdgewareStatsPage = {
             state.addressSummary && m('.lock-lookup-results', [
               m('h3', `Found ${pluralize(state.addressSummary.events.length, 'participation event')}`),
               m('ul', {
-                oncreate: (vnode) => {
+                oncreate: (vvnode) => {
                   $('html, body').animate({
-                    scrollTop: $(vnode.dom).offset().top - 200
+                    scrollTop: $(vvnode.dom).offset().top - 200
                   }, 500);
                 }
               }, state.addressSummary.events.map((event) => {
-                const etherscanNet = state.network === 'mainnet' ? 'https://etherscan.io/' :
-                  'https://ropsten.etherscan.io/';
+                const etherscanNet = state.network === 'mainnet' ? 'https://etherscan.io/'
+                  : 'https://ropsten.etherscan.io/';
                 return m('li', [
-                  (event.type === 'signal') ?
-                    m('h3', 'Signaled') :
-                    m('h3', [
+                  (event.type === 'signal')
+                    ? m('h3', 'Signaled')
+                    : m('h3', [
                       `Locked ${formatNumber(event.eth)} ETH - `,
                       event.returnValues.term.toString() === '0' && '3 months',
                       event.returnValues.term.toString() === '1' && '6 months',
@@ -662,7 +663,8 @@ const EdgewareStatsPage = {
                         target: '_blank',
                       }, event.contractAddr),
                     ]),
-                    m('p', `EDG Public Key: ${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`)[0]}`),
+                    m('p', 'EDG Public Key: '
+                      + `${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`)[0]}`),
                     m('p', `ETH counted from signal: ${formatNumber(event.eth)}`),
                   ] : [
                     m('p', [
@@ -679,7 +681,8 @@ const EdgewareStatsPage = {
                         target: '_blank',
                       }, event.returnValues.lockAddr),
                     ]),
-                    m('p', `EDG Public Key: ${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map(key => `0x${key}`)[0]}`),
+                    m('p', 'EDG Public Key: '
+                      + `${event.returnValues.edgewareAddr.slice(2).match(/.{1,64}/g).map((key) => `0x${key}`)[0]}`),
                     m('p', [
                       'Unlocks In: ',
                       Math.round(event.unlockTimeMinutes),
@@ -713,8 +716,8 @@ const EdgewareStatsPage = {
                     style: 'text-align: center;'
                   }, [
                     m('a', {
-                      href: 'https://docs.google.com/spreadsheets/d/' +
-                        '1ifZ1ya0YGg1hY_hbA1_-VyZXvLFfq_x2rY_QsHBUa8Q/edit#gid=141803740',
+                      href: 'https://docs.google.com/spreadsheets/d/'
+                        + '1ifZ1ya0YGg1hY_hbA1_-VyZXvLFfq_x2rY_QsHBUa8Q/edit#gid=141803740',
                       target: '_blank',
                     }, 'Open in new window')
                   ]),
