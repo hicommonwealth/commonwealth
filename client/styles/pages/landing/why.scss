@@ -31,20 +31,9 @@
         font-weight: 500;
     }
 
-    .div.lead {
-        // background: #f8f8f8;
-        overflow: hidden;
-
-        .explainer img {
-            object-fit: cover;
-            max-width: 100%;
-        }
-
-    }
-
     .div.top {
         background: #272524;
-        height: 400px;
+        height: 380px;
 
         h2.lead-title {
             padding-top: 20px !important;
@@ -63,8 +52,82 @@
             /* Style for "Crypto-nat" */
             color: #2e2928;
             font-family: 'Inter';
-            font-weight: 400;
+            font-weight: 300;
             color: #feffff;
+        }
+    }
+
+    .div.lead {
+        overflow: hidden;
+
+        .explainer img {
+            object-fit: cover;
+            max-width: 100%;
+        }
+
+        h2.lead-title {
+            padding: 0px 0 20px;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 1.25;
+            margin: 42px 0 0;
+            text-align: center;
+        }
+
+        p.lead-title {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 0px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            /* Style for "Crypto-nat" */
+            color: #2e2928;
+            font-family: 'Inter';
+            font-weight: 500;
+        }
+    }
+
+    .div.users {
+        background-color: #efeae8;
+
+        .CommonwealthUsers {
+            height: 300px;
+        }
+        .container {
+            padding-top: 20px; 
+        }
+        
+        .Tab {
+            padding-left: 10px; 
+        }
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 20px;
+            font-weight: 500;
+        }
+    
+        p.lead-bold {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 20px;
+            font-weight: 600;
+        }
+    }
+
+    .div.features {
+        background-color: #2e2928;
+
+        h2.lead-title {
+            color: #feffff;
+            margin: 0 0 0;
         }
     }
 
