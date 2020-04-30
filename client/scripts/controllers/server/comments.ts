@@ -69,8 +69,11 @@ class CommentsController {
     return _.uniq(authors);
   }
 
-  public async create<T extends IUniqueId>(address: string, proposalIdentifier: string, chain: string,
-    community: string, unescapedText: string, parentCommentId: any = null, attachments?: string[], mentions?: string[]) {
+  public async create<T extends IUniqueId>(
+    address: string, proposalIdentifier: string, chain: string,
+    community: string, unescapedText: string, parentCommentId: any = null,
+    attachments?: string[], mentions?: string[]
+  ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
@@ -135,7 +138,7 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
@@ -167,7 +170,7 @@ class CommentsController {
   public async delete(comment) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(app.serverUrl() + '/deleteComment', {
+      $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.login.jwt,
         comment_id: comment.id,
       }).then((result) => {

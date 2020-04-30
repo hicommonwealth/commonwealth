@@ -7,7 +7,7 @@ class SettingsController {
   public static async disableRichText(value: boolean) {
     if (!app.isLoggedIn()) return;
     return new Promise((resolve, reject) => {
-      $.post(app.serverUrl() + '/writeUserSetting', {
+      $.post(`${app.serverUrl()}/writeUserSetting`, {
         jwt: app.login.jwt,
         key: 'disableRichText',
         value: value ? 'true' : 'false',
