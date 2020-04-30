@@ -34,6 +34,7 @@ const WhyPage : m.Component<{}, {}> = {
               basic: false,
               outlined: true,
               label: 'Create your community',
+              style: 'background-color: #ffffff',
             }),
           ),
         ])

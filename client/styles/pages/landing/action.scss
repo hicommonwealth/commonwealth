@@ -53,15 +53,50 @@
 
     .div.near {
        background-color: #4b4f54;
+       p.lead-description {
+        font-size: 16px;
+        line-height: 1.25;
+        margin: 6px 0 42px;
+        color: #feffff;
+        font-family: 'Inter';
+        font-weight: 400;
+    }
     }
     .div.edgeware {
         background-color: #2a2423;
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            color: #feffff;
+            font-family: 'Inter';
+            font-weight: 400;
+        }
     }
     .div.kusama {
         background-color: rgba(230, 0, 122, 0.9);
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            color: #feffff;
+            font-family: 'Inter';
+            font-weight: 400;
+        }
     }
     .div.moloch {
         background-color: #000000;
+
+        p.lead-description {
+            font-size: 16px;
+            line-height: 1.25;
+            margin: 6px 0 42px;
+            color: #feffff;
+            font-family: 'Inter';
+            font-weight: 400;
+        }
     }
     .div.roll {
         background-color: #fff3db;

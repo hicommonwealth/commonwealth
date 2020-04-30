@@ -9,7 +9,7 @@ interface IUserPageState {
 
 const UsersPage : m.Component<IUserPageState> = {
   view: (vnode) => {
-    var user: string = 'Community Managers';
+    if (!vnode.attrs.user) vnode.attrs.user = 'Community Managers';
 
     const users = [
       'Community Managers',

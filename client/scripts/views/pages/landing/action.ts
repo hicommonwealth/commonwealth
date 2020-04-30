@@ -20,24 +20,7 @@ const ActionPage : m.Component<IActionPageState> = {
     ];
 
     return m('.ActionPage', [
-      m(Tabs, {
-        align: 'left',
-        bordered: false,
-        fluid: true,
-        size: 'default',
-      }, [
-        communities.map(community => m(TabItem, {
-          label: community,
-          active: vnode.attrs.active === community,
-          loading: false,
-          onclick: () => {
-            console.log(community);
-            vnode.attrs.active = community;
-            console.log(community);
-          },
-        }))
-      ]),
-      vnode.attrs.active === 'Near' && m('.div.near', [
+      m('.div.near', [
         m('.action.container', [
           m(Grid, { 
             gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 },
@@ -56,7 +39,8 @@ const ActionPage : m.Component<IActionPageState> = {
           ]),
         ]),
       ]),
-      vnode.attrs.active === 'Edgeware' && m('.div.edgeware', [
+      // vnode.attrs.active === 'Edgeware' && 
+      m('.div.edgeware', [
         m('.action.container', [
           m(Grid, { 
             gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 },
@@ -75,7 +59,8 @@ const ActionPage : m.Component<IActionPageState> = {
           ]),
         ]),
       ]),
-      vnode.attrs.active === 'Kusama' && m('.div.kusama', [
+      // vnode.attrs.active === 'Kusama' && 
+      m('.div.kusama', [
         m('.action.container', [
           m(Grid, { 
             gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 },
@@ -96,7 +81,8 @@ const ActionPage : m.Component<IActionPageState> = {
           ]),
         ]),
       ]),
-      vnode.attrs.active === 'Moloch' && m('.div.moloch', [
+      // vnode.attrs.active === 'Moloch' && 
+      m('.div.moloch', [
         m('.action.container', [
           m(Grid, { 
             gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 },
@@ -115,7 +101,8 @@ const ActionPage : m.Component<IActionPageState> = {
           ]),
         ]),
       ]),
-      vnode.attrs.active === 'Roll' && m('.div.roll', [
+      // vnode.attrs.active === 'Roll' && 
+      m('.div.roll', [
         m('.action.container', [
           m(Grid, { 
             gutter: { xs: 0, sm: 10, md: 20, lg: 30, xl: 40 },
