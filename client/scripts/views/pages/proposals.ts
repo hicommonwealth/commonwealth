@@ -41,7 +41,7 @@ const ProposalsPage: m.Component<{}> = {
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
     const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      && (app.chain as Edgeware).signaling.store.getAll().sort(orderProposalsByAmountVoted);
+      && (app.chain as Edgeware).signaling.store.getAll().sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
     const visibleCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
       && (app.chain as Cosmos).governance.store.getAll().sort((a, b) => +b.identifier - +a.identifier);
     const visibleTreasuryProposals = onSubstrate && (app.chain as Substrate).treasury.store.getAll();
