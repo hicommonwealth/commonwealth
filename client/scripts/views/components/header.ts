@@ -86,13 +86,10 @@ const Header: m.Component<{}> = {
         size: 'sm',
         onclick: (e) => m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`),
         label: m('.login-selector-user', [
-          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-          m('.user-info', [
-            m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-            m('.user-address', app.vm.activeAccount.chain.id === 'near'
-              ? `@${app.vm.activeAccount.address}`
-              : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-          ])
+          m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
+          m('.user-address', app.vm.activeAccount.chain.id === 'near'
+            ? `@${app.vm.activeAccount.address}`
+            : `${app.vm.activeAccount.address.slice(0, 6)}...`)
         ]),
       }),
     ]);

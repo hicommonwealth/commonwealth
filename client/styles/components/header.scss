@@ -25,28 +25,12 @@
         margin-left: 10px;
     }
 
-    .login-selector {
-        .User.avatar-only {
-            overflow: visible;
-            padding-right: 11px;
-            position: relative;
-        }
+    .cui-button.login-selector {
         .login-selector-user {
+            display: flex;
             line-height: 1.1;
-            .user-info {
-                position: relative;
-                .User {
-                    //white-space: normal; // prevent long usernames from overflowing
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 110px;
-                    font-size: 14px;
-                }
-                .user-address {
-                    font-size: 12px;
-                    margin: 0;
-                }
+            .user-address {
+                margin-left: 4px;
             }
         }
     }
