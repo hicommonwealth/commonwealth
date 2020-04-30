@@ -199,8 +199,24 @@ if (SHOULD_RESET_DB) {
       });
     });
 } else {
-  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION);
-  setupServer(app, wss, sessionParser);
+  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
+    .then(() => {
+      if (RUN_ENTITY_MIGRATION) {
+        console.log('Entity migration successful.');
+        models.sequelize.close()
+          .then(() => process.exit(0));
+      }
+    }, (err) => {
+      if (RUN_ENTITY_MIGRATION) {
+        console.error(`Entity migration failed: ${JSON.stringify(err)}`);
+        models.sequelize.close()
+          .then(() => (closeMiddleware()))
+          .then(() => process.exit(1));
+      } else {
+        console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
+      }
+    });
+  if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }
 
