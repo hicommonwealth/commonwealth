@@ -31,8 +31,15 @@
         font-weight: 500;
     }
 
-    .div.features {
+    .div.lead {
         // background: #f8f8f8;
+        overflow: hidden;
+
+        .explainer img {
+            object-fit: cover;
+            max-width: 100%;
+        }
+
     }
 
     .div.top {

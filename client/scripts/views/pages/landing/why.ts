@@ -66,7 +66,7 @@ const WhyPage : m.Component<{}, {}> = {
             ]),
           ),
           m(Col, { span: { xs: 12, md: 3 } }, 
-            m('img.community', { src: '/static/img/marketing/articles.png' }),       
+            m('img.explainer', { src: '/static/img/marketing/articles.png' }),       
           ),
         ]),
         m(Grid, { 
@@ -94,7 +94,7 @@ const WhyPage : m.Component<{}, {}> = {
             ]),
           ),
           m(Col, { span: { xs: 12, md: 3 } }, 
-            m('img.community', { src: '/static/img/marketing/threads.png' }),       
+            m('img.explainer', { src: '/static/img/marketing/threads.png' }),       
           ),
         ]),
       ]),
