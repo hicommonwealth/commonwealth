@@ -126,7 +126,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
 
   const threadlessTags = app.tags.store.getAll().map((tag) => {
     if (featuredTagIds.includes(`${tag.id}`)) {
-      if (!featuredTags[`${tag.id}`]) {
+      if (!featuredTags[`${tag.name}`]) {
         featuredTags[tag.name] = {
           count: null,
           description: tag.description,

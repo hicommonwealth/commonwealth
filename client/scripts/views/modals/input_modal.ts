@@ -3,6 +3,7 @@ import 'modals/input_modal.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 const InputModal = {
   confirmExit: async () => true,
@@ -24,7 +25,8 @@ const InputModal = {
         }),
       ]),
       m('.compact-modal-actions', [
-        m('button', {
+        m(Button, {
+          label: 'Submit',
           type: 'submit',
           onclick: (e) => {
             e.preventDefault();
@@ -34,13 +36,14 @@ const InputModal = {
               $(vnode.dom).trigger('modalexit');
             }, 0);
           }
-        }, 'Submit'),
-        m('button', {
+        }),
+        m(Button, {
+          label: 'Cancel',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
           }
-        }, 'Cancel'),
+        }),
       ]),
     ]);
   }
