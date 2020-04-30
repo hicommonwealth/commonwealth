@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import 'components/quill_formatted_text.scss';
 
 import { default as $ } from 'jquery';
@@ -130,7 +131,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
         ? 'ul'
         : group.listtype === 'ordered'
           ? 'ol'
-          : 'div';
+          : group.listtype === 'checked' || group.listtype === 'unchecked'
+            ? 'ul.checklist'
+            : 'div';
       return m(groupTag, group.parents.map((parent) => {
         // render empty parent nodes as .between-paragraphs
         if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
@@ -219,7 +222,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
                       : parent.attributes && parent.attributes.header === 6 ? 'h6'
                         : parent.attributes && parent.attributes.list === 'bullet' ? 'li'
                           : parent.attributes && parent.attributes.list === 'ordered' ? 'li'
-                            : 'div',
+                            : parent.attributes && parent.attributes.list === 'checked' ? 'li.checked'
+                              : parent.attributes && parent.attributes.list === 'unchecked' ? 'li.unchecked'
+                                : 'div',
         children);
       }));
     });
