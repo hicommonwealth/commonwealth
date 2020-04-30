@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 $sidebar-padding: 16px;
-$active-color: #f4f4f9;
+$active-color: #e9e9f5;
 
 .Sidebar {
     position: fixed;
@@ -114,64 +114,6 @@ $active-color: #f4f4f9;
         .icon-lock {
             margin-left: 2px;
         }
-    }
-    .cui-list .action-selector {
-        padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
-        // background: #fff !important;
-        cursor: default !important;
-        user-select: none;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 10px;
-        &:hover {
-            background: initial;
-        }
-    }
-    // bottom
-    .cui-list .login-selector {
-        position: absolute;
-        display: flex;
-        bottom: 0;
-        width: $sidebar-width;
-        z-index: 1;
-        /// background: #fff !important;
-        user-select: none;
-        padding: 17px $sidebar-padding 18px;
-        border-top: 1px solid #eee;
-        &:hover {
-            background: $active-color !important;
-        }
-        button.cui-button {
-            position: relative;
-        }
-        .User.avatar-only {
-            overflow: visible;
-            padding-right: 11px;
-            position: relative;
-        }
-        .login-selector-user {
-            line-height: 1.1;
-            .user-info {
-                position: relative;
-                .User {
-                    //white-space: normal; // prevent long usernames from overflowing
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 110px;
-                    font-size: 14px;
-                }
-                .user-address {
-                    font-size: 12px;
-                    margin: 0;
-                }
-            }
-        }
-    }
-    &.no-active-community .cui-list .title-selector {
-        border-bottom: none;
-    }
-    &.no-active-community .cui-list .login-selector {
-        border-top: none;
     }
 }
 

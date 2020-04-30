@@ -3,7 +3,11 @@ import 'components/header.scss';
 import m from 'mithril';
 import app from 'state';
 import Infinite from 'mithril-infinite';
-import { Button, Icons, PopoverMenu } from 'construct-ui';
+import { Button, Icons, PopoverMenu, ListItem } from 'construct-ui';
+
+import User from 'views/components/widgets/user';
+import LoginModal from 'views/modals/login_modal';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 import NewProposalButton from 'views/components/new_proposal_button';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
@@ -56,6 +60,40 @@ const Header: m.Component<{}> = {
         iconLeft: Icons.MAIL,
         size: 'sm',
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+      }),
+      // logged out state
+      !app.isLoggedIn() && m(Button, {
+        class: 'login-selector',
+        intent: 'primary',
+        iconLeft: Icons.USER,
+        size: 'sm',
+        label: 'Log in',
+        onclick: () => app.modals.create({ modal: LoginModal }),
+      }),
+      // logged in, no address state
+      app.isLoggedIn() && !app.vm.activeAccount && m(Button, {
+        class: 'login-selector',
+        intent: 'none',
+        iconLeft: Icons.USER_PLUS,
+        size: 'sm',
+        label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+        onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+      }),
+      // logged in, address selected state
+      app.isLoggedIn() && app.vm.activeAccount && m(Button, {
+        class: 'login-selector',
+        intent: 'none',
+        size: 'sm',
+        onclick: (e) => m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`),
+        label: m('.login-selector-user', [
+          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
+          m('.user-info', [
+            m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
+            m('.user-address', app.vm.activeAccount.chain.id === 'near'
+              ? `@${app.vm.activeAccount.address}`
+              : `${app.vm.activeAccount.address.slice(0, 6)}...`)
+          ])
+        ]),
       }),
     ]);
   }

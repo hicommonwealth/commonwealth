@@ -1,15 +1,12 @@
 import 'components/sidebar/index.scss';
 
-import {
-  List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  Button, Tag, Menu, MenuHeading, Popover } from 'construct-ui';
-import { setActiveAccount } from 'controllers/app/login';
-import LoginModal from 'views/modals/login_modal';
-
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
+import {
+  List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
+  Button, Tag, Menu, MenuHeading, Popover } from 'construct-ui';
 
 import { ApiStatus, default as app } from 'state';
 import { featherIcon, link } from 'helpers';
@@ -18,6 +15,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { setActiveAccount } from 'controllers/app/login';
 import { ChainClass, ChainBase, Notification } from 'models';
 import { OffchainCommunitiesStore } from 'stores';
 
@@ -25,11 +23,9 @@ import { isMember } from 'views/components/membership_button';
 import ChainIcon from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import User from 'views/components/widgets/user';
 import CommunityMenu from 'views/components/sidebar/community_menu';
 import TagSelector from 'views/components/sidebar/tag_selector';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalModal from 'views/modals/proposals';
 
@@ -213,47 +209,6 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
             label: 'Approve tokens'
           }),
           // TODO: add a "reserve tokens" option here, to apply to DAO?
-
-          !app.isLoggedIn()
-            ? m(ListItem, {
-              class: 'login-selector',
-              label: m('.login-selector-user', [
-                m(Button, {
-                  intent: 'primary',
-                  iconLeft: Icons.USER,
-                  size: 'sm',
-                  fluid: true,
-                  label: 'Log in',
-                  onclick: () => app.modals.create({ modal: LoginModal }),
-                }),
-              ]),
-            })
-            : m(ListItem, {
-              class: 'login-selector',
-              onclick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-              },
-              label: app.vm.activeAccount ? [
-                m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-                m('.login-selector-user', [
-                  m('.user-info', [
-                    m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-                    m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                      ? `@${app.vm.activeAccount.address}`
-                      : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-                  ])
-                ]),
-              ] : app.login.activeAddresses.length === 0 ? m(Button, {
-                intent: 'none',
-                iconLeft: Icons.USER_PLUS,
-                size: 'sm',
-                fluid: true,
-                label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
-                onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-              }) : null,
-            }),
         ]),
       ]),
     ]);
