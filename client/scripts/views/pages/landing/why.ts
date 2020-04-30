@@ -112,10 +112,11 @@ const WhyPage : m.Component<IUserPageState, {}> = {
         ]),
       ]),
       m('.div.users', [
+        m('h2.lead-title', 'Commonwealth for You'),
         m('.CommonwealthUsers', [
           m('Tab', [
             m(Tabs, {
-              align: 'left',
+              align: 'center',
               fluid: true,
               size: 'default',
             }, [
