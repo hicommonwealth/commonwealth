@@ -4,7 +4,7 @@ import 'components/sidebar/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
-import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
+import { List, ListItem, Button, Icon, Icons, Checkbox } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
@@ -129,6 +129,29 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       ],
       contentRight: [
         !hideEditButton && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton && m(Checkbox, {
+          defaultChecked: featured,
+          label: 'Featured Tag',
+          size: 'sm',
+          onclick: (checked) => {
+            const featuredTags = app.community.meta.featuredTags;
+            if (featured) {
+              // remove
+              const removedOneFeaturedTags = featuredTags.slice(featuredTags.indexOf(name), 1);
+              app.community.meta.updateFeaturedTags(removedOneFeaturedTags).then(() => {
+                m.redraw();
+              });
+            } else {
+              // add
+              console.dir(featuredTags);
+              featuredTags.push(name);
+              console.dir(featuredTags);
+              app.community.meta.updateFeaturedTags(featuredTags).then(() => {
+                m.redraw();
+              });
+            }
+          },
+        }),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
