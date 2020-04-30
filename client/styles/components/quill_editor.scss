@@ -291,18 +291,24 @@
         pointer-events: none;
     }
     .ql-editor ul[data-checked=true] > li::before, .ql-editor ul[data-checked=false] > li::before {
-        color: #777;
         cursor: pointer;
         pointer-events: all;
+        font-family: "fontello";
     }
     .ql-editor ul[data-checked="true"] li {
         text-decoration: line-through;
     }
     .ql-editor ul[data-checked=true] > li::before {
-        content: '\2611';
+        content: '\f14a';
+        color: #777;
+        position: relative;
+        top: 1px;
     }
     .ql-editor ul[data-checked=false] > li::before {
-        content: '\2610';
+        content: '\f096';
+        color: #b0bec5;
+        position: relative;
+        top: 1px;
     }
     .ql-editor .ql-indent-1:not(.ql-direction-rtl) {
         padding-left: 3em;

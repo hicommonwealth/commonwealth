@@ -88,9 +88,12 @@
             position: relative;
             padding-right: 11px;
         }
+        li.checked span {
+            text-decoration: line-through;
+        }
         li.checked:before {
             content: '\f14a';
-            color: #5c6bc0;
+            color: #777;
         }
         li.unchecked:before {
             content: '\f096';
