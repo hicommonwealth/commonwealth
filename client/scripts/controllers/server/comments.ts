@@ -138,7 +138,7 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
