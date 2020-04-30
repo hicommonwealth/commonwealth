@@ -266,6 +266,7 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   proposalIndex: number;
   proposalHash: string;
   threshold: number;
+  // TODO: add end block?
   call: {
     method: string;
     section: string;
