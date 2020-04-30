@@ -118,7 +118,15 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
         created_at: { [Op.gt]: new Date(time as string) }
       }
     });
+    const threads = [];
+    threadNum.rows.forEach((r) => {
+      if (!threads.includes(`discussion_${r.id}`)) threads.push(`discussion_${r.id}`);
+    });
+    commentNum.rows.forEach((r) => {
+      if (!threads.includes(r.root_id)) threads.push(r.root_id);
+    });
     unseenPosts[name] = {
+      'activePosts': threads.length,
       'threads': threadNum.count,
       'comments': commentNum.count
     };
