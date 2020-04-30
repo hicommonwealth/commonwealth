@@ -34,7 +34,7 @@ export enum GlobalStatus {
   Set = 'set'
 }
 
-const activeQuillEditorHasText = () => {
+export const activeQuillEditorHasText = () => {
   // TODO: Better lookup than document.getElementsByClassName[0]
   // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
   // However, threading is overdue for a refactor anyway, so we'll handle this then

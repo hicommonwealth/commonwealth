@@ -1,3 +1,6 @@
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default async (models, fetcher, req, res, next) => {
   if (!req.query.chain_object_id) {
     return next(new Error('Must provide chain object id'));

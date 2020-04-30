@@ -1,6 +1,8 @@
 import http from 'http';
 import { DEFAULT_PORT } from '../config';
 import setupWebsocketServer from '../socket';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const setupServer = (app, wss, sessionParser) => {
   const port = process.env.PORT || DEFAULT_PORT;
@@ -13,11 +15,11 @@ const setupServer = (app, wss, sessionParser) => {
     }
     switch (error.code) {
       case 'EACCES':
-        console.error('Port requires elevated privileges');
+        log.error('Port requires elevated privileges');
         process.exit(1);
         break;
       case 'EADDRINUSE':
-        console.error('Port is already in use');
+        log.error('Port is already in use');
         process.exit(1);
         break;
       default:
@@ -28,9 +30,9 @@ const setupServer = (app, wss, sessionParser) => {
   const onListen = () => {
     const addr = server.address();
     if (typeof addr === 'string') {
-      console.log(`Listening on ${addr}`);
+      log.info(`Listening on ${addr}`);
     } else {
-      console.log(`Listening on port ${addr.port}`);
+      log.info(`Listening on port ${addr.port}`);
     }
   };
 

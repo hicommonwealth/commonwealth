@@ -135,7 +135,14 @@ function applyBlockFormatters(parentText, hideFormatting) {
     }, {
       pattern: /^ {3,4}(- |\* |• |· )/,
       formatMany: (text) => m('ul', m('ul', m('ul', text))),
-      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) =>
+        m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+    }, {
+      pattern: /^\[([ x])\] /,
+      formatMany: (text) => m('ul.checklist', text),
+      formatOne: (text, match) => m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
+        m('span', applyInlineFormatters(text.replace(match, ''), hideFormatting))
+      ]),
     }];
 
     // Lines which don't match any of the above groups are assigned an

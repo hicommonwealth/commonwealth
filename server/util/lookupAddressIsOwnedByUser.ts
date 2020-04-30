@@ -5,7 +5,6 @@ import { NextFunction } from 'express';
 import { UserRequest } from '../types';
 
 const lookupAddressIsOwnedByUser = async (models, req: UserRequest, next: NextFunction) => {
-  console.log(req.body);
   if (!req.user) {
     return next(new Error('Not logged in'));
   }

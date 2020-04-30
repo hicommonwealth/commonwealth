@@ -45,6 +45,7 @@ class TagsController {
         'name': tag.name,
         'description': tag.description,
         'featured_order': featured_order,
+        'address': app.vm.activeAccount.address,
         'jwt': app.login.jwt
       });
       const result = modelFromServer(response.result);

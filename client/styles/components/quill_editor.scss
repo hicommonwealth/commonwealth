@@ -278,6 +278,30 @@
     .ql-editor ol li.ql-indent-9:before {
         content: counter(list-9, decimal) '. ';
     }
+    // Checklist styling
+    .ql-editor ul[data-checked=true], .ql-editor ul[data-checked=false] {
+        pointer-events: none;
+    }
+    .ql-editor ul[data-checked=true] > li::before, .ql-editor ul[data-checked=false] > li::before {
+        cursor: pointer;
+        pointer-events: all;
+        font-family: "fontello";
+    }
+    .ql-editor ul[data-checked="true"] li {
+        text-decoration: line-through;
+    }
+    .ql-editor ul[data-checked=true] > li::before {
+        content: '\f14a';
+        color: #777;
+        position: relative;
+        top: 1px;
+    }
+    .ql-editor ul[data-checked=false] > li::before {
+        content: '\f096';
+        color: #b0bec5;
+        position: relative;
+        top: 1px;
+    }
     .ql-editor .ql-indent-1:not(.ql-direction-rtl) {
         padding-left: 3em;
     }

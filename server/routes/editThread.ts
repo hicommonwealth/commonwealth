@@ -3,6 +3,8 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const { body, kind, thread_id, version_history, read_only, privacy } = req.body;

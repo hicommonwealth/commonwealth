@@ -5,6 +5,7 @@ import m from 'mithril';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
 import lity from 'lity';
+import { PopoverMenu, Icon, Icons } from 'construct-ui';
 
 import Near from 'controllers/chain/near/main';
 import { WalletAccount } from 'nearlib';
@@ -55,13 +56,12 @@ import {
   ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons
 } from './header';
 import {
-  GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited, ProposalBodyReply,
-  ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit, ProposalBodySpacer,
-  ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
+  activeQuillEditorHasText, GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited,
+  ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit,
+  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction,
+  ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
-import { PopoverMenu, Icon, Icons } from 'construct-ui';
-
 
 interface IProposalHeaderAttrs {
   commentCount: number;
@@ -529,6 +529,14 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     if (!app.profiles.allLoaded()) {
       return m(PageLoading);
     }
+
+    const windowListener = (e) => {
+      if (vnode.state.editing || activeQuillEditorHasText()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', windowListener);
 
     // fetch completed cosmos proposal votes only when we load the page
     // if (proposal instanceof CosmosProposal && proposal.completed) {

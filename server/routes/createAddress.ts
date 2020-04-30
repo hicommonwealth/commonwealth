@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createAddress = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
@@ -37,10 +39,12 @@ const createAddress = async (models, req: UserRequest, res: Response, next: Next
   } else {
     // address doesn't exist, add it to the database
     try {
-      const newObj = await models.Address.createWithToken((req.user ? req.user.id : null),
-                                                          req.body.chain,
-                                                          req.body.address,
-                                                          req.body.keytype);
+      const newObj = await models.Address.createWithToken(
+        req.user ? req.user.id : null,
+        req.body.chain,
+        req.body.address,
+        req.body.keytype
+      );
       return res.json({ status: 'Success', result: newObj.toJSON() });
     } catch (e) {
       return next(e);

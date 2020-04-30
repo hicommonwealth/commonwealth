@@ -30,7 +30,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
   app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
     const { tags } = thread;
     tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will excluded from
+      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
       // addition to the TagStore, since said store will be more up-to-date
       const existing = app.tags.getByIdentifier(tag.id);
       if (!existing) app.tags.addToStore(tag);

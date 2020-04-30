@@ -49,6 +49,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           default_chain: app.config.chains.getById(community.default_chain),
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
+          featuredTags: community.featured_tags,
           tags: community.tags,
         }));
       });
@@ -361,7 +362,7 @@ $(() => {
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
-        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}}`
+        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 

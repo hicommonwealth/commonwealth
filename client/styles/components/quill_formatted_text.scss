@@ -73,6 +73,36 @@
             margin: 6px 0;
         }
     }
+    ul.checklist {
+        padding-left: 1em;
+        list-style: none;
+        li {
+            text-indent: -1.4em;
+            list-style: inherit;
+            padding-left: 9px;
+        }
+        li::before {
+            width: 1.4em;
+            font-family: "fontello";
+            padding-right: 10px;
+            position: relative;
+            padding-right: 11px;
+        }
+        li.checked span {
+            text-decoration: line-through;
+        }
+        li.checked:before {
+            content: '\f14a';
+            color: #777;
+        }
+        li.unchecked:before {
+            content: '\f096';
+            color: #b0bec5;
+        }
+    }
+    ul.checklist + ul.checklist {
+        margin-top: -10px;
+    }
     p:first-child {
         padding-top: 0;
         margin-top: 0;
@@ -117,7 +147,7 @@
     }
     code:before,
     code:after {
-        content: "\A0";
+        content: '\A0';
         letter-spacing: -2px;
     }
     small {

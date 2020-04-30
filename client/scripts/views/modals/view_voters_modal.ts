@@ -1,12 +1,13 @@
 import 'modals/view_voters_modal.scss';
 
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
-import User from '../components/widgets/user';
 import app from 'state';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
 import { formatAddressShort } from 'helpers';
+import User from '../components/widgets/user';
 
 interface IViewVotersModalAttrs {
   account: SubstrateAccount;
@@ -39,15 +40,16 @@ interface IVoterRowAttrs {
 }
 
 const VoterRow: m.Component<IVoterRowAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IVoterRowAttrs>) => {
     const { account, stake } = vnode.attrs.vote;
 
     return m('.VoterRow', {
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/account/${account.address}}`);
-        }
-      }, [
+        m.route.set(`/${app.activeChainId()}/account/${account.address}`);
+        $(vnode.dom).trigger('modalexit');
+      }
+    }, [
       m('.proposal-row-left', [
         m('.proposal-pre', [
           m(User, {
@@ -94,6 +96,6 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
         ]),
       ]),
       m('.proposal-row-xs-clear'),
-      ]);
-    }
-}
+    ]);
+  }
+};
