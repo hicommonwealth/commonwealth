@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {

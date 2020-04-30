@@ -173,6 +173,7 @@
     "tslint": "^5.13.0",
     "tweetnacl": "^1.0.1",
     "typescript": "^3.8.2",
+    "typescript-logging": "^0.6.4",
     "velocity": "^0.7.2",
     "web3": "^1.2.2",
     "web3-eth": "^1.2.2",
