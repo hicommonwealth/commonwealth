@@ -3,7 +3,10 @@
 .Header {
     position: fixed;
     top: 0;
-    left: $side-width;
+    left: $sidebar-width;
+    &.logged-out {
+        left: $sidebar-width - $switcher-width;
+    }
     right: 0;
     height: 60px;
     padding: 0 40px;

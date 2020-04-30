@@ -19,7 +19,9 @@ const Header: m.Component<{}> = {
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     // TODO: display number of unread notifications
 
-    return m('.Header', [
+    return m('.Header', {
+      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
+    }, [
       m('.placeholder'),
       // new proposal
       m(NewProposalButton, { fluid: false }),

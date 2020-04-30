@@ -43,10 +43,10 @@ const DiscussionRow: m.Component<IAttrs> = {
       }
     };
 
-    const canEditTags = (
-      (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-       || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-       || proposal.author === app.vm.activeAccount.address));
+    const canEditTags = app.vm.activeAccount
+      && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
+          || proposal.author === app.vm.activeAccount.address);
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [

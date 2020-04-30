@@ -7,13 +7,12 @@ $active-color: #f4f4f9;
     position: fixed;
     top: 0;
     bottom: 0;
-    left: 63px;
-    width: $side-width - 63px;
+    left: $switcher-width;
+    width: $sidebar-width - $switcher-width;
     z-index: 9;
     border-right: 1px solid #e8e8e8;
     &.logged-out {
         left: 0;
-        width: $side-width;
     }
     .SidebarMenu {
         height: 100%;
@@ -132,7 +131,7 @@ $active-color: #f4f4f9;
         position: absolute;
         display: flex;
         bottom: 0;
-        width: $side-width;
+        width: $sidebar-width;
         z-index: 1;
         /// background: #fff !important;
         user-select: none;
