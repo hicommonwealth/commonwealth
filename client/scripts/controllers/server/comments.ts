@@ -114,13 +114,10 @@ class CommentsController {
         'id': comment.id,
         'chain': comment.chain,
         'community': comment.community,
-        'address': comment.author,
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
         'jwt': app.login.jwt,
-        'chain': comment.chain,
-        'community': comment.community,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
