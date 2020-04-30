@@ -132,10 +132,10 @@
     }
 
     .div.features {
-        background-color: #2e2928;
+        border-top: 1px solid black;
 
         h2.lead-title {
-            color: #feffff;
+            // color: #feffff;
             margin: 0 0 0;
             padding: 20px 20px 20px;
             font-weight: 400;
@@ -150,6 +150,11 @@
 
         h2.lead-title {
             padding-bottom: 20px;
+            font-weight: 400;
+            font-size: 28px;
+            line-height: 1.25;
+            margin: 26px 0 0;
+                // text-align: left;
         }
     }
 
