@@ -19,27 +19,29 @@ export const isMember = (chain: string, community: string, address?: AddressInfo
     : address;
   const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
 
-  return chain ? roles.map((r) => r.chain_id).indexOf(chain) !== -1 :
-    community ? roles.map((r) => r.offchain_community_id).indexOf(community) !== -1 :
-    false;
-}
+  return chain ? roles.map((r) => r.chain_id).indexOf(chain) !== -1
+    : community ? roles.map((r) => r.offchain_community_id).indexOf(community) !== -1
+      : false;
+};
 
-const MembershipButton: m.Component<{ chain?: string, community?: string, onMembershipChanged?, address? }, { loading }> = {
+const MembershipButton: m.Component<{
+  chain?: string, community?: string, onMembershipChanged?, address?
+}, { loading }> = {
   view: (vnode) => {
     const { chain, community, onMembershipChanged, address } = vnode.attrs; // TODO: onMembershipChanged
     if (!chain && !community) return;
     if (!app.login.roles) return;
 
-    const createRoleWithAddress = (address, e) => {
+    const createRoleWithAddress = (a, e) => {
       $.post('/api/createRole', {
         jwt: app.login.jwt,
-        address_id: address.id,
+        address_id: a.id,
         chain,
         community,
       }).then((result) => {
         // handle state updates
-        app.login.roles.push(result.result)
-        onMembershipChanged && onMembershipChanged(true);
+        app.login.roles.push(result.result);
+        if (onMembershipChanged) onMembershipChanged(true);
         vnode.state.loading = false;
         m.redraw();
         // notify
@@ -47,14 +49,14 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Joined ${name}`);
-      }).catch((e) => {
+      }).catch((err) => {
         vnode.state.loading = false;
         m.redraw();
-        notifyError(e.responseJSON.error);
+        notifyError(err.responseJSON.error);
       });
     };
 
-    const deleteRole = async (address, e) => {
+    const deleteRole = async (a, e) => {
       vnode.state.loading = true;
 
       const confirmed = await confirmationModalWithText('Are you sure you want to leave this community?')();
@@ -66,16 +68,16 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
 
       $.post('/api/deleteRole', {
         jwt: app.login.jwt,
-        address_id: address.id,
+        address_id: a.id,
         chain,
         community,
       }).then((result) => {
         // handle state updates
         const index = chain
-          ? app.login.roles.findIndex((role) => role.chain_id === chain && role.address_id === address.id)
-          : app.login.roles.findIndex((role) => role.offchain_community_id === community && role.address_id === address.id);
+          ? app.login.roles.findIndex((r) => r.chain_id === chain && r.address_id === a.id)
+          : app.login.roles.findIndex((r) => r.offchain_community_id === community && r.address_id === a.id);
         if (index !== -1) app.login.roles.splice(index, 1);
-        onMembershipChanged && onMembershipChanged(false);
+        if (onMembershipChanged) onMembershipChanged(false);
         vnode.state.loading = false;
         m.redraw();
         // notify
@@ -83,10 +85,10 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Left ${name}`);
-      }).catch((e) => {
+      }).catch((err) => {
         vnode.state.loading = false;
         m.redraw();
-        notifyError(e.responseJSON.error);
+        notifyError(err.responseJSON.error);
       });
     };
 
@@ -95,29 +97,29 @@ const MembershipButton: m.Component<{ chain?: string, community?: string, onMemb
     if (!address) {
       const existingRolesAddressIDs = community
         ? app.login.roles.filter((role) => role.offchain_community_id === community).map((role) => role.address_id)
-        : app.login.roles.filter((role) => role.chain_id === chain).map((role) => role.address_id)
+        : app.login.roles.filter((role) => role.chain_id === chain).map((role) => role.address_id);
       const existingJoinableAddresses: AddressInfo[] = community
         ? app.login.addresses
-        : app.login.addresses.filter((address) => address.chain === chain);
+        : app.login.addresses.filter((a) => a.chain === chain);
 
       return m(PopoverMenu, {
         class: 'MembershipButtonPopover',
         closeOnContentClick: true,
         content: [
           // select an existing address
-          existingJoinableAddresses.map((address) => {
-            const hasExistingRole = existingRolesAddressIDs.indexOf(address.id) !== -1;
-            const cannotJoinPrivateCommunity = community && app.config.communities.getById(community)?.privacyEnabled &&
-              !hasExistingRole;
+          existingJoinableAddresses.map((a) => {
+            const hasExistingRole = existingRolesAddressIDs.indexOf(a.id) !== -1;
+            const cannotJoinPrivateCommunity = community && app.config.communities.getById(community)?.privacyEnabled
+              && !hasExistingRole;
             return m(MenuItem, {
               disabled: cannotJoinPrivateCommunity,
               hasAnyExistingRole: hasExistingRole,
               iconLeft: hasExistingRole ? Icons.CHECK : null,
               label: [
-                m(User, { user: [address.address, address.chain] }),
-                ` ${address.address.slice(0, 6)}...`,
+                m(User, { user: [a.address, a.chain] }),
+                ` ${a.address.slice(0, 6)}...`,
               ],
-              onclick: hasExistingRole ? deleteRole.bind(this, address) : createRoleWithAddress.bind(this, address),
+              onclick: hasExistingRole ? deleteRole.bind(this, a) : createRoleWithAddress.bind(this, a),
             });
           }),
           // link a new address

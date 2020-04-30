@@ -1,0 +1,53 @@
+@import 'client/styles/shared';
+
+.Header {
+    position: fixed;
+    top: 0;
+    left: $sidebar-width;
+    &.logged-out {
+        left: $sidebar-width - $switcher-width;
+    }
+    right: 0;
+    height: 60px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #e7e7e7;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+    z-index: 10;
+
+    .placeholder,
+    .header-breadcrumb {
+        flex: 1;
+    }
+    .cui-button, .user-button {
+        margin-left: 10px;
+    }
+
+    .login-selector {
+        .User.avatar-only {
+            overflow: visible;
+            padding-right: 11px;
+            position: relative;
+        }
+        .login-selector-user {
+            line-height: 1.1;
+            .user-info {
+                position: relative;
+                .User {
+                    //white-space: normal; // prevent long usernames from overflowing
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 110px;
+                    font-size: 14px;
+                }
+                .user-address {
+                    font-size: 12px;
+                    margin: 0;
+                }
+            }
+        }
+    }
+}

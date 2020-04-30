@@ -43,10 +43,10 @@ const ProfileContent: m.Component<{ account: Account<any>, type: UserContent, co
           return m(ProfileCommentGroup, { proposal: comment.proposal, comments: [comment] });
         }),
       ]),
-      ((type === UserContent.All && allContent.length > 10 && vnode.state.count < allContent.length) ||
-       (type === UserContent.Threads && proposals.length > 10 && vnode.state.count < proposals.length) ||
-       (type === UserContent.Comments && comments.length > 10 && vnode.state.count < comments.length)) &&
-        m('.btn-wrap', [
+      ((type === UserContent.All && allContent.length > 10 && vnode.state.count < allContent.length)
+       || (type === UserContent.Threads && proposals.length > 10 && vnode.state.count < proposals.length)
+       || (type === UserContent.Comments && comments.length > 10 && vnode.state.count < comments.length))
+        && m('.btn-wrap', [
           m('a.btn', {
             onclick: (e) => {
               e.preventDefault();

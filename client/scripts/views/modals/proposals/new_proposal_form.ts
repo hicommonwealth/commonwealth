@@ -68,21 +68,16 @@ const NewProposalForm = {
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
-      hasAction =
-        vnode.state.councilMotionType === 'createExternalProposal' ||
-        vnode.state.councilMotionType === 'createExternalProposalMajority';
-      hasVotingPeriodAndDelaySelector =
-        vnode.state.councilMotionType === 'createFastTrack' ||
-        vnode.state.councilMotionType === 'createExternalProposalDefault';
-      hasReferendumSelector =
-        vnode.state.councilMotionType === 'createEmergencyCancellation';
-      hasExternalProposalSelector =
-        vnode.state.councilMotionType === 'vetoNextExternal' ||
-        vnode.state.councilMotionType === 'createFastTrack' ||
-        vnode.state.councilMotionType === 'createExternalProposalDefault';
-      hasTreasuryProposalSelector =
-        vnode.state.councilMotionType === 'createTreasuryApprovalMotion' ||
-        vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
+      hasAction = vnode.state.councilMotionType === 'createExternalProposal'
+        || vnode.state.councilMotionType === 'createExternalProposalMajority';
+      hasVotingPeriodAndDelaySelector = vnode.state.councilMotionType === 'createFastTrack'
+        || vnode.state.councilMotionType === 'createExternalProposalDefault';
+      hasReferendumSelector = vnode.state.councilMotionType === 'createEmergencyCancellation';
+      hasExternalProposalSelector = vnode.state.councilMotionType === 'vetoNextExternal'
+        || vnode.state.councilMotionType === 'createFastTrack'
+        || vnode.state.councilMotionType === 'createExternalProposalDefault';
+      hasTreasuryProposalSelector = vnode.state.councilMotionType === 'createTreasuryApprovalMotion'
+        || vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
     } else if (proposalTypeEnum === ProposalType.EdgewareSignalingProposal) {
       hasTitleAndDescription = true;
@@ -107,8 +102,7 @@ const NewProposalForm = {
         vnode.state.error = '';
         callback(result);
       };
-      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(
@@ -150,8 +144,8 @@ const NewProposalForm = {
           'Proposal Type': 'Democracy',
           'Thread Type': 'Proposal',
         });
-      } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal &&
-                 vnode.state.councilMotionType === 'vetoNextExternal') {
+      } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
+                 && vnode.state.councilMotionType === 'vetoNextExternal') {
         args = [author, vnode.state.nextExternalProposalHash];
         createFunc = ([a, h]) => (app.chain as Substrate).council.vetoNextExternal(a, h);
         mixpanel.track('Create Thread', {
@@ -175,8 +169,7 @@ const NewProposalForm = {
         } else if (vnode.state.councilMotionType === 'createFastTrack') {
           args = [author, threshold, vnode.state.nextExternalProposalHash,
             vnode.state.votingPeriod, vnode.state.enactmentDelay];
-          createFunc = ([a, b, c, d, e]) =>
-            (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
+          createFunc = ([a, b, c, d, e]) => (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
         } else if (vnode.state.councilMotionType === 'createEmergencyCancellation') {
           args = [author, threshold, vnode.state.referendumId];
           createFunc = ([a, t, h]) => (app.chain as Substrate).council.createEmergencyCancellation(a, t, h);
@@ -224,9 +217,9 @@ const NewProposalForm = {
           'Thread Type': 'Proposal',
         });
       } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
-        const deposit = vnode.state.deposit ?
-          new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false) :
-          (app.chain as Cosmos).governance.minDeposit;
+        const deposit = vnode.state.deposit
+          ? new CosmosToken((app.chain as Cosmos).governance.minDeposit.denom, vnode.state.deposit, false)
+          : (app.chain as Cosmos).governance.minDeposit;
         args = [author, vnode.state.form.title, vnode.state.form.description, deposit];
         mixpanel.track('Create Thread', {
           'Step No': 2,
@@ -248,9 +241,9 @@ const NewProposalForm = {
           details,
         )
         // TODO: handling errors?
-        .then((result) => done(result))
-        .then(() => m.redraw())
-        .catch((err) => notifyError(err.toString()));
+          .then((result) => done(result))
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
         return;
       } else {
         mixpanel.track('Create Thread', {
@@ -266,7 +259,7 @@ const NewProposalForm = {
     };
 
     // default state options
-    const motions = SubstrateCollectiveProposal.motions
+    const motions = SubstrateCollectiveProposal.motions;
     if (!vnode.state.councilMotionType) {
       vnode.state.councilMotionType = motions[0].name;
       vnode.state.councilMotionDescription = motions[0].description;
@@ -279,7 +272,8 @@ const NewProposalForm = {
           m(DropdownFormField, {
             title: 'Motion',
             choices: motions.map(
-              (m) => ({ name: 'councilMotionType', value: m.name, label: m.label })),
+              (m) => ({ name: 'councilMotionType', value: m.name, label: m.label })
+            ),
             callback: (result) => {
               if (vnode.state.councilMotionType === result) return;
               vnode.state.councilMotionType = result;
@@ -287,13 +281,13 @@ const NewProposalForm = {
               m.redraw();
             },
           }),
-          vnode.state.councilMotionDescription &&
-            m('.council-motion-description', vnode.state.councilMotionDescription),
+          vnode.state.councilMotionDescription
+            && m('.council-motion-description', vnode.state.councilMotionDescription),
         ],
         // actions
         hasAction && m(EdgewareFunctionPicker),
-        hasTags && 
-        m(AutoCompleteTagForm, {
+        hasTags
+        && m(AutoCompleteTagForm, {
           results: activeEntity.meta.tags || [],
           updateFormData: (tags: string[]) => {
             vnode.state.form.tags = tags;
@@ -366,16 +360,17 @@ const NewProposalForm = {
               Math.max((vnode.state.form.amount ? vnode.state.form.amount.inDollars : 0)
                 * (app.chain as Substrate).treasury.bondPct,
               (app.chain as Substrate).treasury.bondMinimum.inDollars),
-              true).format(),
+              true
+            ).format(),
             ` (${(app.chain as Substrate).treasury.bondPct * 100}% of requested amount, `,
             `minimum ${(app.chain as Substrate).treasury.bondMinimum.format()})`,
           ]),
         ],
-        hasPhragmenInfo &&
-          m('.council-slot-info', [,
+        hasPhragmenInfo
+          && m('.council-slot-info', [,
             m('p', [
               `Becoming a candidate requires a deposit of ${formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)}. `,
-              `It will be returned if you are elected, or carried over to the next election if you are in the top `,
+              'It will be returned if you are elected, or carried over to the next election if you are in the top ',
               `${(app.chain as Substrate).phragmenElections.desiredRunnersUp} runners-up.`
             ]),
           ]),
@@ -399,13 +394,12 @@ const NewProposalForm = {
             title: `Deposit (${app.chain.base === ChainBase.Substrate ? app.chain.currency : (app.chain as Cosmos).governance.minDeposit.denom})`,
             options: {
               name: 'deposit',
-              placeholder: 'Min: ' + (app.chain.base === ChainBase.Substrate
+              placeholder: `Min: ${app.chain.base === ChainBase.Substrate
+                ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
+                : +(app.chain as Cosmos).governance.minDeposit}`,
+              oncreate: (vnode) => $(vnode.dom).val(app.chain.base === ChainBase.Substrate
                 ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                 : +(app.chain as Cosmos).governance.minDeposit),
-              oncreate: (vnode) =>
-                $(vnode.dom).val(app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit),
             },
             callback: (result) => {
               vnode.state.deposit = parseFloat(result);
@@ -439,24 +433,25 @@ const NewProposalForm = {
             },
           }),
         ],
-        hasReferendumSelector &&
-          m(DropdownFormField, {
+        hasReferendumSelector
+          && m(DropdownFormField, {
             title: 'Referendum',
             choices: (app.chain as Substrate).democracy.store.getAll().map(
-              (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })),
+              (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
+            ),
             callback: (result) => {
               if (vnode.state.referendumId === result) return;
               vnode.state.referendumId = result;
               m.redraw();
             },
           }),
-        hasExternalProposalSelector &&
-          m(DropdownFormField, {
+        hasExternalProposalSelector
+          && m(DropdownFormField, {
             title: 'Proposal',
             choices: (app.chain as Substrate).democracyProposals.nextExternal ? [{
               name: 'external_proposal',
               value: (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString(),
-              label: (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8) + '...',
+              label: `${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(0, 8)}...`,
             }] : [],
             callback: (result) => {
               if (vnode.state.nextExternalProposalHash === result) return;
@@ -464,11 +459,12 @@ const NewProposalForm = {
               m.redraw();
             },
           }),
-        hasTreasuryProposalSelector &&
-          m(DropdownFormField, {
+        hasTreasuryProposalSelector
+          && m(DropdownFormField, {
             title: 'Treasury Proposal',
             choices: (app.chain as Substrate).treasury.store.getAll().map(
-              (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })),
+              (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
+            ),
             callback: (result) => {
               if (vnode.state.treasuryProposalIndex === result) return;
               vnode.state.treasuryProposalIndex = result;
@@ -557,8 +553,8 @@ const NewProposalForm = {
       ]),
       m('.compact-modal-actions', [
         m('button', {
-          class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal &&
-                  !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
+          class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
+                  && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
           type: 'submit',
           onclick: (e) => {
             e.preventDefault();

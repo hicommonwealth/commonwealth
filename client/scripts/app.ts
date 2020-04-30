@@ -28,7 +28,7 @@ import ConfirmInviteModal from './views/modals/confirm_invite_modal';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(app.serverUrl() + '/status').then((data) => {
+    $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
@@ -49,12 +49,14 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           default_chain: app.config.chains.getById(community.default_chain),
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
+          featuredTags: community.featured_tags,
           tags: community.tags,
         }));
       });
       app.login.roles = data.roles || [];
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
-      app.config.notificationCategories = data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
+      app.config.notificationCategories = data.notificationCategories
+        .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
 
       // update the login status
@@ -77,30 +79,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       reject(err);
     });
   });
-}
-
-// called by the LayoutWithChain wrapper, which is triggered when the
-// user navigates to a page scoped to a particular chain
-export function initChain(chainId: string): Promise<void> {
-  if (chainId) {
-    const chainNodes = app.config.nodes.getByChain(chainId);
-    if (chainNodes && chainNodes.length > 0) {
-      return selectNode(chainNodes[0]);
-    } else {
-      throw new Error(`No nodes found for '${chainId}'`);
-    }
-  } else {
-    throw new Error(`No nodes found for '${chainId}'`);
-  }
-}
-
-export function initCommunity(communityId: string): Promise<void> {
-  const community = app.config.communities.getByCommunity(communityId);
-  if (community && community.length > 0) {
-    return selectCommunity(community[0]);
-  } else {
-    throw new Error(`No community found for '${communityId}'`);
-  }
 }
 
 export async function deinitChainOrCommunity() {
@@ -198,7 +176,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     const Near = (await import('./controllers/chain/near/main')).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -232,20 +210,44 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    $.post(app.serverUrl() + '/selectNode', {
+    $.post(`${app.serverUrl()}/selectNode`, {
       url: n.url,
       chain: n.chain.id,
       auth: true,
       jwt: app.login.jwt,
     }).then((res) => {
       if (res.status !== 'Success') {
-        throw new Error('got unsuccessful status: ' + res.status);
+        throw new Error(`got unsuccessful status: ${res.status}`);
       }
     }).catch((e) => console.error('Failed to select node on server'));
   }
 
   // Redraw with chain fully loaded
   m.redraw();
+}
+
+// called by the LayoutWithChain wrapper, which is triggered when the
+// user navigates to a page scoped to a particular chain
+export function initChain(chainId: string): Promise<void> {
+  if (chainId) {
+    const chainNodes = app.config.nodes.getByChain(chainId);
+    if (chainNodes && chainNodes.length > 0) {
+      return selectNode(chainNodes[0]);
+    } else {
+      throw new Error(`No nodes found for '${chainId}'`);
+    }
+  } else {
+    throw new Error(`No nodes found for '${chainId}'`);
+  }
+}
+
+export function initCommunity(communityId: string): Promise<void> {
+  const community = app.config.communities.getByCommunity(communityId);
+  if (community && community.length > 0) {
+    return selectCommunity(community[0]);
+  } else {
+    throw new Error(`No community found for '${communityId}'`);
+  }
 }
 
 // set up mithril
@@ -255,8 +257,10 @@ m.route.set = (...args) => {
   updateRoute.apply(this, args);
   // wait until any redraws have happened before setting the scroll position
   setTimeout(() => {
-    document.getElementsByTagName('html')[0]?.scrollTo(0, 0);
-    document.getElementsByClassName('mithril-app')[0]?.scrollTo(0, 0);
+    const html = document.getElementsByTagName('html')[0];
+    if (html) html.scrollTo(0, 0);
+    const mithrilApp = document.getElementsByClassName('mithril-app')[0];
+    if (mithrilApp) mithrilApp.scrollTo(0, 0);
   }, 0);
 };
 
@@ -287,7 +291,7 @@ moment.updateLocale('en', {
 $(() => {
   // set window error handler
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
-    notifyError('' + errorMsg);
+    notifyError(`${errorMsg}`);
     return false;
   };
 
@@ -298,7 +302,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean) => ({
+  const importRoute = (module, scoped: string | boolean, hideSidebar?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -311,8 +315,8 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      const activeTag = vnode.attrs.activeTag;
-      return m(Layout, { scope, activeTag }, [ vnode ]);
+      const { activeTag } = vnode.attrs;
+      return m(Layout, { scope, activeTag, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -324,7 +328,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), false),
+    '/':                         importRoute(import('views/pages/home'), false, true),
     '/about':                    importRoute(import('views/pages/landing/about'), false),
     '/terms':                    importRoute(import('views/pages/landing/terms'), false),
     '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
@@ -361,7 +365,7 @@ $(() => {
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
-        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}}`
+        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
@@ -387,8 +391,8 @@ $(() => {
   }
 
   // handle login redirects
-  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') && !m.route.param('path').startsWith('/login')) {
+  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true'
+      && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
 
@@ -471,14 +475,14 @@ $(() => {
   });
 });
 
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////
 // For browserify-hmr
 // See browserify-hmr module.hot API docs for hooks docs.
 declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
   // module.hot.dispose((data: any) => {
-  // 	m.redraw();
+  //   m.redraw();
   // })
 }
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////

@@ -97,16 +97,17 @@ const Chat = {
     const { name } = vnode.attrs;
     // group messages; break up groups when the sender changes, or there is a delay of MESSAGE_GROUPING_DELAY
     const groupedMessages = vnode.state.messages.reduce((acc, msg) => {
-      (acc.length > 0
+      if (acc.length > 0
        && acc[acc.length - 1].sender.address === msg.sender.address
        && acc[acc.length - 1].sender.chain === msg.sender.chain
        && msg.timestamp.diff(
          acc[acc.length - 1].messages[acc[acc.length - 1].messages.length - 1].timestamp,
          'seconds',
-       ) <= MESSAGE_GROUPING_DELAY
-      )
-        ? acc[acc.length - 1].messages.push(msg)
-        : acc.push({ sender: msg.sender, messages: [msg] });
+       ) <= MESSAGE_GROUPING_DELAY) {
+        acc[acc.length - 1].messages.push(msg);
+      } else {
+        acc.push({ sender: msg.sender, messages: [msg] });
+      }
       return acc;
     }, []);
 
@@ -125,38 +126,38 @@ const Chat = {
       ]),
       !app.isLoggedIn() ? m('.chat-composer-unavailable', 'Log in to join chat')
         : !app.vm.activeAccount ? m('.chat-composer-unavailable', 'Set up account to join chat')
-        : !vnode.state.chat.isConnected ? m('.chat-composer-unavailable', 'Waiting for connection')
-        : m('form.chat-composer', [
-          m(ResizableTextarea, {
-            name: 'chat',
-            rows: 1,
-            class: vnode.state.chat.isConnected ? '' : 'disabled',
-            disabled: !vnode.state.chat.isConnected,
-            placeholder: vnode.state.chat.isConnected ? 'Enter a message...' : 'Disconnected',
-            oncreate: (vnode2) => $(vnode2.dom).focus(),
-            oninput: vnode.state.outgoingTypingInputHandler,
-            onkeydown: (e) => {
-              // collapse on escape
-              if (e.keyCode === 27) {
-                e.preventDefault();
-                vnode.state.collapsed = true;
-                localStorage.setItem('cwChatCollapsed', 'true');
-              }
-            },
-            onkeypress: (e) => {
-              // submit on enter
-              if (e.keyCode === 13 && !e.shiftKey) {
-                e.preventDefault();
-                if (!vnode.state.chat.isConnected) return;
-                const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
-                const message = $textarea.val();
-                vnode.state.chat.send('message', message, app.vm.activeAccount, app.login.jwt);
-                vnode.state.oninput = false; // HACK: clear the typing debounce
-                $textarea.val('');
-              }
-            },
-          }),
-        ]),
+          : !vnode.state.chat.isConnected ? m('.chat-composer-unavailable', 'Waiting for connection')
+            : m('form.chat-composer', [
+              m(ResizableTextarea, {
+                name: 'chat',
+                rows: 1,
+                class: vnode.state.chat.isConnected ? '' : 'disabled',
+                disabled: !vnode.state.chat.isConnected,
+                placeholder: vnode.state.chat.isConnected ? 'Enter a message...' : 'Disconnected',
+                oncreate: (vnode2) => $(vnode2.dom).focus(),
+                oninput: vnode.state.outgoingTypingInputHandler,
+                onkeydown: (e) => {
+                  // collapse on escape
+                  if (e.keyCode === 27) {
+                    e.preventDefault();
+                    vnode.state.collapsed = true;
+                    localStorage.setItem('cwChatCollapsed', 'true');
+                  }
+                },
+                onkeypress: (e) => {
+                  // submit on enter
+                  if (e.keyCode === 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!vnode.state.chat.isConnected) return;
+                    const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
+                    const message = $textarea.val();
+                    vnode.state.chat.send('message', message, app.vm.activeAccount, app.login.jwt);
+                    vnode.state.oninput = false; // HACK: clear the typing debounce
+                    $textarea.val('');
+                  }
+                },
+              }),
+            ]),
     ]);
   },
 };

@@ -51,7 +51,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
     await super.init(async () => {
       const edgTypes = Object.values(edgewareDefinitions)
-        .reduce((res, { types }): object => ({ ...res, ...types }), {});
+        .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
 
       await this.chain.resetApi(this.meta, {
         types: {
@@ -65,6 +65,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
           StakingLedger: 'StakingLedgerTo223',
           Votes: 'VotesTo230',
           ReferendumInfo: 'ReferendumInfoTo239',
+          Weight: 'u32',
         },
         // override duplicate type name
         typesAlias: { voting: { Tally: 'VotingTally' } },

@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const deleteReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -13,7 +15,7 @@ const deleteReaction = async (models, req: UserRequest, res: Response, next: Nex
     const userOwnedAddresses = await req.user.getAddresses();
     const reaction = await models.OffchainReaction.findOne({
       where: { id: req.body.reaction_id, },
-       include: [ models.Address ],
+      include: [ models.Address ],
     });
     if (userOwnedAddresses.map((addr) => addr.id).indexOf(reaction.address_id) === -1) {
       return next(new Error('Not owned by this user'));

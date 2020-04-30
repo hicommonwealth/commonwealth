@@ -1,4 +1,4 @@
-/* tslint:disable:max-line-length */
+/* eslint-disable max-len */
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
@@ -119,7 +119,7 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 
 const TermsPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'TermsPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'TermsPage' });
   },
   view: (vnode) => {
     return m('.TermsPage', [

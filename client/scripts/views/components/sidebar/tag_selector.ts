@@ -14,6 +14,103 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
+
+interface IFeaturedCheckboxAttrs {
+  tag: string;
+  featured: boolean;
+  addFeaturedTag: Function;
+  removeFeaturedTag: Function;
+}
+
+const FeaturedCheckbox: m.Component<IFeaturedCheckboxAttrs, {featured: boolean}> = {
+  oninit: (vnode) => {
+    vnode.state.featured = vnode.attrs.featured;
+  },
+  view: (vnode) => {
+    return m(Checkbox, {
+      defaultChecked: vnode.state.featured,
+      label: 'Featured Tag',
+      size: 'sm',
+      onclick: () => {
+        const { featured } = vnode.state;
+        const { addFeaturedTag, removeFeaturedTag, tag, } = vnode.attrs;
+        const featuredTags = app.community.meta.featuredTags;
+        if (featured) {
+          // remove
+          removeFeaturedTag(tag);
+        } else {
+          // add
+          addFeaturedTag(tag);
+        }
+      },
+    });
+  },
+};
+
+interface ITagRowAttrs {
+  count: number,
+  description: string,
+  id: number,
+  featured: boolean;
+  featured_order?: number,
+  name: string;
+  addFeaturedTag: Function;
+  removeFeaturedTag: Function;
+  hideEditButton: boolean;
+}
+
+const TagRow: m.Component<ITagRowAttrs, {}> = {
+  view: (vnode) => {
+    const {
+      count, description, id, featured, featured_order,
+      name, addFeaturedTag, removeFeaturedTag,
+      hideEditButton
+    } = vnode.attrs;
+    if (featured && typeof Number(featured_order) !== 'number') return null;
+    const selected = m.route.get() === `/${app.activeId()}/discussions/${name}`;
+
+    return m(ListItem, {
+      class: 'TagRow',
+      key: id,
+      id,
+      selected,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+      contentLeft: m(Icon, { name: Icons.HASH }),
+      label: [
+        m('span.tag-name', name),
+      ],
+      contentRight: [
+        !hideEditButton && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton && m(FeaturedCheckbox, { tag: name, featured, addFeaturedTag, removeFeaturedTag, }),
+        !hideEditButton && isCommunityAdmin() && m(Button, {
+          class: 'edit-button',
+          size: 'xs',
+          onclick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.modals.create({
+              modal: EditTagModal,
+              data: {
+                description,
+                featured,
+                featured_order,
+                id,
+                name,
+                addFeaturedTag,
+                removeFeaturedTag
+              }
+            });
+          },
+          label: 'Edit',
+        })
+      ]
+    });
+  }
+};
+
 interface IGetTagListingParams {
   activeTag: string,
   featuredTagIds: string[],
@@ -30,7 +127,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
   app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
     const { tags } = thread;
     tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will excluded from
+      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
       // addition to the TagStore, since said store will be more up-to-date
       const existing = app.tags.getByIdentifier(tag.id);
       if (!existing) app.tags.addToStore(tag);
@@ -92,93 +189,9 @@ export const getTagListing = (params: IGetTagListingParams) => {
   return ({ featuredTagListing, otherTagListing });
 };
 
-interface ITagRowAttrs {
-  count: number,
-  description: string,
-  id: number,
-  featured: boolean;
-  featured_order?: number,
-  name: string;
-  addFeaturedTag: Function;
-  removeFeaturedTag: Function;
-  hideEditButton: boolean;
-}
-
-const TagRow: m.Component<ITagRowAttrs, {}> = {
-  view: (vnode) => {
-    const {
-      count, description, id, featured, featured_order,
-      name, addFeaturedTag, removeFeaturedTag,
-      hideEditButton
-    } = vnode.attrs;
-    if (featured && typeof Number(featured_order) !== 'number') return null;
-    const selected = m.route.get() === `/${app.activeId()}/discussions/${name}`;
-
-    return m(ListItem, {
-      class: 'TagRow',
-      key: id,
-      id,
-      selected,
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-      contentLeft: m(Icon, { name: Icons.HASH }),
-      label: [
-        m('span.tag-name', name),
-      ],
-      contentRight: [
-        !hideEditButton && m('.tag-count', pluralize(count, 'post')),
-        !hideEditButton && m(Checkbox, {
-          defaultChecked: featured,
-          label: 'Featured Tag',
-          size: 'sm',
-          onclick: (checked) => {
-            const featuredTags = app.community.meta.featuredTags;
-            if (featured) {
-              // remove
-              const removedOneFeaturedTags = featuredTags.slice(featuredTags.indexOf(name), 1);
-              app.community.meta.updateFeaturedTags(removedOneFeaturedTags).then(() => {
-                m.redraw();
-              });
-            } else {
-              // add
-              console.dir(featuredTags);
-              featuredTags.push(name);
-              console.dir(featuredTags);
-              app.community.meta.updateFeaturedTags(featuredTags).then(() => {
-                m.redraw();
-              });
-            }
-          },
-        }),
-        !hideEditButton && isCommunityAdmin() && m(Button, {
-          class: 'edit-button',
-          size: 'xs',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            app.modals.create({
-              modal: EditTagModal,
-              data: {
-                description,
-                featured,
-                featured_order,
-                id,
-                name,
-                addFeaturedTag,
-                removeFeaturedTag
-              }
-            });
-          },
-          label: 'Edit',
-        })
-      ]
-    });
-  }
-};
-
-const TagSelector: m.Component<{ activeTag: string, showFullListing: boolean, hideEditButton?: boolean }, { refreshed, featuredTagIds }> = {
+const TagSelector: m.Component<{
+  activeTag: string, showFullListing: boolean, hideEditButton?: boolean
+}, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
     const { activeTag, showFullListing, hideEditButton } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;

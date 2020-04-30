@@ -6,8 +6,8 @@ import SocialShare from './social_share';
 const BTCInstructions: m.Component = {
   view: (vnode: m.VnodeDOM) => {
     return m('.BTCInstructions', {
-      oncreate: (vnode) => {
-        $('html, body').animate({ scrollTop: $(vnode.dom).position().top }, 500);
+      oncreate: (vvnode) => {
+        $('html, body').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
       }
     }, [
       m('.step', [
@@ -24,13 +24,13 @@ const BTCInstructions: m.Component = {
           ]),
           m(CodeBlock, 'git clone https://github.com/hicommonwealth/supernova-lockdrop'),
           m('p', [
-            `You will need to install Node v11.6 to run the lockdrop scripts. If you don't `,
-            `have it installed, we recommend using NVM to install Node:`,
+            'You will need to install Node v11.6 to run the lockdrop scripts. If you don\'t ',
+            'have it installed, we recommend using NVM to install Node:',
           ]),
           m(CodeBlock, [
-            `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n`,
-            `nvm install 11.6.0\n`,
-            `nvm use 11.6.0\n`,
+            'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n',
+            'nvm install 11.6.0\n',
+            'nvm use 11.6.0\n',
           ]),
           m('p', [
             'Then, run ',
@@ -48,13 +48,12 @@ const BTCInstructions: m.Component = {
             href: 'https://bcoin.io/guides/beginners.html'
           }, 'here'),
           '. The steps should approximately be:'
-          ]
-        ),
-        m(CodeBlock,  [
-          `git clone https://github.com/bcoin-org/bcoin.git\n`,
-          `cd bcoin\n`,
-          `npm install\n`,
-          `npm install -g # Link bcoin binaries globally`
+        ]),
+        m(CodeBlock, [
+          'git clone https://github.com/bcoin-org/bcoin.git\n',
+          'cd bcoin\n',
+          'npm install\n',
+          'npm install -g # Link bcoin binaries globally'
         ])
       ]),
       m('.step', [
@@ -77,12 +76,12 @@ const BTCInstructions: m.Component = {
           'Install ',
           m('code', 'ipfs'),
           ' globally to have access to the ',
-          m('code' , 'jsipfs'),
+          m('code', 'jsipfs'),
           ' command, and launch the ipfs daemon:'
         ]),
         m(CodeBlock, [
-          `npm install ipfs --global\n`,
-          `jsipfs daemon `
+          'npm install ipfs --global\n',
+          'jsipfs daemon '
         ]),
         m('p', 'Once you have Bcoin access and a working IPFS node, you can proceed with your lock!'),
       ]),
@@ -94,15 +93,15 @@ const BTCInstructions: m.Component = {
           ' file is configured with the following fields ',
         ]),
         m(CodeBlock, [
-          `// Bitcoin parameters`,
-          `const BTC_BIP39_MNEMONIC = process.env.BTC_BIP39_MNEMONIC;\n`,
-          `const BTC_NETWORK_SETTING = process.env.BITCOIN_NETWORK_SETTING || 'regtest';\n`,
-          `// Bcoin parameters`,
-          `const BCOIN_WALLET_ID = process.env.BCOIN_WALLET_ID || 'primary';\n`,
-          `const BCOIN_WALLET_ACCOUNT = process.env.BCOIN_WALLET_ACCOUNT || 'default';\n`,
-          `const BCOIN_WALLET_PASSPHRASE = process.env.BCOIN_WALLET_PASSPHRASE || '';\n`,
-          `const BCOIN_NODE_ADDRESS = process.env.BCOIN_NODE_ADDRESS || '127.0.0.1';\n`,
-          `const BCOIN_WALLET_NODE_ADDRESS = process.env.BCOIN_WALLET_NODE_ADDRESS || '127.0.0.1';\n`
+          '// Bitcoin parameters',
+          'const BTC_BIP39_MNEMONIC = process.env.BTC_BIP39_MNEMONIC;\n',
+          'const BTC_NETWORK_SETTING = process.env.BITCOIN_NETWORK_SETTING || \'regtest\';\n',
+          '// Bcoin parameters',
+          'const BCOIN_WALLET_ID = process.env.BCOIN_WALLET_ID || \'primary\';\n',
+          'const BCOIN_WALLET_ACCOUNT = process.env.BCOIN_WALLET_ACCOUNT || \'default\';\n',
+          'const BCOIN_WALLET_PASSPHRASE = process.env.BCOIN_WALLET_PASSPHRASE || \'\';\n',
+          'const BCOIN_NODE_ADDRESS = process.env.BCOIN_NODE_ADDRESS || \'127.0.0.1\';\n',
+          'const BCOIN_WALLET_NODE_ADDRESS = process.env.BCOIN_WALLET_NODE_ADDRESS || \'127.0.0.1\';\n'
         ])
       ]),
       m('.step', [
@@ -127,7 +126,7 @@ const BTCInstructions: m.Component = {
         ]),
         m('p', [
           'To create a wallet called ',
-          m('code', 'default' ),
+          m('code', 'default'),
           ', run:'
         ]),
         m(CodeBlock, 'bwallet-cli account create default'),

@@ -11,8 +11,8 @@ const ATOMInstructions: m.Component<{}, IState> = {
   view: (vnode: m.VnodeDOM<{}, IState>) => {
     return m('.ATOMInstructions', {
       style: 'display: none;',
-      oncreate: (vnode) => {
-        $(vnode.dom).slideDown(100);
+      oncreate: (vvnode) => {
+        $(vvnode.dom).slideDown(100);
       }
     }, [
       m('.step', [
@@ -27,13 +27,13 @@ const ATOMInstructions: m.Component<{}, IState> = {
         ]),
         m(CodeBlock, 'git clone https://github.com/hicommonwealth/supernova-lockdrop'),
         m('p', [
-          `You will need to install Node v11.6 to run the lockdrop scripts. If you don't `,
-          `have it installed, we recommend using NVM to install Node:`,
+          'You will need to install Node v11.6 to run the lockdrop scripts. If you don\'t ',
+          'have it installed, we recommend using NVM to install Node:',
         ]),
         m(CodeBlock, [
-          `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n`,
-          `nvm install 11.6.0\n`,
-          `nvm use 11.6.0\n`,
+          'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n',
+          'nvm install 11.6.0\n',
+          'nvm use 11.6.0\n',
         ]),
         m('p', [
           'Then, run ',
@@ -99,15 +99,15 @@ const ATOMInstructions: m.Component<{}, IState> = {
               m('a', {
                 href: 'https://golang.org/doc/install'
               }, 'official docs'),
-              `. Then set your `,
-              `environment variables in the command line as follows:`
+              '. Then set your ',
+              'environment variables in the command line as follows:'
             ]),
             m(CodeBlock, [
-              `mkdir -p $HOME/go/bin\n`,
-              `echo "export GOPATH=$HOME/go" >> ~/.bash_profile\n`,
-              `echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile\n`,
-              `echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile\n`,
-              `source ~/.bash_profile`
+              'mkdir -p $HOME/go/bin\n',
+              'echo "export GOPATH=$HOME/go" >> ~/.bash_profile\n',
+              'echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile\n',
+              'echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile\n',
+              'source ~/.bash_profile'
             ])
           ]),
           m('.step', [
@@ -122,11 +122,11 @@ const ATOMInstructions: m.Component<{}, IState> = {
               ' branch.'
             ]),
             m(CodeBlock, [
-              `mkdir -p $GOPATH/src/github.com/cosmos\n`,
-              `cd $GOPATH/src/github.com/cosmos\n`,
-              `git clone https://github.com/cosmos/cosmos-sdk\n`,
-              `cd cosmos-sdk && git checkout master\n`,
-              `make tools install`
+              'mkdir -p $GOPATH/src/github.com/cosmos\n',
+              'cd $GOPATH/src/github.com/cosmos\n',
+              'git clone https://github.com/cosmos/cosmos-sdk\n',
+              'cd cosmos-sdk && git checkout master\n',
+              'make tools install'
             ]),
             m('p', [
               'Then verify the installation by running ',
@@ -163,7 +163,7 @@ const ATOMInstructions: m.Component<{}, IState> = {
             onclick: (e) => {
               e.preventDefault();
               m.route.set('/supernova/lockdrop/notes#cosmos-lock-notes');
-            }}, 'Cosmos locking'),
+            } }, 'Cosmos locking'),
           ' for information on how to verify the status of your delegation.'
         ]),
       ]),
@@ -182,7 +182,7 @@ const ATOMInstructions: m.Component<{}, IState> = {
           'previously configured password for TestKey, after which the lock will occur immediately.'
         ]),
         m(CodeBlock, [
-          `yarn lock-atom 100 --keyName TestKey --validator <VALIDATOR_ADDRESS>`
+          'yarn lock-atom 100 --keyName TestKey --validator <VALIDATOR_ADDRESS>'
         ]),
       ]),
       m(SocialShare)

@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const bulkProfiles = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   let chains;

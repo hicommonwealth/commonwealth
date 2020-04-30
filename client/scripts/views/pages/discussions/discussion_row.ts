@@ -43,10 +43,10 @@ const DiscussionRow: m.Component<IAttrs> = {
       }
     };
 
-    const canEditTags = (
-      (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-       || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-       || proposal.author === app.vm.activeAccount.address));
+    const canEditTags = app.vm.activeAccount
+      && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
+          || proposal.author === app.vm.activeAccount.address);
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
@@ -127,9 +127,10 @@ const DiscussionRow: m.Component<IAttrs> = {
             ]),
             m('.discussion-meta-right', [
               m('.discussion-tags', [
-                proposal.tags.sort((a,b) => tagSortByName(a,b)).map((tag) => {
+                proposal.tags.sort((a, b) => tagSortByName(a, b)).map((tag) => {
                   return m(Tag, {
-                    intent: 'primary',
+                    rounded: true,
+                    intent: 'none',
                     label: tag.name,
                     size: 'xs',
                     onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),

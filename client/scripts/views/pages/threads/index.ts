@@ -127,7 +127,7 @@ export const newThread = (
 };
 
 export function detectURL(str: string) {
-  if (str.slice(0, 4) !== 'http') str = 'http://' + str;
+  if (str.slice(0, 4) !== 'http') str = `http://${str}`;
   return !!str.match(re_weburl);
 }
 
@@ -136,7 +136,7 @@ export const newLink = (form, quillEditorState, author, kind = OffchainThreadKin
 };
 
 export const getLinkTitle = async (url: string) => {
-  if (url.slice(0, 4) !== 'http') url = 'http://' + url;
+  if (url.slice(0, 4) !== 'http') url = `http://${url}`;
   const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
   if (response.status === 404) return '404: Not Found';
   if (response.status === 500) return '500: Server Error';

@@ -12,7 +12,7 @@ export class ModalStore {
     m.redraw();
   }
   public remove(modalspec) {
-    const index = this._modals.findIndex((m) => m.id === modalspec.id);
+    const index = this._modals.findIndex((ms) => ms.id === modalspec.id);
     if (index === -1) {
       throw new Error('Invalid modal');
     }

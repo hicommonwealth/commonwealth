@@ -89,7 +89,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
               }).then((result) => {
                 vnode.state.disabled = false;
                 if (result.status === 'Success') {
-                  const idx = vnode.attrs.webhooks.findIndex((webhook) => webhook.url === `${webhook.url}`);
+                  const idx = vnode.attrs.webhooks.findIndex((w) => `${w.url}` === `${webhook.url}`);
                   if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
                   vnode.state.success = true;
                   vnode.state.successMsg = 'Webhook deleted!';

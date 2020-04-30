@@ -5,7 +5,7 @@ import Login from 'views/components/login';
 
 const LoginPage: m.Component<{}> = {
   oncreate: (vnode) => {
-      mixpanel.track('PageVisit', {'Page Name': 'LoginPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
     // this page requires a logged-out user

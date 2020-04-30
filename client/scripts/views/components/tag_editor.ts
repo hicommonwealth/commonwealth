@@ -14,8 +14,8 @@ const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
   view: (vnode) => {
     const { onChangeHandler, tags } = vnode.attrs;
     return m(TagInput, {
-      oncreate: (vnode) => {
-        $(vnode.dom).find('input').focus();
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('input').focus();
       },
       contentLeft: m(Icon, { name: Icons.TAG }),
       tags: tags && (tags.length !== 0)

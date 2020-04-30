@@ -99,7 +99,7 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
             m.redraw();
           });
         }
-      }, selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add')
+      }, selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add');
     };
 
     return m('.CreateInviteModal', [
@@ -114,7 +114,7 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           m('.community-url', `commonwealth.im/${id}`),
         ]),
         m('form', [
-          m('h4', `Option 1: Add member by address`),
+          m('h4', 'Option 1: Add member by address'),
           m(DropdownFormField, {
             name: 'invitedAddressChain',
             choices: chains,
@@ -131,9 +131,9 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           m('input[type="text"]', {
             name: 'address',
             autocomplete: 'off',
-            placeholder: `Address`,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            placeholder: 'Address',
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           }),
           getInviteButton('address'),

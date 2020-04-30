@@ -3,6 +3,8 @@ import send, { WebhookContent } from '../webhookNotifier';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 const { Op } = Sequelize;
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define('Subscription', {
@@ -59,7 +61,6 @@ module.exports = (sequelize, DataTypes) => {
         address: notification_data.author_address,
       },
     });
-    console.log(category_id);
     // get subscribers to send notifications to
     const subscribers = await models.Subscription.findAll({
       where: {
@@ -71,7 +72,6 @@ module.exports = (sequelize, DataTypes) => {
         [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
       },
     });
-    console.log(subscribers);
     // create notifications if data exists
     if (notification_data) {
       await Promise.all(subscribers.map(async (subscription) => {

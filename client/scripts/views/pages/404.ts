@@ -5,7 +5,7 @@ import { default as mixpanel } from 'mixpanel-browser';
 
 const PageNotFound: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': '404Page'});
+    mixpanel.track('PageVisit', { 'Page Name': '404Page' });
   },
   view: (vnode) => {
     return m('.PageNotFound', [

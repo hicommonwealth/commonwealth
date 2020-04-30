@@ -46,8 +46,8 @@ const ProfileBlock = makeDynamicComponent<IAttrs, IState>({
       m('.profile-block-right', [
         m('.profile-block-name', [
           m(User, { user: account, hideAvatar: true, tooltip: true }),
-          showBalance && m('span.balance', vnode.state.dynamic.balance === undefined ? '--' :
-            formatCoin(vnode.state.dynamic.balance, true)),
+          showBalance && m('span.balance', vnode.state.dynamic.balance === undefined ? '--'
+            : formatCoin(vnode.state.dynamic.balance, true)),
         ]),
         m('.profile-block-address', {
           class: profile && profile.address ? '' : 'no-address',

@@ -59,18 +59,16 @@ const MessageSigningCLIOption = {
       app.chain && app.chain.base === ChainBase.CosmosSDK && m('.instructions', [
         'Use the cosmos-signer utility to sign this message:'
       ]),
-      app.chain && app.chain.base === ChainBase.Substrate &&
-        m(CodeBlock, { clickToSelect: true }, [
+      app.chain && app.chain.base === ChainBase.Substrate
+        && m(CodeBlock, { clickToSelect: true }, [
           `echo "${account.validationToken}" | subkey ${(account as SubstrateAccount).isEd25519 ? '-e ' : ''}sign "`,
           m('span.no-select', 'secret phrase'),
           '"',
-        ]
-      ),
-      app.chain && app.chain.base === ChainBase.CosmosSDK &&
-        m(CodeBlock, { clickToSelect: true }, [
+        ]),
+      app.chain && app.chain.base === ChainBase.CosmosSDK
+        && m(CodeBlock, { clickToSelect: true }, [
           `${account.validationToken}`
-        ]
-      ),
+        ]),
       // action
       m('p', 'Enter the signature here:'),
       m('textarea.signature', {
@@ -137,8 +135,8 @@ export const getSignatureForMessage = (account: Account<any>, title?: string, me
       completeCallback: (data) => { complete = true; },
       exitCallback: (data) => { complete ? resolve(data) : reject(data); },
       data: {
-        account: account,
-        title: title,
+        account,
+        title,
         defaultMethod: method,
       },
     });

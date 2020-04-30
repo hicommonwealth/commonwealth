@@ -9,9 +9,9 @@ import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
 
+import { Account } from 'models';
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import { createTXModal } from './tx_signing_modal';
-import { Account } from 'models';
 import { SubstrateAccount } from '../../controllers/chain/substrate/account';
 import AvatarUpload from '../components/avatar_upload';
 import Substrate from '../../controllers/chain/substrate/main';
@@ -109,7 +109,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
           name: inputName,
           id: inputName,
           placeholder: description,
-          limit: limit,
+          limit,
         }),
       ]);
     };

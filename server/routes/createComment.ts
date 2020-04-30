@@ -5,6 +5,8 @@ import { UserRequest } from '../types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -120,7 +122,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       where: { identifier: id, type: prefix }
     });
   } else {
-    console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+    log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
   if (!proposal || proposal.read_only) {
@@ -162,7 +164,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         return user;
       }));
     } catch (err) {
-      console.log(err);
+      log.error(err);
     }
   }
 

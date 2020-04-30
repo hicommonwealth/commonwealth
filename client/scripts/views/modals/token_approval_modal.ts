@@ -17,17 +17,17 @@ interface IState {
 
 const TokenApprovalModal: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-
     return m('.TokenApprovalModal', [
       m('.header', 'Approve'),
       m('.compact-modal-body', [
         m(TextInputFormField, {
           title: 'Amount of token to approve',
-          subtitle: 'If you want to become a DAO member, you must allow it to handle some of your tokens. Choose the amount.',
+          subtitle: 'If you want to become a DAO member, '
+            + 'you must allow it to handle some of your tokens. Choose the amount.',
           options: {
             value: vnode.state.tokensToApprove,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           },
           callback: (val) => {
@@ -40,11 +40,11 @@ const TokenApprovalModal: m.Component<IAttrs, IState> = {
             e.preventDefault();
             const toApprove = new BN(vnode.state.tokensToApprove);
             vnode.attrs.account.approveShares(toApprove)
-            .then((result) => {
-              $(vnode.dom).trigger('modalforceexit');
-              m.redraw();
-            })
-            .catch((err) => notifyError(err));
+              .then((result) => {
+                $(vnode.dom).trigger('modalforceexit');
+                m.redraw();
+              })
+              .catch((err) => notifyError(err));
           }
         }, 'Approve'),
       ]),

@@ -33,7 +33,7 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
 }
 
 export function extractDomain(url) {
-  const re = new RegExp('^(?:https?:)?(?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)');
+  const re = new RegExp('^(?:https?:)?(?://)?(?:[^@]+@)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
 }
 
@@ -51,7 +51,7 @@ export function featherIcon(icon, size, stroke, color) {
     'stroke-linejoin': 'round',
   }, [
     m('use', {
-      'xlink:href': '/static/img/feather-sprite.svg#' + icon
+      'xlink:href': `/static/img/feather-sprite.svg#${icon}`
     }),
   ]);
 }
@@ -81,8 +81,8 @@ export function byAscendingCreationDate(a, b) {
 }
 
 export function orderAccountsByAddress(a, b) {
-  return a.address < b.address ? -1 :
-    a.address > b.address ? 1 : 0;
+  return a.address < b.address ? -1
+    : a.address > b.address ? 1 : 0;
 }
 
 export function isSameAccount(a, b) {
@@ -94,11 +94,11 @@ export function isSameAccount(a, b) {
  */
 export function pluralize(num : number, str : string) {
   if (str.endsWith('y')) {
-    return num + ' ' + str.slice(0, str.length - 1) + ((num === 1) ? 'y' : 'ies');
+    return `${num} ${str.slice(0, str.length - 1)}${(num === 1) ? 'y' : 'ies'}`;
   } else if (str.endsWith('ss')) {
-    return num + ' ' + str + (num === 1 ? '' : 'es');
+    return `${num} ${str}${num === 1 ? '' : 'es'}`;
   } else {
-    return num + ' ' + str + ((num === 1 || str.endsWith('s')) ? '' : 's');
+    return `${num} ${str}${(num === 1 || str.endsWith('s')) ? '' : 's'}`;
   }
 }
 
@@ -136,23 +136,23 @@ export function formatPercentShort(num : number) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
-  return (num * 100).toFixed(1) + '%';
+  return `${(num * 100).toFixed(1)}%`;
 }
 
 export function formatDuration(duration : moment.Duration) {
   const days = Math.floor(duration.asDays());
   return [
-    (days) ? (days + 'd ') : '',
-    (days || duration.hours()) ? (duration.hours() + 'h ') : '',
-    (days || duration.minutes()) ? (duration.minutes()  + 'm ') : '',
-    duration.seconds() + 's',
+    (days) ? (`${days}d `) : '',
+    (days || duration.hours()) ? (`${duration.hours()}h `) : '',
+    (days || duration.minutes()) ? (`${duration.minutes()}m `) : '',
+    `${duration.seconds()}s`,
   ].join('');
 }
 
 export function formatAddressShort(addr : string) {
   if (!addr) return;
   if (addr.length < 16) return addr;
-  return addr.slice(0, 5) + '…' + addr.slice(addr.length - 3);
+  return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
 }
 
 export function formatProposalHashShort(hash : string) {
@@ -227,7 +227,7 @@ export class BlocktimeHelper {
     const newblocktime = Math.round(durations[Math.floor(durations.length / 2)]);
     if (newblocktime > 0 && newblocktime !== this._blocktime) {
       this._blocktime = newblocktime;
-      console.log('blocktime: ' + this._blocktime);
+      console.log(`blocktime: ${this._blocktime}`);
       m.redraw();
     }
   }
