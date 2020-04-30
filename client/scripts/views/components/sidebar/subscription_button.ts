@@ -17,9 +17,11 @@ const SubscriptionButton = {
       size: 'sm',
       onclick: (e) => {
         e.preventDefault();
-        communitySubscription ?
-          subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw()) :
+        if (communitySubscription) {
+          subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw());
+        } else {
           subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => m.redraw());
+        }
       },
       // label: communitySubscription ? 'New thread notifications on' : 'New thread notifications off',
       iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,

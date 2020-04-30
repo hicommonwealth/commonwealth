@@ -36,7 +36,7 @@ const AddressInput: m.Component<IAttrs, IState> = {
         let decodedAddress: Uint8Array;
         try {
           decodedAddress = decodeAddress(address);
-        } catch (e) {
+        } catch (err) {
           vnode.state.error = 'failed to decode address';
           return;
         }
@@ -48,7 +48,7 @@ const AddressInput: m.Component<IAttrs, IState> = {
             try {
               vnode.state.address = encodeAddress(decodedAddress, vnode.attrs.currentPrefix);
               vnode.state.error = null;
-            } catch (e) {
+            } catch (err) {
               vnode.state.error = 'failed to reencode address';
             }
           } else {
