@@ -5,13 +5,16 @@ $active-color: #f4f4f9;
 
 .Sidebar {
     position: fixed;
-    left: 63px;
     top: 0;
     bottom: 0;
+    left: 63px;
     width: $side-width - 63px;
     z-index: 9;
-    // box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
     border-right: 1px solid #e8e8e8;
+    &.logged-out {
+        left: 0;
+        width: $side-width;
+    }
     .SidebarMenu {
         height: 100%;
     }

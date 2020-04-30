@@ -299,7 +299,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean) => ({
+  const importRoute = (module, scoped: string | boolean, hideSidebar?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -312,8 +312,8 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      const activeTag = vnode.attrs.activeTag;
-      return m(Layout, { scope, activeTag }, [ vnode ]);
+      const { activeTag } = vnode.attrs;
+      return m(Layout, { scope, activeTag, hideSidebar }, [ vnode ]);
     },
   });
 
@@ -325,7 +325,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), false),
+    '/':                         importRoute(import('views/pages/home'), false, true),
     '/about':                    importRoute(import('views/pages/landing/about'), false),
     '/terms':                    importRoute(import('views/pages/landing/terms'), false),
     '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
