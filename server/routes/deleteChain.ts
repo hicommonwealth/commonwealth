@@ -1,6 +1,8 @@
-import deleteCommunity from "./deleteCommunity";
 import { Response, NextFunction } from 'express';
+import deleteCommunity from "./deleteCommunity";
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const deleteChain = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
