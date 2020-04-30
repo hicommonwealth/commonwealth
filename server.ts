@@ -204,7 +204,6 @@ if (SHOULD_RESET_DB) {
   setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
     .then(() => {
       if (RUN_ENTITY_MIGRATION) {
-        console.log('Entity migration successful.');
         models.sequelize.close()
           .then(() => process.exit(0));
       }

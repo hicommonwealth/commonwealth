@@ -8,7 +8,7 @@ import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind } from './
 export type IChainEntityKind = SubstrateEntityKind;
 export type IChainEventData = ISubstrateEventData;
 export type IChainEventKind = SubstrateEventKind;
-export const EventSupportingChains = ['edgeware', 'edgeware-local', 'kusama', 'kusama-local'];
+export const EventSupportingChains = ['edgeware', 'edgeware-local', /*'kusama', 'kusama-local'*/];
 
 export interface CWEvent {
   blockNumber: number;

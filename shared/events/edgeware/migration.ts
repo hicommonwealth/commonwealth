@@ -28,6 +28,7 @@ import {
 } from './types';
 
 async function fetchDemocracyProposals(api: ApiPromise): Promise<CWEvent[]> {
+  console.log('Migrating democracy proposals...');
   const publicProps = await api.query.democracy.publicProps();
   const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await api.queryMulti(
     publicProps.map(([ idx ]) => [ api.query.democracy.depositOf, idx ])
@@ -45,10 +46,12 @@ async function fetchDemocracyProposals(api: ApiPromise): Promise<CWEvent[]> {
       };
     })
     .filter((e) => !!e);
+  console.log(`Found ${proposedEvents.length} democracy proposals!`);
   return proposedEvents.map((data) => ({ blockNumber: 0, data }));
 }
 
 async function fetchDemocracyReferenda(api: ApiPromise): Promise<CWEvent[]> {
+  console.log('Migrating democracy referenda...');
   const activeReferenda = await api.derive.democracy.referendumsActive();
   const startEvents = activeReferenda.map((r) => {
     return {
@@ -80,11 +83,13 @@ async function fetchDemocracyReferenda(api: ApiPromise): Promise<CWEvent[]> {
       ];
     })
   );
+  console.log(`Found ${startEvents.length + passedEvents.length} democracy referenda!`);
   return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber: 0, data }));
 }
 
 // must pass proposal hashes found in prior events
 async function fetchDemocracyPreimages(api: ApiPromise, hashes: string[]): Promise<CWEvent[]> {
+  console.log('Migrating preimages...');
   const hashCodecs = hashes.map((hash) => api.createType('Hash', hash));
   const preimages = await api.derive.democracy.preimages(hashCodecs);
   const notedEvents: Array<[ number, ISubstratePreimageNoted ]> = _.zip(hashes, preimages)
@@ -101,12 +106,15 @@ async function fetchDemocracyPreimages(api: ApiPromise, hashes: string[]): Promi
         }
       } as ISubstratePreimageNoted ];
     });
-  return notedEvents
+  const cwEvents = notedEvents
     .filter(([ blockNumber, data ]) => !!data)
     .map(([ blockNumber, data ]) => ({ blockNumber, data }));
+  console.log(`Found ${cwEvents.length} preimages!`);
+  return cwEvents;
 }
 
 async function fetchTreasuryProposals(api: ApiPromise): Promise<CWEvent[]> {
+  console.log('Migrating treasury proposals...');
   const proposals = await api.derive.treasury.proposals();
   const proposedEvents = proposals.proposals.map((p) => {
     return {
@@ -118,10 +126,12 @@ async function fetchTreasuryProposals(api: ApiPromise): Promise<CWEvent[]> {
       bond: p.proposal.bond.toString(),
     } as ISubstrateTreasuryProposed;
   });
+  console.log(`Found ${proposedEvents.length} treasury proposals!`);
   return proposedEvents.map((data) => ({ blockNumber: 0, data }));
 }
 
 async function fetchCollectiveProposals(api: ApiPromise): Promise<CWEvent[]> {
+  console.log('Migrating collective proposals...');
   const councilProposals = await api.derive.council.proposals();
   let proposals: DeriveCollectiveProposal[];
   if (api.query.technicalCommittee) {
@@ -148,11 +158,14 @@ async function fetchCollectiveProposals(api: ApiPromise): Promise<CWEvent[]> {
         proposer: '',
       } as ISubstrateCollectiveProposed;
     });
+  console.log(`Found ${proposedEvents.length} collective proposals!`);
   return proposedEvents.map((data) => ({ blockNumber: 0, data }));
 }
 
 async function fetchSignalingProposals(api: ApiPromise): Promise<CWEvent[]> {
+  console.log('Migrating signaling proposals...');
   if (!api.query.voting || !api.query.signaling) {
+    console.log('Found no signaling proposals (wrong chain)!');
     return [];
   }
   // in "prevoting" phase
@@ -230,6 +243,7 @@ async function fetchSignalingProposals(api: ApiPromise): Promise<CWEvent[]> {
 
   const events = [...newProposalEvents, ...commitStartedEvents, ...votingStartedEvents, ...completedEvents];
   // we could plausibly populate the completed events with block numbers, but not necessary
+  console.log(`Found ${newProposalEvents.length} signaling proposals!`);
   return events.map((data) => ({ blockNumber: 0, data }));
 }
 
@@ -258,6 +272,8 @@ export default async function (
 
   /** signaling proposals */
   const signalingProposalEvents = await fetchSignalingProposals(api);
+
+  console.log('Migration complete.');
   return [
     ...democracyProposalEvents,
     ...democracyReferendaEvents,

@@ -30,14 +30,12 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
   console.log('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   console.log('Setting up event listeners...');
-  nodes.filter((node) => EventSupportingChains.includes(node.chain))
+  await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
       const notificationHandler = new EdgewareNotificationHandler(models, wss, node.chain);
       const archivalHandler = new EdgewareArchivalHandler(models, wss, node.chain);
-      let url = node.url.substr(0, 2) === 'ws' ? node.url : `ws://${node.url}`;
-      url = (url.indexOf(':9944') !== -1) ? url : `${url}:9944`;
       const subscriber = await subscribeEdgewareEvents(
-        url,
+        node.url,
         [ notificationHandler, archivalHandler ],
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
@@ -51,7 +49,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         }
       });
       return subscriber;
-    });
+    }));
 };
 
 export default setupChainEventListeners;

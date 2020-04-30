@@ -17,7 +17,7 @@
     "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "start-events": "ts-node -P ./tsconfig.node.json -T ./eventSubscriber.ts",
-    "migrate-events": "NO_CLIENT=true RUN_ENTITY_MIGRATION=true yarn start",
+    "migrate-events": "NO_CLIENT=true NO_ARCHIVE=true RUN_ENTITY_MIGRATION=true ts-node --project tsconfig.node.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "reset-server": "NO_CLIENT=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "update-events": "UPDATE_EVENTS=true ts-node --project tsconfig.node.json server.ts",
