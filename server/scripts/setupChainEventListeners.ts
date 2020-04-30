@@ -1,3 +1,4 @@
+import WebSocket from 'ws';
 import EdgewareNotificationHandler from '../eventHandlers/edgeware/notifications';
 import EdgewareArchivalHandler from '../eventHandlers/edgeware/archival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
@@ -25,7 +26,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss, skipCatchup = false, migrate = false) => {
+const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
   console.log('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   console.log('Setting up event listeners...');

@@ -13,7 +13,7 @@ import MolochAPI from './api';
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
   IMolochProposalResponse,
-  MolochProposal,
+  MolochProposal
 > {
   // MEMBERS
   private _proposalCount: BN;

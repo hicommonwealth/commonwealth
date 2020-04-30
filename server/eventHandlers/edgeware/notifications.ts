@@ -1,13 +1,14 @@
 /**
  * Transforms raw edgeware events into notifications, and stores them in the db as ChainEvents.
  */
+import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { NotificationCategories } from '../../../shared/types';
 
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _wss,
+    private readonly _wss: WebSocket.Server,
     private readonly _chain: string,
   ) {
     super();

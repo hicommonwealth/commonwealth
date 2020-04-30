@@ -1,16 +1,30 @@
 /**
  * Transforms raw edgeware events into the final form for storage
  */
+import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
+import { NotificationCategories } from '../../../shared/types';
 
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _wss,
+    private readonly _wss: WebSocket.Server,
     private readonly _chain: string,
   ) {
     super();
+  }
+
+  public wssSend(dbEntity, dbEvent) {
+    if (!this._wss) return;
+    const data = {
+      event: 'server-event',
+      topic: NotificationCategories.EntityEvent,
+      object_id: dbEntity.id,
+      chainEntity: dbEntity.toJSON(),
+      chainEvent: dbEvent.toJSON(),
+    };
+    this._wss.emit('server-event', data);
   }
 
   /**
@@ -39,6 +53,7 @@ export default class extends IEventHandler {
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
+      this.wssSend(dbEntity, dbEvent);
 
       // TODO: create thread?
       return dbEntity;
@@ -59,6 +74,8 @@ export default class extends IEventHandler {
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
+      this.wssSend(dbEntity, dbEvent);
+
       return dbEntity;
     };
 

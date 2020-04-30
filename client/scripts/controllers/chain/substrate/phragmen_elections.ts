@@ -5,7 +5,6 @@ import {
   ISubstratePhragmenElectionState,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import { SubstratePhragmenElectionAdapter } from 'adapters/chain/substrate/subscriptions';
 import { first, flatMap, map } from 'rxjs/operators';
 import { Unsubscribable } from 'rxjs';
 import BN from 'bn.js';

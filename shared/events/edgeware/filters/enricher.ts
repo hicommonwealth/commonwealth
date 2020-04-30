@@ -139,7 +139,7 @@ export default async function (
         if (!infoOpt.isSome) {
           throw new Error(`could not find info for referendum ${+referendumIndex}`);
         }
-        if ((infoOpt.unwrap() as any).tally) {
+        if ((infoOpt.unwrap() as any).isOngoing) {
           // kusama
           const info = infoOpt.unwrap() as ReferendumInfo;
           if (!info.isOngoing) {

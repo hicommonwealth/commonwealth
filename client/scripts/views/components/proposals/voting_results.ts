@@ -10,7 +10,7 @@ import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models';
 import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
 import { first } from 'rxjs/operators';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
+import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 

@@ -1,23 +1,13 @@
 import _ from 'underscore';
 import {
-  Proposal,
   ITXModalData,
-  ProposalEndTime,
-  ProposalStatus,
-  IVote,
-  VotingUnit,
   ProposalModule,
-  VotingType,
-  DepositVote
 } from 'models';
 import {
-  ICosmosProposal, ICosmosProposalState, CosmosToken, CosmosVoteChoice, CosmosProposalState, ICosmosProposalTally
+  ICosmosProposal, CosmosToken, ICosmosProposalTally
 } from 'adapters/chain/cosmos/types';
-import { CosmosProposalAdapter, voteToEnum } from 'adapters/chain/cosmos/subscriptions';
 import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { of, forkJoin, Subject, Unsubscribable } from 'rxjs';
-import { ProposalStore } from 'stores';
-import { default as moment } from 'moment-twitter';
 import { map, flatMap } from 'rxjs/operators';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';

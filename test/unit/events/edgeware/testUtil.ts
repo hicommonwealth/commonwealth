@@ -56,10 +56,14 @@ export function constructFakeApi(callOverrides): ApiPromise {
       },
       council: {
         voting: callOverrides['voting'],
+        proposalOf: callOverrides['collectiveProposalOf'],
       },
       signaling: {
-        proposalOf: callOverrides['proposalOf'],
-      }
+        proposalOf: callOverrides['signalingProposalOf'],
+      },
+      voting: {
+        voteRecords: callOverrides['voteRecords'],
+      },
     },
     derive: {
       chain: {
@@ -67,6 +71,7 @@ export function constructFakeApi(callOverrides): ApiPromise {
       },
       democracy: {
         dispatchQueue: callOverrides['dispatchQueue'],
+        preimage: callOverrides['preimage'],
       }
     }
   } as ApiPromise;
