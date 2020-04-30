@@ -5,6 +5,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
+import $ from 'jquery';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -32,6 +33,8 @@ interface IDiscussionPageState {
   lookback?: number;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
+  hasOlderPosts?: boolean;
+  defaultLookback: number;
 }
 
 const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
@@ -40,7 +43,29 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       'Page Name': 'DiscussionsPage',
       Scope: app.activeId(),
     });
-    if (m.route.param('lookback')) vnode.state.lookback = +m.route.param('lookback');
+    // Infinite Scroll
+    $(window).on('scroll', () => {
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > (scrollHeight - 400)) {
+        if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
+          vnode.state.lookback += vnode.state.defaultLookback;
+          m.redraw();
+        }
+      }
+    });
+
+    // const options = {
+    //   root: null, // Page as root
+    //   rootMargin: '0px',
+    //   threshold: 1.0
+    // };
+    // const observer = new IntersectionObserver(
+    //   handleObserver.bind(this),
+    //   options
+    // );
+    // //Observ the `loadingRef`
+    // observer.observe(loadingRef);
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
@@ -144,7 +169,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         return ago - (ago % week);
       });
       const weekIndexes = Object.keys(proposalsByWeek);
-      const hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
+      vnode.state.hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
 
       // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
       // for easy comparison with weekly indexes' msecAgo
@@ -160,7 +185,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         .map((str) => Number(str)));
 
       // determine lookback length
-      const defaultLookback = 20;
+      vnode.state.defaultLookback = 20;
+      const { defaultLookback } = vnode.state;
       vnode.state.lookback = (!vnode.state.lookback || isNaN(vnode.state.lookback))
         ? defaultLookback
         : vnode.state.lookback;
@@ -211,18 +237,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           m('.no-threads', 'No threads'),
         ],
         allProposals.length !== 0
-        && getRecentPostsSortedByWeek(),
-        hasOlderPosts
-        && !vnode.state.postsDepleted
-        && m('a.extra-items.discussion-group-wrap', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            vnode.state.lookback += defaultLookback;
-            updateRoute(m.route.get(), { lookback: vnode.state.lookback });
-          },
-        }, 'Show more'),
+        && getRecentPostsSortedByWeek()
       ]);
     };
 
