@@ -14,7 +14,6 @@ import ListingPage from 'views/pages/_listing_page';
 import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
-import { orderProposalsByAmountVoted } from 'views/components/proposals/ordering';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy';
 import Substrate from 'controllers/chain/substrate/main';
