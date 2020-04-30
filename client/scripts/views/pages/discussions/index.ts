@@ -54,18 +54,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         }
       }
     });
-
-    // const options = {
-    //   root: null, // Page as root
-    //   rootMargin: '0px',
-    //   threshold: 1.0
-    // };
-    // const observer = new IntersectionObserver(
-    //   handleObserver.bind(this),
-    //   options
-    // );
-    // //Observ the `loadingRef`
-    // observer.observe(loadingRef);
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
