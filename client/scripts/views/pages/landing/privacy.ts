@@ -1,4 +1,4 @@
-/* tslint:disable:max-line-length */
+/* tslint:disable:max-len */
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
@@ -113,7 +113,7 @@ If you have any questions about this Privacy Statement, please contact us at: he
 
 const PrivacyPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'PrivacyPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'PrivacyPage' });
   },
   view: (vnode) => {
     return m('.PrivacyPage', [

@@ -32,7 +32,7 @@ import {
   OffchainTag
 } from 'models';
 
-import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
+import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
@@ -605,12 +605,19 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     const { replyParent } = vnode.state;
     return m('.ViewProposalPage', [
       m(ProposalHeader, {
-        proposal, commentCount, viewCount, getSetGlobalEditingStatus,
+        proposal,
+        commentCount,
+        viewCount,
+        getSetGlobalEditingStatus,
         getSetGlobalReplyStatus
       }),
       m(ProposalComments, {
-        proposal, comments, createdCommentCallback, replyParent,
-        getSetGlobalEditingStatus, getSetGlobalReplyStatus
+        proposal,
+        comments,
+        createdCommentCallback,
+        replyParent,
+        getSetGlobalEditingStatus,
+        getSetGlobalReplyStatus
       }),
       m(ProposalSidebar, { proposal }),
     ]);

@@ -70,8 +70,8 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       const mentions = !quillEditorState
         ? null
         : quillEditorState.markdownMode
-        ? parseMentionsForServer(quillEditorState.editor.getText(), true)
-        : parseMentionsForServer(quillEditorState.editor.getContents(), false);
+          ? parseMentionsForServer(quillEditorState.editor.getText(), true)
+          : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
       const attachments = [];
       // const attachments = vnode.state.files ?
@@ -83,7 +83,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
-                                              chainId, communityId, commentText, parentComment?.id, attachments, mentions);
+          chainId, communityId, commentText, parentComment?.id, attachments, mentions);
         callback();
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.setContents();
@@ -125,7 +125,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         oncreateBind: (state) => {
           vnode.state.quillEditorState = state;
         },
-        editorNamespace: document.location.pathname + '-commenting',
+        editorNamespace: `${document.location.pathname}-commenting`,
         onkeyboardSubmit: submitComment,
       }),
       m('.form-bottom', [

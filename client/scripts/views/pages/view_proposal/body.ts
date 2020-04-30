@@ -19,7 +19,7 @@ import {
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 
-import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
+import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -108,7 +108,9 @@ export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | Offcha
   }
 };
 
-export const ProposalBodyReply: m.Component<{ item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState }> = {
+export const ProposalBodyReply: m.Component<{
+  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
+}> = {
   view: (vnode) => {
     const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
     if (!item) return;
@@ -130,7 +132,9 @@ export const ProposalBodyReply: m.Component<{ item: OffchainComment<any>, getSet
   }
 };
 
-export const ProposalBodyReplyMenuItem: m.Component<{ item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState }> = {
+export const ProposalBodyReplyMenuItem: m.Component<{
+  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
+}> = {
   view: (vnode) => {
     const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
     if (!item) return;
@@ -149,7 +153,9 @@ export const ProposalBodyReplyMenuItem: m.Component<{ item: OffchainComment<any>
   }
 };
 
-export const ProposalBodyEdit: m.Component<{ item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState }> = {
+export const ProposalBodyEdit: m.Component<{
+  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+}> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
     if (!item) return;
@@ -178,7 +184,9 @@ export const ProposalBodyEdit: m.Component<{ item: OffchainThread | OffchainComm
   }
 };
 
-export const ProposalBodyEditMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState }> = {
+export const ProposalBodyEditMenuItem: m.Component<{
+  item: OffchainThread | OffchainComment<any>, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState
+}> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parentState } = vnode.attrs;
     if (!item) return;
@@ -217,7 +225,8 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
         onclick: async (e) => {
           e.preventDefault();
           const confirmed = await confirmationModalWithText(
-            isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
+            isThread ? 'Delete this entire thread?' : 'Delete this comment?'
+          )();
           if (!confirmed) return;
           (isThread ? app.threads : app.comments).delete(item).then(() => {
             if (isThread) m.route.set(`/${app.activeId()}/`);
@@ -241,7 +250,8 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
       onclick: async (e) => {
         e.preventDefault();
         const confirmed = await confirmationModalWithText(
-          isThread ? 'Delete this entire thread?' : 'Delete this comment?')();
+          isThread ? 'Delete this entire thread?' : 'Delete this comment?'
+        )();
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);

@@ -124,8 +124,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           tag,
           getBackHomeButton(),
         ]),
-        tagObj.description &&
-        m('h4', [
+        tagObj.description
+        && m('h4', [
           tagObj.description,
         ]),
         list.length === 0

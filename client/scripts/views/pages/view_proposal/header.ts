@@ -29,7 +29,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
 import VersionHistoryModal from 'views/modals/version_history_modal';
-import { jumpHighlightComment } from 'views/pages/view_proposal/jump_to_comment';
+import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 
 export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -193,7 +193,8 @@ export const ProposalHeaderOnchainId: m.Component<{ proposal: AnyProposal }> = {
     if (!proposal) return;
     return m(
       '.ProposalHeaderOnchainId',
-      `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`);
+      `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`
+    );
   }
 };
 

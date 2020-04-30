@@ -91,8 +91,8 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     return m('.SubscriptionRow', [
       m('h3', `${vnode.state.subscription.objectId}`),
       m('h4', `Subscription Type: ${vnode.state.subscription.category}`),
-      activeSubscription &&
-        m('button.pauseButton', {
+      activeSubscription
+        && m('button.pauseButton', {
           class: activeSubscription.isActive ? '' : 'formular-button-negative',
           href: '#',
           onclick: async (e) => {
@@ -145,7 +145,7 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
       subscriptions = subscriptions.filter((subscription) => chainIds.includes(subscription.objectId));
     }
     if (communities) {
-      const communtyIds = communities.map((com) => {return com.id; });
+      const communtyIds = communities.map((com) => { return com.id; });
       subscriptions = subscriptions.filter((subscription) => communtyIds.includes(subscription.objectId));
     }
     return m('button.PauseToggle', {

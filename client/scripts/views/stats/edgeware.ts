@@ -92,7 +92,7 @@ const Pie = {
         id: vnode.attrs.id,
         oncreate: (canvas) => {
           const { data, title, unit } = vnode.attrs.getData();
-          // tslint:disable-next-line:no-string-literal
+          // disable-next-line:no-string-literal
           const ctx = canvas.dom['getContext']('2d');
           vnode.state.chart = new Chart(ctx, {
             type: 'pie',

@@ -73,10 +73,11 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
                 clipboard.writeText(account.address);
                 vnode.state.copied = true;
                 setTimeout(() => {
-                  $(e.target).next('.copy-done').fadeOut(1000).promise().done(() => {
-                    vnode.state.copied = false;
-                    m.redraw();
-                  });
+                  $(e.target).next('.copy-done').fadeOut(1000).promise()
+                    .done(() => {
+                      vnode.state.copied = false;
+                      m.redraw();
+                    });
                 }, 1500);
               }
             }, 'Copy address'),
