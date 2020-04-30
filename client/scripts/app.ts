@@ -28,7 +28,7 @@ import ConfirmInviteModal from './views/modals/confirm_invite_modal';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(app.serverUrl() + '/status').then((data) => {
+    $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
@@ -199,7 +199,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     const Near = (await import('./controllers/chain/near/main')).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -233,14 +233,14 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    $.post(app.serverUrl() + '/selectNode', {
+    $.post(`${app.serverUrl()}/selectNode`, {
       url: n.url,
       chain: n.chain.id,
       auth: true,
       jwt: app.login.jwt,
     }).then((res) => {
       if (res.status !== 'Success') {
-        throw new Error('got unsuccessful status: ' + res.status);
+        throw new Error(`got unsuccessful status: ${res.status}`);
       }
     }).catch((e) => console.error('Failed to select node on server'));
   }
@@ -288,7 +288,7 @@ moment.updateLocale('en', {
 $(() => {
   // set window error handler
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
-    notifyError('' + errorMsg);
+    notifyError(`${errorMsg}`);
     return false;
   };
 
@@ -388,8 +388,8 @@ $(() => {
   }
 
   // handle login redirects
-  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') && !m.route.param('path').startsWith('/login')) {
+  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true'
+      && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
 
@@ -472,7 +472,7 @@ $(() => {
   });
 });
 
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////
 // For browserify-hmr
 // See browserify-hmr module.hot API docs for hooks docs.
 declare const module: any; // tslint:disable-line no-reserved-keywords
@@ -482,4 +482,4 @@ if (module.hot) {
   // 	m.redraw();
   // })
 }
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////
