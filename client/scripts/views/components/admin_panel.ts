@@ -450,6 +450,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
           const user = noAdmins[indexOfName];
           const newRole = (vnode.state.role === 'Admin') ? 'admin'
             : (vnode.state.role === 'Moderator') ? 'moderator' : '';
+          if (!user) return;
           $.post(`${app.serverUrl()}/upgradeMember`, {
             new_role: newRole,
             address: user.Address.address,
@@ -601,32 +602,30 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
   oncreate: (vnode) => {
   },
   view: (vnode) => {
-    return m('.AdminPanel', [
-      m(ListItem, {
-        href: '#',
-        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
-        label: 'Manage Community',
-        contentLeft: m(Icon, { name: Icons.SETTINGS, }),
-        style: 'font-weight: 500;',
+    return [m(ListItem, {
+      href: '#',
+      class: 'AdminPanel',
+      onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+      label: 'Manage Community',
+      contentLeft: m(Icon, { name: Icons.SETTINGS, }),
+    }),
+    m(Dialog, {
+      autofocus: true,
+      basic: false,
+      closeOnEscapeKey: true,
+      closeOnOutsideClick: true,
+      class: 'adminDialog',
+      content: m(Panel, {
+        onChangeHandler: (v) => { vnode.state.isOpen = v; },
       }),
-      m(Dialog, {
-        autofocus: true,
-        basic: false,
-        closeOnEscapeKey: true,
-        closeOnOutsideClick: true,
-        class: 'adminDialog',
-        content: m(Panel, {
-          onChangeHandler: (v) => { vnode.state.isOpen = v; },
-        }),
-        hasBackdrop: true,
-        isOpen: vnode.state.isOpen,
-        inline: false,
-        onClose: () => { vnode.state.isOpen = false; },
-        title:'Manage Community',
-        transitionDuration: 200,
-        footer: null,
-      }),
-    ]);
+      hasBackdrop: true,
+      isOpen: vnode.state.isOpen,
+      inline: false,
+      onClose: () => { vnode.state.isOpen = false; },
+      title:'Manage Community',
+      transitionDuration: 200,
+      footer: null,
+    })];
   },
 };
 
