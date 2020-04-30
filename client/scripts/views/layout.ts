@@ -16,16 +16,16 @@ import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-export const LoadingLayout: m.Component<{ activeTag: string, hideSidebar: boolean }> = {
+export const LoadingLayout: m.Component<{ activeTag: string, hideNavigation: boolean }> = {
   view: (vnode) => {
-    const { activeTag, hideSidebar } = vnode.attrs;
+    const { activeTag, hideNavigation } = vnode.attrs;
 
     return m('.mithril-app', [
       m(CommunitySwitcher),
-      !hideSidebar && m(Sidebar),
-      m(Header),
+      !hideNavigation && m(Sidebar),
+      !hideNavigation && m(Header),
       m('.layout-content', {
-        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideSidebar ? 'hidden-sidebar' : ''}`
+        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideNavigation ? 'navigation-hidden' : ''}`
       }, [
         m('.LoadingLayout'),
       ]),
@@ -35,24 +35,24 @@ export const LoadingLayout: m.Component<{ activeTag: string, hideSidebar: boolea
   }
 };
 
-export const Layout: m.Component<{ scope: string, activeTag?: string, hideSidebar?: boolean }, { loadingScope }> = {
+export const Layout: m.Component<{ scope: string, activeTag?: string, hideNavigation?: boolean }, { loadingScope }> = {
   view: (vnode) => {
-    const { scope, activeTag, hideSidebar } = vnode.attrs;
+    const { scope, activeTag, hideNavigation } = vnode.attrs;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
     if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
-      return m(LoadingLayout, { activeTag, hideSidebar });
+      return m(LoadingLayout, { activeTag, hideNavigation });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.mithril-app', [
         m(CommunitySwitcher),
-        !hideSidebar && m(Sidebar),
-        m(Header),
+        !hideNavigation && m(Sidebar),
+        !hideNavigation && m(Header),
         m('.layout-content', {
-          class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideSidebar ? 'hidden-sidebar' : ''}`
+          class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideNavigation ? 'navigation-hidden' : ''}`
         }, m(PageNotFound)),
         m(AppModals),
         m(AppToasts),
@@ -63,10 +63,10 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, hideSideba
       vnode.state.loadingScope = scope;
       if (scopeMatchesChain) {
         initChain(scope);
-        return m(LoadingLayout, { activeTag, hideSidebar });
+        return m(LoadingLayout, { activeTag, hideNavigation });
       } else if (scopeMatchesCommunity) {
         initCommunity(scope);
-        return m(LoadingLayout, { activeTag, hideSidebar });
+        return m(LoadingLayout, { activeTag, hideNavigation });
       }
     } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're
@@ -75,15 +75,15 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, hideSideba
         vnode.state.loadingScope = null;
         m.redraw();
       });
-      return m(LoadingLayout, { activeTag, hideSidebar });
+      return m(LoadingLayout, { activeTag, hideNavigation });
     }
 
     return m('.mithril-app', [
       m(CommunitySwitcher),
-      !hideSidebar && m(Sidebar),
-      m(Header),
+      !hideNavigation && m(Sidebar),
+      !hideNavigation && m(Header),
       m('.layout-content', {
-        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideSidebar ? 'hidden-sidebar' : ''}`
+        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} ${hideNavigation ? 'navigation-hidden' : ''}`
       }, vnode.children),
       m(AppModals),
       m(AppToasts),

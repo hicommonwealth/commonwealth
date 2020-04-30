@@ -244,11 +244,12 @@ body.modal-open {
     &.logged-out {
         padding-left: $sidebar-width;
     }
-    &.hidden-sidebar {
+    &.navigation-hidden {
         padding-left: 40px;
-    }
-    &.hidden-header {
         padding-top: 15px;
+    }
+    &.navigation-hidden.logged-out {
+        padding-left: 0;
     }
 }
 

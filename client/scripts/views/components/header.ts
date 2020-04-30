@@ -16,12 +16,10 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
-    if (!app.chain && !app.community) return; // TODO
-
     // user menu
-    const notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    const notifications = app.login.notifications
+      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-    // TODO: display number of unread notifications
 
     return m('.Header', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`

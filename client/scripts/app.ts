@@ -302,7 +302,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, hideSidebar?: boolean) => ({
+  const importRoute = (module, scoped: string | boolean, hideNavigation?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -316,7 +316,7 @@ $(() => {
           // false => scope is null
           : null;
       const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, hideSidebar }, [ vnode ]);
+      return m(Layout, { scope, activeTag, hideNavigation }, [ vnode ]);
     },
   });
 
