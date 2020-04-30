@@ -7,7 +7,7 @@ import { renderMultilineText } from 'helpers';
 
 const AboutPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'AboutPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'AboutPage' });
   },
   view: (vnode) => {
     return m(LandingPage, {

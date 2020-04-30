@@ -1,10 +1,12 @@
 import sgMail from '@sendgrid/mail';
 import moment from 'moment';
+import { Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const registerWaitingList = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const email = req.body.email;
@@ -81,7 +83,7 @@ Or copy and paste this link into your browser: ${registrationLink}`,
     sgMail.send(msg).then((result) => {
       res.json({ status: 'Success' });
     }).catch((e) => {
-      console.error(`Could not send registration email: ${registrationLink}`);
+      log.error(`Could not send registration email: ${registrationLink}`);
       res.status(500).json({ error: 'SendGrid error', message: e.message });
     });
   }

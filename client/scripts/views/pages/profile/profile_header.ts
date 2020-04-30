@@ -19,6 +19,7 @@ function capitalizeFirstLetter(string) {
 const editIdentityAction = (account: Account<any>, currentIdentity?: IdentityInfo) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
+    class: app.chain.loaded ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
@@ -72,10 +73,11 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
                 clipboard.writeText(account.address);
                 vnode.state.copied = true;
                 setTimeout(() => {
-                  $(e.target).next('.copy-done').fadeOut(1000).promise().done(() => {
-                    vnode.state.copied = false;
-                    m.redraw();
-                  });
+                  $(e.target).next('.copy-done').fadeOut(1000).promise()
+                    .done(() => {
+                      vnode.state.copied = false;
+                      m.redraw();
+                    });
                 }, 1500);
               }
             }, 'Copy address'),

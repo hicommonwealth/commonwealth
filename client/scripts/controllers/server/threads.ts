@@ -90,8 +90,8 @@ class ThreadsController {
       return result;
     }, (err) => {
       console.log('Failed to create thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-        'Failed to create thread');
+      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+        : 'Failed to create thread');
     });
   }
 
@@ -127,8 +127,8 @@ class ThreadsController {
       return result;
     } catch (err) {
       console.log('Failed to edit thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-        'Failed to edit thread');
+      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+        : 'Failed to edit thread');
     }
   }
 

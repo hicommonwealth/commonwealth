@@ -1,7 +1,9 @@
+import { Response, NextFunction } from 'express';
 import request from 'superagent';
 import { SLACK_FEEDBACK_WEBHOOK } from '../config';
-import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const sendFeedback = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.body.text) {

@@ -108,16 +108,15 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
     };
 
     return m('.DropdownFormField.FormField', {
-      oncreate: (vnode) => {
-        $(vnode.dom).find('select').trigger('input');
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('select').trigger('input');
       }
     }, [
       m('.form-group', [
         title && m('.form-title', title),
         subtitle && m('.form-subtitle', subtitle),
         m('select.form-field', options,
-          choices.map((item) => m('option', item))
-         ),
+          choices.map((item) => m('option', item))),
       ]),
     ]);
   }
@@ -188,9 +187,9 @@ export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
               name,
               value: item.value,
               id: item.value,
-              oncreate: (vnode) => {
+              oncreate: (vvnode) => {
                 if (item.checked) {
-                  $(vnode.dom).prop('checked', true);
+                  $(vvnode.dom).prop('checked', true);
                 }
               },
               oninput: (e) => {
@@ -279,9 +278,11 @@ export const MultipleButtonSelectorFormField: m.Component<IButtonSelectorAttrs, 
             onclick: (e) => {
               e.preventDefault();
               const index = vnode.state.selection.indexOf(item.value);
-              index === -1 ?
-                vnode.state.selection.push(item.value) :
+              if (index === -1) {
+                vnode.state.selection.push(item.value);
+              } else {
                 vnode.state.selection.splice(index, 1);
+              }
               if (vnode.attrs.callback) {
                 vnode.attrs.callback(vnode.state.selection);
               }

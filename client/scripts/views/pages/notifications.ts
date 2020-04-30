@@ -74,8 +74,8 @@ const NotificationRow: m.Component<INotificationRow> = {
       ]),
       m('.notification-content', [
         // category === NotificationCategories.NewCommunity ? 'New community' :
-          category === NotificationCategories.NewThread ? `New thread #${thread}` :
-          category === NotificationCategories.NewComment ? [
+        category === NotificationCategories.NewThread ? `New thread #${thread}`
+          : category === NotificationCategories.NewComment ? [
             m(User, { user: [comment.author, comment.authorChain], hideAvatar: true }),
             ' commented'
           ] : 'Unknown notification'
@@ -102,8 +102,10 @@ const Notifications = {
     const notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
     // const newCommunitySubscription = app.login.notifications.subscriptions
     //   .find((v) => v.category === NotificationCategories.NewCommunity);
-    const chainOrCommunitySubscription = app.vm.activeAccount && app.vm.activeAccount.chain && app.login.notifications.subscriptions
-      .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.vm.activeAccount.chain.id);
+    const chainOrCommunitySubscription = app.vm.activeAccount
+      && app.vm.activeAccount.chain
+      && app.login.notifications.subscriptions
+        .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.vm.activeAccount.chain.id);
     return m('.Notifications', [
       m('.row', [
         // notifications
@@ -146,19 +148,24 @@ const Notifications = {
         //           app.login.notifications.subscribe(NotificationCategories.NewCommunity, '').then(() => m.redraw());
         //         }
         //       }
-        //     }, newCommunitySubscription && newCommunitySubscription.isActive ? 'Unsubscribe from community creation' : 'Subscribe to community creation'),
+        //     }, newCommunitySubscription && newCommunitySubscription.isActive
+        //       ? 'Unsubscribe from community creation'
+        //       : 'Subscribe to community creation'),
         //     m('button.formular-button-primary', {
         //       onclick: (e) => {
         //         e.preventDefault();
         //         if (chainOrCommunitySubscription && chainOrCommunitySubscription.isActive) {
-        //           app.login.notifications.disableSubscriptions([chainOrCommunitySubscription]).then(() => m.redraw());
+        //           app.login.notifications.disableSubscriptions([chainOrCommunitySubscription])
+        //           .then(() => m.redraw());
         //         } else {
         //           app.login.notifications.subscribe(
         //             NotificationCategories.NewThread, app.vm.activeAccount.chain.id
         //           ).then(() => m.redraw());
         //         }
         //       }
-        //     }, chainOrCommunitySubscription && chainOrCommunitySubscription.isActive ? 'Unsubscribe from thread creation' : 'Subscribe to thread creation'),
+        //     }, chainOrCommunitySubscription && chainOrCommunitySubscription.isActive
+        //        ? 'Unsubscribe from thread creation'
+        //        : 'Subscribe to thread creation'),
         //   ]),
         // ]),
       ]),

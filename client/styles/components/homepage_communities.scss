@@ -1,7 +1,6 @@
 @import 'client/styles/shared';
 
 .HomepageCommunities {
-    max-width: 560px;
     h4 {
         margin-top: 32px;
         font-weight: 500;
@@ -10,7 +9,10 @@
     }
     .home-card {
         display: flex;
-        margin-bottom: 8px;
+        float: left;
+        width: calc(50% - 16px);
+        margin-right: 16px;
+        margin-bottom: 12px;
         min-height: 72px;
         border-color: #eee;
         .ChainIcon {

@@ -10,11 +10,11 @@ const ProfileBio: m.Component<{ account: Account<any> }> = {
 
     return m('.ProfileBio', [
       m('span.header', 'Bio'),
-      account.profile && account.profile.bio ?
-        m('p', [
+      account.profile && account.profile.bio
+        ? m('p', [
           m(MarkdownFormattedText, { doc: account.profile.bio })
-        ]) :
-        m('.no-items', [
+        ])
+        : m('.no-items', [
           (account.profile && account.profile.name) ? account.profile.name : 'This account',
           ' hasn\'t created a bio'
         ]),

@@ -1,53 +1,29 @@
 import 'modals/view_voters_modal.scss';
 
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
-import User from '../components/widgets/user';
 import app from 'state';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
 import { formatAddressShort } from 'helpers';
-
-interface IViewVotersModalAttrs {
-  account: SubstrateAccount;
-  votes: PhragmenElectionVote[];
-}
-
-const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
-  view: (vnode) => {
-    const { address } = vnode.attrs.account;
-
-    return m('.ViewVotersModal', [
-      m('.compact-modal-title', [
-        m('h3', `Voters for ${formatAddressShort(address)}`),
-        m(CompactModalExitButton),
-      ]),
-      m('.compact-modal-body', [
-        vnode.attrs.votes.map(
-          (vote) => m(VoterRow, { vote })
-        ),
-        m('.clear'),
-      ]),
-    ]);
-  }
-};
-
-export default ViewVotersModal;
+import User from '../components/widgets/user';
 
 interface IVoterRowAttrs {
   vote: PhragmenElectionVote;
 }
 
 const VoterRow: m.Component<IVoterRowAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IVoterRowAttrs>) => {
     const { account, stake } = vnode.attrs.vote;
 
     return m('.VoterRow', {
       onclick: (e) => {
         e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/account/${account.address}}`);
-        }
-      }, [
+        m.route.set(`/${app.activeChainId()}/account/${account.address}`);
+        $(vnode.dom).trigger('modalexit');
+      }
+    }, [
       m('.proposal-row-left', [
         m('.proposal-pre', [
           m(User, {
@@ -94,6 +70,32 @@ const VoterRow: m.Component<IVoterRowAttrs> = {
         ]),
       ]),
       m('.proposal-row-xs-clear'),
-      ]);
-    }
+    ]);
+  }
+};
+
+interface IViewVotersModalAttrs {
+  account: SubstrateAccount;
+  votes: PhragmenElectionVote[];
 }
+
+const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
+  view: (vnode) => {
+    const { address } = vnode.attrs.account;
+
+    return m('.ViewVotersModal', [
+      m('.compact-modal-title', [
+        m('h3', `Voters for ${formatAddressShort(address)}`),
+        m(CompactModalExitButton),
+      ]),
+      m('.compact-modal-body', [
+        vnode.attrs.votes.map(
+          (vote) => m(VoterRow, { vote })
+        ),
+        m('.clear'),
+      ]),
+    ]);
+  }
+};
+
+export default ViewVotersModal;

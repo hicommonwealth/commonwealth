@@ -84,4 +84,9 @@
         margin-bottom: 20px;
         margin-left: $left-margin;
     }
+
+    // TODO: remove when privacy selection is turned back on
+    .privacy-selection {
+        display: none;
+    }
 }

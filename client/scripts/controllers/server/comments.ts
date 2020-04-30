@@ -69,8 +69,11 @@ class CommentsController {
     return _.uniq(authors);
   }
 
-  public async create<T extends IUniqueId>(address: string, proposalIdentifier: string, chain: string,
-    community: string, unescapedText: string, parentCommentId: any = null, attachments?: string[], mentions?: string[]) {
+  public async create<T extends IUniqueId>(
+    address: string, proposalIdentifier: string, chain: string,
+    community: string, unescapedText: string, parentCommentId: any = null,
+    attachments?: string[], mentions?: string[]
+  ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
@@ -110,7 +113,11 @@ class CommentsController {
 
     try {
       const response = await $.post(`${app.serverUrl()}/editComment`, {
+        'author_chain': app.vm.activeAccount.chain.id,
         'id': comment.id,
+        'chain': comment.chain,
+        'community': comment.community,
+        'address': comment.author,
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
@@ -163,11 +170,12 @@ class CommentsController {
   public async delete(comment) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(app.serverUrl() + '/deleteComment', {
+      $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.login.jwt,
         comment_id: comment.id,
       }).then((result) => {
-        this._store.remove(comment);
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
         resolve(result);
       }).catch((e) => {
         console.error(e);

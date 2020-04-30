@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 // highlight the header/body of a parent thread, or the body of a comment
-export const jumpHighlightComment = (commentId, shouldScroll = true, animationDelayTime = 2000) => {
+const jumpHighlightComment = (commentId, shouldScroll = true, animationDelayTime = 2000) => {
   const $div = (commentId === 'parent' || commentId === 'body')
     ? $('html, body').find('.ProposalHeader')
     : $('html, body').find(`.comment-${commentId}`);
@@ -27,3 +27,5 @@ export const jumpHighlightComment = (commentId, shouldScroll = true, animationDe
     }, animationDelayTime);
   }
 };
+
+export default jumpHighlightComment;

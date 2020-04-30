@@ -21,29 +21,32 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     if (app.community) {
       return m(Button, {
         class: 'NewProposalButton',
-        iconLeft: Icons.PLUS,
-        intent: 'primary',
         label: 'New post',
+        iconLeft: Icons.PLUS,
+        size: 'sm',
+        intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       });
     }
 
     // a button with popover menu for chains
     return m(PopoverMenu, {
       class: 'NewProposalButton',
+      transitionDuration: 0,
       trigger: activeAccount ? m(Button, {
         iconLeft: Icons.CHEVRON_DOWN,
+        label: 'New post',
+        size: 'sm',
         intent: 'primary',
-        label: 'New post or proposal',
         fluid,
       }) : m(Tooltip, {
         content: 'Link an address to post',
         trigger: m(Button, {
           iconLeft: Icons.CHEVRON_DOWN,
+          size: 'xs',
           intent: 'primary',
-          label: 'New post or proposal',
           class: 'cui-disabled',
           style: 'cursor: pointer !important',
           fluid,
@@ -56,7 +59,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       },
       content: [
         app.activeId() && m(MenuItem, {
-          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
           label: 'New thread',
         }),
 

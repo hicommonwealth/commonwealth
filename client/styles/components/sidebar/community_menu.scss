@@ -1,0 +1,141 @@
+@import 'client/styles/shared';
+
+.CommunityMenu {
+    width: $sidebar-width;
+    padding-top: 2px;
+    padding-bottom: 8px;
+    user-select: none;
+    min-height: 100vh;
+    max-height: 100vh;
+    z-index: 2;
+    overflow-y: auto;
+
+    $padding: 11px 18px;
+
+    background: #2f3136;
+    color: #fff;
+
+    .cui-list {
+    }
+    .cui-list-item {
+        color: #fff !important;
+        &:hover {
+            background: #36393f;
+        }
+    }
+
+    $size: 36px;
+
+    h4 {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 20px 18px 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #444;
+    }
+    hr {
+        border: none;
+        border-bottom: 1px solid #444;
+        margin: 12px 15px 10px;
+    }
+
+    a.CommunityMenuChain,
+    a.CommunityMenuCommunity,
+    .CommunityMenuSettingsMenu .trigger {
+        position: relative;
+        display: flex;
+        height: $size;
+        box-sizing: content-box;
+        padding: $padding;
+        text-decoration: none;
+        font-weight: 500;
+        color: #fff;
+        &:hover {
+            background: #36393f;
+        }
+        .icon-inner {
+            position: relative;
+            .ChainIcon img {
+                width: $size;
+                height: $size;
+            }
+            .User {
+                position: absolute;
+                right: -4px;
+                bottom: -4px;
+            }
+        }
+        .content-inner {
+            margin-left: 12px;
+            line-height: 1.35;
+            .sidebar-user {
+                font-size: 13px;
+                color: #777;
+                .User .user-avatar {
+                    margin-right: 5px;
+                }
+                .User .user-display-name {
+                    color: #777;
+                }
+            }
+        }
+    }
+    a.CommunityMenuCommunity {
+        .icon-inner {
+            text-align: center;
+            color: #eee;
+            background: #36393f;
+            height: $size;
+            width: $size;
+            border-radius: 8px;
+            .name {
+                position: relative;
+                top: 7px;
+            }
+        }
+        &:hover, &.active {
+            .icon-inner {
+                background: darken(#36393f, 7%);
+            }
+        }
+    }
+    .CommunityMenuSetting {
+        position: absolute;
+        bottom: 0;
+        margin: 14px 16px;
+    }
+
+    a.CommunityMenuLink {
+        position: relative;
+        display: block;
+        //display: flex;
+        text-decoration: none;
+        padding: $padding;
+        font-weight: 500;
+        color: #fff;
+        &:hover {
+            background: #36393f;
+        }
+        .cui-icon {
+            display: inline-block;
+            color: #fff;
+            position: relative;
+            top: -2px;
+            margin-left: 10px;
+            margin-right: 16px;
+        }
+        .menu-option-label {
+            display: inline-block;
+        }
+    }
+}
+
+.community-menu-popover {
+    .cui-popover-content {
+        margin-left: -62px;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+}

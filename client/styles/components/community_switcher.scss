@@ -2,40 +2,36 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 240px;
+    width: 62px;
     bottom: 0;
-    background: #e4e4e6;
+    background: darken(#4e4e53, 7%);
     z-index: 10;
     user-select: none;
     .sidebar-content {
         position: absolute;
         top: 0;
-        bottom: 67px;
+        bottom: 0;
         padding: 6px 0;
         width: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
-        border-bottom: 1px solid #d7d7d7;
     }
 
     $size: 36px;
 
     a.CommunitySwitcherChain,
-    a.CommunitySwitcherCommunity,
-    .CommunitySwitcherSettingsMenu .trigger {
+    a.CommunitySwitcherCommunity {
         position: relative;
         display: flex;
         height: $size;
         box-sizing: content-box;
-        padding: 11px 15px;
+        padding: 8px 13px;
         text-decoration: none;
         color: #222;
         font-weight: 500;
-        &:hover {
-            background: #eee;
-        }
         .icon-inner {
             position: relative;
+            opacity: 0.4;
             .ChainIcon img {
                 width: $size;
                 height: $size;
@@ -46,19 +42,9 @@
                 bottom: -4px;
             }
         }
-        .content-inner {
-            margin-left: 12px;
-            line-height: 1.35;
-            .sidebar-user {
-                font-size: 13px;
-                color: #777;
-                .User .user-avatar {
-                    margin-right: 5px;
-                }
-                .User .user-display-name {
-                    color: #777;
-                }
-            }
+        &.active .icon-inner,
+        &:hover .icon-inner {
+            opacity: 1;
         }
     }
     a.CommunitySwitcherCommunity {
@@ -71,7 +57,7 @@
             border-radius: 8px;
             .name {
                 position: relative;
-                top: 7px;
+                top: 8px;
             }
         }
         &:hover, &.active {
@@ -80,9 +66,13 @@
             }
         }
     }
-    .CommunitySwitcherSettingsMenu {
-        position: absolute;
-        bottom: 0;
-        margin: 14px 16px;
+}
+
+.CommunitySwitcherTooltip {
+    font-weight: 500;
+    margin: 1px 1px 0 2px;
+    line-height: 1.1;
+    > * {
+        display: inline;
     }
 }

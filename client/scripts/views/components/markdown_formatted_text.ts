@@ -83,6 +83,7 @@ const applyInlineFormatters = (text, hideFormatting) => {
     // check which exact pattern was matched, and push the matched text
     for (const inlineFormatter of inlineFormatters) {
       const matched = match[0].match(inlineFormatter.pattern);
+      // eslint-disable-next-line
       if (!matched) continue;
       if (matched.length < 2) {
         console.error('RegExp got empty match content - this should never happen:', match[0]);
@@ -98,8 +99,8 @@ const applyInlineFormatters = (text, hideFormatting) => {
   return result;
 };
 
-function applyBlockFormatters(text, hideFormatting) {
-  const sections = text.split('\n\n');
+function applyBlockFormatters(parentText, hideFormatting) {
+  const sections = parentText.split('\n\n');
   return sections.map((section) => {
     const lines = section.split('\n')
       .filter((p) => !!p.trim())
@@ -108,38 +109,40 @@ function applyBlockFormatters(text, hideFormatting) {
     const blockFormatters = [{
       pattern: /^# /,
       formatMany: (text) => m('h1', text),
-      formatOne: (text, match) => hideFormatting ? [] :
-        m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^## /,
       formatMany: (text) => m('h2', text),
-      formatOne: (text, match) => hideFormatting ? [] :
-        m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^### /,
       formatMany: (text) => m('h3', text),
-      formatOne: (text, match) => hideFormatting ? [] :
-        m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^> /,
       formatMany: (text) => m('blockquote', text),
-      formatOne: (text, match) =>
-        m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^(- |\* |• |· )/,
       formatMany: (text) => m('ul', text),
-      formatOne: (text, match) =>
-        m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
-      pattern: /^  ?(- |\* |• |· )/,
+      pattern: /^ {1,2}(- |\* |• |· )/,
       formatMany: (text) => m('ul', m('ul', text)),
-      formatOne: (text, match) =>
-        m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
-      pattern: /^    ?(- |\* |• |· )/,
+      pattern: /^ {3,4}(- |\* |• |· )/,
       formatMany: (text) => m('ul', m('ul', m('ul', text))),
-      formatOne: (text, match) =>
-        m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+    }, {
+      pattern: /^\[([ x])\] /,
+      formatMany: (text) => m('ul.checklist', text),
+      formatOne: (text, match) => m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
+        m('span', applyInlineFormatters(text.replace(match, ''), hideFormatting))
+      ]),
     }];
 
     // Lines which don't match any of the above groups are assigned an
@@ -147,7 +150,7 @@ function applyBlockFormatters(text, hideFormatting) {
     // and will be formatted using `defaultGroup`. See the
     // special-casing code further down.
     const defaultGroup = (children) => {
-      return m((hideFormatting ? 'span' :  'p'), children.map((text) => {
+      return m((hideFormatting ? 'span' : 'p'), children.map((text) => {
         return m((hideFormatting ? 'span' : 'div'), applyInlineFormatters(text, hideFormatting));
       }));
     };
@@ -155,7 +158,7 @@ function applyBlockFormatters(text, hideFormatting) {
     let lastLineFormat;
     let lastGroup = [];
     const results = [];
-    lines.map((line: string, index: number) => {
+    lines.forEach((line: string, index: number) => {
       let thisLineFormat;
       let match;
       for (let i = 0; i < blockFormatters.length; i++) {
@@ -168,29 +171,30 @@ function applyBlockFormatters(text, hideFormatting) {
       if (thisLineFormat === lastLineFormat) {
         // if we are in the same group, keep appending to it
         lastGroup.push(
-          (blockFormatters[thisLineFormat] && !hideFormatting) ?
-            blockFormatters[thisLineFormat].formatOne(line, match[0]) : line
+          (blockFormatters[thisLineFormat] && !hideFormatting)
+            ? blockFormatters[thisLineFormat].formatOne(line, match[0]) : `${line} `
         );
       } else {
         // otherwise, push the previous group onto `results` and start anew
         results.push(
-          (blockFormatters[lastLineFormat] && !hideFormatting) ?
-            blockFormatters[lastLineFormat].formatMany(lastGroup) :
-            defaultGroup(lastGroup)
+          (blockFormatters[lastLineFormat] && !hideFormatting)
+            ? blockFormatters[lastLineFormat].formatMany(lastGroup)
+            : defaultGroup(lastGroup)
         );
         lastLineFormat = thisLineFormat;
         lastGroup = [
-          (blockFormatters[thisLineFormat] && !hideFormatting) ?
-            blockFormatters[thisLineFormat].formatOne(line, match[0]) : line
+          (blockFormatters[thisLineFormat] && !hideFormatting)
+            ? blockFormatters[thisLineFormat].formatOne(line, match[0])
+            : `${line} `
         ];
       }
     });
     // push the last group onto `results`
     if (lastGroup.length > 0) {
       results.push(
-        (blockFormatters[lastLineFormat] && !hideFormatting) ?
-          blockFormatters[lastLineFormat].formatMany(lastGroup) :
-          defaultGroup(lastGroup)
+        (blockFormatters[lastLineFormat] && !hideFormatting)
+          ? blockFormatters[lastLineFormat].formatMany(lastGroup)
+          : defaultGroup(lastGroup)
       );
     }
     return results;
@@ -209,7 +213,7 @@ interface IState {
 
 const MarkdownFormattedText : m.Component<IAttrs, IState> = {
   view: (vnode) => {
-    const doc = '' + vnode.attrs.doc;
+    const doc = `${vnode.attrs.doc}`;
     const hideFormatting = vnode.attrs.hideFormatting;
     if (!doc) return;
     const results = [];

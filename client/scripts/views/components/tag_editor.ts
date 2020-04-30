@@ -1,21 +1,25 @@
 import m from 'mithril';
 import $ from 'jquery';
 import { OffchainThread, OffchainTag } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
 import app from 'state';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
   onChangeHandler: Function;
+  popoverMenu?: boolean;
 }
 
 const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
   view: (vnode) => {
     const { onChangeHandler, tags } = vnode.attrs;
     return m(TagInput, {
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('input').focus();
+      },
       contentLeft: m(Icon, { name: Icons.TAG }),
-      tags: tags && (tags.length !== 0) &&
-        vnode.attrs.tags.map((tag) => {
+      tags: tags && (tags.length !== 0)
+        && vnode.attrs.tags.map((tag) => {
           return m(Tag, {
             label: `#${tag}`,
             onRemove: () => {
@@ -45,15 +49,18 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
   },
   view: (vnode) => {
     return m('TagEditor', [
-      m('a', {
-        href: '#',
-        onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; }
-      }, [
-        // m(Icon, { size: 'xs', name: Icons.TAG, style: 'color: #999;' }),
-        'Edit tags'
-      ]),
+      vnode.attrs.popoverMenu
+        ? m(MenuItem, {
+          iconLeft: Icons.TAG,
+          fluid: true,
+          label: 'Edit Tags',
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        })
+        : m('a', {
+          href: '#',
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        }, [ 'Edit tags' ]),
       m(Dialog, {
-        autofocus: true,
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,

@@ -15,7 +15,7 @@ const post = (route, args, callback) => {
       console.error(resp);
     }
   }).catch((e) => console.error(e));
-}
+};
 
 class NotificationsController {
   private _store: NotificationStore = new NotificationStore();
@@ -24,10 +24,6 @@ class NotificationsController {
 
   private _subscriptions: NotificationSubscription[] = [];
   public get subscriptions() { return this._subscriptions; }
-
-  public constructor() {
-    // do nothing
-  }
 
   public subscribe(category: string, objectId: string) {
     const subscription = this.subscriptions.find((v) => v.category === category && v.objectId === objectId);
@@ -79,9 +75,9 @@ class NotificationsController {
     return post('/markNotificationsRead', {
       'notification_ids[]': notifications.map((n) => n.id),
     }, (result) => {
-      for (const n of notifications.filter((n) => !n.isRead)) {
-        n.markRead();
-      }
+      notifications
+        .filter((n) => !n.isRead)
+        .forEach((n) => n.markRead());
     });
   }
 

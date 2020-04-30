@@ -3,7 +3,10 @@ import 'pages/new_signaling.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import { default as mixpanel } from 'mixpanel-browser';
-import { Grid, Col, Classes, ButtonGroup, Callout, Form, FormGroup, FormLabel, Button, Icon, Icons, Radio, RadioGroup, Tag, Input, TextArea } from 'construct-ui';
+import {
+  Grid, Col, Classes, ButtonGroup, Callout, Form, FormGroup,
+  FormLabel, Button, Icon, Icons, Radio, RadioGroup, Tag, Input, TextArea
+} from 'construct-ui';
 import app from 'state';
 
 import { symbols, formatDuration, blockperiodToDuration } from 'helpers';
@@ -47,19 +50,20 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       m.route.set(`/${app.activeChainId()}/login`, {}, { replace: true });
       return m(PageLoading);
     }
-    if (!app.chain?.loaded) {
+    if (!app.chain || !app.chain.loaded) {
       return m(PageLoading);
     }
-    if (app.chain.class !== ChainClass.Edgeware) {
-      notifyInfo('Not supported');
+    if (app.chain && app.chain.class !== ChainClass.Edgeware) {
+      notifyInfo('Can only create signaling proposals on Edgeware');
       m.route.set(`/${app.activeChainId()}/discussions`);
-      return m(PageLoading);
+      return;
     }
 
     const author = app.vm.activeAccount;
     const newThread = () => {
       if (!vnode.state.form.title || !vnode.state.form.description) {
-        return vnode.state.error = 'Both title and description are required.';
+        vnode.state.error = 'Both title and description are required.';
+        return;
       }
       mixpanel.track('Create Thread', {
         'Step No': 2,
@@ -97,11 +101,11 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
     };
 
     return m('.NewSignalingPage', [
-        m('.forum-container', [
-          m('h2.page-title', 'New Signaling Proposal'),
-          m(Grid, [
-            m(Col, { span }, [
-              !app.vm.activeAccount
+      m('.forum-container', [
+        m('h2.page-title', 'New Signaling Proposal'),
+        m(Grid, [
+          m(Col, { span }, [
+            !app.vm.activeAccount
               ? m(Callout, {
                 icon: Icons.ALERT_TRIANGLE,
                 intent: 'primary',
@@ -112,96 +116,100 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                 header: 'Create signaling proposal',
                 content: [
                   m('div', `Refundable bond: ${formatCoin((app.chain as Edgeware).signaling.proposalBond)} `),
-                  m('div', `Voting period: ${formatDuration(blockperiodToDuration((app.chain as Edgeware).signaling.votingPeriod))}`),
-                  m('div', 'After creating the proposal, you must trigger the start of voting.'),
+                  m('div', 'Voting period: '
+                    + `${formatDuration(blockperiodToDuration((app.chain as Edgeware).signaling.votingPeriod))}`),
                 ]
               }),
-              m('br'),
-              m(Form, [
+            m('br'),
+            m(Form, [
+              m(FormGroup, [
+                m(Input, {
+                  name: 'title',
+                  placeholder: 'Ask a question...',
+                  disabled: !author,
+                  autocomplete: 'off',
+                  onchange: (e) => {
+                    vnode.state.form.title = (e.target as any).value;
+                  }
+                }),
+              ]),
+              m(FormGroup, [
+                m(TextArea, {
+                  name: 'description',
+                  placeholder: 'Add a description',
+                  disabled: !author,
+                  onchange: (e) => {
+                    vnode.state.form.description = (e.target as any).value;
+                  },
+                }),
+              ]),
+              m(FormGroup, [
                 m(FormGroup, [
-                  m(Input, {
-                    name: 'title',
-                    placeholder: 'Ask a question...',
-                    disabled: !author,
-                    autocomplete: 'off',
-                    onchange: (e) => vnode.state.form.title = (e.target as any).value,
+                  m(RadioGroup, {
+                    value: vnode.state.voteType,
+                    disabled: !app.vm.activeAccount,
+                    options: [{
+                      label: 'Binary',
+                      value: 'binary',
+                      disabled: vnode.state.voteOutcomes.length > 2,
+                    }, {
+                      label: 'Multi Option',
+                      value: 'multioption',
+                      disabled: vnode.state.voteOutcomes.length <= 2,
+                    }, {
+                      label: 'Ranked Choice',
+                      value: 'rankedchoice',
+                      disabled: vnode.state.voteOutcomes.length <= 2,
+                    }],
+                    onchange: (e) => {
+                      vnode.state.voteType = (e.target as any).value;
+                      if (vnode.state.voteType === 'binary') {
+                        vnode.state.voteOutcomes = ['Yes', 'No'];
+                      } else {
+                        while (vnode.state.voteOutcomes.length < 3) vnode.state.voteOutcomes.push('');
+                      }
+                    }
                   }),
                 ]),
-                m(FormGroup, [
-                  m(TextArea, {
-                    name: 'description',
-                    placeholder: 'Add a description',
-                    disabled: !author,
-                    onchange: (e) => vnode.state.form.description = (e.target as any).value,
-                  }),
-                ]),
-                m(FormGroup, [
-                  m(FormGroup, [
-                    m(RadioGroup, {
-                      value: vnode.state.voteType,
-                      disabled: !app.vm.activeAccount,
-                      options: [{
-                        label: 'Binary',
-                        value: 'binary',
-                        disabled: vnode.state.voteOutcomes.length > 2,
-                      }, {
-                        label: 'Multi Option',
-                        value: 'multioption',
-                        disabled: vnode.state.voteOutcomes.length <= 2,
-                      }, {
-                        label: 'Ranked Choice',
-                        value: 'rankedchoice',
-                        disabled: vnode.state.voteOutcomes.length <= 2,
-                      }],
-                      onchange: (e) => {
-                        vnode.state.voteType = (e.target as any).value;
-                        if (vnode.state.voteType === 'binary') {
-                          vnode.state.voteOutcomes = ['Yes', 'No'];
-                        } else {
-                          while (vnode.state.voteOutcomes.length < 3) vnode.state.voteOutcomes.push('');
-                        }
-                      }
-                    }),
-                  ]),
-                  vnode.state.voteOutcomes.map((outcome, index) => m(FormGroup, [ m(Input, {
-                    value: outcome,
-                    disabled: !app.vm.activeAccount || vnode.state.voteType === 'binary',
-                    contentLeft: m(Tag, { label: `Option ${index + 1}` })
-                  }) ])),
-                  m(ButtonGroup, { fluid: true }, [
-                    m(Button, {
-                      iconLeft: Icons.PLUS,
-                      label: 'Add option',
-                      disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 6,
-                      onclick: () => {
-                        if (vnode.state.voteOutcomes.length >= 6) return;
-                        vnode.state.voteOutcomes.push('');
-                      }
-                    }),
-                    m(Button, {
-                      iconLeft: Icons.MINUS,
-                      label: 'Remove option',
-                      disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 3,
-                      onclick: () => {
-                        if (vnode.state.voteOutcomes.length <= 3) return;
-                        vnode.state.voteOutcomes.splice(vnode.state.voteOutcomes.length - 1);
-                      }
-                    }),
-                  ]),
-                ]),
-                m(FormGroup, [
+                vnode.state.voteOutcomes.map((outcome, index) => m(FormGroup, [ m(Input, {
+                  value: outcome,
+                  disabled: !app.vm.activeAccount || vnode.state.voteType === 'binary',
+                  contentLeft: m(Tag, { label: `Option ${index + 1}` })
+                }) ])),
+                m(ButtonGroup, { fluid: true }, [
                   m(Button, {
-                    intent: 'primary',
-                    disabled: !author,
-                    onclick: (e) => newThread(),
-                    label: 'Create proposal',
+                    iconLeft: Icons.PLUS,
+                    label: 'Add option',
+                    disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 6,
+                    onclick: () => {
+                      if (vnode.state.voteOutcomes.length >= 6) return;
+                      vnode.state.voteOutcomes.push('');
+                    }
+                  }),
+                  m(Button, {
+                    iconLeft: Icons.MINUS,
+                    label: 'Remove option',
+                    disabled: vnode.state.voteType === 'binary' || vnode.state.voteOutcomes.length === 3,
+                    onclick: () => {
+                      if (vnode.state.voteOutcomes.length <= 3) return;
+                      vnode.state.voteOutcomes.splice(vnode.state.voteOutcomes.length - 1);
+                    }
                   }),
                 ]),
               ]),
-              vnode.state.error && m('.error-message', vnode.state.error),
+              m(FormGroup, [
+                m(Button, {
+                  intent: 'primary',
+                  disabled: !author,
+                  onclick: (e) => newThread(),
+                  label: 'Create proposal',
+                }),
+              ]),
             ]),
+            vnode.state.error && m('.error-message', vnode.state.error),
           ]),
         ]),
+      ]),
     ]);
   }
 };

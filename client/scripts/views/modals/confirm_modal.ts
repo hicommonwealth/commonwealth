@@ -5,20 +5,6 @@ import { default as $ } from 'jquery';
 import app from 'state';
 import { Button } from 'construct-ui';
 
-export const confirmationModalWithText = (text) => {
-  return async () : Promise<boolean> => {
-    let confirmed = false;
-    return new Promise((resolve) => {
-      app.modals.create({
-        modal: ConfirmModal,
-        data: { text: text },
-        completeCallback: () => confirmed = true,
-        exitCallback: () => resolve(confirmed)
-      });
-    });
-  };
-};
-
 const ConfirmModal = {
   confirmExit: async () => true,
   view: (vnode) => {
@@ -37,8 +23,8 @@ const ConfirmModal = {
               $(vnode.dom).trigger('modalexit');
             }, 0);
           },
-          oncreate: (vnode) => {
-            $(vnode.dom).focus();
+          oncreate: (vvnode) => {
+            $(vvnode.dom).focus();
           },
           label: 'Yes',
         }),
@@ -53,6 +39,20 @@ const ConfirmModal = {
       ]),
     ]);
   }
+};
+
+export const confirmationModalWithText = (text) => {
+  return async () : Promise<boolean> => {
+    let confirmed = false;
+    return new Promise((resolve) => {
+      app.modals.create({
+        modal: ConfirmModal,
+        data: { text },
+        completeCallback: () => { confirmed = true; },
+        exitCallback: () => resolve(confirmed)
+      });
+    });
+  };
 };
 
 export default ConfirmModal;

@@ -24,7 +24,7 @@ import NewProposalModal from 'views/modals/proposals';
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'ProposalsPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
   },
   view: (vnode) => {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
@@ -40,15 +40,15 @@ const ProposalsPage: m.Component<{}> = {
 
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
-    const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware) &&
-      (app.chain as Edgeware).signaling.store.getAll().sort(orderProposalsByAmountVoted);
-    const visibleCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK) &&
-      (app.chain as Cosmos).governance.store.getAll().sort((a, b) => +b.identifier - +a.identifier);
+    const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      && (app.chain as Edgeware).signaling.store.getAll().sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
+    const visibleCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      && (app.chain as Cosmos).governance.store.getAll().sort((a, b) => +b.identifier - +a.identifier);
     const visibleTreasuryProposals = onSubstrate && (app.chain as Substrate).treasury.store.getAll();
 
     // XXX: display these
-    const visibleTechnicalCommitteeProposals = app.chain && app.chain.class === ChainClass.Kusama &&
-      (app.chain as Substrate).technicalCommittee.store.getAll();
+    const visibleTechnicalCommitteeProposals = app.chain && app.chain.class === ChainClass.Kusama
+      && (app.chain as Substrate).technicalCommittee.store.getAll();
 
     let nextReferendum;
     let nextReferendumDetail;
@@ -59,14 +59,12 @@ const ProposalsPage: m.Component<{}> = {
         [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
       else
         [nextReferendum, nextReferendumDetail] = ['Council',
-                                                  'Last was council, but no democracy proposal was found'];
-    } else {
-      if ((app.chain as Substrate).democracyProposals.nextExternal)
-        [nextReferendum, nextReferendumDetail] = ['Council', ''];
-      else
-        [nextReferendum, nextReferendumDetail] = ['Democracy',
-                                                  'Last was democracy, but no council proposal was found'];
-    }
+          'Last was council, but no democracy proposal was found'];
+    } else if ((app.chain as Substrate).democracyProposals.nextExternal)
+      [nextReferendum, nextReferendumDetail] = ['Council', ''];
+    else
+      [nextReferendum, nextReferendumDetail] = ['Democracy',
+        'Last was democracy, but no council proposal was found'];
 
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
@@ -75,12 +73,12 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Governance Proposals',
       subtitle: 'Vote on network changes',
       content: (!app.chain || !app.chain.loaded) ? m('.forum-container', m(ProposalsLoadingRow)) : [
-        !visibleReferenda &&
-          !visibleCouncilProposals &&
-          !visibleDemocracyProposals &&
-          !visibleCosmosProposals &&
-          !visibleMolochProposals &&
-          m('.no-proposals', 'No referenda, motions, or proposals'),
+        !visibleReferenda
+          && !visibleCouncilProposals
+          && !visibleDemocracyProposals
+          && !visibleCosmosProposals
+          && !visibleMolochProposals
+          && m('.no-proposals', 'No referenda, motions, or proposals'),
         //
         (visibleDispatchQueue.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
         visibleDispatchQueue && visibleDispatchQueue.map((proposal) => m(ProposalRow, { proposal })),
@@ -95,24 +93,24 @@ const ProposalsPage: m.Component<{}> = {
         (visibleDemocracyProposals.length > 0) && m('h4.proposals-subheader', [
           'Democracy Proposed Referenda',
         ]),
-        visibleDemocracyProposals &&
-          visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
+        visibleDemocracyProposals
+          && visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
         //
         (visibleSignalingProposals.length > 0) && m('h4.proposals-subheader', [
           'Signaling proposals',
         ]),
-        visibleSignalingProposals &&
-          visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
+        visibleSignalingProposals
+          && visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
         //
         (visibleTreasuryProposals.length > 0) && m('h4.proposals-subheader', [
           'Treasury proposals',
         ]),
-        visibleTreasuryProposals &&
-          visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal: proposal })),
+        visibleTreasuryProposals
+          && visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
         //
         visibleCosmosProposals && m('h4.proposals-subheader', [
           'Cosmos proposals',
-        m('a.proposals-action', {
+          m('a.proposals-action', {
             onclick: (e) => app.modals.create({
               modal: NewProposalModal,
               data: { typeEnum: ProposalType.CosmosProposal }
@@ -146,9 +144,9 @@ const ProposalsPage: m.Component<{}> = {
         onSubstrate && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'Next referendum'),
           m('.stats-tile-figure-major', [
-            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock ?
-              m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock }) :
-              '--'
+            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
+              : '--'
           ]),
           m('.stats-tile-figure-minor', [
             `Block ${onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock}`
@@ -162,24 +160,24 @@ const ProposalsPage: m.Component<{}> = {
         onSubstrate && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'Next-up council referendum'),
           m('.stats-tile-figure-major', [
-            (app.chain as Substrate).democracyProposals.nextExternal ?
-              //((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
+            (app.chain as Substrate).democracyProposals.nextExternal
+              // ((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
               // (app.chain as Substrate).chain.methodToTitle(
               //   (app.chain as Substrate).democracyProposals.nextExternal[0])
-              //) : '--'
-              (app.chain as Substrate).democracyProposals.nextExternal[0].toString() : '--'
+              // ) : '--'
+              ? `${(app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8)}...` : '--'
           ]),
           m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
-            m('p', 'Hash: ' + (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8) + '...'),
+            m('p', `Hash: ${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8)}...`),
             m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
           ] : 'None'),
         ]),
         onSubstrate && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'Next treasury spend'),
           m('.stats-tile-figure-major', [
-            app.chain && (app.chain as Substrate).treasury.nextSpendBlock ?
-              m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock }) :
-              '--',
+            app.chain && (app.chain as Substrate).treasury.nextSpendBlock
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
+              : '--',
           ]),
           m('.stats-tile-figure-minor', `Block ${app.chain && (app.chain as Substrate).treasury.nextSpendBlock}`),
         ]),
@@ -194,13 +192,13 @@ const ProposalsPage: m.Component<{}> = {
               'Referenda are voted on by all coinholders, in a timelock-weighted yes/no vote. ',
             ]),
             m('li', [
-              `If a referendum passes, winning voters' coins are locked for up to `,
+              'If a referendum passes, winning voters\' coins are locked for up to ',
               `${(app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime} blocks `,
               `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime))}). `,
-              `Locked coins can still be staked or voted.`,
+              'Locked coins can still be staked or voted.',
             ]),
             m('li', [
-              `If a referendum is approved, it executes after a delay of `,
+              'If a referendum is approved, it executes after a delay of ',
               `${(app.chain as Substrate).democracy.enactmentPeriod} blocks `,
               `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod))}).`,
             ]),
@@ -217,7 +215,7 @@ const ProposalsPage: m.Component<{}> = {
             ]),
             m('h4', 'Democracy Proposals'),
             m('li', [
-              `Any coinholder can propose a referendum, by placing a bond of at least `,
+              'Any coinholder can propose a referendum, by placing a bond of at least ',
               `${app.chain && formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)}. `,
             ]),
             m('li', [

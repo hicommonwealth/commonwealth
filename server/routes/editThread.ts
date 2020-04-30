@@ -3,6 +3,8 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const editThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
@@ -49,8 +51,8 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
-    if (read_only) thread.read_only = !thread.read_only;
-    if (privacy) thread.private = false;
+    if (read_only !== 'false') thread.read_only = !thread.read_only;
+    if (privacy !== 'false') thread.private = false;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({

@@ -164,14 +164,16 @@ import ProfileBio from './profile_bio';
 //       isSubstrate && vnode.state.dynamic.proxyFor && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account is a proxy for: '),
-//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id],
+//                     showSecondaryName: true, linkify: true }),
 //           // TODO: resign proxy button
 //         ]),
 //       ]),
 //       isSubstrate && vnode.state.dynamic.delegation && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account has assigned a delegate: '),
-//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id]
+//                     showSecondaryName: true, linkify: true }),
 //         ]),
 //       ]),
 //     ]);
@@ -191,7 +193,7 @@ const ProfilePage: m.Component<{ address: string }> = {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading);
+    if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
     if (!account) return m(PageLoading);
 
@@ -217,38 +219,38 @@ const ProfilePage: m.Component<{ address: string }> = {
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
     return m('.ProfilePage', [
-        m('.forum-container-alt', [
-          m(ProfileHeader, { account }),
-          m('.row.row-narrow.forum-row', [
-            m('.col-xs-8', [
-              m(Tabs, [{
-                name: allTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.All,
-                  content: { allContent }
-                })
-              }, {
-                name: threadsTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.Threads,
-                  content: { proposals }
-                }),
-              }, {
-                name: commentsTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.Comments,
-                  content: { comments }
-                }),
-              }]),
-            ]),
-            m('.col-xs-4', [
-              m(ProfileBio, { account }),
-            ]),
+      m('.forum-container-alt', [
+        m(ProfileHeader, { account }),
+        m('.row.row-narrow.forum-row', [
+          m('.col-xs-8', [
+            m(Tabs, [{
+              name: allTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.All,
+                content: { allContent }
+              })
+            }, {
+              name: threadsTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.Threads,
+                content: { proposals }
+              }),
+            }, {
+              name: commentsTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.Comments,
+                content: { comments }
+              }),
+            }]),
+          ]),
+          m('.col-xs-4', [
+            m(ProfileBio, { account }),
           ]),
         ]),
+      ]),
     ]);
   },
 };

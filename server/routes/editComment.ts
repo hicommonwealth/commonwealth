@@ -4,10 +4,10 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 import { getProposalUrl } from '../../shared/utils';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!req.user) {
     return next(new Error('Not logged in'));
@@ -65,7 +65,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         where: { identifier: id, type: prefix }
       });
     } else {
-      console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+      log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
     const cwUrl = getProposalUrl(prefix, proposal, comment);
 

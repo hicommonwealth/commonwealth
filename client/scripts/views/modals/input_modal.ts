@@ -4,22 +4,6 @@ import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
 
-export const inputModalWithText = (title, text?, placeholder?, value?) => {
-  return async () : Promise<string> => {
-    return new Promise<string>((resolve, reject) => {
-      // Since it's impossible to return a value via a triggered event, we need
-      // some other way. This seems preferable to creating a global in this file
-      const retval = { text: undefined };
-      app.modals.create({
-        modal: InputModal,
-        data: { title, text, placeholder, value, retval },
-        completeCallback: (e) => null,
-        exitCallback: (e) => resolve(retval.text),
-      });
-    });
-  };
-};
-
 const InputModal = {
   confirmExit: async () => true,
   view: (vnode) => {
@@ -32,10 +16,10 @@ const InputModal = {
         m('h3', promptTitle),
         promptText && m('p', promptText),
         m('input[type="text"]', {
-          placeholder: placeholder,
-          oncreate: (vnode) => {
-            if (defaultValue !== undefined) $(vnode.dom).val(defaultValue);
-            $(vnode.dom).focus();
+          placeholder,
+          oncreate: (vvnode) => {
+            if (defaultValue !== undefined) $(vvnode.dom).val(defaultValue);
+            $(vvnode.dom).focus();
           }
         }),
       ]),
@@ -60,6 +44,22 @@ const InputModal = {
       ]),
     ]);
   }
+};
+
+export const inputModalWithText = (title, text?, placeholder?, value?) => {
+  return async () : Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+      // Since it's impossible to return a value via a triggered event, we need
+      // some other way. This seems preferable to creating a global in this file
+      const retval = { text: undefined };
+      app.modals.create({
+        modal: InputModal,
+        data: { title, text, placeholder, value, retval },
+        completeCallback: (e) => null,
+        exitCallback: (e) => resolve(retval.text),
+      });
+    });
+  };
 };
 
 export default InputModal;

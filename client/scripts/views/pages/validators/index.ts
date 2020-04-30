@@ -140,7 +140,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
 
 const ValidatorPage : m.Component = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'ValidatorPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },
   view: (vnode) => {
     if (!app.chain || app.chain.networkStatus !== ApiStatus.Connected) return m(PageLoading);

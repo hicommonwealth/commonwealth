@@ -91,7 +91,7 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
             callback: (value) => {
               vnode.state.form.name = value;
             },
-            oncreate: (vnode) => $(vnode.dom).find('input[type="text"]').focus().select(),
+            oncreate: (vvnode) => $(vvnode.dom).find('input[type="text"]').focus().select(),
           }),
           m(TextareaFormField, {
             title: 'Description',
@@ -106,7 +106,7 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
           }),
           m(CheckboxFormField, {
             name: 'featured-checkbox',
-            title: 'Featured?',
+            title: 'Pin to sidebar',
             options: { class: 'featured-checkbox' },
             callback: () => {
               vnode.state.form.featured = !vnode.state.form.featured;

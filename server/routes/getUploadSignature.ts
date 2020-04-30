@@ -3,6 +3,8 @@ import uuidv4 from 'uuid/v4';
 
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 AWS.config.update({
   signatureVersion: 'v4'

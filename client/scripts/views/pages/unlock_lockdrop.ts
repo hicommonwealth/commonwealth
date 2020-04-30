@@ -10,6 +10,7 @@ import {
   setupWeb3Provider,
   getCurrentTimestamp,
   formatNumber,
+  getParticipationSummary,
 } from '../stats/stats_helpers';
 
 const LockdropV1 = '0x1b75b90e60070d37cfa9d87affd124bb345bf70a';
@@ -47,6 +48,16 @@ const unlock = async (lockContractAddress, userAddress, web3) => {
   });
 };
 
+const getLocks = async (lockdropContract, address) => {
+  return lockdropContract.getPastEvents('Locked', {
+    fromBlock: 0,
+    toBlock: 'latest',
+    filter: {
+      owner: address,
+    }
+  });
+};
+
 const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) => {
   console.log(`Fetching locks for account ${userAddress} for contract ${lockdropContractAddress}`);
   const json = await $.getJSON('/static/contracts/edgeware/Lockdrop.json');
@@ -66,24 +77,21 @@ const getLocksForAddress = async (userAddress, lockdropContractAddress, web3) =>
     };
   });
 
-  return await Promise.all(promises);
+  return Promise.all(promises);
 };
 
-const getLocks = async (lockdropContract, address) => {
-  return await lockdropContract.getPastEvents('Locked', {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      owner: address,
-    }
-  });
-};
-
-const fetchUnlocksFromMetamaskAccount = async (network = 'mainnet', remoteUrl = undefined) => {
+const fetchUnlocks = async (network = 'mainnet', remoteUrl = undefined) => {
   const web3 = getWeb3(network, remoteUrl);
-  const results = await getLocksForAddress(state.user, state.contractAddress, web3);
-  state.locks = results;
-  return results;
+  if (window['Web3'] || window['web3']) {
+    const results = await getLocksForAddress(state.user, state.contractAddress, web3);
+    state.locks = results;
+    return results;
+  } else {
+    const results = await getParticipationSummary(network);
+    const { ethAddrToLockEvent } = results;
+    state.locks = ethAddrToLockEvent[state.user][0];
+    return ethAddrToLockEvent[state.user][0];
+  }
 };
 
 const ContractOption = ({ contract, checked }) => {
@@ -111,7 +119,7 @@ const ContractOption = ({ contract, checked }) => {
 
 const LockContractComponent = {
   view: (vnode) => {
-    const { owner, eth, lockContractAddr, unlockTime, term, edgewareAddr } = vnode.attrs.data;
+    const { owner, eth, lockContractAddr, unlockTime, unlockTimeMinutes, term, edgewareAddr } = vnode.attrs.data;
     const etherscanNet = 'https://etherscan.io/';
     return m('.LockContractComponent', [
       m('h3', [
@@ -137,7 +145,7 @@ const LockContractComponent = {
       m('p', `EDG Public Keys: ${edgewareAddr}`),
       m('p', [
         'Unlocks In: ',
-        Math.round(Number(unlockTime)),
+        Math.round(Number(unlockTime || unlockTimeMinutes)),
         ' minutes'
       ]),
       m('button.formular-button-primary', {
@@ -157,8 +165,8 @@ const LockContractComponent = {
               state.web3
             );
             vnode.state.success = 'Transaction sent!';
-          } catch (e) {
-            vnode.state.error = e.toString();
+          } catch (err) {
+            vnode.state.error = err.toString();
           }
           m.redraw();
         }
@@ -170,7 +178,7 @@ const LockContractComponent = {
 
 const UnlockPage = {
   oncreate: async (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'UnlockPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'UnlockPage' });
     state.web3 = getWeb3('mainnet', undefined);
 
     // if an injected web3 provider e.g. Metamask is found, enable it
@@ -235,7 +243,7 @@ const UnlockPage = {
                       return;
                     }
                     try {
-                      const results : any[] = await fetchUnlocksFromMetamaskAccount();
+                      const results : any[] = await fetchUnlocks();
                       if (results.length === 0) {
                         vnode.state.error = 'No locks from this address';
                       }

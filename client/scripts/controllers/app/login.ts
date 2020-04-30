@@ -17,6 +17,32 @@ import {
 } from 'models';
 import moment from 'moment';
 
+function createAccount(account: Account<any>) {
+  return $.post(`${app.serverUrl()}/createAddress`, {
+    address: account.address,
+    keytype: account.chainBase === ChainBase.Substrate
+      && (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined,
+    chain: account.chain.id,
+    jwt: app.login.jwt,
+  });
+}
+
+export async function setActiveAccount(account: Account<any>, suppressNotification?) {
+  if (!suppressNotification) {
+    notifySuccess('Switched account');
+  }
+  app.vm.activeAccount = account;
+
+  if (app.activeCommunityId()) {
+    app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
+  } else if (app.activeChainId()) {
+    app.login.selectedAddresses.setByChain(app.activeChainId(), account);
+  } else {
+    localStorage.setItem('initChain', account.chain.id);
+    localStorage.setItem('initAddress', account.address);
+  }
+}
+
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
   if (!app.isLoggedIn()) return;
   try {
@@ -70,7 +96,8 @@ export function updateActiveAddresses(chain?: ChainInfo) {
   // try to load a previously selected account for the chain/community
   if (chain) {
     const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
-    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
+    app.vm.activeAccount = app.login.activeAddresses
+      .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
   } else if (app.activeCommunityId()) {
     const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
     app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
@@ -146,19 +173,9 @@ export async function createUserWithAddress(address: string, keytype?: string): 
   return account;
 }
 
-function createAccount(account: Account<any>) {
-  return $.post(app.serverUrl() + '/createAddress', {
-    address: account.address,
-    keytype: account.chainBase === ChainBase.Substrate &&
-      (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined,
-    chain: account.chain.id,
-    jwt: app.login.jwt,
-  });
-}
-
 export function unlinkLogin(account) {
   const unlinkingCurrentlyActiveAccount = app.vm.activeAccount === account;
-  return $.post(app.serverUrl() + '/deleteAddress', {
+  return $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
     chain: account.chain,
     auth: true,
@@ -174,20 +191,4 @@ export function unlinkLogin(account) {
     if (!unlinkingCurrentlyActiveAccount) return;
     app.vm.activeAccount = app.login.activeAddresses.length > 0 ? app.login.activeAddresses[0] : null;
   });
-}
-
-export async function setActiveAccount(account: Account<any>, suppressNotification?) {
-  if (!suppressNotification) {
-    notifySuccess('Switched account');
-  }
-  app.vm.activeAccount = account;
-
-  if (app.activeCommunityId()) {
-    app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
-  } else if (app.activeChainId()) {
-    app.login.selectedAddresses.setByChain(app.activeChainId(), account);
-  } else {
-    localStorage.setItem('initChain', account.chain.id);
-    localStorage.setItem('initAddress', account.address);
-  }
 }

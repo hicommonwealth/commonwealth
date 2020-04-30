@@ -28,10 +28,12 @@
             font-size: 12px;
             letter-spacing: 0.2px;
             text-transform: uppercase;
+            overflow-wrap: break-word;
         }
         .stats-tile-figure-major {
             font-size: 28px;
             line-height: 1.25;
+            overflow-wrap: break-word;
         }
         .stats-tile-figure-minor {
             color: #888;

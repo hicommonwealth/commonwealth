@@ -239,9 +239,12 @@ body.modal-open {
 
 .layout-content {
     padding: 15px 40px;
-    padding-left: $side-width + 40px;
+    padding-left: $sidebar-width + 40px;
     &.logged-out {
-        padding-left: $side-width;
+        padding-left: $sidebar-width;
+    }
+    &.hidden-sidebar {
+        padding-left: 40px;
     }
 }
 
@@ -269,4 +272,17 @@ body.modal-open {
     top: auto;
     bottom: 0;
     z-index: 99999;
+}
+
+.cui-tag.cui-none.cui-xs {
+    border-color: #f1f3f5;
+    padding-top: 0;
+    padding-bottom: 0;
+    cursor: pointer;
+    position: relative;
+    top: -1px;
+    &:hover {
+        border-color: darken(#f1f3f5, 2%);
+        background: darken(#f1f3f5, 2%);
+    }
 }

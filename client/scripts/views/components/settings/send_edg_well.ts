@@ -27,17 +27,17 @@ const getBalanceTransferChecks = (
   if (senderAddress === recipientAddress) {
     checks.push([
       featherIcon('slash', 14, 2, '#444'),
-      `You cannot send balance to yourself`]);
+      'You cannot send balance to yourself']);
     canTransfer = false;
   } else if (senderBalance.lt(amount)) {
     checks.push([
       featherIcon('slash', 14, 2, '#444'),
-      `You do not have the required balance for this transaction.`]);
+      'You do not have the required balance for this transaction.']);
     canTransfer = false;
   } else if (senderBalance.sub(amount).lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
       featherIcon('info', 14, 2, '#444'),
-      `Your balance will drop below the minimum, and any remaining balance may be lost.`
+      'Your balance will drop below the minimum, and any remaining balance may be lost.'
     ]);
   }
   if (canTransfer && txFee.gtn(0)) {
@@ -52,21 +52,21 @@ const getBalanceTransferChecks = (
       `Account creation fee: ${formatCoin((app.chain as Substrate).chain.creationfee)}`
     ]);
   }
-  const resultingBalance = app.chain.chain.coins(recipientBalance.add(recipientBalance.gtn(0) ?
-                                                 amount.sub(txFee) :
-                                                 amount.sub(txFee)
-                                                  .sub((app.chain as Substrate).chain.creationfee)));
+  const resultingBalance = app.chain.chain.coins(recipientBalance.add(recipientBalance.gtn(0)
+    ? amount.sub(txFee)
+    : amount.sub(txFee)
+      .sub((app.chain as Substrate).chain.creationfee)));
   if (recipientBalance.eqn(0) && resultingBalance.lt((app.chain as Substrate).chain.existentialdeposit)) {
     checks.push([
       featherIcon('slash', 14, 2, '#444'),
-      `The recipient's balance must be above the minimum after fees: ` +
-        `${formatCoin((app.chain as Substrate).chain.existentialdeposit)}`]);
+      'The recipient\'s balance must be above the minimum after fees: '
+        + `${formatCoin((app.chain as Substrate).chain.existentialdeposit)}`]);
     canTransfer = false;
   } else if (amount.lte(txFee)) {
-      checks.push([
-        featherIcon('slash', 14, 2, '#444'),
-        `Amount sent must be greater than the transfer fee.`]);
-      canTransfer = false;
+    checks.push([
+      featherIcon('slash', 14, 2, '#444'),
+      'Amount sent must be greater than the transfer fee.']);
+    canTransfer = false;
   } else if (canTransfer) {
     checks.push([
       featherIcon('info', 14, 2, '#444'),
@@ -103,7 +103,9 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
   getObservables: (attrs: IAttrs) => ({
     groupKey: attrs.sender.address,
     senderBalance: attrs.sender.balance,
-    substrateTxFee: attrs.sender.chainBase === ChainBase.Substrate ? (attrs.sender as SubstrateAccount).balanceTransferFee : null,
+    substrateTxFee: attrs.sender.chainBase === ChainBase.Substrate
+      ? (attrs.sender as SubstrateAccount).balanceTransferFee
+      : null,
   }),
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     let canTransfer = true;
@@ -153,7 +155,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
             try {
               vnode.state.amount = app.chain.chain.coins(parseFloat(e.target.value), true);
               vnode.state.error = undefined;
-            } catch (e) {
+            } catch (err) {
               vnode.state.error = 'invalid amount';
               vnode.state.amount = undefined;
             }
@@ -195,7 +197,7 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
               createTXModal(sender.sendBalanceTx(account, amount)).then(() => {
                 vnode.state.sending = false;
                 m.redraw();
-              }, (e) => {
+              }, (err) => {
                 vnode.state.sending = false;
                 m.redraw();
               });
@@ -203,8 +205,8 @@ const SendEDGWell = makeDynamicComponent<IAttrs, IState>({
               // TODO: cosmos balance transfer
               throw new Error('Can only send balance on Substrate-based networks');
             }
-          } catch (e) {
-            vnode.state.error = e.message;
+          } catch (err) {
+            vnode.state.error = err.message;
             vnode.state.sending = false;
             m.redraw();
           }

@@ -29,7 +29,7 @@ class SelectedAddressesController {
     this.save();
   }
   public getByCommunity(communityId: string): string {
-     return this._communities[communityId];
+    return this._communities[communityId];
   }
 
   public save() {

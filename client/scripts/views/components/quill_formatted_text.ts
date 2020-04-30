@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import 'components/quill_formatted_text.scss';
 
 import { default as $ } from 'jquery';
@@ -27,7 +28,7 @@ export const sliceQuill = (json: IQuillJSON, length: number) => {
     const text = ele.insert;
     if (count + text.length > length) {
       const fullText = text;
-      ele.insert = text.slice(0, length - count) + `\n`;
+      ele.insert = `${text.slice(0, length - count)}\n`;
       truncatedObj.push(ele);
       count += fullText.length;
     } else {
@@ -43,7 +44,7 @@ const preprocessQuillDeltaForRendering = (nodes) => {
   const lines = [];
   for (const node of nodes) {
     if (typeof node.insert === 'string') {
-      node.insert.match(/[^\n]+\n?|\n/g).map((line) => {
+      node.insert.match(/[^\n]+\n?|\n/g).forEach((line) => {
         lines.push({ attributes: node.attributes, insert: line });
       });
     } else {
@@ -70,9 +71,9 @@ const preprocessQuillDeltaForRendering = (nodes) => {
       parent.children.push(node);
     }
   }
-  // check for \n at the end of the document
+  // If there was no \n at the end of the document, we need to push whatever remains in `parent`
+  // onto the result. This may happen if we are rendering a truncated Quill document
   if (parent.children.length > 0) {
-    console.error('Quill document ended without a newline - this should never happen');
     result.push(parent);
   }
 
@@ -94,7 +95,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
 
   // first, concatenate parent nodes for <ul> and <ol> into groups
   const groups = [];
-  preprocessQuillDeltaForRendering(delta.ops).map((parent) => {
+  preprocessQuillDeltaForRendering(delta.ops).forEach((parent) => {
     // if the last parent was a <ul> or <ol> with the same attributes.list,
     // concatenate the current parent's children onto the last instead
     if (groups.length !== 0
@@ -121,7 +122,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
             const embedType = Object.keys(child.insert)[0];
             return m('span', `[${stringUpperFirst(embedType)} embed]`);
           }
-          return m('span', child.insert.toString());
+          return m('span', `${child.insert} `);
         });
       }));
     })
@@ -130,7 +131,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
         ? 'ul'
         : group.listtype === 'ordered'
           ? 'ol'
-          : 'div';
+          : group.listtype === 'checked' || group.listtype === 'unchecked'
+            ? 'ul.checklist'
+            : 'div';
       return m(groupTag, group.parents.map((parent) => {
         // render empty parent nodes as .between-paragraphs
         if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
@@ -161,11 +164,13 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
             if (!(<any>window).twttr) {
               loadScript('//platform.twitter.com/widgets.js').then(() => {
                 setTimeout(() => {
+                  // eslint-disable-next-line
                   (<any>window).twttr?.widgets?.load();
                 }, 1);
               });
             } else {
               setTimeout(() => {
+                // eslint-disable-next-line
                 (<any>window).twttr?.widgets?.load();
               }, 1);
             }
@@ -191,20 +196,21 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
-            }, child.insert?.toString());
+            }, `${child.insert} `);
           } else {
-            result = m('span', child.insert?.toString());
+            result = m('span', `${child.insert} `);
           }
-          Object.entries(child.attributes || {}).map(([k, v]) => {
+          Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if ((k !== 'color' && k !== 'background') && v !== true) return;
             switch (k) {
-              case 'bold': return result = m('strong', result);
-              case 'italic': return result = m('em', result);
-              case 'strike': return result = m('s', result);
-              case 'underline': return result = m('u', result);
-              case 'code': return result = m('code', result);
-              case 'added': return result = m('span.added', result);
-              case 'deleted': return result = m('span.deleted', result);
+              case 'bold': result = m('strong', result); return;
+              case 'italic': result = m('em', result); return;
+              case 'strike': result = m('s', result); return;
+              case 'underline': result = m('u', result); return;
+              case 'code': result = m('code', result); return;
+              case 'added': result = m('span.added', result); return;
+              case 'deleted': result = m('span.deleted', result); return;
+              default: result = m('span', result);
             }
           });
           return result;
@@ -219,7 +225,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
                       : parent.attributes && parent.attributes.header === 6 ? 'h6'
                         : parent.attributes && parent.attributes.list === 'bullet' ? 'li'
                           : parent.attributes && parent.attributes.list === 'ordered' ? 'li'
-                            : 'div',
+                            : parent.attributes && parent.attributes.list === 'checked' ? 'li.checked'
+                              : parent.attributes && parent.attributes.list === 'unchecked' ? 'li.unchecked'
+                                : 'div',
         children);
       }));
     });

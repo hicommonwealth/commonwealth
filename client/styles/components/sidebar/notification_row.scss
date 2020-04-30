@@ -1,0 +1,37 @@
+.HeaderNotificationRow {
+    display: flex;
+    font-size: 14px;
+    padding: 15px 18px;
+    margin: 0;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    &:hover {
+        background: #f7f8f9;
+    }
+    &.unread {
+        background: #ffffe0;
+    }
+
+    .comment-body {
+        flex: 1;
+        margin-left: 12px;
+    }
+    .comment-body-title {
+        .User .user-display-name,
+        span.commented-obj {
+            font-weight: 600;
+        }
+    }
+    .comment-body-excerpt {
+        margin: 7px 0 8px;
+        color: #888;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .comment-body-created {
+        color: #888;
+        margin-top: 7px;
+    }
+}

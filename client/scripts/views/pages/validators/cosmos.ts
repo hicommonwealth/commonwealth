@@ -54,7 +54,7 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
                       vnode.state.sending = false;
                       m.redraw();
                     })
-                    .catch((e) => {
+                    .catch((err) => {
                       vnode.state.sending = false;
                       m.redraw();
                     });
@@ -62,8 +62,8 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
                   // TODO: cosmos balance transfer
                   throw new Error('Can only delegate on Cosmos based chain.');
                 }
-              } catch (e) {
-                vnode.state.error = e.message;
+              } catch (err) {
+                vnode.state.error = err.message;
                 vnode.state.sending = false;
                 m.redraw();
               }
@@ -88,12 +88,12 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
     if (app.vm.activeAccount) {
       const account = app.chain.accounts.get(app.vm.activeAccount.address);
       const delegation = (account.balance.value) ? account.delegations() : null;
-      isDelegated = (delegation) ?
-        (delegation[vnode.attrs.stash] !== 0) ? true : false : false;
+      isDelegated = (delegation)
+        ? (delegation[vnode.attrs.stash] !== 0) : false;
     }
 
     return m('tr.ValidatorRow', [
-      m('td.val-name', (vnode.attrs.name !== null) ? vnode.attrs.name : 'Validator' ),
+      m('td.val-name', (vnode.attrs.name !== null) ? vnode.attrs.name : 'Validator'),
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-total', formatCoin(vnode.attrs.total, true)),
       m('td.val-action', [
@@ -156,7 +156,8 @@ export const ValidatorPresentationComponent = (chain: Cosmos) => {
         m('th.val-action', ''),
       ]),
       Object.keys(validators)
-        .filter((validator) => ((validators[validator].status === CosmosValidatorState.Bonded) && (!validators[validator].isJailed)))
+        .filter((validator) => ((validators[validator].status === CosmosValidatorState.Bonded)
+                                && (!validators[validator].isJailed)))
         .sort((val1, val2) => validators[val2].tokens - validators[val1].tokens)
         .map((validator) => {
           const total = app.chain.chain.coins(validators[validator].tokens);
@@ -177,7 +178,8 @@ export const ValidatorPresentationComponent = (chain: Cosmos) => {
         m('th.val-action', ''),
       ]),
       Object.keys(validators)
-        .filter((validator) => ((validators[validator].status === CosmosValidatorState.Unbonded) && (!validators[validator].isJailed)))
+        .filter((validator) => ((validators[validator].status === CosmosValidatorState.Unbonded)
+                                && (!validators[validator].isJailed)))
         .sort((val1, val2) => validators[val2].tokens - validators[val1].tokens)
         .map((validator) => {
           const total = app.chain.chain.coins(validators[validator].tokens);
@@ -208,4 +210,4 @@ export const ValidatorPresentationComponent = (chain: Cosmos) => {
         }),
     ]),
   }]);
-}
+};

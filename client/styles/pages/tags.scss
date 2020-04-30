@@ -1,2 +1,8 @@
 .TagsPage {
+    .TagSelector .cui-list {
+        max-height: none;
+        border: 1px solid #c5cdd1;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
 }

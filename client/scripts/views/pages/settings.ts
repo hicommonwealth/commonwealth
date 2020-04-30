@@ -12,7 +12,7 @@ import SendEDGWell from 'views/components/settings/send_edg_well';
 
 const SettingsPage: m.Component<{}> = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'SettingsPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'SettingsPage' });
   },
   view: (vnode) => {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
@@ -26,8 +26,8 @@ const SettingsPage: m.Component<{}> = {
           m('h2.page-title', 'Settings'),
           m(SettingsWell),
           m(AccountsWell),
-          !app.community && app.vm.activeAccount && app.vm.activeAccount instanceof SubstrateAccount &&
-            m(SendEDGWell, { sender: app.vm.activeAccount }),
+          !app.community && app.vm.activeAccount && app.vm.activeAccount instanceof SubstrateAccount
+            && m(SendEDGWell, { sender: app.vm.activeAccount }),
         ])
     ]);
   }

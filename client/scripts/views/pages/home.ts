@@ -15,7 +15,7 @@ const HomePage : m.Component<{}, {}> = {
           m(HomepageCommunities),
         ]),
       ]),
-    ])
+    ]);
   }
 };
 
