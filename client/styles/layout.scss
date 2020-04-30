@@ -245,11 +245,11 @@ body.modal-open {
         padding-left: $sidebar-width;
     }
     &.navigation-hidden {
-        padding-left: 40px;
+        padding-left: $switcher-width + 40px;
         padding-top: 15px;
     }
     &.navigation-hidden.logged-out {
-        padding-left: 0;
+        padding-left: 40px;
     }
 }
 
