@@ -5,6 +5,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import webdriver, { Builder } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome';
 
 import {
   setupDriver,
@@ -35,16 +36,19 @@ describe('Browser Tests', () => {
   });
 
   beforeEach(async () => {
+    const chromeOptions = new chrome.Options();
+    const defaultChromeFlags = [ '--incognito' ];
+    chromeOptions.addArguments(defaultChromeFlags);
     // setup event and driver in proper environment
     event = { url: 'http://localhost:8080', webhookUrl: process.env.WEBHOOK_URL };
     driver = (LOCAL)
-      ? await new Builder().forBrowser('chrome').build()
+      ? await new Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build()
       : await setupDriver();
     // hit event url
     driver.get(event.url);
   });
 
-  after(async () => {
+  afterEach(async () => {
     await driver.close();
     await driver.quit();
   });
