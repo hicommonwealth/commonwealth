@@ -164,3 +164,8 @@ export const createSubscription = async (args: SubscriptionArgs) => {
   const subscription = res.body.result;
   return subscription;
 };
+
+export const getChains = async () => {
+  const chains = await models['Chain'].findAll();
+  return chains;
+};

@@ -1,4 +1,5 @@
 .DS_Store
+/output
 *.pyc
 /venv
 /build

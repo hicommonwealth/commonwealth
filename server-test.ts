@@ -224,7 +224,7 @@ setupAPI(app, models, fetcher, viewCountCache);
 setupErrorHandlers();
 setupServer();
 
-export const resetDatabase = () => resetServer();
+export const resetDatabase = (debug) => resetServer(debug);
 export const closeServer = async () => {
   console.log('shutting down server');
   viewCountCache.close();
