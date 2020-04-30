@@ -44,7 +44,7 @@ class CommunityInfo {
     invitesEnabled: boolean
   ) {
     try {
-      await $.post(`${app.serverUrl()}/updateCommunity`, {
+      $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
         'name': name,
         'description': description,
@@ -59,10 +59,10 @@ class CommunityInfo {
         this.invitesEnabled = updatedCommunity.invitesEnabled;
       });
     } catch (err) {
-      console.log('Failed to update Community Data');
+      console.log('Failed to update community data');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update Community Data');
+        : 'Failed to update community data');
     }
   }
 
@@ -72,9 +72,6 @@ class CommunityInfo {
         'id': app.activeCommunityId(),
         'featured_tags[]': tags,
         'jwt': app.login.jwt
-      }).then((result) => {
-        console.dir(result);
-        console.dir(result.result);
       });
     } catch (err) {
       console.log('Failed to update featured tags');

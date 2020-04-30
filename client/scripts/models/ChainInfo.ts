@@ -52,10 +52,10 @@ class ChainInfo {
         this.description = updatedChain.description;
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update chain data');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update chain data');
     }
   }
 

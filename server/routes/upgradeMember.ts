@@ -13,12 +13,12 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
   if (!req.user) return next(new Error('Not logged in'));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
-  const adminAddresses = await req.user.getAddresses();
-  const adminAddressIds = Array.from(adminAddresses.map((a) => a.id));
+  const requesterAddresses = await req.user.getAddresses();
+  const requesterAddressIds = Array.from(requesterAddresses.map((a) => a.id));
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: { [Op.in]: adminAddressIds },
+      address_id: { [Op.in]: requesterAddressIds },
       permission: 'admin',
     },
   });
@@ -37,7 +37,7 @@ const upgradeMember = async (models, req: UserRequest, res: Response, next: Next
     },
   });
   if (!member) return next(new Error('Cannot find member to upgrade!'));
-  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error('Cannot demote self.'));
+  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error('Cannot demote self'));
   // if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
 
   member.permission = new_role;

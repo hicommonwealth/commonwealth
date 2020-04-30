@@ -21,7 +21,7 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
       },
     });
     if (userMembership.permission !== 'admin') {
-      return next(new Error('Invalid Permission to Update Community'));
+      return next(new Error('Invalid permission to update community'));
     }
   }
 

@@ -189,6 +189,9 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
           //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
           //     contentLeft: m(Icon, { name: Icons.BOX }),
           //   }),
+          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+            && (app.community || app.chain)
+            && m(AdminPanel),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: NewProposalModal,

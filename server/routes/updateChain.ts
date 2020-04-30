@@ -19,8 +19,8 @@ const updateChain = async (models, req: UserRequest, res: Response, next: NextFu
         chain_id: chain.id,
       },
     });
-    if (!userMembership && userMembership.role.permission !== 'admin') {
-      return next(new Error('Invalid community or chain'));
+    if (!userMembership || userMembership.permission !== 'admin') {
+      return next(new Error('Not an admin'));
     }
   }
 

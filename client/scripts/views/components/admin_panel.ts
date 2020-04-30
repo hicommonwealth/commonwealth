@@ -9,12 +9,12 @@ import 'components/admin_panel.scss';
 
 const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
-    return (vnode.attrs.roledata?.length > 0) &&
-      m('RoleData', [
+    if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
+    const chainOrCommObj = app.activeCommunityId()
+      ? { community: app.activeCommunityId() }
+      : { chain: app.activeChainId() };
+    return m('.RoleData', [
           vnode.attrs.roledata?.map((role) => {
-            const chainOrCommObj = (app.activeChainId())
-              ? { chain: app.activeChainId() }
-              : { community: app.activeCommunityId() };
             return m('.role-item', { style: 'display: inline-block; padding-right: 6px;' }, [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
@@ -33,7 +33,7 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                     jwt: app.login.jwt,
                   }).then((res) => {
                     if (res.status !== 'Success') {
-                      throw new Error(`got unsuccessful status: ${res.status}`);
+                      throw new Error(`Got unsuccessful status: ${res.status}`);
                     }
                     vnode.attrs.onRoleUpdate(role, res.result);
                   }).catch((e) => console.error('Failed To demote admin'));
@@ -41,7 +41,7 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
               }),
             ]);
           })
-      ]);
+    ]);
   }
 };
 
@@ -123,11 +123,11 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
     vnode.state.url = vnode.attrs.community.id;
   },
   view: (vnode) => {
-    return m('CommunityMetadata', [m(Table, {
+    return m('.CommunityMetadata', [m(Table, {
       bordered: false,
       interactive: false,
       striped: false,
-      class: '.community.metadata',
+      class: 'community metadataSection',
       style: 'table-layout: fixed;'
     }, [
       m(TableRow, {
@@ -210,12 +210,12 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
     vnode.state.symbol = vnode.attrs.chain.symbol;
   },
   view: (vnode) => {
-    return m('ChainMetadata', [
+    return m('.ChainMetadata', [
       m(Table, {
         bordered: false,
         interactive: false,
         striped: false,
-        class: '.chain.metadata',
+        class: 'chain metadataSection',
         style: 'table-layout: fixed;'
       }, [
         m(TableRow, {
@@ -292,7 +292,7 @@ interface IWebhooksFormState {
 const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
   view: (vnode) => {
     const { webhooks } = vnode.attrs;
-    const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
 
     const createWebhook = (e) => {
       e.preventDefault();
@@ -401,10 +401,10 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           label: 'Add webhook',
           onclick: createWebhook,
         }),
-        // vnode.state.success && m('h3.success-message', vnode.state.successMsg),
-        // vnode.state.failure && m('h3.error-message', [
-        //   vnode.state.error || 'An error occurred'
-        // ]),
+        vnode.state.success && m('h3.success-message', vnode.state.successMsg),
+        vnode.state.failure && m('h3.error-message', [
+          vnode.state.error || 'An error occurred'
+        ]),
       ]),
     ]);
   }
@@ -421,7 +421,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
   view: (vnode) => {
     const { roleData, onRoleUpgrade } = vnode.attrs;
     const noAdmins = roleData.filter((role) => {
-      return role.permission === RolePermission.member || (role.permission === RolePermission.moderator);
+      return (role.permission === RolePermission.member) || (role.permission === RolePermission.moderator);
     });
     const names: string[] = noAdmins.map((role) => {
       const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
@@ -515,7 +515,7 @@ interface IPanelState {
 
 const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
   view: (vnode) => {
-    const chainOrCommObj = (app.chain) ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
+    const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
     const loadRoles = async () => {
       try {
@@ -552,7 +552,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
 
     return m('.Panel', [
       m('.panel-left', [
-        (isCommunity)
+        isCommunity
           ? vnode.state.loadingFinished
             && m(CommunityMetadata, {
               community: app.community.meta,
