@@ -1,8 +1,10 @@
+@import 'client/styles/shared';
+
 .CommunitySwitcher {
     position: fixed;
     top: 0;
     left: 0;
-    width: 62px;
+    width: $switcher-width;
     bottom: 0;
     background: darken(#4e4e53, 7%);
     z-index: 10;
