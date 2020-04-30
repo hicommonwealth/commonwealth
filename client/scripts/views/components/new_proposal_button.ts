@@ -27,7 +27,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
       });
     }
 
@@ -59,7 +59,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       },
       content: [
         app.activeId() && m(MenuItem, {
-          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`) },
+          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
           label: 'New thread',
         }),
 

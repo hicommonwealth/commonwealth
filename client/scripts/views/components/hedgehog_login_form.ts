@@ -20,8 +20,8 @@ const messages = {
   //   instructions: `Enter a username and password to create a new Ethereum address.`
   // },
   // invalid: `Incorrect username or password. Try again.`,
-  empty: `Please enter a username and password.`,
-  exists: `Account already exists, please try logging in.`,
+  empty: 'Please enter a username and password.',
+  exists: 'Account already exists, please try logging in.',
   // mismatched: `The passwords you entered don't match.`
 };
 
@@ -78,23 +78,21 @@ const checkHedgehogWalletStatus = (vnode) => {
   if (vnode.state.hedgehog && vnode.state.hedgehog.isLoggedIn()) {
     // TODO: Handle already signed on
     vnode.state.wallet = vnode.state.hedgehog.getWallet();
+  } else if (
+    vnode.state.hedgehog
+        && vnode.state.hedgehog.walletExistsLocally
+        && vnode.state.hedgehog.walletExistsLocally()
+  ) {
+    vnode.state.wallet = vnode.state.hedgehog.restoreLocalWallet();
   } else {
-    if (
-      vnode.state.hedgehog &&
-        vnode.state.hedgehog.walletExistsLocally &&
-        vnode.state.hedgehog.walletExistsLocally()
-    ) {
-      vnode.state.wallet = vnode.state.hedgehog.restoreLocalWallet();
-    } else {
-      // TODO: Handle signed out
-      vnode.state.wallet = undefined;
-    }
+    // TODO: Handle signed out
+    vnode.state.wallet = undefined;
   }
 };
 
 const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
   return m('a.btn', {
-    class: 'login-with-web3' + (vnode.state.disabled ? ' disabled' : ''),
+    class: `login-with-web3${vnode.state.disabled ? ' disabled' : ''}`,
     onclick: async (e) => {
       e.preventDefault();
       const username = $(vnode.dom).find('[name="username"]').val().toString();
@@ -112,9 +110,9 @@ const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
         vnode.state.loading = true;
         vnode.state.error = '';
         try {
-          const result = isLogin ?
-            await vnode.state.hedgehog.login(username, password) :
-            await vnode.state.hedgehog.signUp(username, password);
+          const result = isLogin
+            ? await vnode.state.hedgehog.login(username, password)
+            : await vnode.state.hedgehog.signUp(username, password);
           checkHedgehogWalletStatus(vnode);
           // we should be logged in
           const address = vnode.state.wallet.getAddress().toString('hex');
@@ -127,19 +125,19 @@ const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
             vnode.attrs.accountVerifiedCallback(signerAccount, parentVnode); // done!
             m.redraw();
           } catch (err) {
-            vnode.state.error = 'Verification failed. There was an inconsistency error; ' +
-              'please report this to the developers.';
+            vnode.state.error = 'Verification failed. There was an inconsistency error; '
+              + 'please report this to the developers.';
             vnode.state.loading = false;
             m.redraw();
           }
-        } catch (e) {
-          vnode.state.error = e.message; //isLogin ? e.message : messages.exists;
+        } catch (err) {
+          vnode.state.error = err.message; // isLogin ? err.message : messages.exists;
           vnode.state.loading = false;
           m.redraw();
         }
-      } catch (e) {
-        console.log('Error', e);
-        vnode.state.error = e;
+      } catch (err) {
+        console.log('Error', err);
+        vnode.state.error = err;
         vnode.state.disabled = false;
         m.redraw();
       }
@@ -161,23 +159,23 @@ const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, parentVnode }, {
     const parentVnode = vnode.attrs.parentVnode;
     return m('.HedgehogLoginForm', [
       m('.hedgehog-note', [
-        m('p', 'We will use these credentials to generate an Ethereum private key, ' +
-          'stored locally in your browser.'),
+        m('p', 'We will use these credentials to generate an Ethereum private key, '
+          + 'stored locally in your browser.'),
         m('p', 'Do not lose your password! It cannot be recovered.'),
       ]),
       m('input[type="text"]', {
         name: 'username',
         placeholder: 'Username',
-        oncreate: (vnode) => {
-          $(vnode.dom).focus();
+        oncreate: (vvnode) => {
+          $(vvnode.dom).focus();
         },
       }),
       m('input[type="password"]', {
         name: 'password',
         placeholder: 'Password',
       }),
-      getHedgehogLoginOrSignupButton(vnode, parentVnode, true),   // login btn
-      getHedgehogLoginOrSignupButton(vnode, parentVnode, false),  // signup btn
+      getHedgehogLoginOrSignupButton(vnode, parentVnode, true), // login btn
+      getHedgehogLoginOrSignupButton(vnode, parentVnode, false), // signup btn
       vnode.state.error && m('.error-message', vnode.state.error),
     ]);
   }

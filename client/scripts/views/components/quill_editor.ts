@@ -56,7 +56,7 @@ const instantiateEditor = (
   // Register markdown shortcuts
   Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
 
-  const insertEmbeds = (text, quill) => {
+  const insertEmbeds = (text) => {
     const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
     const videoRe = /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
     const embeddableTweet = twitterRe.test(text);
@@ -158,13 +158,17 @@ const instantiateEditor = (
       if (!(<any>window).twttr) {
         loadScript('//platform.twitter.com/widgets.js').then(() => {
           setTimeout(() => {
+            // eslint-disable-next-line
             (<any>window).twttr?.widgets?.load();
+            // eslint-disable-next-line
             (<any>window).twttr?.widgets?.createTweet(id, node);
           }, 1);
         });
       } else {
         setTimeout(() => {
+          // eslint-disable-next-line
           (<any>window).twttr?.widgets?.load();
+          // eslint-disable-next-line
           (<any>window).twttr?.widgets?.createTweet(id, node);
         }, 1);
       }
@@ -244,7 +248,7 @@ const instantiateEditor = (
         if (isMarkdownMode()) return true;
         const [line, offset] = quill.getLine(range.index);
         const { textContent } = line.domNode;
-        const isEmbed = insertEmbeds(textContent, quill);
+        const isEmbed = insertEmbeds(textContent);
         // if embed, stopPropogation; otherwise continue
         return !isEmbed;
       }
@@ -556,7 +560,7 @@ const instantiateEditor = (
       },
       keyboard: { bindings },
       mention: {
-        allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_\.]*$/,
+        allowedChars: /^[A-Za-z0-9\sÅÄÖåäö\-_.]*$/,
         mentionDenotationChars: ['@'],
         dataAttributes: ['name', 'link', 'component'],
         renderItem: (item) => item.component,

@@ -164,11 +164,13 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
             if (!(<any>window).twttr) {
               loadScript('//platform.twitter.com/widgets.js').then(() => {
                 setTimeout(() => {
+                  // eslint-disable-next-line
                   (<any>window).twttr?.widgets?.load();
                 }, 1);
               });
             } else {
               setTimeout(() => {
+                // eslint-disable-next-line
                 (<any>window).twttr?.widgets?.load();
               }, 1);
             }

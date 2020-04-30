@@ -65,7 +65,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       for (const t of tags) {
         if (t.toLowerCase() === tag.toLowerCase()) {
           clearAutoComplete(formInput);
-          //vnode.attrs.updateParentErrors('You may not add duplicate tags.');
+          // vnode.attrs.updateParentErrors('You may not add duplicate tags.');
           return;
         }
       }

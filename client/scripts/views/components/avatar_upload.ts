@@ -36,7 +36,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
-        $.post(app.serverUrl() + '/getUploadSignature', {
+        $.post(`${app.serverUrl()}/getUploadSignature`, {
           name: file.name, // tokyo.png
           mimetype: file.type, // image/png
           auth: true,
@@ -51,7 +51,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           setTimeout(() => vnode.state.dropzone.processFile(file));
         }).catch((err : any) => {
           done('Failed to get an S3 signed upload URL',
-               err.responseJSON ? err.responseJSON.error : err.responseText);
+            err.responseJSON ? err.responseJSON.error : err.responseText);
         });
       },
       sending: (file, xhr) => {
