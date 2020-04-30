@@ -15,33 +15,50 @@ import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
 
-interface IFeaturedCheckboxAttrs {
-  tag: string;
-  featured: boolean;
-  addFeaturedTag: Function;
-  removeFeaturedTag: Function;
+interface IEditTagForm {
+  description: string,
+  featured: boolean
+  id: number,
+  name: string,
 }
 
-const FeaturedCheckbox: m.Component<IFeaturedCheckboxAttrs, {featured: boolean}> = {
+const FeaturedCheckbox: m.Component<ITagRowAttrs, {featured: boolean, form: IEditTagForm}> = {
   oninit: (vnode) => {
     vnode.state.featured = vnode.attrs.featured;
   },
   view: (vnode) => {
+    if (!isCommunityAdmin()) return null;
+    const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
+    if (!vnode.state.form) {
+      vnode.state.form = { description, featured, id, name };
+    }
+    const updateTag = async (form) => {
+      const tagInfo = {
+        id,
+        description: form.description,
+        featured: form.featured,
+        name: form.name,
+        communityId: app.activeCommunityId(),
+        chainId: app.activeChainId(),
+      };
+      if (form.featured !== vnode.attrs.featured) {
+        if (form.featured) addFeaturedTag(`${id}`);
+        else removeFeaturedTag(`${id}`);
+        await app.tags.edit(tagInfo, form.featured);
+      } else {
+        await app.tags.edit(tagInfo);
+      }
+      m.redraw();
+    };
+
     return m(Checkbox, {
       defaultChecked: vnode.state.featured,
       label: 'Featured Tag',
       size: 'sm',
-      onclick: () => {
-        const { featured } = vnode.state;
-        const { addFeaturedTag, removeFeaturedTag, tag, } = vnode.attrs;
-        const featuredTags = app.community.meta.featuredTags;
-        if (featured) {
-          // remove
-          removeFeaturedTag(tag);
-        } else {
-          // add
-          addFeaturedTag(tag);
-        }
+      onclick: async (e) => {
+        e.preventDefault();
+        vnode.state.form.featured = !vnode.state.form.featured;
+        await updateTag(vnode.state.form);
       },
     });
   },
@@ -84,7 +101,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       ],
       contentRight: [
         !hideEditButton && m('.tag-count', pluralize(count, 'post')),
-        !hideEditButton && m(FeaturedCheckbox, { tag: name, featured, addFeaturedTag, removeFeaturedTag, }),
+        !hideEditButton && m(FeaturedCheckbox, { ...vnode.attrs }),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
