@@ -55,7 +55,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       });
       app.login.roles = data.roles || [];
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
-      app.config.notificationCategories = data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
+      app.config.notificationCategories = data.notificationCategories
+        .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
 
       // update the login status
@@ -78,30 +79,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       reject(err);
     });
   });
-}
-
-// called by the LayoutWithChain wrapper, which is triggered when the
-// user navigates to a page scoped to a particular chain
-export function initChain(chainId: string): Promise<void> {
-  if (chainId) {
-    const chainNodes = app.config.nodes.getByChain(chainId);
-    if (chainNodes && chainNodes.length > 0) {
-      return selectNode(chainNodes[0]);
-    } else {
-      throw new Error(`No nodes found for '${chainId}'`);
-    }
-  } else {
-    throw new Error(`No nodes found for '${chainId}'`);
-  }
-}
-
-export function initCommunity(communityId: string): Promise<void> {
-  const community = app.config.communities.getByCommunity(communityId);
-  if (community && community.length > 0) {
-    return selectCommunity(community[0]);
-  } else {
-    throw new Error(`No community found for '${communityId}'`);
-  }
 }
 
 export async function deinitChainOrCommunity() {
@@ -249,6 +226,30 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   m.redraw();
 }
 
+// called by the LayoutWithChain wrapper, which is triggered when the
+// user navigates to a page scoped to a particular chain
+export function initChain(chainId: string): Promise<void> {
+  if (chainId) {
+    const chainNodes = app.config.nodes.getByChain(chainId);
+    if (chainNodes && chainNodes.length > 0) {
+      return selectNode(chainNodes[0]);
+    } else {
+      throw new Error(`No nodes found for '${chainId}'`);
+    }
+  } else {
+    throw new Error(`No nodes found for '${chainId}'`);
+  }
+}
+
+export function initCommunity(communityId: string): Promise<void> {
+  const community = app.config.communities.getByCommunity(communityId);
+  if (community && community.length > 0) {
+    return selectCommunity(community[0]);
+  } else {
+    throw new Error(`No community found for '${communityId}'`);
+  }
+}
+
 // set up mithril
 m.route.prefix = '';
 export const updateRoute = m.route.set;
@@ -256,8 +257,10 @@ m.route.set = (...args) => {
   updateRoute.apply(this, args);
   // wait until any redraws have happened before setting the scroll position
   setTimeout(() => {
-    document.getElementsByTagName('html')[0]?.scrollTo(0, 0);
-    document.getElementsByClassName('mithril-app')[0]?.scrollTo(0, 0);
+    const html = document.getElementsByTagName('html')[0];
+    if (html) html.scrollTo(0, 0);
+    const mithrilApp = document.getElementsByClassName('mithril-app')[0];
+    if (mithrilApp) mithrilApp.scrollTo(0, 0);
   }, 0);
 };
 
@@ -479,7 +482,7 @@ declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
   // module.hot.dispose((data: any) => {
-  // 	m.redraw();
+  //   m.redraw();
   // })
 }
 // /////////////////////////////////////////////////////////
