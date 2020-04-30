@@ -118,15 +118,18 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
         created_at: { [Op.gt]: new Date(time as string) }
       }
     });
-    const threads = [];
+    const activeThreads = [];
     threadNum.rows.forEach((r) => {
-      if (!threads.includes(`discussion_${r.id}`)) threads.push(`discussion_${r.id}`);
+      if (!activeThreads.includes(r.id)) activeThreads.push(r.id);
     });
     commentNum.rows.forEach((r) => {
-      if (!threads.includes(r.root_id)) threads.push(r.root_id);
+      if (r.root_id.includes('discussion')) {
+        const id = Number(r.root_id.split('_')[1]);
+        if (!activeThreads.includes(id)) activeThreads.push(id);
+      }
     });
     unseenPosts[name] = {
-      'activePosts': threads.length,
+      'activePosts': activeThreads.length,
       'threads': threadNum.count,
       'comments': commentNum.count
     };
