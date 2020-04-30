@@ -53,6 +53,7 @@ const FeaturedCheckbox: m.Component<ITagRowAttrs, {featured: boolean, form: IEdi
 
     return m(Checkbox, {
       defaultChecked: vnode.state.featured,
+      class: 'FeaturedCheckbox',
       label: 'Featured Tag',
       size: 'sm',
       onclick: async (e) => {
