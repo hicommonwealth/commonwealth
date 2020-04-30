@@ -25,7 +25,10 @@ const UpgradeMemberModal = {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
       vnode.state.roleData = response.result;
-      if (vnode.state.roleData.findIndex((role) => (role.Address.address === app.vm.activeAccount.address && role.permission === RolePermission.moderator)) !== -1) {
+      if (vnode.state.roleData.findIndex((role) => {
+        return (role.Address.address === app.vm.activeAccount.address
+                && role.permission === RolePermission.moderator);
+      }) !== -1) {
         vnode.state.isMod = true;
       }
       vnode.state.loadingFinished = true;
@@ -107,7 +110,10 @@ const UpgradeMemberModal = {
         m('h3', 'Member to upgrade:'),
         (vnode.state.roleData)
           ? vnode.state.roleData.sort(sortAdminsAndModsFirst).filter(
-            (role) => role.permission === RolePermission.member || (!vnode.state.isMod && role.permission === RolePermission.moderator)
+            (role) => {
+              return role.permission === RolePermission.member
+                || (!vnode.state.isMod && role.permission === RolePermission.moderator);
+            }
           ).map((role) => {
             const displayName = app.profiles.getProfile(role.Address.chain, role.Address.address).displayName;
             return m('.form-field', [

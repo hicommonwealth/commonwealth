@@ -73,14 +73,14 @@ const ConfirmInviteModal = {
           : m('h3', 'No more invites'),
         m(CompactModalExitButton),
       ]),
-      !vnode.state.isComplete &&
-        m(SideMenu, {
+      !vnode.state.isComplete
+        && m(SideMenu, {
           invites,
           location: vnode.state.location,
           onChangeHandler: (result) => { vnode.state.location = result; vnode.state.selectedAddress = null; }
         }),
-      invites.length > 0 && !vnode.state.isComplete ?
-        m('.compact-modal-body', [
+      invites.length > 0 && !vnode.state.isComplete
+        ? m('.compact-modal-body', [
           m('p', 'You\'ve been invited to a community on Commonwealth:'),
           m('.CommunityBlock', [
             m('.community-block-top', `${invites[vnode.state.location].community_name}`),
@@ -90,11 +90,11 @@ const ConfirmInviteModal = {
           vnode.state.accepted.includes(vnode.state.location) ? [
             m('h4', 'You\'ve already accepted this invite!')
           ] : [
-            addresses.length > 0 &&
-              m('p', 'Accept the invite with any of your addresses:'),
+            addresses.length > 0
+              && m('p', 'Accept the invite with any of your addresses:'),
             addresses,
-            addresses.length > 0 &&
-              m('button.formular-button-primary.submit', {
+            addresses.length > 0
+              && m('button.formular-button-primary.submit', {
                 disabled: vnode.state.accepted.includes(vnode.state.location) || !vnode.state.selectedAddress,
                 onclick: (e) => {
                   e.preventDefault();
@@ -121,10 +121,10 @@ const ConfirmInviteModal = {
                   }
                 }
               }, 'Accept invite'),
-            addresses.length > 0 &&
-              m('p', 'Or, reject the invite (you will need to be invited again to join the community):'),
-            addresses.length > 0 &&
-              m('button.formular-button-negative.reject', {
+            addresses.length > 0
+              && m('p', 'Or, reject the invite (you will need to be invited again to join the community):'),
+            addresses.length > 0
+              && m('button.formular-button-negative.reject', {
                 disabled: vnode.state.accepted.includes(vnode.state.location),
                 onclick: (e) => {
                   e.preventDefault();
@@ -147,10 +147,10 @@ const ConfirmInviteModal = {
                   });
                 }
               }, 'Reject invite'),
-            addresses.length === 0 &&
-              m('.no-accounts', `You must link a new address to join this community.`),
-            addresses.length === 0 &&
-            m('a.btn.add-account', {
+            addresses.length === 0
+              && m('.no-accounts', 'You must link a new address to join this community.'),
+            addresses.length === 0
+            && m('a.btn.add-account', {
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
@@ -162,7 +162,7 @@ const ConfirmInviteModal = {
         ])
         : m('.compact-modal-body', [
           m('div', [
-            m('p', `No more invites!`),
+            m('p', 'No more invites!'),
             m('p', 'Click anywhere outside this window to close it.'),
           ]),
         ])
