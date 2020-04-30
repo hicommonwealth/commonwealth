@@ -8,6 +8,7 @@ import Poller from './poller';
 import Processor from './processor';
 import { SubstrateBlock } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
+import migrate from './migration';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -53,40 +54,56 @@ export default function (
   handlers: IEventHandler[],
   skipCatchup: boolean,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
+  performMigration?: boolean,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
   const provider = new WsProvider(url);
   return new Promise((resolve) => {
     let subscriber;
     provider.on('connected', () => {
       if (subscriber) {
-        resolve(subscriber);
-        return;
+        return subscriber;
       }
       createApi(provider).isReady.then((api) => {
-        subscriber = new Subscriber(api);
-        const poller = new Poller(api);
+        // helper function that sends an event through event handlers
+        const handleEventFn = async (event: CWEvent) => {
+          let prevResult = null;
+          /* eslint-disable-next-line no-restricted-syntax */
+          for (const handler of handlers) {
+            try {
+              // pass result of last handler into next one (chaining db events)
+              /* eslint-disable-next-line no-await-in-loop */
+              prevResult = await handler.handle(event, prevResult);
+            } catch (err) {
+              console.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
+              break;
+            }
+          }
+        };
+
+        // helper function that sends a block through the event processor and
+        // into the event handlers
         const processor = new Processor(api);
         const processBlockFn = async (block: SubstrateBlock) => {
           // retrieve events from block
           const events: CWEvent[] = await processor.process(block);
 
           // send all events through event-handlers in sequence
-          await Promise.all(events.map(async (event) => {
-            let prevResult = null;
-            /* eslint-disable-next-line no-restricted-syntax */
-            for (const handler of handlers) {
-              try {
-                // pass result of last handler into next one (chaining db events)
-                /* eslint-disable-next-line no-await-in-loop */
-                prevResult = await handler.handle(event, prevResult);
-              } catch (err) {
-                console.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
-                break;
-              }
-            }
-          }));
+          await Promise.all(events.map((event) => handleEventFn(event)));
         };
 
+        // special case to perform a migration on first run
+        // returns early, does not initialize the subscription
+        if (performMigration) {
+          return migrate(api).then((events) => {
+            return Promise.all(events.map((event) => handleEventFn(event)));
+          });
+        }
+
+        subscriber = new Subscriber(api);
+        const poller = new Poller(api);
+
+        // helper function that runs after we've been offline/the server's been down,
+        // and attempts to fetch events from skipped blocks
         const pollMissedBlocksFn = async () => {
           console.log('Detected offline time, polling missed blocks...');
           // grab the cached block immediately to avoid a new block appearing before the
@@ -142,7 +159,7 @@ export default function (
           console.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
         }
 
-        resolve(subscriber);
+        return subscriber;
       });
     });
   });

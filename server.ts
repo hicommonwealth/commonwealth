@@ -49,6 +49,7 @@ const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDR
 const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
+const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION === 'true';
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -198,7 +199,7 @@ if (SHOULD_RESET_DB) {
       });
     });
 } else {
-  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP);
+  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION);
   setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }

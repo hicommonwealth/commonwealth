@@ -25,7 +25,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
+const setupChainEventListeners = async (models, wss, skipCatchup = false, migrate = false) => {
   console.log('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   console.log('Setting up event listeners...');
@@ -40,11 +40,14 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
         [ notificationHandler, archivalHandler ],
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
+        migrate,
       );
 
       // hook for clean exit
       process.on('SIGTERM', () => {
-        subscriber.unsubscribe();
+        if (subscriber) {
+          subscriber.unsubscribe();
+        }
       });
       return subscriber;
     });
