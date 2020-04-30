@@ -82,7 +82,7 @@ const sessionParser = session({
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000      // Set session expiration to 7 days
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
   }),
   resave: false,
   saveUninitialized: true,
@@ -134,7 +134,9 @@ const setupMiddleware = () => {
 const templateFile = (() => {
   try {
     return fs.readFileSync('./build/index.html');
-  } catch (e) {}
+  } catch (e) {
+    console.error(`Failed to read template file: ${JSON.stringify(e)}`);
+  }
 })();
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
