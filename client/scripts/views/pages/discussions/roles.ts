@@ -14,8 +14,10 @@ import UpgradeMemberModal from '../../modals/upgrade_member_modal';
 import ManageCommunityModal from '../../modals/manage_community_modal';
 
 export const isCommunityAdmin = () => {
-  const role = app.login.roles.find((r) => (r.chain_id && r.chain_id === app.activeChainId())
-                                    || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId()));
+  const role = app.login.roles.find((r) => {
+    return (r.chain_id && r.chain_id === app.activeChainId())
+      || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId());
+  });
   return role?.permission === RolePermission.admin;
 };
 

@@ -212,7 +212,7 @@ const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.login.jwt,
     }).then((result) => {
-      result.result.map((sub) => {
+      result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
       m.redraw();

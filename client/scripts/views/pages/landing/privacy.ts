@@ -1,4 +1,4 @@
-/* tslint:disable:max-len */
+/* eslint-disable max-len */
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';

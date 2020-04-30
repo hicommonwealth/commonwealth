@@ -34,37 +34,40 @@ interface IChainManagerState {
 
 const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
   view: (vnode) => {
-    const nodeRows = (chain) => (app.config.nodes.getByChain(chain.id) || []).map((node, nodeIndex) => m('li.chain-node', [
-      m('span', node.url),
-      ' ',
-      m('a', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          if (!app.login.jwt) return alert('Login required');
-          if (!app.login.isSiteAdmin) return alert('Admin required');
-          vnode.attrs.success = null;
-          vnode.attrs.error = null;
-          if (!confirm('Are you sure?')) return;
-          $.post(`${app.serverUrl()}/deleteChainNode`, {
-            id: chain.id,
-            node_url: node.url,
-            auth: true,
-            jwt: app.login.jwt,
-          }).then((result) => {
-            if (result.status !== 'Success') return;
-            app.config.nodes.remove(node);
-            vnode.attrs.success = 'Successfully deleted';
-            m.redraw();
-          }, (err) => {
-            vnode.state.error = err.responseJSON
-              ? err.responseJSON.error
-              : (`${err.status}: ${err.statusText}`);
-            m.redraw();
-          });
-        }
-      }, 'Remove'),
-    ]));
+    const nodeRows = (chain) => (app.config.nodes.getByChain(chain.id) || [])
+      .map((node, nodeIndex) => {
+        return m('li.chain-node', [
+          m('span', node.url),
+          ' ',
+          m('a', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              if (!app.login.jwt) return alert('Login required');
+              if (!app.login.isSiteAdmin) return alert('Admin required');
+              vnode.attrs.success = null;
+              vnode.attrs.error = null;
+              if (!confirm('Are you sure?')) return;
+              $.post(`${app.serverUrl()}/deleteChainNode`, {
+                id: chain.id,
+                node_url: node.url,
+                auth: true,
+                jwt: app.login.jwt,
+              }).then((result) => {
+                if (result.status !== 'Success') return;
+                app.config.nodes.remove(node);
+                vnode.attrs.success = 'Successfully deleted';
+                m.redraw();
+              }, (err) => {
+                vnode.state.error = err.responseJSON
+                  ? err.responseJSON.error
+                  : (`${err.status}: ${err.statusText}`);
+                m.redraw();
+              });
+            }
+          }, 'Remove'),
+        ]);
+      });
 
     const addNodeRow = (chain) => m('li', [
       m('a', {

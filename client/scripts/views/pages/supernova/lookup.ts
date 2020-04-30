@@ -162,7 +162,7 @@ const SupernovaLockLookupPage: m.Component<{}, IState> = {
                   name: 'ethAddress',
                   placeholder: 'Enter ETH address'
                 },
-                callback: (result) => vnode.state.ethAddress = result
+                callback: (result) => { vnode.state.ethAddress = result; }
               })
             ]),
             m('span.explanation', [
@@ -209,9 +209,9 @@ const SupernovaLockLookupPage: m.Component<{}, IState> = {
             vnode.state.ethAddressSummary && m('.lock-lookup-results', [
               m('h3', `Found ${pluralize(vnode.state.ethAddressSummary.length, 'participation event')}`),
               m('ul', {
-                oncreate: (vnode) => {
+                oncreate: (vvnode) => {
                   $('html, body').animate({
-                    scrollTop: $(vnode.dom).offset().top - 200
+                    scrollTop: $(vvnode.dom).offset().top - 200
                   }, 500);
                 }
               }, vnode.state.ethAddressSummary.map((lock) => {
@@ -228,29 +228,31 @@ const SupernovaLockLookupPage: m.Component<{}, IState> = {
                   vnode.state.ethAmount = Web3.default.utils.fromWei(txData.returnValues.eth, 'ether');
                 });
                 return m('li', [
-                  m('h3', `Locked ${vnode.state.ethAmount ? formatNumber(vnode.state.ethAmount) : '--'} ETH - 6 months`),
-                  [
-                    m('p', [
-                      'Owner Address: ',
-                      m('a', {
-                        href: `${etherscanNet}address/${txData.returnValues.owner}`,
-                        target: '_blank',
-                      }, txData.returnValues.owner),
-                    ]),
-                    m('p', [
-                      'Lockdrop User Contract Address: ',
-                      m('a', {
-                        href: `${etherscanNet}address/${txData.returnValues.lockAddr}`,
-                        target: '_blank',
-                      }, txData.returnValues.lockAddr),
-                    ]),
-                    m('p', `DUST Address: ${txData.returnValues.supernovaAddr}`),
-                    m('p', [
-                      'Unlocks In: ',
-                      (Math.round(diffDays) >= 0) ? Math.round(diffDays) : 0,
-                      ' minutes'
-                    ]),
-                  ],
+                  m('h3', [
+                    'Locked ',
+                    vnode.state.ethAmount ? formatNumber(vnode.state.ethAmount) : '--',
+                    ' ETH - 6 months'
+                  ]),
+                  m('p', [
+                    'Owner Address: ',
+                    m('a', {
+                      href: `${etherscanNet}address/${txData.returnValues.owner}`,
+                      target: '_blank',
+                    }, txData.returnValues.owner),
+                  ]),
+                  m('p', [
+                    'Lockdrop User Contract Address: ',
+                    m('a', {
+                      href: `${etherscanNet}address/${txData.returnValues.lockAddr}`,
+                      target: '_blank',
+                    }, txData.returnValues.lockAddr),
+                  ]),
+                  m('p', `DUST Address: ${txData.returnValues.supernovaAddr}`),
+                  m('p', [
+                    'Unlocks In: ',
+                    (Math.round(diffDays) >= 0) ? Math.round(diffDays) : 0,
+                    ' minutes'
+                  ]),
                 ]);
               }))
             ]),
