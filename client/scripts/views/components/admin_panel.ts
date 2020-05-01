@@ -15,7 +15,7 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
       : { chain: app.activeChainId() };
     return m('.RoleData', [
           vnode.attrs.roledata?.map((role) => {
-            return m('.role-item', { style: 'display: inline-block; padding-right: 6px;' }, [
+            return m('.role-item', [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
                 linkify: true,
@@ -24,7 +24,7 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
               m(Icon, {
                 name: Icons.X,
                 size: 'xs',
-                style: 'padding-left: 2px;',
+                class: 'x',
                 onclick: async () => {
                   await $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,
@@ -72,8 +72,10 @@ interface ITableRowAttrs {
 
 const TableRow: m.Component<ITableRowAttrs> = {
   view: (vnode) => {
-    return m('tr', [
-      m('td', { style: 'width: 100px' }, vnode.attrs.title),
+    return m('tr', {
+      class: 'TableRow',
+    }, [
+      m('td', { class: 'title-column', }, vnode.attrs.title),
       m('td', [
         m(Input, {
           defaultValue: vnode.attrs.defaultValue,
@@ -128,7 +130,6 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
       interactive: false,
       striped: false,
       class: 'community metadataSection',
-      style: 'table-layout: fixed;'
     }, [
       m(TableRow, {
         title: 'Name',
@@ -215,7 +216,6 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
         interactive: false,
         striped: false,
         class: 'chain metadataSection',
-        style: 'table-layout: fixed;'
       }, [
         m(TableRow, {
           title: 'Name',

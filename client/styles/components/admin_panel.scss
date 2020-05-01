@@ -20,6 +20,25 @@
           @media (min-width: 800px) {
             width: 60%;
           }
+
+          .role-item {
+            display: inline-block;
+            padding-right: 6px;
+
+            .x {
+              padding-left: 2px;
+            }
+          }
+
+          .metadataSection {
+            table-layout: fixed;
+          }
+
+          .TableRow {
+            .title-column {
+              width: 100px;
+            }
+          }
         } // .panel-left
 
         .panel-right {
@@ -33,14 +52,11 @@
               padding: 0 20px 10px;
             }
 
-            
             .membersList {
               min-height: 240px;
               max-height: 240px;
               overflow-y: scroll;
             }
-
-            
 
             .PanelButton {
               margin-top: 20px;
