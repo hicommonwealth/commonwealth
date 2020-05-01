@@ -4,6 +4,8 @@ import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const updateChain = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
+
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.user.isAdmin) return next(new Error('Must be admin'));
   if (!req.body.id) return next(new Error('Must provide chain id'));
@@ -15,7 +17,7 @@ const updateChain = async (models, req: UserRequest, res: Response, next: NextFu
     const userAddressIds = await req.user.getAddresses().map((address) => address.id);
     const userMembership = await models.Role.findOne({
       where: {
-        address_id: userAddressIds,
+        address_id: { [Op.in]: userAddressIds },
         chain_id: chain.id,
       },
     });
