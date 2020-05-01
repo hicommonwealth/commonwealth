@@ -4,18 +4,30 @@ import { UserRequest } from '../types';
 
 const createTag = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   console.dir(req.body);
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!chain && !community) return next(new Error('Invalid chain or community'));
   if (chain && community) return next(new Error('Invalid chain or community'));
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.name) return next(new Error('Tag name required'));
 
-  const options = community ? {
+  const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
+  const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+  const userMembership = await models.Role.findOne({
+    where: {
+      address_id: { [Op.in]: userAddressIds },
+      ...chainOrCommObj,
+    },
+  });
+  if (userMembership.permission !== 'admin') {
+    return next(new Error('Must be an admin'));
+  }
+
+  const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };
+
+  const options = {
     name: req.body.name,
-    community_id: community.id,
-  } : {
-    name: req.body.name,
-    chain_id: chain.id,
+    ...chainOrCommObj2,
   };
 
   const newTag = await models.OffchainTag.findOrCreate({
