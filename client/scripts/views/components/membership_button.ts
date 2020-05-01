@@ -140,6 +140,10 @@ const MembershipButton: m.Component<{
           iconLeft: Icons.CHEVRON_DOWN,
           label: hasAnyExistingRole ? 'Joined' : 'Join',
           size: 'xs',
+          onclick: (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          },
         }),
       });
     }
