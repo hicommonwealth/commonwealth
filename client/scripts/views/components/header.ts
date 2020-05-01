@@ -786,7 +786,10 @@ const Header: m.Component<{}, IHeaderState> = {
               e.preventDefault();
               e.stopPropagation();
               $(e.target).trigger('menuclose');
-              m.route.set(app.login.selectedNode ? `/${app.login.selectedNode.chain.id || app.login.selectedNode.chain}/` : '/');
+              m.route.set(app.login.selectedNode
+                ? `/${app.login.selectedNode.chain.id || app.login.selectedNode.chain}/`
+                : '/'
+              );
             },
           }, [
             m('.header-logo-image')

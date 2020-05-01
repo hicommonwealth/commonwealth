@@ -107,14 +107,17 @@ class CommentsController {
     const newBody = body || comment.text;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
-
     try {
       const response = await $.post(`${app.serverUrl()}/editComment`, {
+        'address': app.vm.activeAccount.address,
+        'author_chain': app.vm.activeAccount.chain.id,
         'id': comment.id,
+        'chain': comment.chain,
+        'community': comment.community,
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
-        'jwt': app.login.jwt
+        'jwt': app.login.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {

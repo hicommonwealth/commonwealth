@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions */
-
+require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
@@ -44,7 +44,9 @@ describe('Invite Tests', () => {
       expect(userJWT).to.not.be.null;
     });
 
-    it.skip('/createInvite as admin', async () => {
+    it('/createInvite as admin', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const res = await chai.request(app)
         .post('/api/createInvite')
         .set('Accept', 'application/json')
@@ -55,14 +57,15 @@ describe('Invite Tests', () => {
           author_chain: chain,
           address: adminAddress,
         });
-      console.log(res);
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.community_id).to.be.equal(community);
       expect(res.body.result.invited_email).to.be.equal(userEmail);
       expect(res.body.result.used).to.be.false;
     });
 
-    it.skip('/createInvite as user', async () => {
+    it('/createInvite as user', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const res = await modelUtils.createAndVerifyAddress({ chain });
       const newUserAddress = res.address;
       const newUserEmail = 'zak2@commonwealth.im';
@@ -84,7 +87,9 @@ describe('Invite Tests', () => {
       expect(invite.body.result.used).to.be.false;
     });
 
-    it.skip('/acceptInvite', async () => {
+    it('/acceptInvite', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
       const invite = await chai.request(app)
         .post('/api/createInvite')
         .set('Accept', 'application/json')

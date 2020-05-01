@@ -6,6 +6,8 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { UserRequest } from '../types';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl } from '../../shared/utils';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -96,6 +98,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       community: finalReaction.community,
     },
     req.wss,
+    [ finalReaction.Address.address ],
   );
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });

@@ -1,5 +1,7 @@
 
 import crypto from 'crypto';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createInviteLink = async (models, req, res, next) => {
   if (!req.user) return next(new Error('Not logged in'));

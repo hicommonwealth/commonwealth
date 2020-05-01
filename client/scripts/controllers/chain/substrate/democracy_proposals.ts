@@ -1,7 +1,7 @@
 import { Unsubscribable, Observable } from 'rxjs';
 import { map, first } from 'rxjs/operators';
 import { Codec } from '@polkadot/types/types';
-import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal } from '@polkadot/types/interfaces';
+import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal, PreimageStatus } from '@polkadot/types/interfaces';
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import {
@@ -147,9 +147,18 @@ class SubstrateDemocracyProposals extends ProposalModule<
   public getProposal(hash: string): Observable<Proposal> {
     if (!this._Chain?.apiInitialized) return; // TODO
     return this._Chain.query((api: ApiRx) => api.query.democracy.preimages(hash))
-      .pipe(map((preimage) => {
-        if (preimage && preimage.isSome) {
-          return this._Chain.createType('Proposal', preimage.unwrap()[0].toU8a(true));
+      .pipe(map((preimageOpt) => {
+        if (preimageOpt && preimageOpt.isSome) {
+          const preimage = preimageOpt.unwrap();
+          if ((preimage as any).isAvailable) {
+            const { data } = (preimage as unknown as PreimageStatus).asAvailable;
+            return this._Chain.createType('Proposal', data.toU8a(true));
+          } else if (!(preimage as any).isMissing) {
+            const [ data ] = preimage;
+            return this._Chain.createType('Proposal', data.toU8a(true));
+          } else {
+            return null;
+          }
         } else {
           return null;
         }
