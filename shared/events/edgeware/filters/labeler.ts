@@ -253,8 +253,8 @@ const labelerFunc: LabelerFilter = (
       return {
         heading: 'Council Candidate Submitted',
         label: `${fmtAddr(candidate)} submitted a candidacy for council.`,
-        // TODO: should this link to the council page instead?
-        linkUrl: chainId ? `/${chainId}/account/${candidate}` : null,
+        // TODO: this could also link to the member's page
+        linkUrl: chainId ? `/${chainId}/council` : null,
       };
     }
     case SubstrateEventKind.ElectionMemberKicked: {
