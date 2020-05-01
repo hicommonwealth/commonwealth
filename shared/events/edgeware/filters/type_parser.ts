@@ -1,16 +1,21 @@
-import { Event } from '@polkadot/types/interfaces';
+import { Event, Extrinsic } from '@polkadot/types/interfaces';
 import { SubstrateEventKind } from '../types';
 
 /**
  * This is the Type Parser function, which takes a raw Substrate chain Event
  * and determines which of our local event kinds it belongs to.
  */
-export default function (event: Event, versionName: string, versionNumber: number): SubstrateEventKind | null {
+export default function (
+  versionName: string,
+  versionNumber: number,
+  section: string,
+  method: string,
+): SubstrateEventKind | null {
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
-  switch (event.section) {
+  switch (section) {
     case 'staking':
-      switch (event.method) {
+      switch (method) {
         case 'Slash': return SubstrateEventKind.Slash;
         case 'Reward': return SubstrateEventKind.Reward;
         case 'Bonded': return SubstrateEventKind.Bonded;
@@ -18,7 +23,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'democracy':
-      switch (event.method) {
+      switch (method) {
         case 'Proposed': return SubstrateEventKind.DemocracyProposed;
         case 'Tabled': return SubstrateEventKind.DemocracyTabled;
         case 'Started': return SubstrateEventKind.DemocracyStarted;
@@ -35,14 +40,15 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'treasury':
-      switch (event.method) {
+      switch (method) {
         case 'Proposed': return SubstrateEventKind.TreasuryProposed;
         case 'Awarded': return SubstrateEventKind.TreasuryAwarded;
         case 'Rejected': return SubstrateEventKind.TreasuryRejected;
         default: return null;
       }
     case 'elections':
-      switch (event.method) {
+      switch (method) {
+        case 'submitCandidacy': return SubstrateEventKind.ElectionCandidacySubmitted;
         case 'NewTerm': return SubstrateEventKind.ElectionNewTerm;
         case 'EmptyTerm': return SubstrateEventKind.ElectionEmptyTerm;
         case 'MemberKicked': return SubstrateEventKind.ElectionMemberKicked;
@@ -50,7 +56,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'collective':
-      switch (event.method) {
+      switch (method) {
         case 'Proposed': return SubstrateEventKind.CollectiveProposed;
         case 'Approved': return SubstrateEventKind.CollectiveApproved;
         case 'Disapproved': return SubstrateEventKind.CollectiveDisapproved;
@@ -59,7 +65,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'signaling':
-      switch (event.method) {
+      switch (method) {
         case 'NewProposal': return SubstrateEventKind.SignalingNewProposal;
         case 'CommitStarted': return SubstrateEventKind.SignalingCommitStarted;
         case 'VotingStarted': return SubstrateEventKind.SignalingVotingStarted;
@@ -67,7 +73,7 @@ export default function (event: Event, versionName: string, versionNumber: numbe
         default: return null;
       }
     case 'treasuryReward':
-      switch (event.method) {
+      switch (method) {
         case 'TreasuryMinting': {
           if (versionNumber < 34) {
             return SubstrateEventKind.TreasuryRewardMinting;

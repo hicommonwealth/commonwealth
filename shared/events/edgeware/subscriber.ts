@@ -2,7 +2,7 @@
  * Fetches events from edgeware chain in real time.
  */
 import { ApiPromise } from '@polkadot/api';
-import { Header, RuntimeVersion } from '@polkadot/types/interfaces';
+import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';
 
 import { IBlockSubscriber } from '../interfaces';
 import { SubstrateBlock } from './types';
@@ -29,9 +29,12 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
       // subscribe to events and pass to block processor
       this._subscription = this._api.rpc.chain.subscribeNewHeads(async (header: Header) => {
         const events = await this._api.query.system.events.at(header.hash);
+        const signedBlock = await this._api.rpc.chain.getBlock(header.hash);
+        const extrinsics: Extrinsic[] = signedBlock.block.extrinsics;
         const block: SubstrateBlock = {
           header,
           events,
+          extrinsics,
           versionNumber: this._versionNumber,
           versionName: this._versionName,
         };

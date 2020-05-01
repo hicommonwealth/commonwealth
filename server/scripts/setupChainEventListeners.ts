@@ -30,7 +30,7 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
   console.log('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   console.log('Setting up event listeners...');
-  nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
+  await Promise.all(nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
     .map(async (node) => {
       const eventHandler = new EdgewareEventHandler(models, wss, node.chain);
       let url = node.url.substr(0, 2) === 'ws' ? node.url : `ws://${node.url}`;
@@ -47,7 +47,7 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
         subscriber.unsubscribe();
       });
       return subscriber;
-    });
+    }));
 };
 
 export default setupChainEventListeners;

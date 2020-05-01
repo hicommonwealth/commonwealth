@@ -2,9 +2,11 @@
  * Processes edgeware blocks and emits events.
  */
 import { ApiPromise } from '@polkadot/api';
+import { GenericEvent } from '@polkadot/types';
+import { Extrinsic, Event } from '@polkadot/types/interfaces';
 
 import { IBlockProcessor, CWEvent } from '../interfaces';
-import { SubstrateBlock } from './types';
+import { SubstrateBlock, isEvent } from './types';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
@@ -26,12 +28,18 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
       this._lastBlockNumber = blockNumber;
     }
 
-    const events = await Promise.all(block.events.map(async ({ event }) => {
-      // apply filters
-      const kind = parseEventType(event, block.versionName, block.versionNumber);
+    const applyFilters = async (data: Event | Extrinsic) => {
+      const kind = isEvent(data)
+        ? parseEventType(block.versionName, block.versionNumber, data.section, data.method)
+        : parseEventType(
+          block.versionName,
+          block.versionNumber,
+          data.method.sectionName,
+          data.method.methodName
+        );
       if (kind !== null) {
         try {
-          const result = await enrichEvent(this._api, blockNumber, kind, event);
+          const result = await enrichEvent(this._api, blockNumber, kind, data);
           return result;
         } catch (e) {
           console.error(`Event enriching failed for ${kind}`);
@@ -40,7 +48,10 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
       } else {
         return null;
       }
-    }));
-    return events.filter((e) => !!e); // remove null / unwanted events
+    };
+
+    const events = await Promise.all(block.events.map(({ event }) => applyFilters(event)));
+    const extrinsics = await Promise.all(block.extrinsics.map((extrinsic) => applyFilters(extrinsic)));
+    return [...events, ...extrinsics].filter((e) => !!e); // remove null / unwanted events
   }
 }

@@ -1,12 +1,12 @@
 import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
-  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes,
+  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic
 } from '@polkadot/types/interfaces';
 import { ProposalRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
-import { SubstrateEventKind, ISubstrateEventData } from '../types';
+import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
 import { CWEvent } from '../../interfaces';
 
 /**
@@ -21,9 +21,9 @@ export default async function (
   api: ApiPromise,
   blockNumber: number,
   kind: SubstrateEventKind,
-  event: Event,
+  rawData: Event | Extrinsic,
 ): Promise<CWEvent> {
-  const extractData = async (): Promise<{
+  const extractEventData = async (event: Event): Promise<{
     data: ISubstrateEventData,
     includeAddresses?: string[],
     excludeAddresses?: string[],
@@ -432,14 +432,36 @@ export default async function (
       }
 
       default: {
-        // ensure exhaustive matching -- gives ts error if missing cases
-        const _exhaustiveMatch: never = kind;
         throw new Error(`unknown event type: ${kind}`);
       }
     }
   };
 
-  // construct CWEvent
-  const eventData = await extractData();
+  const extractExtrinsicData = async (extrinsic: Extrinsic): Promise<{
+    data: ISubstrateEventData,
+    includeAddresses?: string[],
+    excludeAddresses?: string[],
+  }> => {
+    switch (kind) {
+      case SubstrateEventKind.ElectionCandidacySubmitted: {
+        const candidate = extrinsic.signer.toString();
+        return {
+          excludeAddresses: [ candidate ],
+          data: {
+            kind,
+            candidate,
+          }
+        };
+      }
+      default: {
+        throw new Error(`unknown event type: ${kind}`);
+      }
+    }
+  };
+
+  const eventData = await (isEvent(rawData)
+    ? extractEventData(rawData as Event)
+    : extractExtrinsicData(rawData as Extrinsic)
+  );
   return { ...eventData, blockNumber };
 }

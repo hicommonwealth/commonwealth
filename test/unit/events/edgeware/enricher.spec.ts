@@ -1,7 +1,7 @@
 import chai from 'chai';
 import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, BlockNumber,
-  ReferendumIndex, TreasuryProposal, Votes, Event
+  ReferendumIndex, TreasuryProposal, Votes, Event, Extrinsic
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
@@ -76,6 +76,14 @@ const constructEvent = (data: any[], typeDef: string[] = []): Event => {
   return {
     data: new FakeEventData(typeDef, ...data),
   } as Event;
+};
+
+const constructExtrinsic = (signer: string, args: any[] = []): Extrinsic => {
+  return {
+    signer,
+    args,
+    data: new Uint8Array(),
+  } as unknown as Extrinsic;
 };
 
 const constructBool = (b: boolean): bool => {
@@ -400,6 +408,19 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
+      }
+    });
+  });
+  it('should enrich election-candidacy-submitted event', async () => {
+    const kind = SubstrateEventKind.ElectionCandidacySubmitted;
+    const extrinsic = constructExtrinsic('alice');
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, extrinsic);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        candidate: 'alice',
       }
     });
   });

@@ -159,6 +159,12 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A new election term begins with no member changes.',
       };
     }
+    case SubstrateEventKind.ElectionCandidacySubmitted: {
+      return {
+        title: 'Candidacy Submitted',
+        description: 'Someone submits a council candidacy.',
+      };
+    }
     case SubstrateEventKind.ElectionMemberKicked: {
       return {
         title: 'Member Kicked',
