@@ -1,13 +1,11 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
-const log = factory.getLogger(formatFilename(__filename));
 
 const updateChain = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
 
   if (!req.user) return next(new Error('Not logged in'));
-  if (!req.user.isAdmin) return next(new Error('Must be admin'));
   if (!req.body.id) return next(new Error('Must provide chain id'));
   if (req.body.network) return next(new Error('Cannot change chain network'));
 
@@ -19,9 +17,10 @@ const updateChain = async (models, req: UserRequest, res: Response, next: NextFu
       where: {
         address_id: { [Op.in]: userAddressIds },
         chain_id: chain.id,
+        permission: 'admin',
       },
     });
-    if (!userMembership || userMembership.permission !== 'admin') {
+    if (!userMembership) {
       return next(new Error('Not an admin'));
     }
   }
