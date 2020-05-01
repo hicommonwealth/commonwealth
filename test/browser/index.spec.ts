@@ -76,7 +76,7 @@ describe('Browser Tests', () => {
   });
 
   it('should click into Edgeware and ensure it is connected', async () => {
-    // click into Edgeware
+    // click into Edgeware (clickIntoCommunity) checks that the chain has connected by default
     await clickIntoCommunity(driver, 'edgeware');
     // wait until status indicator is connected
     await driver.wait(webdriver.until.elementLocated(webdriver.By.className('status connected')), 5000);
