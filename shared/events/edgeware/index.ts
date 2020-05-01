@@ -15,27 +15,31 @@ import migrate from './migration';
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(provider: WsProvider): ApiPromise {
+export function createApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
   const registry = new TypeRegistry();
-  const edgewareTypes = Object.values(edgewareDefinitions)
-    .map((v) => v.default)
-    .reduce((res, { types }): object => ({ ...res, ...types }), {});
-  return new ApiPromise({
-    provider,
-    types: {
-      ...edgewareTypes,
-      'voting::VoteType': 'VoteType',
-      'voting::TallyType': 'TallyType',
-      // chain-specific overrides
-      Address: 'GenericAddress',
-      Keys: 'SessionKeys4',
-      StakingLedger: 'StakingLedgerTo223',
-      Votes: 'VotesTo230',
-      ReferendumInfo: 'ReferendumInfoTo239',
-      Weight: 'u32',
-    },
-    registry
-  });
+  if (isEdgeware) {
+    const edgewareTypes = Object.values(edgewareDefinitions)
+      .map((v) => v.default)
+      .reduce((res, { types }): object => ({ ...res, ...types }), {});
+    return new ApiPromise({
+      provider,
+      types: {
+        ...edgewareTypes,
+        'voting::VoteType': 'VoteType',
+        'voting::TallyType': 'TallyType',
+        // chain-specific overrides
+        Address: 'GenericAddress',
+        Keys: 'SessionKeys4',
+        StakingLedger: 'StakingLedgerTo223',
+        Votes: 'VotesTo230',
+        ReferendumInfo: 'ReferendumInfoTo239',
+        Weight: 'u32',
+      },
+      registry
+    });
+  } else {
+    return new ApiPromise({ provider, registry });
+  }
 }
 
 /**
@@ -50,6 +54,7 @@ export function createApi(provider: WsProvider): ApiPromise {
  * @returns An active block subscriber.
  */
 export default async function (
+  chain: string,
   url = 'ws://localhost:9944',
   handlers: IEventHandler[],
   skipCatchup: boolean,
@@ -61,7 +66,7 @@ export default async function (
     provider.on('connected', () => resolve());
   });
 
-  const api = await createApi(provider).isReady;
+  const api = await createApi(provider, chain.startsWith('edgeware')).isReady;
 
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent) => {

@@ -35,6 +35,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       const notificationHandler = new EdgewareNotificationHandler(models, wss, node.chain);
       const archivalHandler = new EdgewareArchivalHandler(models, wss, node.chain);
       const subscriber = await subscribeEdgewareEvents(
+        node.chain,
         node.url,
         [ notificationHandler, archivalHandler ],
         skipCatchup,

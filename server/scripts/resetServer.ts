@@ -13,7 +13,7 @@ const nodes = [
   [ 'wss://berlin1.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://berlin2.edgewa.re', 'edgeware-testnet' ],
   [ 'wss://berlin3.edgewa.re', 'edgeware-testnet' ],
-  [ 'wss://mainnet2.edgewa.re:9944', 'edgeware' ],
+  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
