@@ -10,7 +10,7 @@ import 'components/admin_panel.scss';
 const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
-    const chainOrCommObj = app.activeCommunityId()
+    const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
     return m('.RoleData', [
@@ -427,6 +427,9 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
       const roletext = (role.permission === 'moderator') ? '(moderator)' : '';
       return `${displayName}: ${role.Address.address.slice(0, 6)}...${roletext}`;
     });
+    const chainOrCommObj = app.community
+      ? { community: app.activeCommunityId() }
+      : { chain: app.activeChainId() };
     return m('.UpgradeRoles', [
       m('h3', 'Select Member:'),
       m(RadioGroup, {
@@ -454,7 +457,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
           $.post(`${app.serverUrl()}/upgradeMember`, {
             new_role: newRole,
             address: user.Address.address,
-            community: app.activeCommunityId(),
+            ...chainOrCommObj,
             jwt: app.login.jwt,
           }).then((r) => {
             onRoleUpgrade(user, r.result);
