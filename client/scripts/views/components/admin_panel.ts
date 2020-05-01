@@ -440,6 +440,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
       m('h3', 'Select Member:'),
       m(RadioGroup, {
         name: 'members/mods',
+        class: 'membersList',
         options: names,
         value: vnode.state.user,
         onchange: (e: Event) => { vnode.state.user = (e.currentTarget as HTMLInputElement).value; },
