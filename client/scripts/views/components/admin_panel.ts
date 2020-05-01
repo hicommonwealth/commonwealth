@@ -25,13 +25,14 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                 name: Icons.X,
                 size: 'xs',
                 style: 'padding-left: 2px;',
-                onclick: () => {
-                  $.post(`${app.serverUrl()}/upgradeMember`, {
+                onclick: async () => {
+                  await $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,
                     new_role: 'member',
                     address: role.Address.address,
                     jwt: app.login.jwt,
                   }).then((res) => {
+                    console.dir(res);
                     if (res.status !== 'Success') {
                       throw new Error(`Got unsuccessful status: ${res.status}`);
                     }
@@ -160,8 +161,7 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
         m('td', [ m(RoleRow, {
           roledata: vnode.attrs.admins,
           onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
-
-        }), ])
+        }), ]),
       ]),
       vnode.attrs.mods.length > 0 &&
         m('tr', [
@@ -253,12 +253,18 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
         }),
         m('tr', [
           m('td', 'Admins'),
-          m('td', [ m(RoleRow, { roledata: vnode.attrs.admins }), ])
+          m('td', [ m(RoleRow, {
+            roledata: vnode.attrs.admins,
+            onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+          }), ]),
         ]),
         vnode.attrs.mods.length > 0 &&
           m('tr', [
             m('td', 'Moderators'),
-            m('td', [ m(RoleRow, { roledata: vnode.attrs.mods }), ])
+            m('td', [ m(RoleRow, {
+              roledata: vnode.attrs.mods,
+              onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+            }), ])
           ]),
       ]),
       m(Button, {
