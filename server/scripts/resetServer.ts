@@ -274,6 +274,14 @@ const resetServer = (models, closeMiddleware) => {
       verified: true,
       keytype: 'sr25519',
     });
+    await models.Address.create({
+      address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
+      chain: 'edgeware',
+      verification_token: crypto.randomBytes(18).toString('hex'),
+      verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
+      verified: true,
+      keytype: 'sr25519',
+    });
     // Notification Categories
     await models.NotificationCategory.create({
       name: NotificationCategories.NewCommunity,
@@ -358,7 +366,17 @@ const resetServer = (models, closeMiddleware) => {
       permission: 'admin',
     });
     await models.Role.create({
+      address_id: 4,
+      chain_id: 'edgeware',
+      permission: 'admin',
+    });
+    await models.Role.create({
       address_id: 3,
+      offchain_community_id: 'staking',
+      permission: 'admin',
+    });
+    await models.Role.create({
+      address_id: 4,
       offchain_community_id: 'staking',
       permission: 'admin',
     });

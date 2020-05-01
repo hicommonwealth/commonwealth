@@ -17,21 +17,18 @@ import { isCommunityAdmin } from 'views/pages/discussions/roles';
 
 interface IEditTagForm {
   description: string,
-  featured: boolean
+  featured: boolean,
   id: number,
   name: string,
 }
 
-const FeaturedCheckbox: m.Component<ITagRowAttrs, {featured: boolean, form: IEditTagForm}> = {
-  oninit: (vnode) => {
-    vnode.state.featured = vnode.attrs.featured;
-  },
+const FeaturedCheckbox: m.Component<ITagRowAttrs, {form: IEditTagForm}> = {
   view: (vnode) => {
     if (!isCommunityAdmin()) return null;
     const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
-    if (!vnode.state.form) {
-      vnode.state.form = { description, featured, id, name };
-    }
+
+    vnode.state.form = { description, id, name, featured };
+
     const updateTag = async (form) => {
       const tagInfo = {
         id,
@@ -41,18 +38,15 @@ const FeaturedCheckbox: m.Component<ITagRowAttrs, {featured: boolean, form: IEdi
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
-      if (form.featured !== vnode.attrs.featured) {
-        if (form.featured) addFeaturedTag(`${id}`);
-        else removeFeaturedTag(`${id}`);
-        await app.tags.edit(tagInfo, form.featured);
-      } else {
-        await app.tags.edit(tagInfo);
-      }
+
+      (form.featured) ? addFeaturedTag(`${id}`) : removeFeaturedTag(`${id}`);
+      await app.tags.edit(tagInfo, form.featured);
+
       m.redraw();
     };
 
     return m(Checkbox, {
-      defaultChecked: vnode.state.featured,
+      defaultChecked: vnode.state.form.featured,
       class: 'FeaturedCheckbox',
       label: 'Featured Tag',
       size: 'sm',

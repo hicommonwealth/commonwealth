@@ -136,7 +136,7 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
               contentLeft: m(Icon, { name: Icons.BOX }),
             }),
           (app.community || app.chain)
-            && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
+            && m(TagSelector, { activeTag, showFullListing: false , hideEditButton: true }),
           (app.community || app.chain)
             && m(ListItem, {
               active: onMembersPage(m.route.get()),
