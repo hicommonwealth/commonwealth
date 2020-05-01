@@ -118,6 +118,9 @@ class SubstrateDemocracyProposal extends ProposalModel<
       this._title = eventData.proposalHash;
     }
 
+    entity.chainEvents.forEach((e) => this.update(e));
+
+    this._initialized.next(true);
     this._depositSubscription = this._subscribeDepositors();
     this._Proposals.store.add(this);
   }
@@ -131,6 +134,9 @@ class SubstrateDemocracyProposal extends ProposalModel<
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
+      case SubstrateEventKind.DemocracyProposed: {
+        break;
+      }
       case SubstrateEventKind.DemocracyTabled: {
         this.complete();
         break;

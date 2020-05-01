@@ -26,6 +26,10 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       console.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
       return;
     }
+    if ((range.endBlock - range.startBlock) > 500) {
+      console.log(`Attempting to poll ${range.endBlock - range.startBlock} blocks, reducing query size.`);
+      range.startBlock = range.endBlock - 500;
+    }
 
     // discover current version
     const version = await this._api.rpc.state.getRuntimeVersion();

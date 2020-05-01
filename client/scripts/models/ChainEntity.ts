@@ -28,7 +28,9 @@ class ChainEntity {
     this._updatedAt = moment(updatedAt);
 
     // TODO: move this into a chain event controller to avoid duplication
-    this._chainEvents = chainEvents.map((c) => ChainEvent.fromJSON(c));
+    this._chainEvents = chainEvents
+      .map((c) => ChainEvent.fromJSON(c))
+      .sort(({ id: id1 }, { id: id2 }) => id1 - id2); // sort ascending
   }
 
   public static fromJSON(json) {

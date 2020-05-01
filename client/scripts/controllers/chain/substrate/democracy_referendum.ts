@@ -135,7 +135,7 @@ export class SubstrateDemocracyReferendum
     return account.chainBase === ChainBase.Substrate;
   }
   private _title: string;
-  private readonly _endBlock: number;
+  private _endBlock: number;
   private readonly _proposalHash: string;
 
   private _passed: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -175,6 +175,10 @@ export class SubstrateDemocracyReferendum
     } else {
       this._title = `Referendum #${this.data.index}`;
     }
+
+    // handle events params for passing, if exists at init time
+    entity.chainEvents.forEach((e) => this.update(e));
+
     this._initialized.next(true);
     this._subscribeVoters();
     this._Democracy.store.add(this);
@@ -186,6 +190,9 @@ export class SubstrateDemocracyReferendum
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
+      case SubstrateEventKind.DemocracyStarted: {
+        break;
+      }
       case SubstrateEventKind.DemocracyCancelled:
       case SubstrateEventKind.DemocracyNotPassed: {
         this._passed.next(false);
@@ -195,6 +202,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateEventKind.DemocracyPassed: {
         this._passed.next(true);
         this._executionBlock = e.data.dispatchBlock;
+        this._endBlock = e.data.dispatchBlock; // fix timer if in dispatch queue
         break;
       }
       case SubstrateEventKind.DemocracyExecuted: {

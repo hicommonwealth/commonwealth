@@ -76,6 +76,8 @@ export class SubstrateCollectiveProposal
     this._Collective = Collective;
     this._title = `${eventData.call.section}.${eventData.call.method}(${eventData.call.args.join(', ')})`;
 
+    entity.chainEvents.forEach((e) => this.update(e));
+
     this._initialized.next(true);
     this._subscribeVoters();
     this._Collective.store.add(this);
@@ -87,6 +89,9 @@ export class SubstrateCollectiveProposal
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
+      case SubstrateEventKind.CollectiveProposed: {
+        break;
+      }
       case SubstrateEventKind.CollectiveDisapproved: {
         this._approved.next(false);
         this.complete();

@@ -97,6 +97,9 @@ export class SubstrateTreasuryProposal
     this.bond = this._Chain.coins(this.data.bond);
     this.beneficiaryAddress = this.data.beneficiary;
     this._author = this._Accounts.fromAddress(this.data.proposer);
+
+    entity.chainEvents.forEach((e) => this.update(e));
+
     this._initialized.next(true);
     this._Treasury.store.add(this);
   }
@@ -107,6 +110,9 @@ export class SubstrateTreasuryProposal
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
+      case SubstrateEventKind.TreasuryProposed: {
+        break;
+      }
       case SubstrateEventKind.TreasuryAwarded: {
         this._awarded.next(true);
         this.complete();

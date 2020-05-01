@@ -146,6 +146,9 @@ export class EdgewareSignalingProposal
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Signaling = Signaling;
+
+    entity.chainEvents.forEach((e) => this.update(e));
+
     this._initialized.next(true);
     this._subscribeVoters();
     this._Signaling.store.add(this);
@@ -157,6 +160,9 @@ export class EdgewareSignalingProposal
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
+      case SubstrateEventKind.SignalingNewProposal: {
+        break;
+      }
       case SubstrateEventKind.SignalingCommitStarted: {
         if (this.stage !== SignalingProposalStage.PreVoting) {
           throw new Error('signaling stage out of order!');

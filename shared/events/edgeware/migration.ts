@@ -27,7 +27,7 @@ import {
   ISubstrateSignalingVotingCompleted,
 } from './types';
 
-async function fetchDemocracyProposals(api: ApiPromise): Promise<CWEvent[]> {
+async function fetchDemocracyProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   console.log('Migrating democracy proposals...');
   const publicProps = await api.query.democracy.publicProps();
   const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await api.queryMulti(
@@ -47,10 +47,10 @@ async function fetchDemocracyProposals(api: ApiPromise): Promise<CWEvent[]> {
     })
     .filter((e) => !!e);
   console.log(`Found ${proposedEvents.length} democracy proposals!`);
-  return proposedEvents.map((data) => ({ blockNumber: 0, data }));
+  return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
-async function fetchDemocracyReferenda(api: ApiPromise): Promise<CWEvent[]> {
+async function fetchDemocracyReferenda(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   console.log('Migrating democracy referenda...');
   const activeReferenda = await api.derive.democracy.referendumsActive();
   const startEvents = activeReferenda.map((r) => {
@@ -84,7 +84,7 @@ async function fetchDemocracyReferenda(api: ApiPromise): Promise<CWEvent[]> {
     })
   );
   console.log(`Found ${startEvents.length + passedEvents.length} democracy referenda!`);
-  return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber: 0, data }));
+  return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber, data }));
 }
 
 // must pass proposal hashes found in prior events
@@ -113,7 +113,7 @@ async function fetchDemocracyPreimages(api: ApiPromise, hashes: string[]): Promi
   return cwEvents;
 }
 
-async function fetchTreasuryProposals(api: ApiPromise): Promise<CWEvent[]> {
+async function fetchTreasuryProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   console.log('Migrating treasury proposals...');
   const proposals = await api.derive.treasury.proposals();
   const proposedEvents = proposals.proposals.map((p) => {
@@ -127,10 +127,10 @@ async function fetchTreasuryProposals(api: ApiPromise): Promise<CWEvent[]> {
     } as ISubstrateTreasuryProposed;
   });
   console.log(`Found ${proposedEvents.length} treasury proposals!`);
-  return proposedEvents.map((data) => ({ blockNumber: 0, data }));
+  return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
-async function fetchCollectiveProposals(api: ApiPromise): Promise<CWEvent[]> {
+async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   console.log('Migrating collective proposals...');
   const councilProposals = await api.derive.council.proposals();
   let proposals: DeriveCollectiveProposal[];
@@ -159,10 +159,10 @@ async function fetchCollectiveProposals(api: ApiPromise): Promise<CWEvent[]> {
       } as ISubstrateCollectiveProposed;
     });
   console.log(`Found ${proposedEvents.length} collective proposals!`);
-  return proposedEvents.map((data) => ({ blockNumber: 0, data }));
+  return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
-async function fetchSignalingProposals(api: ApiPromise): Promise<CWEvent[]> {
+async function fetchSignalingProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   console.log('Migrating signaling proposals...');
   if (!api.query.voting || !api.query.signaling) {
     console.log('Found no signaling proposals (wrong chain)!');
@@ -244,17 +244,19 @@ async function fetchSignalingProposals(api: ApiPromise): Promise<CWEvent[]> {
   const events = [...newProposalEvents, ...commitStartedEvents, ...votingStartedEvents, ...completedEvents];
   // we could plausibly populate the completed events with block numbers, but not necessary
   console.log(`Found ${newProposalEvents.length} signaling proposals!`);
-  return events.map((data) => ({ blockNumber: 0, data }));
+  return events.map((data) => ({ blockNumber, data }));
 }
 
 export default async function (
   api: ApiPromise
 ): Promise<CWEvent[]> {
+  const blockNumber = +(await api.rpc.chain.getHeader()).number;
+
   /** democracy proposals */
-  const democracyProposalEvents = await fetchDemocracyProposals(api);
+  const democracyProposalEvents = await fetchDemocracyProposals(api, blockNumber);
 
   /** democracy referenda */
-  const democracyReferendaEvents = await fetchDemocracyReferenda(api);
+  const democracyReferendaEvents = await fetchDemocracyReferenda(api, blockNumber);
 
   /** democracy preimages */
   const proposalHashes = democracyProposalEvents
@@ -265,13 +267,13 @@ export default async function (
   const democracyPreimageEvents = await fetchDemocracyPreimages(api, [ ...proposalHashes, ...referendaHashes ]);
 
   /** treasury proposals */
-  const treasuryProposalEvents = await fetchTreasuryProposals(api);
+  const treasuryProposalEvents = await fetchTreasuryProposals(api, blockNumber);
 
   /** collective proposals */
-  const collectiveProposalEvents = await fetchCollectiveProposals(api);
+  const collectiveProposalEvents = await fetchCollectiveProposals(api, blockNumber);
 
   /** signaling proposals */
-  const signalingProposalEvents = await fetchSignalingProposals(api);
+  const signalingProposalEvents = await fetchSignalingProposals(api, blockNumber);
 
   console.log('Migration complete.');
   return [
