@@ -620,9 +620,11 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         throw new Error('chain event notification does not have expected data');
       }
       // TODO: use different labelers depending on chain
+      const chainId = notification.chainEvent.type.chain;
+      const chainName = app.config.chains.getById(chainId).name;
       const label = labelEdgewareEvent(
         notification.chainEvent.blockNumber,
-        notification.chainEvent.type.chain,
+        chainId,
         notification.chainEvent.data,
       );
       return m('li.HeaderNotificationRow', {
@@ -637,7 +639,7 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         },
       }, [
         m('.comment-body', [
-          m('.comment-body-top', label.heading),
+          m('.comment-body-top', `${label.heading} on ${chainName}`),
           m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
           m('.comment-body-excerpt', label.label),
         ]),
@@ -784,7 +786,10 @@ const Header: m.Component<{}, IHeaderState> = {
               e.preventDefault();
               e.stopPropagation();
               $(e.target).trigger('menuclose');
-              m.route.set(app.login.selectedNode ? `/${app.login.selectedNode.chain.id || app.login.selectedNode.chain}/` : '/');
+              m.route.set(app.login.selectedNode
+                ? `/${app.login.selectedNode.chain.id || app.login.selectedNode.chain}/`
+                : '/'
+              );
             },
           }, [
             m('.header-logo-image')

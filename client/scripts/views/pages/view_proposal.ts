@@ -1039,6 +1039,14 @@ const ViewProposalPage: m.Component<IViewProposalPageAttrs, IViewProposalPageSta
       return m(PageLoading);
     }
 
+    const windowListener = (e) => {
+      if (vnode.state.editing || activeQuillEditorHasText()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', windowListener);
+
     let proposal: AnyProposal;
     try {
       proposal = idToProposal(proposalType, proposalId);

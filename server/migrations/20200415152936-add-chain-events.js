@@ -32,6 +32,7 @@ const SubstrateEventKinds = {
 
   ElectionNewTerm: 'election-new-term',
   ElectionEmptyTerm: 'election-empty-term',
+  ElectionCandidacySubmitted: 'election-candidacy-submitted',
   ElectionMemberKicked: 'election-member-kicked',
   ElectionMemberRenounced: 'election-member-renounced',
 

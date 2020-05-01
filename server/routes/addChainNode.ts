@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const addChainNode = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -16,7 +18,10 @@ const addChainNode = async (models, req: UserRequest, res: Response, next: NextF
 
   let chain = await models.Chain.findOne({ where: {
     // TODO: should we only check id?
-    [Op.or]: [{id: req.body.id}, {name: req.body.name}]
+    [Op.or]: [
+      { id: req.body.id },
+      { name: req.body.name }
+    ]
   } });
   if (chain) {
     const existingNode = await models.ChainNode.find({ where: {

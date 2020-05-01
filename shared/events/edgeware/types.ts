@@ -1,4 +1,4 @@
-import { Header, EventRecord } from '@polkadot/types/interfaces';
+import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 
 /**
  * To implement a new form of event, add it to this enum, and add its
@@ -14,11 +14,12 @@ export type SubstrateRuntimeVersion = number;
 
 /**
  * Substrate lacks a block type that includes events as well, so we synthesize a type
- * from the combination of headers and events.
+ * from the combination of headers, events, and extrinsics.
  */
 export interface SubstrateBlock {
   header: Header;
   events: EventRecord[];
+  extrinsics: Extrinsic[];
   versionNumber: number;
   versionName: string;
 }
@@ -34,6 +35,13 @@ export enum SubstrateEntityKind {
 }
 
 // Each kind of event we handle
+// In theory we could use a higher level type-guard here, like
+// `e instanceof GenericEvent`, but that makes unit testing
+// more difficult, as we need to then mock the original constructor.
+export function isEvent(e: Event | Extrinsic): e is Event {
+  return !(e.data instanceof Uint8Array);
+}
+
 export enum SubstrateEventKind {
   Slash = 'slash',
   Reward = 'reward',
@@ -61,6 +69,7 @@ export enum SubstrateEventKind {
 
   ElectionNewTerm = 'election-new-term',
   ElectionEmptyTerm = 'election-empty-term',
+  ElectionCandidacySubmitted = 'election-candidacy-submitted',
   ElectionMemberKicked = 'election-member-kicked',
   ElectionMemberRenounced = 'election-member-renounced',
 
@@ -247,6 +256,11 @@ export interface ISubstrateElectionEmptyTerm extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionEmptyTerm;
 }
 
+export interface ISubstrateCandidacySubmitted extends ISubstrateEvent {
+  kind: SubstrateEventKind.ElectionCandidacySubmitted;
+  candidate: SubstrateAccountId;
+}
+
 export interface ISubstrateElectionMemberKicked extends ISubstrateEvent {
   kind: SubstrateEventKind.ElectionMemberKicked;
   who: SubstrateAccountId;
@@ -377,6 +391,7 @@ export type ISubstrateEventData =
   | ISubstrateTreasuryRejected
   | ISubstrateElectionNewTerm
   | ISubstrateElectionEmptyTerm
+  | ISubstrateCandidacySubmitted
   | ISubstrateElectionMemberKicked
   | ISubstrateElectionMemberRenounced
   | ISubstrateCollectiveProposed

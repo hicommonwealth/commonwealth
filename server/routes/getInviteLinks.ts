@@ -1,3 +1,5 @@
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const getInviteLinks = async (models, req, res, next) => {
   if (!req.user) return next(new Error('Not logged in'));

@@ -1,6 +1,8 @@
 import sgMail from '@sendgrid/mail';
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const verifyAddress = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   // Verify that a linked address is actually owned by its supposed user.
@@ -70,9 +72,9 @@ const verifyAddress = async (models, req: UserRequest, res: Response, next: Next
           html: `${mainText}<br/><br/>${secondLine}<br/><br/>${thirdLine}`,
         };
         await sgMail.send(msg);
-        console.log('sent address move email!');
+        log.info('sent address move email!');
       } catch (e) {
-        console.error(`Could not send address move email for: ${req.body.address}`);
+        log.error(`Could not send address move email for: ${req.body.address}`);
       }
     }
 

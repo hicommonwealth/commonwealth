@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -13,35 +14,70 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Thread Tests', () => {
+  const markdownThread = require('../../util/fixtures/markdownThread');
+  const community = 'staking';
+  const chain = 'ethereum';
+  let adminJWT;
+  let adminAddress;
+  let userJWT;
+  let userAddress;
+  let thread;
+
   before('reset database', async () => {
     await resetDatabase();
+    let res = await modelUtils.createAndVerifyAddress({ chain });
+    adminAddress = res.address;
+    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    const isAdmin = await modelUtils.assignAdmin(res.address_id, chain);
+    expect(adminAddress).to.not.be.null;
+    expect(adminJWT).to.not.be.null;
+    expect(isAdmin).to.not.be.null;
+
+    res = await modelUtils.createAndVerifyAddress({ chain });
+    userAddress = res.address;
+    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    expect(userAddress).to.not.be.null;
+    expect(userJWT).to.not.be.null;
   });
 
-  describe('/editThread Tests', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
-    const community = 'staking';
-    const chain = 'ethereum';
-    let adminJWT;
-    let adminAddress;
-    let userJWT;
-    let userAddress;
-    let thread;
+  describe('/editComment', () => {
+    it('should edit a comment', async () => {
+      const markdownComment = require('../../util/fixtures/markdownComment');
+      const title = 'test title';
+      const body = 'test body';
+      const text = 'tes text';
+      const tRes = await modelUtils.createThread({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        title,
+        body,
+      });
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        text: decodeURIComponent(markdownComment.text),
+        proposalIdentifier: `discussion_${tRes.result.id}`,
+      });
+      const eRes = await modelUtils.editComment({
+        text,
+        jwt: userJWT,
+        comment_id: cRes.result.id,
+        address: userAddress,
+        chain,
+      });
+      expect(eRes).not.to.be.null;
+      expect(eRes.status).to.be.equal('Success');
+      expect(eRes.result).not.to.be.null;
+      expect(eRes.result.chain).to.be.equal(chain);
+      expect(eRes.result.root_id).to.be.equal(`discussion_${tRes.result.id}`);
+      expect(eRes.result.community).to.be.null;
+    });
+  });
 
+  describe('/editThread', () => {
     before(async () => {
-      let res = await modelUtils.createAndVerifyAddress({ chain });
-      adminAddress = res.address;
-      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, chain);
-      expect(adminAddress).to.not.be.null;
-      expect(adminJWT).to.not.be.null;
-      expect(isAdmin).to.not.be.null;
-
-      res = await modelUtils.createAndVerifyAddress({ chain });
-      userAddress = res.address;
-      userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      expect(userAddress).to.not.be.null;
-      expect(userJWT).to.not.be.null;
-
       const res2 = await modelUtils.createThread({
         chain,
         address: adminAddress,

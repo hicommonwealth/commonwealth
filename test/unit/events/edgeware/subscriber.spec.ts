@@ -24,6 +24,13 @@ const getApi = () => {
       if (hash === hashes[1]) return events[1];
       assert.fail('events.at called with invalid hash');
     },
+    getBlock: (hash) => {
+      return {
+        block: {
+          extrinsics: [],
+        }
+      };
+    },
     subscribeRuntimeVersion: (callback) => {
       callback({ specVersion: 10, specName: 'edgeware' } as unknown as RuntimeVersion);
     }

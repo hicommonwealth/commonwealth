@@ -43,7 +43,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
  * This a labeler function, which takes event data and describes it in "plain english",
  * such that we can display a notification regarding its contents.
  */
-const labelerFunc: LabelerFilter = (
+const labelEdgewareEvent: LabelerFilter = (
   blockNumber: number,
   chainId: string,
   data: IChainEventData,
@@ -260,6 +260,15 @@ const labelerFunc: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
     }
+    case SubstrateEventKind.ElectionCandidacySubmitted: {
+      const { candidate } = data;
+      return {
+        heading: 'Council Candidate Submitted',
+        label: `${fmtAddr(candidate)} submitted a candidacy for council.`,
+        // TODO: this could also link to the member's page
+        linkUrl: chainId ? `/${chainId}/council` : null,
+      };
+    }
     case SubstrateEventKind.ElectionMemberKicked: {
       const { who } = data;
       return {
@@ -386,4 +395,4 @@ const labelerFunc: LabelerFilter = (
   }
 };
 
-export default labelerFunc;
+export default labelEdgewareEvent;

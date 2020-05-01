@@ -48,7 +48,6 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
     const proposal = vnode.attrs.proposal;
     const callback = vnode.attrs.callback;
     const user: SubstrateAccount = app.vm.activeAccount as SubstrateAccount;
-
     if (vnode.attrs.proposal instanceof EdgewareSignalingProposal) {
       const advanceSignalingProposal = (e) => {
         e.preventDefault();

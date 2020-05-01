@@ -18,6 +18,12 @@ import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/su
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 
+export const formatProposalHashShort = (pHash : string) => {
+  if (!pHash) return;
+  if (pHash.length < 16) return pHash;
+  return pHash.slice(0, 16) + '…' + pHash.slice(pHash.length - 3);
+}
+
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing ? 'pass' :
   proposal.isPassing === ProposalStatus.Passed ? 'pass' :
@@ -254,7 +260,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug == ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
-            m('.proposal-row-metadata', (proposal as SubstrateDemocracyProposal).title.split('(')[0]),
+            m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal).title.split('(')[0])),
           ]),
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Seconds'),

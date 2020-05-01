@@ -17,6 +17,8 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import { factory, formatFilename } from './server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_ARCHIVE, QUERY_URL_OVERRIDE } from './server/config';
@@ -35,6 +37,7 @@ import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import { UserRequest } from './server/types.js';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
+
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -166,7 +169,7 @@ if (SHOULD_RESET_DB) {
   // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
   // This only needs to run once on prod to make the necessary queries.
   fetchStats(models, 'mainnet').then((result) => {
-    console.log('Finished adding Lockdrop statistics into the DB');
+    log.info('Finished adding Lockdrop statistics into the DB');
     process.exit(0);
   });
 } else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
@@ -183,14 +186,14 @@ if (SHOULD_RESET_DB) {
     .then(() => (models.sequelize.close()))
     .then(() => (closeMiddleware()))
     .then(() => {
-      console.log('Finished adding test queries to db.');
+      log.info('Finished adding test queries to db.');
       process.exit(0);
     });
 } else if (!NO_ARCHIVE && SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY) {
   fetcher.fetch()
     .then(() => {
       closeMiddleware().then(() => {
-        console.log('Finished fetching chain objects.');
+        log.info('Finished fetching chain objects.');
         process.exit(0);
       });
     })

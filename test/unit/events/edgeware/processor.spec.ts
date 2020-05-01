@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { Header, EventRecord } from '@polkadot/types/interfaces';
+import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 
 import Processor from '../../../../shared/events/edgeware/processor';
 import { SubstrateEventKind, ISubstrateSlash } from '../../../../shared/events/edgeware/types';
@@ -13,7 +13,7 @@ interface IFakeEvent {
   data: any;
 }
 
-const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
+const constructFakeBlock = (blockNumber: number, events: IFakeEvent[], extrinsics = []) => {
   return {
     header: {
       hash: blockNumber,
@@ -24,6 +24,7 @@ const constructFakeBlock = (blockNumber: number, events: IFakeEvent[]) => {
     ),
     versionNumber: 10,
     versionName: 'edgeware',
+    extrinsics: extrinsics as Extrinsic[],
   };
 };
 
@@ -48,9 +49,21 @@ describe('Edgeware Event Processor Tests', () => {
       },
     ];
 
+    const fakeExtrinsics = [
+      {
+        method: {
+          sectionName: 'elections',
+          methodName: 'submitCandidacy',
+          args: [],
+        },
+        signer: 'Alice',
+        data: new Uint8Array(),
+      }
+    ];
+
     const fakeBlocks = [
       constructFakeBlock(1, fakeEvents.slice(0, 2)),
-      constructFakeBlock(2, fakeEvents.slice(2, 3)),
+      constructFakeBlock(2, fakeEvents.slice(2, 3), fakeExtrinsics),
     ];
 
     const api = constructFakeApi({
@@ -117,6 +130,14 @@ describe('Edgeware Event Processor Tests', () => {
           },
           blockNumber: 2,
         },
+        {
+          data: {
+            kind: SubstrateEventKind.ElectionCandidacySubmitted,
+            candidate: 'Alice',
+          },
+          blockNumber: 2,
+          excludeAddresses: ['Alice'],
+        }
       ]);
       done();
     }).catch((err) => done(err));
@@ -137,6 +158,36 @@ describe('Edgeware Event Processor Tests', () => {
     ];
 
     const block = constructFakeBlock(1, fakeEvents);
+    const api = constructFakeApi({});
+
+    // run test
+    const processor = new Processor(api);
+    processor.process(block).then((results) => {
+      try {
+        assert.equal(processor.lastBlockNumber, 1);
+        assert.deepEqual(results, []);
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+  });
+
+  it('should fail gracefully to find an extrinsic', (done) => {
+    // setup fake data
+    const fakeExtrinsics = [
+      {
+        method: {
+          sectionName: 'elections',
+          methodName: 'submitBetterCandidacy',
+          args: [],
+        },
+        signer: 'Alice',
+        data: new Uint8Array(),
+      }
+    ];
+
+    const block = constructFakeBlock(1, [], fakeExtrinsics);
     const api = constructFakeApi({});
 
     // run test

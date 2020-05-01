@@ -47,6 +47,13 @@ const getMockApi = () => {
     'blockHash.multi': (blockNumbers: number[]) => {
       return blockNumbers.map((n) => hashes[n - 100]);
     },
+    getBlock: (hash) => {
+      return {
+        block: {
+          extrinsics: [],
+        }
+      };
+    },
     getRuntimeVersion: () => {
       return {
         specVersion: 10,

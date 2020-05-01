@@ -108,7 +108,7 @@ const ProposalsPage: m.Component<{}> = {
           'Treasury proposals',
         ]),
         visibleTreasuryProposals &&
-          visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal: proposal })),
+          visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
         //
         visibleCosmosProposals && m('h4.proposals-subheader', [
           'Cosmos proposals',

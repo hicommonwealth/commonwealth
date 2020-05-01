@@ -4,6 +4,8 @@ import send, { WebhookContent } from '../webhookNotifier';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 
 const { Op } = Sequelize;
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define('Subscription', {
