@@ -115,7 +115,7 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.read_only).to.be.equal(true);
+      expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(false);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
@@ -143,7 +143,7 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.read_only).to.be.equal(false);
+      expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(false);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
@@ -199,7 +199,7 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.read_only).to.be.equal(true);
+      expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(false);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
