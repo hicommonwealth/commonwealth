@@ -14,14 +14,14 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
   if (!community) return next(new Error('community not found'));
   else {
     const userAddressIds = await req.user.getAddresses().map((address) => address.id);
-    const userMembership = await models.Role.findOne({
+    const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,
         offchain_community_id: community.id,
       },
     });
-    if (userMembership.permission !== 'admin') {
-      return next(new Error('Invalid permission to update community'));
+    if (userRole.permission !== 'admin') {
+      return next(new Error('Invalid community or chain'));
     }
   }
 
