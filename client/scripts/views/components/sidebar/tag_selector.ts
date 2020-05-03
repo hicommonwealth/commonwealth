@@ -4,7 +4,7 @@ import 'components/sidebar/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
-import { List, ListItem, Button, Icon, Icons, Checkbox } from 'construct-ui';
+import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
@@ -22,7 +22,9 @@ interface IEditTagForm {
   name: string,
 }
 
-const FeaturedCheckbox: m.Component<ITagRowAttrs, {form: IEditTagForm}> = {
+const ToggleFeaturedTagButton: m.Component<{
+  id, description, featured, name, addFeaturedTag, removeFeaturedTag
+}, {form: IEditTagForm}> = {
   view: (vnode) => {
     if (!isCommunityAdmin()) return null;
     const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
@@ -39,17 +41,22 @@ const FeaturedCheckbox: m.Component<ITagRowAttrs, {form: IEditTagForm}> = {
         chainId: app.activeChainId(),
       };
 
-      (form.featured) ? addFeaturedTag(`${id}`) : removeFeaturedTag(`${id}`);
+      if (form.featured) {
+        addFeaturedTag(`${id}`);
+      } else {
+        removeFeaturedTag(`${id}`);
+      }
       await app.tags.edit(tagInfo, form.featured);
 
       m.redraw();
     };
 
-    return m(Checkbox, {
+    return m(Button, {
       defaultChecked: vnode.state.form.featured,
-      class: 'FeaturedCheckbox',
-      label: 'Featured Tag',
-      size: 'sm',
+      class: 'ToggleFeaturedTagButton',
+      label: vnode.state.form.featured ? 'Unpin' : 'Pin to sidebar',
+      iconLeft: vnode.state.form.featured ? null : Icons.STAR,
+      size: 'xs',
       onclick: async (e) => {
         e.preventDefault();
         vnode.state.form.featured = !vnode.state.form.featured;
@@ -96,7 +103,8 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       ],
       contentRight: [
         !hideEditButton && m('.tag-count', pluralize(count, 'post')),
-        !hideEditButton && m(FeaturedCheckbox, { ...vnode.attrs }),
+        !hideEditButton
+          && m(ToggleFeaturedTagButton, { description, featured, id, name, addFeaturedTag, removeFeaturedTag }),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
