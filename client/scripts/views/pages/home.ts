@@ -10,7 +10,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const visitedChain = !!app.login.unseenPosts[chain];
-    const newThreads = app.login.unseenPosts[chain]?.threads ? app.login.unseenPosts[chain]?.threads : 0;
+    const newThreads = app.login.unseenPosts[chain]?.activePosts || 0;
     return link('a.home-card.ChainCard', `/${chain}/`, [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('.chain-info', [
@@ -23,7 +23,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
       ],
       app.isLoggedIn() && m('.chain-membership', [
         m(MembershipButton, {
-          chain: chain,
+          chain,
           onMembershipChanged: (created) => {
             if (created) justJoinedChains.push(chain);
           }
