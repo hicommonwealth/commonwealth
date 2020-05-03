@@ -44,7 +44,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       Scope: app.activeId(),
     });
     // Infinite Scroll
-    $(window).on('scroll', () => {
+    const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
       if (scrollPos > (scrollHeight - 400)) {
@@ -53,7 +53,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           m.redraw();
         }
       }
-    });
+    }, 400);
+    $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
