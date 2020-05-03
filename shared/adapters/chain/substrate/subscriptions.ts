@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import {
   Call, BalanceOf, ReferendumInfoTo239, Hash, ProposalIndex,
   TreasuryProposal, VoteIndex, AccountId, PropIndex, ReferendumIndex, Votes,
-  VoterInfo, BlockNumber, ReferendumInfo
+  VoterInfo, BlockNumber, ReferendumInfo, PreimageStatus
 } from '@polkadot/types/interfaces';
 import { Vec, Option, bool, u32, Bytes } from '@polkadot/types';
 import { createType } from '@polkadot/types/create';
@@ -27,7 +27,7 @@ import { marshallMethod, waitEvent, IMethod } from './shared';
 
 type PublicProp = [PropIndex, Hash, AccountId] & Codec;
 type DepositOf = [BalanceOf, Vec<AccountId>] & Codec;
-type PreImage = Option<[Bytes, AccountId, BalanceOf, BlockNumber] & Codec>;
+type PreImage = [Bytes, AccountId, BalanceOf, BlockNumber] & Codec;
 
 export class SubstrateDemocracyProposalAdapter
 extends ProposalAdapter<ApiRx, ISubstrateDemocracyProposal, ISubstrateDemocracyProposalState> {
@@ -266,11 +266,20 @@ extends ProposalAdapter<ApiRx, ISubstrateDemocracyReferendum, ISubstrateDemocrac
         }
         return hash ? api.query.democracy.preimages(hash) : of(null);
       }),
-      map((preimage: PreImage) => {
-        if (preimage && preimage.isSome) {
-          const [ propVec, proposer, balance, at ] = preimage.unwrap();
-          const prop = createType(api.registry, 'Proposal', propVec.toU8a(true));
-          state.method = marshallMethod(prop);
+      map((preimageOpt: Option<PreImage | PreimageStatus>) => {
+        if (preimageOpt && preimageOpt.isSome) {
+          const preimage = preimageOpt.unwrap();
+          if ((preimage as any).isAvailable) {
+            // kusama preimage
+            const { data } = (preimage as PreimageStatus).asAvailable;
+            const prop = createType(api.registry, 'Proposal', data.toU8a(true));
+            state.method = marshallMethod(prop);
+          } else if (!(preimage as any).isMissing) {
+            // edgeware preimage
+            const [ propVec ] = preimage as PreImage;
+            const prop = createType(api.registry, 'Proposal', propVec.toU8a(true));
+            state.method = marshallMethod(prop);
+          }
         }
         return state;
       }),
