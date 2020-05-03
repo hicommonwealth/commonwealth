@@ -13,6 +13,7 @@ import { OffchainThreadKind } from 'models';
 import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
+import { inputModalWithText } from '../../modals/input_modal';
 
 interface ITagRowAttrs {
   count: number,
@@ -50,7 +51,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
         m('span.tag-name', name),
       ],
       contentRight: [
-        !hideEditButton && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton && count && m('.tag-count', pluralize(count, 'post')),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
@@ -123,6 +124,27 @@ export const getTagListing = (params: IGetTagListingParams) => {
     });
   });
 
+  const threadlessTags = app.tags.store.getAll().map((tag) => {
+    if (featuredTagIds.includes(`${tag.id}`)) {
+      if (!featuredTags[`${tag.name}`]) {
+        featuredTags[tag.name] = {
+          count: null,
+          description: tag.description,
+          featured_order: featuredTagIds.indexOf(`${tag.id}`),
+          id: tag.id,
+          name: tag.name,
+        };
+      }
+    } else if (!otherTags[tag.name]) {
+      otherTags[tag.name] = {
+        count: null,
+        description: tag.description,
+        id: tag.id,
+        name: tag.name,
+      };
+    }
+  });
+
   const otherTagListing = Object.keys(otherTags)
     .sort((a, b) => otherTags[b].count - otherTags[a].count)
     .map((name, idx) => m(TagRow, {
@@ -153,6 +175,22 @@ export const getTagListing = (params: IGetTagListingParams) => {
     : [];
 
   return ({ featuredTagListing, otherTagListing });
+};
+
+const NewTagButton: m.Component = {
+  view: (vnode) => {
+    return m(Button, {
+      class: '',
+      label: 'Create New Tag',
+      iconLeft: Icons.PLUS,
+      onclick: async (e) => {
+        e.preventDefault();
+        const tag = await inputModalWithText('New Tag:')();
+        if (!tag) return;
+        app.tags.add(tag).then(() => { m.redraw(); });
+      },
+    });
+  },
 };
 
 const TagSelector: m.Component<{
@@ -198,6 +236,7 @@ const TagSelector: m.Component<{
       }, featuredTagListing),
       showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
+      showFullListing && m(NewTagButton),
       !showFullListing
         && (app.community || app.chain)
         && m(List, [
