@@ -4,6 +4,9 @@
     @include dragula;
     .tag-count {
         display: inline-block;
-        width: 140px;
+        width: 60px;
+    }
+    .ToggleFeaturedTagButton {
+        margin-right: 10px;
     }
 }

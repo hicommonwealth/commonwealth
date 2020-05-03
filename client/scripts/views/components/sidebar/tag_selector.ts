@@ -15,6 +15,58 @@ import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
 import { inputModalWithText } from '../../modals/input_modal';
 
+
+interface IEditTagForm {
+  description: string,
+  featured: boolean,
+  id: number,
+  name: string,
+}
+
+const ToggleFeaturedTagButton: m.Component<{
+  id, description, featured, name, addFeaturedTag, removeFeaturedTag
+}, {form: IEditTagForm}> = {
+  view: (vnode) => {
+    if (!isCommunityAdmin()) return null;
+    const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
+
+    vnode.state.form = { description, id, name, featured };
+
+    const updateTag = async (form) => {
+      const tagInfo = {
+        id,
+        description: form.description,
+        featured: form.featured,
+        name: form.name,
+        communityId: app.activeCommunityId(),
+        chainId: app.activeChainId(),
+      };
+
+      if (form.featured) {
+        addFeaturedTag(`${id}`);
+      } else {
+        removeFeaturedTag(`${id}`);
+      }
+      await app.tags.edit(tagInfo, form.featured);
+
+      m.redraw();
+    };
+
+    return m(Button, {
+      defaultChecked: vnode.state.form.featured,
+      class: 'ToggleFeaturedTagButton',
+      label: vnode.state.form.featured ? 'Unpin' : 'Pin to sidebar',
+      iconLeft: vnode.state.form.featured ? null : Icons.STAR,
+      size: 'xs',
+      onclick: async (e) => {
+        e.preventDefault();
+        vnode.state.form.featured = !vnode.state.form.featured;
+        await updateTag(vnode.state.form);
+      },
+    });
+  },
+};
+
 interface ITagRowAttrs {
   count: number,
   description: string,
@@ -52,6 +104,8 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       ],
       contentRight: [
         !hideEditButton && count && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton
+          && m(ToggleFeaturedTagButton, { description, featured, id, name, addFeaturedTag, removeFeaturedTag }),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
