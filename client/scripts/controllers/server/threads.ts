@@ -104,7 +104,7 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newReadOnly = readOnly || proposal.readOnly;
-    const newPrivacy = privacy || false;
+    const newPrivacy = privacy || proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
 
