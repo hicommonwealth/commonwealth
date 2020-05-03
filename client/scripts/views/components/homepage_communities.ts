@@ -140,6 +140,7 @@ const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommuni
       // other
       m(LinkCard, { title: 'Edgeware Lockdrop Statistics', target: '/edgeware/stats' }),
       m(LinkCard, { title: 'Edgeware Lockdrop Unlock', target: '/unlock', }),
+      m('.clear'),
     ]);
   }
 };

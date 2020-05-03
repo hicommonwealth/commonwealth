@@ -12,7 +12,7 @@ import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
 
-import { Layout, LoadingLayout } from 'views/layouts';
+import { Layout, LoadingLayout } from 'views/layout';
 import { ChainInfo, CommunityInfo, NodeInfo,
   OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -302,7 +302,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, hideSidebar?: boolean) => ({
+  const importRoute = (module, scoped: string | boolean, hideNavigation?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -316,7 +316,7 @@ $(() => {
           // false => scope is null
           : null;
       const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, hideSidebar }, [ vnode ]);
+      return m(Layout, { scope, activeTag, hideNavigation }, [ vnode ]);
     },
   });
 

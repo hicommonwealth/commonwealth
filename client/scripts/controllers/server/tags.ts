@@ -62,6 +62,30 @@ class TagsController {
     }
   }
 
+  public async add(name: string,) {
+    try {
+      const chainOrCommObj = (app.activeChainId())
+        ? { 'chain': app.activeChainId() }
+        : { 'community': app.activeCommunityId() };
+      const response = await $.post(`${app.serverUrl()}/createTag`, {
+        ...chainOrCommObj,
+        'name': name,
+        'jwt': app.login.jwt,
+      });
+      const result = modelFromServer(response.result);
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+      this._store.add(result);
+      return result;
+    } catch (err) {
+      console.log('Failed to edit tag');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to edit tag');
+    }
+  }
+
   public async remove(tag) {
     try {
       const response = await $.post(`${app.serverUrl()}/deleteTag`, {

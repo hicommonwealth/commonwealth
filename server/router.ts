@@ -73,6 +73,7 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
+import createTag from './routes/createTag';
 import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
 import deleteTag from './routes/deleteTag';
@@ -129,6 +130,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/bulkComments', bulkComments.bind(this, models));
 
   // offchain tags
+  router.post('/createTag', passport.authenticate('jwt', { session: false }), createTag.bind(this, models));
   router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
   router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
   router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));

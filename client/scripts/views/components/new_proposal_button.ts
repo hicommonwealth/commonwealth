@@ -16,6 +16,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     const fluid = !!vnode.attrs.fluid;
 
     if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
 
     // just a button for communities, or chains without governance
     if (app.community) {
@@ -45,7 +46,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         content: 'Link an address to post',
         trigger: m(Button, {
           iconLeft: Icons.CHEVRON_DOWN,
-          size: 'xs',
+          size: 'sm',
           intent: 'primary',
           class: 'cui-disabled',
           style: 'cursor: pointer !important',

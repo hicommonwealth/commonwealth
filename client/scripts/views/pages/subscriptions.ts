@@ -217,7 +217,6 @@ const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
       });
       m.redraw();
     }, (error) => {
-      console.dir(error);
       m.route.set('/');
     });
   },

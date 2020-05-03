@@ -11,7 +11,7 @@
 
 .ProposalHeader {
     .proposal-header {
-        padding: $padding $gutter;
+        padding: $padding-top $gutter $padding;
     }
     .proposal-body {
         padding: $padding $gutter ($padding + 6px);

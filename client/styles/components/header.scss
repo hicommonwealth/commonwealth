@@ -8,7 +8,7 @@
         left: $sidebar-width - $switcher-width;
     }
     right: 0;
-    height: 60px;
+    height: $header-height;
     padding: 0 40px;
     display: flex;
     align-items: center;
