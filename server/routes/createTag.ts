@@ -1,9 +1,8 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { UserRequest } from '../types';
 
 const createTag = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  console.dir(req.body);
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!chain && !community) return next(new Error('Invalid chain or community'));

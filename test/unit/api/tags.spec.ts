@@ -51,7 +51,6 @@ describe('Tag Tests', () => {
           jwt: adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      console.dir(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
