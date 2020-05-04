@@ -86,7 +86,7 @@ describe('Event Handler Tests', () => {
     const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
-    await eventHandler.handle(event);
+    await eventHandler.handle(event, null, false);
 
     // expect results
     const chainEvents = await models['ChainEvent'].findAll({
@@ -128,7 +128,7 @@ describe('Event Handler Tests', () => {
     const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
-    await eventHandler.handle(event);
+    await eventHandler.handle(event, null, false);
 
     // expect results
     const chainEvents = await models['ChainEvent'].findAll({
@@ -174,7 +174,7 @@ describe('Event Handler Tests', () => {
     const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
-    await eventHandler.handle(event);
+    await eventHandler.handle(event, null, false);
 
     // expect results
     const chainEvents = await models['ChainEvent'].findAll({
@@ -216,7 +216,7 @@ describe('Event Handler Tests', () => {
     const eventHandler = new EdgewareNotificationHandler(models, null, 'edgeware');
 
     // process event
-    await eventHandler.handle(event as unknown as CWEvent);
+    await eventHandler.handle(event as unknown as CWEvent, null, false);
 
     // confirm no event emitted
     const chainEvents = await models['ChainEvent'].findAll({

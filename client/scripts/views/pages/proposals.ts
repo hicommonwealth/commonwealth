@@ -36,7 +36,7 @@ const ProposalsPage: m.Component<{}> = {
 
     // do not display the dispatch queue as full proposals for now
     const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed);
+    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll(); // .filter((p) => !p.completed && !p.passed);
 
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
