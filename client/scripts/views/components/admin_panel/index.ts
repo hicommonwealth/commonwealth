@@ -346,7 +346,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
 
 
     return m(Form, {
-      class: 'Webhooks',
+      class: 'WebhooksForm',
     }, [
       m(FormGroup, [
         m('h3', 'Active webhooks:'),
