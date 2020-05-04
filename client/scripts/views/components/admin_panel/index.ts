@@ -73,7 +73,7 @@ interface IInputPropertyRowAttrs {
 const InputPropertyRow: m.Component<IInputPropertyRowAttrs> = {
   view: (vnode) => {
     return m('tr', {
-      class: 'TableRow',
+      class: 'InputPropertyRow',
     }, [
       m('td', { class: 'title-column', }, vnode.attrs.title),
       m('td', [
@@ -88,26 +88,26 @@ const InputPropertyRow: m.Component<IInputPropertyRowAttrs> = {
   }
 };
 
-interface IPropertyToggleRowAttrs {
+interface ITogglePropertyRowAttrs {
   title: string;
   defaultValue: boolean;
   disabled?: boolean;
   onToggle: Function;
 }
 
-interface IPropertyToggleRowState {
+interface ITogglePropertyRowState {
   toggled: boolean;
   checked: boolean;
 }
 
-const PropertyToggleRow: m.Component<IPropertyToggleRowAttrs, IPropertyToggleRowState> = {
+const TogglePropertyRow: m.Component<ITogglePropertyRowAttrs, ITogglePropertyRowState> = {
   oninit: (vnode) => {
     vnode.state.toggled = false;
     vnode.state.checked = vnode.attrs.defaultValue;
   },
   view: (vnode) => {
     return m('tr', {
-      class: 'PropertyToggleRow',
+      class: 'TogglePropertyRow',
     }, [
       m('td', vnode.attrs.title),
       m('td', [
@@ -125,76 +125,77 @@ const PropertyToggleRow: m.Component<IPropertyToggleRowAttrs, IPropertyToggleRow
   },
 };
 
-const CommunityMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementState> = {
-  oninit: (vnode) => {
-    vnode.state.name = vnode.attrs.community.name;
-    vnode.state.description = vnode.attrs.community.description;
-    vnode.state.url = vnode.attrs.community.id;
-  },
-  view: (vnode) => {
-    return m('.CommunityMetadata', [m(Table, {
-      bordered: false,
-      interactive: false,
-      striped: false,
-      class: 'community metadataSection',
-    }, [
-      m(InputPropertyRow, {
-        title: 'Name',
-        defaultValue: vnode.state.name,
-        onChangeHandler: (v) => { vnode.state.name = v; },
-      }),
-      m(InputPropertyRow, {
-        title: 'Description',
-        defaultValue: vnode.state.description,
-        onChangeHandler: (v) => { vnode.state.description = v; },
-      }),
-      m(InputPropertyRow, {
-        title: 'URL',
-        defaultValue: `commonwealth.im/${vnode.state.url}`,
-        disabled: true,
-        onChangeHandler: (v) => { vnode.state.url = v; },
-      }),
-      m(PropertyToggleRow, {
-        title: 'Private Community?',
-        defaultValue: vnode.attrs.community.privacyEnabled,
-        onToggle: (v) => { vnode.state.privacyToggled = !vnode.state.privacyToggled; },
-      }),
-      m(PropertyToggleRow, {
-        title: 'Invites Enabled?',
-        defaultValue: vnode.attrs.community.invitesEnabled,
-        onToggle: (v) => { vnode.state.invitesToggled = !vnode.state.invitesToggled; },
-      }),
-      m('tr', [
-        m('td', 'Admins'),
-        m('td', [ m(ManageRoleRow, {
-          roledata: vnode.attrs.admins,
-          onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
-        }), ]),
-      ]),
-      vnode.attrs.mods.length > 0 &&
+const CommunityMetadataManagementTable:
+  m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementState> = {
+    oninit: (vnode) => {
+      vnode.state.name = vnode.attrs.community.name;
+      vnode.state.description = vnode.attrs.community.description;
+      vnode.state.url = vnode.attrs.community.id;
+    },
+    view: (vnode) => {
+      return m('.CommunityMetadataManagementTable', [m(Table, {
+        bordered: false,
+        interactive: false,
+        striped: false,
+        class: 'metadataManagementTable',
+      }, [
+        m(InputPropertyRow, {
+          title: 'Name',
+          defaultValue: vnode.state.name,
+          onChangeHandler: (v) => { vnode.state.name = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Description',
+          defaultValue: vnode.state.description,
+          onChangeHandler: (v) => { vnode.state.description = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'URL',
+          defaultValue: `commonwealth.im/${vnode.state.url}`,
+          disabled: true,
+          onChangeHandler: (v) => { vnode.state.url = v; },
+        }),
+        m(TogglePropertyRow, {
+          title: 'Private Community?',
+          defaultValue: vnode.attrs.community.privacyEnabled,
+          onToggle: (v) => { vnode.state.privacyToggled = !vnode.state.privacyToggled; },
+        }),
+        m(TogglePropertyRow, {
+          title: 'Invites Enabled?',
+          defaultValue: vnode.attrs.community.invitesEnabled,
+          onToggle: (v) => { vnode.state.invitesToggled = !vnode.state.invitesToggled; },
+        }),
         m('tr', [
-          m('td', 'Moderators'),
+          m('td', 'Admins'),
           m('td', [ m(ManageRoleRow, {
-            roledata: vnode.attrs.mods,
+            roledata: vnode.attrs.admins,
             onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
-          }), ])
+          }), ]),
         ]),
-    ]),
-    m(Button, {
-      label: 'submit',
-      onclick: () => {
-        vnode.attrs.community.updateCommunityData(
-          vnode.state.name,
-          vnode.state.description,
-          vnode.state.privacyToggled,
-          vnode.state.invitesToggled,
-        );
-        vnode.attrs.onChangeHandler(false);
-      },
-    }),
-    ]);
-  },
-};
+        vnode.attrs.mods.length > 0 &&
+          m('tr', [
+            m('td', 'Moderators'),
+            m('td', [ m(ManageRoleRow, {
+              roledata: vnode.attrs.mods,
+              onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+            }), ])
+          ]),
+      ]),
+      m(Button, {
+        label: 'submit',
+        onclick: () => {
+          vnode.attrs.community.updateCommunityData(
+            vnode.state.name,
+            vnode.state.description,
+            vnode.state.privacyToggled,
+            vnode.state.invitesToggled,
+          );
+          vnode.attrs.onChangeHandler(false);
+        },
+      }),
+      ]);
+    },
+  };
 
 interface IChainMetadataManagementState {
   name: string;
@@ -217,12 +218,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.symbol = vnode.attrs.chain.symbol;
   },
   view: (vnode) => {
-    return m('.ChainMetadata', [
+    return m('.ChainMetadataManagementTable', [
       m(Table, {
         bordered: false,
         interactive: false,
         striped: false,
-        class: 'chain metadataSection',
+        class: 'metadataManagementTable',
       }, [
         m(InputPropertyRow, {
           title: 'Name',
@@ -408,7 +409,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           placeholder: 'https://hooks.slack.com/services/',
         }),
         m(Button, {
-          class: 'PanelButton',
+          class: 'AdminTabPanelButton',
           type: 'submit',
           label: 'Add webhook',
           onclick: createWebhook,
@@ -429,7 +430,17 @@ const WebhooksTab: m.Component<{webhooks: IWebhookData[]}> = {
   }
 };
 
-const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, }, {role: string, user: string, }> = {
+interface IUpgradeRolesFormAttrs {
+  roleData: any[];
+  onRoleUpgrade: Function;
+}
+
+interface IUpgradeRolesFormState {
+  role: string;
+  user: string;
+}
+
+const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormState> = {
   view: (vnode) => {
     const { roleData, onRoleUpgrade } = vnode.attrs;
     const noAdmins = roleData.filter((role) => {
@@ -443,7 +454,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
-    return m('.UpgradeRoles', [
+    return m('.UpgradeRolesForm', [
       m('h3', 'Select Member:'),
       m(RadioGroup, {
         name: 'members/mods',
@@ -460,7 +471,7 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
         onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
       }),
       m(Button, {
-        class: 'PanelButton',
+        class: 'AdminTabPanelButton',
         label: 'Upgrade Member',
         onclick: () => {
           const indexOfName = names.indexOf(vnode.state.user);
@@ -482,19 +493,19 @@ const UpgradeRolesTab: m.Component<{roleData: any[], onRoleUpgrade: Function, },
   }
 };
 
-interface ITabPanelAttrs {
+interface IAdminTabPanelAttrs {
   defaultTab: number;
   roleData: any[];
   onRoleUpgrade: Function;
   webhooks;
 }
 
-const TabPanel: m.Component<ITabPanelAttrs, {index: number, }> = {
+const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
   oninit: (vnode) => {
     vnode.state.index = vnode.attrs.defaultTab;
   },
   view: (vnode) => {
-    return m('.TabPanel', [
+    return m('.AdminTabPanel', [
       m(Tabs, {
         align: 'center',
         bordered: true,
@@ -513,7 +524,7 @@ const TabPanel: m.Component<ITabPanelAttrs, {index: number, }> = {
         }),
       ]),
       (vnode.state.index === 1) &&
-        m(UpgradeRolesTab, {
+        m(UpgradeRolesForm, {
           roleData: vnode.attrs.roleData,
           onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
         }),
@@ -523,14 +534,14 @@ const TabPanel: m.Component<ITabPanelAttrs, {index: number, }> = {
   },
 };
 
-interface IPanelState {
+interface IAdminPanelContentsState {
   roleData: RoleInfo[];
   webhooks;
   loadingFinished: boolean;
   loadingStarted: boolean;
 }
 
-const AdminPanelContents: m.Component<{onChangeHandler: Function}, IPanelState> = {
+const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelContentsState> = {
   view: (vnode) => {
     const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
@@ -597,7 +608,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IPanelState> 
       ]),
       m('.panel-right', [
         vnode.state.loadingFinished &&
-          m(TabPanel, {
+          m(AdminTabPanel, {
             roleData: vnode.state.roleData,
             defaultTab: 1,
             onRoleUpgrade: (x, y) => {

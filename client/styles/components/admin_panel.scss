@@ -30,11 +30,11 @@
             }
           }
 
-          .metadataSection {
+          .metadataManagementTable {
             table-layout: fixed;
           }
 
-          .TableRow {
+          .InputPropertyRow {
             .title-column {
               width: 100px;
             }
@@ -47,7 +47,7 @@
             width: 40%;
           }
 
-          .TabPanel {
+          .AdminTabPanel {
             .UpgradeRoles, .WebhooksForm {
               padding: 0 20px 10px;
             }
