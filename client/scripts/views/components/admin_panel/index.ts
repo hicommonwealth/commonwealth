@@ -4,7 +4,7 @@ import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, 
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup, Form, FormGroup, FormLabel } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
-import User from './widgets/user';
+import User from '../widgets/user';
 import 'components/admin_panel.scss';
 
 const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
