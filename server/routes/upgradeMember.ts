@@ -6,7 +6,6 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const upgradeMember = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-  console.dir(req.body);
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const { address, new_role } = req.body;
   if (!address) return next(new Error('Invalid Address'));
