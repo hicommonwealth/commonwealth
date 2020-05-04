@@ -409,3 +409,74 @@ export type ISubstrateEventData =
 ;
 
 export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKind);
+
+/**
+ * The following auxiliary types and functions are used in migrations and should
+ * not be relied upon for general implementations.
+ */
+export type ISubstrateDemocracyProposalEvents =
+  ISubstrateDemocracyProposed | ISubstrateDemocracyTabled;
+export type ISubstrateDemocracyReferendumEvents =
+  ISubstrateDemocracyStarted | ISubstrateDemocracyPassed | ISubstrateDemocracyNotPassed
+  | ISubstrateDemocracyCancelled | ISubstrateDemocracyExecuted;
+export type ISubstrateDemocracyPreimageEvents =
+  ISubstratePreimageNoted | ISubstratePreimageUsed | ISubstratePreimageInvalid
+  | ISubstratePreimageMissing | ISubstratePreimageReaped;
+export type ISubstrateTreasuryProposalEvents =
+  ISubstrateTreasuryProposed | ISubstrateTreasuryRejected | ISubstrateTreasuryAwarded;
+export type ISubstrateCollectiveProposalEvents =
+  ISubstrateCollectiveProposed | ISubstrateCollectiveApproved
+  | ISubstrateCollectiveDisapproved | ISubstrateCollectiveExecuted;
+export type ISubstrateSignalingProposalEvents =
+  ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
+  | ISubstrateSignalingVotingStarted | ISubstrateSignalingVotingCompleted;
+
+export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
+  switch (event) {
+    case SubstrateEventKind.DemocracyProposed:
+    case SubstrateEventKind.DemocracyTabled: {
+      return SubstrateEntityKind.DemocracyProposal;
+    }
+
+    case SubstrateEventKind.DemocracyStarted:
+    case SubstrateEventKind.DemocracyPassed:
+    case SubstrateEventKind.DemocracyNotPassed:
+    case SubstrateEventKind.DemocracyCancelled:
+    case SubstrateEventKind.DemocracyExecuted: {
+      return SubstrateEntityKind.DemocracyReferendum;
+    }
+
+    case SubstrateEventKind.PreimageNoted:
+    case SubstrateEventKind.PreimageUsed:
+    case SubstrateEventKind.PreimageInvalid:
+    case SubstrateEventKind.PreimageMissing:
+    case SubstrateEventKind.PreimageReaped: {
+      return SubstrateEntityKind.DemocracyPreimage;
+    }
+
+    case SubstrateEventKind.TreasuryProposed:
+    case SubstrateEventKind.TreasuryRejected:
+    case SubstrateEventKind.TreasuryAwarded: {
+      return SubstrateEntityKind.TreasuryProposal;
+    }
+
+    case SubstrateEventKind.CollectiveProposed:
+    case SubstrateEventKind.CollectiveApproved:
+    case SubstrateEventKind.CollectiveDisapproved:
+    case SubstrateEventKind.CollectiveExecuted: {
+      return SubstrateEntityKind.CollectiveProposal;
+    }
+
+    // Signaling Events
+    case SubstrateEventKind.SignalingNewProposal:
+    case SubstrateEventKind.SignalingCommitStarted:
+    case SubstrateEventKind.SignalingVotingStarted:
+    case SubstrateEventKind.SignalingVotingCompleted: {
+      return SubstrateEntityKind.SignalingProposal;
+    }
+
+    default: {
+      return null;
+    }
+  }
+}

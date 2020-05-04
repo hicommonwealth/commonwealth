@@ -30,8 +30,10 @@ export default class extends IEventHandler {
   /**
    * Handles an existing ChainEvent by connecting it with an entity, and creating
    * threads as needed.
+   *
+   * `dbEvent` is the database entry corresponding to the `event`. `migrate` is unused.
    */
-  public async handle(event: CWEvent, dbEvent) {
+  public async handle(event: CWEvent, dbEvent, migrate = false) {
     if (!dbEvent) {
       console.error('no db event found!');
       return;
