@@ -21,7 +21,7 @@
             width: 60%;
           }
 
-          .role-item {
+          .RoleChild {
             display: inline-block;
             padding-right: 6px;
 
@@ -48,7 +48,7 @@
           }
 
           .AdminTabPanel {
-            .UpgradeRoles, .WebhooksForm {
+            .UpgradeRolesForm, .WebhooksForm {
               padding: 0 20px 10px;
             }
 
@@ -58,7 +58,7 @@
               overflow-y: scroll;
             }
 
-            .PanelButton {
+            .AdminTabPanelButton {
               margin-top: 20px;
             }
 

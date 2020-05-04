@@ -1,7 +1,8 @@
-import m, { Vnode } from 'mithril';
+import m from 'mithril';
 import $ from 'jquery';
-import { OffchainThread, OffchainTag, CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, ListItem, Table, Input, List, TextArea, Switch, Tabs, TabItem, RadioGroup, Form, FormGroup, FormLabel } from 'construct-ui';
+import { CommunityInfo, RolePermission, ChainInfo, ChainNetwork, RoleInfo } from 'models';
+import { Button, Dialog, Icon, Icons, ListItem, Table, Input,
+  List, Switch, Tabs, TabItem, RadioGroup, Form, FormGroup } from 'construct-ui';
 import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from '../widgets/user';
@@ -13,9 +14,9 @@ const ManageRoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
-    return m('.RoleData', [
+    return m('.ManageRoleRow', [
           vnode.attrs.roledata?.map((role) => {
-            return m('.role-item', [
+            return m('.RoleChild', [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
                 linkify: true,
@@ -24,7 +25,7 @@ const ManageRoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
               m(Icon, {
                 name: Icons.X,
                 size: 'xs',
-                class: 'x',
+                class: 'roleXIcon',
                 onclick: async () => {
                   await $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,
@@ -182,7 +183,8 @@ const CommunityMetadataManagementTable:
           ]),
       ]),
       m(Button, {
-        label: 'submit',
+        label: 'Save changes',
+        intent: 'primary',
         onclick: () => {
           vnode.attrs.community.updateCommunityData(
             vnode.state.name,
@@ -266,8 +268,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
           }), ]),
         ]),
-        vnode.attrs.mods.length > 0 &&
-          m('tr', [
+        vnode.attrs.mods.length > 0
+          && m('tr', [
             m('td', 'Moderators'),
             m('td', [ m(ManageRoleRow, {
               roledata: vnode.attrs.mods,
@@ -276,7 +278,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           ]),
       ]),
       m(Button, {
-        label: 'submit',
+        label: 'Save changes',
+        intent: 'primary',
         onclick: () => {
           vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
           vnode.attrs.onChangeHandler(false);
