@@ -76,6 +76,35 @@ describe('Thread Tests', () => {
     });
   });
 
+  describe('Testing ReadOnly with /createComment', () => {
+    it('should fail to create a comment on a readOnly thread', async () => {
+      const markdownComment = require('../../util/fixtures/markdownComment');
+      const title = 'test title';
+      const body = 'test body';
+      const readOnly = true;
+      const tRes = await modelUtils.createThread({
+        chain,
+        address: adminAddress,
+        jwt: adminJWT,
+        title,
+        body,
+        readOnly,
+      });
+      expect(tRes).not.to.be.null;
+      expect(tRes.status).to.be.equal('Success');
+      expect(tRes.result.read_only).to.be.equal(true);
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        text: decodeURIComponent(markdownComment.text),
+        proposalIdentifier: `discussion_${tRes.result.id}`,
+      });
+      expect(cRes).not.to.be.null;
+      expect(cRes.error).not.to.be.null;
+    });
+  });
+
   describe('/editThread', () => {
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
@@ -265,7 +294,6 @@ describe('Thread Tests', () => {
       expect(res.body.result.private).to.be.equal(false);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-
     });
 
     it('User should fail to edit admin\'s post', async () => {
