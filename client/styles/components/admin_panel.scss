@@ -1,4 +1,4 @@
-.adminDialog {
+.CommunityManagementDialog {
   .cui-dialog-content {
     width: 800px; // style override: default 600px
   
@@ -6,7 +6,7 @@
     } // .cui-dialog-header
   
     .cui-dialog-body {
-      .Panel {
+      .AdminPanelContents {
         display: flex;
         flex-direction: column;
         align-items: flex-start;

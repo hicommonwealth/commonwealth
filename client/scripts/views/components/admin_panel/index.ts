@@ -7,7 +7,7 @@ import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import User from '../widgets/user';
 import 'components/admin_panel.scss';
 
-const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
+const ManageRoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = app.community
@@ -46,7 +46,7 @@ const RoleRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   }
 };
 
-interface ICommunityMetadataState {
+interface ICommunityMetadataManagementState {
     name: string;
     description: string;
     url: string;
@@ -54,7 +54,7 @@ interface ICommunityMetadataState {
     invitesToggled: boolean;
 }
 
-interface IChainCommunityAttrs {
+interface IChainOrCommMetadataManagementAttrs {
   community?: CommunityInfo;
   chain?: ChainInfo;
   onChangeHandler: Function;
@@ -63,14 +63,14 @@ interface IChainCommunityAttrs {
   mods;
 }
 
-interface ITableRowAttrs {
+interface IInputPropertyRowAttrs {
   title: string;
   defaultValue: string;
   disabled?: boolean;
   onChangeHandler: Function;
 }
 
-const TableRow: m.Component<ITableRowAttrs> = {
+const InputPropertyRow: m.Component<IInputPropertyRowAttrs> = {
   view: (vnode) => {
     return m('tr', {
       class: 'TableRow',
@@ -88,20 +88,27 @@ const TableRow: m.Component<ITableRowAttrs> = {
   }
 };
 
-interface IToggleRowAttrs {
+interface IPropertyToggleRowAttrs {
   title: string;
   defaultValue: boolean;
   disabled?: boolean;
   onToggle: Function;
 }
 
-const ToggleRow: m.Component<IToggleRowAttrs, {toggled: boolean, checked: boolean}> = {
+interface IPropertyToggleRowState {
+  toggled: boolean;
+  checked: boolean;
+}
+
+const PropertyToggleRow: m.Component<IPropertyToggleRowAttrs, IPropertyToggleRowState> = {
   oninit: (vnode) => {
     vnode.state.toggled = false;
     vnode.state.checked = vnode.attrs.defaultValue;
   },
   view: (vnode) => {
-    return m('tr', [
+    return m('tr', {
+      class: 'PropertyToggleRow',
+    }, [
       m('td', vnode.attrs.title),
       m('td', [
         m(Switch, {
@@ -118,7 +125,7 @@ const ToggleRow: m.Component<IToggleRowAttrs, {toggled: boolean, checked: boolea
   },
 };
 
-const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataState> = {
+const CommunityMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementState> = {
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
     vnode.state.description = vnode.attrs.community.description;
@@ -131,35 +138,35 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
       striped: false,
       class: 'community metadataSection',
     }, [
-      m(TableRow, {
+      m(InputPropertyRow, {
         title: 'Name',
         defaultValue: vnode.state.name,
         onChangeHandler: (v) => { vnode.state.name = v; },
       }),
-      m(TableRow, {
+      m(InputPropertyRow, {
         title: 'Description',
         defaultValue: vnode.state.description,
         onChangeHandler: (v) => { vnode.state.description = v; },
       }),
-      m(TableRow, {
+      m(InputPropertyRow, {
         title: 'URL',
         defaultValue: `commonwealth.im/${vnode.state.url}`,
         disabled: true,
         onChangeHandler: (v) => { vnode.state.url = v; },
       }),
-      m(ToggleRow, {
+      m(PropertyToggleRow, {
         title: 'Private Community?',
         defaultValue: vnode.attrs.community.privacyEnabled,
         onToggle: (v) => { vnode.state.privacyToggled = !vnode.state.privacyToggled; },
       }),
-      m(ToggleRow, {
+      m(PropertyToggleRow, {
         title: 'Invites Enabled?',
         defaultValue: vnode.attrs.community.invitesEnabled,
         onToggle: (v) => { vnode.state.invitesToggled = !vnode.state.invitesToggled; },
       }),
       m('tr', [
         m('td', 'Admins'),
-        m('td', [ m(RoleRow, {
+        m('td', [ m(ManageRoleRow, {
           roledata: vnode.attrs.admins,
           onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
         }), ]),
@@ -167,7 +174,7 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
       vnode.attrs.mods.length > 0 &&
         m('tr', [
           m('td', 'Moderators'),
-          m('td', [ m(RoleRow, {
+          m('td', [ m(ManageRoleRow, {
             roledata: vnode.attrs.mods,
             onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
           }), ])
@@ -189,7 +196,7 @@ const CommunityMetadata: m.Component<IChainCommunityAttrs, ICommunityMetadataSta
   },
 };
 
-interface IChainMetadataState {
+interface IChainMetadataManagementState {
   name: string;
   description: string;
   url: string;
@@ -200,7 +207,7 @@ interface IChainMetadataState {
   symbol: string;
 }
 
-const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
+const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAttrs, IChainMetadataManagementState> = {
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.chain.name;
     vnode.state.description = vnode.attrs.chain.description;
@@ -217,35 +224,35 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
         striped: false,
         class: 'chain metadataSection',
       }, [
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'Name',
           defaultValue: vnode.state.name,
           onChangeHandler: (v) => { vnode.state.name = v; },
         }),
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'Description',
           defaultValue: vnode.state.description,
           onChangeHandler: (v) => { vnode.state.description = v; },
         }),
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'URL',
           defaultValue: `commonwealth.im/${vnode.state.url}`,
           disabled: true,
           onChangeHandler: (v) => { vnode.state.url = v; },
         }),
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'Network',
           defaultValue: vnode.state.network,
           disabled: true,
           onChangeHandler: (v) => { vnode.state.network = v; },
         }),
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'Symbol',
           defaultValue: vnode.state.symbol,
           disabled: true,
           onChangeHandler: (v) => { vnode.state.symbol = v; },
         }),
-        m(TableRow, {
+        m(InputPropertyRow, {
           title: 'Icon',
           defaultValue: vnode.state.iconUrl,
           disabled: true,
@@ -253,7 +260,7 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
         }),
         m('tr', [
           m('td', 'Admins'),
-          m('td', [ m(RoleRow, {
+          m('td', [ m(ManageRoleRow, {
             roledata: vnode.attrs.admins,
             onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
           }), ]),
@@ -261,7 +268,7 @@ const ChainMetadata: m.Component<IChainCommunityAttrs, IChainMetadataState> = {
         vnode.attrs.mods.length > 0 &&
           m('tr', [
             m('td', 'Moderators'),
-            m('td', [ m(RoleRow, {
+            m('td', [ m(ManageRoleRow, {
               roledata: vnode.attrs.mods,
               onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
             }), ])
@@ -523,7 +530,7 @@ interface IPanelState {
   loadingStarted: boolean;
 }
 
-const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
+const AdminPanelContents: m.Component<{onChangeHandler: Function}, IPanelState> = {
   view: (vnode) => {
     const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
@@ -560,11 +567,11 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
       });
     }
 
-    return m('.Panel', [
+    return m('.AdminPanelContents', [
       m('.panel-left', [
         isCommunity
           ? vnode.state.loadingFinished
-            && m(CommunityMetadata, {
+            && m(CommunityMetadataManagementTable, {
               community: app.community.meta,
               admins,
               mods,
@@ -576,7 +583,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
               onChangeHandler: vnode.attrs.onChangeHandler,
             })
           : vnode.state.loadingFinished
-            && m(ChainMetadata, {
+            && m(ChainMetadataManagementTable, {
               chain: app.config.chains.getById(app.activeChainId()),
               admins,
               mods,
@@ -605,7 +612,7 @@ const Panel: m.Component<{onChangeHandler: Function}, IPanelState> = {
   }
 };
 
-const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
+const CommunityManagementPanel: m.Component<{}, {isOpen: boolean}> = {
   oninit: (vnode) => {
     vnode.state.isOpen = false;
   },
@@ -614,7 +621,7 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
   view: (vnode) => {
     return [m(ListItem, {
       href: '#',
-      class: 'AdminPanel',
+      class: 'CommunityManagementPanel',
       onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
       label: 'Manage Community',
       contentLeft: m(Icon, { name: Icons.SETTINGS, }),
@@ -624,8 +631,8 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
       basic: false,
       closeOnEscapeKey: true,
       closeOnOutsideClick: true,
-      class: 'adminDialog',
-      content: m(Panel, {
+      class: 'CommunityManagementDialog',
+      content: m(AdminPanelContents, {
         onChangeHandler: (v) => { vnode.state.isOpen = v; },
       }),
       hasBackdrop: true,
@@ -639,4 +646,4 @@ const AdminPanel: m.Component<{}, {isOpen: boolean}> = {
   },
 };
 
-export default AdminPanel;
+export default CommunityManagementPanel;
