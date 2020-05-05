@@ -6,7 +6,6 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { factory, formatFilename } from '../util/logging';
-import { ProposalType } from 'client/scripts/identifiers';
 const log = factory.getLogger(formatFilename(__filename));
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
@@ -114,30 +113,10 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   // Comments always need identified parents.
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_');
-
   if (prefix === 'discussion') {
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('signaling')) {
-    proposal = await models.Proposal.findOne({
-      where: { identifier: id, type: prefix }
-    });
-
-    // TODO: We can remove this once we identify why signal proposals aren't created
-    if (!proposal) {
-      await models.Proposal.create({
-        chain: chain.id,
-        identifier: id,
-        type: prefix,
-        data: {},
-        completed: false,
-      });
-
-      proposal = await models.Proposal.findOne({
-        where: { identifier: id, type: prefix }
-      });
-    }
   } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
     proposal = await models.Proposal.findOne({
       where: { identifier: id, type: prefix }
@@ -145,7 +124,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   } else {
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
-  console.log(proposal);
+
   if (!proposal || proposal.read_only) {
     await finalComment.destroy();
     return next(new Error('Cannot comment when thread is read_only'));
