@@ -517,6 +517,24 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
+  public claimNominatorPayoutTx(era, validators) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.staking.payoutNominator(era, validators),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
+    );
+  }
+
+  public claimValidatorPayoutTx(era) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.staking.payoutValidator(era),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
+    );
+  }
+
   // Nickname module is not used by chains we are supporting now
   //
   // public get nickname(): Observable<string> {

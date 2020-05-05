@@ -411,6 +411,21 @@ export const ValidationPreHeader = (vnode, chain: Substrate, sender: SubstrateAc
         }, 'Manage'),
       ]),
     ]),
+    m('.validators-preheader-item', [
+      m('h3', 'Claim Payout'),
+      m('.preheader-item-text', [
+        m('a.btn.formular-button-primary', {
+          class: app.vm.activeAccount ? '' : 'disabled',
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            // createTXModal(sender.claimPayoutTx())
+            //   .then(() => { m.redraw(); })
+            //   .catch(() => { m.redraw(); });
+          }
+        }, 'Claim'),
+      ]),
+    ]),
     vnode.state.nominationsHasChanged && m('.validators-preheader-item', [
       m('h3', 'Update nominations'),
       m('.preheader-item-text', [
