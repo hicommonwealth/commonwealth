@@ -20,7 +20,9 @@ export interface SocialAccountInstance extends Sequelize.Instance<SocialAccountA
   setUser: Sequelize.BelongsToSetAssociationMixin<UserInstance, UserInstance['id']>;
 }
 
-export type SocialAccountModel = Sequelize.Model<SocialAccountInstance, SocialAccountAttributes>;
+export interface SocialAccountModel extends Sequelize.Model<SocialAccountInstance, SocialAccountAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

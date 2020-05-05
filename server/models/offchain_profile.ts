@@ -6,7 +6,7 @@ export interface OffchainProfileAttributes {
   data?: string;
 
   // associations
-  Address: AddressAttributes;
+  Address?: AddressAttributes;
 }
 
 export interface OffchainProfileInstance
@@ -14,7 +14,9 @@ extends Sequelize.Instance<OffchainProfileAttributes>, OffchainProfileAttributes
 
 }
 
-export type OffchainProfileModel = Sequelize.Model<OffchainProfileInstance, OffchainProfileAttributes>;
+export interface OffchainProfileModel extends Sequelize.Model<OffchainProfileInstance, OffchainProfileAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

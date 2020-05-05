@@ -23,7 +23,9 @@ export interface MembershipInstance extends Sequelize.Instance<MembershipAttribu
   // no mixins used
 }
 
-export type MembershipModel = Sequelize.Model<MembershipInstance, MembershipAttributes>;
+export interface MembershipModel extends Sequelize.Model<MembershipInstance, MembershipAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

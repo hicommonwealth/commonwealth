@@ -35,7 +35,9 @@ export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThrea
   // no mixins used
 }
 
-export type OffchainThreadModel = Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes>;
+export interface OffchainThreadModel extends Sequelize.Model<OffchainThreadInstance, OffchainThreadAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

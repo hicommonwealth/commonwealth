@@ -22,7 +22,11 @@ extends Sequelize.Instance<OffchainAttachmentAttributes>, OffchainAttachmentAttr
 
 }
 
-export type OffchainAttachmentModel = Sequelize.Model<OffchainAttachmentInstance, OffchainAttachmentAttributes>;
+export interface OffchainAttachmentModel extends Sequelize.Model<
+  OffchainAttachmentInstance, OffchainAttachmentAttributes
+> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -24,13 +24,15 @@ export interface RoleInstance extends Sequelize.Instance<RoleAttributes>, RoleAt
 
 }
 
-export type RoleModel = Sequelize.Model<RoleInstance, RoleAttributes>;
+export interface RoleModel extends Sequelize.Model<RoleInstance, RoleAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
 ): RoleModel => {
-  const Role = sequelize.define('Role', {
+  const Role = sequelize.define<RoleInstance, RoleAttributes>('Role', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     offchain_community_id: { type: dataTypes.STRING, allowNull: true },

@@ -15,6 +15,8 @@ const sequelize = new Sequelize(DATABASE_URI, {
     requestTimeout: 10000
   },
 });
+
+// TODO: separate Sequelize and SequelizeStatic into new object & type this as Sequelize.Models
 const db = {
   sequelize,
   Sequelize,

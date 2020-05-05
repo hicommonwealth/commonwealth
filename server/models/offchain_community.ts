@@ -32,7 +32,9 @@ extends Sequelize.Instance<OffchainCommunityAttributes>, OffchainCommunityAttrib
 
 }
 
-export type OffchainCommunityModel = Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes>;
+export interface OffchainCommunityModel extends Sequelize.Model<OffchainComunityInstance, OffchainCommunityAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,
