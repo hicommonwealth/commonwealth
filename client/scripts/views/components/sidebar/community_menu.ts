@@ -2,19 +2,15 @@ import 'components/sidebar/community_menu.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
 import { Icon, Icons, PopoverMenu, MenuItem, Button, Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { initAppState } from 'app';
 import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
 import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
-import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
-import FeedbackModal from 'views/modals/feedback_modal';
 
 const avatarSize = 14;
 
@@ -134,37 +130,6 @@ const CommunityMenu: m.Component<{}> = {
         onclick: () => m.route.set('/'),
         icon: Icons.HOME,
         label: 'Home'
-      }),
-      m(CommunityMenuLink, {
-        onclick: () => m.route.set('/settings'),
-        icon: Icons.SETTINGS,
-        label: 'Settings'
-      }),
-      app.login?.isSiteAdmin && app.activeChainId() && m(CommunityMenuLink, {
-        onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
-        icon: Icons.USER,
-        label: 'Admin'
-      }),
-      m(CommunityMenuLink, {
-        onclick: () => app.modals.create({ modal: FeedbackModal }),
-        icon: Icons.SEND,
-        label: 'Send feedback',
-      }),
-      app.isLoggedIn() && m(CommunityMenuLink, {
-        onclick: () => {
-          $.get(`${app.serverUrl()}/logout`).then(async () => {
-            await initAppState();
-            notifySuccess('Logged out');
-            m.route.set('/');
-            m.redraw();
-          }).catch((err) => {
-            // eslint-disable-next-line no-restricted-globals
-            location.reload();
-          });
-          mixpanel.reset();
-        },
-        icon: Icons.X_SQUARE,
-        label: 'Logout'
       }),
     ]);
   }

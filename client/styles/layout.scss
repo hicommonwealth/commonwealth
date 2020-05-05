@@ -291,3 +291,10 @@ body.modal-open {
         background: darken(#f1f3f5, 2%);
     }
 }
+
+.cui-menu {
+    padding: 2px 0;
+}
+.cui-menu > .cui-menu-divider {
+    margin: 2px 0;
+}

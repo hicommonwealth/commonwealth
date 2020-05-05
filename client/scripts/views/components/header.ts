@@ -1,10 +1,16 @@
 import 'components/header.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
-import app from 'state';
+import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
-import { Button, Icons, PopoverMenu, ListItem } from 'construct-ui';
+import { Button, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivider } from 'construct-ui';
 
+import app from 'state';
+import { initAppState } from 'app';
+
+import { notifySuccess } from 'controllers/app/notifications';
+import FeedbackModal from 'views/modals/feedback_modal';
 import User from 'views/components/widgets/user';
 import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
@@ -69,29 +75,82 @@ const Header: m.Component<{}> = {
         onclick: () => app.modals.create({ modal: LoginModal }),
       }),
       // logged in, no address state
-      app.isLoggedIn() && !app.vm.activeAccount && m(Button, {
-        class: 'login-selector',
-        intent: 'none',
-        iconLeft: Icons.USER_PLUS,
-        size: 'sm',
-        label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
-        onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+      app.isLoggedIn() && !app.vm.activeAccount && m(PopoverMenu, {
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        trigger: m(Button, {
+          class: 'login-selector',
+          intent: 'none',
+          iconLeft: Icons.USER_PLUS,
+          size: 'sm',
+          label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+          onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+        }),
+        content: [
+          // TODO
+          m(MenuItem, {
+            label: 'TODO',
+          }),
+        ],
       }),
       // logged in, address selected state
-      app.isLoggedIn() && app.vm.activeAccount && m(Button, {
-        class: 'login-selector',
-        intent: 'none',
-        size: 'sm',
-        onclick: (e) => m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`),
-        label: m('.login-selector-user', [
-          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-          m('.user-info', [
-            m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
+      app.isLoggedIn() && app.vm.activeAccount && m(PopoverMenu, {
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        trigger: m(Button, {
+          class: 'login-selector',
+          intent: 'none',
+          size: 'sm',
+          label: m('.login-selector-user', [
+            m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
             m('.user-address', app.vm.activeAccount.chain.id === 'near'
               ? `@${app.vm.activeAccount.address}`
               : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-          ])
-        ]),
+          ]),
+        }),
+        content: [
+          m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}` && [
+            m(MenuItem, {
+              label: 'Go to profile',
+              onclick: (e) => m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`),
+              iconLeft: Icons.USER,
+            }),
+            m(MenuDivider),
+          ],
+          m(MenuItem, {
+            onclick: () => m.route.set('/settings'),
+            iconLeft: Icons.SETTINGS,
+            label: 'Settings'
+          }),
+          app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
+            onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
+            iconLeft: Icons.USER,
+            label: 'Admin'
+          }),
+          m(MenuItem, {
+            onclick: () => app.modals.create({ modal: FeedbackModal }),
+            iconLeft: Icons.SEND,
+            label: 'Send feedback',
+          }),
+          m(MenuItem, {
+            onclick: () => {
+              $.get(`${app.serverUrl()}/logout`).then(async () => {
+                await initAppState();
+                notifySuccess('Logged out');
+                m.route.set('/');
+                m.redraw();
+              }).catch((err) => {
+                // eslint-disable-next-line no-restricted-globals
+                location.reload();
+              });
+              mixpanel.reset();
+            },
+            iconLeft: Icons.X_SQUARE,
+            label: 'Logout'
+          }),
+        ]
       }),
     ]);
   }
