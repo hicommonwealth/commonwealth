@@ -64,7 +64,6 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
     const { community, address } = vnode.attrs;
     const visitedCommunity = !!app.login.unseenPosts[community.name];
     const updatedThreads = app.login.unseenPosts[community.name]?.activePosts || 0;
-    console.log(app.login.unseenPosts);
 
     const active = app.activeCommunityId() === community.id
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
