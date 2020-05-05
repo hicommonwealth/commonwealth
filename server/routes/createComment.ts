@@ -114,7 +114,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
   // Comments always need identified parents.
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_');
-  console.log(prefix);
+
   if (prefix === 'discussion') {
     proposal = await models.OffchainThread.findOne({
       where: { id }
