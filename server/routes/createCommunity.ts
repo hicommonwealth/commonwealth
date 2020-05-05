@@ -84,6 +84,7 @@ const createCommunity = async (models, req: UserRequest, res: Response, next: Ne
       community: req.body.name,
     },
     req.wss,
+    [ req.body.creator_address ],
   );
 
   return res.json({ status: 'Success', result: community.toJSON() });
