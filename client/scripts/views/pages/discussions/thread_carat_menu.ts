@@ -10,7 +10,7 @@ import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
 
 
 
-const ThreadSubscriptionButton: m.Component<{proposal: OffchainThread,}> = {
+export const ThreadSubscriptionButton: m.Component<{proposal: OffchainThread,}> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const subscriptions = app.login.notifications;

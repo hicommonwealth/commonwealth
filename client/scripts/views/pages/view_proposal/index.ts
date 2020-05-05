@@ -62,6 +62,7 @@ import {
   ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
+import { ThreadSubscriptionButton } from '../discussions/thread_carat_menu';
 
 interface IProposalHeaderAttrs {
   commentCount: number;
@@ -108,7 +109,19 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 ))
             && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
+          m(ProposalHeaderSpacer),
           m(ProposalHeaderDelete, { proposal }),
+          m(PopoverMenu, {
+            transitionDuration: 0,
+            closeOnOutsideClick: true,
+            menuAttrs: { size: 'default', },
+            content: m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+            trigger: m(Icon, {
+              name: Icons.BELL,
+              class: 'discussion-edit-tags',
+              style: 'margin-right: 6px;'
+            }),
+          })
         ]),
         m('.proposal-title', [
           m(ProposalHeaderTitle, { proposal }),
