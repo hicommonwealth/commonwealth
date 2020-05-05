@@ -9,6 +9,8 @@ const sequelize = new Sequelize(DATABASE_URI, {
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : () => {},
 });
+
+// TODO: separate Sequelize and SequelizeStatic into new object & type this as Sequelize.Models
 const db = {
   sequelize,
   Sequelize,

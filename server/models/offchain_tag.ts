@@ -25,7 +25,9 @@ export interface OffchainTagInstance extends Sequelize.Instance<OffchainTagAttri
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export type OffchainTagModel = Sequelize.Model<OffchainTagInstance, OffchainTagAttributes>;
+export interface OffchainTagModel extends Sequelize.Model<OffchainTagInstance, OffchainTagAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

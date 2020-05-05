@@ -31,7 +31,9 @@ extends Sequelize.Instance<OffchainCommentAttributes>, OffchainCommentAttributes
   // no mixins used
 }
 
-export type OffchainCommentModel = Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes>;
+export interface OffchainCommentModel extends Sequelize.Model<OffchainCommentInstance, OffchainCommentAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

@@ -38,7 +38,9 @@ export interface UserInstance extends Sequelize.Instance<UserAttributes>, UserAt
   getMemberships: Sequelize.HasManyGetAssociationsMixin<MembershipInstance>;
 }
 
-export type UserModel = Sequelize.Model<UserInstance, UserAttributes>;
+export interface UserModel extends Sequelize.Model<UserInstance, UserAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

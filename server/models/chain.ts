@@ -35,7 +35,9 @@ export interface ChainInstance extends Sequelize.Instance<ChainAttributes>, Chai
   getChainNodes: Sequelize.HasManyGetAssociationsMixin<ChainNodeInstance>;
 }
 
-export type ChainModel = Sequelize.Model<ChainInstance, ChainAttributes>;
+export interface ChainModel extends Sequelize.Model<ChainInstance, ChainAttributes> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

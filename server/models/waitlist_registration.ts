@@ -13,7 +13,11 @@ extends Sequelize.Instance<WaitlistRegistrationAttributes>, WaitlistRegistration
 
 }
 
-export type WaitlistRegistrationModel = Sequelize.Model<WaitlistRegistrationInstance, WaitlistRegistrationAttributes>;
+export interface WaitlistRegistrationModel extends Sequelize.Model<
+  WaitlistRegistrationInstance, WaitlistRegistrationAttributes
+> {
+
+}
 
 export default (
   sequelize: Sequelize.Sequelize,

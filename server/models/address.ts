@@ -17,7 +17,7 @@ import { KeyringOptions } from '@polkadot/keyring/types';
 import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { ChainAttributes } from './chain';
+import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes } from './user';
 import { OffchainProfileAttributes } from './offchain_profile';
 import { RoleAttributes } from './role';
@@ -51,10 +51,31 @@ export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, 
 }
 
 export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
-  // TODO: type these
-  createWithToken: any;
-  updateWithToken: any;
-  verifySignature: any;
+  // static methods
+  createWithToken: (
+    user_id: number,
+    chain: string,
+    address: string,
+    keytype?: string
+  ) => Promise<AddressInstance>;
+
+  updateWithToken: (
+    models,
+    chain: ChainInstance,
+    addressModel: AddressInstance,
+    user_id: number,
+    signatureString: string,
+    signatureParams: string,
+  ) => Promise<boolean>;
+
+  verifySignature: (
+    models: Sequelize.Models,
+    chain: ChainInstance,
+    addressModel: AddressInstance,
+    user_id: number,
+    signatureString: string,
+    signatureParams: string,
+  ) => Promise<boolean>;
 }
 
 export default (
@@ -84,14 +105,19 @@ export default (
     classMethods: {
       // Create an unverified 'stub' address, with a verification token
       // tslint:disable:variable-name
-      createWithToken: (user_id, chain, address, keytype?) => {
+      createWithToken: (
+        user_id: number,
+        chain: string,
+        address: string,
+        keytype?: string
+      ): Promise<AddressInstance> => {
         const verification_token = crypto.randomBytes(18).toString('hex');
         const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
         return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype });
       },
 
       // Update an existing address' verification token
-      updateWithToken: (address, user_id?, keytype?) => {
+      updateWithToken: (address: AddressInstance, user_id?: number, keytype?: string): Promise<AddressInstance> => {
         const verification_token = crypto.randomBytes(18).toString('hex');
         const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
         if (user_id) {
@@ -107,13 +133,13 @@ export default (
       // passed from the frontend to show exactly what was signed.
       // Supports Substrate, Ethereum, Cosmos, and NEAR.
       verifySignature: async (
-        models,
-        chain,
-        addressModel,
-        user_id,
+        models: Sequelize.Models,
+        chain: ChainInstance,
+        addressModel: AddressInstance,
+        user_id: number,
         signatureString: string,
         signatureParams: string,
-      ) => {
+      ): Promise<boolean> => {
         if (!chain) {
           console.error('no chain provided to verifySignature');
           return false;
