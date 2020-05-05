@@ -110,7 +110,6 @@ class TagsController {
         community: communityId,
         jwt: app.login.jwt,
       });
-      console.log(response.result);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }

@@ -53,6 +53,15 @@ $switcher-item-extra-spacing: 6px;
         .icon-inner {
             position: relative;
             opacity: 0.4;
+            .notification-dot {
+                position: relative;
+                left: 32px;
+                top: -2px;
+                background-color: red;
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+            }
             .ChainIcon img {
                 width: $switcher-item-size;
                 height: $switcher-item-size;

@@ -22,6 +22,8 @@ const avatarSize = 16;
 const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
+    const visitedChain = !!app.login.unseenPosts[chain];
+    const updatedThreads = app.login.unseenPosts[chain]?.activePosts || 0;
 
     const active = app.activeChainId() === chain
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
@@ -46,6 +48,9 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
         }
       }, [
         m('.icon-inner', [
+          visitedChain
+          && updatedThreads
+          && m('.notification-dot'),
           m(ChainIcon, { chain: nodeList[0].chain }),
           m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
         ]),
@@ -57,6 +62,9 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
 const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
   view: (vnode) => {
     const { community, address } = vnode.attrs;
+    const visitedCommunity = !!app.login.unseenPosts[community.name];
+    const updatedThreads = app.login.unseenPosts[community.name]?.activePosts || 0;
+    console.log(app.login.unseenPosts);
 
     const active = app.activeCommunityId() === community.id
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
@@ -81,6 +89,9 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
         },
       }, [
         m('.icon-inner', [
+          visitedCommunity
+          && updatedThreads
+          && m('.notification-dot'),
           m('.name', community.name.slice(0, 2).toLowerCase()),
           m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
         ]),
