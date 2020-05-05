@@ -41,7 +41,6 @@ const Header: m.Component<{}> = {
         hoverCloseDelay: 0,
         trigger: m(Button, {
           iconLeft: Icons.BELL,
-          size: 'sm'
         }),
         position: 'bottom-end',
         closeOnContentClick: true,
@@ -62,7 +61,6 @@ const Header: m.Component<{}> = {
       // invites menu
       app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
         iconLeft: Icons.MAIL,
-        size: 'sm',
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
       // logged out state
@@ -70,7 +68,6 @@ const Header: m.Component<{}> = {
         class: 'login-selector',
         intent: 'primary',
         iconLeft: Icons.USER,
-        size: 'sm',
         label: 'Log in',
         onclick: () => app.modals.create({ modal: LoginModal }),
       }),
@@ -83,7 +80,6 @@ const Header: m.Component<{}> = {
           class: 'login-selector',
           intent: 'none',
           iconLeft: Icons.USER_PLUS,
-          size: 'sm',
           label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
           onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
         }),
@@ -102,7 +98,6 @@ const Header: m.Component<{}> = {
         trigger: m(Button, {
           class: 'login-selector',
           intent: 'none',
-          size: 'sm',
           label: m('.login-selector-user', [
             m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
             m('.user-address', app.vm.activeAccount.chain.id === 'near'

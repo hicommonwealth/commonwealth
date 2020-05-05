@@ -14,7 +14,6 @@ const SubscriptionButton = {
 
     return m(Button, {
       intent: communitySubscription ? 'primary' : 'none',
-      size: 'sm',
       onclick: (e) => {
         e.preventDefault();
         if (communitySubscription) {

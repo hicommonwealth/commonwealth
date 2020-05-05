@@ -292,9 +292,25 @@ body.modal-open {
     }
 }
 
+// reduce padding on menus
 .cui-menu {
     padding: 2px 0;
 }
 .cui-menu > .cui-menu-divider {
     margin: 2px 0;
+}
+
+// darken color on menus
+.cui-menu > .cui-button.cui-basic {
+    color: #546e7c;
+}
+
+// allow menus to be wider by default
+.cui-menu {
+    max-width: 240px;
+}
+
+// align text in menus to the left by default
+.cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
+    text-align: left;
 }
