@@ -10,6 +10,7 @@ import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification } from 'models';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import labelEdgewareEvent from '../../../../../shared/events/edgeware/filters/labeler';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
@@ -128,14 +129,54 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       pageJump
     } = getNotificationFields(category, JSON.parse(notification.data));
 
-    return getHeaderNotificationRow(
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    );
+    if (category === NotificationCategories.ChainEvent) {
+      if (!notification.chainEvent) {
+        throw new Error('chain event notification does not have expected data');
+      }
+      // TODO: use different labelers depending on chain
+      const chainId = notification.chainEvent.type.chain;
+      const chainName = app.config.chains.getById(chainId).name;
+      const label = labelEdgewareEvent(
+        notification.chainEvent.blockNumber,
+        chainId,
+        notification.chainEvent.data,
+      );
+      return m('li.HeaderNotificationRow', {
+        class: notification.isRead ? '' : 'active',
+        onclick: async () => {
+          const notificationArray: Notification[] = [];
+          notificationArray.push(notification);
+          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          if (!label.linkUrl) return;
+          await m.route.set(label.linkUrl);
+          m.redraw.sync();
+        },
+      }, [
+        m('.comment-body', [
+          m('.comment-body-top', `${label.heading} on ${chainName}`),
+          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+          m('.comment-body-excerpt', label.label),
+        ]),
+      ]);
+    } else {
+      const {
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      } = getNotificationFields(category, JSON.parse(notification.data));
+
+      return getHeaderNotificationRow(
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      );
+    }
 
     // else if (category === NotificationCategories.NewCommunity) {
     //   //const { created_at, proposal_id } = JSON.parse(notification.data);

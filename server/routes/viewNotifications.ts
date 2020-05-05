@@ -29,6 +29,16 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
   const includeParams: any = {
     model: models.Notification,
     as: 'Notifications',
+    include: [{
+      model: models.ChainEvent,
+      required: false,
+      as: 'ChainEvent',
+      include: [{
+        model: models.ChainEventType,
+        required: false,
+        as: 'ChainEventType',
+      }],
+    }]
   };
   if (req.body.unread_only) {
     includeParams.where = { is_read: false };

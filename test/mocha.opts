@@ -4,4 +4,3 @@
   --require @babel/register
   --require source-map-support/register
   --timeout 10000
-  --require mocha-steps

@@ -387,9 +387,16 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get balanceTransferFee(): Observable<SubstrateCoin> {
     if (this.chainClass === ChainClass.Edgeware) {
       // grab const tx fee on edgeware
-      return this._Chain.api.pipe(
-        map((api: ApiRx) => this._Chain.coins(api.consts.balances.transferFee as Balance))
-      );
+      return from(this._Chain.api.pipe(map((api: ApiRx) => (api.consts.balances.transferFee as Balance)))
+        .toPromise()
+        .then((txFee) => {
+          if (txFee) {
+            return Promise.resolve(this._Chain.coins(txFee));
+          } else {
+            const dummyTxFunc = (api: ApiRx) => api.tx.balances.transfer(this.address, '0');
+            return this._Chain.computeFees(this.address, dummyTxFunc);
+          }
+        }));
     } else {
       // compute fee on Kusama
       const dummyTxFunc = (api: ApiRx) => api.tx.balances.transfer(this.address, '0');

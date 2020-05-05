@@ -11,6 +11,7 @@ export const NotificationCategories = {
   NewReaction: 'new-reaction',
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
+  ChainEvent: 'chain-event',
 };
 
 export enum ProposalType {
