@@ -51,8 +51,9 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
-    if (read_only) thread.read_only = !thread.read_only;
-    if (privacy) thread.private = false;
+    thread.read_only = read_only;
+    // threads can be changed from private to public, but not the other way around
+    if (thread.private) thread.private = privacy;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({
