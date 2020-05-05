@@ -40,7 +40,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       where: { id: req.body.id },
     });
 
-    if (userOwnedAddresses.map((addr) => addr.id).indexOf(comment.address_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const arr = comment.version_history;
@@ -95,6 +95,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         community: finalComment.community,
       },
       req.wss,
+      [ finalComment.Address.address ],
     );
 
     return res.json({ status: 'Success', result: finalComment.toJSON() });

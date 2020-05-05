@@ -21,7 +21,7 @@
     .header-breadcrumb {
         flex: 1;
     }
-    .cui-button, .user-button {
+    > .cui-button {
         margin-left: 10px;
     }
 
@@ -32,21 +32,16 @@
             position: relative;
         }
         .login-selector-user {
-            line-height: 1.1;
-            .user-info {
-                position: relative;
-                .User {
-                    //white-space: normal; // prevent long usernames from overflowing
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 110px;
-                    font-size: 14px;
-                }
-                .user-address {
-                    font-size: 12px;
-                    margin: 0;
-                }
+            display: flex;
+            .User {
+                //white-space: normal; // prevent long usernames from overflowing
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 110px;
+            }
+            .user-address {
+                margin-left: 6px;
             }
         }
     }

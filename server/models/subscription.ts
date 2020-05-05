@@ -55,32 +55,66 @@ module.exports = (sequelize, DataTypes) => {
     notification_data: IPostNotificationData | ICommunityNotificationData,
     webhook_data: WebhookContent,
     wss?,
+    excludeAddresses?: string[],
+    includeAddresses?: string[],
+    chainEventId?: number,
   ) => {
-    const creatorAddress = await models.Address.findOne({
-      where: {
-        address: notification_data.author_address,
-      },
-    });
-
     // get subscribers to send notifications to
-    const subscribers = await models.Subscription.findAll({
-      where: {
-        [Op.and]: [
-          { category_id },
-          { object_id },
-          { is_active: true },
-        ],
-        [Op.not]: [{ subscriber_id: creatorAddress.user_id }],
-      },
-    });
+    const findOptions: any = {
+      [Op.and]: [
+        { category_id },
+        { object_id },
+        { is_active: true },
+      ],
+    };
+
+    const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
+      // fetch user ids from address models
+      const addressModels = await models.Address.findAll({
+        where: {
+          address: {
+            [Op.in]: addresses,
+          },
+        },
+      });
+      if (addressModels && addressModels.length > 0) {
+        const userIds = addressModels.map((a) => a.user_id);
+
+        // remove duplicates
+        const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+        return userIdsDedup;
+      } else {
+        return [];
+      }
+    };
+
+    // currently excludes override includes, but we may want to provide the option for both
+    if (excludeAddresses && excludeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(excludeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions[Op.and].push({ subscriber_id: { [Op.notIn]: ids } });
+      }
+    } else if (includeAddresses && includeAddresses.length > 0) {
+      const ids = await fetchUsersFromAddresses(includeAddresses);
+      if (ids && ids.length > 0) {
+        findOptions[Op.and].push({ subscriber_id: { [Op.in]: ids } });
+      }
+    }
+
+    const subscribers = await models.Subscription.findAll({ where: findOptions });
 
     // create notifications if data exists
+    let notifications = [];
     if (notification_data) {
-      await Promise.all(subscribers.map(async (subscription) => {
-        const notification = await models.Notification.create({
+      notifications = await Promise.all(subscribers.map(async (subscription) => {
+        const notificationObj: any = {
           subscription_id: subscription.id,
           notification_data: JSON.stringify(notification_data),
-        });
+        };
+        if (chainEventId) {
+          notificationObj.chain_event_id = chainEventId;
+        }
+        const notification = await models.Notification.create(notificationObj);
         return notification;
       }));
     }
@@ -100,6 +134,7 @@ module.exports = (sequelize, DataTypes) => {
       notificationCategory: category_id,
       ...webhook_data
     });
+    return notifications;
   };
 
   return Subscription;

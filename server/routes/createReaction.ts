@@ -98,6 +98,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
       community: finalReaction.community,
     },
     req.wss,
+    [ finalReaction.Address.address ],
   );
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });

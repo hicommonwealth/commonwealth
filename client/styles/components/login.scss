@@ -13,12 +13,28 @@
     }
 
     // web3 login button with icon for NEAR
-    a.btn.login-wallet-button.formular-button-black {
-        margin-bottom: 26px;
-        padding: 10px 0;
+    .login-button-black {
+        background: #444;
+        color: #fff;
+        box-shadow: none !important;
+        border: none !important;
+        &:hover, &:focus {
+            background: #222;
+        }
+    }
+    .more-options {
+        margin-top: 24px;
+        margin-bottom: -12px;
+        a {
+            color: #777;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
     }
     img.login-wallet-icon {
-        width: 17px;
+        width: 15px;
         display: inline-block;
         margin: -3px 0;
         margin-right: 10px;

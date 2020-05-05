@@ -23,11 +23,11 @@ import { isMember } from 'views/components/membership_button';
 import ChainIcon from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import CommunityMenu from 'views/components/sidebar/community_menu';
 import TagSelector from 'views/components/sidebar/tag_selector';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalModal from 'views/modals/proposals';
+import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -39,7 +39,7 @@ import { IPostNotificationData, ICommunityNotificationData } from 'shared/types'
 import { isRoleOfCommunity } from 'helpers/roles';
 import AdminPanel from '../admin_panel';
 
-const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolean }> = {
+const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
@@ -106,27 +106,22 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
           size: 'lg',
         }, [
           // header
-          // TODO: remove (app.community || app.chain)
-          m(Popover, {
-            class: 'community-menu-popover',
-            isOpen: vnode.state.communityMenuVisible,
-            hasBackdrop: true,
-            content: m(CommunityMenu),
-            onClose: () => {
-              vnode.state.communityMenuVisible = false;
-            },
-            hasArrow: false,
-            closeOnEscapeKey: true,
-            closeOnContentClick: true,
-            trigger: m('.title-selector', (app.community || app.chain) ? [
-              m('.community-name', selectedNode
-                ? selectedNode.chain.name
-                : selectedCommunity ? selectedCommunity.meta.name : ''),
-              !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-              !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-              selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-            ] : 'Commonwealth'),
-          }),
+          m('.title-selector', [
+            m('.title-selector-left', [
+              (app.community || app.chain) ? [
+                m('.community-name', selectedNode
+                  ? selectedNode.chain.name
+                  : selectedCommunity ? selectedCommunity.meta.name : ''),
+                !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
+                !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
+                selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
+              ] : m('.community-name', 'Commonwealth'),
+            ]),
+            m('.title-selector-right', [
+              app.isLoggedIn() && (app.community || app.chain)
+                && m(SubscriptionButton),
+            ]),
+          ]),
           // discussions (all communities)
           (app.community || app.chain)
             && m('h4', 'Off-chain'),

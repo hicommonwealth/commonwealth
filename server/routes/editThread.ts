@@ -44,7 +44,7 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     const thread = await models.OffchainThread.findOne({
       where: { id: thread_id },
     });
-    if (userOwnedAddresses.map((addr) => addr.id).indexOf(thread.author_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const arr = thread.version_history;
@@ -77,6 +77,7 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
       // don't send webhook notifications for edits
       null,
       req.wss,
+      [ finalThread.Address.address ],
     );
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {

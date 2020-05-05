@@ -130,9 +130,13 @@
     }
 }
 
+.community-menu-portal {
+    position: fixed;
+    z-index: 99;
+}
 .community-menu-popover {
     .cui-popover-content {
-        margin-left: -$switcher-width;
+        padding-top: $header-height + 15px;
         border: none;
         border-radius: 0;
         padding: 0;
