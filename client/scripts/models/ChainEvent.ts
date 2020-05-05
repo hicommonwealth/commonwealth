@@ -15,7 +15,6 @@ class ChainEvent {
   }
 
   public static fromJSON(json) {
-    console.log(json);
     return new ChainEvent(
       json.id,
       json.block_number,

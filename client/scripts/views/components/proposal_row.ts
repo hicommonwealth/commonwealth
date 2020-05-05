@@ -226,49 +226,49 @@ const ProposalRow: m.Component<IRowAttrs> = {
       }
     }, [
       m('.proposal-row-left', [
-        (slug === ProposalType.SubstrateDemocracyReferendum || proposal.author === null) ? m('.proposal-display-id', proposal.shortIdentifier) : [
-          m('.proposal-pre', [
-            m(User, {
-              user: proposal.author,
-              avatarOnly: true,
-              avatarSize: 36,
-              tooltip: true,
-            }),
-          ]),
-          m('.proposal-pre-mobile', [
-            m(User, {
-              user: proposal.author,
-              avatarOnly: true,
-              avatarSize: 16,
-              tooltip: true,
-            }),
-          ]),
-        ],
+        (slug === ProposalType.SubstrateDemocracyReferendum || proposal.author === null)
+          ? m('.proposal-display-id', proposal.shortIdentifier)
+          : [
+            m('.proposal-pre', [
+              m(User, {
+                user: proposal.author,
+                avatarOnly: true,
+                avatarSize: 36,
+                tooltip: true,
+              }),
+            ]),
+            m('.proposal-pre-mobile', [
+              m(User, {
+                user: proposal.author,
+                avatarOnly: true,
+                avatarSize: 16,
+                tooltip: true,
+              }),
+            ]),
+          ],
       ]),
       m('.proposal-row-main.container', [
 
         // Case 0. Referendum + other types of proposals, just one main div with metadata
-        (slug != ProposalType.SubstrateTreasuryProposal
-          && slug != ProposalType.SubstrateDemocracyProposal
-          && slug != ProposalType.SubstrateCollectiveProposal ) && [
+        (slug !== ProposalType.SubstrateTreasuryProposal
+          && slug !== ProposalType.SubstrateDemocracyProposal
+          && slug !== ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           m('.proposal-row-metadata', [
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
         // Case 1. Democracy Proposed. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
-        (slug == ProposalType.SubstrateDemocracyProposal) && [
+        (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
-            m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal).title.split('(')[0])),
+            m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal)
+              .title
+              .split('(')[0])),
           ]),
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Seconds'),
             m('.proposal-row-metadata', (proposal as SubstrateDemocracyProposal).getVoters.length),
-          ]),
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;' }, authorComment ? authorComment.text : 'None')
           ]),
         ],
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
@@ -276,10 +276,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Actions'),
             m('.proposal-row-metadata', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
-          ]),
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;'}, authorComment ? authorComment.text : 'None')
           ]),
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
@@ -310,10 +306,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
                 }),
               ]),
             ])
-          ]),
-          m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;' }, authorComment ? authorComment.text : 'None')
           ]),
         ],
       ]),

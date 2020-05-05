@@ -2,7 +2,9 @@ import subscribeEdgewareEvents from './shared/events/edgeware/index';
 import { IEventHandler, CWEvent } from './shared/events/interfaces';
 
 const url = process.env.NODE_URL || undefined;
+
 const chain = process.env.NODE_CHAIN || 'edgeware';
+
 const DEV = process.env.NODE_ENV !== 'production';
 class StandaloneSubstrateEventHandler extends IEventHandler {
   public async handle(event: CWEvent) {
@@ -12,4 +14,5 @@ class StandaloneSubstrateEventHandler extends IEventHandler {
 }
 
 const skipCatchup = false;
+
 subscribeEdgewareEvents(chain, url, [ new StandaloneSubstrateEventHandler() ], skipCatchup);

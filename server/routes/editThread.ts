@@ -44,15 +44,16 @@ const editThread = async (models, req: UserRequest, res: Response, next: NextFun
     const thread = await models.OffchainThread.findOne({
       where: { id: thread_id },
     });
-    if (userOwnedAddresses.map((addr) => addr.id).indexOf(thread.author_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const arr = thread.version_history;
     arr.unshift(version_history);
     thread.version_history = arr;
     thread.body = body;
-    if (read_only) thread.read_only = !thread.read_only;
-    if (privacy) thread.private = false;
+    thread.read_only = read_only;
+    // threads can be changed from private to public, but not the other way around
+    if (thread.private) thread.private = privacy;
     await thread.save();
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({

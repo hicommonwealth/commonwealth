@@ -54,6 +54,7 @@ const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION === 'true';
 
+
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
   environment: process.env.NODE_ENV,

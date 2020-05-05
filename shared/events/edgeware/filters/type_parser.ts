@@ -18,7 +18,6 @@ export default function (
       switch (method) {
         case 'Slash': return SubstrateEventKind.Slash;
         case 'Reward': return SubstrateEventKind.Reward;
-
         // NOTE: these are not supported yet on Edgeware, only kusama and edgeware-develop
         case 'Bonded': return SubstrateEventKind.Bonded;
         case 'Unbonded': return SubstrateEventKind.Unbonded;

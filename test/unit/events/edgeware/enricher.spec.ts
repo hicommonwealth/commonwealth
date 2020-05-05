@@ -7,7 +7,6 @@ import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types'
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist';
-
 import EdgewareEnricherFunc from '../../../../shared/events/edgeware/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
 import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
@@ -286,6 +285,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+
   it('should enrich democracy-passed event', async () => {
     const kind = SubstrateEventKind.DemocracyPassed;
     const event = constructEvent([ '1' ]);
