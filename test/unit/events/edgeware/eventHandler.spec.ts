@@ -66,9 +66,9 @@ describe('Event Handler Tests', () => {
     );
   });
 
-  after('close database', async () => {
-    await closeServer();
-  });
+  // after('close database', async () => {
+  //   await closeServer();
+  // });
 
   it('should create chain event and emit notification', async () => {
     // setup
