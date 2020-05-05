@@ -6,14 +6,15 @@ import { default as moment } from 'moment-twitter';
 
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
-import { Icon, Icons, Tag, PopoverMenu } from 'construct-ui';
+import { Icon, Icons, Tag, } from 'construct-ui';
 
 import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind, OffchainTag } from 'models';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import TagEditor from 'views/components/tag_editor';
-import { isRoleOfCommunity } from 'helpers/roles';
+
+import ThreadCaratMenu from './thread_carat_menu';
+
 
 interface IAttrs {
   proposal: OffchainThread;
@@ -42,11 +43,6 @@ const DiscussionRow: m.Component<IAttrs> = {
         return 0;
       }
     };
-
-    const canEditTags = app.vm.activeAccount
-      && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-          || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-          || proposal.author === app.vm.activeAccount.address);
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
@@ -80,22 +76,7 @@ const DiscussionRow: m.Component<IAttrs> = {
                 `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
                 [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
               ),
-            canEditTags
-              && m(PopoverMenu, {
-                transitionDuration: 0,
-                closeOnOutsideClick: true,
-                menuAttrs: { size: 'sm', },
-                content: m(TagEditor, {
-                  thread: proposal,
-                  popoverMenu: true,
-                  onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); },
-                }),
-                trigger: m(Icon, {
-                  name: Icons.CHEVRON_DOWN,
-                  class: 'discussion-edit-tags',
-                  style: 'margin-right: 6px;'
-                }),
-              }),
+              m(ThreadCaratMenu, { proposal }),
           ]),
           propType === OffchainThreadKind.Link
             && proposal.url
