@@ -11,7 +11,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const visitedChain = !!app.login.unseenPosts[chain];
-    const newThreads = app.login.unseenPosts[chain]?.threads ? app.login.unseenPosts[chain]?.threads : 0;
+    const updatedThreads = app.login.unseenPosts[chain]?.activePosts || 0;
 
     return m(Card, {
       class: 'home-card',
@@ -24,7 +24,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
       m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
       isMember(chain, null) && justJoinedChains.indexOf(chain) === -1 && [
         app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
-        newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
+        updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
       app.isLoggedIn() && m('.chain-membership', [
         m(MembershipButton, {
@@ -43,7 +43,7 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
     const { justJoinedCommunities } = vnode.attrs;
     const c = vnode.attrs.community;
     const visitedCommunity = !!app.login.unseenPosts[c.id];
-    const newThreads = app.login.unseenPosts[c.id]?.threads ? app.login.unseenPosts[c.id]?.threads : 0;
+    const updatedThreads = app.login.unseenPosts[c.id]?.activePosts || 0;
     return m(Card, {
       class: 'home-card',
       fluid: true,
@@ -57,7 +57,7 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
       ]),
       isMember(null, c.id) && justJoinedCommunities.indexOf(c.id) === -1 && [
         app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
-        newThreads > 0 && m('.chain-new', m('.new-threads', `${newThreads} new`)),
+        updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
       app.isLoggedIn() && [
         m(MembershipButton, {
