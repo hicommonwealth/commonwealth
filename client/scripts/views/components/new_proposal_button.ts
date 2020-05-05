@@ -9,6 +9,7 @@ import { ChainClass } from 'models';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import NewProposalModal from 'views/modals/proposals';
+import NewThreadModal from 'views/modals/new_thread_modal';
 
 const NewProposalButton: m.Component<{ fluid: boolean }> = {
   view: (vnode) => {
@@ -28,7 +29,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+        onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
 
@@ -38,7 +39,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         intent: 'primary',
         label: 'New post',
         fluid,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+        onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
       m(PopoverMenu, {
         class: 'NewProposalButton',
@@ -62,6 +63,12 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
           align: 'left',
         },
         content: [
+          m(MenuItem, {
+            onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+            label: 'New post',
+          }),
+          (activeAccount instanceof CosmosAccount || activeAccount instanceof SubstrateAccount)
+            && m(MenuDivider),
           activeAccount instanceof CosmosAccount && m(MenuItem, {
             onclick: (e) => app.modals.create({
               modal: NewProposalModal,
