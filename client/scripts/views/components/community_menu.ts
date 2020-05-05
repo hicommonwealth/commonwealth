@@ -127,7 +127,10 @@ const CommunityMenu: m.Component<{}> = {
       }),
       app.login.roles.length > 0 && m('hr'),
       m(CommunityMenuLink, {
-        onclick: () => m.route.set('/'),
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/')
+        },
         icon: Icons.HOME,
         label: 'Home'
       }),
