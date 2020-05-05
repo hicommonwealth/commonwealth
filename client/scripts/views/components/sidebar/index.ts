@@ -113,7 +113,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
                 !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
                 selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-              ] : 'Commonwealth',
+              ] : m('.community-name', 'Commonwealth'),
             ]),
             m('.title-selector-right', [
               app.isLoggedIn() && (app.community || app.chain)

@@ -60,7 +60,7 @@ const Header: m.Component<{}> = {
         iconLeft: Icons.MAIL,
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
-      // logged out state
+      // logged out
       !app.isLoggedIn() && m(Button, {
         class: 'login-selector',
         intent: 'primary',
@@ -68,49 +68,38 @@ const Header: m.Component<{}> = {
         label: 'Log in',
         onclick: () => app.modals.create({ modal: LoginModal }),
       }),
-      // logged in, no address state
-      app.isLoggedIn() && !app.vm.activeAccount && m(PopoverMenu, {
+      // logged in
+      app.isLoggedIn() && m(PopoverMenu, {
         closeOnContentClick: true,
         transitionDuration: 0,
         hoverCloseDelay: 0,
+        position: 'bottom-end',
         trigger: m(Button, {
-          class: 'login-selector',
+          class: app.vm.activeAccount ? 'login-selector' : 'login-selector cui-button-icon',
           intent: 'none',
-          iconLeft: Icons.USER_PLUS,
-          label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
-          onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+          label: app.vm.activeAccount
+            ? m('.login-selector-user', [
+              m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
+              m('.user-address', app.vm.activeAccount.chain.id === 'near'
+                ? `@${app.vm.activeAccount.address}`
+                : `${app.vm.activeAccount.address.slice(0, 6)}...`)
+            ])
+            : m(Icon, { name: Icons.CHEVRON_DOWN }),
         }),
         content: [
-          // TODO
-          m(MenuItem, {
-            label: 'TODO',
-          }),
-        ],
-      }),
-      // logged in, address selected state
-      app.isLoggedIn() && app.vm.activeAccount && m(PopoverMenu, {
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        trigger: m(Button, {
-          class: 'login-selector',
-          intent: 'none',
-          label: m('.login-selector-user', [
-            m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
-            m('.user-address', app.vm.activeAccount.chain.id === 'near'
-              ? `@${app.vm.activeAccount.address}`
-              : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-          ]),
-        }),
-        content: [
-          m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}` && [
-            m(MenuItem, {
-              label: 'Go to profile',
-              onclick: (e) => m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`),
-              iconLeft: Icons.USER,
-            }),
-            m(MenuDivider),
-          ],
+          app.vm.activeAccount
+            && app.vm.activeAccount.chain
+            && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`
+            && [
+              m(MenuItem, {
+                label: 'Go to profile',
+                iconLeft: Icons.USER,
+                onclick: (e) => {
+                  m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+                },
+              }),
+              m(MenuDivider),
+            ],
           m(MenuItem, {
             onclick: () => m.route.set('/settings'),
             iconLeft: Icons.SETTINGS,
