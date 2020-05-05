@@ -12,18 +12,26 @@ const SubscriptionButton = {
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
     const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();
 
-    return m(Button, {
-      intent: communitySubscription ? 'primary' : 'none',
-      onclick: (e) => {
-        e.preventDefault();
-        if (communitySubscription) {
-          subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw());
-        } else {
-          subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => m.redraw());
-        }
-      },
-      // label: communitySubscription ? 'New thread notifications on' : 'New thread notifications off',
-      iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,
+    return m(PopoverMenu, {
+      transitionDuration: 0,
+      closeOnContentClick: true,
+      menuAttrs: { size: 'sm', },
+      content: m(MenuItem, {
+        onclick: (e) => {
+          e.preventDefault();
+          if (communitySubscription) {
+            subscriptions.deleteSubscription(communitySubscription).then(() => {
+              m.redraw();
+            });
+          } else {
+            subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain).then(() => {
+              m.redraw();
+            });
+          }
+        },
+        label: communitySubscription ? 'Turn off notifications' : 'Turn on notifications',
+      }),
+      trigger: m(Icon, { name: Icons.CHEVRON_DOWN, class: 'SubscriptionButton' }),
     });
   },
 };

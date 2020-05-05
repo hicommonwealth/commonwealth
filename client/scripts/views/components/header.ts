@@ -16,7 +16,6 @@ import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 import NewProposalButton from 'views/components/new_proposal_button';
-import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import NotificationRow from 'views/components/sidebar/notification_row';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
@@ -34,8 +33,6 @@ const Header: m.Component<{}> = {
       // new proposal
       m(NewProposalButton, { fluid: false }),
       // notifications menu
-      app.isLoggedIn() && (app.community || app.chain)
-        && m(SubscriptionButton),
       app.isLoggedIn() && m(PopoverMenu, {
         transitionDuration: 0,
         hoverCloseDelay: 0,

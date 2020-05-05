@@ -1,4 +1,4 @@
-import 'components/sidebar/community_menu.scss';
+import 'components/community_menu.scss';
 
 import m from 'mithril';
 import $ from 'jquery';

@@ -14,10 +14,26 @@ $switcher-item-extra-spacing: 6px;
     z-index: 10;
     user-select: none;
     align-items: center;
-    .sidebar-content {
+    .sidebar-logo {
         position: absolute;
         top: 0;
+        height: $header-height;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        // TODO: hmm...
+        padding: 9px 10px;
+        font-size: 40px;
+        cursor: pointer;
+        &:hover {
+            background:  darken(#4e4e53, 10%);
+        }
+    }
+    .sidebar-content {
+        position: absolute;
+        top: $header-height;
         bottom: 0;
+        border-top: 1px solid #444;
         padding: $switcher-item-extra-spacing 0;
         width: 100%;
         overflow-y: scroll;

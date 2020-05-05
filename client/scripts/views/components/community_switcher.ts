@@ -3,7 +3,7 @@ import 'components/community_switcher.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Icon, Icons, PopoverMenu, MenuItem, Button, Tooltip } from 'construct-ui';
+import { Icon, Icons, Popover, PopoverMenu, MenuItem, Button, Tooltip } from 'construct-ui';
 
 import app from 'state';
 import { initAppState } from 'app';
@@ -15,8 +15,9 @@ import User from 'views/components/widgets/user';
 import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
 import FeedbackModal from 'views/modals/feedback_modal';
+import CommunityMenu from 'views/components/community_menu';
 
-const avatarSize = 14;
+const avatarSize = 16;
 
 const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
@@ -46,7 +47,7 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
       }, [
         m('.icon-inner', [
           m(ChainIcon, { chain: nodeList[0].chain }),
-          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
         ]),
       ])
     });
@@ -81,14 +82,14 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
       }, [
         m('.icon-inner', [
           m('.name', community.name.slice(0, 2).toLowerCase()),
-          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+          m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
         ]),
       ])
     });
   }
 };
 
-const CommunitySwitcher: m.Component<{}> = {
+const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
 
@@ -105,6 +106,20 @@ const CommunitySwitcher: m.Component<{}> = {
     const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
 
     return m('.CommunitySwitcher', [
+      m(Popover, {
+        portalAttrs: { class: 'community-menu-portal' },
+        class: 'community-menu-popover',
+        isOpen: vnode.state.communityMenuVisible,
+        hasBackdrop: true,
+        content: m(CommunityMenu),
+        onClose: () => {
+          vnode.state.communityMenuVisible = false;
+        },
+        hasArrow: false,
+        closeOnEscapeKey: true,
+        closeOnContentClick: true,
+        trigger: m('.sidebar-logo', '🤔'),
+      }),
       m('.sidebar-content', [
         chainRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);

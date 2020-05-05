@@ -81,27 +81,30 @@ $active-color: #e9e9f5;
     // top
     .cui-list .title-selector {
         display: flex;
-        padding: 2px $sidebar-padding 0;
+        padding: 1px $sidebar-padding 0;
         margin-bottom: 12px;
-        cursor: pointer !important;
         user-select: none;
         border-bottom: 1px solid #eee;
+        background: #fff !important;
         color: #222 !important;
         min-height: $header-height;
         align-items: center;
 
         border-bottom: 1px solid #e7e7e7;
         box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-        &:hover {
-            background: $active-color;
+        .title-selector-left {
+            flex: 1;
+            display: flex;
         }
         .community-name {
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
-            font-size: 16px;
             font-weight: 700;
             line-height: 1.25;
+        }
+        .icon-lock {
+            margin-left: 2px;
         }
         .ChainStatusIndicator {
             display: inline-block;
@@ -110,8 +113,8 @@ $active-color: #e9e9f5;
             position: relative;
             top: -1px;
         }
-        .icon-lock {
-            margin-left: 2px;
+        .SubscriptionButton {
+            float: right;
         }
     }
 }
