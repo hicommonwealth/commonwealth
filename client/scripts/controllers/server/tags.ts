@@ -110,7 +110,6 @@ class TagsController {
         community: communityId,
         jwt: app.login.jwt,
       });
-      console.log(response.result);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -119,7 +118,6 @@ class TagsController {
       }
       const tags = (app.chain) ? response.result.filter((tag) => !tag.communityId) : response.result;
       tags.forEach((t) => this._store.add(modelFromServer(t)));
-      console.log(this._store);
       this._initialized = true;
     } catch (err) {
       console.log('Failed to load offchain tags');
