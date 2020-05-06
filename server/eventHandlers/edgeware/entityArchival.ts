@@ -1,5 +1,5 @@
 /**
- * Transforms raw edgeware events into the final form for storage
+ * Determines which chain entities each event affects and updates state accordingly.
  */
 import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
@@ -31,9 +31,9 @@ export default class extends IEventHandler {
    * Handles an existing ChainEvent by connecting it with an entity, and creating
    * threads as needed.
    *
-   * `dbEvent` is the database entry corresponding to the `event`. `migrate` is unused.
+   * `dbEvent` is the database entry corresponding to the `event`.
    */
-  public async handle(event: CWEvent, dbEvent, migrate = false) {
+  public async handle(event: CWEvent, dbEvent) {
     if (!dbEvent) {
       console.error('no db event found!');
       return;
@@ -82,10 +82,6 @@ export default class extends IEventHandler {
     };
 
     switch (event.data.kind) {
-      // TODO: we might need to do additional work for Democracy regarding preimages
-      //    and generating titles for threads. But for now, preimages can be
-      //    their own entity type.
-
       // Democracy Proposal Events
       case SubstrateEventKind.DemocracyProposed: {
         const { proposalIndex } = event.data;

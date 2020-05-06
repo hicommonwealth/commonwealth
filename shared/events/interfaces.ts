@@ -21,7 +21,7 @@ export interface CWEvent {
 // handles individual events by sending them off to storage/notifying
 export abstract class IEventHandler {
   // throws on error, returns a db event, or void
-  public abstract handle(event: CWEvent, dbEvent?: any, migrate?: boolean): Promise<any>;
+  public abstract handle(event: CWEvent, dbEvent?: any): Promise<any>;
 }
 
 // parses events out of blocks into a standard format and

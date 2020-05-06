@@ -1,22 +1,18 @@
 /**
- * Transforms raw edgeware events into the final form for storage
+ * Generic handler that stores the event in the database.
  */
 import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
-import { NotificationCategories } from '../../shared/types';
 
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _wss,
     private readonly _chain: string,
   ) {
     super();
   }
 
   /**
-   * Handles an event by transforming it as needed.
-   * @param event the raw event from chain
-   * @returns the processed event
+   * Handles an event by creating a ChainEvent in the database.
    */
   public async handle(event: CWEvent) {
     console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
@@ -29,7 +25,7 @@ export default class extends IEventHandler {
       console.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
-      console.log(`found chain event type: ${dbEventType.id}`);
+      // console.log(`found chain event type: ${dbEventType.id}`);
     }
 
     // create event in db
@@ -39,22 +35,6 @@ export default class extends IEventHandler {
       event_data: event.data,
     });
 
-    console.log(`created db event: ${dbEvent.id}`);
-
-    // locate subscriptions generate notifications as needed
-    const dbNotifications = await this._models.Subscription.emitNotifications(
-      this._models,
-      NotificationCategories.ChainEvent,
-      dbEventType.id,
-      {
-        created_at: new Date(),
-      },
-      { }, // TODO: add webhook data once specced out
-      this._wss,
-      event.excludeAddresses,
-      event.includeAddresses,
-      dbEvent.id,
-    );
-    console.log(`Emitted ${dbNotifications.length} notifications.`);
+    return dbEvent;
   }
 }

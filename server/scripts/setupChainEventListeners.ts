@@ -1,8 +1,10 @@
 import WebSocket from 'ws';
-import EdgewareNotificationHandler from '../eventHandlers/edgeware/notifications';
-import EdgewareArchivalHandler from '../eventHandlers/edgeware/archival';
+import EventStorageHandler from '../eventHandlers/storage';
+import EventNotificationHandler from '../eventHandlers/notifications';
+import EdgewareMigrationHandler from '../eventHandlers/edgeware/migration';
+import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import { IDisconnectedRange, EventSupportingChains } from '../../shared/events/interfaces';
+import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
@@ -32,12 +34,20 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
   console.log('Setting up event listeners...');
   await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
-      const notificationHandler = new EdgewareNotificationHandler(models, wss, node.chain);
-      const archivalHandler = new EdgewareArchivalHandler(models, wss, node.chain);
+      const handlers: IEventHandler[] = [];
+      if (migrate) {
+        const migrationHandler = new EdgewareMigrationHandler(models, node.chain);
+        handlers.push(migrationHandler);
+      } else {
+        const storageHandler = new EventStorageHandler(models, node.chain);
+        const notificationHandler = new EventNotificationHandler(models, wss);
+        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, wss, node.chain);
+        handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
+      }
       const subscriber = await subscribeEdgewareEvents(
         node.chain,
         node.url,
-        [ notificationHandler, archivalHandler ],
+        handlers,
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
         migrate,
