@@ -110,31 +110,28 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       switchMap((api: ApiRx) => combineLatest(
         of(api),
         api.derive.staking.validators(),
+        api.query.staking.currentEra(),
       )),
 
       // fetch balances alongside validators
-      flatMap(([api, { nextElected, validators: currentSet }]: [ApiRx, DeriveStakingValidators]) => {
+      flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, any]) => {
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
-        console.log(toBeElected);
-
+        const stakersCall = (api.query.staking.stakers)
+          ? api.query.staking.stakers
+          : api.query.staking.erasStakers;
+        const stakersCallArgs = (account) => (api.query.staking.stakers)
+          ? account
+          : [era.toString(), account];
         // TODO: api.query.staking.stakers should be replaced with erasStakers as part of
         //  Kusama staking API upgrade (which we have not implemented)
         return combineLatest(
           of(currentSet),
           of(toBeElected),
-          api.queryMulti(currentSet.map(
-            (v) => [ api.query.staking.bonded, v.toString() ]
-          )),
-          api.queryMulti(currentSet.map(
-            (v) => [ api.query.staking.stakers, v.toString() ]
-          )),
-          api.queryMulti(toBeElected.map(
-            (v) => [ api.query.staking.bonded, v.toString() ]
-          )),
-          api.queryMulti(toBeElected.map(
-            (v) => [ api.query.staking.stakers, v.toString() ]
-          )),
+          api.query.staking.bonded.multi(currentSet.map((elt) => elt.toString())),
+          stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
+          api.query.staking.bonded.multi(toBeElected.map((elt) => elt.toString())),
+          stakersCall.multi(toBeElected.map((elt) => stakersCallArgs(elt.toString()))),
         );
       }),
       auditTime(100),
@@ -534,30 +531,4 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       `${this.address} attempts to unlock from democracy`,
     );
   }
-
-  // Nickname module is not used by chains we are supporting now
-  //
-  // public get nickname(): Observable<string> {
-  //   if (!this._Chain?.apiInitialized) return;
-  //   return this._Chain.query((api: ApiRx) => api.derive.accounts.info(this.address))
-  //     .pipe(map((id: DeriveAccountInfo) => {
-  //       return id.nickname;
-  //     }));
-  // }
-
-  // public async setNickname(name: string): Promise<any> {
-  //   if (!this._Chain?.apiInitialized) return Promise.resolve();
-  //   // check if user has enough funds to register a nickname
-  //   const fundsAvailable = await this.canWithdraw(this._Chain.reservationFee, false);
-  //   if (!fundsAvailable) {
-  //     throw new Error('not enough liquid funds');
-  //   }
-
-  //   return this._Chain.createTXModalData(
-  //     this,
-  //     (api: ApiRx) => api.tx.nicks.setName(name),
-  //     'setName',
-  //     `set nickname to ${name}`
-  //   );
-  // }
 }

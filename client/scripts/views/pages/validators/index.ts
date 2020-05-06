@@ -1,7 +1,6 @@
 import 'pages/validators.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
@@ -16,20 +15,17 @@ import PageLoading from 'views/pages/loading';
 import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
-import Tabs from '../../components/widgets/tabs';
 import ListingPage from '../_listing_page';
-import { createTXModal } from '../../modals/tx_signing_modal';
-
 
 import * as CosmosValidationViews from './cosmos';
-import * as SubstrateValidationViews from './substrate';
+import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
 
 export interface IManageStakingModalState {
   dynamic: {
     exposures: any;
     validators: IValidators | { [address: string]: ICosmosValidator };
-    bonded: SubstrateAccount;
-    stakingLedger: StakingLedger;
+    bonded?: SubstrateAccount;
+    stakingLedger?: StakingLedger;
   };
   sending: boolean;
   error: any;
@@ -52,6 +48,7 @@ export interface IValidatorAttrs {
 interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
+    stakingLedger?: StakingLedger;
   };
   nominations: any[];
   originalNominations: any[];
@@ -105,24 +102,32 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
+    stakingLedger: (app.chain.base === ChainBase.Substrate && app.vm.activeAccount)
+      ? (app.vm.activeAccount as SubstrateAccount).stakingLedger
+      : null,
   }),
   view: (vnode) => {
     let vComponents = [];
-    let sender;
     switch (app.chain.class) {
-      case ChainClass.Kusama:
-        sender = app.vm.activeAccount as SubstrateAccount;
+      case ChainClass.Edgeware:
         vComponents = [
-          SubstrateValidationViews.ValidationPreHeader(vnode, app.chain as Substrate, sender),
-          SubstrateValidationViews.ValidatorPresentationComponent(vnode, app.chain as Substrate),
+          SubstratePreHeader(
+            vnode,
+            app.chain as Substrate,
+            app.vm.activeAccount as SubstrateAccount
+          ),
+          SubstratePresentationComponent(vnode, app.chain as Substrate),
         ];
         break;
-      case ChainClass.Edgeware:
-        sender = app.vm.activeAccount as SubstrateAccount;
+      case ChainClass.Kusama:
         vComponents = [
-          SubstrateValidationViews.ValidationPreHeader(vnode, app.chain as Substrate, sender),
-          SubstrateValidationViews.ValidatorPresentationComponent(vnode, app.chain as Substrate),
+          SubstratePreHeader(
+            vnode,
+            app.chain as Substrate,
+            app.vm.activeAccount as SubstrateAccount
+          ),
+          SubstratePresentationComponent(vnode, app.chain as Substrate),
         ];
         break;
       case ChainClass.CosmosHub:
@@ -141,7 +146,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
 
 const ValidatorPage : m.Component = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'ValidatorPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },
   view: (vnode) => {
     if (!app.chain || app.chain.networkStatus !== ApiStatus.Connected) return m(PageLoading);
