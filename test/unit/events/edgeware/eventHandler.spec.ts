@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { resetDatabase, closeServer } from '../../../../server-test';
+import { resetDatabase } from '../../../../server-test';
 import models from '../../../../server/database';
 import { NotificationCategories } from '../../../../shared/types';
 import EdgewareEventHandler from '../../../../server/eventHandlers/edgeware';
@@ -65,10 +65,6 @@ describe('Event Handler Tests', () => {
       'edgeware',
     );
   });
-
-  // after('close database', async () => {
-  //   await closeServer();
-  // });
 
   it('should create chain event and emit notification', async () => {
     // setup
