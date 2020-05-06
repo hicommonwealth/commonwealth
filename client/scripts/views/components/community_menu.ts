@@ -129,7 +129,15 @@ const CommunityMenu: m.Component<{}> = {
       m(CommunityMenuLink, {
         onclick: (e) => {
           e.preventDefault();
-          m.route.set('/')
+          m.route.set('/notifications');
+        },
+        icon: Icons.BELL,
+        label: 'Manage Notifications',
+      }),
+      m(CommunityMenuLink, {
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/');
         },
         icon: Icons.HOME,
         label: 'Home'
