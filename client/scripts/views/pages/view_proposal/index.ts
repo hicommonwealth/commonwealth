@@ -10,6 +10,7 @@ import { PopoverMenu, Icon, Icons } from 'construct-ui';
 import Near from 'controllers/chain/near/main';
 import { WalletAccount } from 'nearlib';
 
+import { NotificationCategories } from 'types';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
@@ -62,6 +63,7 @@ import {
   ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
+import { ThreadSubscriptionButton } from '../discussions/thread_carat_menu';
 
 interface IProposalHeaderAttrs {
   commentCount: number;
@@ -94,6 +96,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
 
+    const notificationSubscription = app.login.notifications.subscriptions
+      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
+
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -108,7 +113,18 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 ))
             && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
+          m(ProposalHeaderSpacer),
           m(ProposalHeaderDelete, { proposal }),
+          app.isLoggedIn() && m(PopoverMenu, {
+            transitionDuration: 0,
+            closeOnOutsideClick: true,
+            closeOnContentClick: true,
+            menuAttrs: { size: 'default' },
+            content: m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+            trigger: m('.ProposalHeaderCaretMenu', [
+              m('a', notificationSubscription ? 'Notifications on' : 'Notifications off'),
+            ]),
+          })
         ]),
         m('.proposal-title', [
           m(ProposalHeaderTitle, { proposal }),
