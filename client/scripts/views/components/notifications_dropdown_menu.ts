@@ -25,6 +25,10 @@ class BatchedNotification {
     return this._batch;
   }
 
+  public addNotification(n: Notification): void {
+    this._batch.push(n);
+  }
+
   public markBatchRead(): void {
     this._batch.map((n) => {
       n.markRead();
