@@ -1,18 +1,18 @@
 import m from 'mithril';
 import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
 import ActionForm from './action_form';
 
-
-const ControllerForm: m.Component<{ stashes, stash }, {}> = {
+const ControllerForm: m.Component<{ stashes, stashAccount }, {}> = {
   view: (vnode) => [
-    m('p', `This account is configured as a controller for ${vnode.attrs.stash}`),
+    m('p', `This account is configured as a controller for ${vnode.attrs.stashAccount}`),
     vnode.attrs.stashes.map(([stash, { exposure, balance }]) => m('.well', [
       m('.stash-stat', [
         m('h5', 'Stash'),
         m('.stash-stat-text', [
-          m(User, { user: stash, avatarSize: 24 }),
+          m(User, { user: (app.chain as Substrate).accounts.fromAddress(stash), avatarSize: 24 }),
         ]),
       ]),
       m('.stash-stat', [

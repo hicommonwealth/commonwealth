@@ -7,7 +7,7 @@ import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
-  AccountData, Balance, BalanceLock, BalanceLockTo212,
+  AccountData, Balance, BalanceLock, BalanceLockTo212, EraIndex,
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
@@ -114,7 +114,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       )),
 
       // fetch balances alongside validators
-      flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, any]) => {
+      flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, EraIndex]) => {
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
         // Different runtimes call for different access to stakers: old vs. new
@@ -229,7 +229,21 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // The amount staked by this account & accounts who have nominated it
   public get stakingExposure(): Observable<Exposure> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.query.staking.stakers(this.address)) as Observable<Exposure>;
+    return this._Chain.api.pipe(
+      switchMap((api: ApiRx) => combineLatest(
+        of(api),
+        api.query.staking.currentEra(),
+      )),
+      flatMap(([api, era]: [ApiRx, EraIndex]) => {
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = (api.query.staking.stakers)
+          ? api.query.staking.stakers
+          : api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) => (api.query.staking.stakers) ? [account] : [era.toString(), account];
+        return stakersCall(...stakersCallArgs(this.address));
+      })
+    ) as Observable<Exposure>;
   }
 
   public get bonded(): Observable<SubstrateAccount> {

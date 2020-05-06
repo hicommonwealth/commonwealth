@@ -5,7 +5,6 @@ import mixpanel from 'mixpanel-browser';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import _ from 'lodash';
-import { StakingLedger, ActiveEraInfo, EraIndex, SessionIndex } from '@polkadot/types/interfaces';
 import app, { ApiStatus } from 'state';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
@@ -19,17 +18,6 @@ import ListingPage from '../_listing_page';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
-
-export interface IManageStakingModalState {
-  dynamic: {
-    exposures: any;
-    validators: IValidators | { [address: string]: ICosmosValidator };
-    bonded?: SubstrateAccount;
-    stakingLedger?: StakingLedger;
-  };
-  sending: boolean;
-  error: any;
-}
 
 export interface IValidatorAttrs {
   stash: string;
@@ -48,10 +36,6 @@ export interface IValidatorAttrs {
 export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
-    stakingLedger?: StakingLedger;
-    currentSession?: SessionIndex;
-    currentEra?: EraIndex;
-    activeEra?: ActiveEraInfo;
   };
   nominations: any[];
   originalNominations: any[];
@@ -118,13 +102,21 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     switch (app.chain.class) {
       case ChainClass.Edgeware:
         vComponents = [
-          SubstratePreHeader(vnode.state, app.chain as Substrate,app.vm.activeAccount as SubstrateAccount),
+          m(SubstratePreHeader, {
+            sender: app.vm.activeAccount as SubstrateAccount,
+            nominations: vnode.state.nominations,
+            nominationsHasChanged: vnode.state.nominationsHasChanged
+          }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
       case ChainClass.Kusama:
         vComponents = [
-          SubstratePreHeader(vnode.state, app.chain as Substrate, app.vm.activeAccount as SubstrateAccount),
+          m(SubstratePreHeader, {
+            sender: app.vm.activeAccount as SubstrateAccount,
+            nominations: vnode.state.nominations,
+            nominationsHasChanged: vnode.state.nominationsHasChanged
+          }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;

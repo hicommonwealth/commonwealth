@@ -4,10 +4,23 @@ import { formatAddressShort } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import User from 'views/components/widgets/user';
-import { IManageStakingModalState } from '..';
+import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
+import { ICosmosValidator } from 'controllers/chain/cosmos/account';
+import { StakingLedger } from '@polkadot/types/interfaces';
 import StashAccountForm from './stash_form';
 import ControllerAccountForm from './controller_form';
 import NewStashForm from './new_stash_form';
+
+interface IManageStakingModalState {
+  dynamic: {
+    exposures: any;
+    validators: IValidators | { [address: string]: ICosmosValidator };
+    bonded?: SubstrateAccount;
+    stakingLedger?: StakingLedger;
+  };
+  sending: boolean;
+  error: any;
+}
 
 const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModalState>({
   getObservables: (attrs) => ({
@@ -19,8 +32,7 @@ const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModal
     validators: (app.chain as Substrate).accounts.validators,
   }),
   view: (vnode) => {
-    const { exposures } = vnode.state.dynamic;
-    const { validators } = vnode.state.dynamic;
+    const { exposures, validators, stakingLedger, bonded } = vnode.state.dynamic;
     const stashes = Object.entries(validators || {})
       .filter(([stash, { controller }]) => controller === vnode.attrs.account.address);
 
@@ -29,12 +41,12 @@ const ManageStakingModal = makeDynamicComponent<{ account }, IManageStakingModal
     // checks whether the account is a controller because controllers have stakingLedgers
     if (vnode.state.dynamic.bonded) {
       accountForm = m(StashAccountForm, {
-        controller: vnode.state.dynamic.bonded,
+        controller: bonded,
       });
-    } else if (vnode.state.dynamic.stakingLedger) {
+    } else if (stakingLedger) {
       accountForm = m(ControllerAccountForm, {
         stashes,
-        stash: vnode.state.dynamic.stakingLedger.stash,
+        stashAccount: stakingLedger.stash,
       });
     } else {
       accountForm = [
