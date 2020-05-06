@@ -54,6 +54,44 @@ describe('Event Storage Handler Tests', () => {
     assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
   });
 
+  it('should not create db event for duplicates', async () => {
+    // setup
+    const event: CWEvent = {
+      blockNumber: 11,
+      data: {
+        kind: SubstrateEventKind.DemocracyStarted,
+        referendumIndex: 1,
+        endBlock: 100,
+        proposalHash: 'hash2',
+        voteThreshold: 'Supermajorityapproval',
+      }
+    };
+
+    const eventHandler = new StorageHandler(models, 'edgeware');
+
+    // process event
+    const dbEvent = await eventHandler.handle(event);
+    const dbEvent2 = await eventHandler.handle(event);
+
+    // expect results
+    assert.isUndefined(dbEvent2);
+    assert.deepEqual(dbEvent.event_data, event.data);
+    const chainEvents = await models['ChainEvent'].findAll({
+      where: {
+        chain_event_type_id: 'edgeware-democracy-started',
+        block_number: 11,
+      }
+    });
+    assert.lengthOf(chainEvents, 1);
+    assert.deepEqual(chainEvents[0].toJSON(), dbEvent.toJSON());
+
+    const dbEventType = await dbEvent.getChainEventType();
+    const chainEventType = await models['ChainEventType'].findOne({
+      where : { id: 'edgeware-democracy-started' }
+    });
+    assert.deepEqual(chainEventType.toJSON(), dbEventType.toJSON());
+  });
+
   it('should not create chain event for unknown event type', async () => {
     const event = {
       blockNumber: 13,

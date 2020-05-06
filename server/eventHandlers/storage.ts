@@ -29,11 +29,16 @@ export default class extends IEventHandler {
     }
 
     // create event in db
-    const dbEvent = await this._models.ChainEvent.create({
+    const [ dbEvent, created ] = await this._models.ChainEvent.findOrCreate({ where: {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,
-    });
+    } });
+
+    if (!created) {
+      console.error('Received duplicate event!');
+      return;
+    }
 
     return dbEvent;
   }
