@@ -89,7 +89,6 @@ export const getSecondaryStatusText = (proposal: AnyProposal): string | null => 
 }
 
 export const getSupportText = (proposal: AnyProposal) => {
-  console.log(proposal);
   if (typeof proposal.support === 'number') {
     return `${formatPercentShort(proposal.support)} voted yes`;
   } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting) {
