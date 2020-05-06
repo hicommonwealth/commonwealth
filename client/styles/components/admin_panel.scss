@@ -1,80 +1,81 @@
 .CommunityManagementDialog {
-  .cui-dialog-content {
-    width: 800px; // style override: default 600px
-  
-    .cui-dialog-header {
-    } // .cui-dialog-header
-  
+    .cui-dialog-content {
+        width: 800px; // style override: default 600px
+    }
     .cui-dialog-body {
-      .AdminPanelContents {
+        padding: 0;
+    }
+    .cui-tabs {
+        margin-top: 2px;
+    }
+
+    .AdminPanelContents {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         @media (min-width: 800px) {
-          flex-direction: row;
+            flex-direction: row;
+        }
+        .panel-left {
+            width: 100%;
+            border-right: 1px #c5cdd1 solid;
+            @media (min-width: 800px) {
+                width: 60%;
+            }
+            .RoleChild {
+                display: inline-block;
+                padding-right: 6px;
+
+                .roleXIcon {
+                    padding-left: 2px;
+                }
+            }
+            .metadataManagementTable {
+                table-layout: fixed;
+            }
+            .InputPropertyRow {
+                .title-column {
+                    width: 110px;
+                }
+            }
         }
 
-        .panel-left {
-          width: 100%;
-          border-right: 1px#c5cdd1 solid;
-          @media (min-width: 800px) {
-            width: 60%;
-          }
-
-          .RoleChild {
-            display: inline-block;
-            padding-right: 6px;
-
-            .roleXIcon {
-              padding-left: 2px;
+        .CommunityMetadataManagementTable {
+            td {
+                padding: 11px 20px;
             }
-          }
-
-          .metadataManagementTable {
-            table-layout: fixed;
-          }
-
-          .InputPropertyRow {
-            .title-column {
-              width: 100px;
+            .cui-button {
+                margin: 16px 20px;
             }
-          }
-        } // .panel-left
+            .cui-tabs {
+                margin-top: 4px;
+            }
+        }
 
         .panel-right {
-          width: 100%;
-          @media (min-width: 800px) {
-            width: 40%;
-          }
-
-          .AdminTabPanel {
-            .UpgradeRolesForm, .WebhooksForm {
-              padding: 0 20px 10px;
+            width: 100%;
+            @media (min-width: 800px) {
+                width: 40%;
             }
 
-            .membersList {
-              min-height: 240px;
-              max-height: 240px;
-              overflow-y: scroll;
+            .AdminTabPanel {
+                .UpgradeRolesForm, .WebhooksForm {
+                    padding: 0 20px 10px;
+                }
+                .membersList {
+                    min-height: 240px;
+                    max-height: 240px;
+                    overflow-y: scroll;
+                }
+                .AdminTabPanelButton {
+                    margin-top: 20px;
+                }
+                .ActiveWebhooks {
+                    min-height: 180px;
+                    max-height: 180px;
+                    overflow-y: scroll;
+                }
             }
-
-            .AdminTabPanelButton {
-              margin-top: 20px;
-            }
-
-            .ActiveWebhooks {
-              min-height: 180px;
-              max-height: 180px;
-              overflow-y: scroll;
-            }
-          }
-        } // .panel-right
-
-      } // .Panel
-    } // .cui-dialog-body
-  
-  } // .cui-dialog-content
-  
-
+        }
+    }
 }
-
