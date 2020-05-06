@@ -10,12 +10,12 @@ import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification } from 'models';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
-import labelEdgewareEvent from '../../../../../shared/events/edgeware/filters/labeler';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
+import labelEdgewareEvent from '../../../../../shared/events/edgeware/filters/labeler';
 import { getProposalUrl } from '../../../../../shared/utils';
 
 interface IHeaderNotificationRow {

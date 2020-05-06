@@ -50,18 +50,29 @@ $switcher-item-extra-spacing: 6px;
         color: #222;
         font-weight: 500;
         justify-content: center;
+        .notification-dot {
+            position: absolute;
+            top: $switcher-item-spacing + 2px;
+            left: $switcher-item-spacing + 2px;
+            background-color: $badge-red;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .active-bar {
+            position: absolute;
+            left: 0;
+            top: $switcher-item-spacing;
+            bottom: $switcher-item-spacing;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+        }
+        &.active .active-bar {
+            background: #eee;
+        }
         .icon-inner {
             position: relative;
-            opacity: 0.4;
-            .notification-dot {
-                position: relative;
-                left: 32px;
-                top: -2px;
-                background-color: red;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-            }
             .ChainIcon img {
                 width: $switcher-item-size;
                 height: $switcher-item-size;
@@ -72,16 +83,17 @@ $switcher-item-extra-spacing: 6px;
                 bottom: -5px;
             }
         }
-        &.active .icon-inner,
-        &:hover .icon-inner {
-            opacity: 1;
+        &.unread .icon-inner {
+            border: 1px solid #eee;
+            width: $switcher-item-size + 2px;
+            height: $switcher-item-size + 2px;
         }
     }
     a.CommunitySwitcherCommunity {
         .icon-inner {
             text-align: center;
             color: #eee;
-            background: #36393f;
+            background: #555;
             height: $switcher-item-size;
             width: $switcher-item-size;
             border-radius: 8px;
@@ -90,10 +102,10 @@ $switcher-item-extra-spacing: 6px;
                 top: 8px;
             }
         }
-        &:hover, &.active {
-            .icon-inner {
-                background: darken(#36393f, 7%);
-            }
+        &.unread .icon-inner {
+            border: 1px solid #eee;
+            width: $switcher-item-size + 2px;
+            height: $switcher-item-size + 2px;
         }
     }
 }
