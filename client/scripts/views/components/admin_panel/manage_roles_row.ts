@@ -30,7 +30,6 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                     address: role.Address.address,
                     jwt: app.login.jwt,
                   }).then((res) => {
-                    console.dir(res);
                     if (res.status !== 'Success') {
                       throw new Error(`Got unsuccessful status: ${res.status}`);
                     }

@@ -18,13 +18,12 @@ const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
   view: (vnode) => {
     return m('.AdminTabPanel', [
       m(Tabs, {
-        align: 'center',
+        align: 'left',
         bordered: true,
         fluid: true,
-        size: 'xs',
       }, [
         m(TabItem, {
-          label: 'Roles',
+          label: 'Promote Admins',
           active: vnode.state.index === 1,
           onclick: () => { vnode.state.index = 1; },
         }),

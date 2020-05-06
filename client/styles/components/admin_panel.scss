@@ -7,6 +7,9 @@
     }
     .cui-tabs {
         margin-top: 2px;
+        > :first-child {
+            margin-left: 15px;
+        }
     }
 
     .AdminPanelContents {
@@ -63,16 +66,16 @@
                     padding: 0 20px 10px;
                 }
                 .membersList {
-                    min-height: 240px;
-                    max-height: 240px;
+                    min-height: 160px;
+                    max-height: 160px;
                     overflow-y: scroll;
                 }
                 .AdminTabPanelButton {
                     margin-top: 20px;
                 }
                 .ActiveWebhooks {
-                    min-height: 180px;
-                    max-height: 180px;
+                    min-height: 160px;
+                    max-height: 160px;
                     overflow-y: scroll;
                 }
             }
