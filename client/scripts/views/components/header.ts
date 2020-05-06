@@ -18,13 +18,11 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import NewProposalButton from 'views/components/new_proposal_button';
 import NotificationRow from 'views/components/sidebar/notification_row';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import NotificationsDrowdownMenu from './notifications_dropdown_menu';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
     // user menu
-    const notifications = app.login.notifications
-      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
-    const unreadNotifications = notifications.filter((n) => !n.isRead).length;
 
     return m('.Header', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
@@ -33,28 +31,8 @@ const Header: m.Component<{}> = {
       // new proposal
       m(NewProposalButton, { fluid: false }),
       // notifications menu
-      app.isLoggedIn() && m(PopoverMenu, {
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        trigger: m(Button, {
-          iconLeft: Icons.BELL,
-        }),
-        position: 'bottom-end',
-        closeOnContentClick: true,
-        menuAttrs: {
-          align: 'left',
-        },
-        class: 'notification-menu',
-        content: m('.notification-list', [
-          notifications.length > 0
-            ? m(Infinite, {
-              maxPages: 8,
-              pageData: () => notifications,
-              item: (data, opts, index) => m(NotificationRow, { notification: data }),
-            })
-            : m('li.no-notifications', 'No Notifications'),
-        ]),
-      }),
+      app.isLoggedIn()
+        && m(NotificationsDrowdownMenu),
       // invites menu
       app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
         iconLeft: Icons.MAIL,
