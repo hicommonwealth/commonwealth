@@ -17,8 +17,6 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
       class: 'home-card',
       fluid: true,
       elevation: 1,
-      interactive: true,
-      onclick: (e) => m.route.set(`/${chain}`)
     }, [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
@@ -26,6 +24,13 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
         app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
         updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
+      m(Button, {
+        interactive: true,
+        compact: true,
+        size: 'sm',
+        onclick: (e) => m.route.set(`/${chain}`),
+        label: 'Visit'
+      }),
       app.isLoggedIn() && m('.chain-membership', [
         m(MembershipButton, {
           chain,
@@ -48,8 +53,6 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
       class: 'home-card',
       fluid: true,
       elevation: 1,
-      interactive: true,
-      onclick: (e) => m.route.set(`/${c.id}`)
     }, [
       m('h3', [
         c.name,
@@ -59,6 +62,13 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
         app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
         updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
+      m(Button, {
+        interactive: true,
+        compact: true,
+        size: 'sm',
+        onclick: (e) => m.route.set(`/${c.id}`),
+        label: 'Visit'
+      }),
       app.isLoggedIn() && [
         m(MembershipButton, {
           community: c.id,
