@@ -51,7 +51,7 @@ const api = constructFakeApi({
     { index: 1, imageHash: 'hash1', at: 20 },
     { index: 2, imageHash: 'hash2', at: 30 },
   ] as unknown as DeriveDispatch[],
-  proposals: (idx) => +idx !== 1
+  treasuryProposals: (idx) => +idx !== 1
     ? constructOption()
     : constructOption({
       proposer: 'alice',

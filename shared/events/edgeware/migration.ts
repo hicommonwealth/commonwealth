@@ -83,7 +83,7 @@ async function fetchDemocracyReferenda(api: ApiPromise, blockNumber: number): Pr
       ];
     })
   );
-  console.log(`Found ${startEvents.length + passedEvents.length} democracy referenda!`);
+  console.log(`Found ${startEvents.length} democracy referenda!`);
   return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber, data }));
 }
 
