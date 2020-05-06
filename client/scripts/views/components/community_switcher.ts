@@ -16,6 +16,7 @@ import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
 import FeedbackModal from 'views/modals/feedback_modal';
 import CommunityMenu from 'views/components/community_menu';
+import { setActiveAccount } from 'controllers/app/login';
 
 const avatarSize = 16;
 
@@ -85,6 +86,10 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
           if (address) {
             localStorage.setItem('initAddress', address.address);
             localStorage.setItem('initChain', address.chain);
+            if (app.vm.activeAccount.address !== address.address) {
+              const account = app.login.activeAddresses.find((addr) => addr.address === address.address);
+              setActiveAccount(account);
+            }
           }
           m.route.set(`/${community.id}/`);
         }
