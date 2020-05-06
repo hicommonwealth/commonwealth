@@ -5,10 +5,17 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
+import { IValidatorPageState } from '..';
 
-export const SubstratePreHeader = (vnode, chain: Substrate, sender: SubstrateAccount) => {
-  const validators: IValidators = vnode.state.dynamic.validators;
-  const isController: boolean = vnode.state.dynamic.stakingLedger;
+export const SubstratePreHeader = (state: IValidatorPageState, chain: Substrate, sender: SubstrateAccount) => {
+  const {
+    validators,
+    currentSession,
+    currentEra,
+    activeEra,
+    stakingLedger
+  } = state.dynamic;
+  const isController: boolean = !!state.dynamic.stakingLedger;
   if (!validators) return;
   let totalStaked = chain.chain.coins(0);
   Object.entries(validators).forEach(([_stash, { exposure }]) => {
@@ -19,6 +26,14 @@ export const SubstratePreHeader = (vnode, chain: Substrate, sender: SubstrateAcc
     m('.validators-preheader-item', [
       m('h3', 'Current Block'),
       m('.preheader-item-text', chain.block.height),
+    ]),
+    m('.validators-preheader-item', [
+      m('h3', 'Current Session'),
+      m('.preheader-item-text', currentSession.toString()),
+    ]),
+    m('.validators-preheader-item', [
+      m('h3', 'Current Era'),
+      m('.preheader-item-text', currentEra.toString()),
     ]),
     m('.validators-preheader-item', [
       m('h3', 'Total Supply'),
@@ -60,7 +75,7 @@ export const SubstratePreHeader = (vnode, chain: Substrate, sender: SubstrateAcc
         }, 'Claim'),
       ]),
     ]),
-    vnode.state.nominationsHasChanged && m('.validators-preheader-item', [
+    state.nominationsHasChanged && m('.validators-preheader-item', [
       m('h3', 'Update nominations'),
       m('.preheader-item-text', [
         m('a.btn.formular-button-primary', {
@@ -68,9 +83,9 @@ export const SubstratePreHeader = (vnode, chain: Substrate, sender: SubstrateAcc
           href: '#',
           onclick: (e) => {
             e.preventDefault();
-            createTXModal((vnode.state.nominations.length === 0)
+            createTXModal((state.nominations.length === 0)
               ? sender.chillTx()
-              : sender.nominateTx(vnode.state.nominations)).then(() => {
+              : sender.nominateTx(state.nominations)).then(() => {
               // vnode.attrs.sending = false;
               m.redraw();
             }, (e) => {

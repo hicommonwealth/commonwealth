@@ -4,8 +4,8 @@ import Substrate from 'controllers/chain/substrate/main';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 
-const PresentationComponent = (vnode, chain: Substrate) => {
-  const validators = vnode.state.dynamic.validators;
+const PresentationComponent = (state, chain: Substrate) => {
+  const validators = state.dynamic.validators;
   if (!validators) return;
   return m(Tabs, [{
     name: 'Current Validators',
@@ -33,8 +33,8 @@ const PresentationComponent = (vnode, chain: Substrate) => {
             && !!nominators.find(({ stash }) => stash === app.vm.activeAccount.address);
           // add validator to collection if hasNominated already
           if (hasNominated) {
-            vnode.state.nominations.push(validator);
-            vnode.state.originalNominations.push(validator);
+            state.nominations.push(validator);
+            state.originalNominations.push(validator);
           }
           return m(ValidatorRow, {
             stash: validator,
@@ -45,10 +45,10 @@ const PresentationComponent = (vnode, chain: Substrate) => {
             nominators,
             hasNominated,
             onChangeHandler: (result) => {
-              if (vnode.state.nominations.indexOf(result) === -1) {
-                vnode.state.nominations.push(result);
+              if (state.nominations.indexOf(result) === -1) {
+                state.nominations.push(result);
               } else {
-                vnode.state.nominations = vnode.state.nominations.filter((n) => n !== result);
+                state.nominations = state.nominations.filter((n) => n !== result);
               }
             }
           });

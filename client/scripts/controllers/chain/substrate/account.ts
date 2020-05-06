@@ -117,14 +117,10 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, any]) => {
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
-        const stakersCall = (api.query.staking.stakers)
-          ? api.query.staking.stakers
-          : api.query.staking.erasStakers;
-        const stakersCallArgs = (account) => (api.query.staking.stakers)
-          ? account
-          : [era.toString(), account];
-        // TODO: api.query.staking.stakers should be replaced with erasStakers as part of
-        //  Kusama staking API upgrade (which we have not implemented)
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = (api.query.staking.stakers) ? api.query.staking.stakers : api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) => (api.query.staking.stakers) ? account : [era.toString(), account];
         return combineLatest(
           of(currentSet),
           of(toBeElected),
