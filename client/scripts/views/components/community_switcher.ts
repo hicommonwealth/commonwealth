@@ -22,6 +22,7 @@ const avatarSize = 16;
 const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[], address: AddressInfo }> = {
   view: (vnode) => {
     const { chain, nodeList, address } = vnode.attrs;
+    const updatedThreads = app.login.unseenPosts[chain]?.activePosts || 0;
 
     const active = app.activeChainId() === chain
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
@@ -33,9 +34,12 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
       content: m('.CommunitySwitcherTooltip', [
         m('.sidebar-tooltip-name', nodeList[0].chain.name),
       ]),
+      hoverOpenDelay: 0,
+      hoverCloseDelay: 0,
+      transitionDuration: 0,
       trigger: m('a.CommunitySwitcherChain', {
         href: '#',
-        class: active ? 'active' : '',
+        class: `${active ? 'active' : ''} ${updatedThreads > 0 ? 'unread' : ''}`,
         onclick: (e) => {
           e.preventDefault();
           if (address) {
@@ -45,6 +49,7 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
           m.route.set(`/${chain}/`);
         }
       }, [
+        m('.active-bar'),
         m('.icon-inner', [
           m(ChainIcon, { chain: nodeList[0].chain }),
           m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
@@ -57,6 +62,7 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
 const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, address: AddressInfo }> = {
   view: (vnode) => {
     const { community, address } = vnode.attrs;
+    const updatedThreads = app.login.unseenPosts[community.id]?.activePosts || 0;
 
     const active = app.activeCommunityId() === community.id
       && (!address || (address.chain === app.vm.activeAccount?.chain.id
@@ -68,9 +74,12 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
       content: m('.CommunitySwitcherTooltip', [
         m('.sidebar-tooltip-name', community.name),
       ]),
+      hoverOpenDelay: 0,
+      hoverCloseDelay: 0,
+      transitionDuration: 0,
       trigger: m('a.CommunitySwitcherCommunity', {
         href: '#',
-        class: active ? 'active' : '',
+        class: `${active ? 'active' : ''} ${updatedThreads > 0 ? 'unread' : ''}`,
         onclick: (e) => {
           e.preventDefault();
           if (address) {
@@ -78,8 +87,9 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
             localStorage.setItem('initChain', address.chain);
           }
           m.route.set(`/${community.id}/`);
-        },
+        }
       }, [
+        m('.active-bar'),
         m('.icon-inner', [
           m('.name', community.name.slice(0, 2).toLowerCase()),
           m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize }),
