@@ -15,14 +15,17 @@ const { assert } = chai;
 
 describe('Edgeware Migration Event Handler Tests', () => {
   before('reset database', async () => {
+    await resetDatabase();
   });
 
   it('should create new event', async () => {
 
   });
+
   it('should upgrade existing event', async () => {
 
   });
+
   it('should ignore irrelevant events', async () => {
 
   });

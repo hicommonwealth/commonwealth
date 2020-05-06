@@ -15,6 +15,7 @@ const { assert } = chai;
 
 describe('Edgeware Archival Event Handler Tests', () => {
   before('reset database', async () => {
+    await resetDatabase();
   });
 
   it('should create chain entity from event', async () => {

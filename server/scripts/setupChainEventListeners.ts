@@ -37,11 +37,12 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       const handlers: IEventHandler[] = [];
       if (migrate) {
         const migrationHandler = new EdgewareMigrationHandler(models, node.chain);
-        handlers.push(migrationHandler);
+        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain);
+        handlers.push(migrationHandler, entityArchivalHandler);
       } else {
         const storageHandler = new EventStorageHandler(models, node.chain);
         const notificationHandler = new EventNotificationHandler(models, wss);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, wss, node.chain);
+        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
       const subscriber = await subscribeEdgewareEvents(

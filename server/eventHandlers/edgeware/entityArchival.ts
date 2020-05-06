@@ -9,8 +9,8 @@ import { NotificationCategories } from '../../../shared/types';
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
-    private readonly _wss: WebSocket.Server,
     private readonly _chain: string,
+    private readonly _wss?: WebSocket.Server,
   ) {
     super();
   }
