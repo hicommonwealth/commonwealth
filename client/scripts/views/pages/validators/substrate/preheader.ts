@@ -44,6 +44,16 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     if (!validators) return;
 
     let totalStaked = (app.chain as Substrate).chain.coins(0);
+    let hasClaimablePayouts = false;
+    if (app.chain.base === ChainBase.Substrate) {
+      (app.chain as Substrate).chain.api.toPromise()
+        .then((api) => {
+          if (api.query.staking.erasStakers) {
+            hasClaimablePayouts = true;
+          }
+        });
+    }
+
     Object.entries(validators).forEach(([_stash, { exposure }]) => {
       const valStake = (app.chain as Substrate).chain.coins(exposure.total.toBn());
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
@@ -85,7 +95,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }, 'Manage'),
         ]),
       ]),
-      m('.validators-preheader-item', [
+      hasClaimablePayouts && m('.validators-preheader-item', [
         m('h3', 'Claim Payout'),
         m('.preheader-item-text', [
           m('a.btn.formular-button-primary', {
