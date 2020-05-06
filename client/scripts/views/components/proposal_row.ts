@@ -88,18 +88,23 @@ export const getSecondaryStatusText = (proposal: AnyProposal): string | null => 
   }
 };
 
-export const getSupportText = (proposal: AnyProposal) => typeof proposal.support === 'number'
-  ? `${formatPercentShort(proposal.support)} voted yes`
-  : proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting
-    ? `${proposal.support.format()} voted yes`
-    : proposal.support instanceof Coin && proposal.votingType === VotingType.ConvictionYesNoVoting
-      ? `${proposal.support.format()} voted yes`
-      : proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesApprovalVoting
-        ? `${proposal.support.format()} locked`
-        : proposal.support instanceof Coin && proposal.votingType === VotingType.RankedChoiceVoting
-          ? `${proposal.support.format()} voted`
-          : proposal.support instanceof Coin && proposal.votingType === VotingType.None
-            ? '' : '';
+export const getSupportText = (proposal: AnyProposal) => {
+  if (typeof proposal.support === 'number') {
+    return `${formatPercentShort(proposal.support)} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting) {
+    return `${proposal.support.format()} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.ConvictionYesNoVoting) {
+    return `${proposal.support.format()} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesApprovalVoting) {
+    return `${proposal.support.format()} locked`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.RankedChoiceVoting) {
+    return `${proposal.support.format()} voted`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.None) {
+    return '';
+  } else {
+    return '';
+  }
+};
 
 export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
   ? m(ProposalPieChart, {
@@ -251,8 +256,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate)
-            ? proposal.title.split('(')[0] : proposal.title),
+          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           m('.proposal-row-metadata', [
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
@@ -261,17 +265,13 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
-            m('.proposal-row-metadata', [
-              formatProposalHashShort((proposal as SubstrateDemocracyProposal).title.split('(')[0])
-            ]),
+            m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal)
+              .title
+              .split('(')[0])),
           ]),
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Seconds'),
             m('.proposal-row-metadata', (proposal as SubstrateDemocracyProposal).getVoters.length),
-          ]),
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;' }, authorComment ? authorComment.text : 'None')
           ]),
         ],
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
@@ -279,10 +279,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Actions'),
             m('.proposal-row-metadata', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
-          ]),
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;' }, authorComment ? authorComment.text : 'None')
           ]),
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
@@ -313,10 +309,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
                 }),
               ]),
             ])
-          ]),
-          m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Proposal Comment'),
-            m('.proposal-row-metadata', { style : 'font-weight: 400;' }, authorComment ? authorComment.text : 'None')
           ]),
         ],
       ]),
