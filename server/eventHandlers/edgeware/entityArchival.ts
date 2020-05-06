@@ -58,7 +58,7 @@ export default class extends IEventHandler {
       this.wssSend(dbEntity, dbEvent);
 
       // TODO: create thread?
-      return dbEntity;
+      return dbEvent;
     };
 
     const updateEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
@@ -78,7 +78,7 @@ export default class extends IEventHandler {
       await dbEvent.save();
       this.wssSend(dbEntity, dbEvent);
 
-      return dbEntity;
+      return dbEvent;
     };
 
     switch (event.data.kind) {
@@ -161,6 +161,7 @@ export default class extends IEventHandler {
 
       default: {
         // console.log(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+        return dbEvent;
       }
     }
   }
