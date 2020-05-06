@@ -85,7 +85,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           }, 'Manage'),
         ]),
       ]),
-      !!stakingLedger && m('.validators-preheader-item', [
+      m('.validators-preheader-item', [
         m('h3', 'Claim Payout'),
         m('.preheader-item-text', [
           m('a.btn.formular-button-primary', {
