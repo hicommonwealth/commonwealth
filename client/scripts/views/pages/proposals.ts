@@ -9,6 +9,7 @@ import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
+import PageLoading from 'views/pages/loading';
 
 import ListingPage from 'views/pages/_listing_page';
 import ConvictionsTable from 'views/components/proposals/convictions_table';
@@ -67,11 +68,12 @@ const ProposalsPage: m.Component<{}> = {
 
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
+    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Chain is loading...' });
     return m(ListingPage, {
       class: 'ProposalsPage',
       title: 'Governance Proposals',
       subtitle: 'Vote on network changes',
-      content: (!app.chain || !app.chain.loaded) ? m('.forum-container', m(ProposalsLoadingRow)) : [
+      content: [
         !visibleReferenda
           && !visibleCouncilProposals
           && !visibleDemocracyProposals
