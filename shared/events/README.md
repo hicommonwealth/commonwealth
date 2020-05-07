@@ -45,7 +45,7 @@ To add a new entity to Edgeware, you must perform the following steps:
   * Add the new entity type to the [migration event handler](../../server/eventHandlers/edgeware/migration.ts).
   * Add corresponding unit tests to [migration.spec.ts](../../test/unit/events/edgeware/migration.spec.ts) and optionally to [migrationHandler.spec.ts](../../test/unit/events/edgeware/migrationHandler.spec.ts)
 5. If required, update all corresponding controllers on the client side to handle the new entity.
-6. Test out your change by triggering the corresponding sequence of events on a local testnet (this may require migration as per [Upgrading](#Upgrading)), and ensuring the entity's fields and associations are populated as expected. Also consider testing by adding a test case to [entityArchivalHandler.spec.ts](../../test/unit/events/edgeware/entityArchivalHandler.spec.ts).
+6. Test out your change by triggering the corresponding sequence of events on a local testnet (this may require migration as per [Upgrading](#Upgrading), and, if so, step 4 is mandatory), and ensuring the entity's fields and associations are populated as expected. Also consider testing by adding a test case to [entityArchivalHandler.spec.ts](../../test/unit/events/edgeware/entityArchivalHandler.spec.ts).
 
 ## Adding a new chain
 
