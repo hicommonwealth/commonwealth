@@ -321,7 +321,6 @@ export const ProposalBodySaveEdit: m.Component<{
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
-              console.dir('saved');
               callback();
               m.redraw();
             });
