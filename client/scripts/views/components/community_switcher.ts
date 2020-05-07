@@ -46,6 +46,10 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
           if (address) {
             localStorage.setItem('initAddress', address.address);
             localStorage.setItem('initChain', address.chain);
+            if (app.vm.activeAccount.address !== address.address) {
+              const account = app.login.activeAddresses.find((addr) => addr.address === address.address);
+              setActiveAccount(account);
+            }
           }
           m.route.set(`/${chain}/`);
         }
