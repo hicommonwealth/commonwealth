@@ -27,7 +27,11 @@ export default class extends IEventHandler {
       chainEntity: dbEntity.toJSON(),
       chainEvent: dbEvent.toJSON(),
     };
-    this._wss.emit('server-event', data);
+    try {
+      this._wss.emit('server-event', data);
+    } catch (e) {
+      log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
+    }
   }
 
   /**

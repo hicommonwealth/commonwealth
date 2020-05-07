@@ -2,7 +2,7 @@ import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'shared/adapters/currency';
 
-import { IChainModule, IAccountsModule, IServerControllers, IBlockInfo } from './interfaces';
+import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import Account from './Account';
 import NodeInfo from './NodeInfo';
@@ -14,14 +14,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
-  public abstract server: IServerControllers;
 
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
 
+  protected async _initProposalComments(): Promise<void> {
+    await this.app.comments.refreshAll(this.id, null, true, false, true);
+    // await this.app.reactions.refreshAll(this.id, null, false);
+  }
+
   public async init(onServerLoaded? : () => void, initChainModuleFn?: () => Promise<void>): Promise<void> {
     await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true, true);
     await this.app.reactions.refreshAll(this.id, null, true);
     await this.app.chainEntities.refresh(this.meta.chain.id);
     this._serverLoaded = true;

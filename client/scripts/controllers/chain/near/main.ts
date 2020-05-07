@@ -9,7 +9,6 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public class = ChainClass.Near;
   public chain: NearChain;
   public accounts: NearAccounts;
-  public readonly server = {};
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
@@ -23,7 +22,8 @@ export default class Near extends IChainAdapter<NearToken, any> {
       await this.chain.init(this.meta);
     }, onServerLoaded);
     await this.accounts.init(this.chain);
-
+    await this._initProposalComments();
+  
     this._loaded = true;
   }
   public async deinit() {

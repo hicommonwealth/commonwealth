@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import { combineLatest, of, BehaviorSubject, Unsubscribable } from 'rxjs';
-import { takeWhile, flatMap, first } from 'rxjs/operators';
+import { takeWhile, flatMap, take } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
@@ -30,7 +30,7 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
 
 const backportEventToAdapter = (event: ISubstrateCollectiveProposed): ISubstrateCollectiveProposal => {
   return {
-    identifier: event.proposalIndex.toString(),
+    identifier: event.proposalHash.toString(),
     index: event.proposalIndex,
     threshold: event.threshold,
     hash: event.proposalHash,
@@ -124,11 +124,11 @@ export class SubstrateCollectiveProposal
         flatMap((v) => combineLatest(
           of(v),
           combineLatest(
-            v.unwrap().ayes.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
-          ).pipe(first()),
+            v.unwrap().ayes.map((who) => this._Accounts.fromAddress(who.toString()).balance)
+          ).pipe(take(1)),
           combineLatest(
-            v.unwrap().nays.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
-          ).pipe(first()),
+            v.unwrap().nays.map((who) => this._Accounts.fromAddress(who.toString()).balance)
+          ).pipe(take(1)),
         )),
       )
       .subscribe(([ v, ayeBalances, nayBalances ]) => {

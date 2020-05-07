@@ -17,7 +17,6 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
-  public readonly server = { };
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
@@ -63,6 +62,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await this.governance.init(api, this.accounts, this.meta.chain.chainObjectId, useChainProposalData);
+    await this._initProposalComments();
 
     this._loaded = true;
   }

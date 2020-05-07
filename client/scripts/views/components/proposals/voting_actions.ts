@@ -188,7 +188,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
-        ])));
+        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false,
@@ -311,7 +311,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', choice)
-        ])));
+        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
       }
     };
 

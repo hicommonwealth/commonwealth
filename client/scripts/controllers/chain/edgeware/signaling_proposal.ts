@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { takeWhile, switchMap, flatMap, first } from 'rxjs/operators';
+import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
@@ -30,7 +30,7 @@ const backportEventToAdapter = (
   event: ISubstrateSignalingNewProposal,
 ): IEdgewareSignalingProposal => {
   return {
-    identifier: event.voteId.toString(),
+    identifier: event.proposalHash,
     voteIndex: +event.voteId,
     hash: event.proposalHash,
     author: event.proposer,
@@ -211,7 +211,7 @@ export class EdgewareSignalingProposal
         combineLatest(
           v.unwrap().reveals
             .map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
-        ).pipe(first()),
+        ).pipe(take(1)),
       )),
     ).subscribe(([ v, balances ]) => {
       const record = v.unwrap();

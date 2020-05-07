@@ -51,7 +51,6 @@ export {
   IChainModule,
   IAccountsModule,
   IOffchainAccountsModule,
-  IServerControllers,
   ITransactionResult,
   ITXData,
   ITXModalData,

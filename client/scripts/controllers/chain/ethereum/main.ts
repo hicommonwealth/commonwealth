@@ -13,7 +13,6 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
-  public readonly server = {};
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
@@ -29,6 +28,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+    await this._initProposalComments();
     await this.chain.initEventLoop();
 
     if (this.webWallet) {

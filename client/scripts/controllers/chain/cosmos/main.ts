@@ -8,7 +8,6 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
-  public readonly server = {};
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
 
@@ -26,6 +25,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     }, onServerLoaded);
     await this.accounts.init(this.chain);
     await this.governance.init(this.chain, this.accounts);
+    await this._initProposalComments();
     this._loaded = true;
   }
 

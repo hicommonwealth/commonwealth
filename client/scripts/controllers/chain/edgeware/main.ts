@@ -26,10 +26,6 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public signaling: EdgewareSignaling;
 
-  public readonly server = {
-    // proposals: new ProposalArchiveController(),
-  };
-
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
@@ -82,6 +78,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),
     ]);
+    await this._initProposalComments();
     await this.chain.initEventLoop();
 
     this._loaded = true;
