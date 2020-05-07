@@ -22,7 +22,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
 
     // just a button for communities, or chains without governance
     if (app.community) {
-      return m(Button, {
+      const CommunityButton = m(Button, {
         class: 'NewProposalButton',
         label: 'New post',
         iconLeft: Icons.PLUS,
@@ -31,11 +31,17 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         disabled: !activeAccount,
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
+      return activeAccount
+        ? CommunityButton
+        : m(Tooltip, {
+          content: 'Link an address to post',
+          trigger: CommunityButton
+        });
     }
 
-    // a button with popover menu for chains
-    return m(ButtonGroup, [
+    const ProposalButtonGroup = m(ButtonGroup, [
       m(Button, {
+        disabled: !activeAccount,
         intent: 'primary',
         label: 'New post',
         fluid,
@@ -45,17 +51,10 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         class: 'NewProposalButton',
         transitionDuration: 0,
         hoverCloseDelay: 0,
-        trigger: activeAccount ? m(Button, {
+        trigger: m(Button, {
+          disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
-        }) : m(Tooltip, {
-          content: 'Link an address to post',
-          trigger: m(Button, {
-            iconLeft: Icons.CHEVRON_DOWN,
-            intent: 'primary',
-            class: 'cui-disabled',
-            style: 'cursor: pointer !important',
-          }),
         }),
         position: 'bottom-end',
         closeOnContentClick: true,
@@ -105,6 +104,14 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         ],
       }),
     ]);
+
+    // a button with popover menu for chains
+    return activeAccount
+      ? ProposalButtonGroup
+      : m(Tooltip, {
+        content: 'Link an address to post',
+        trigger: ProposalButtonGroup
+      });
   }
 };
 
