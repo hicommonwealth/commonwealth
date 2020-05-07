@@ -12,6 +12,9 @@ import {
   ISubstrateSignalingProposalEvents,
 } from '../../../shared/events/edgeware/types';
 
+import { factory, formatFilename } from '../../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
@@ -32,10 +35,10 @@ export default class extends IEventHandler {
         event_name: event.data.kind.toString(),
       } });
       if (!dbEventType) {
-        console.error(`unknown event type: ${event.data.kind}`);
+        log.error(`unknown event type: ${event.data.kind}`);
         return;
       } else {
-        // console.log(`found chain event type: ${dbEventType.id}`);
+        log.trace(`found chain event type: ${dbEventType.id}`);
       }
       const queryFieldName = `event_data.${fieldName}`;
       const existingEvent = await this._models.ChainEvent.findOne({ where: {
@@ -45,10 +48,10 @@ export default class extends IEventHandler {
       if (existingEvent) {
         existingEvent.event_data = event.data;
         await existingEvent.save();
-        console.log('Existing event found and migrated successfully!');
+        log.debug('Existing event found and migrated successfully!');
         return existingEvent;
       } else {
-        console.log('No existing event found, creating new event in db!');
+        log.debug('No existing event found, creating new event in db!');
         return this._models.ChainEvent.create({
           chain_event_type_id: dbEventType.id,
           block_number: event.blockNumber,

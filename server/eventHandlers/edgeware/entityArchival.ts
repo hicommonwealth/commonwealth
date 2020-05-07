@@ -6,6 +6,9 @@ import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
 import { NotificationCategories } from '../../../shared/types';
 
+import { factory, formatFilename } from '../../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
@@ -35,7 +38,7 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent, dbEvent) {
     if (!dbEvent) {
-      console.error('no db event found!');
+      log.error('no db event found!');
       return;
     }
 
@@ -51,7 +54,7 @@ export default class extends IEventHandler {
       const dbEntity = await this._models.ChainEntity.create({
         type: type.toString(), type_id, chain: this._chain,
       });
-      console.log(`Created db entity, ${type.toString()}: ${type_id}.`);
+      log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
@@ -68,10 +71,10 @@ export default class extends IEventHandler {
         }
       });
       if (!dbEntity) {
-        console.error(`no relevant db entity found for ${type}: ${type_id}`);
+        log.error(`no relevant db entity found for ${type}: ${type_id}`);
         return;
       }
-      console.log(`Updated db entity, ${type}: ${type_id}.`);
+      log.info(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
@@ -160,7 +163,7 @@ export default class extends IEventHandler {
       }
 
       default: {
-        // console.log(`no archival action needed for event of kind ${event.data.kind.toString()}`);
+        log.trace(`no archival action needed for event of kind ${event.data.kind.toString()}`);
         return dbEvent;
       }
     }

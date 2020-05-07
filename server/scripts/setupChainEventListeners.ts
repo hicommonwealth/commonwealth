@@ -6,6 +6,9 @@ import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchi
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
 import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
 
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
@@ -21,7 +24,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   });
   if (lastChainEvent && lastChainEvent.length > 0 && lastChainEvent[0]) {
     const lastEventBlockNumber = lastChainEvent[0].block_number;
-    console.log(`Discovered chain event in db at block ${lastEventBlockNumber}.`);
+    log.info(`Discovered chain event in db at block ${lastEventBlockNumber}.`);
     return { startBlock: lastEventBlockNumber + 1 };
   } else {
     return { startBlock: null };
@@ -29,9 +32,9 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
-  console.log('Fetching node urls...');
+  log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
-  console.log('Setting up event listeners...');
+  log.info('Setting up event listeners...');
   await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
       const handlers: IEventHandler[] = [];

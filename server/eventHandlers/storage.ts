@@ -3,6 +3,9 @@
  */
 import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
 
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
@@ -15,14 +18,14 @@ export default class extends IEventHandler {
    * Handles an event by creating a ChainEvent in the database.
    */
   public async handle(event: CWEvent) {
-    console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.info(`Received event: ${JSON.stringify(event, null, 2)}`);
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
       chain: this._chain,
       event_name: event.data.kind.toString(),
     } });
     if (!dbEventType) {
-      console.error(`unknown event type: ${event.data.kind}`);
+      log.error(`unknown event type: ${event.data.kind}`);
       return;
     } else {
       // console.log(`found chain event type: ${dbEventType.id}`);
@@ -36,7 +39,7 @@ export default class extends IEventHandler {
     } });
 
     if (!created) {
-      console.error('Received duplicate event!');
+      log.error('Received duplicate event!');
       return;
     }
 

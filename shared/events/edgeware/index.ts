@@ -10,6 +10,9 @@ import { SubstrateBlock } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import migrate from './migration';
 
+import { factory, formatFilename } from '../../../server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
@@ -78,7 +81,7 @@ export default async function (
         /* eslint-disable-next-line no-await-in-loop */
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        console.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
+        log.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
         break;
       }
     }
@@ -99,7 +102,7 @@ export default async function (
   // returns early, does not initialize the subscription
   if (performMigration) {
     const version = await api.rpc.state.getRuntimeVersion();
-    console.log(`Starting event migration for ${version.specName}:${version.specVersion} at ${url}.`);
+    log.info(`Starting event migration for ${version.specName}:${version.specVersion} at ${url}.`);
     const events = await migrate(api);
     await Promise.all(events.map((event) => handleEventFn(event)));
     return;
@@ -111,7 +114,7 @@ export default async function (
   // helper function that runs after we've been offline/the server's been down,
   // and attempts to fetch events from skipped blocks
   const pollMissedBlocksFn = async () => {
-    console.log('Detected offline time, polling missed blocks...');
+    log.info('Detected offline time, polling missed blocks...');
     // grab the cached block immediately to avoid a new block appearing before the
     // server can do its thing...
     const lastBlockNumber = processor.lastBlockNumber;
@@ -136,7 +139,7 @@ export default async function (
     // if we can't figure out when the last block we saw was, do nothing
     // (i.e. don't try and fetch all events from block 0 onward)
     if (!offlineRange || !offlineRange.startBlock) {
-      console.error('Unable to determine offline time range.');
+      log.warn('Unable to determine offline time range.');
       return;
     }
 
@@ -145,24 +148,24 @@ export default async function (
       const blocks = await poller.poll(offlineRange);
       await Promise.all(blocks.map(processBlockFn));
     } catch (e) {
-      console.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
+      log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
     }
   };
 
   if (!skipCatchup) {
     pollMissedBlocksFn();
   } else {
-    console.log('Skipping event catchup on startup!');
+    log.info('Skipping event catchup on startup!');
   }
 
   try {
-    console.log(`Subscribing to Edgeware at ${url}...`);
+    log.info(`Subscribing to Substrate endpoint at ${url}...`);
     subscriber.subscribe(processBlockFn);
 
     // handle reconnects with poller
     api.on('connected', pollMissedBlocksFn);
   } catch (e) {
-    console.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
+    log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
   }
 
   return subscriber;

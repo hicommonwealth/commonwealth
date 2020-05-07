@@ -5,6 +5,9 @@ import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
 import { NotificationCategories } from '../../shared/types';
 
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IEventHandler {
   constructor(
     private readonly _models,
@@ -17,14 +20,14 @@ export default class extends IEventHandler {
    * Handles an event by emitting notifications as needed.
    */
   public async handle(event: CWEvent, dbEvent) {
-    console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (!dbEvent) {
-      console.error('No db event received! Ignoring.');
+      log.error('No db event received! Ignoring.');
       return;
     }
     const dbEventType = await dbEvent.getChainEventType();
     if (!dbEventType) {
-      console.error('Failed to fetch event type! Ignoring.');
+      log.error('Failed to fetch event type! Ignoring.');
       return;
     }
 
@@ -42,7 +45,7 @@ export default class extends IEventHandler {
       event.includeAddresses,
       dbEvent.id,
     );
-    console.log(`Emitted ${dbNotifications.length} notifications.`);
+    log.info(`Emitted ${dbNotifications.length} notifications.`);
     return dbEvent;
   }
 }

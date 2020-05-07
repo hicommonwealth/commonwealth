@@ -27,8 +27,11 @@ import {
   ISubstrateSignalingVotingCompleted,
 } from './types';
 
+import { factory, formatFilename } from '../../../server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 async function fetchDemocracyProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
-  console.log('Migrating democracy proposals...');
+  log.info('Migrating democracy proposals...');
   const publicProps = await api.query.democracy.publicProps();
   const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await api.queryMulti(
     publicProps.map(([ idx ]) => [ api.query.democracy.depositOf, idx ])
@@ -46,12 +49,12 @@ async function fetchDemocracyProposals(api: ApiPromise, blockNumber: number): Pr
       };
     })
     .filter((e) => !!e);
-  console.log(`Found ${proposedEvents.length} democracy proposals!`);
+  log.info(`Found ${proposedEvents.length} democracy proposals!`);
   return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
 async function fetchDemocracyReferenda(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
-  console.log('Migrating democracy referenda...');
+  log.info('Migrating democracy referenda...');
   const activeReferenda = await api.derive.democracy.referendumsActive();
   const startEvents = activeReferenda.map((r) => {
     return {
@@ -83,13 +86,13 @@ async function fetchDemocracyReferenda(api: ApiPromise, blockNumber: number): Pr
       ];
     })
   );
-  console.log(`Found ${startEvents.length} democracy referenda!`);
+  log.info(`Found ${startEvents.length} democracy referenda!`);
   return [ ...startEvents, ...passedEvents ].map((data) => ({ blockNumber, data }));
 }
 
 // must pass proposal hashes found in prior events
 async function fetchDemocracyPreimages(api: ApiPromise, hashes: string[]): Promise<CWEvent[]> {
-  console.log('Migrating preimages...');
+  log.info('Migrating preimages...');
   const hashCodecs = hashes.map((hash) => api.createType('Hash', hash));
   const preimages = await api.derive.democracy.preimages(hashCodecs);
   const notedEvents: Array<[ number, ISubstratePreimageNoted ]> = _.zip(hashes, preimages)
@@ -109,12 +112,12 @@ async function fetchDemocracyPreimages(api: ApiPromise, hashes: string[]): Promi
   const cwEvents = notedEvents
     .filter(([ blockNumber, data ]) => !!data)
     .map(([ blockNumber, data ]) => ({ blockNumber, data }));
-  console.log(`Found ${cwEvents.length} preimages!`);
+  log.info(`Found ${cwEvents.length} preimages!`);
   return cwEvents;
 }
 
 async function fetchTreasuryProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
-  console.log('Migrating treasury proposals...');
+  log.info('Migrating treasury proposals...');
   const proposals = await api.derive.treasury.proposals();
   const proposedEvents = proposals.proposals.map((p) => {
     return {
@@ -126,12 +129,12 @@ async function fetchTreasuryProposals(api: ApiPromise, blockNumber: number): Pro
       bond: p.proposal.bond.toString(),
     } as ISubstrateTreasuryProposed;
   });
-  console.log(`Found ${proposedEvents.length} treasury proposals!`);
+  log.info(`Found ${proposedEvents.length} treasury proposals!`);
   return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
 async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
-  console.log('Migrating collective proposals...');
+  log.info('Migrating collective proposals...');
   const councilProposals = await api.derive.council.proposals();
   let proposals: DeriveCollectiveProposal[];
   if (api.query.technicalCommittee) {
@@ -158,14 +161,14 @@ async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): P
         proposer: '',
       } as ISubstrateCollectiveProposed;
     });
-  console.log(`Found ${proposedEvents.length} collective proposals!`);
+  log.info(`Found ${proposedEvents.length} collective proposals!`);
   return proposedEvents.map((data) => ({ blockNumber, data }));
 }
 
 async function fetchSignalingProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
-  console.log('Migrating signaling proposals...');
+  log.info('Migrating signaling proposals...');
   if (!api.query.voting || !api.query.signaling) {
-    console.log('Found no signaling proposals (wrong chain)!');
+    log.info('Found no signaling proposals (wrong chain)!');
     return [];
   }
   // in "prevoting" phase
@@ -243,7 +246,7 @@ async function fetchSignalingProposals(api: ApiPromise, blockNumber: number): Pr
 
   const events = [...newProposalEvents, ...commitStartedEvents, ...votingStartedEvents, ...completedEvents];
   // we could plausibly populate the completed events with block numbers, but not necessary
-  console.log(`Found ${newProposalEvents.length} signaling proposals!`);
+  log.info(`Found ${newProposalEvents.length} signaling proposals!`);
   return events.map((data) => ({ blockNumber, data }));
 }
 
@@ -275,7 +278,7 @@ export default async function (
   /** signaling proposals */
   const signalingProposalEvents = await fetchSignalingProposals(api, blockNumber);
 
-  console.log('Migration complete.');
+  log.info('Migration complete.');
   return [
     ...democracyProposalEvents,
     ...democracyReferendaEvents,
