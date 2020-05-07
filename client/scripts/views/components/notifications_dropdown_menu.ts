@@ -54,7 +54,6 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const notificationsAndArrays = [];
 
-    
 
     return m(PopoverMenu, {
       transitionDuration: 0,
