@@ -1,4 +1,6 @@
-import { takeWhile } from 'rxjs/operators';
+import _ from 'underscore';
+import { combineLatest, of, BehaviorSubject, Unsubscribable } from 'rxjs';
+import { takeWhile, flatMap, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
@@ -7,20 +9,22 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { BehaviorSubject, Unsubscribable } from 'rxjs';
 import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
-  private _balance: SubstrateCoin;
-  public get balance(): SubstrateCoin { return this._balance; }
+  public readonly balance: SubstrateCoin;
 
-  constructor(proposal: SubstrateCollectiveProposal, account: SubstrateAccount, choice: boolean) {
+  constructor(
+    proposal: SubstrateCollectiveProposal,
+    account: SubstrateAccount,
+    choice: boolean,
+    balance: SubstrateCoin
+  ) {
     super(account, choice);
-    this.account.balance.pipe(takeWhile(() => proposal.initialized && !proposal.completed))
-      .subscribe((bal) => { this._balance = bal; });
+    this.balance = balance;
   }
 }
 
@@ -113,20 +117,33 @@ export class SubstrateCollectiveProposal
 
   private _subscribeVoters(): Unsubscribable {
     return this._Chain.query((api) => api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash))
-      .pipe(takeWhile((v) => v.isSome && this.initialized && !this.completed))
-      .subscribe((votesOpt) => {
-        const votes = votesOpt.unwrap();
+      .pipe(
+        takeWhile((v) => v.isSome && this.initialized && !this.completed),
+
+        // grab latest voter balances as well, to avoid subscribing to each on vote-creation
+        flatMap((v) => combineLatest(
+          of(v),
+          combineLatest(
+            v.unwrap().ayes.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
+          ).pipe(first()),
+          combineLatest(
+            v.unwrap().nays.map(([ who ]) => this._Accounts.fromAddress(who.toString()).balance)
+          ).pipe(first()),
+        )),
+      )
+      .subscribe(([ v, ayeBalances, nayBalances ]) => {
+        const votes = v.unwrap();
         const ayes = votes.ayes;
         const nays = votes.nays;
         // eslint-disable-next-line no-restricted-syntax
-        for (const voter of ayes) {
+        for (const [ voter, balance ] of _.zip(ayes, ayeBalances)) {
           const acct = this._Accounts.fromAddress(voter.toString());
-          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, true));
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, true, balance));
         }
         // eslint-disable-next-line no-restricted-syntax
-        for (const voter of nays) {
+        for (const [ voter, balance ] of _.zip(nays, nayBalances)) {
           const acct = this._Accounts.fromAddress(voter.toString());
-          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, false));
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, false, balance));
         }
       });
   }
