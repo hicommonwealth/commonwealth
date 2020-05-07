@@ -27,6 +27,7 @@ const ProposalsPage: m.Component<{}> = {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
   },
   view: (vnode) => {
+    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Chain is loading...' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
@@ -68,7 +69,7 @@ const ProposalsPage: m.Component<{}> = {
 
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Chain is loading...' });
+
     return m(ListingPage, {
       class: 'ProposalsPage',
       title: 'Governance Proposals',
