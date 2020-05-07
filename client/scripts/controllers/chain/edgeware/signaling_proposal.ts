@@ -67,7 +67,7 @@ export class EdgewareSignalingProposal
     // TODO: support 1p1v
     if (this.getVotes().some((v) => v.balance === undefined)) {
       // balances haven't resolved yet!
-      console.error('Balances haven\'t resolved');
+      // console.error('Balances haven\'t resolved');
       return 0;
     }
     const yesVotes = this.getVotes()
