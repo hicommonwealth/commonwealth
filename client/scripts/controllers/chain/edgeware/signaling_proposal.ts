@@ -68,14 +68,14 @@ export class EdgewareSignalingProposal
     if (this.getVotes().some((v) => v.balance === undefined)) {
       // balances haven't resolved yet!
       // console.error('Balances haven\'t resolved');
-      return 0;
+      return null;
     }
     const yesVotes = this.getVotes()
       .filter((vote) => vote.choices.length === 1
-        && vote.choices[0].toHex() === this._Chain.createType('VoteOutcome', [1]).toHex());
+        && vote.choices[0].toHex() === this.data.choices[0].toHex());
     const noVotes = this.getVotes()
       .filter((vote) => vote.choices.length === 1
-        && vote.choices[0].toHex() === this._Chain.createType('VoteOutcome', [0]).toHex());
+        && vote.choices[0].toHex() === this.data.choices[1].toHex());
     if (yesVotes.length === 0 && noVotes.length === 0) return 0;
 
     const yesSupport = yesVotes.reduce(((total, vote) => vote.balance.inDollars + total), 0);
@@ -200,6 +200,7 @@ export class EdgewareSignalingProposal
         const record = v.unwrap();
         // eslint-disable-next-line no-restricted-syntax
         for (const [ voter, reveals ] of record.reveals) {
+          console.log('adding voter: ' + voter.toString());
           const acct = this._Accounts.fromAddress(voter.toString());
           this.addOrUpdateVote(new SignalingVote(this, acct, reveals));
         }

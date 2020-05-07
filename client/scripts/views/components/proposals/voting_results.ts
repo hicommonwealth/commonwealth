@@ -15,8 +15,11 @@ import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
-  return u8aToString(v.toU8a());
-}
+  const outcomeArray = v.toU8a();
+  // cut off trailing 0s
+  const sliceEnd = outcomeArray.indexOf(0);
+  return u8aToString(outcomeArray.slice(0, sliceEnd));
+};
 
 const ProposalVotingResults = {
   view: (vnode) => {
