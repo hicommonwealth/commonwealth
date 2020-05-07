@@ -36,7 +36,7 @@ An "entity" is a stateful object on a given chain, whose major state updates are
 
 To add a new entity to Edgeware, you must perform the following steps:
 
-1. Determine a list of events that correspond to the particular entity. Each event type can only correspond to a single type of identity, so ensure that the correspondence is essential (e.g. do not associate preimage events with democracy proposals, preimages should be their own entity).
+1. Determine a list of events that correspond to the particular entity. Each event type can only correspond to a single type of entity, so ensure that the correspondence is essential (e.g. do not associate preimage events with the democracy proposal entity, preimages should be their own type of entity).
 2. Determine what the entity's immutable identifier will be, such as an index or hash, and ensure all orresponding event interfaces contain that identifier. This may require updating the event's interface and [enricher.ts](edgeware/filters/enricher.ts) step.
 3. Add the appropriate cases to [entityArchival.ts](../../server/eventHandlers/edgeware/entityArchival.ts) that create and update the entity's state.
 4. (Optional) If fetching historical data is needed to initialize storage of the new entity, then you must do as follows:
