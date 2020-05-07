@@ -167,7 +167,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalHeaderSpacer),
             m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
             m(ProposalHeaderSpacer),
-            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state, }),
+            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
           ],
         ] : [
           m(ProposalHeaderOnchainId, { proposal }),
@@ -627,7 +627,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
         commentCount,
         viewCount,
         getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus,
+        getSetGlobalReplyStatus
       }),
       m(ProposalComments, {
         proposal,
