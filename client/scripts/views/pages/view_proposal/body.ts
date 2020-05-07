@@ -294,9 +294,10 @@ export const ProposalBodySaveEdit: m.Component<{
   item: OffchainThread | OffchainComment<any>,
   getSetGlobalEditingStatus,
   parentState,
+  callback?: Function; // required for OffchainComments
 }> = {
   view: (vnode) => {
-    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    const { item, getSetGlobalEditingStatus, parentState, callback } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
@@ -320,6 +321,8 @@ export const ProposalBodySaveEdit: m.Component<{
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              console.dir('saved');
+              callback();
               m.redraw();
             });
           }
