@@ -13,10 +13,9 @@ export const redirectWithLoginError = (res, message) => {
   const url = SERVER_URL + `/?loggedin=false&loginerror=${encodeURIComponent(message)}`;
   return res.redirect(url);
 };
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 
-const finishEmailLogin = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   const previousUser = req.user;
   if (req.user && req.user.email) {
     return redirectWithLoginSuccess(res, req.user.email);

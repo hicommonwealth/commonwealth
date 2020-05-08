@@ -1,10 +1,13 @@
+import WebSocket from 'ws';
 import http from 'http';
+import express from 'express';
+import { Express } from 'express-serve-static-core';
 import { DEFAULT_PORT } from '../config';
 import setupWebsocketServer from '../socket';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupServer = (app, wss, sessionParser) => {
+const setupServer = (app: Express, wss: WebSocket.Server, sessionParser: express.RequestHandler) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);

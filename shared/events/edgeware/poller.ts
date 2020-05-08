@@ -58,7 +58,7 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
       const events = await this._api.query.system.events.at(hash);
       const signedBlock = await this._api.rpc.chain.getBlock(hash);
       const extrinsics = signedBlock.block.extrinsics;
-      log.debug(`Fetched Block for ${versionName}:${versionNumber}: ${+header.number}`);
+      log.trace(`Fetched Block for ${versionName}:${versionNumber}: ${+header.number}`);
       return { header, events, extrinsics, versionNumber, versionName };
     }));
     log.info('Finished polling past blocks!');

@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const acceptInvite = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const acceptInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }

@@ -1,6 +1,5 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
-import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -8,7 +7,7 @@ import { getProposalUrl } from '../../shared/utils';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { title, body, kind, url, privacy, readOnly } = req.body;

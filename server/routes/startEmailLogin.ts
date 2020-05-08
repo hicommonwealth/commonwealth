@@ -1,14 +1,13 @@
 import moment from 'moment';
 import sgMail from '@sendgrid/mail';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const startEmailLogin = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const startEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   if (req.user && req.user.email) {
     return next(new Error('Already logged in'));
   }

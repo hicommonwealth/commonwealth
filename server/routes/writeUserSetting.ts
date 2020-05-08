@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const writeUserSetting = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const writeUserSetting = async (models, req: Request, res: Response, next: NextFunction) => {
   const { key, value } = req.body;
 
   if (!req.user) {

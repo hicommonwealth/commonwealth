@@ -1,6 +1,5 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -10,7 +9,7 @@ import proposalIdToEntity from '../util/proposalIdToEntity';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { parent_id, root_id, text } = req.body;

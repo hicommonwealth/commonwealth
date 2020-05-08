@@ -1,6 +1,6 @@
 import { default as crypto } from 'crypto';
 import { default as sgMail } from '@sendgrid/mail';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 
@@ -15,11 +15,10 @@ export const Errors = {
 };
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createInvite = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error('Not logged in'));
 
