@@ -60,7 +60,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules'],
+    modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules', '..'],
   },
   module: {
     rules: [
