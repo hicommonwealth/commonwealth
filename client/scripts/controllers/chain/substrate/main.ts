@@ -4,7 +4,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import { SubstrateEntityKind, SubstrateEventKind } from 'shared/events/edgeware/types';
+import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
 import { IChainAdapter, ChainBase, ChainClass, ChainEntity } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';

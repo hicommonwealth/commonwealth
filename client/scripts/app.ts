@@ -15,11 +15,11 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { default as moment } from 'moment-twitter';
 import { default as mixpanel } from 'mixpanel-browser';
 
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
-import { WebsocketMessageType, IWebsocketsPayload } from 'shared/types';
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything

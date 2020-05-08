@@ -1,6 +1,6 @@
 import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
-import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';

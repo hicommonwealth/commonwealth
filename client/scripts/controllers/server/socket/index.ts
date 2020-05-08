@@ -1,4 +1,4 @@
-import { WebsocketEventType, IWebsocketsPayload, WebsocketMessageType } from 'shared/types';
+import { WebsocketEventType, IWebsocketsPayload, WebsocketMessageType } from 'types';
 
 // how long to wait after being disconnected
 export const RECONNECT_DELAY = 5000;

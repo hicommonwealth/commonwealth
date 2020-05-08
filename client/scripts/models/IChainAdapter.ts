@@ -1,7 +1,7 @@
 import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
-import { Coin } from 'shared/adapters/currency';
-import { WebsocketMessageType, IWebsocketsPayload } from 'shared/types';
+import { Coin } from 'adapters/currency';
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
