@@ -4,7 +4,7 @@
 import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
-import { NotificationCategories } from '../../../shared/types';
+import { NotificationCategories, WebsocketMessageType } from '../../../shared/types';
 
 import { factory, formatFilename } from '../../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -28,7 +28,7 @@ export default class extends IEventHandler {
       chainEvent: dbEvent.toJSON(),
     };
     try {
-      this._wss.emit('server-event', data);
+      this._wss.emit(WebsocketMessageType.ChainEntity, data);
     } catch (e) {
       log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
     }

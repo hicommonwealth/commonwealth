@@ -18,6 +18,10 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
+
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EthereumChain(this.app);
@@ -28,7 +32,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
-    await this._initProposalComments();
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     if (this.webWallet) {

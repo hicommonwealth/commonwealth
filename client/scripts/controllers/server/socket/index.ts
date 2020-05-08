@@ -1,4 +1,4 @@
-import { default as moment } from 'moment-twitter';
+import { WebsocketEventType, IWebsocketsPayload, WebsocketMessageType } from 'shared/types';
 
 // how long to wait after being disconnected
 export const RECONNECT_DELAY = 5000;
@@ -13,14 +13,11 @@ export interface IScrollbackMessage {
   text: string;
 }
 
-export interface IWebsocketsPayload {
-  event: string; // options: 'message', 'heartbeat', 'typing', 'scrollback'
-  text?: string;
-  jwt?: string; // for outgoing payloads
-  chain?: string; // for incoming payloads
-  address?: string; // for incoming payloads
-  data?: IScrollbackMessage[]; // for incoming 'scrollback' payloads
-}
+export type WebsocketMessageHandler = (payload: IWebsocketsPayload<any>) => void;
+const DefaultWebsocketHandler = (
+  key: WebsocketEventType,
+  payload: IWebsocketsPayload<any>
+) => console.log(`No WS handler available for ${key}`);
 
 class WebsocketController {
   public get ws() { return this._ws; }
@@ -29,30 +26,33 @@ class WebsocketController {
   public get isConnected() { return this._isConnected; }
   public _isConnected : boolean;
 
-  public _purpose : string;
-  public _onStatusChange : (boolean) => void;
+  public _onStatusChange : (b: boolean) => void;
   public _heartbeatTimer : number;
   public _init : (() => void);
-  public _listeners: Array<(str : string, author: string, author_chain: string, timestamp? : moment.Moment) => void>;
+  private _listeners: { [key in WebsocketEventType]: WebsocketMessageHandler };
 
-  constructor(url, purpose = 'chat', jwt, onStatusChange) {
-    this._purpose = purpose;
-    this._listeners = [];
-    this._onStatusChange = onStatusChange || new Function();
+  constructor(url, jwt, onStatusChange) {
+    this._listeners = Object.assign(
+      {},
+      ...Object.keys(WebsocketEventType)
+        .map((key) => ({
+          [key]: DefaultWebsocketHandler.bind(null, key),
+        }))
+    );
+    this._onStatusChange = onStatusChange || (() => { });
     this._init = () => {
       // tear down old heartbeat timer
       if (this._heartbeatTimer) clearInterval(this._heartbeatTimer);
-      // set up new websocket
-      console.log(`${this._purpose}: websocket connecting to`, url);
       const ws = new WebSocket(url);
       ws.onopen = this.onopen.bind(this);
       ws.onclose = this.onclose.bind(this);
       ws.onerror = this.onerror.bind(this);
       ws.onmessage = this.onmessage.bind(this);
       this._ws = ws;
+
       // set up new heartbeat time
       const heartbeatTimer = setInterval(() => {
-        const heartbeat : IWebsocketsPayload = { event: 'heartbeat', jwt };
+        const heartbeat: IWebsocketsPayload<any> = { type: WebsocketMessageType.Heartbeat, jwt };
         ws.send(JSON.stringify(heartbeat));
       }, HEARTBEAT_DELAY);
       this._heartbeatTimer = +heartbeatTimer;
@@ -61,54 +61,40 @@ class WebsocketController {
   }
 
   public onopen() {
-    console.log(`${this._purpose}: websocket opened`);
+    console.log('Websocket opened');
     this._isConnected = true;
     this._onStatusChange(true);
   }
+
   public onerror() {
-    console.log(`${this._purpose}: websocket error`);
+    console.log('Websocket error');
   }
+
   public onclose() {
-    console.log(`${this._purpose}: websocket closed`);
+    console.log('Websocket closed');
     this._isConnected = false;
     this._onStatusChange(false);
     setTimeout(this._init, RECONNECT_DELAY);
   }
-  public async onmessage(event) {
-    console.log(`${this._purpose}: websocket received message`, event);
-    const payload : IWebsocketsPayload = JSON.parse(event.data);
-    if (payload.event === 'message' || payload.event === 'heartbeat-pong') {
-      console.log('Payload', payload);
-    } else if (payload.event === 'server-event') {
-      console.log('Server event payload', payload);
-    } else {
-      console.log(`${this._purpose}: received malformed message`, payload);
-    }
+
+  public async onmessage(event: MessageEvent) {
+    console.log('Websocket received message', event);
+    const payload: IWebsocketsPayload<any> = JSON.parse(event.data);
+    this._listeners[payload.type](payload);
   }
 
   // senders
-  public send(event = 'message', text, account, jwt) {
-    const payload : IWebsocketsPayload = {
-      event,
-      jwt,
-      text,
-      address: (account) ? account.address : null,
-      chain: (account) ? account.chain.id : null,
-    };
+  public send(type = WebsocketMessageType.Message, data, chain, address, jwt) {
+    const payload : IWebsocketsPayload<any> = { type, jwt, address, chain, data };
     this._ws.send(JSON.stringify(payload));
   }
+
   // listeners
-  public addListener(listener) {
-    const index = this._listeners.indexOf(listener);
-    (index !== -1) ?
-      console.log(`${this._purpose}: Attempted to add existing listener`) :
-      this._listeners.push(listener);
+  public addListener(type: WebsocketMessageType, listener: WebsocketMessageHandler) {
+    this._listeners[type] = listener;
   }
-  public removeListener(listener) {
-    const index = this._listeners.indexOf(listener);
-    (index === -1) ?
-      console.log(`${this._purpose}: Attempted to remove nonexistent listener`) :
-      this._listeners.splice(index, 1);
+  public removeListener(type: WebsocketMessageType) {
+    this._listeners[type] = DefaultWebsocketHandler.bind(null, type);
   }
 }
 

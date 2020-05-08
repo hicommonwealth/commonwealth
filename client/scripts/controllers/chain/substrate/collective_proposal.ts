@@ -92,6 +92,9 @@ export class SubstrateCollectiveProposal
   }
 
   public update(e: ChainEvent) {
+    if (this.completed) {
+      return;
+    }
     switch (e.data.kind) {
       case SubstrateEventKind.CollectiveProposed: {
         break;
@@ -106,6 +109,9 @@ export class SubstrateCollectiveProposal
         break;
       }
       case SubstrateEventKind.CollectiveExecuted: {
+        if (!this._approved.value) {
+          this._approved.next(true);
+        }
         this.complete();
         break;
       }

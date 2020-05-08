@@ -4,8 +4,8 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-
-import { IChainAdapter, ChainBase, ChainClass } from 'models';
+import { SubstrateEntityKind, SubstrateEventKind } from 'shared/events/edgeware/types';
+import { IChainAdapter, ChainBase, ChainClass, ChainEntity } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -28,6 +28,38 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Kusama;
+
+  public handleEntityUpdate(e: ChainEntity): void {
+    this.app.chainEntities.update(e);
+    switch (e.type) {
+      case SubstrateEntityKind.DemocracyProposal: {
+        return this.democracyProposals.updateProposal(e);
+      }
+      case SubstrateEntityKind.DemocracyReferendum: {
+        return this.democracy.updateProposal(e);
+      }
+      case SubstrateEntityKind.DemocracyPreimage: {
+        const notedEvent = e.chainEvents.find(({ data: { kind } }) => kind === SubstrateEventKind.PreimageNoted);
+        const proposal = this.democracyProposals.getByHash(e.typeId);
+        if (proposal) {
+          proposal.update(notedEvent);
+        }
+        const referendum = this.democracy.getByHash(e.typeId);
+        if (referendum) {
+          referendum.update(notedEvent);
+        }
+        break;
+      }
+      case SubstrateEntityKind.TreasuryProposal: {
+        return this.treasury.updateProposal(e);
+      }
+      case SubstrateEntityKind.CollectiveProposal: {
+        return this.council.updateProposal(e);
+      }
+      default:
+        break;
+    }
+  }
 
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
@@ -55,7 +87,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
-    await this._initProposalComments();
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     this._loaded = true;

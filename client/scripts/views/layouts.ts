@@ -8,7 +8,7 @@ import { default as app } from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import Header from 'views/components/header';
 import Footer from 'views/components/footer';
-import CommunityChat from 'views/components/community_chat';
+// import CommunityChat from 'views/components/community_chat';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
 import { featherIcon } from 'helpers';
@@ -75,7 +75,7 @@ export const Layout: m.Component<ILayoutAttrs, { loadingScope }> = {
       m('.clear'),
       vnode.children,
       m(Footer),
-      //m(CommunityChat),
+      // m(CommunityChat),
       m(AppModals),
     ]);
   }

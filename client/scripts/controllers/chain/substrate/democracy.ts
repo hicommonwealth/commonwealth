@@ -29,6 +29,10 @@ class SubstrateDemocracy extends ProposalModule<
   private _useRedesignLogic: boolean;
   public get isRedesignLogic() { return this._useRedesignLogic; }
 
+  public getByHash(hash: string) {
+    return this.store.getAll().find((referendum) => referendum.hash === hash);
+  }
+
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean): Promise<void> {
     this._Chain = ChainInfo;

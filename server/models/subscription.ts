@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { ProposalType, WebsocketMessageType } from '../../shared/types';
 
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../util/logging';
@@ -128,7 +128,7 @@ module.exports = (sequelize, DataTypes) => {
         object_id,
         ...notification_data,
       };
-      wss.emit('server-event', data, subscribers.map((s) => s.subscriber_id));
+      wss.emit(WebsocketMessageType.Notification, data, subscribers.map((s) => s.subscriber_id));
     }
     // send data to relevant webhooks
     await send(models, {

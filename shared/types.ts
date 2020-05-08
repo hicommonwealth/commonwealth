@@ -27,6 +27,31 @@ export enum ProposalType {
   MolochProposal = 'molochproposal',
 }
 
+export enum WebsocketEventType {
+  Connection = 'connection',
+  Message = 'message',
+  Upgrade = 'upgrade',
+  Close = 'close',
+}
+
+export enum WebsocketMessageType {
+  Message = 'message',
+  Heartbeat = 'heartbeat',
+  HeartbeatPong = 'heartbeat-pong',
+  Scrollback = 'scrollback',
+  Typing = 'typing',
+  Notification = 'notification',
+  ChainEntity = 'chain-entity',
+}
+
+export interface IWebsocketsPayload<T> {
+  type: WebsocketMessageType;
+  jwt?: string; // for outgoing payloads
+  chain?: string; // for incoming payloads
+  address?: string; // for incoming payloads
+  data?: T;
+}
+
 export interface IPostNotificationData {
   created_at: any;
   root_id: number;

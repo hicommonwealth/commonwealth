@@ -1,11 +1,11 @@
 import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'shared/adapters/currency';
+import { WebsocketMessageType, IWebsocketsPayload } from 'shared/types';
 
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
-import Account from './Account';
-import NodeInfo from './NodeInfo';
+import { Account, NodeInfo, ChainEntity } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -18,9 +18,20 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
 
-  protected async _initProposalComments(): Promise<void> {
+  protected async _postModuleLoad(): Promise<void> {
     await this.app.comments.refreshAll(this.id, null, true, false, true);
     // await this.app.reactions.refreshAll(this.id, null, false);
+
+    // attach listener for entity update events
+    this.app.socket.addListener(
+      WebsocketMessageType.ChainEntity,
+      (payload: IWebsocketsPayload<any>) => payload.data
+        // ignore other chains' state updates (for now)
+        && payload.data.chain === this.meta.chain.id
+        && this.handleEntityUpdate(
+          ChainEntity.fromJSON(payload.data)
+        ),
+    );
   }
 
   public async init(onServerLoaded? : () => void, initChainModuleFn?: () => Promise<void>): Promise<void> {
@@ -41,6 +52,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.reactions.deinit();
     this.app.chainEntities.deinit();
   }
+
+  public abstract handleEntityUpdate(e: ChainEntity): void;
 
   public abstract base: ChainBase;
   public abstract class: ChainClass;

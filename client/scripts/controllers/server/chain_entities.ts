@@ -36,6 +36,10 @@ class ChainEntityController {
     }
   }
 
+  public update(e: ChainEntity) {
+    this._store.add(e);
+  }
+
   public refresh(chain) {
     return get('/bulkEntities', { chain }, (result) => {
       for (const entityJSON of result) {

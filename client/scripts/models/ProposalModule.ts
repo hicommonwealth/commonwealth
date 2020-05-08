@@ -5,6 +5,7 @@ import { ProposalStore } from '../stores';
 import { IVote, ITXModalData } from './interfaces';
 import Proposal from './Proposal';
 import StorageModule from './StorageModule';
+import ChainEntity from './ChainEntity';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
 export abstract class ProposalModule<
@@ -19,6 +20,14 @@ export abstract class ProposalModule<
 
   private _app: IApp;
   public get app() { return this._app; }
+
+  public updateProposal(e: ChainEntity): void {
+    const proposal = this.store.getByIdentifier(e.typeId);
+    if (!proposal) return;
+
+    // TODO: avoid duplicate updates?
+    e.chainEvents.forEach((event) => proposal.update(event));
+  }
 
   constructor(app: IApp) {
     super();

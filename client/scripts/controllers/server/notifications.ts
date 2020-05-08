@@ -94,6 +94,10 @@ class NotificationsController {
     });
   }
 
+  public update(n: Notification) {
+    this._store.add(n);
+  }
+
   public refresh() {
     if (!app.login || !app.login.jwt) {
       throw new Error('must be logged in to refresh notifications');

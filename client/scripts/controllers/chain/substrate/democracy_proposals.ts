@@ -52,6 +52,10 @@ class SubstrateDemocracyProposals extends ProposalModule<
 
   private _Accounts: SubstrateAccounts;
 
+  public getByHash(hash: string) {
+    return this.store.getAll().find((proposal) => proposal.hash === hash);
+  }
+
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
@@ -127,32 +131,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
       'noteImminentPreimage',
       title,
     );
-  }
-
-  /**
-   * Fetches a preimage for a given democracy proposal if it exists
-   *
-   * @param hash Preimage hash of democracy proposal
-   */
-  public getProposal(hash: string): Observable<Proposal> {
-    if (!this._Chain?.apiInitialized) return; // TODO
-    return this._Chain.query((api: ApiRx) => api.query.democracy.preimages(hash))
-      .pipe(map((preimageOpt) => {
-        if (preimageOpt && preimageOpt.isSome) {
-          const preimage = preimageOpt.unwrap();
-          if ((preimage as any).isAvailable) {
-            const { data } = (preimage as unknown as PreimageStatus).asAvailable;
-            return this._Chain.createType('Proposal', data.toU8a(true));
-          } else if (!(preimage as any).isMissing) {
-            const [ data ] = preimage;
-            return this._Chain.createType('Proposal', data.toU8a(true));
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      }));
   }
 }
 
