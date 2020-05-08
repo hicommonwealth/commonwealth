@@ -47,6 +47,40 @@ To add a new entity to Edgeware, you must perform the following steps:
 5. If required, update all corresponding controllers on the client side to handle the new entity.
 6. Test out your change by triggering the corresponding sequence of events on a local testnet (this may require migration as per [Upgrading](#Upgrading), and, if so, step 4 is mandatory), and ensuring the entity's fields and associations are populated as expected. Also consider testing by adding a test case to [entityArchivalHandler.spec.ts](../../test/unit/events/edgeware/entityArchivalHandler.spec.ts).
 
+### What is a migration?
+
+In the previous two sections, I mention the idea of a migration, which initializes storage. I'd like to discuss the specifics and use case of this migration, to demonstrate its role in event handling why it might be necessary.
+
+Consider the following timeline, assuming each state update event affects the proposal created on block 2:
+
+```
+blocks     events         database
+  1
+  2      new proposal      offline
+  3                        offline
+  4      state update 1    offline
+  5                        online
+  6      state update 2    online
+  7
+  |
+  V
+```
+
+In the timeline above, the database comes online at block 5, but two proposal events have already taken place, at blocks 2 and 4 respectively. If we assume the database is freshly initialized, then we will only receive the "state update 2" event, missing the prior events. However, the logic of chain entities requires that we have a list of all events relating to that entity in sequence. How do we solve this, and construct a full proposal despite only seeing one of its state updates?
+
+The naive answer is to fetch all prior blocks. However, most chains perform a degree of pruning, and discard past block data. On Substrate, the pruning time is set to 250 blocks by default. Most proposals have timelines on the order of days, which means gaps of at least 14,000 blocks between events. Thus, we will be unable to simply fetch the historical events as they occurred on chain. We will need to _reconstruct_ prior events in order to obtain the complete data required to display the proposal. How can we do this?
+
+Substrate exposes a set of queryable storage objects, which we can ask for at any time (or even subscribe to updates for), and which contain some subset of proposal state. Thus the role of a migration is to query the specific storage objects and use the data to reconstruct "fake" chain events, as they may have happened at an earlier moment on the chain. We use these events to initialize the state of any extant chain object, so that incoming updates, such as "state update 2", affect a pre-existing object rather than referring to some unknown entity on chain.
+
+In particular, we differentiate between two types of entity-affecting events: creation events, and update events. The [entityArchival.ts](../../server/eventHandlers/edgeware/entityArchival.ts) event handler is where this distinction is logically manifest: certain events involve creating new entities, others involve updating existing entities in the database. Thus, the [migration.ts](edgeware/migration.ts) fetcher attempts first to reconstruct the creation events for each extant on-chain entity, and then attempts to reconstruct state updates as thoroughly as possible.
+
+This system as some limitations:
+  * In some cases we are unable to reconstruct the full event as it would have been emitted, due to the subset of data kept in storage. In these cases, we simply leave the field blank, and do our best to work around the lack of information. Thankfully, none of the omitted data elements are highly significant to the entity. One such example is a passed democracy referendum's "vote threshold": it is already known to have passed, so the vote threshold under which it passed is of marginal concern.
+  * In most cases, we are unable to determine the exact block when an event would have occurred. Luckily, we do not rely on the event emission block for the majority of the entity logic. The migration generates events as if they occurred on the block when we ran the migration.
+  * If an entity has been fully processed and removed from the chain at the time the migration is run, such as a fully passed and executed proposal, we're often unable to fetch any information about it. This limits the extent of our archiving to the set of active entities when the database is first migrated, but should not have any impact on exposing possible user actions. Fully processed entities, definitionally, have no valid user interactions. They are finished, and maintaining them is useful for historical purposes only.
+
+The migration system is designed to handle one other case. Consider if we ran the event handler for a while, and if, at some point, the interfaces to certain events, as defined in [types.ts](edgeware/types.ts), were updated to add additional information. In this case, where we have stored events with "old" interfaces that may be insufficient to back the desired state of the entity, we attempt to "upgrade" all existing events during the process of migration. This looks effectively the same as reconstructing the event from nothing, except we overwrite the underlying event data rather than creating a new event in the database.
+
 ## Adding a new chain
 
 A new chain must include all components specified in [interfaces.ts](interfaces.ts): a set of types, a subscriber, a poller, a processor, and an event handler, as well as a filters folder that includes a labeler and a titler.
