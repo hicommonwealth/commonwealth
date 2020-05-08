@@ -51,11 +51,11 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
       });
     }
 
-    const onRoleUpdate = (x, y) => {
-      // y is the newly created Role returned from the server, doesn't have address
-      // x is the previous RoleInfo which has Role + Address
-      y.Address = x.Address; // add the missing Address property to the new RoleInfo
-      vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
+    const onRoleUpdate = (oldRole, newRole) => {
+      // newRole doesn't have the Address property that oldRole has,
+      // Add the missing Address property to the newRole, then splice it into the array.
+      newRole.Address = oldRole.Address;
+      vnode.state.roleData.splice(vnode.state.roleData.indexOf(oldRole), 1, newRole);
       m.redraw();
     };
 
@@ -67,7 +67,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
               community: app.community.meta,
               admins,
               mods,
-              onRoleUpdate: (x, y) => onRoleUpdate(x, y),
+              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
               onChangeHandler: vnode.attrs.onChangeHandler,
             })
           : vnode.state.loadingFinished
@@ -76,7 +76,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
               admins,
               mods,
               onChangeHandler: vnode.attrs.onChangeHandler,
-              onRoleUpdate: (x, y) => onRoleUpdate(x, y),
+              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
             }),
       ]),
       m('.panel-right', [
@@ -84,7 +84,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
           && m(AdminTabPanel, {
             roleData: vnode.state.roleData,
             defaultTab: 1,
-            onRoleUpgrade: (x, y) => onRoleUpdate(x, y),
+            onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
             webhooks: vnode.state.webhooks,
           }),
       ]),

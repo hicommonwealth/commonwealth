@@ -66,7 +66,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         m('td', 'Admins'),
         m('td', [ m(ManageRolesRow, {
           roledata: vnode.attrs.admins,
-          onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+          onRoleUpdate: (oldRole, newRole) => { vnode.attrs.onRoleUpdate(oldRole, newRole); },
         }), ]),
       ]),
       vnode.attrs.mods.length > 0
@@ -74,7 +74,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           m('td', 'Moderators'),
           m('td', [ m(ManageRolesRow, {
             roledata: vnode.attrs.mods,
-            onRoleUpdate: (x, y) => { vnode.attrs.onRoleUpdate(x, y); },
+            onRoleUpdate: (oldRole, newRole) => { vnode.attrs.onRoleUpdate(oldRole, newRole); },
           }), ])
         ]),
     ]),

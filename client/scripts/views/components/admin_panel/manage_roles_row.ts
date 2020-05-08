@@ -33,11 +33,12 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                   if (res.status !== 'Success') {
                     throw new Error(`Got unsuccessful status: ${res.status}`);
                   }
-                  vnode.attrs.onRoleUpdate(role, res.result);
+                  const newRole = res.result;
+                  vnode.attrs.onRoleUpdate(role, newRole);
                 },
               }),
             ]);
-          })
+          }),
     ]);
   }
 };
