@@ -45,11 +45,19 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
     const admins = [];
     const mods = [];
     if (vnode.state.roleData?.length > 0) {
-      vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
+      vnode.state.roleData.sort(sortAdminsAndModsFirst).forEach((role) => {
         if (role.permission === RolePermission.admin) admins.push(role);
         else if (role.permission === RolePermission.moderator) mods.push(role);
       });
     }
+
+    const onRoleUpdate = (x, y) => {
+      // y is the newly created Role returned from the server, doesn't have address
+      // x is the previous RoleInfo which has Role + Address
+      y.Address = x.Address; // add the missing Address property to the new RoleInfo
+      vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
+      m.redraw();
+    };
 
     return m('.AdminPanelContents', [
       m('.panel-left', [
@@ -59,11 +67,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
               community: app.community.meta,
               admins,
               mods,
-              onRoleUpdate: (x, y) => {
-                y.Address = x.Address;
-                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
-                m.redraw();
-              },
+              onRoleUpdate: (x, y) => onRoleUpdate(x, y),
               onChangeHandler: vnode.attrs.onChangeHandler,
             })
           : vnode.state.loadingFinished
@@ -72,11 +76,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
               admins,
               mods,
               onChangeHandler: vnode.attrs.onChangeHandler,
-              onRoleUpdate: (x, y) => {
-                y.Address = x.Address;
-                vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
-                m.redraw();
-              },
+              onRoleUpdate: (x, y) => onRoleUpdate(x, y),
             }),
       ]),
       m('.panel-right', [
@@ -84,11 +84,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
           && m(AdminTabPanel, {
             roleData: vnode.state.roleData,
             defaultTab: 1,
-            onRoleUpgrade: (x, y) => {
-              y.Address = x.Address;
-              vnode.state.roleData.splice(vnode.state.roleData.indexOf(x), 1, y);
-              m.redraw();
-            },
+            onRoleUpgrade: (x, y) => onRoleUpdate(x, y),
             webhooks: vnode.state.webhooks,
           }),
       ]),

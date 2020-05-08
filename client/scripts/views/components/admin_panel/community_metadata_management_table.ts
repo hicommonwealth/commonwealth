@@ -9,8 +9,8 @@ interface ICommunityMetadataManagementState {
   name: string;
   description: string;
   url: string;
-  privacyToggled: boolean;
-  invitesToggled: boolean;
+  privacyValue: boolean;
+  invitesValue: boolean;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -55,12 +55,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       m(TogglePropertyRow, {
         title: 'Private Community?',
         defaultValue: vnode.attrs.community.privacyEnabled,
-        onToggle: (v) => { vnode.state.privacyToggled = !vnode.state.privacyToggled; },
+        onToggle: (checked) => { vnode.state.privacyValue = checked; },
       }),
       m(TogglePropertyRow, {
         title: 'Invites Enabled?',
         defaultValue: vnode.attrs.community.invitesEnabled,
-        onToggle: (v) => { vnode.state.invitesToggled = !vnode.state.invitesToggled; },
+        onToggle: (checked) => { vnode.state.invitesValue = checked; },
       }),
       m('tr', [
         m('td', 'Admins'),
@@ -85,8 +85,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         vnode.attrs.community.updateCommunityData(
           vnode.state.name,
           vnode.state.description,
-          vnode.state.privacyToggled,
-          vnode.state.invitesToggled,
+          vnode.state.privacyValue,
+          vnode.state.invitesValue,
         );
         vnode.attrs.onChangeHandler(false);
       },

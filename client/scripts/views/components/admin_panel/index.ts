@@ -14,7 +14,10 @@ const CommunityManagementPanel: m.Component<{}, {isOpen: boolean}> = {
     return [m(ListItem, {
       href: '#',
       class: 'CommunityManagementPanel',
-      onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+      onclick: (e) => {
+        e.preventDefault();
+        vnode.state.isOpen = true;
+      },
       label: 'Manage Community',
       contentLeft: m(Icon, { name: Icons.SETTINGS, }),
     }),

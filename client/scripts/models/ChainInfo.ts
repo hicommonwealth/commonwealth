@@ -40,23 +40,15 @@ class ChainInfo {
   }
 
   public async updateChainData(name: string, description: string,) {
-    try {
-      await $.post(`${app.serverUrl()}/updateChain`, {
-        'id': app.activeChainId(),
-        'name': name,
-        'description': description,
-        'jwt': app.login.jwt,
-      }).then((r) => {
-        const updatedChain: ChainInfo = r.result;
-        this.name = updatedChain.name;
-        this.description = updatedChain.description;
-      });
-    } catch (err) {
-      console.log('Failed to update chain data');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update chain data');
-    }
+    const r = await $.post(`${app.serverUrl()}/updateChain`, {
+      'id': app.activeChainId(),
+      'name': name,
+      'description': description,
+      'jwt': app.login.jwt,
+    });
+    const updatedChain: ChainInfo = r.result;
+    this.name = updatedChain.name;
+    this.description = updatedChain.description;
   }
 
   public async updateFeaturedTags(tags: string[]) {

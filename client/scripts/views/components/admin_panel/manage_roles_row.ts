@@ -24,17 +24,16 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
                 size: 'xs',
                 class: 'roleXIcon',
                 onclick: async () => {
-                  await $.post(`${app.serverUrl()}/upgradeMember`, {
+                  const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,
                     new_role: 'member',
                     address: role.Address.address,
                     jwt: app.login.jwt,
-                  }).then((res) => {
-                    if (res.status !== 'Success') {
-                      throw new Error(`Got unsuccessful status: ${res.status}`);
-                    }
-                    vnode.attrs.onRoleUpdate(role, res.result);
-                  }).catch((e) => console.error('Failed To demote admin'));
+                  });
+                  if (res.status !== 'Success') {
+                    throw new Error(`Got unsuccessful status: ${res.status}`);
+                  }
+                  vnode.attrs.onRoleUpdate(role, res.result);
                 },
               }),
             ]);

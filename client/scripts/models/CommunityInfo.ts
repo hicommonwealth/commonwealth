@@ -43,27 +43,21 @@ class CommunityInfo {
     privacyEnabled: boolean,
     invitesEnabled: boolean
   ) {
-    try {
-      $.post(`${app.serverUrl()}/updateCommunity`, {
-        'id': app.activeCommunityId(),
-        'name': name,
-        'description': description,
-        'privacy': privacyEnabled,
-        'invites': invitesEnabled,
-        'jwt': app.login.jwt,
-      }).then((r) => {
-        const updatedCommunity: CommunityInfo = r.result;
-        this.name = updatedCommunity.name;
-        this.description = updatedCommunity.description;
-        this.privacyEnabled = updatedCommunity.privacyEnabled;
-        this.invitesEnabled = updatedCommunity.invitesEnabled;
-      });
-    } catch (err) {
-      console.log('Failed to update community data');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to update community data');
-    }
+    console.dir(privacyEnabled);
+    console.dir(invitesEnabled);
+    const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
+      'id': app.activeCommunityId(),
+      'name': name,
+      'description': description,
+      'privacy': privacyEnabled,
+      'invites': invitesEnabled,
+      'jwt': app.login.jwt,
+    });
+    const updatedCommunity: CommunityInfo = r.result;
+    this.name = updatedCommunity.name;
+    this.description = updatedCommunity.description;
+    this.privacyEnabled = updatedCommunity.privacyEnabled;
+    this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
 
   public async updateFeaturedTags(tags: string[]) {

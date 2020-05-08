@@ -9,13 +9,11 @@ interface ITogglePropertyRowAttrs {
 }
 
 interface ITogglePropertyRowState {
-  toggled: boolean;
   checked: boolean;
 }
 
 const TogglePropertyRow: m.Component<ITogglePropertyRowAttrs, ITogglePropertyRowState> = {
   oninit: (vnode) => {
-    vnode.state.toggled = false;
     vnode.state.checked = vnode.attrs.defaultValue;
   },
   view: (vnode) => {
@@ -28,9 +26,8 @@ const TogglePropertyRow: m.Component<ITogglePropertyRowAttrs, ITogglePropertyRow
           checked: vnode.state.checked,
           disabled: vnode.attrs.disabled || false,
           onchange: () => {
-            vnode.state.toggled = !vnode.state.toggled;
             vnode.state.checked = !vnode.state.checked;
-            vnode.attrs.onToggle(vnode.state.toggled);
+            vnode.attrs.onToggle(vnode.state.checked);
           },
         })
       ])
