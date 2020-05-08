@@ -6,16 +6,16 @@ import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
 import { Button, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivider } from 'construct-ui';
 
-import NotificationRow from 'views/components/sidebar/notification_row';
+import NotificationRow from './sidebar/notification_row';
 import { initAppState } from '../../app';
 import { notifySuccess } from '../../controllers/app/notifications';
-import User from '../components/widgets/user';
+import User from './widgets/user';
 import LoginModal from '../modals/login_modal';
 import FeedbackModal from '../modals/feedback_modal';
 
 
 const PseudoHeader : m.Component<{}, {}> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<{}, {}>) => {
     const notifications = app.login.notifications
       ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
     const accountURI = app?.vm?.activeAccount?.chain?.id
