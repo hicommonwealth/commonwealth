@@ -6,7 +6,8 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
-import { Errors } from 'server/routes/createInvite';
+import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
+import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
 import { JWT_SECRET } from 'server/config';
 import app, { resetDatabase, closeServer } from '../../../server-test';
 import * as modelUtils from '../../util/modelUtils';
@@ -60,7 +61,6 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedEmail: userEmail,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
       expect(res.body.status).to.be.equal('Success');
@@ -81,7 +81,6 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedAddress: addrRes.address,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
       expect(res.body.status).to.be.equal('Success');
@@ -137,13 +136,12 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedAddress: address,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
     });
 
     it('should fail to invite an address that is already a member', async () => {
@@ -163,13 +161,12 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedAddress: res.address,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.IsAlreadyMember);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.IsAlreadyMember);
     });
 
     it('should fail to create an invite from an invites disabled community as a user', async () => {
@@ -184,13 +181,12 @@ describe('Invite Tests', () => {
           jwt: userJWT,
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: userAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.MustBeAdminOrMod);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.MustBeAdminOrMod);
     });
 
     it('should fail to create an invite with an invalid JWT', async () => {
@@ -204,7 +200,6 @@ describe('Invite Tests', () => {
           jwt: 'jwt',
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: userAddress,
         });
 
@@ -224,13 +219,12 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.InvalidEmail);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.InvalidEmail);
     });
 
     it('should fail to create an invite with an address and an email', async () => {
@@ -247,13 +241,12 @@ describe('Invite Tests', () => {
           invitedEmail: newUserEmail,
           invitedAddress: newUserAddress,
           community,
-          author_chain: chain,
           address: userAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.NoEmailAndAddress);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.NoEmailAndAddress);
     });
 
     it('should fail to create an invite without an address or an email', async () => {
@@ -268,20 +261,17 @@ describe('Invite Tests', () => {
         .send({
           jwt: userJWT,
           community,
-          author_chain: chain,
           address: userAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.NoEmailOrAddress);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.NoEmailOrAddress);
     });
 
     it('should fail to create an invite with a non-existent address', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      const newUserAddress = res.address;
       const newUserEmail = 'test@commonwealth.im';
       const invite = await chai.request(app)
         .post('/api/createInvite')
@@ -290,13 +280,12 @@ describe('Invite Tests', () => {
           jwt: userJWT,
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: '',
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
     });
 
     it('should fail to create an invite from a non-admin user passing in an admin address', async () => {
@@ -311,13 +300,12 @@ describe('Invite Tests', () => {
           jwt: userJWT,
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
     });
 
     it('should fail to create an invite from a non-admin user passing in an admin address in an invites disabled community', async () => {
@@ -332,18 +320,17 @@ describe('Invite Tests', () => {
           jwt: userJWT,
           invitedEmail: newUserEmail,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
 
       expect(invite.status).to.be.equal(500);
       expect(invite.body.error).to.not.be.null;
-      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+      expect(invite.body.error).to.be.equal(CreateInviteErrors.AddressNotFound);
     });
   });
 
   describe('/acceptInvite', () => {
-    it('should accept an invite create by an admin as a user', async () => {
+    it('should accept an invite created by an admin as a user', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
       const invite = await chai.request(app)
@@ -353,7 +340,6 @@ describe('Invite Tests', () => {
           jwt: adminJWT,
           invitedEmail: userEmail,
           community,
-          author_chain: chain,
           address: adminAddress,
         });
       expect(invite.body.status).to.be.equal('Success');
@@ -372,6 +358,35 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.used).to.be.true;
       expect(res.body.result.membership.active).to.be.true;
       expect(res.body.result.membership.community).to.be.equal(community);
+    });
+
+    it.skip('should fail to accept an invite created by an admin as a user who does not own the address', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedEmail: userEmail,
+          community,
+          address: adminAddress,
+        });
+
+      const newUserRes = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserAddress = newUserRes.address;
+      const res = await chai.request(app)
+        .post('/api/acceptInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          reject: false,
+          inviteCode: invite.body.result.id,
+          address: newUserAddress,
+        });
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(AcceptInviteErrors.WrongOwner);
     });
   });
 
