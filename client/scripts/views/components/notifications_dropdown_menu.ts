@@ -5,7 +5,8 @@ import app from 'state';
 import { PopoverMenu, Button, Icons } from 'construct-ui';
 import HeaderNotificationRow from 'views/components/sidebar/notification_row';
 import moment from 'moment';
-import { Notification, NotificationSubscription, ChainEvent } from 'models';
+import { Notification, NotificationSubscription, ChainEvent, NotificationCategory } from 'models';
+import { NotificationCategories } from 'types';
 
 class BatchedNotification {
   public readonly id: number;
@@ -21,7 +22,7 @@ class BatchedNotification {
     return this._isRead;
   }
 
-  public get getBatch(): Notification[] {
+  public get batch(): Notification[] {
     return this._batch;
   }
 
@@ -30,7 +31,7 @@ class BatchedNotification {
   }
 
   public markBatchRead(): void {
-    this._batch.map((n) => {
+    this._batch.forEach((n) => {
       n.markRead();
     });
   }
@@ -47,13 +48,40 @@ class BatchedNotification {
   }
 }
 
+const batchNotifications = (n: Notification[]) => {
+  const notificationsAndBatches = [];
+  const batchTypes = [
+    NotificationCategories.NewComment,
+    NotificationCategories.NewReaction,
+    NotificationCategories.NewThread,
+  ];
+
+  for (let i = 0; i < n.length; i++) {
+    if (batchTypes.includes(n[i].subscription.category)) {
+      const newBatch = new BatchedNotification(n[i]);
+      for (let j = i + 1; j < n.length; j) {
+        if (n[j].subscription.id === newBatch.subscription.id) {
+          newBatch.addNotification(n[j]);
+          n.splice(j, 1);
+        } else j++;
+      }
+      if (newBatch.batch.length > 0) notificationsAndBatches.push(newBatch);
+      else notificationsAndBatches.push(n[i]);
+    } else {
+      notificationsAndBatches.push(n[i]);
+    }
+  }
+
+  return notificationsAndBatches;
+};
+
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
   view: (vnode) => {
     const notifications = app.login.notifications
       ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-    const notificationsAndArrays = [];
-
+    console.dir(notifications.length);
+    console.dir(batchNotifications(notifications));
 
     return m(PopoverMenu, {
       transitionDuration: 0,
