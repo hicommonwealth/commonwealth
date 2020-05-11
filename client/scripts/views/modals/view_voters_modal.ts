@@ -5,7 +5,7 @@ import m from 'mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CompactModalExitButton } from 'views/modal';
 import app from 'state';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { formatAddressShort } from 'helpers';
 import User from '../components/widgets/user';
 

@@ -64,7 +64,6 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
-import bulkProposals from './routes/bulkProposals';
 import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
 import deleteChainNode from './routes/deleteChainNode';
@@ -89,6 +88,8 @@ import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 
+import bulkEntities from './routes/bulkEntities';
+
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
 
@@ -100,9 +101,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
   router.post('/selectAddress', passport.authenticate('jwt', { session: false }), selectAddress.bind(this, models));
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
-
-  // proposals
-  router.get('/bulkProposals', bulkProposals.bind(this, models));
 
   // chains
   router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models));
@@ -233,6 +231,8 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));
+
+  router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   app.use('/api', router);
 }

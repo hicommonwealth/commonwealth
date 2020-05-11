@@ -5,15 +5,13 @@ import faker from 'faker';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase, closeServer } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 
-const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
 

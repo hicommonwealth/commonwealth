@@ -7,6 +7,9 @@ import { Hash } from '@polkadot/types/interfaces';
 import { IBlockPoller, IDisconnectedRange } from '../interfaces';
 import { SubstrateBlock } from './types';
 
+import { factory, formatFilename } from '../../../server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
   /**
    * Connects to chain, fetches specified blocks and passes them
@@ -20,11 +23,15 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
     if (!range.endBlock) {
       const header = await this._api.rpc.chain.getHeader();
       range.endBlock = +header.number;
-      console.log(`Discovered endBlock: ${range.endBlock}`);
+      log.info(`Discovered endBlock: ${range.endBlock}`);
     }
     if ((range.endBlock - range.startBlock) <= 0) {
-      console.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
+      log.error(`End of range (${range.endBlock}) <= start (${range.startBlock})! No blocks to fetch.`);
       return;
+    }
+    if ((range.endBlock - range.startBlock) > 500) {
+      log.info(`Attempting to poll ${range.endBlock - range.startBlock} blocks, reducing query size.`);
+      range.startBlock = range.endBlock - 500;
     }
 
     // discover current version
@@ -39,22 +46,22 @@ export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
     // fetch blocks from start to end
     const blockNumbers = [ ...Array(range.endBlock - range.startBlock).keys()]
       .map((i) => range.startBlock + i);
-    console.log(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
+    log.debug(`Fetching hashes for blocks: ${JSON.stringify(blockNumbers)}`);
     const hashes: Hash[] = await this._api.query.system.blockHash.multi(blockNumbers);
 
     // remove all-0 block hashes -- those blocks have been pruned & we cannot fetch their data
     const nonZeroHashes = hashes.filter((hash) => !hash.isEmpty);
-    console.log(`${nonZeroHashes.length} active and ${hashes.length - nonZeroHashes.length} pruned hashes fetched!`);
-    console.log('Fetching headers and events...');
+    log.info(`${nonZeroHashes.length} active and ${hashes.length - nonZeroHashes.length} pruned hashes fetched!`);
+    log.debug('Fetching headers and events...');
     const blocks: SubstrateBlock[] = await Promise.all(nonZeroHashes.map(async (hash) => {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
       const signedBlock = await this._api.rpc.chain.getBlock(hash);
       const extrinsics = signedBlock.block.extrinsics;
-      console.log(`Poller fetched Block: ${+header.number}`);
+      log.debug(`Fetched Block for ${versionName}:${versionNumber}: ${+header.number}`);
       return { header, events, extrinsics, versionNumber, versionName };
     }));
-    console.log('Finished polling past blocks!');
+    log.info('Finished polling past blocks!');
 
     return blocks;
   }

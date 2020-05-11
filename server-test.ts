@@ -246,12 +246,5 @@ setupErrorHandlers();
 setupServer();
 
 export const resetDatabase = () => resetServer();
-export const closeServer = async () => {
-  console.log('shutting down server');
-  viewCountCache.close();
-  wss.close();
-  server.close();
-  await models.sequelize.close();
-};
 
 export default app;

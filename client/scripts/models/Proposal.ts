@@ -1,18 +1,17 @@
 import moment from 'moment-twitter';
-import { BehaviorSubject, Unsubscribable, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Coin } from 'shared/adapters/currency';
-import { IIdentifiable, ICompletable, ProposalAdapter } from 'shared/adapters/shared';
+import { IIdentifiable, ICompletable } from 'shared/adapters/shared';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
 import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
 import Account from './Account';
 import { ProposalStore } from '../stores';
+import ChainEvent from './ChainEvent';
 
 abstract class Proposal<
   ApiT,
   C extends Coin,
   ConstructorT extends IIdentifiable,
-  UpdateT extends ICompletable,
   VoteT extends IVote<C>
 > implements IUniqueId {
   // basic info
@@ -43,18 +42,14 @@ abstract class Proposal<
   // TODO: these should be observables
   public abstract get support(): Coin | number;
   public abstract get turnout(): number;
-  //public abstract get requirementName(): string;
-  //public abstract get requirementExplanation(): string;
 
-  // adapter logic
-  protected _subscription: Unsubscribable;
   protected _completed: BehaviorSubject<boolean> = new BehaviorSubject(false);
   get completed() { return this._completed.getValue(); }
   get completed$() { return this._completed.asObservable(); }
   protected _completedAt: moment.Moment; // TODO: fill this out
   get completedAt() { return this._completedAt; }
 
-  private _initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  protected _initialized: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public get initialized$(): Observable<boolean> { return this._initialized.asObservable(); }
   public get initialized(): boolean { return this._initialized.value; }
 
@@ -64,35 +59,21 @@ abstract class Proposal<
     this.identifier = data.identifier;
   }
 
-  // adapter logic
-  protected updateState(store: ProposalStore<Proposal<ApiT, C, ConstructorT, UpdateT, VoteT>>, state: UpdateT): void {
+  public abstract update(e: ChainEvent): any;
+
+  protected complete(
+    store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
+  ): void {
     if (this._completed.getValue() === true) {
       throw new Error('cannot update state once marked completed');
     }
-    if (state.completed) {
-      this._completed.next(true);
-      this.unsubscribe();
-    }
+    this._completed.next(true);
     store.update(this);
-    if (!this.initialized) {
-      this._initialized.next(true);
-      this._initialized.complete();
-    }
+    this._initialized.complete();
   }
-  protected subscribe(
-    api: Observable<ApiT>,
-    store: ProposalStore<Proposal<ApiT, C, ConstructorT, UpdateT, VoteT>>,
-    adapter: ProposalAdapter<ApiT, ConstructorT, UpdateT>
-  ): void {
-    this._subscription = api.pipe(
-      switchMap((api: ApiT) =>
-        adapter.subscribeState(api, this.data))
-    ).subscribe((s) => this.updateState(store, s));
-  }
-  public unsubscribe(): void {
-    if (this._subscription) {
-      this._subscription.unsubscribe();
-    }
+
+  public deinit() {
+    this._initialized.next(false);
   }
 
   // voting
@@ -117,8 +98,9 @@ abstract class Proposal<
   }
   public getVotes(fromAccount?: Account<C>) {
     if (fromAccount) {
-      return this.votes.getValue()[fromAccount.address] !== undefined ?
-        [this.votes.getValue()[fromAccount.address]] : [];
+      return this.votes.getValue()[fromAccount.address] !== undefined
+        ? [this.votes.getValue()[fromAccount.address]]
+        : [];
     } else {
       return Object.values(this.votes.getValue());
     }

@@ -8,7 +8,6 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
-  public readonly server = {};
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
 
@@ -26,15 +25,13 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     }, onServerLoaded);
     await this.accounts.init(this.chain);
     await this.governance.init(this.chain, this.accounts);
+    await this._initProposalComments();
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
 
     await this.governance.deinit();
     await this.accounts.deinit();

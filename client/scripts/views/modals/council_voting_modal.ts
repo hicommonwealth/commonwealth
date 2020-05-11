@@ -9,7 +9,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { formatCoin } from 'adapters/currency';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import { MultipleButtonSelectorFormField } from 'views/components/forms';
 import SendingFrom from 'views/components/sending_from';
 import User from 'views/components/widgets/user';

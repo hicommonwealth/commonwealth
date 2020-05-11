@@ -16,7 +16,7 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { orderProposalsByAmountVoted } from 'views/components/proposals/ordering';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy';
+import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -36,7 +36,7 @@ const ProposalsPage: m.Component<{}> = {
 
     // do not display the dispatch queue as full proposals for now
     const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed);
+    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll(); // .filter((p) => !p.completed && !p.passed);
 
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();

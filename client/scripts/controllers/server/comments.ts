@@ -19,13 +19,14 @@ const modelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
+  const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.version_history,
     attachments,
-    uniqueIdToProposal(decodeURIComponent(comment.root_id)),
+    proposal,
     comment.id,
     moment(comment.created_at),
     comment.child_comments,
@@ -174,12 +175,28 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(chainId: string, communityId: string, reset = false) {
+  public async refreshAll(
+    chainId: string,
+    communityId: string,
+    reset = false,
+    offchainThreadsOnly = false,
+    proposalsOnly = false
+  ) {
     try {
-      const response = await $.get(`${app.serverUrl()}/bulkComments`, {
+      const args: any = {
         chain: chainId,
         community: communityId,
-      });
+      };
+      if (offchainThreadsOnly && proposalsOnly) {
+        throw new Error('cannot select mutually exclusive offchain threads and proposals only options');
+      }
+      if (offchainThreadsOnly) {
+        args.offchain_threads_only = 1;
+      }
+      if (proposalsOnly) {
+        args.proposals_only = 1;
+      }
+      const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);
       }

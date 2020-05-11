@@ -7,6 +7,9 @@ import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';
 import { IBlockSubscriber } from '../interfaces';
 import { SubstrateBlock } from './types';
 
+import { factory, formatFilename } from '../../../server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
   private _subscription;
   private _versionName: string;
@@ -21,7 +24,7 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
       this._api.rpc.state.subscribeRuntimeVersion((version: RuntimeVersion) => {
         this._versionNumber = +version.specVersion;
         this._versionName = version.specName.toString();
-        console.log(`Subscriber fetched runtime version for ${this._versionName}: ${this._versionNumber}`);
+        log.info(`Fetched runtime version for ${this._versionName}: ${this._versionNumber}`);
         resolve();
       });
     });
@@ -39,7 +42,7 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
           versionName: this._versionName,
         };
         // TODO: add logging prefix output
-        console.log(`Subscriber fetched Block: ${+block.header.number}`);
+        log.debug(`Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`);
         cb(block);
       });
     });

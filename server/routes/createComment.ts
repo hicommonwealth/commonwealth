@@ -5,6 +5,8 @@ import { UserRequest } from '../types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -117,15 +119,17 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-    proposal = await models.Proposal.findOne({
-      where: { identifier: id, type: prefix }
-    });
+  } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    proposal = await proposalIdToEntity(models, chain.id, finalComment.root_id);
   } else {
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
-  if (!proposal || proposal.read_only) {
+  if (!proposal) {
+    await finalComment.destroy();
+    return next(new Error('Cannot comment; thread not found'));
+  }
+  if (proposal.read_only) {
     await finalComment.destroy();
     return next(new Error('Cannot comment when thread is read_only'));
   }

@@ -1,3 +1,7 @@
+/**
+ * NOTE: THIS MODEL IS DEPRECATED DO NOT USE
+ */
+
 module.exports = (sequelize, DataTypes) => {
   const Proposal = sequelize.define('Proposal', {
     chain: { type: DataTypes.STRING, allowNull: false },

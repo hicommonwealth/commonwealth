@@ -17,7 +17,7 @@ import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from '
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -48,7 +48,7 @@ import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';

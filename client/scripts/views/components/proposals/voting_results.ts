@@ -8,15 +8,18 @@ import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote } from 'models';
-import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling';
+import { SignalingVote, EdgewareSignalingProposal } from 'controllers/chain/edgeware/signaling_proposal';
 import { first } from 'rxjs/operators';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
+import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { MolochProposalVote, MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 
 const signalingVoteToString = (v: VoteOutcome): string => {
-  return u8aToString(v.toU8a());
-}
+  const outcomeArray = v.toU8a();
+  // cut off trailing 0s
+  const sliceEnd = outcomeArray.indexOf(0);
+  return u8aToString(outcomeArray.slice(0, sliceEnd));
+};
 
 const ProposalVotingResults = {
   view: (vnode) => {

@@ -15,7 +15,7 @@ const post = (route, args, callback) => {
       console.error(resp);
     }
   }).catch((e) => console.error(e));
-}
+};
 
 class NotificationsController {
   private _store: NotificationStore = new NotificationStore();

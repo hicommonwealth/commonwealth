@@ -25,6 +25,14 @@ export function constructOption<T extends Codec>(value?: T): Option<T> {
 
 export function constructFakeApi(callOverrides): ApiPromise {
   return {
+    createType: (name, value) => value,
+    queryMulti: (queries) => {
+      return Promise.all(queries.map((q: any[]) => {
+        const qFunc = q[0];
+        const qArgs = q.slice(1);
+        return qFunc(...qArgs);
+      }));
+    },
     rpc: {
       chain: {
         subscribeNewHeads: callOverrides['subscribeNewHeads'],
@@ -51,16 +59,24 @@ export function constructFakeApi(callOverrides): ApiPromise {
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
         publicProps: callOverrides['publicProps'],
+        depositOf: callOverrides['depositOf'],
       },
       treasury: {
-        proposals: callOverrides['proposals'],
+        proposals: callOverrides['treasuryProposals'],
       },
       council: {
         voting: callOverrides['voting'],
+        proposalOf: callOverrides['collectiveProposalOf'],
       },
       signaling: {
-        proposalOf: callOverrides['proposalOf'],
-      }
+        proposalOf: callOverrides['signalingProposalOf'],
+        inactiveProposals: callOverrides['inactiveProposals'],
+        activeProposals: callOverrides['activeProposals'],
+        completedProposals: callOverrides['completedProposals'],
+      },
+      voting: {
+        voteRecords: callOverrides['voteRecords'],
+      },
     },
     derive: {
       chain: {
@@ -68,6 +84,15 @@ export function constructFakeApi(callOverrides): ApiPromise {
       },
       democracy: {
         dispatchQueue: callOverrides['dispatchQueue'],
+        preimage: callOverrides['preimage'],
+        preimages: callOverrides['preimages'],
+        referendumsActive: callOverrides['referendumsActive'],
+      },
+      treasury: {
+        proposals: callOverrides['treasuryProposalsDerive'],
+      },
+      council: {
+        proposals: callOverrides['councilProposalsDerive'],
       }
     }
   } as ApiPromise;

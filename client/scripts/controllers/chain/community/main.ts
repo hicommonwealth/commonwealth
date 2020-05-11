@@ -6,7 +6,6 @@ import OffchainAccounts, { OffchainAccount } from './account';
 class Community extends ICommunityAdapter<Coin, OffchainAccount> {
   private _loaded: boolean = false;
   public accounts: OffchainAccounts;
-  public readonly server = {};
 
   get loaded() { return this._loaded; }
 

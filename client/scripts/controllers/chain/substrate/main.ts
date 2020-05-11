@@ -22,7 +22,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public identities: SubstrateIdentities;
   public readonly webWallet: WebWalletController = new WebWalletController();
-  public readonly server = {};
 
   private _loaded: boolean = false;
   public get loaded() { return this._loaded; }
@@ -56,17 +55,15 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
+    await this._initProposalComments();
     await this.chain.initEventLoop();
 
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),
