@@ -5,7 +5,7 @@ import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
-import { Account, NodeInfo, ChainEntity } from '.';
+import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -25,12 +25,26 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     // attach listener for entity update events
     this.app.socket.addListener(
       WebsocketMessageType.ChainEntity,
-      (payload: IWebsocketsPayload<any>) => payload.data
-        // ignore other chains' state updates (for now)
-        && payload.data.chain === this.meta.chain.id
-        && this.handleEntityUpdate(
-          ChainEntity.fromJSON(payload.data)
-        ),
+      (payload: IWebsocketsPayload<any>) => {
+        if (payload
+          && payload.data
+          && payload.data.chainEntity.chain === this.meta.chain.id
+        ) {
+          const { chainEntity, chainEvent, chainEventType } = payload.data;
+
+          // add fake "include" for construction purposes
+          chainEvent.ChainEventType = chainEventType;
+          const eventModel = ChainEvent.fromJSON(chainEvent);
+          let existingEntity = this.app.chainEntities.store.getById(chainEntity.id);
+          if (existingEntity) {
+            existingEntity.addEvent(eventModel, moment(chainEntity.updated_at));
+          } else {
+            existingEntity = ChainEntity.fromJSON(chainEntity);
+            existingEntity.addEvent(eventModel);
+          }
+          this.handleEntityUpdate(existingEntity, eventModel);
+        }
+      }
     );
   }
 
@@ -53,7 +67,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.chainEntities.deinit();
   }
 
-  public abstract handleEntityUpdate(e: ChainEntity): void;
+  public abstract handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void;
 
   public abstract base: ChainBase;
   public abstract class: ChainClass;

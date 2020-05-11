@@ -45,7 +45,7 @@ export enum WebsocketMessageType {
 }
 
 export interface IWebsocketsPayload<T> {
-  type: WebsocketMessageType;
+  event: WebsocketMessageType;
   jwt?: string; // for outgoing payloads
   chain?: string; // for incoming payloads
   address?: string; // for incoming payloads

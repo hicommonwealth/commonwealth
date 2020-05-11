@@ -59,7 +59,7 @@ export default function (
       log.info(`Received message ${message} from session ${sessionId}`);
       try {
         const payload: IWebsocketsPayload<any> = JSON.parse(message.toString());
-        if (payload.type === WebsocketMessageType.Heartbeat && jwt) {
+        if (payload.event === WebsocketMessageType.Heartbeat) {
           ws.isAlive = true;
 
           // reset liveness timers
@@ -73,14 +73,16 @@ export default function (
           }, EXPIRATION_TIME);
 
           // get user if verified
-          jwt.verify(payload.jwt, JWT_SECRET, async (err, decodedUser) => {
-            if (err) {
-              log.error(`received message with malformed JWT: ${payload.jwt}`);
-            } else {
-              ws.isAuthenticated = true;
-              ws.user = decodedUser;
-            }
-          });
+          if (payload.jwt) {
+            jwt.verify(payload.jwt, JWT_SECRET, async (err, decodedUser) => {
+              if (err) {
+                log.error(`received message with malformed JWT: ${payload.jwt}`);
+              } else {
+                ws.isAuthenticated = true;
+                ws.user = decodedUser;
+              }
+            });
+          }
         } else {
           log.error('received malformed message');
         }
@@ -97,6 +99,7 @@ export default function (
     });
   });
 
+  // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
   wss.on(WebsocketMessageType.Scrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
     if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
     // eslint-disable-next-line no-restricted-syntax
@@ -121,10 +124,10 @@ export default function (
     if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);
     // eslint-disable-next-line no-restricted-syntax
     for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
-      if (sessionSocket.isAlive) {
+      if (sessionSocket && sessionSocket.isAlive) {
         sessionSocket.send(JSON.stringify(payload), (err) => {
           log.error(`Failed to send chain entity to session: ${session}`);
-          log.error(`Error: ${err.message}.`);
+          log.error(`Error: ${err}.`);
           // TODO: remove from map if err is that it's closed?
         });
       }

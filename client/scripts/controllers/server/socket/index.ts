@@ -1,4 +1,4 @@
-import { WebsocketEventType, IWebsocketsPayload, WebsocketMessageType } from 'types';
+import { IWebsocketsPayload, WebsocketMessageType } from 'types';
 
 // how long to wait after being disconnected
 export const RECONNECT_DELAY = 5000;
@@ -15,7 +15,7 @@ export interface IScrollbackMessage {
 
 export type WebsocketMessageHandler = (payload: IWebsocketsPayload<any>) => void;
 const DefaultWebsocketHandler = (
-  key: WebsocketEventType,
+  key: WebsocketMessageType,
   payload: IWebsocketsPayload<any>
 ) => console.log(`No WS handler available for ${key}`);
 
@@ -29,12 +29,12 @@ class WebsocketController {
   public _onStatusChange : (b: boolean) => void;
   public _heartbeatTimer : number;
   public _init : (() => void);
-  private _listeners: { [key in WebsocketEventType]: WebsocketMessageHandler };
+  private _listeners: { [key in WebsocketMessageType]: WebsocketMessageHandler };
 
   constructor(url, jwt, onStatusChange) {
     this._listeners = Object.assign(
       {},
-      ...Object.keys(WebsocketEventType)
+      ...Object.values(WebsocketMessageType)
         .map((key) => ({
           [key]: DefaultWebsocketHandler.bind(null, key),
         }))
@@ -52,7 +52,7 @@ class WebsocketController {
 
       // set up new heartbeat time
       const heartbeatTimer = setInterval(() => {
-        const heartbeat: IWebsocketsPayload<any> = { type: WebsocketMessageType.Heartbeat, jwt };
+        const heartbeat: IWebsocketsPayload<any> = { event: WebsocketMessageType.Heartbeat, jwt };
         ws.send(JSON.stringify(heartbeat));
       }, HEARTBEAT_DELAY);
       this._heartbeatTimer = +heartbeatTimer;
@@ -78,20 +78,21 @@ class WebsocketController {
   }
 
   public async onmessage(event: MessageEvent) {
-    console.log('Websocket received message', event);
     const payload: IWebsocketsPayload<any> = JSON.parse(event.data);
-    this._listeners[payload.type](payload);
+    console.log('Websocket received payload', payload);
+    this._listeners[payload.event](payload);
   }
 
   // senders
-  public send(type = WebsocketMessageType.Message, data, chain, address, jwt) {
-    const payload : IWebsocketsPayload<any> = { type, jwt, address, chain, data };
+  public send(event = WebsocketMessageType.Message, data, chain, address, jwt) {
+    const payload : IWebsocketsPayload<any> = { event, jwt, address, chain, data };
     this._ws.send(JSON.stringify(payload));
   }
 
   // listeners
   public addListener(type: WebsocketMessageType, listener: WebsocketMessageHandler) {
     this._listeners[type] = listener;
+    console.log(this._listeners);
   }
   public removeListener(type: WebsocketMessageType) {
     this._listeners[type] = DefaultWebsocketHandler.bind(null, type);

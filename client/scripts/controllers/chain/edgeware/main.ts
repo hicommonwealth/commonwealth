@@ -7,7 +7,7 @@ import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
-import { ChainClass, IChainAdapter, ChainBase, ChainEntity } from 'models';
+import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
@@ -33,35 +33,35 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
-  public handleEntityUpdate(e: ChainEntity): void {
-    this.app.chainEntities.update(e);
-    switch (e.type) {
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    switch (entity.type) {
       case SubstrateEntityKind.DemocracyProposal: {
-        return this.democracyProposals.updateProposal(e);
+        return this.democracyProposals.updateProposal(entity, event);
       }
       case SubstrateEntityKind.DemocracyReferendum: {
-        return this.democracy.updateProposal(e);
+        return this.democracy.updateProposal(entity, event);
       }
       case SubstrateEntityKind.DemocracyPreimage: {
-        const notedEvent = e.chainEvents.find(({ data: { kind } }) => kind === SubstrateEventKind.PreimageNoted);
-        const proposal = this.democracyProposals.getByHash(e.typeId);
-        if (proposal) {
-          proposal.update(notedEvent);
-        }
-        const referendum = this.democracy.getByHash(e.typeId);
-        if (referendum) {
-          referendum.update(notedEvent);
+        if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+          const proposal = this.democracyProposals.getByHash(entity.typeId);
+          if (proposal) {
+            proposal.update(event);
+          }
+          const referendum = this.democracy.getByHash(entity.typeId);
+          if (referendum) {
+            referendum.update(event);
+          }
         }
         break;
       }
       case SubstrateEntityKind.TreasuryProposal: {
-        return this.treasury.updateProposal(e);
+        return this.treasury.updateProposal(entity, event);
       }
       case SubstrateEntityKind.CollectiveProposal: {
-        return this.council.updateProposal(e);
+        return this.council.updateProposal(entity, event);
       }
       case SubstrateEntityKind.SignalingProposal: {
-        return this.signaling.updateProposal(e);
+        return this.signaling.updateProposal(entity, event);
       }
       default:
         break;

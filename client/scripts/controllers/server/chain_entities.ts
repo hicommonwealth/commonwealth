@@ -3,7 +3,7 @@ import { default as $ } from 'jquery';
 import { default as _ } from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainEntity } from 'models';
+import { ChainEntity, ChainEvent } from 'models';
 import app from 'state';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
 
@@ -34,10 +34,6 @@ class ChainEntityController {
     } else {
       return null;
     }
-  }
-
-  public update(e: ChainEntity) {
-    this._store.add(e);
   }
 
   public refresh(chain) {

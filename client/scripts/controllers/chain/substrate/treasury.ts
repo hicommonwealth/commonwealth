@@ -7,7 +7,7 @@ import {
   ISubstrateTreasuryProposal,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import { ProposalModule } from 'models';
+import { ProposalModule, ChainEntity } from 'models';
 import { SubstrateEntityKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -58,6 +58,10 @@ class SubstrateTreasury extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
+  protected _entityConstructor(entity: ChainEntity) {
+    return new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, entity);
+  }
+
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -77,8 +81,7 @@ class SubstrateTreasury extends ProposalModule<
         });
         */
         const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
-        const proposals = entities
-          .map(async (e) => new SubstrateTreasuryProposal(ChainInfo, Accounts, this, e));
+        const proposals = entities.map((e) => this._entityConstructor(e));
 
         this._initialized = true;
         resolve();

@@ -4,7 +4,7 @@
 import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
-import { NotificationCategories, WebsocketMessageType } from '../../../shared/types';
+import { NotificationCategories, WebsocketMessageType, IWebsocketsPayload } from '../../../shared/types';
 
 import { factory, formatFilename } from '../../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,17 +18,20 @@ export default class extends IEventHandler {
     super();
   }
 
-  public wssSend(dbEntity, dbEvent) {
+  public async wssSend(dbEntity, dbEvent) {
     if (!this._wss) return;
-    const data = {
-      event: 'server-event',
-      topic: NotificationCategories.EntityEvent,
-      object_id: dbEntity.id,
-      chainEntity: dbEntity.toJSON(),
-      chainEvent: dbEvent.toJSON(),
+    const dbEventType = await dbEvent.getChainEventType();
+    const payload: IWebsocketsPayload<any> = {
+      event: WebsocketMessageType.ChainEntity,
+      data: {
+        object_id: dbEntity.id,
+        chainEntity: dbEntity.toJSON(),
+        chainEvent: dbEvent.toJSON(),
+        chainEventType: dbEventType.toJSON(),
+      }
     };
     try {
-      this._wss.emit(WebsocketMessageType.ChainEntity, data);
+      this._wss.emit(WebsocketMessageType.ChainEntity, payload);
     } catch (e) {
       log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
     }
@@ -62,7 +65,7 @@ export default class extends IEventHandler {
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
-      this.wssSend(dbEntity, dbEvent);
+      await this.wssSend(dbEntity, dbEvent);
 
       // TODO: create thread?
       return dbEvent;
@@ -83,7 +86,7 @@ export default class extends IEventHandler {
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
-      this.wssSend(dbEntity, dbEvent);
+      await this.wssSend(dbEntity, dbEvent);
 
       return dbEvent;
     };
