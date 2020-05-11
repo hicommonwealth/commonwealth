@@ -15,7 +15,7 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
   }
 
   const { inviteCode, address, reject } = req.body;
-  console.log(req.body);
+
   const code = await models.InviteCode.findOne({
     where: {
       id: inviteCode,

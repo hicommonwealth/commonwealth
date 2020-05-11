@@ -88,19 +88,23 @@ export const getSecondaryStatusText = (proposal: AnyProposal): string | null => 
   }
 }
 
-export const getSupportText = (proposal: AnyProposal) =>
-  typeof proposal.support === 'number' ?
-  `${formatPercentShort(proposal.support)} voted yes` :
-  proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting ?
-  `${proposal.support.format()} voted yes` :
-  proposal.support instanceof Coin && proposal.votingType === VotingType.ConvictionYesNoVoting ?
-  `${proposal.support.format()} voted yes` :
-  proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesApprovalVoting ?
-  `${proposal.support.format()} locked` :
-  proposal.support instanceof Coin && proposal.votingType === VotingType.RankedChoiceVoting ?
-  `${proposal.support.format()} voted` :
-  proposal.support instanceof Coin && proposal.votingType === VotingType.None ?
-  `` : ``;
+export const getSupportText = (proposal: AnyProposal) => {
+  if (typeof proposal.support === 'number') {
+    return `${formatPercentShort(proposal.support)} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesNoVoting) {
+    return `${proposal.support.format()} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.ConvictionYesNoVoting) {
+    return `${proposal.support.format()} voted yes`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.SimpleYesApprovalVoting) {
+    return `${proposal.support.format()} locked`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.RankedChoiceVoting) {
+    return `${proposal.support.format()} voted`;
+  } else if (proposal.support instanceof Coin && proposal.votingType === VotingType.None) {
+    return '';
+  } else {
+    return '';
+  }
+};
 
 export const getProposalPieChart = (proposal) =>
   typeof proposal.support === 'number' ?
