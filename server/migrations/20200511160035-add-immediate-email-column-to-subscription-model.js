@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: async (queryInterface, DataTypes) => {
     await queryInterface.addColumn(
       'Subscriptions',
       'immediate_email',
@@ -13,7 +13,7 @@ module.exports = {
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: async (queryInterface, DataTypes) => {
     await queryInterface.removeColumn(
       'Subscriptions',
       'immediate_email',
