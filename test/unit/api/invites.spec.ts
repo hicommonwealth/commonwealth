@@ -6,8 +6,9 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
+import { Errors } from 'server/routes/createInvite';
+import { JWT_SECRET } from 'server/config';
 import app, { resetDatabase, closeServer } from '../../../server-test';
-import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
 const ethUtil = require('ethereumjs-util');
@@ -15,36 +16,41 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Invite Tests', () => {
-  before('reset database', async () => {
+  const community = 'staking';
+  const chain = 'ethereum';
+  let adminJWT;
+  let adminAddress;
+  let adminUserId
+  let userJWT;
+  let userAddress;
+  let userUserId;
+  const userEmail = 'test@commonwealth.im';
+
+  before(async () => {
     await resetDatabase();
+    let res = await modelUtils.createAndVerifyAddress({ chain });
+    adminAddress = res.address;
+    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    adminUserId = res.user_id;
+    const isAdmin = await modelUtils.assignRole({
+      address_id: res.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
+    res = await modelUtils.createAndVerifyAddress({ chain });
+    userAddress = res.address;
+    userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
+    userUserId = res.user_id;
+    expect(adminAddress).to.not.be.null;
+    expect(adminJWT).to.not.be.null;
+    expect(isAdmin).to.not.be.null;
+    expect(userAddress).to.not.be.null;
+    expect(userEmail).to.not.be.null;
+    expect(userJWT).to.not.be.null;
   });
 
-  describe('Email Invite Tests', () => {
-    const community = 'staking';
-    const chain = 'ethereum';
-    let adminJWT;
-    let adminAddress;
-    let userJWT;
-    let userAddress;
-    const userEmail = 'zak@commonwealth.im';
-
-    before(async () => {
-      let res = await modelUtils.createAndVerifyAddress({ chain });
-      adminAddress = res.address;
-      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
-      res = await modelUtils.createAndVerifyAddress({ chain });
-      userAddress = res.address;
-      userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      expect(adminAddress).to.not.be.null;
-      expect(adminJWT).to.not.be.null;
-      expect(isAdmin).to.not.be.null;
-      expect(userAddress).to.not.be.null;
-      expect(userEmail).to.not.be.null;
-      expect(userJWT).to.not.be.null;
-    });
-
-    it('/createInvite as admin', async () => {
+  describe('/createInvite', () => {
+    it('should create an invite for an email from an invites disabled community as admin', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
       const res = await chai.request(app)
@@ -63,13 +69,113 @@ describe('Invite Tests', () => {
       expect(res.body.result.used).to.be.false;
     });
 
-    it('/createInvite as user', async () => {
+    it('should create an invite for an address from a invites disabled community as admin', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const addrRes = await modelUtils.createAndVerifyAddress({ chain });
+
+      const res = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedAddress: addrRes.address,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.address_id).to.be.equal(addrRes.address_id);
+    });
+
+    it('should create an invite from a community as user in an invites enabled community', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: userJWT,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'false',
+        invitesEnabled: 'true',
+        id: 'invites',
+        name: 'invites community',
+        creator_id: userUserId,
+        creator_address: userAddress,
+        creator_chain: chain,
+        description: 'Invites enabled community',
+        default_chain: chain,
+      };
+
+      const invCommunity = await modelUtils.createCommunity(communityArgs);
+      const newUserEmail = 'test@commonwealth.im';
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          invitedEmail: newUserEmail,
+          community: invCommunity.id,
+          author_chain: invCommunity.default_chain,
+          address: userAddress,
+        });
+      expect(invite.body.status).to.be.equal('Success');
+      expect(invite.body.result.community_id).to.be.equal(invCommunity.id);
+      expect(invite.body.result.invited_email).to.be.equal(newUserEmail);
+      expect(invite.body.result.used).to.be.false;
+    });
+
+    it('should fail to invite an address that does not exist', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const { address } = modelUtils.generateEthAddress();
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedAddress: address,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+    });
+
+    it('should fail to invite an address that is already a member', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
       const res = await modelUtils.createAndVerifyAddress({ chain });
-      const newUserAddress = res.address;
-      const newUserEmail = 'zak2@commonwealth.im';
-      const newUserJWT = jwt.sign({ id: res.user_id, email: newUserEmail }, JWT_SECRET);
+      await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'member',
+      });
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedAddress: res.address,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.IsAlreadyMember);
+    });
+
+    it('should fail to create an invite from an invites disabled community as a user', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const newUserEmail = 'test@commonwealth.im';
 
       const invite = await chai.request(app)
         .post('/api/createInvite')
@@ -81,13 +187,163 @@ describe('Invite Tests', () => {
           author_chain: chain,
           address: userAddress,
         });
-      expect(invite.body.status).to.be.equal('Success');
-      expect(invite.body.result.community_id).to.be.equal(community);
-      expect(invite.body.result.invited_email).to.be.equal(newUserEmail);
-      expect(invite.body.result.used).to.be.false;
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.MustBeAdminOrMod);
     });
 
-    it('/acceptInvite', async () => {
+    it('should fail to create an invite with an invalid JWT', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const newUserEmail = 'test@commonwealth.im';
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: 'jwt',
+          invitedEmail: newUserEmail,
+          community,
+          author_chain: chain,
+          address: userAddress,
+        });
+
+      expect(invite.status).to.be.equal(401);
+    });
+
+    it('should fail to create an invite with an invalid email', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserAddress = res.address;
+      const newUserEmail = 'test-commonwealth.im';
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedEmail: newUserEmail,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.InvalidEmail);
+    });
+
+    it('should fail to create an invite with an address and an email', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserAddress = res.address;
+      const newUserEmail = 'test@commonwealth.im';
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          invitedEmail: newUserEmail,
+          invitedAddress: newUserAddress,
+          community,
+          author_chain: chain,
+          address: userAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.NoEmailAndAddress);
+    });
+
+    it('should fail to create an invite without an address or an email', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserAddress = res.address;
+      const newUserEmail = 'test@commonwealth.im';
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          community,
+          author_chain: chain,
+          address: userAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.NoEmailOrAddress);
+    });
+
+    it('should fail to create an invite with a non-existent address', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserAddress = res.address;
+      const newUserEmail = 'test@commonwealth.im';
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          invitedEmail: newUserEmail,
+          community,
+          author_chain: chain,
+          address: '',
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+    });
+
+    it('should fail to create an invite from a non-admin user passing in an admin address', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const newUserEmail = 'test@commonwealth.im';
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          invitedEmail: newUserEmail,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+    });
+
+    it('should fail to create an invite from a non-admin user passing in an admin address in an invites disabled community', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const newUserEmail = 'test@commonwealth.im';
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          invitedEmail: newUserEmail,
+          community,
+          author_chain: chain,
+          address: adminAddress,
+        });
+
+      expect(invite.status).to.be.equal(500);
+      expect(invite.body.error).to.not.be.null;
+      expect(invite.body.error).to.be.equal(Errors.AddressNotFound);
+    });
+  });
+
+  describe('/acceptInvite', () => {
+    it('should accept an invite create by an admin as a user', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
       const invite = await chai.request(app)
@@ -119,33 +375,8 @@ describe('Invite Tests', () => {
     });
   });
 
-  describe('Invite Link Tests', () => {
-    const community = 'staking';
-    const chain = 'ethereum';
-    let adminJWT;
-    let adminAddress;
-    let userJWT;
-    let userAddress;
-    const userEmail = 'zak@commonwealth.im';
-    let inviteCodeId;
-
-    before(async () => {
-      let res = await modelUtils.createAndVerifyAddress({ chain });
-      adminAddress = res.address;
-      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
-      res = await modelUtils.createAndVerifyAddress({ chain });
-      userAddress = res.address;
-      userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      expect(adminAddress).to.not.be.null;
-      expect(adminJWT).to.not.be.null;
-      expect(isAdmin).to.not.be.null;
-      expect(userAddress).to.not.be.null;
-      expect(userEmail).to.not.be.null;
-      expect(userJWT).to.not.be.null;
-    });
-
-    it('/createInviteLink as admin', async () => {
+  describe('/createInviteLink', () => {
+    it('should create an invite link as an admin', async () => {
       const res = await chai.request(app)
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
@@ -160,10 +391,9 @@ describe('Invite Tests', () => {
       expect(res.body.result.time_limit).to.be.equal('none');
       expect(res.body.result.multi_use).to.be.null;
       expect(res.body.result.active).to.be.true;
-      inviteCodeId = res.body.result.id;
     });
 
-    it('/createInviteLink as user', async () => {
+    it('should create an invite link as a user', async () => {
       const res = await chai.request(app)
         .post('/api/createInviteLink')
         .set('Accept', 'application/json')
@@ -178,7 +408,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.time_limit).to.be.equal('none');
       expect(res.body.result.multi_use).to.be.null;
       expect(res.body.result.active).to.be.true;
-      inviteCodeId = res.body.result.id;
     });
   });
 });
