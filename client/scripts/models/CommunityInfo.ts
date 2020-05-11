@@ -43,8 +43,6 @@ class CommunityInfo {
     privacyEnabled: boolean,
     invitesEnabled: boolean
   ) {
-    console.dir(privacyEnabled);
-    console.dir(invitesEnabled);
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
