@@ -266,14 +266,14 @@ const Navigation: m.Component<IMenuAttrs> = {
         path: `/${app.activeChainId()}/council`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/council`),
       }, 'Council'),
-      //
-      // Validators page
-      //
-      app.chain && !app.community && [ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
-        label: [ 'Validators', m('.header-beta', 'alpha') ],
-        path: `/${app.activeChainId()}/validators`,
-        activeIf: (p) => p.startsWith(`/${app.activeChainId()}/validators`),
-      }),
+      // //
+      // // Validators page
+      // //
+      // app.chain && !app.community && [ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
+      //   label: [ 'Validators', m('.header-beta', 'alpha') ],
+      //   path: `/${app.activeChainId()}/validators`,
+      //   activeIf: (p) => p.startsWith(`/${app.activeChainId()}/validators`),
+      // }),
     ] : [])));
   }
 };
