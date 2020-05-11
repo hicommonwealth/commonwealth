@@ -33,7 +33,7 @@ const setupChainEventListeners = async (models, wss, skipCatchup = false) => {
   await Promise.all(nodes.filter((node) => node.chain === 'edgeware' || node.chain === 'edgeware-local')
     .map(async (node) => {
       const eventHandler = new EdgewareEventHandler(models, wss, node.chain);
-      let url = node.url.substr(0, 2) === 'ws' ? node.url : `ws://${node.url}`;
+      let url = node.url.substr(0, 2) === 'ws' ? node.url : `wss://${node.url}`;
       url = (url.indexOf(':9944') !== -1) ? url : `${url}:9944`;
       const subscriber = await subscribeEdgewareEvents(
         url,
