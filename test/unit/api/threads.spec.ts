@@ -28,7 +28,11 @@ describe('Thread Tests', () => {
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
     adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    const isAdmin = await modelUtils.assignAdmin(res.address_id, chain);
+    const isAdmin = await modelUtils.assignRole({
+      address_id: res.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;

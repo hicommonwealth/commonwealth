@@ -48,9 +48,13 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
+      const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
+      const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
+      const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+      const url = protocol + node.url;
       const subscriber = await subscribeEdgewareEvents(
         node.chain,
-        node.url,
+        url,
         handlers,
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),

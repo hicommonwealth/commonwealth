@@ -40,8 +40,16 @@ describe('Webhook Tests', () => {
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    await modelUtils.assignAdmin(result.address_id, { offchain_community_id: community });
-    await modelUtils.assignAdmin(result.address_id, { chain_id: chain });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { chain_id: chain },
+      role: 'admin',
+    });
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;

@@ -77,12 +77,25 @@ export class EdgewareSignalingProposal
       // console.error('Balances haven\'t resolved');
       return null;
     }
+    // TODO: Make more expressive when signaling choices are not YES/NO
+    const isYes = (hexChoice) => {
+      return hexChoice === this._Chain.createType('VoteOutcome', [1]).toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'Yes').toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'YES').toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'yes').toHex();
+    };
+
+    const isNo = (hexChoice) => {
+      return hexChoice === this._Chain.createType('VoteOutcome', [0]).toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'No').toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'NO').toHex()
+        || hexChoice === this._Chain.createType('VoteOutcome', 'no').toHex();
+    };
+
     const yesVotes = this.getVotes()
-      .filter((vote) => vote.choices.length === 1
-        && vote.choices[0].toHex() === this.data.choices[0].toHex());
+      .filter((vote) => (vote.choices.length === 1 && isYes(vote.choices[0].toHex())));
     const noVotes = this.getVotes()
-      .filter((vote) => vote.choices.length === 1
-        && vote.choices[0].toHex() === this.data.choices[1].toHex());
+      .filter((vote) => (vote.choices.length === 1 && isNo(vote.choices[0].toHex())));
     if (yesVotes.length === 0 && noVotes.length === 0) return 0;
 
     const yesSupport = yesVotes.reduce(((total, vote) => vote.balance.inDollars + total), 0);
