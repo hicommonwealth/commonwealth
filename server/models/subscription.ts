@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     category_id: { type: DataTypes.STRING, allowNull: false },
     object_id: { type: DataTypes.STRING, allowNull: false },
     is_active: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false },
+    immediate_email: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
   }, {
     underscored: true,
     paranoid: true,
@@ -115,6 +116,9 @@ module.exports = (sequelize, DataTypes) => {
           notificationObj.chain_event_id = chainEventId;
         }
         const notification = await models.Notification.create(notificationObj);
+        // if (subscription.immediate_email) {
+        //   console.dir('Send Immediate Email');
+        // }
         return notification;
       }));
     }
