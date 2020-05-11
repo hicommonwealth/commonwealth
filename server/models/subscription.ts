@@ -116,9 +116,9 @@ module.exports = (sequelize, DataTypes) => {
           notificationObj.chain_event_id = chainEventId;
         }
         const notification = await models.Notification.create(notificationObj);
-        // if (subscription.immediate_email) {
-        //   console.dir('Send Immediate Email');
-        // }
+        if (subscription.immediate_email) {
+          log.info(notificationObj); // make a sensible notification from this
+        }
         return notification;
       }));
     }
