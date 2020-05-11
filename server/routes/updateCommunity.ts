@@ -25,9 +25,11 @@ const updateCommunity = async (models, req: UserRequest, res: Response, next: Ne
     }
   }
 
-  if (req.body.name) community.setName(req.body.name);
-  if (req.body.title) community.setDescription(req.body.description);
+  if (req.body.name) community.name = req.body.name;
+  if (req.body.description) community.description = req.body.description;
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
+  community.invitesEnabled = req.body.invites || false;
+  community.privacyEnabled = req.body.privacy || false;
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
   if (req.body['attachments[]']) {
