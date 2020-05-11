@@ -656,7 +656,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public get activeEra(): Observable<ActiveEraInfo> {
-    return this.query((api: ApiRx) => api.query.staking.activeEra())
+    return this.query((api: ApiRx) => {
+      if (api.query.staking.activeEra) {
+        return api.query.staking.activeEra();
+      } else {
+        return of(null);
+      }
+    })
       .pipe(map((era: ActiveEraInfo) => {
         if (era) {
           return era;
