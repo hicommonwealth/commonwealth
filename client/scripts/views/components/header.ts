@@ -19,6 +19,7 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import NotificationRow from 'views/components/sidebar/notification_row';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import EditProfileModal from 'views/modals/edit_profile_modal';
+import EditIdentityModal from '../modals/edit_identity_modal';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
@@ -119,6 +120,14 @@ const Header: m.Component<{}> = {
             }),
             iconLeft: Icons.EDIT,
             label: 'Edit Profile'
+          }),
+          m(MenuItem, {
+            onclick: async () => app.modals.create({
+              modal: EditIdentityModal,
+              data: { account: app.vm.activeAccount },
+            }),
+            iconLeft: Icons.LINK,
+            label: 'Set on-chain ID'
           }),
           m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
