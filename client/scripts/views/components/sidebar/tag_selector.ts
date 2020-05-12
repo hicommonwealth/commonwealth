@@ -178,12 +178,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
     });
   });
 
-  const a = app;
-  const cT = app.tags.getByCommunity(app.activeId());
-  debugger
-
   const threadlessTags = app.tags.getByCommunity(app.activeId()).forEach((tag) => {
-    debugger
     if (featuredTagIds.includes(`${tag.id}`)) {
       if (!featuredTags[`${tag.name}`]) {
         featuredTags[tag.name] = {
