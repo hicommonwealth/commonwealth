@@ -1,9 +1,14 @@
 import Sequelize from 'sequelize';
+import { default as sgMail } from '@sendgrid/mail';
 import send, { WebhookContent } from '../webhookNotifier';
 import { NotificationCategories, ProposalType } from '../../shared/types';
+import { SENDGRID_API_KEY } from '../config';
 
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../util/logging';
+// import { sendImmediateNotificationEmail } from '../scripts/emails';
+sgMail.setApiKey(SENDGRID_API_KEY);
+
 const log = factory.getLogger(formatFilename(__filename));
 
 module.exports = (sequelize, DataTypes) => {
@@ -104,6 +109,22 @@ module.exports = (sequelize, DataTypes) => {
 
     const subscribers = await models.Subscription.findAll({ where: findOptions });
 
+    // construct the immediate email once, in case there are many of them to send
+    const notificationContext = NotificationCategories.NewComment ? 'INSERT THREAD NAME HERE'
+      : NotificationCategories.NewMention ? 'THREAD or COMMENT'
+        : NotificationCategories.NewReaction ? 'THREAD or COMMENT'
+          : NotificationCategories.NewThread ? 'COMMUNITY'
+            : NotificationCategories.ThreadEdit ? 'THREAD'
+              : NotificationCategories.ChainEvent ? 'CHAIN'
+                : 'Commonwealth';
+    const subjectLine = NotificationCategories.NewComment ? `New Comment on ${notificationContext}` : null;
+    const msg = {
+      to: null,
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      subject: subjectLine,
+      text: 'hi'
+    };
+
     // create notifications if data exists
     let notifications = [];
     if (notification_data) {
@@ -116,8 +137,22 @@ module.exports = (sequelize, DataTypes) => {
           notificationObj.chain_event_id = chainEventId;
         }
         const notification = await models.Notification.create(notificationObj);
+
+        // send immediate email to subscriber if turned on
         if (subscription.immediate_email) {
-          log.info(notificationObj); // make a sensible notification from this
+          const user = await subscription.getUser();
+          console.dir(user.email);
+          console.dir(subscription.immediate_email);
+          msg.to = user.email;
+          console.dir(msg.to);
+          try {
+            await sgMail.send(msg);
+          } catch (e) {
+            log.error(e);
+          }
+
+          // const body =
+          //   (subscription.category_id === NotificationCategories.NewComment) ? 'A new '
         }
         return notification;
       }));
