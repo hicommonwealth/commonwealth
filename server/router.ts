@@ -40,6 +40,8 @@ import createSubscription from './routes/createSubscription';
 import deleteSubscription from './routes/deleteSubscription';
 import enableSubscriptions from './routes/enableSubscriptions';
 import disableSubscriptions from './routes/disableSubscriptions';
+import enableImmediateEmails from './routes/enableImmediateEmails';
+import disableImmediateEmails from './routes/disableImmediateEmails';
 import viewNotifications from './routes/viewNotifications';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
@@ -197,6 +199,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
     markNotificationsRead.bind(this, models));
   router.post('/clearReadNotifications', passport.authenticate('jwt', { session: false }),
     clearReadNotifications.bind(this, models));
+  router.post('/enableImmediateEmails', passport.authenticate('jwt', { session: false }),
+    enableImmediateEmails.bind(this, models));
+  router.post('/disableImmediateEmails', passport.authenticate('jwt', { session: false }),
+    disableImmediateEmails.bind(this, models));
 
   // settings
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
