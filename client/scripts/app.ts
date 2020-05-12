@@ -457,15 +457,18 @@ $(() => {
         app.socket.addListener(
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
-            if (payload.data) {
+            if (payload.data && payload.data.subscription_id) {
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );
               // note that payload.data should have the correct JSON form
               if (subscription) {
+                console.log('adding new notification from websocket:', payload.data);
                 const notification = Notification.fromJSON(payload.data, subscription);
                 app.login.notifications.update(notification);
               }
+            } else {
+              console.error('got invalid notification payload:', payload);
             }
           },
         );

@@ -52,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
 
   interface IChainEventNotificationData {
     chainEvent: any;
+    chainEventType: any;
   }
 
   Subscription.emitNotifications = async (
@@ -153,12 +154,12 @@ module.exports = (sequelize, DataTypes) => {
       if (isChainEventData(notification_data)) {
         payload.data.notification_data = {};
         payload.data.ChainEvent = notification_data.chainEvent.toJSON();
+        payload.data.ChainEvent.ChainEventType = notification_data.chainEventType.toJSON();
       } else {
         payload.data.notification_data = notification_data;
       }
       const subscriberIds: number[] = subscribers.map((s) => s.subscriber_id);
-      const notificationIds: number[] = notifications.map((n) => n.id);
-      const userNotificationMap = _.object(subscriberIds, notificationIds);
+      const userNotificationMap = _.object(subscriberIds, notifications);
       wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
     }
     return notifications;

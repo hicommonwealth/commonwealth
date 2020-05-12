@@ -112,15 +112,16 @@ export default function (
 
   wss.on(
     WebsocketMessageType.Notification,
-    (payload: IWebsocketsPayload<any>, notificationIds: { [user: number]: number }) => {
+    (payload: IWebsocketsPayload<any>, notifications: { [user: number]: any }) => {
       if (logging) {
-        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notificationIds))}`);
+        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notifications))}`);
       }
       // eslint-disable-next-line no-restricted-syntax
-      for (const [ user, notificationId ] of Object.entries(notificationIds)) {
+      for (const [ user, notification ] of Object.entries(notifications)) {
         if (user && user in userMap && userMap[user].isAlive) {
           // augment notification with unique database id
-          payload.data.id = notificationId;
+          payload.data.id = notification.id;
+          payload.data.subscription_id = notification.subscription_id;
           userMap[user].send(JSON.stringify(payload));
         }
       }
