@@ -292,42 +292,52 @@ const labelEdgewareEvent: LabelerFilter = (
      * Collective Events
      */
     case SubstrateEventKind.CollectiveProposed: {
-      const { proposer, proposalIndex, threshold } = data;
+      const { proposer, proposalIndex, threshold, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
       return {
-        heading: 'New Council Proposal',
-        label: `${fmtAddr(proposer)} introduced a new council proposal, requiring ${threshold} approvals to pass.`,
+        heading: `New ${collective} Proposal`,
+        label: `${fmtAddr(proposer)} introduced a new ${collective} proposal, requiring ${threshold} approvals to pass.`,
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalIndex}` : null,
       };
     }
     case SubstrateEventKind.CollectiveApproved: {
-      const { proposalIndex, ayes, nays } = data;
+      const { proposalIndex, ayes, nays, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
       return {
-        heading: 'Council Proposal Approved',
-        label: `Council proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
+        heading: `${collective} Proposal Approved`,
+        label: `${collective} proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
         // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.CollectiveDisapproved: {
-      const { proposalIndex, ayes, nays } = data;
+      const { proposalIndex, ayes, nays, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
       return {
-        heading: 'Council Proposal Disapproved',
-        label: `Council proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
+        heading: `${collective} Proposal Disapproved`,
+        label: `${collective} proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
         // TODO: once we have proposal archiving, add linkUrl here
       };
     }
     case SubstrateEventKind.CollectiveExecuted: {
-      const { executionOk } = data;
+      const { executionOk, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
       return {
-        heading: 'Council Proposal Executed',
-        label: `Approved council proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
+        heading: `${collective} Proposal Executed`,
+        label: `Approved ${collective} proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
         // no way to recover the index here besides checking the db for proposed event
       };
     }
     case SubstrateEventKind.CollectiveMemberExecuted: {
-      const { executionOk } = data;
+      const { executionOk, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
       return {
-        heading: 'Council Proposal Executed',
-        label: `A member-executed council proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
+        heading: `${collective} Proposal Executed`,
+        label: `A member-executed ${collective} proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
         // no way to recover the index here besides checking the db for proposed event
         // ...and for member-exectured proposals, that might not even exist, depending on logic
       };

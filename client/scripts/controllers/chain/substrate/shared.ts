@@ -36,7 +36,7 @@ import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import addressDefaults from '@polkadot/util-crypto/address/defaults';
-import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
+import { SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents } from 'events/edgeware/types';
 import { SubstrateAccount } from './account';
 import Edgeware from '../edgeware/main';
 import Kusama from './main';
@@ -91,8 +91,12 @@ export function handleSubstrateEntityUpdate(chain: Edgeware | Kusama, entity: Ch
       return chain.treasury.updateProposal(entity, event);
     }
     case SubstrateEntityKind.CollectiveProposal: {
-      // TODO: disambiguate technicalCollective vs council here
-      return chain.council.updateProposal(entity, event);
+      const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
+      if (collectiveName && collectiveName === 'technicalCommittee' && chain instanceof Kusama) {
+        return chain.technicalCommittee.updateProposal(entity, event);
+      } else {
+        return chain.council.updateProposal(entity, event);
+      }
     }
     case SubstrateEntityKind.SignalingProposal: {
       if (chain instanceof Edgeware) {

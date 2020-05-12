@@ -276,6 +276,7 @@ export interface ISubstrateElectionMemberRenounced extends ISubstrateEvent {
  */
 export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveProposed;
+  collectiveName?: 'council' | 'technicalCommittee';
   proposer: SubstrateAccountId;
   proposalIndex: number;
   proposalHash: string;
@@ -290,6 +291,7 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
 
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveApproved;
+  collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   proposalIndex: number;
   threshold: number;
@@ -299,6 +301,7 @@ export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
 
 export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveDisapproved;
+  collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   proposalIndex: number;
   threshold: number;
@@ -308,12 +311,14 @@ export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
 
 export interface ISubstrateCollectiveExecuted extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveExecuted;
+  collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   executionOk: boolean;
 }
 
 export interface ISubstrateCollectiveMemberExecuted extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveMemberExecuted;
+  collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   executionOk: boolean;
 }

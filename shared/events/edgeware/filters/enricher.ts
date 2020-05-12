@@ -360,6 +360,8 @@ export default async function (
           excludeAddresses: [ proposer.toString() ],
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposer: proposer.toString(),
             proposalIndex: +index,
             proposalHash: hash.toString(),
@@ -383,6 +385,8 @@ export default async function (
         return {
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposalHash: hash.toString(),
             proposalIndex: +index,
             threshold: +threshold,
@@ -397,6 +401,8 @@ export default async function (
         return {
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposalHash: hash.toString(),
             executionOk: executionOk.isTrue,
           }
