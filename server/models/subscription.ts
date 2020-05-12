@@ -1,14 +1,12 @@
 import Sequelize from 'sequelize';
 import sgMail from '@sendgrid/mail';
 import send, { WebhookContent } from '../webhookNotifier';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { ProposalType } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../util/logging';
-import { getProposalUrl } from '../../shared/utils';
 import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
-// import { sendImmediateNotificationEmail } from '../scripts/emails';
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
