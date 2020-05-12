@@ -79,7 +79,7 @@ class NotificationsController {
     return post('/markNotificationsRead', {
       'notification_ids[]': notifications.map((n) => n.id),
     }, (result) => {
-      for (const n of notifications.filter((n) => !n.isRead)) {
+      for (const n of notifications.filter((notif) => !notif.isRead)) {
         n.markRead();
       }
     });
@@ -96,6 +96,7 @@ class NotificationsController {
 
   public update(n: Notification) {
     this._store.add(n);
+    // TODO: this should trigger a redraw if it doesn't already
   }
 
   public refresh() {

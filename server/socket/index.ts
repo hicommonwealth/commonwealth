@@ -110,15 +110,22 @@ export default function (
     }
   });
 
-  wss.on(WebsocketMessageType.Notification, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const user of userIds) {
-      if (user && user in userMap && userMap[user].isAlive) {
-        userMap[user].send(JSON.stringify(payload));
+  wss.on(
+    WebsocketMessageType.Notification,
+    (payload: IWebsocketsPayload<any>, notificationIds: { [user: number]: number }) => {
+      if (logging) {
+        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notificationIds))}`);
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [ user, notificationId ] of Object.entries(notificationIds)) {
+        if (user && user in userMap && userMap[user].isAlive) {
+          // augment notification with unique database id
+          payload.data.id = notificationId;
+          userMap[user].send(JSON.stringify(payload));
+        }
       }
     }
-  });
+  );
 
   wss.on(WebsocketMessageType.ChainEntity, (payload: IWebsocketsPayload<any>) => {
     if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);

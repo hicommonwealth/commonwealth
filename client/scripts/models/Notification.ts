@@ -17,7 +17,7 @@ class Notification {
   constructor(id, data, isRead, createdAt, subscription, chainEvent?) {
     this.id = id;
     this.data = data;
-    this._isRead = isRead;
+    this._isRead = !!isRead;
     this.createdAt = moment(createdAt);
     this.subscription = subscription;
     this.chainEvent = chainEvent;

@@ -461,6 +461,7 @@ $(() => {
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );
+              // note that payload.data should have the correct JSON form
               if (subscription) {
                 const notification = Notification.fromJSON(payload.data, subscription);
                 app.login.notifications.update(notification);

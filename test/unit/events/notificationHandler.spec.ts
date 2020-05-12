@@ -101,7 +101,7 @@ describe('Event Handler Tests', () => {
         data: {
           topic: NotificationCategories.ChainEvent,
           object_id: 'edgeware-democracy-started',
-          blockNumber: 10,
+          chainEvent: dbEvent.toJSON(),
         },
       });
     });
@@ -151,7 +151,7 @@ describe('Event Handler Tests', () => {
         data: {
           topic: NotificationCategories.ChainEvent,
           object_id: 'edgeware-slash',
-          blockNumber: 11,
+          chainEvent: dbEvent.toJSON(),
         },
       });
     });
@@ -205,7 +205,7 @@ describe('Event Handler Tests', () => {
         data: {
           topic: NotificationCategories.ChainEvent,
           object_id: 'edgeware-democracy-started',
-          blockNumber: 12,
+          chainEvent: dbEvent.toJSON(),
         },
       });
     });
