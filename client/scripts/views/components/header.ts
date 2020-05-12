@@ -18,6 +18,7 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import NewProposalButton from 'views/components/new_proposal_button';
 import NotificationRow from 'views/components/sidebar/notification_row';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import EditProfileModal from 'views/modals/edit_profile_modal';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
@@ -109,6 +110,15 @@ const Header: m.Component<{}> = {
             onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
             iconLeft: Icons.USER,
             label: 'Admin'
+          }),
+          app.vm.activeAccount
+          && m(MenuItem, {
+            onclick: () => app.modals.create({
+              modal: EditProfileModal,
+              data: app.vm.activeAccount
+            }),
+            iconLeft: Icons.EDIT,
+            label: 'Edit Profile'
           }),
           m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
