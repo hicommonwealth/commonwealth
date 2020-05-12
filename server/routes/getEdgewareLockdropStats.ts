@@ -12,6 +12,8 @@ import {
   getSignalsForAddress
 } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
 const MAINNET_LOCKDROP = '0xFEC6F679e32D45E22736aD09dFdF6E3368704e31';
@@ -128,9 +130,9 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
   } else {
     lockdropStartTime = (await lockdropContracts[0].methods.LOCK_START_TIME().call());
   }
-  console.log(`Lock events ${lockEvents.length}`);
+  log.info(`Lock events ${lockEvents.length}`);
   for (let i = 0; i < lockEvents.length; i++) {
-    if (i % 500 === 0) console.log(`Processing lock event #${i + 1}`);
+    if (i % 500 === 0) log.info(`Processing lock event #${i + 1}`);
     const event = lockEvents[i];
     const data = event.returnValues;
 
@@ -180,7 +182,7 @@ const calculateEffectiveLocks = async (web3, lockdropContracts) => {
     } else if (data.term.toString() === '2') {
       totalETHLocked12mo = totalETHLocked12mo.add(toBN(data.eth));
     } else {
-      console.log('encountered lock transaction with invalid term');
+      log.info('encountered lock transaction with invalid term');
     }
 
     // Add all validators to a separate collection to do validator election over later
@@ -246,10 +248,10 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
 
     signalEvents = [ ...signalEvents, ...events ];
   }
-  console.log(`Signal events ${signalEvents.length}`);
+  log.info(`Signal events ${signalEvents.length}`);
   const gLocks = {};
   for (let i = 0; i < signalEvents.length; i++) {
-    if (i % 100 === 0) console.log(`Processing signal event #${i + 1}`);
+    if (i % 100 === 0) log.info(`Processing signal event #${i + 1}`);
     const event = signalEvents[i];
     const data = event.returnValues;
     // Get balance at block that lockdrop ends
@@ -262,7 +264,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
           balance = await web3.eth.getBalance(data.contractAddr);
         }
       } catch (e) {
-        // console.log(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
+        // log.info(`Couldn't find: ${JSON.stringify(data, null, 4)}`);
       }
     }
 
@@ -299,7 +301,7 @@ const calculateEffectiveSignals = async (web3, lockdropContracts, blockNumber = 
 
       // Treat generalized locks as 3 month locks
       if (generalizedLocks.lockedContractAddresses.includes(data.contractAddr)) {
-        console.log('Generalized lock:', balance, data.contractAddr);
+        log.info(`Generalized lock: ${balance}, ${data.contractAddr}`);
         value = getEffectiveValue(balance, '0');
         if (keys[0] in gLocks) {
           gLocks[keys[0]] = toBN(gLocks[keys[0]]).add(value).toString();
@@ -411,7 +413,8 @@ export const getCountsByBlock = async (web3, contracts) => {
   blocknumToTime[Math.floor(allEvents[0].blockNumber / roundToBlocks) * roundToBlocks] =
     new Date(+web3.utils.toBN(time2) * 1000);
 
-  const lastBlock = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
+  const lastBlockNum = Math.max.apply(this, allEvents.map((e) => e.blockNumber));
+  const lastBlock = await web3.eth.getBlock(lastBlockNum);
 
   return {
     participantsByBlock,

@@ -45,6 +45,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           default_chain: app.config.chains.getById(community.default_chain),
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
+          featuredTags: community.featured_tags,
           tags: community.tags,
         }));
       });
@@ -347,13 +348,13 @@ $(() => {
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
-        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}}`
+        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
     // '/:scope/questions':         importRoute(import('views/pages/questions'), true),
     // '/:scope/requests':          importRoute(import('views/pages/requests'), true),
-    // '/:scope/validators':        importRoute(import('views/pages/validators/index'), true),
+    // '/:scope/validators':        importRoute(import('views/pages/validators'), true),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),

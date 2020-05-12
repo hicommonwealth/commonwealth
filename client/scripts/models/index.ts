@@ -27,6 +27,9 @@ export { default as StorageModule } from './StorageModule';
 export { default as ChainObject } from './ChainObject';
 export { default as ChainObjectQuery } from './ChainObjectQuery';
 export { default as ChainObjectVersion } from './ChainObjectVersion';
+export { default as ChainEventType } from './ChainEventType';
+export { default as ChainEvent } from './ChainEvent';
+export { default as ChainEntity } from './ChainEntity';
 
 export { DepositVote, BinaryVote } from './votes';
 
@@ -48,7 +51,6 @@ export {
   IChainModule,
   IAccountsModule,
   IOffchainAccountsModule,
-  IServerControllers,
   ITransactionResult,
   ITXData,
   ITXModalData,

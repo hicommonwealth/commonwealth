@@ -1,7 +1,9 @@
+import { Response, NextFunction } from 'express';
 import { successResponse } from '../util/apiHelpers';
 import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
-import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const body = req.body;
@@ -26,7 +28,7 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
 
       return res.json({ status: 'Success', result: hedgehogObj.toJSON() });
     } catch (err) {
-      console.error('Error signing up a user', err);
+      log.error('Error signing up a user', err);
       return next(new Error('Error signing up a user'));
     }
   } else return next(new Error('Missing one of the required fields: username, walletAddress'));

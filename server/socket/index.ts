@@ -1,10 +1,12 @@
 import { handleHeartbeat } from './handlers';
 import { IWebsocketsPayload } from './types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 const map = {};
 
 export default function (wss, server, sessionParser, logging: boolean) {
   server.on('upgrade', (req, socket, head) => {
-    console.log('\nParsing session from request...\n');
+    log.info('\nParsing session from request...\n');
 
     sessionParser(req, {}, () => {
       if (!req.session || !req.session.passport || !req.session.passport.user) {
@@ -12,7 +14,7 @@ export default function (wss, server, sessionParser, logging: boolean) {
         return;
       }
 
-      console.log('Session is parsed!');
+      log.info('Session is parsed!');
 
       wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit('connection', ws, req);
@@ -26,16 +28,16 @@ export default function (wss, server, sessionParser, logging: boolean) {
     map[userId] = ws;
 
     ws.on('message', (message) => {
-      console.log(`Received message ${message} from user ${userId}`);
+      log.info(`Received message ${message} from user ${userId}`);
       try {
         const payload = JSON.parse(message);
         if (payload.event === 'heartbeat') {
           handleHeartbeat(ws, payload);
         } else {
-          console.log('received malformed message');
+          log.error('received malformed message');
         }
       } catch (e) {
-        console.log('received malformed message');
+        log.error('received malformed message');
       }
     });
 
@@ -45,7 +47,7 @@ export default function (wss, server, sessionParser, logging: boolean) {
   });
 
   wss.on('server-event', (payload: IWebsocketsPayload, userIds: number[]) => {
-    if (logging) console.log(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
+    if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
     for (const user of userIds) {
       if (user && user in map) {
         map[user].send(JSON.stringify(payload));

@@ -13,7 +13,7 @@ import { ChainBase, ChainClass, IVote } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
@@ -241,22 +241,6 @@ const CouncilPage: m.Component<{}> = {
             candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
             m('.clear'),
           ]),
-        // voters
-        app.chain && app.chain.class !== ChainClass.Kusama && [
-          m('h4.proposals-subheader', 'Voters'),
-          m('.council-election-voters', app.chain && [
-            voters.length === 0
-              ? m('.no-proposals', 'No voters')
-              : m('.council-voters', [
-                voters.map((acct) => m(CouncilElectionVoter, {
-                  vote: (app.chain as Substrate).phragmenElections.activeElection.getVotes(
-                    app.chain.accounts.get(acct)
-                  )[0]
-                })),
-                m('.clear'),
-              ]),
-          ]),
-        ],
       ],
       sidebar: [
         // stats

@@ -2,6 +2,8 @@ import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -27,6 +29,16 @@ export default async (models, req: UserRequest, res: Response, next: NextFunctio
   const includeParams: any = {
     model: models.Notification,
     as: 'Notifications',
+    include: [{
+      model: models.ChainEvent,
+      required: false,
+      as: 'ChainEvent',
+      include: [{
+        model: models.ChainEventType,
+        required: false,
+        as: 'ChainEventType',
+      }],
+    }]
   };
   if (req.body.unread_only) {
     includeParams.where = { is_read: false };

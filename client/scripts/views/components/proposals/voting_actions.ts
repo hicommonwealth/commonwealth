@@ -6,13 +6,15 @@ import mixpanel from 'mixpanel-browser';
 import app from 'state';
 import { CosmosVoteChoice } from 'adapters/chain/cosmos/types';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/governance';
+import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { ProposalStatus, BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
-import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy';
+import { SubstrateDemocracyReferendum, convictionToWeight } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
-import { EdgewareSignalingProposal, SignalingProposalStage, SignalingVote } from 'controllers/chain/edgeware/signaling';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import {
+  EdgewareSignalingProposal, SignalingProposalStage, SignalingVote
+} from 'controllers/chain/edgeware/signaling_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { ConvictionsChooser } from 'views/components/proposals/convictions_table';
@@ -20,7 +22,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import Edgeware from 'controllers/chain/edgeware/main';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateChain from 'controllers/chain/substrate/shared';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_elections';
+import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import { hexToUtf8 } from 'web3-utils';
 import MolochProposal, {
   MolochProposalVote,
@@ -46,7 +48,6 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
     const proposal = vnode.attrs.proposal;
     const callback = vnode.attrs.callback;
     const user: SubstrateAccount = app.vm.activeAccount as SubstrateAccount;
-
     if (vnode.attrs.proposal instanceof EdgewareSignalingProposal) {
       const advanceSignalingProposal = (e) => {
         e.preventDefault();
@@ -187,7 +188,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', [0])
-        ])));
+        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false,
@@ -310,7 +311,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
           (app.chain.chain as SubstrateChain).createType('VoteOutcome', choice)
-        ])));
+        ], app.chain.chain.coins(0)))); // fake balance, not needed for voting
       }
     };
 

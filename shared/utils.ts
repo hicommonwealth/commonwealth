@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = (proposal.community) ? proposal.community : proposal.chain;
-  const tId = proposal.id;
+  const tId = proposal.type_id || proposal.id;
   const tTitle = proposal.title || '';
   let cId = '';
   if (comment) {

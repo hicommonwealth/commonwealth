@@ -32,7 +32,6 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
       as: 'tags',
     },
   });
-
   // searching for both chain and community
   if (params.chain && params.community) return next(new Error('Invalid community or chain'));
   // searching for chain that doesn't exist

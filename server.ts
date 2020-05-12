@@ -17,6 +17,8 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import { factory, formatFilename } from './server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_ARCHIVE, QUERY_URL_OVERRIDE } from './server/config';
@@ -30,10 +32,12 @@ import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
+import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import { UserRequest } from './server/types.js';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
+
 // set up express async error handling hack
 require('express-async-errors');
 
@@ -47,6 +51,9 @@ const SHOULD_ADD_TEST_QUERIES = process.env.ADD_TEST_QUERIES === 'true';
 const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
+const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
+const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION === 'true';
+
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -79,7 +86,7 @@ const sessionParser = session({
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000      // Set session expiration to 7 days
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
   }),
   resave: false,
   saveUninitialized: true,
@@ -131,7 +138,9 @@ const setupMiddleware = () => {
 const templateFile = (() => {
   try {
     return fs.readFileSync('./build/index.html');
-  } catch (e) {}
+  } catch (e) {
+    console.error(`Failed to read template file: ${JSON.stringify(e)}`);
+  }
 })();
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
@@ -161,7 +170,7 @@ if (SHOULD_RESET_DB) {
   // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
   // This only needs to run once on prod to make the necessary queries.
   fetchStats(models, 'mainnet').then((result) => {
-    console.log('Finished adding Lockdrop statistics into the DB');
+    log.info('Finished adding Lockdrop statistics into the DB');
     process.exit(0);
   });
 } else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
@@ -178,14 +187,14 @@ if (SHOULD_RESET_DB) {
     .then(() => (models.sequelize.close()))
     .then(() => (closeMiddleware()))
     .then(() => {
-      console.log('Finished adding test queries to db.');
+      log.info('Finished adding test queries to db.');
       process.exit(0);
     });
 } else if (!NO_ARCHIVE && SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY) {
   fetcher.fetch()
     .then(() => {
       closeMiddleware().then(() => {
-        console.log('Finished fetching chain objects.');
+        log.info('Finished fetching chain objects.');
         process.exit(0);
       });
     })
@@ -196,7 +205,23 @@ if (SHOULD_RESET_DB) {
       });
     });
 } else {
-  setupServer(app, wss, sessionParser);
+  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
+    .then(() => {
+      if (RUN_ENTITY_MIGRATION) {
+        models.sequelize.close()
+          .then(() => process.exit(0));
+      }
+    }, (err) => {
+      if (RUN_ENTITY_MIGRATION) {
+        console.error(`Entity migration failed: ${JSON.stringify(err)}`);
+        models.sequelize.close()
+          .then(() => (closeMiddleware()))
+          .then(() => process.exit(1));
+      } else {
+        console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
+      }
+    });
+  if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }
 

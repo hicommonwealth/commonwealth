@@ -26,7 +26,6 @@ function setupPassport(models) {
           // note the return removed with passport JWT - add this return for passport local
           done(null, user);
         } else {
-          console.log('user not found in db');
           done(null, false);
         }
       });

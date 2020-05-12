@@ -16,7 +16,7 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { orderProposalsByAmountVoted } from 'views/components/proposals/ordering';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy';
+import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -36,7 +36,7 @@ const ProposalsPage: m.Component<{}> = {
 
     // do not display the dispatch queue as full proposals for now
     const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed);
+    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll(); // .filter((p) => !p.completed && !p.passed);
 
     const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
     const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
@@ -108,7 +108,7 @@ const ProposalsPage: m.Component<{}> = {
           'Treasury proposals',
         ]),
         visibleTreasuryProposals &&
-          visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal: proposal })),
+          visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
         //
         visibleCosmosProposals && m('h4.proposals-subheader', [
           'Cosmos proposals',
@@ -167,7 +167,7 @@ const ProposalsPage: m.Component<{}> = {
               // (app.chain as Substrate).chain.methodToTitle(
               //   (app.chain as Substrate).democracyProposals.nextExternal[0])
               //) : '--'
-              (app.chain as Substrate).democracyProposals.nextExternal[0].toString() : '--'
+              (app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8) + '...' : '--'
           ]),
           m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
             m('p', 'Hash: ' + (app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8) + '...'),

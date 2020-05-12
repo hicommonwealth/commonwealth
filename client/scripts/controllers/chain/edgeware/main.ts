@@ -26,10 +26,6 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public signaling: EdgewareSignaling;
 
-  public readonly server = {
-    // proposals: new ProposalArchiveController(),
-  };
-
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
@@ -51,7 +47,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
     await super.init(async () => {
       const edgTypes = Object.values(edgewareDefinitions)
-        .reduce((res, { types }): object => ({ ...res, ...types }), {});
+        .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
 
       await this.chain.resetApi(this.meta, {
         types: {
@@ -65,6 +61,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
           StakingLedger: 'StakingLedgerTo223',
           Votes: 'VotesTo230',
           ReferendumInfo: 'ReferendumInfoTo239',
+          Weight: 'u32',
         },
         // override duplicate type name
         typesAlias: { voting: { Tally: 'VotingTally' } },
@@ -81,17 +78,15 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),
     ]);
+    await this._initProposalComments();
     await this.chain.initEventLoop();
 
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     // this.server.proposals.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([

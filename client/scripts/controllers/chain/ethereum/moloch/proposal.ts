@@ -49,7 +49,6 @@ export default class MolochProposal extends Proposal<
   MolochAPI,
   MolochShares,
   IMolochProposalResponse,
-  ICompletable, // unused
   MolochProposalVote
 > {
   private _Members: MolochMembers;
@@ -197,6 +196,10 @@ export default class MolochProposal extends Proposal<
     this._addOrUpdateVotes(data.votes);
 
     this._Gov.store.add(this);
+  }
+
+  public update() {
+    throw new Error('unimplemented');
   }
 
   public canVoteFrom(account: MolochMember) {

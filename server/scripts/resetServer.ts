@@ -3,14 +3,18 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
+import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { EventSupportingChains } from '../../shared/events/interfaces';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [
-  [ 'localhost:9944', 'edgeware-local' ],
-  [ 'berlin1.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin2.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin3.edgewa.re', 'edgeware-testnet' ],
-  [ 'mainnet1.edgewa.re', 'edgeware' ],
-  //[ 'localhost:9944', 'kusama-local' ],
+  [ 'ws://localhost:9944', 'edgeware-local' ],
+  [ 'wss://berlin1.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin2.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin3.edgewa.re', 'edgeware-testnet' ],
+  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
+  // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
@@ -29,10 +33,10 @@ const nodes = [
   [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
 ];
 const resetServer = (models, closeMiddleware) => {
-  console.log('Resetting database...');
+  log.debug('Resetting database...');
 
   models.sequelize.sync({ force: true }).then(async () => {
-    console.log('Initializing default models...');
+    log.debug('Initializing default models...');
     // Users
     const dillon = await models.User.create({
       email: 'dillon@commonwealth.im',
@@ -293,6 +297,10 @@ const resetServer = (models, closeMiddleware) => {
       name: NotificationCategories.NewReaction,
       description: 'someone reacts to a post',
     });
+    await models.NotificationCategory.create({
+      name: NotificationCategories.ChainEvent,
+      description: 'a chain event occurs',
+    });
 
     // Admins need to be subscribed to mentions
     await models.Subscription.create({
@@ -363,14 +371,29 @@ const resetServer = (models, closeMiddleware) => {
 
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
 
+    // initialize chain event types
+    const initChainEventTypes = (chain) => {
+      return Promise.all(
+        SubstrateEventKinds.map((event_name) => {
+          return models.ChainEventType.create({
+            id: `${chain}-${event_name}`,
+            chain,
+            event_name,
+          });
+        })
+      );
+    };
+
+    await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
+
     closeMiddleware().then(() => {
-      console.log('Reset database and initialized default models');
+      log.debug('Reset database and initialized default models');
       process.exit(0);
     });
   }).catch((error) => {
     closeMiddleware().then(() => {
-      console.error(error);
-      console.error('Error syncing db and initializing default models');
+      log.error(error);
+      log.error('Error syncing db and initializing default models');
       process.exit(1);
     });
   });

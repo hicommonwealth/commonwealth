@@ -7,12 +7,17 @@ import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
+import BN from 'bn.js';
 
 import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
 import { NotificationCategories } from 'types';
+
+import { formatCoin } from 'adapters/currency';
+import labelEdgewareEvent from 'events/edgeware/filters/labeler';
+
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
@@ -262,17 +267,18 @@ const Navigation: m.Component<IMenuAttrs> = {
         path: `/${app.activeChainId()}/council`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/council`),
       }, 'Council'),
-      app.chain && app.chain.base === ChainBase.Substrate && (app.chain as Substrate).chain.hasEVM && m(NavigationItem, {
-        label: 'EVM',
-        path: `/${app.activeChainId()}/evm`,
-        activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
-      }, 'EVM'),
-      //
-      // Validators page
-      //
-      // app.chain && !app.community && [
-      //   ChainBase.CosmosSDK, ChainBase.Substrate
-      // ].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
+      app.chain
+        && app.chain.base === ChainBase.Substrate
+        && (app.chain as Substrate).chain.hasEVM
+        && m(NavigationItem, {
+          label: 'EVM',
+          path: `/${app.activeChainId()}/evm`,
+          activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
+        }, 'EVM'),
+      // //
+      // // Validators page
+      // //
+      // app.chain && !app.community && [ChainBase.Substrate].indexOf(app.chain.base) !== -1 && m(NavigationItem, {
       //   label: [ 'Validators', m('.header-beta', 'alpha') ],
       //   path: `/${app.activeChainId()}/validators`,
       //   activeIf: (p) => p.startsWith(`/${app.activeChainId()}/validators`),
@@ -624,36 +630,54 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
-    const {
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    } = getNotificationFields(category, JSON.parse(notification.data));
+    if (category === NotificationCategories.ChainEvent) {
+      if (!notification.chainEvent) {
+        throw new Error('chain event notification does not have expected data');
+      }
+      // TODO: use different labelers depending on chain
+      const chainId = notification.chainEvent.type.chain;
+      const chainName = app.config.chains.getById(chainId).name;
+      const label = labelEdgewareEvent(
+        notification.chainEvent.blockNumber,
+        chainId,
+        notification.chainEvent.data,
+      );
+      return m('li.HeaderNotificationRow', {
+        class: notification.isRead ? '' : 'active',
+        onclick: async () => {
+          const notificationArray: Notification[] = [];
+          notificationArray.push(notification);
+          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          if (!label.linkUrl) return;
+          await m.route.set(label.linkUrl);
+          m.redraw.sync();
+        },
+      }, [
+        m('.comment-body', [
+          m('.comment-body-top', `${label.heading} on ${chainName}`),
+          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
+          m('.comment-body-excerpt', label.label),
+        ]),
+      ]);
+    } else {
+      const {
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      } = getNotificationFields(category, JSON.parse(notification.data));
 
-    return getHeaderNotificationRow(
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    );
-
-    // else if (category === NotificationCategories.NewCommunity) {
-    //   //const { created_at, proposal_id } = JSON.parse(notification.data);
-    //   //const thread = app.threads.store.getByIdentifier(proposal_id);
-    //   const community = app.activeId();
-
-    //   return getHeaderNotificationRow(
-    //     moment.utc(created_at),
-    //     null,
-    //     `New community created`,
-    //     '',
-    //     `/${community}/`);
-    // }
+      return getHeaderNotificationRow(
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      );
+    }
   },
 };
 
@@ -709,6 +733,7 @@ const NotificationButtons: m.Component<{ notifications }> = {
     const { notifications } = vnode.attrs;
     return m('.NotificationButtons', [
       m('.button', {
+        class: notifications.length > 0 ? '' : 'disabled',
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
@@ -740,9 +765,8 @@ const NotificationMenu : m.Component<{ menusOpen }> = {
         class: (unreadCount > 0 || invites.length > 0) ? 'unread-notifications' : '',
       }, unreadMessage),
     }, [
+      notifications.length > 0 && m(NotificationButtons, { notifications }),
       m(Notifications, { notifications }),
-      notifications.length > 0
-        && m(NotificationButtons, { notifications }),
     ]);
   }
 };
@@ -777,7 +801,10 @@ const Header: m.Component<{}, IHeaderState> = {
               e.preventDefault();
               e.stopPropagation();
               $(e.target).trigger('menuclose');
-              m.route.set(app.login.selectedNode ? `/${app.login.selectedNode.chain.id}/` : '/');
+              m.route.set(app.login.selectedNode
+                ? `/${app.login.selectedNode.chain.id || app.login.selectedNode.chain}/`
+                : '/'
+              );
             },
           }, [
             m('.header-logo-image')

@@ -5,6 +5,10 @@ import { UserRequest } from '../types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -115,12 +119,19 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-    proposal = await models.Proposal.findOne({
-      where: { identifier: id, type: prefix }
-    });
+  } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    proposal = await proposalIdToEntity(models, chain.id, finalComment.root_id);
   } else {
-    console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+    log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+  }
+
+  if (!proposal) {
+    await finalComment.destroy();
+    return next(new Error('Cannot comment; thread not found'));
+  }
+  if (proposal.read_only) {
+    await finalComment.destroy();
+    return next(new Error('Cannot comment when thread is read_only'));
   }
 
   // craft commonwealth url
@@ -157,7 +168,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         return user;
       }));
     } catch (err) {
-      console.log(err);
+      log.error(err);
     }
   }
 
@@ -186,6 +197,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       community: finalComment.community,
     },
     req.wss,
+    [ finalComment.Address.address ],
   );
 
   // if child comment, dispatch notification to parent author
@@ -216,6 +228,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         community: finalComment.community,
       },
       req.wss,
+      [ finalComment.Address.address ],
     );
   }
 
@@ -251,7 +264,8 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
-        req.wss
+        req.wss,
+        [ finalComment.Address.address ],
       );
     }));
   }

@@ -17,7 +17,7 @@ import {
 } from 'views/components/forms';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
@@ -108,7 +108,7 @@ const NewProposalForm = {
         callback(result);
       };
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(

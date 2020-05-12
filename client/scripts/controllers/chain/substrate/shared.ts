@@ -8,8 +8,21 @@ import BN from 'bn.js';
 import { ApiRx, WsProvider, SubmittableResult, Keyring } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
-  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties, DispatchError
+  Moment,
+  Balance,
+  EventRecord,
+  Event,
+  BlockNumber,
+  Index,
+  Hash,
+  AccountId,
+  ChainProperties,
+  DispatchError,
+  ActiveEraInfo,
+  EraIndex,
+  SessionIndex
 } from '@polkadot/types/interfaces';
+
 import { Vec, Compact } from '@polkadot/types/codec';
 import { createType } from '@polkadot/types/create';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
@@ -635,6 +648,45 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     });
     const name = method.meta ? method.meta.name : `${method.section}.${method.call}`;
     return name + '(' + args.reduce((prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr, '') + ')';
+  }
+
+  public get currentEra(): Observable<EraIndex> {
+    return this.query((api: ApiRx) => api.query.staking.currentEra())
+      .pipe(map((era: EraIndex) => {
+        if (era) {
+          return era;
+        } else {
+          return null;
+        }
+      }));
+  }
+
+  public get activeEra(): Observable<ActiveEraInfo> {
+    return this.query((api: ApiRx) => {
+      if (api.query.staking.activeEra) {
+        return api.query.staking.activeEra();
+      } else {
+        return of(null);
+      }
+    })
+      .pipe(map((era: ActiveEraInfo) => {
+        if (era) {
+          return era;
+        } else {
+          return null;
+        }
+      }));
+  }
+
+  public get session(): Observable<SessionIndex> {
+    return this.query((api: ApiRx) => api.query.session.currentIndex())
+      .pipe(map((sessionInx) => {
+        if (sessionInx) {
+          return sessionInx;
+        } else {
+          return null;
+        }
+      }));
   }
 }
 

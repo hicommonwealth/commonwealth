@@ -5,6 +5,8 @@ import { UserRequest } from '../types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -115,7 +117,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         },
       });
     } catch (err) {
-      console.log(err);
+      log.error(err);
     }
     try {
       await models.TaggedThread.create({
@@ -123,7 +125,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         thread_id: thread.id,
       });
     } catch (err) {
-      console.log(err);
+      log.error(err);
     }
   }));
 
@@ -187,6 +189,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       community: finalThread.community,
     },
     req.wss,
+    [ finalThread.Address.address ],
   );
 
   // grab mentions to notify tagged users
@@ -205,7 +208,7 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         return user;
       }));
     } catch (err) {
-      console.log(err);
+      log.error(err);
     }
   }
 
@@ -238,7 +241,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
-      req.wss
+      req.wss,
+      [ finalThread.Address.address ],
     );
   }));
 

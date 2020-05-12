@@ -75,7 +75,7 @@ class WebsocketController {
     setTimeout(this._init, RECONNECT_DELAY);
   }
   public async onmessage(event) {
-    console.log(`${this._purpose}: websocket received message`);
+    console.log(`${this._purpose}: websocket received message`, event);
     const payload : IWebsocketsPayload = JSON.parse(event.data);
     if (payload.event === 'message' || payload.event === 'heartbeat-pong') {
       console.log('Payload', payload);

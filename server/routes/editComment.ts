@@ -4,6 +4,10 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -40,7 +44,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       where: { id: req.body.id },
     });
 
-    if (userOwnedAddresses.map((addr) => addr.id).indexOf(comment.address_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const arr = comment.version_history;
@@ -60,13 +64,15 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
       proposal = await models.OffchainThread.findOne({
         where: { id }
       });
-    } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-      proposal = await models.Proposal.findOne({
-        where: { identifier: id, type: prefix }
-      });
+    } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+      proposal = await proposalIdToEntity(models, chain.id, comment.root_id);
     } else {
-      console.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+      log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
+    if (!proposal) {
+      throw new Error('No matching proposal found.');
+    }
+
     const cwUrl = getProposalUrl(prefix, proposal, comment);
 
     // dispatch notifications to subscribers of the comment/thread
@@ -95,6 +101,7 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
         community: finalComment.community,
       },
       req.wss,
+      [ finalComment.Address.address ],
     );
 
     return res.json({ status: 'Success', result: finalComment.toJSON() });

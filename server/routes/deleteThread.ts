@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { UserRequest } from '../types';
+import { factory, formatFilename } from '../util/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const deleteThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -14,7 +16,7 @@ const deleteThread = async (models, req: UserRequest, res: Response, next: NextF
     const thread = await models.OffchainThread.findOne({
       where: { id: req.body.thread_id, }
     });
-    if (userOwnedAddresses.map((addr) => addr.id).indexOf(thread.author_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const associatedTags = await thread.getTags();

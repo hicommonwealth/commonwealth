@@ -10,6 +10,7 @@ import {
   setupWeb3Provider,
   getCurrentTimestamp,
   formatNumber,
+  getParticipationSummary,
 } from '../stats/stats_helpers';
 
 const LockdropV1 = '0x1b75b90e60070d37cfa9d87affd124bb345bf70a';
@@ -79,11 +80,18 @@ const getLocks = async (lockdropContract, address) => {
   });
 };
 
-const fetchUnlocksFromMetamaskAccount = async (network = 'mainnet', remoteUrl = undefined) => {
+const fetchUnlocks = async (network = 'mainnet', remoteUrl = undefined) => {
   const web3 = getWeb3(network, remoteUrl);
-  const results = await getLocksForAddress(state.user, state.contractAddress, web3);
-  state.locks = results;
-  return results;
+  if (window['Web3'] || window['web3']) {
+    const results = await getLocksForAddress(state.user, state.contractAddress, web3);
+    state.locks = results;
+    return results;
+  } else {
+    const results = await getParticipationSummary(network);
+    const { ethAddrToLockEvent } = results;
+    state.locks = ethAddrToLockEvent[state.user][0];
+    return ethAddrToLockEvent[state.user][0];
+  }
 };
 
 const ContractOption = ({ contract, checked }) => {
@@ -111,7 +119,7 @@ const ContractOption = ({ contract, checked }) => {
 
 const LockContractComponent = {
   view: (vnode) => {
-    const { owner, eth, lockContractAddr, unlockTime, term, edgewareAddr } = vnode.attrs.data;
+    const { owner, eth, lockContractAddr, unlockTime, unlockTimeMinutes, term, edgewareAddr } = vnode.attrs.data;
     const etherscanNet = 'https://etherscan.io/';
     return m('.LockContractComponent', [
       m('h3', [
@@ -137,7 +145,7 @@ const LockContractComponent = {
       m('p', `EDG Public Keys: ${edgewareAddr}`),
       m('p', [
         'Unlocks In: ',
-        Math.round(Number(unlockTime)),
+        Math.round(Number(unlockTime || unlockTimeMinutes)),
         ' minutes'
       ]),
       m('button.formular-button-primary', {
@@ -235,7 +243,7 @@ const UnlockPage = {
                       return;
                     }
                     try {
-                      const results : any[] = await fetchUnlocksFromMetamaskAccount();
+                      const results : any[] = await fetchUnlocks();
                       if (results.length === 0) {
                         vnode.state.error = 'No locks from this address';
                       }

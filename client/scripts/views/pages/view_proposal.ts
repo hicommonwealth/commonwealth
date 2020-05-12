@@ -17,7 +17,7 @@ import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from '
 import CommentsController, { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -48,7 +48,7 @@ import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 import moment from 'moment';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { formatCoin } from 'adapters/currency';
 import { parseMentionsForServer } from './threads';
 import VersionHistoryModal from '../modals/version_history_modal';
@@ -152,7 +152,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs> = {
       m('.row.row-narrow', [
         m('.col-xs-12.col-lg-9', [
           m('.proposal-title-row', [
-            m('.title', proposal.title),
+            m('.title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           ]),
           isThread
             ? m('.discussion-meta', [
@@ -1038,6 +1038,14 @@ const ViewProposalPage: m.Component<IViewProposalPageAttrs, IViewProposalPageSta
     if (!app.threads.initialized) {
       return m(PageLoading);
     }
+
+    const windowListener = (e) => {
+      if (vnode.state.editing || activeQuillEditorHasText()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', windowListener);
 
     let proposal: AnyProposal;
     try {
