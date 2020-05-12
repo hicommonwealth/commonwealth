@@ -3,10 +3,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import { EventEmitter } from 'events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import { NotificationCategories } from '../../../shared/types';
+import { NotificationCategories, WebsocketMessageType } from '../../../shared/types';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
 import { CWEvent } from '../../../shared/events/interfaces';
@@ -48,6 +49,8 @@ const setupUserAndEventSubscriptions = async (email, address, chain) => {
     object_id: 'edgeware-slash',
     is_active: true,
   });
+
+  return user.id;
 };
 
 const setupDbEvent = async (event: CWEvent) => {
@@ -55,17 +58,19 @@ const setupDbEvent = async (event: CWEvent) => {
   return storageHandler.handle(event);
 };
 
+let aliceUserId, bobUserId;
+
 describe('Event Handler Tests', () => {
   before('reset database', async () => {
     await resetDatabase();
 
-    await setupUserAndEventSubscriptions(
+    aliceUserId = await setupUserAndEventSubscriptions(
       'alice@gmail.com',
       '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
       'edgeware',
     );
 
-    await setupUserAndEventSubscriptions(
+    bobUserId = await setupUserAndEventSubscriptions(
       'bob@gmail.com',
       '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
       'edgeware',
@@ -86,7 +91,22 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models);
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.Notification, (payload, subscribers) => {
+      assert.sameMembers(subscribers, [ aliceUserId, bobUserId ]);
+      assert.deepEqual(payload, {
+        event: WebsocketMessageType.Notification,
+        data: {
+          topic: NotificationCategories.ChainEvent,
+          object_id: 'edgeware-democracy-started',
+          blockNumber: 10,
+        },
+      });
+    });
+
+    const eventHandler = new NotificationHandler(models, mockWssServer as any);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -121,7 +141,22 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models);
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.Notification, (payload, subscribers) => {
+      assert.sameMembers(subscribers, [ bobUserId ]);
+      assert.deepEqual(payload, {
+        event: WebsocketMessageType.Notification,
+        data: {
+          topic: NotificationCategories.ChainEvent,
+          object_id: 'edgeware-slash',
+          blockNumber: 11,
+        },
+      });
+    });
+
+    const eventHandler = new NotificationHandler(models, mockWssServer as any);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -160,7 +195,22 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models);
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.Notification, (payload, subscribers) => {
+      assert.sameMembers(subscribers, [ aliceUserId ]);
+      assert.deepEqual(payload, {
+        event: WebsocketMessageType.Notification,
+        data: {
+          topic: NotificationCategories.ChainEvent,
+          object_id: 'edgeware-democracy-started',
+          blockNumber: 12,
+        },
+      });
+    });
+
+    const eventHandler = new NotificationHandler(models, mockWssServer as any);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -197,7 +247,13 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new NotificationHandler(models);
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.Notification, (payload, subscribers) => {
+      assert.fail('should not emit notification');
+    });
+
+    const eventHandler = new NotificationHandler(models, mockWssServer as any);
 
     // process event
     const notificationCount = await models['Notification'].count();

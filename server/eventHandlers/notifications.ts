@@ -36,8 +36,9 @@ export default class extends IEventHandler {
       this._models,
       NotificationCategories.ChainEvent,
       dbEventType.id,
+      // TODO: send actual event data!
       {
-        created_at: new Date(),
+        blockNumber: event.blockNumber,
       },
       { }, // TODO: add webhook data once specced out
       this._wss,
