@@ -12,6 +12,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identity';
+import { handleSubstrateEntityUpdate } from '../substrate/shared';
 
 
 class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
@@ -34,38 +35,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   get loaded() { return this._loaded; }
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    switch (entity.type) {
-      case SubstrateEntityKind.DemocracyProposal: {
-        return this.democracyProposals.updateProposal(entity, event);
-      }
-      case SubstrateEntityKind.DemocracyReferendum: {
-        return this.democracy.updateProposal(entity, event);
-      }
-      case SubstrateEntityKind.DemocracyPreimage: {
-        if (event.data.kind === SubstrateEventKind.PreimageNoted) {
-          const proposal = this.democracyProposals.getByHash(entity.typeId);
-          if (proposal) {
-            proposal.update(event);
-          }
-          const referendum = this.democracy.getByHash(entity.typeId);
-          if (referendum) {
-            referendum.update(event);
-          }
-        }
-        break;
-      }
-      case SubstrateEntityKind.TreasuryProposal: {
-        return this.treasury.updateProposal(entity, event);
-      }
-      case SubstrateEntityKind.CollectiveProposal: {
-        return this.council.updateProposal(entity, event);
-      }
-      case SubstrateEntityKind.SignalingProposal: {
-        return this.signaling.updateProposal(entity, event);
-      }
-      default:
-        break;
-    }
+    handleSubstrateEntityUpdate(this, entity, event);
   }
 
   public async init(onServerLoaded?) {

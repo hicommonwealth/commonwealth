@@ -27,6 +27,8 @@ import {
   ITXData,
   ChainBase,
   ChainClass,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -34,7 +36,10 @@ import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import addressDefaults from '@polkadot/util-crypto/address/defaults';
+import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
 import { SubstrateAccount } from './account';
+import Edgeware from '../edgeware/main';
+import Kusama from './main';
 
 export type HandlerId = number;
 
@@ -58,6 +63,47 @@ function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
     // tslint:disable-next-line
     window['wsProvider'] = options.provider;
     return new ApiRx(options);
+  }
+}
+
+export function handleSubstrateEntityUpdate(chain: Edgeware | Kusama, entity: ChainEntity, event: ChainEvent): void {
+  switch (entity.type) {
+    case SubstrateEntityKind.DemocracyProposal: {
+      return chain.democracyProposals.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.DemocracyReferendum: {
+      return chain.democracy.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.DemocracyPreimage: {
+      if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+        const proposal = chain.democracyProposals.getByHash(entity.typeId);
+        if (proposal) {
+          proposal.update(event);
+        }
+        const referendum = chain.democracy.getByHash(entity.typeId);
+        if (referendum) {
+          referendum.update(event);
+        }
+      }
+      break;
+    }
+    case SubstrateEntityKind.TreasuryProposal: {
+      return chain.treasury.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.CollectiveProposal: {
+      // TODO: disambiguate technicalCollective vs council here
+      return chain.council.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.SignalingProposal: {
+      if (chain instanceof Edgeware) {
+        return chain.signaling.updateProposal(entity, event);
+      } else {
+        console.error('Received signaling update on non-edgeware chain!');
+        break;
+      }
+    }
+    default:
+      break;
   }
 }
 
