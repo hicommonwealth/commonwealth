@@ -24,7 +24,8 @@ class OffchainThread implements IUniqueId {
   public readonly slug = 'discussion';
   public readonly url: string;
   public readonly versionHistory: string[];
-  public readonly community: string | number;
+  public readonly community: string;
+  public readonly chain: string;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -39,7 +40,8 @@ class OffchainThread implements IUniqueId {
     tags: OffchainTag[],
     kind: OffchainThreadKind,
     versionHistory: string[],
-    community: number | string,
+    community: string,
+    chain: string,
     privacy: boolean,
     readOnly: boolean,
     body?: string,
@@ -61,6 +63,7 @@ class OffchainThread implements IUniqueId {
     this.url = url;
     this.versionHistory = versionHistory;
     this.community = community;
+    this.chain = chain;
     this.privacy = privacy;
     this.readOnly = readOnly;
   }
