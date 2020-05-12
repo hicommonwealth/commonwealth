@@ -69,6 +69,7 @@ export default function (
           if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
           ws.expirationTimer = setTimeout(() => {
             // TODO: do i need to manually close the socket here?
+            console.log(`Websocket ${sessionId} expired, emitting close`);
             wss.emit(WebsocketEventType.Close);
           }, EXPIRATION_TIME);
 
@@ -92,8 +93,11 @@ export default function (
     });
 
     ws.on(WebsocketEventType.Close, () => {
-      delete sessionMap[sessionId];
-      if (userId) {
+      console.log(`Received close event for websocket ${sessionId}`);
+      if (sessionMap[sessionId]) {
+        delete sessionMap[sessionId];
+      }
+      if (userId && userMap[userId]) {
         delete userMap[userId];
       }
     });

@@ -35,11 +35,8 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
-import addressDefaults from '@polkadot/util-crypto/address/defaults';
 import { SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents } from 'events/edgeware/types';
 import { SubstrateAccount } from './account';
-import Edgeware from '../edgeware/main';
-import Kusama from './main';
 
 export type HandlerId = number;
 
@@ -66,7 +63,7 @@ function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
   }
 }
 
-export function handleSubstrateEntityUpdate(chain: Edgeware | Kusama, entity: ChainEntity, event: ChainEvent): void {
+export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
   switch (entity.type) {
     case SubstrateEntityKind.DemocracyProposal: {
       return chain.democracyProposals.updateProposal(entity, event);
@@ -92,14 +89,14 @@ export function handleSubstrateEntityUpdate(chain: Edgeware | Kusama, entity: Ch
     }
     case SubstrateEntityKind.CollectiveProposal: {
       const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee' && chain instanceof Kusama) {
+      if (collectiveName && collectiveName === 'technicalCommittee' && chain.class === ChainClass.Kusama) {
         return chain.technicalCommittee.updateProposal(entity, event);
       } else {
         return chain.council.updateProposal(entity, event);
       }
     }
     case SubstrateEntityKind.SignalingProposal: {
-      if (chain instanceof Edgeware) {
+      if (chain.class === ChainClass.Edgeware) {
         return chain.signaling.updateProposal(entity, event);
       } else {
         console.error('Received signaling update on non-edgeware chain!');

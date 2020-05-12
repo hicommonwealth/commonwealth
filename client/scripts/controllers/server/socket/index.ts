@@ -61,13 +61,12 @@ class WebsocketController {
   }
 
   public onopen() {
-    console.log('Websocket opened');
     this._isConnected = true;
     this._onStatusChange(true);
   }
 
-  public onerror() {
-    console.log('Websocket error');
+  public onerror(error) {
+    console.error('Websocket error', error);
   }
 
   public onclose() {
@@ -92,7 +91,6 @@ class WebsocketController {
   // listeners
   public addListener(type: WebsocketMessageType, listener: WebsocketMessageHandler) {
     this._listeners[type] = listener;
-    console.log(this._listeners);
   }
   public removeListener(type: WebsocketMessageType) {
     this._listeners[type] = DefaultWebsocketHandler.bind(null, type);
