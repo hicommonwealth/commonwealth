@@ -72,6 +72,7 @@ class TagsController {
         'name': name,
         'jwt': app.login.jwt,
       });
+      debugger
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
@@ -103,14 +104,13 @@ class TagsController {
     }
   }
 
-  public async refreshAll(communityId?, chainId?, reset = false) {
+  public async refreshAll(chainId, communityId, reset = false) {
     try {
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
-        chain: chainId,
-        community: communityId,
+        chain: chainId || app.activeChainId(),
+        community: communityId || app.activeCommunityId(),
         jwt: app.login.jwt,
       });
-      console.log(response.result);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -119,7 +119,6 @@ class TagsController {
       }
       const tags = (app.chain) ? response.result.filter((tag) => !tag.communityId) : response.result;
       tags.forEach((t) => this._store.add(modelFromServer(t)));
-      console.log(this._store);
       this._initialized = true;
     } catch (err) {
       console.log('Failed to load offchain tags');

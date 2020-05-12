@@ -23,6 +23,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, true);
     await this.app.reactions.refreshAll(this.id, null, true);
+    await this.app.tags.refreshAll(this.id, null, true);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
     await initChainModuleFn();
