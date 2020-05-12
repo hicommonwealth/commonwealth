@@ -6,6 +6,11 @@ class NotificationSubscription {
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
 
+  private _immediateEmail: boolean;
+  public get immediateEmail() { return this._immediateEmail; }
+  public enableImmediateEmail() { this._immediateEmail = true; }
+  public disableImmediateEmail() { this._immediateEmail = false; }
+
   private _isActive: boolean;
   public get isActive() { return this._isActive; }
   public enable() { this._isActive = true; }
