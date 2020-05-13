@@ -116,12 +116,13 @@ export class EdgewareSignalingProposal
   }
 
   public get votingType() {
-    // TODO: support ranked-choice votes
-    return (this.data.voteType.toString() === 'binary')
-      ? VotingType.SimpleYesNoVoting // TODO: generalize this to what the options are
-      : (this.data.voteType.toString() === 'multioption')
-        ? VotingType.MultiOptionVoting
-        : VotingType.RankedChoiceVoting;
+    if (this.data.voteType.toString().toLowerCase() === 'binary') {
+      return VotingType.SimpleYesNoVoting;
+    } else if (this.data.voteType.toString().toLowerCase() === 'multioption') {
+      return VotingType.MultiOptionVoting;
+    } else {
+      return VotingType.RankedChoiceVoting;
+    }
   }
   public get votingUnit() {
     return VotingUnit.CoinVote;
