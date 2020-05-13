@@ -12,7 +12,7 @@ import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/int
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
-import { Button, Icons, Select, List } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 
 const NotificationButtons: m.Component = {
@@ -434,26 +434,59 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   }
 };
 
-const SubscriptionsPage: m.Component = {
-  view: () => {
-    return m('.SubscriptionsPage', [
-      m('.Sidebar', {
-        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
-          + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
+const SubscriptionsPageSideBar: m.Component<{selectedPage: string, onChangeHandler: Function}> = {
+  view: (vnode) => {
+    const { selectedPage } = vnode.attrs;
+    return m('.Sidebar', {
+      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
+        + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
+    }, [
+      m(List, {
+        class: 'SidebarMenu',
+        interactive: true,
+        size: 'lg',
       }, [
-        m(List, {
-          class: 'SidebarMenu',
-          interactive: true,
-          size: 'lg',
-        }, [
-          // header
-          m('.title-selector', [
-            m('.title-selector-left', [
-              m('.community-name', 'Notifications Manager'),
-            ]),
+        // header
+        m('.title-selector', [
+          m('.title-selector-left', [
+            m('.community-name', 'Notifications Manager'),
           ]),
-        ])
-      ]),
+        ]),
+        m(ListItem, {
+          active: selectedPage === 'Active Subscriptions',
+          label: 'Active Subscriptions',
+          onclick: () => {
+            vnode.attrs.onChangeHandler('Active Subscriptions');
+          },
+        }),
+        m(ListItem, {
+          active: selectedPage === 'Community 1',
+          label: 'Community 1',
+          onclick: () => {
+            vnode.attrs.onChangeHandler('Community 1');
+          },
+        }),
+      ])
+    ]);
+  },
+};
+
+interface ISubscriptionsPageState {
+  selectedPage: string;
+}
+const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
+  oninit: (vnode) => {
+    vnode.state.selectedPage = 'Active Subscriptions';
+  },
+  view: (vnode) => {
+    const { selectedPage } = vnode.state;
+    return m('.SubscriptionsPage', [
+      m(SubscriptionsPageSideBar, {
+        selectedPage: vnode.state.selectedPage,
+        onChangeHandler: (v) => {
+          vnode.state.selectedPage = v;
+        },
+      }),
       m('.forum-container', [
         m(Tabs, [{
           name: 'Active Subscriptions',
