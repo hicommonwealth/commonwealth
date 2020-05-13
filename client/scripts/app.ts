@@ -354,7 +354,7 @@ $(() => {
 
     // '/:scope/questions':         importRoute(import('views/pages/questions'), true),
     // '/:scope/requests':          importRoute(import('views/pages/requests'), true),
-    // '/:scope/validators':        importRoute(import('views/pages/validators/index'), true),
+    // '/:scope/validators':        importRoute(import('views/pages/validators'), true),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),
