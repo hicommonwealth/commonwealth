@@ -12,7 +12,7 @@ import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/int
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
-import { Button, Icons, Select } from 'construct-ui';
+import { Button, Icons, Select, List } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 
 const NotificationButtons: m.Component = {
@@ -437,6 +437,23 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
 const SubscriptionsPage: m.Component = {
   view: () => {
     return m('.SubscriptionsPage', [
+      m('.Sidebar', {
+        class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
+          + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
+      }, [
+        m(List, {
+          class: 'SidebarMenu',
+          interactive: true,
+          size: 'lg',
+        }, [
+          // header
+          m('.title-selector', [
+            m('.title-selector-left', [
+              m('.community-name', 'Notifications Manager'),
+            ]),
+          ]),
+        ])
+      ]),
       m('.forum-container', [
         m(Tabs, [{
           name: 'Active Subscriptions',

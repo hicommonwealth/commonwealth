@@ -82,6 +82,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -93,7 +94,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
-
+    if (onNotificationsPage(m.route.get())) return;
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
