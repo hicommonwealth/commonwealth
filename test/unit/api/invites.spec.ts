@@ -360,7 +360,7 @@ describe('Invite Tests', () => {
       expect(res.body.result.membership.community).to.be.equal(community);
     });
 
-    it.skip('should fail to accept an invite created by an admin as a user who does not own the address', async () => {
+    it('should fail to accept an invite created by an admin as a user who does not own the address', async () => {
       if (!process.env.SENDGRID_API_KEY) return;
 
       const invite = await chai.request(app)
@@ -387,6 +387,21 @@ describe('Invite Tests', () => {
       expect(res.status).to.be.equal(500);
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(AcceptInviteErrors.WrongOwner);
+    });
+
+    it('should fail to accept an invite that does not exist', async () => {
+      const res = await chai.request(app)
+        .post('/api/acceptInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          reject: false,
+          inviteCode: '',
+          address: userAddress,
+        });
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(AcceptInviteErrors.NoInviteCodeFound(''));
     });
   });
 

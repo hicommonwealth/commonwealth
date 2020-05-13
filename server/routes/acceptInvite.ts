@@ -7,13 +7,12 @@ export const Errors = {
   NoInviteCodeFound: (code) => `Cannot find invite code: ${code}`,
   NoAddressFound: (address) => `Cannot find Address: ${address}`,
   WrongOwner: 'Logged in user does not own address accepting invite',
-}
+  NoCommunityFound: (community) => `Cannot find community: ${community}`,
+  RoleCreationFailure: 'Failed to create new Role',
+  CodeUpdateFailure: 'Failed to Update Code',
+};
 
 const acceptInvite = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
-
   const { inviteCode, address, reject } = req.body;
 
   const code = await models.InviteCode.findOne({
@@ -52,14 +51,14 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
       id: code.community_id,
     }
   });
-  if (!community) return next(new Error(`Cannot find community: ${code.community_id}`));
+  if (!community) return next(new Error(Errors.NoCommunityFound(code.community_id)));
 
   const role = await models.Role.create({
     address_id: addressObj.id,
     offchain_community_id: community.id,
     permission: 'member',
   });
-  if (!role) return next(new Error('Failed to create new Role'));
+  if (!role) return next(new Error(Errors.RoleCreationFailure));
 
   const membership = await models.Membership.create({
     user_id: req.user.id,
@@ -69,7 +68,7 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
   const updatedCode = await code.update({
     used: true,
   });
-  if (!updatedCode) return next(new Error('Failed to Update Code'));
+  if (!updatedCode) return next(new Error(Errors.CodeUpdateFailure));
 
   return res.json({ status: 'Success', result: { updatedCode, membership } });
 };
