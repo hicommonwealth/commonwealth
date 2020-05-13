@@ -14,6 +14,7 @@ import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
 import { Button, Icons, Select, List, ListItem } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
+import _ from 'lodash';
 
 const NotificationButtons: m.Component = {
   oninit: (vnode) => {
@@ -434,9 +435,34 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   }
 };
 
-const SubscriptionsPageSideBar: m.Component<{selectedPage: string, onChangeHandler: Function}> = {
+interface ISubscriptionSideBarListItemAttrs {
+  label: string;
+  id: string;
+  selectedFilter: string;
+  onChangeHandler: Function;
+}
+
+const SubscriptionSideBarListItem: m.Component<ISubscriptionSideBarListItemAttrs> = {
   view: (vnode) => {
-    const { selectedPage } = vnode.attrs;
+    const { id, selectedFilter, onChangeHandler, label } = vnode.attrs;
+    return m(ListItem, {
+      active: selectedFilter === id,
+      label,
+      onclick: () => { onChangeHandler(id); },
+    });
+  },
+};
+
+interface ISubscriptionsPageSideBarAttrs {
+  chains: ChainInfo[];
+  communities: CommunityInfo[];
+  selectedFilter: string;
+  onChangeHandler: Function;
+}
+
+const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
+  view: (vnode) => {
+    const { selectedFilter, onChangeHandler, chains, communities } = vnode.attrs;
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
@@ -452,19 +478,32 @@ const SubscriptionsPageSideBar: m.Component<{selectedPage: string, onChangeHandl
             m('.community-name', 'Notifications Manager'),
           ]),
         ]),
-        m(ListItem, {
-          active: selectedPage === 'Active Subscriptions',
-          label: 'Active Subscriptions',
-          onclick: () => {
-            vnode.attrs.onChangeHandler('Active Subscriptions');
-          },
+        m('h4', 'General'),
+        m(SubscriptionSideBarListItem, {
+          label: 'User Notifications',
+          id: 'default',
+          selectedFilter,
+          onChangeHandler,
         }),
-        m(ListItem, {
-          active: selectedPage === 'Community 1',
-          label: 'Community 1',
-          onclick: () => {
-            vnode.attrs.onChangeHandler('Community 1');
-          },
+        chains.length > 0
+          && m('h4', 'Chains'),
+        chains.map((chain) => {
+          return m(SubscriptionSideBarListItem, {
+            label: chain.name,
+            id: chain.id,
+            selectedFilter,
+            onChangeHandler,
+          });
+        }),
+        communities.length > 0
+          && m('h4', 'Communites'),
+        communities.map((community) => {
+          return m(SubscriptionSideBarListItem, {
+            label: community.name,
+            id: community.id,
+            selectedFilter,
+            onChangeHandler,
+          });
         }),
       ])
     ]);
@@ -472,19 +511,39 @@ const SubscriptionsPageSideBar: m.Component<{selectedPage: string, onChangeHandl
 };
 
 interface ISubscriptionsPageState {
-  selectedPage: string;
+  selectedFilter: string;
+  chains: ChainInfo[];
+  communities: CommunityInfo[];
 }
 const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
   oninit: (vnode) => {
-    vnode.state.selectedPage = 'Active Subscriptions';
+    const communityIds = app.login.roles
+      .filter((role) => role.offchain_community_id)
+      .map((r) => r.offchain_community_id);
+    vnode.state.communities = _.uniq(
+      app.config.communities.getAll()
+        .filter((c) => communityIds.includes(c.id))
+    );
+    const chainIds = app.login.roles
+      .filter((role) => role.chain_id)
+      .map((r) => r.chain_id);
+    vnode.state.chains = _.uniq(
+      app.config.chains.getAll()
+        .filter((c) => chainIds.includes(c.id))
+    );
+    vnode.state.selectedFilter = 'default';
   },
   view: (vnode) => {
-    const { selectedPage } = vnode.state;
+    const { selectedFilter, chains, communities } = vnode.state;
+
     return m('.SubscriptionsPage', [
       m(SubscriptionsPageSideBar, {
-        selectedPage: vnode.state.selectedPage,
+        selectedFilter,
+        communities,
+        chains,
         onChangeHandler: (v) => {
-          vnode.state.selectedPage = v;
+          vnode.state.selectedFilter = v;
+          console.log(vnode.state.selectedFilter);
         },
       }),
       m('.forum-container', [
