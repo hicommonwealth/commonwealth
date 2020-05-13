@@ -12,7 +12,8 @@ import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/int
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
-import { Button } from 'construct-ui';
+import { Button, Icons, Select } from 'construct-ui';
+import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 
 const NotificationButtons: m.Component = {
   oninit: (vnode) => {
@@ -56,8 +57,10 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === communityOrChain.id);
 
-    return m('button.ChainOrCommunitySubscriptionButton', {
-      class: communitySubscription ? 'formular-button-primary' : '',
+    return m(Button, {
+      label: communitySubscription ? 'Notifications on' : 'Notifications off',
+      iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,
+      class: 'ChainOrCommunitySubscriptionButton',
       href: '#',
       onclick: (e) => {
         e.preventDefault();
@@ -67,11 +70,7 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
           subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain.id).then(() => m.redraw());
         }
       },
-    }, [
-      communitySubscription
-        ? [ m('span.icon-bell'), ' Notifications on' ]
-        : [ m('span.icon-bell-off'), ' Notifications off' ]
-    ]);
+    });
   }
 };
 
@@ -100,8 +99,10 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       m('h3', `${vnode.state.subscription.objectId}`),
       m('h4', `Subscription Type: ${vnode.state.subscription.category}`),
       activeSubscription
-        && m('button.pauseButton', {
-          class: activeSubscription.isActive ? '' : 'formular-button-negative',
+        && m(Button, {
+          label: activeSubscription.isActive ? 'Pause' : 'Unpause',
+          iconLeft: activeSubscription.isActive ? Icons.VOLUME_2 : Icons.VOLUME_X,
+          class: 'pauseButton',
           href: '#',
           onclick: async (e) => {
             e.preventDefault();
@@ -112,9 +113,9 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
             }
             m.redraw();
           }
-        }, activeSubscription.isActive ? 'Pause' : 'Unpause'),
-      m('button.activeSubscriptionButton', {
-        class: activeSubscription ? 'formular-button-primary' : '',
+        }),
+      m(Button, {
+        class: 'activeSubscriptionButton',
         href: '#',
         onclick: (e) => {
           e.preventDefault();
@@ -127,12 +128,10 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
               m.redraw();
             });
           }
-        }
-      }, [
-        activeSubscription
-          ? [ m('span.icon-bell'), ' Notifications on' ]
-          : [ m('span.icon-bell-off'), ' Notifications off' ]
-      ]),
+        },
+        label: activeSubscription ? 'Notifications on' : 'Notifications off',
+        iconLeft: activeSubscription ? Icons.BELL : Icons.BELL_OFF,
+      }),
     ]);
   }
 };
@@ -156,7 +155,9 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
       const communtyIds = communities.map((com) => { return com.id; });
       subscriptions = subscriptions.filter((subscription) => communtyIds.includes(subscription.objectId));
     }
-    return m('button.PauseToggle', {
+    return m(Button, {
+      class: 'PauseToggle',
+      label: text,
       onclick: async (e) => {
         if (subscriptions.length > 0) {
           if (pause) {
@@ -168,7 +169,7 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
           }
         }
       },
-    }, `${text}`);
+    });
   }
 };
 
@@ -330,8 +331,9 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
         && sub.objectId === objectId);
     return m('.EventSubscriptionRow', [
       m('h3', `${title}`),
-      app.loginStatusLoaded && m('button.activeSubscriptionButton', {
-        class: subscription && subscription.isActive ? 'formular-button-primary' : '',
+      app.loginStatusLoaded && m(Button, {
+        label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
+        iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
         onclick: async (e) => {
           e.preventDefault();
           if (subscription && subscription.isActive) {
@@ -341,9 +343,7 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
           }
           setTimeout(() => { m.redraw(); }, 0);
         }
-      }, subscription && subscription.isActive
-        ? [ m('span.icon-bell'), ' Notifications on' ]
-        : [ m('span.icon-bell-off'), ' Notifications off' ]),
+      }),
       m('span', description),
     ]);
   }
@@ -386,19 +386,23 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       : [];
     return m('.EventSubscriptions', [
       m('h1', 'On-Chain Events'),
-      supportedChains.length > 0 && m(DropdownFormField, {
+      supportedChains.length > 0 && m(Select, {
         name: 'chain',
-        choices: supportedChains.map((t) => ({ name: t.id, label: t.name, value: t.id })),
-        callback: (result) => {
-          vnode.state.chain = result;
-          setTimeout(() => { m.redraw(); }, 0);
-        },
+        options: supportedChains.map((c) => c.name),
+        onchange: (e) => {
+          const { value } = e.target as any;
+          vnode.state.chain = value;
+          m.redraw(); // TODO TEST THIS SELECT COMPONENT REFRESH PROPERLY
+          // setTimeout(() => { m.redraw(); }, 0);
+        }
       }),
       m('h2', 'Subscribe to New Events:'),
       m('.EventSubscriptionRow', [
         m('h3', 'Subscribe All'),
-        app.loginStatusLoaded && m('button.activeSubscriptionButton', {
-          class: vnode.state.isSubscribedAll ? 'formular-button-primary' : '',
+        app.loginStatusLoaded && m(Button, {
+          class: 'activeSubscriptionButton',
+          label: vnode.state.isSubscribedAll ? 'Notifications on' : 'Notifications off',
+          iconLeft: vnode.state.isSubscribedAll ? Icons.BELL : Icons.BELL_OFF,
           onclick: async (e) => {
             e.preventDefault();
             if (vnode.state.isSubscribedAll) {
