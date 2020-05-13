@@ -7,7 +7,7 @@ import app from 'state';
 import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { ChainBase } from '../../../models/models';
+import { ChainBase } from 'models';
 import SubstrateEVMContent from './substrate';
 import SubstrateEVMSidebar from './substrate/sidebar';
 
@@ -20,7 +20,7 @@ const EVMPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain || !app.vm.activeAccount) return m(PageLoading);
+    if (!app.chain) return m(PageLoading);
     const account = app.vm.activeAccount;
     let content, sidebar;
     if (app.chain.base === ChainBase.Substrate) {

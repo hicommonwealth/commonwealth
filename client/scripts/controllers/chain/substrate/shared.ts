@@ -296,11 +296,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         first(), // TODO: leave this open?
       ).subscribe(([
         chainname, chainversion, chainruntimename, minimumperiod, blockNumber,
-        totalbalance, existentialdeposit, transferfee, creationfee, sudokey,
+        totalbalance, existentialdeposit, creationfee, sudokey,
         chainProps, reservationFee, hasEVM,
       ]: [
           string, string, string, Moment, BlockNumber,
-          Balance, Balance, Balance, Balance, AccountId,
+          Balance, Balance, Balance, AccountId,
           ChainProperties, Balance, Boolean,
       ]) => {
         this.app.chain.name = chainname;

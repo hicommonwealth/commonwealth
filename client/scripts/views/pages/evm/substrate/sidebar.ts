@@ -20,12 +20,11 @@ interface IState {
 const SubstrateEVMSidebar = makeDynamicComponent<IAttrs, IState>({
   getObservables: (attrs: IAttrs) => {
     return {
-      groupKey: attrs.account.address,
-      evmAccount: attrs.account.evmAccount,
+      groupKey: (attrs.account) ? attrs.account.address : null,
+      evmAccount: (attrs.account) ? attrs.account.evmAccount : null,
     };
   },
   view: (vnode) => {
-    console.log(vnode.state.dynamic);
     const account = vnode.attrs.account;
     return [
       m(AccountsWell, {

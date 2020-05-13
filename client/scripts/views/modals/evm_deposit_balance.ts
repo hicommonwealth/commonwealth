@@ -10,8 +10,6 @@ import { CompactModalExitButton } from 'views/modal';
 import CharacterLimitedTextInput from '../components/widgets/character_limited_text_input';
 import { createTXModal } from './tx_signing_modal';
 
-
-
 const DepositeEVMBalanceModal = {
   // confirmExit: confirmationModalWithText('Are you sure you want to exit?'),
   view: (vnode) => {
