@@ -514,6 +514,7 @@ interface ISubscriptionsPageState {
   selectedFilter: string;
   chains: ChainInfo[];
   communities: CommunityInfo[];
+  subscriptions: NotificationSubscription[];
 }
 const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
   oninit: (vnode) => {
@@ -532,9 +533,10 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         .filter((c) => chainIds.includes(c.id))
     );
     vnode.state.selectedFilter = 'default';
+    vnode.state.subscriptions = app.login.notifications.subscriptions;
   },
   view: (vnode) => {
-    const { selectedFilter, chains, communities } = vnode.state;
+    const { selectedFilter, chains, communities, subscriptions } = vnode.state;
 
     return m('.SubscriptionsPage', [
       m(SubscriptionsPageSideBar, {
@@ -547,23 +549,27 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         },
       }),
       m('.forum-container', [
-        m(Tabs, [{
-          name: 'Active Subscriptions',
-          content: m(ActiveSubscriptions),
-        }, {
-          name: 'Chain Subscriptions',
-          content: m(ChainSubscriptions),
-        }, {
-          name: 'Community Subscriptions',
-          content: m(CommunitySubscriptions),
-        }, {
-          name: 'Event Subscriptions',
-          content: m(EventSubscriptions),
-        }, {
-          name: 'Notifications',
-          content: m(NotificationButtons),
-        },
-        ]),
+        (selectedFilter === 'default')
+          && m(NotificationButtons),
+        (selectedFilter === 'edgeware')
+          && m(ChainSubscriptions),
+        // m(Tabs, [{
+        //   name: 'Active Subscriptions',
+        //   content: m(ActiveSubscriptions),
+        // }, {
+        //   name: 'Chain Subscriptions',
+        //   content: m(ChainSubscriptions),
+        // }, {
+        //   name: 'Community Subscriptions',
+        //   content: m(CommunitySubscriptions),
+        // }, {
+        //   name: 'Event Subscriptions',
+        //   content: m(EventSubscriptions),
+        // }, {
+        //   name: 'Notifications',
+        //   content: m(NotificationButtons),
+        // },
+        // ]),
       ]),
     ]);
   },
