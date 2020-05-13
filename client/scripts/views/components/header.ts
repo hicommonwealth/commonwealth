@@ -502,15 +502,15 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { typeEnum: ProposalType.SubstrateCollectiveProposal }
             })
           }, 'New council motion'),
-          app.chain.base === ChainBase.Substrate
-          && (app.chain as Substrate).chain.hasEVM
-          && activeAcct instanceof SubstrateAccount
-          && m('li', {
-            onclick: (e) => app.modals.create({
-              modal: NewEVMContract,
-              data: {}
-            }),
-          }, 'New EVM contract'),
+          // app.chain.base === ChainBase.Substrate
+          // && (app.chain as Substrate).chain.hasEVM
+          // && activeAcct instanceof SubstrateAccount
+          // && m('li', {
+          //   onclick: (e) => app.modals.create({
+          //     modal: NewEVMContract,
+          //     data: {}
+          //   }),
+          // }, 'New EVM contract'),
           m('li.divider'),
         ],
         //
