@@ -12,6 +12,7 @@ import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/int
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
+import { Button } from 'construct-ui';
 
 const NotificationButtons: m.Component = {
   oninit: (vnode) => {
@@ -23,19 +24,21 @@ const NotificationButtons: m.Component = {
     }
     return m('.NotificationButtons', [
       m('h2', 'Notifications:'),
-      m('button', {
+      m(Button, {
+        label: 'Mark all as read',
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
           app.login.notifications.markAsRead(notifications).then(() => m.redraw());
         }
-      }, 'Mark all as read'),
-      m('button', {
+      }),
+      m(Button, {
+        label: 'Clear all read',
         onclick: (e) => {
           e.preventDefault();
           app.login.notifications.clearAllRead().then(() => m.redraw());
         }
-      }, 'Clear all read'),
+      }),
     ]);
   }
 };

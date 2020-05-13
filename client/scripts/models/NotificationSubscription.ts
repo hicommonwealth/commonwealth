@@ -16,12 +16,13 @@ class NotificationSubscription {
   public enable() { this._isActive = true; }
   public disable() { this._isActive = false; }
 
-  constructor(id, category, objectId, isActive, createdAt) {
+  constructor(id, category, objectId, isActive, createdAt, immediateEmail) {
     this.id = id;
     this.category = category;
     this.objectId = objectId;
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
+    this._immediateEmail = immediateEmail;
   }
 
   public static fromJSON(json) {
@@ -30,7 +31,8 @@ class NotificationSubscription {
       json.category_id,
       json.object_id,
       json.is_active,
-      json.created_at
+      json.created_at,
+      json.immediate_email,
     );
   }
 }
