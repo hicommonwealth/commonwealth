@@ -96,7 +96,6 @@ class NotificationsController {
 
   public update(n: Notification) {
     this._store.add(n);
-    // TODO: this should trigger a redraw if it doesn't already
   }
 
   public refresh() {

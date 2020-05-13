@@ -54,7 +54,7 @@ export interface IWebsocketsPayload<T> {
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: number;
+  root_id: string;
   root_title: string;
   root_type: string;
   comment_id?: number;
@@ -73,6 +73,11 @@ export interface ICommunityNotificationData {
   author_address: string;
   chain: string;
   community: string;
+}
+
+export interface IChainEventNotificationData {
+  chainEvent: any;
+  chainEventType: any;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

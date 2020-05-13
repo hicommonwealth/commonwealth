@@ -571,6 +571,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     chain: chain_id,
     community: community_id,
   };
+
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');

@@ -81,7 +81,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       '',
       {
         created_at: new Date(),
-        root_id: Number(proposal.id),
+        root_id: proposal.type_id || proposal.id,
         root_title: proposal.title || '',
         root_type: prefix,
         comment_id: Number(finalComment.id),

@@ -2,7 +2,10 @@ import _ from 'underscore';
 import WebSocket from 'ws';
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
-import { ProposalType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
+import {
+  WebsocketMessageType, IWebsocketsPayload,
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
+} from '../../shared/types';
 
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../util/logging';
@@ -28,32 +31,6 @@ module.exports = (sequelize, DataTypes) => {
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.Notification);
   };
-
-  interface IPostNotificationData {
-    created_at: any;
-    root_id: number;
-    root_title: string;
-    root_type: ProposalType;
-    comment_id?: number;
-    comment_text?: string;
-    chain_id: string;
-    community_id: string;
-    author_address: string;
-    author_chain: string;
-  }
-
-  interface ICommunityNotificationData {
-    created_at: any;
-    role_id: string | number;
-    author_address: string;
-    chain: string;
-    community: string;
-  }
-
-  interface IChainEventNotificationData {
-    chainEvent: any;
-    chainEventType: any;
-  }
 
   Subscription.emitNotifications = async (
     models,

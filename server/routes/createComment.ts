@@ -178,7 +178,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     root_id,
     {
       created_at: new Date(),
-      root_id: Number(proposal.id),
+      root_id: proposal.type_id || proposal.id,
       root_title: proposal.title || '',
       root_type: prefix,
       comment_id: Number(finalComment.id),
@@ -207,7 +207,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: Number(proposal.id),
+        root_id: proposal.type_id || proposal.id,
         root_title: proposal.title || '',
         root_type: prefix,
         comment_id: Number(finalComment.id),
@@ -253,7 +253,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(proposal.id),
+          root_id: proposal.type_id || proposal.id,
           root_title: proposal.title || '',
           root_type: prefix,
           comment_id: Number(finalComment.id),
@@ -263,6 +263,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
+        { }, // TODO: add webhook data for mentions
         req.wss,
         [ finalComment.Address.address ],
       );
