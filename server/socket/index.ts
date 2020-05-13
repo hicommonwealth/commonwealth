@@ -137,10 +137,12 @@ export default function (
     // eslint-disable-next-line no-restricted-syntax
     for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
       if (sessionSocket && sessionSocket.isAlive) {
-        sessionSocket.send(JSON.stringify(payload), (err) => {
-          log.error(`Failed to send chain entity to session: ${session}`);
-          log.error(`Error: ${err}.`);
-          // TODO: remove from map if err is that it's closed?
+        sessionSocket.send(JSON.stringify(payload), (err?) => {
+          if (err) {
+            log.error(`Failed to send chain entity to session: ${session}`);
+            log.error(`Error: ${err}.`);
+            // TODO: remove from map if err is that it's closed?
+          }
         });
       }
     }
