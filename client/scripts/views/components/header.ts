@@ -267,14 +267,17 @@ const Navigation: m.Component<IMenuAttrs> = {
         path: `/${app.activeChainId()}/council`,
         activeIf: (p) => p.startsWith(`/${app.activeChainId()}/council`),
       }, 'Council'),
-      app.chain
-        && app.chain.base === ChainBase.Substrate
-        && (app.chain as Substrate).chain.hasEVM
-        && m(NavigationItem, {
-          label: 'EVM',
-          path: `/${app.activeChainId()}/evm`,
-          activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
-        }, 'EVM'),
+      // //
+      // // EVM page
+      // //
+      // app.chain
+      //   && app.chain.base === ChainBase.Substrate
+      //   && (app.chain as Substrate).chain.hasEVM
+      //   && m(NavigationItem, {
+      //     label: 'EVM',
+      //     path: `/${app.activeChainId()}/evm`,
+      //     activeIf: (p) => p.startsWith(`/${app.activeChainId()}/evm`),
+      //   }, 'EVM'),
       // //
       // // Validators page
       // //
