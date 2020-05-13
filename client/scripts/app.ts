@@ -336,7 +336,7 @@ $(() => {
     // Login page
     '/login':                    importRoute(import('views/pages/login'), false),
     '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
+    '/notifications':            importRoute(import('views/pages/notifications'), false),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
@@ -345,7 +345,7 @@ $(() => {
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
+    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), true),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
     '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
