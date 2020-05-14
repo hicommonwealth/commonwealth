@@ -105,26 +105,31 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
 
     const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
     const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
+    const HomeButton = m('.home-button-wrap', [
+      m(Button, {
+        onclick: (e) => {
+          if (m.route.get() !== '/') m.route.set('/');
+        },
+        class: '.sidebar-logo',
+        iconLeft: Icons.HOME,
+        size: 'xl'
+      })
+    ]);
 
     return m('.CommunitySwitcher', [
-      m(Popover, {
-        portalAttrs: { class: 'community-menu-portal' },
-        class: 'community-menu-popover',
-        hasBackdrop: true,
-        content: m(CommunityMenu),
-        hasArrow: false,
-        closeOnEscapeKey: true,
-        closeOnContentClick: true,
-        closeOnOutsideClick: true,
-        trigger: m(Button, {
-          onclick: (e) => {
-            if (m.route.get() !== '/') m.route.set('/');
-          },
-          class: '.sidebar-logo',
-          iconLeft: Icons.HOME,
-          size: 'xl'
-        }),
-      }),
+      app.isLoggedIn()
+        ? m(Popover, {
+          portalAttrs: { class: 'community-menu-portal' },
+          class: 'community-menu-popover',
+          hasBackdrop: true,
+          content: m(CommunityMenu),
+          hasArrow: false,
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          trigger: HomeButton
+        })
+        : HomeButton,
       m('.sidebar-content', [
         chainRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);

@@ -241,16 +241,16 @@ body.modal-open {
     padding: 15px 40px;
     padding-top: $header-height + 15px;
     padding-left: $sidebar-width + 40px;
-    &.logged-out {
-        padding-left: $sidebar-width;
-    }
+    // &.logged-out {
+    //     padding-left: $sidebar-width;
+    // }
     &.navigation-hidden {
         padding-left: $switcher-width + 40px;
         padding-top: 15px;
     }
-    &.navigation-hidden.logged-out {
-        padding-left: 40px;
-    }
+    // &.navigation-hidden.logged-out {
+    //     padding-left: 40px;
+    // }
 }
 
 @media (max-width: 680px) {
