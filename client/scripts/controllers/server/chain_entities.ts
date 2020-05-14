@@ -36,6 +36,16 @@ class ChainEntityController {
     }
   }
 
+  public update(entity: ChainEntity, event: ChainEvent) {
+    const existingEntity = this.store.getById(entity.id);
+    if (!existingEntity) {
+      this._store.add(entity);
+    } else {
+      entity = existingEntity;
+    }
+    entity.addEvent(event);
+  }
+
   public refresh(chain) {
     return get('/bulkEntities', { chain }, (result) => {
       for (const entityJSON of result) {

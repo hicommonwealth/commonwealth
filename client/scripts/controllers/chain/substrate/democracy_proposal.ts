@@ -132,9 +132,6 @@ class SubstrateDemocracyProposal extends Proposal<
   }
 
   public update(e: ChainEvent) {
-    if (this.completed) {
-      return;
-    }
     switch (e.data.kind) {
       case SubstrateEventKind.DemocracyProposed: {
         break;

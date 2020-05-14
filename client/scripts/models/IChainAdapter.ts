@@ -35,13 +35,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
           // add fake "include" for construction purposes
           chainEvent.ChainEventType = chainEventType;
           const eventModel = ChainEvent.fromJSON(chainEvent);
+
           let existingEntity = this.app.chainEntities.store.getById(chainEntity.id);
-          if (existingEntity) {
-            existingEntity.addEvent(eventModel, moment(chainEntity.updated_at));
-          } else {
+          if (!existingEntity) {
             existingEntity = ChainEntity.fromJSON(chainEntity);
-            existingEntity.addEvent(eventModel);
           }
+          this.app.chainEntities.update(existingEntity, eventModel);
           this.handleEntityUpdate(existingEntity, eventModel);
         }
       }

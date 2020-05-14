@@ -47,9 +47,11 @@ class ChainEntity {
   }
 
   public addEvent(chainEvent: ChainEvent, updatedAt?: moment.Moment) {
-    this._chainEvents.push(chainEvent);
-    if (updatedAt) {
-      this._updatedAt = updatedAt;
+    if (!this._chainEvents.find((e) => e.id === chainEvent.id)) {
+      this._chainEvents.push(chainEvent);
+      if (updatedAt) {
+        this._updatedAt = updatedAt;
+      }
     }
   }
 }

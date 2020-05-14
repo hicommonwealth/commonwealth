@@ -86,6 +86,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
     }
     case SubstrateEntityKind.DemocracyPreimage: {
       if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+        console.log('dispatching preimage noted, from entity', entity);
         const proposal = chain.democracyProposals.getByHash(entity.typeId);
         if (proposal) {
           proposal.update(event);
@@ -119,6 +120,8 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
     default:
       break;
   }
+  // force titles to update?
+  m.redraw();
 }
 
 export interface ISubstrateTXData extends ITXData {
