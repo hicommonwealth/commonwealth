@@ -60,20 +60,22 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === communityOrChain.id);
 
-    return m(Button, {
-      label: communitySubscription ? 'Notifications on' : 'Notifications off',
-      iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,
-      class: 'ChainOrCommunitySubscriptionButton',
-      href: '#',
-      onclick: (e) => {
-        e.preventDefault();
-        if (communitySubscription) {
-          subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw());
-        } else {
-          subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain.id).then(() => m.redraw());
-        }
-      },
-    });
+    return [
+      m('h4', 'New Threads:'),
+      m(Button, {
+        label: communitySubscription ? 'Notifications on' : 'Notifications off',
+        iconLeft: communitySubscription ? Icons.BELL : Icons.BELL_OFF,
+        class: 'ChainOrCommunitySubscriptionButton',
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          if (communitySubscription) {
+            subscriptions.deleteSubscription(communitySubscription).then(() => m.redraw());
+          } else {
+            subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain.id).then(() => m.redraw());
+          }
+        },
+      })];
   }
 };
 
@@ -88,6 +90,7 @@ const ImmediateEmailButton: m.Component<{subscription: NotificationSubscription}
       trigger: m(Button, {
         label: m(Icon, { name : Icons.MAIL }),
         intent: subscription.immediateEmail ? 'positive' : 'none',
+        size: 'sm',
         onclick: async () => {
           if (subscription.immediateEmail) {
             await app.login.notifications.disableImmediateEmails([subscription]);
@@ -129,8 +132,10 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       activeSubscription
         && m(Button, {
           label: activeSubscription.isActive ? 'Pause' : 'Unpause',
+          intent: activeSubscription.isActive ? 'none' : 'negative',
           iconLeft: activeSubscription.isActive ? Icons.VOLUME_2 : Icons.VOLUME_X,
           class: '',
+          size: 'sm',
           onclick: async (e) => {
             e.preventDefault();
             if (activeSubscription.isActive) {
@@ -143,6 +148,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
         }),
       m(Button, {
         class: '',
+        size: 'sm',
         onclick: (e) => {
           e.preventDefault();
           if (activeSubscription) {
@@ -184,6 +190,7 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
     return m(Button, {
       class: 'PauseToggle',
       label: text,
+      size: 'sm',
       onclick: async (e) => {
         if (subscriptions.length > 0) {
           if (pause) {
