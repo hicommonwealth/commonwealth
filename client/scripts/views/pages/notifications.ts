@@ -438,19 +438,29 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
 interface IChainOrCommNotifPageAttrs {
   subscriptions: NotificationSubscription[];
   selectedFilter: string;
+  chains?: ChainInfo[];
+  communities?: CommunityInfo[];
 }
 
 const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> = {
   view: (vnode) => {
-    const { subscriptions, selectedFilter } = vnode.attrs;
-    return m('div', `ChainNotification=${selectedFilter}`);
+    const { subscriptions, selectedFilter, chains } = vnode.attrs;
+    const chain = chains.find((c) => c.id === selectedFilter);
+    return m('ChainNotificationManagementPage', [
+      m('h2', chain.name),
+      m(ChainOrCommunitySubscriptionButton, { chain, }),
+    ]);
   },
 };
 
 const CommunityNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> = {
   view: (vnode) => {
-    const { subscriptions, selectedFilter } = vnode.attrs;
-    return m('div', `CommunityNotification=${selectedFilter}`);
+    const { subscriptions, selectedFilter, communities } = vnode.attrs;
+    const community = communities.find((c) => c.id === selectedFilter);
+    return m('CommunityNotificationManagementPage', [
+      m('h2', community.name),
+      m(ChainOrCommunitySubscriptionButton, { community, }),
+    ]);
   },
 };
 
@@ -501,6 +511,12 @@ const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
         m(SubscriptionSideBarListItem, {
           label: 'User Notifications',
           id: 'default',
+          selectedFilter,
+          onChangeHandler,
+        }),
+        m(SubscriptionSideBarListItem, {
+          label: 'Active Subscriptions',
+          id: 'active',
           selectedFilter,
           onChangeHandler,
         }),
@@ -573,10 +589,12 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
       m('.forum-container', [
         (selectedFilter === 'default')
           && m(NotificationButtons),
+        (selectedFilter === 'active')
+          && m(ActiveSubscriptions),
         (chainIds.includes(selectedFilter))
-          && m(ChainNotificationManagementPage, { subscriptions, selectedFilter }),
+          && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
         (communityIds.includes(selectedFilter))
-          && m(CommunityNotificationManagementPage, { subscriptions, selectedFilter }),
+          && m(CommunityNotificationManagementPage, { subscriptions, selectedFilter, communities }),
       ]),
     ]);
   },
