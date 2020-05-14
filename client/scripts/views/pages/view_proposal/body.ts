@@ -322,7 +322,6 @@ export const ProposalBodySaveEdit: m.Component<{
               parentState.editing = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               callback();
-              m.redraw();
             });
           }
         }
