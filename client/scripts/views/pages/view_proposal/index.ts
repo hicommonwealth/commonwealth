@@ -294,7 +294,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           m(ProposalBodySpacer),
           m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
           m(ProposalBodySpacer),
-          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, }),
+          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
         ],
       ]),
       m('.comment-body-content', [
@@ -376,6 +376,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             getSetGlobalReplyStatus,
             parent: comment,
             proposal,
+            callback: createdCommentCallback,
           }),
           !!child.childComments.length
             && m('.child-comments-wrap', recursivelyGatherChildComments(child, replyParent2))
@@ -392,6 +393,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             getSetGlobalReplyStatus,
             parent: proposal,
             proposal,
+            callback: createdCommentCallback,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
