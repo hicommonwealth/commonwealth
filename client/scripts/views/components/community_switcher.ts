@@ -128,7 +128,12 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
         hasArrow: false,
         closeOnEscapeKey: true,
         closeOnContentClick: true,
-        trigger: m('.sidebar-logo', '🤔'),
+        trigger: m(Button, {
+          onclick: (e) => m.route.set('/'),
+          class: '.sidebar-logo',
+          iconLeft: Icons.HOME,
+          size: 'xl'
+        }),
       }),
       m('.sidebar-content', [
         chainRoles.map((role) => {
