@@ -1,4 +1,4 @@
-import 'pages/_listing_page.scss';
+// import 'pages/_listing_page.scss';
 import 'pages/subscriptions.scss';
 
 import m from 'mithril';
@@ -12,11 +12,11 @@ import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/int
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
-import { Button, Icons, Select, List, ListItem } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import _ from 'lodash';
 
-const NotificationButtons: m.Component = {
+const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   oninit: (vnode) => {
   },
   view: (vnode) => {
@@ -24,7 +24,9 @@ const NotificationButtons: m.Component = {
     if (app.loginStatusLoaded) {
       notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
     }
-    return m('.NotificationButtons', [
+    const { subscriptions } = vnode.attrs;
+    const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    return m('.UserSubscriptions', [
       m('h2', 'Notifications:'),
       m(Button, {
         label: 'Mark all as read',
@@ -75,6 +77,30 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
   }
 };
 
+const ImmediateEmailButton: m.Component<{subscription: NotificationSubscription}> = {
+  view: (vnode) => {
+    const { subscription } = vnode.attrs;
+    const tooltipContent = subscription.immediateEmail ? 'Turn off immediate notification emails' : 'Turn on immediate notification emails';
+    return m(Tooltip, {
+      content: tooltipContent,
+      hasArrow: true,
+      position: 'top',
+      trigger: m(Button, {
+        label: m(Icon, { name : Icons.MAIL }),
+        intent: subscription.immediateEmail ? 'positive' : 'none',
+        onclick: async () => {
+          if (subscription.immediateEmail) {
+            await app.login.notifications.disableImmediateEmails([subscription]);
+          } else {
+            await app.login.notifications.enableImmediateEmails([subscription]);
+          }
+          m.redraw();
+        },
+      }),
+    });
+  },
+};
+
 interface ISubscriptionRowAttrs {
   subscription: NotificationSubscription;
 }
@@ -97,14 +123,14 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       vnode.state.subscription = activeSubscription;
     }
     return m('.SubscriptionRow', [
-      m('h3', `${vnode.state.subscription.objectId}`),
-      m('h4', `Subscription Type: ${vnode.state.subscription.category}`),
+      m('h4', `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
+      activeSubscription
+      && m(ImmediateEmailButton, { subscription: activeSubscription }),
       activeSubscription
         && m(Button, {
           label: activeSubscription.isActive ? 'Pause' : 'Unpause',
           iconLeft: activeSubscription.isActive ? Icons.VOLUME_2 : Icons.VOLUME_X,
-          class: 'pauseButton',
-          href: '#',
+          class: '',
           onclick: async (e) => {
             e.preventDefault();
             if (activeSubscription.isActive) {
@@ -116,8 +142,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
           }
         }),
       m(Button, {
-        class: 'activeSubscriptionButton',
-        href: '#',
+        class: '',
         onclick: (e) => {
           e.preventDefault();
           if (activeSubscription) {
@@ -569,7 +594,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
       app.config.chains.getAll()
         .filter((c) => chainIds.includes(c.id))
     );
-    vnode.state.selectedFilter = 'internal';
+    vnode.state.selectedFilter = 'default';
     vnode.state.subscriptions = app.login.notifications.subscriptions;
   },
   view: (vnode) => {
@@ -577,6 +602,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
     const chainIds = chains.map((c) => c.id);
     const communityIds = communities.map((c) => c.id);
 
+    if (!app.loginStatusLoaded()) return;
     return m('.SubscriptionsPage', [
       m(SubscriptionsPageSideBar, {
         selectedFilter,
@@ -589,7 +615,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
       }),
       m('.forum-container', [
         (selectedFilter === 'default')
-          && m(NotificationButtons),
+          && m(UserSubscriptions, { subscriptions }),
         (selectedFilter === 'active')
           && m(ActiveSubscriptions),
         (chainIds.includes(selectedFilter))
