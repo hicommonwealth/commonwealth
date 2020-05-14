@@ -111,6 +111,24 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
       expect(res.body.status).to.be.equal('Success');
     });
+    it('should turn on immediate emails', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should turn off immediate emails', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
+      expect(res.body.status).to.be.equal('Success');
+    });
   });
 
   describe('/deleteSubscription', () => {
