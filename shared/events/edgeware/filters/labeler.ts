@@ -58,6 +58,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Validator Slashed',
         label: `Validator ${fmtAddr(validator)} was slashed by amount ${balanceFormatter(amount)}.`,
+        // TODO: get link to validator page
       };
     }
     case SubstrateEventKind.Reward: {
@@ -67,6 +68,7 @@ const labelEdgewareEvent: LabelerFilter = (
         label: data.validator
           ? `Validator ${fmtAddr(data.validator)} was rewarded by amount ${balanceFormatter(amount)}.`
           : `All validators were rewarded by amount ${balanceFormatter(amount)}.`,
+        // TODO: get link to validator page
       };
     }
     case SubstrateEventKind.Bonded: {
@@ -74,6 +76,8 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Bonded',
         label: `You bonded ${balanceFormatter(amount)} from controller ${fmtAddr(controller)} to stash ${fmtAddr(stash)}.`,
+        // TODO: should this link to controller or stash?
+        linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
     case SubstrateEventKind.Unbonded: {
@@ -81,6 +85,8 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Bonded',
         label: `You unbonded ${balanceFormatter(amount)} from controller ${fmtAddr(controller)} to stash ${fmtAddr(stash)}.`,
+        // TODO: should this link to controller or stash?
+        linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
 
@@ -91,7 +97,8 @@ const labelEdgewareEvent: LabelerFilter = (
       const { who, target } = data;
       return {
         heading: 'Vote Delegated',
-        label: `Your account ${fmtAddr(target)} received a voting delegation from ${fmtAddr(who)}.`
+        label: `Your account ${fmtAddr(target)} received a voting delegation from ${fmtAddr(who)}.`,
+        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
     case SubstrateEventKind.DemocracyProposed: {
@@ -108,11 +115,6 @@ const labelEdgewareEvent: LabelerFilter = (
         heading: 'Democracy Proposal Tabled',
         label: `Democracy proposal ${proposalIndex} has been tabled as a referendum.`,
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
-        // TODO: the only way to get the linkUrl here for the new referendum is to fetch the hash
-        //    from the Proposed event, and then use that to discover the Started event which occurs
-        //    *after* this, or else to fetch the not-yet-created referendum from storage.
-        //    Once we have the referendum, we can use *that* index to generate a link. Or, we can
-        //    just link to the completed proposal, as we do now.
       };
     }
     case SubstrateEventKind.DemocracyStarted: {
@@ -132,7 +134,7 @@ const labelEdgewareEvent: LabelerFilter = (
         label: dispatchBlock
           ? `Referendum ${referendumIndex} passed and will be dispatched on block ${dispatchBlock}.`
           : `Referendum ${referendumIndex} passed was dispatched on block ${blockNumber}.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case SubstrateEventKind.DemocracyNotPassed: {
@@ -141,7 +143,7 @@ const labelEdgewareEvent: LabelerFilter = (
         heading: 'Democracy Referendum Failed',
         // TODO: include final tally?
         label: `Referendum ${referendumIndex} has failed.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case SubstrateEventKind.DemocracyCancelled: {
@@ -150,7 +152,7 @@ const labelEdgewareEvent: LabelerFilter = (
         heading: 'Democracy Referendum Cancelled',
         // TODO: include cancellation vote?
         label: `Referendum ${referendumIndex} was cancelled.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case SubstrateEventKind.DemocracyExecuted: {
@@ -158,7 +160,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Democracy Referendum Executed',
         label: `Referendum ${referendumIndex} was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
 
@@ -191,7 +193,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Preimage Invalid',
         label: `Preimage for referendum ${referendumIndex} was invalid.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case SubstrateEventKind.PreimageMissing: {
@@ -199,7 +201,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Preimage Missing',
         label: `Preimage for referendum ${referendumIndex} not found.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
     case SubstrateEventKind.PreimageReaped: {
@@ -207,6 +209,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Preimage Reaped',
         label: `A preimage noted by ${fmtAddr(noter)} was reaped by ${fmtAddr(reaper)}.`,
+        // TODO: see linkURL comment above, but also we could link to the reaper?
       };
     }
 
@@ -226,7 +229,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Treasury Proposal Awarded',
         label: `Treasury proposal ${proposalIndex} of ${balanceFormatter(value)} was awarded to ${fmtAddr(beneficiary)}.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/treasuryproposal/${proposalIndex}` : null,
       };
     }
     case SubstrateEventKind.TreasuryRejected: {
@@ -234,7 +237,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Treasury Proposal Rejected',
         label: `Treasury proposal ${proposalIndex} was rejected.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/treasuryproposal/${proposalIndex}` : null,
       };
     }
 
@@ -292,43 +295,43 @@ const labelEdgewareEvent: LabelerFilter = (
      * Collective Events
      */
     case SubstrateEventKind.CollectiveProposed: {
-      const { proposer, proposalIndex, threshold, collectiveName } = data;
+      const { proposer, proposalHash, threshold, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `New ${collective} Proposal`,
         label: `${fmtAddr(proposer)} introduced a new ${collective} proposal, requiring ${threshold} approvals to pass.`,
-        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalIndex}` : null,
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveApproved: {
-      const { proposalIndex, ayes, nays, collectiveName } = data;
+      const { proposalHash, proposalIndex, ayes, nays, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Approved`,
         label: `${collective} proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveDisapproved: {
-      const { proposalIndex, ayes, nays, collectiveName } = data;
+      const { proposalIndex, ayes, nays, collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Disapproved`,
         label: `${collective} proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
-        // TODO: once we have proposal archiving, add linkUrl here
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveExecuted: {
-      const { executionOk, collectiveName } = data;
+      const { executionOk, collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Executed`,
         label: `Approved ${collective} proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
-        // no way to recover the index here besides checking the db for proposed event
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveMemberExecuted: {
@@ -338,8 +341,8 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: `${collective} Proposal Executed`,
         label: `A member-executed ${collective} proposal was executed ${executionOk ? 'successfully' : 'unsuccessfully'}.`,
-        // no way to recover the index here besides checking the db for proposed event
-        // ...and for member-exectured proposals, that might not even exist, depending on logic
+        // no proposal link will exist, because this happens immediately, without creating a proposal
+        // TODO: maybe link to the executing member?
       };
     }
 
@@ -387,6 +390,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Treasury Reward Minted',
         label: `A reward of size ${balanceFormatter(reward)} was minted. Treasury pot now of size ${balanceFormatter(pot)}.`
+        // TODO: link to pot? or something?
       };
     }
     case SubstrateEventKind.TreasuryRewardMintingV2: {
@@ -394,6 +398,7 @@ const labelEdgewareEvent: LabelerFilter = (
       return {
         heading: 'Treasury Reward Minted',
         label: `A treasury reward was minted, pot now of size ${balanceFormatter(pot)}.`
+        // TODO: link to pot? or something?
       };
     }
 
