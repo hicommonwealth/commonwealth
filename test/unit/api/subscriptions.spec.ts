@@ -124,7 +124,7 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('should turn on immediate emails', async () => {
+    it('should turn on immediate emails, /enableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai.request(app)
         .post('/api/enableImmediateEmails')
@@ -134,7 +134,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should turn off immediate emails', async () => {
+    it('should turn off immediate emails, /disableImmediateEmails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai.request(app)
         .post('/api/disableImmediateEmails')
