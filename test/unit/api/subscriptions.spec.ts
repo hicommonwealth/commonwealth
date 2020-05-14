@@ -111,6 +111,19 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
       expect(res.body.status).to.be.equal('Success');
     });
+  });
+
+  describe('toggling immediate emails property on subscription model', () => {
+    let subscription: NotificationSubscription;
+    beforeEach('creating a subscription', async () => {
+      subscription = await modelUtils.createSubscription({
+        object_id: community,
+        jwt: jwtToken,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+      });
+    });
+
     it('should turn on immediate emails', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai.request(app)
