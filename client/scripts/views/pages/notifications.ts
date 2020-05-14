@@ -457,6 +457,7 @@ const CommunityNotificationManagementPage: m.Component<IChainOrCommNotifPageAttr
   view: (vnode) => {
     const { subscriptions, selectedFilter, communities } = vnode.attrs;
     const community = communities.find((c) => c.id === selectedFilter);
+    const communitySubscriptions = subscriptions.filter((s) => s);
     return m('CommunityNotificationManagementPage', [
       m('h2', community.name),
       m(ChainOrCommunitySubscriptionButton, { community, }),
@@ -568,7 +569,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
       app.config.chains.getAll()
         .filter((c) => chainIds.includes(c.id))
     );
-    vnode.state.selectedFilter = 'default';
+    vnode.state.selectedFilter = 'internal';
     vnode.state.subscriptions = app.login.notifications.subscriptions;
   },
   view: (vnode) => {
