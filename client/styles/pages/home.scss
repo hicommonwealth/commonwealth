@@ -6,14 +6,6 @@
         position: relative;
         padding: 0 20px 60px;
         width: 100%;
-        .pseudo-header {
-            display: flex;
-            justify-content: space-between;
-            margin: 42px 0 0;
-            .cui-button + .cui-button {
-                margin-left: 10px;
-            }
-        }
         @include xs-max {
             padding: 0 10px;
             margin: 0;

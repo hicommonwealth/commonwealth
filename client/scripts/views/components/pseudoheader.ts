@@ -1,10 +1,12 @@
+import 'pages/pseudoheader.scss';
+
 import $ from 'jquery';
 import { default as m } from 'mithril';
 import app from 'state';
 
 import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
-import { Button, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivider } from 'construct-ui';
+import { Button, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
 import NotificationRow from './sidebar/notification_row';
 import { initAppState } from '../../app';
@@ -22,7 +24,7 @@ const PseudoHeader : m.Component<{}, {}> = {
       ? `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`
       : null;
 
-    return m('.pseudo-header', [
+    return m('.PseudoHeader', [
       m('.left-pseudo-header', [
         m('h2.lead-title', 'On-chain communities'),
         m('p.lead-description', [
