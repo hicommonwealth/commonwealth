@@ -1,20 +1,13 @@
 import 'components/community_switcher.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
-import { Icon, Icons, Popover, PopoverMenu, MenuItem, Button, Tooltip } from 'construct-ui';
+import { Icons, Popover, Button, Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { initAppState } from 'app';
-import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
-import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
-import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
-import FeedbackModal from 'views/modals/feedback_modal';
 import CommunityMenu from 'views/components/community_menu';
 
 const avatarSize = 16;
@@ -102,6 +95,7 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
 const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
+    if (!vnode.state.communityMenuVisible) vnode.state.communityMenuVisible = false;
 
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
@@ -119,17 +113,16 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
       m(Popover, {
         portalAttrs: { class: 'community-menu-portal' },
         class: 'community-menu-popover',
-        isOpen: vnode.state.communityMenuVisible,
         hasBackdrop: true,
         content: m(CommunityMenu),
-        onClose: () => {
-          vnode.state.communityMenuVisible = false;
-        },
         hasArrow: false,
         closeOnEscapeKey: true,
         closeOnContentClick: true,
+        closeOnOutsideClick: true,
         trigger: m(Button, {
-          onclick: (e) => m.route.set('/'),
+          onclick: (e) => {
+            if (m.route.get() !== '/') m.route.set('/');
+          },
           class: '.sidebar-logo',
           iconLeft: Icons.HOME,
           size: 'xl'
@@ -145,6 +138,21 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
           const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
           return m(CommunitySwitcherCommunity, { community, address });
         }),
+        m(Popover, {
+          portalAttrs: { class: 'community-menu-portal' },
+          class: 'community-menu-popover',
+          hasBackdrop: true,
+          content: m(CommunityMenu),
+          hasArrow: false,
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          trigger: m('a.CommunitySwitcherCommunity', [
+            m('.icon-inner', [
+              m('.name', '...')
+            ]),
+          ])
+        })
       ]),
     ]);
   }
