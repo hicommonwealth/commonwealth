@@ -94,9 +94,6 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
 
 const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
   view: (vnode) => {
-    if (!app.isLoggedIn()) return;
-    if (!vnode.state.communityMenuVisible) vnode.state.communityMenuVisible = false;
-
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -138,7 +135,7 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
           const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
           return m(CommunitySwitcherCommunity, { community, address });
         }),
-        m(Popover, {
+        app.isLoggedIn() && m(Popover, {
           portalAttrs: { class: 'community-menu-portal' },
           class: 'community-menu-popover',
           hasBackdrop: true,
