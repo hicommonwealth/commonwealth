@@ -15,16 +15,12 @@ import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
-  public readonly balance: SubstrateCoin;
-
   constructor(
     proposal: SubstrateCollectiveProposal,
     account: SubstrateAccount,
     choice: boolean,
-    balance: SubstrateCoin
   ) {
     super(account, choice);
-    this.balance = balance;
   }
 }
 
@@ -92,6 +88,7 @@ export class SubstrateCollectiveProposal
   }
 
   public update(e: ChainEvent) {
+    console.log(e);
     if (this.completed) {
       return;
     }
@@ -100,18 +97,29 @@ export class SubstrateCollectiveProposal
         break;
       }
       case SubstrateEventKind.CollectiveDisapproved: {
+        console.log('disapproved', e);
         this._approved.next(false);
+        this._updateVotes(
+          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
+          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
+        );
         this.complete();
         break;
       }
       case SubstrateEventKind.CollectiveApproved: {
         this._approved.next(true);
+        this._updateVotes(
+          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
+          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
+        );
         break;
       }
       case SubstrateEventKind.CollectiveExecuted: {
         if (!this._approved.value) {
           this._approved.next(true);
         }
+        // unfortunately we don't have the vote at this point in time, so unless
+        // we see a prior approved event, we wont be able to display it.
         this.complete();
         break;
       }
@@ -121,39 +129,22 @@ export class SubstrateCollectiveProposal
     }
   }
 
+  private _updateVotes(ayes: SubstrateAccount[], nays: SubstrateAccount[]) {
+    this.clearVotes();
+    ayes.map((who) => this.addOrUpdateVote(new SubstrateCollectiveVote(this, who, true)));
+    nays.map((who) => this.addOrUpdateVote(new SubstrateCollectiveVote(this, who, false)));
+  }
+
   private _subscribeVoters(): Unsubscribable {
     return this._Chain.query((api) => api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash))
       .pipe(
-        takeWhile((v) => v.isSome && this.initialized && !this.completed),
-
-        // grab latest voter balances as well, to avoid subscribing to each on vote-creation
-        flatMap((v) => combineLatest(
-          of(v),
-          combineLatest(
-            v.unwrap().ayes.map((who) => this._Accounts.fromAddress(who.toString()).balance)
-          ).pipe(take(1)),
-          combineLatest(
-            v.unwrap().nays.map((who) => this._Accounts.fromAddress(who.toString()).balance)
-          ).pipe(take(1)),
-        )),
+        takeWhile((v) => v.isSome && this.initialized && !this.approved && !this.completed),
       )
-      .subscribe(([ v, ayeBalances, nayBalances ]) => {
+      .subscribe((v) => {
         const votes = v.unwrap();
-        const ayes = votes.ayes;
-        const nays = votes.nays;
-
-        // always clear before, in case a vote was removed due to a collective member change
-        this.clearVotes();
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [ voter, balance ] of _.zip(ayes, ayeBalances)) {
-          const acct = this._Accounts.fromAddress(voter.toString());
-          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, true, balance));
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [ voter, balance ] of _.zip(nays, nayBalances)) {
-          const acct = this._Accounts.fromAddress(voter.toString());
-          this.addOrUpdateVote(new SubstrateCollectiveVote(this, acct, false, balance));
-        }
+        const ayes = votes.ayes.map((who) => this._Accounts.fromAddress(who.toString()));
+        const nays = votes.nays.map((who) => this._Accounts.fromAddress(who.toString()));
+        this._updateVotes(ayes, nays);
       });
   }
 
