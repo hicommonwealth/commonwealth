@@ -141,6 +141,9 @@ export class SubstrateCollectiveProposal
         const votes = v.unwrap();
         const ayes = votes.ayes;
         const nays = votes.nays;
+
+        // always clear before, in case a vote was removed due to a collective member change
+        this.clearVotes();
         // eslint-disable-next-line no-restricted-syntax
         for (const [ voter, balance ] of _.zip(ayes, ayeBalances)) {
           const acct = this._Accounts.fromAddress(voter.toString());
