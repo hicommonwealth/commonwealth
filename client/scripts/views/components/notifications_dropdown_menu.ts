@@ -20,7 +20,8 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
     const notifications = app.login.notifications
       ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-    const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');
+    const sortedNotificationsObj = sortNotifications(notifications, 'subscription', 'objectId');
+    const sortedNotifications = Object.values(sortedNotificationsObj);
 
     return m(PopoverMenu, {
       transitionDuration: 0,
@@ -37,9 +38,11 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
       content: m('.notification-list', [
         notifications.length > 0
           ? m(Infinite, {
-            maxPages: 8,
-            pageData: () => notifications,
-            item: (data, opts, index) => m(HeaderNotificationRow, { notification: data }),
+            maxPages: 1, // prevents rollover/repeat
+            pageData: () => sortedNotifications,
+            item: (data, opts, index) => {
+              return m('li', `hello + ${index}`);
+            },
           })
           : m('li.no-notifications', 'No Notifications'),
       ]),
