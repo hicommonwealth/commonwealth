@@ -84,6 +84,11 @@ const PseudoHeader : m.Component<{}, {}> = {
               iconLeft: Icons.SETTINGS,
               label: 'Settings'
             }),
+            m(MenuItem, {
+              onclick: () => m.route.set('/notifications'),
+              iconLeft: Icons.BELL,
+              label: 'Manage Notifications'
+            }),
           app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
               onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
               iconLeft: Icons.USER,
