@@ -6,7 +6,7 @@ import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import Subscriber from './subscriber';
 import Poller from './poller';
 import Processor from './processor';
-import { SubstrateBlock } from './types';
+import { SubstrateBlock, ISubstrateEventData } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import fetchFromStorage from './storageFetcher';
 
@@ -74,7 +74,7 @@ export default async function (
   const api = await createApi(provider, chain.startsWith('edgeware')).isReady;
 
   // helper function that sends an event through event handlers
-  const handleEventFn = async (event: CWEvent) => {
+  const handleEventFn = async (event: CWEvent<ISubstrateEventData>) => {
     let prevResult = null;
     /* eslint-disable-next-line no-restricted-syntax */
     for (const handler of handlers) {
@@ -94,7 +94,7 @@ export default async function (
   const processor = new Processor(api);
   const processBlockFn = async (block: SubstrateBlock) => {
     // retrieve events from block
-    const events: CWEvent[] = await processor.process(block);
+    const events: CWEvent<ISubstrateEventData>[] = await processor.process(block);
 
     // send all events through event-handlers in sequence
     await Promise.all(events.map((event) => handleEventFn(event)));

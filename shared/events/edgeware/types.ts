@@ -1,5 +1,12 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 
+export const EdgewareEventChains = [
+  'edgeware',
+  'edgeware-local',
+  'kusama',
+  'kusama-local',
+];
+
 /**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).

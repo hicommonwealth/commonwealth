@@ -4,7 +4,12 @@ import EventNotificationHandler from '../eventHandlers/notifications';
 import EdgewareMigrationHandler from '../eventHandlers/edgeware/migration';
 import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
+import MolochMigrationHandler from '../eventHandlers/moloch/migration';
+import MolochEntityArchivalHandler from '../eventHandlers/moloch/entityArchival';
+import subscribeMolochEvents from '../../shared/events/moloch/index';
+import { IDisconnectedRange, IEventHandler, EventSupportingChains } from '../../shared/events/interfaces';
+import { EdgewareEventChains } from '../../shared/events/edgeware/types';
+import { MolochEventChains } from '../../shared/events/moloch/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -38,28 +43,45 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
   await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
+      let migrationHandler;
+      let entityArchivalHandler;
+      let subscribeFn;
+      if (EdgewareEventChains.includes(node.chain)) {
+        migrationHandler = new EdgewareMigrationHandler(models, node.chain);
+        entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
+        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
+        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+        const url = protocol + node.url;
+        subscribeFn = (evtHandlers) => subscribeEdgewareEvents(
+          node.chain,
+          url,
+          evtHandlers,
+          skipCatchup,
+          () => discoverReconnectRange(models, node.chain),
+          migrate,
+        );
+      } else if (MolochEventChains.includes(node.chain)) {
+        migrationHandler = new MolochMigrationHandler(models, node.chain);
+        entityArchivalHandler = new MolochEntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+        subscribeFn = (evtHandlers) => subscribeMolochEvents(
+          node.chain,
+          'TODO',
+          evtHandlers,
+          skipCatchup,
+          () => discoverReconnectRange(models, node.chain),
+          migrate,
+        );
+      }
+      const storageHandler = new EventStorageHandler(models, node.chain);
+      const notificationHandler = new EventNotificationHandler(models, wss);
       if (migrate) {
-        const migrationHandler = new EdgewareMigrationHandler(models, node.chain);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain);
         handlers.push(migrationHandler, entityArchivalHandler);
       } else {
-        const storageHandler = new EventStorageHandler(models, node.chain);
-        const notificationHandler = new EventNotificationHandler(models, wss);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
-      const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
-      const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
-      const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-      const url = protocol + node.url;
-      const subscriber = await subscribeEdgewareEvents(
-        node.chain,
-        url,
-        handlers,
-        skipCatchup,
-        () => discoverReconnectRange(models, node.chain),
-        migrate,
-      );
+
+      const subscriber = await subscribeFn(handlers);
 
       // hook for clean exit
       process.on('SIGTERM', () => {

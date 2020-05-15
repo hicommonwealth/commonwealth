@@ -2,20 +2,21 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind } from './edgeware/types';
+import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind, EdgewareEventChains } from './edgeware/types';
+import { MolochEntityKind, IMolochEventData, MolochEventKind, MolochEventChains } from './moloch/types';
 
 // add other events here as union types
-export type IChainEntityKind = SubstrateEntityKind;
-export type IChainEventData = ISubstrateEventData;
-export type IChainEventKind = SubstrateEventKind;
-export const EventSupportingChains = ['edgeware', 'edgeware-local', 'kusama', 'kusama-local'];
+export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
+export type IChainEventData = ISubstrateEventData | IMolochEventData;
+export type IChainEventKind = SubstrateEventKind | MolochEventKind;
+export const EventSupportingChains = [...EdgewareEventChains, ...MolochEventChains];
 
-export interface CWEvent {
+export interface CWEvent<IEventData = IChainEventData> {
   blockNumber: number;
   includeAddresses?: string[];
   excludeAddresses?: string[];
 
-  data: IChainEventData;
+  data: IEventData;
 }
 
 // handles individual events by sending them off to storage/notifying

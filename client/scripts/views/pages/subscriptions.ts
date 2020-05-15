@@ -6,8 +6,10 @@ import $ from 'jquery';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'events/edgeware/types';
+import { SubstrateEventKinds, EdgewareEventChains } from 'events/edgeware/types';
+import { MolochEventKinds, MolochEventChains } from 'events/moloch/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
+import MolochTitlerFunc from 'events/moloch/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
@@ -364,9 +366,12 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   view: (vnode) => {
     let titler;
     // TODO: swap this to use EventSupportingChains somehow
-    if (vnode.state.chain.startsWith('edgeware') || vnode.state.chain.startsWith('kusama')) {
+    if (EdgewareEventChains.includes(vnode.state.chain)) {
       titler = EdgewareTitlerFunc;
       vnode.state.eventKinds = SubstrateEventKinds;
+    } else if (MolochEventChains.includes(vnode.state.chain)) {
+      titler = MolochTitlerFunc;
+      vnode.state.eventKinds = MolochEventKinds;
     } else {
       titler = null;
       vnode.state.eventKinds = [];

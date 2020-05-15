@@ -3,7 +3,8 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
-import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { SubstrateEventKinds, EdgewareEventChains } from '../../shared/events/edgeware/types';
+import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
 import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -373,15 +374,29 @@ const resetServer = (models, closeMiddleware) => {
 
     // initialize chain event types
     const initChainEventTypes = (chain) => {
-      return Promise.all(
-        SubstrateEventKinds.map((event_name) => {
-          return models.ChainEventType.create({
-            id: `${chain}-${event_name}`,
-            chain,
-            event_name,
-          });
-        })
-      );
+      if (EdgewareEventChains.includes(chain)) {
+        return Promise.all(
+          SubstrateEventKinds.map((event_name) => {
+            return models.ChainEventType.create({
+              id: `${chain}-${event_name}`,
+              chain,
+              event_name,
+            });
+          })
+        );
+      } else if (MolochEventChains.includes(chain)) {
+        return Promise.all(
+          MolochEventKinds.map((event_name) => {
+            return models.ChainEventType.create({
+              id: `${chain}-${event_name}`,
+              chain,
+              event_name,
+            });
+          })
+        );
+      } else {
+        log.error(`Unknown event chain at reset: ${chain}.`);
+      }
     };
 
     await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));

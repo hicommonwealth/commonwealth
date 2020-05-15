@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 
-import { SubstrateBalanceString, SubstrateEventKind } from '../types';
-import { IEventLabel, IChainEventData, LabelerFilter } from '../../interfaces';
+import { SubstrateBalanceString, SubstrateEventKind, ISubstrateEventData } from '../types';
+import { IEventLabel, LabelerFilter } from '../../interfaces';
 import { SubstrateCoin } from '../../../adapters/chain/substrate/types';
 
 function fmtAddr(addr : string) {
@@ -46,7 +46,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
 const labelEdgewareEvent: LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  data: IChainEventData,
+  data: ISubstrateEventData,
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {

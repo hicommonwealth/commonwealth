@@ -3,7 +3,7 @@
  */
 import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
-import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
+import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../shared/events/edgeware/types';
 import { NotificationCategories, WebsocketMessageType, IWebsocketsPayload } from '../../../shared/types';
 
 import { factory, formatFilename } from '../../../shared/logging';
@@ -43,7 +43,7 @@ export default class extends IEventHandler {
    *
    * `dbEvent` is the database entry corresponding to the `event`.
    */
-  public async handle(event: CWEvent, dbEvent) {
+  public async handle(event: CWEvent<ISubstrateEventData>, dbEvent) {
     if (!dbEvent) {
       log.error('no db event found!');
       return;

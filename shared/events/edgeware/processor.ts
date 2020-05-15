@@ -6,7 +6,7 @@ import { GenericEvent } from '@polkadot/types';
 import { Extrinsic, Event } from '@polkadot/types/interfaces';
 
 import { IBlockProcessor, CWEvent } from '../interfaces';
-import { SubstrateBlock, isEvent } from './types';
+import { SubstrateBlock, isEvent, ISubstrateEventData } from './types';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
@@ -24,7 +24,7 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
    * @param block the block received for processing
    * @returns an array of processed events
    */
-  public async process(block: SubstrateBlock): Promise<CWEvent[]> {
+  public async process(block: SubstrateBlock): Promise<CWEvent<ISubstrateEventData>[]> {
     // cache block number if needed for disconnection purposes
     const blockNumber = +block.header.number;
     if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {

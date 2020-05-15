@@ -23,7 +23,7 @@ export default async function (
   blockNumber: number,
   kind: SubstrateEventKind,
   rawData: Event | Extrinsic,
-): Promise<CWEvent> {
+): Promise<CWEvent<ISubstrateEventData>> {
   const extractEventData = async (event: Event): Promise<{
     data: ISubstrateEventData,
     includeAddresses?: string[],
