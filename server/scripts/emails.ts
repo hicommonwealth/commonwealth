@@ -9,7 +9,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const sendImmediateNotificationEmail = async (subscription, emailObject) => {
   const user = await subscription.getUser();
-  emailObject.to = (process.env.NODE_ENV === 'development') ? 'zak@commonwealth.im' : user.email; // user.email
+  emailObject.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
 
   try {
     await sgMail.send(emailObject);
