@@ -389,9 +389,9 @@ interface IEventSubscriptionState {
   isSubscribedAll: boolean;
 }
 
-const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
+const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionState> = {
   oninit: (vnode) => {
-    vnode.state.chain = EventSupportingChains.sort()[0];
+    vnode.state.chain = vnode.attrs.chain.id;
     vnode.state.eventKinds = SubstrateEventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
@@ -419,16 +419,16 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       : [];
     return m('.EventSubscriptions', [
       m('h1', 'On-Chain Events'),
-      supportedChains.length > 0 && m(Select, {
-        name: 'chain',
-        options: supportedChains.map((c) => c.name),
-        onchange: (e) => {
-          const { value } = e.target as any;
-          vnode.state.chain = value;
-          m.redraw(); // TODO TEST THIS SELECT COMPONENT REFRESH PROPERLY
-          // setTimeout(() => { m.redraw(); }, 0);
-        }
-      }),
+      // supportedChains.length > 0 && m(Select, {
+      //   name: 'chain',
+      //   options: supportedChains.map((c) => c.name),
+      //   onchange: (e) => {
+      //     const { value } = e.target as any;
+      //     vnode.state.chain = value;
+      //     m.redraw(); // TODO TEST THIS SELECT COMPONENT REFRESH PROPERLY
+      //     // setTimeout(() => { m.redraw(); }, 0);
+      //   }
+      // }),
       m('h2', 'Subscribe to New Events:'),
       m('.EventSubscriptionRow', [
         m('h3', 'Subscribe All'),
@@ -481,6 +481,7 @@ const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> =
     return m('ChainNotificationManagementPage', [
       m('h2', chain.name),
       m(ChainOrCommunitySubscriptionButton, { chain, }),
+      m(EventSubscriptions, { chain }),
     ]);
   },
 };
