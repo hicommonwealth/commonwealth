@@ -1,21 +1,15 @@
 import 'components/community_switcher.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
-import { Icon, Icons, Popover, PopoverMenu, MenuItem, Button, Tooltip } from 'construct-ui';
+import { Icons, Popover, Button, Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { initAppState } from 'app';
-import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
-import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
-import { notifySuccess } from 'controllers/app/notifications';
 import ChainIcon from 'views/components/chain_icon';
-import FeedbackModal from 'views/modals/feedback_modal';
 import CommunityMenu from 'views/components/community_menu';
+import { setActiveAccount } from 'controllers/app/login';
 
 const avatarSize = 16;
 
@@ -45,6 +39,10 @@ const CommunitySwitcherChain: m.Component<{ chain: string, nodeList: NodeInfo[],
           if (address) {
             localStorage.setItem('initAddress', address.address);
             localStorage.setItem('initChain', address.chain);
+            if (app.vm.activeAccount.address !== address.address) {
+              const account = app.login.activeAddresses.find((addr) => addr.address === address.address);
+              setActiveAccount(account);
+            }
           }
           m.route.set(`/${chain}/`);
         }
@@ -85,6 +83,10 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
           if (address) {
             localStorage.setItem('initAddress', address.address);
             localStorage.setItem('initChain', address.chain);
+            if (app.vm.activeAccount.address !== address.address) {
+              const account = app.login.activeAddresses.find((addr) => addr.address === address.address);
+              setActiveAccount(account);
+            }
           }
           m.route.set(`/${community.id}/`);
         }
@@ -101,8 +103,6 @@ const CommunitySwitcherCommunity: m.Component<{ community: CommunityInfo, addres
 
 const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
   view: (vnode) => {
-    if (!app.isLoggedIn()) return;
-
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
       if (chains[n.chain.id]) {
@@ -114,22 +114,31 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
 
     const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
     const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
+    const HomeButton = m('.home-button-wrap', [
+      m(Button, {
+        onclick: (e) => {
+          if (m.route.get() !== '/') m.route.set('/');
+        },
+        class: '.sidebar-logo',
+        iconLeft: Icons.HOME,
+        size: 'xl'
+      })
+    ]);
 
     return m('.CommunitySwitcher', [
-      m(Popover, {
-        portalAttrs: { class: 'community-menu-portal' },
-        class: 'community-menu-popover',
-        isOpen: vnode.state.communityMenuVisible,
-        hasBackdrop: true,
-        content: m(CommunityMenu),
-        onClose: () => {
-          vnode.state.communityMenuVisible = false;
-        },
-        hasArrow: false,
-        closeOnEscapeKey: true,
-        closeOnContentClick: true,
-        trigger: m('.sidebar-logo', '🤔'),
-      }),
+      app.isLoggedIn()
+        ? m(Popover, {
+          portalAttrs: { class: 'community-menu-portal' },
+          class: 'community-menu-popover',
+          hasBackdrop: true,
+          content: m(CommunityMenu),
+          hasArrow: false,
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          trigger: HomeButton
+        })
+        : HomeButton,
       m('.sidebar-content', [
         chainRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);
@@ -140,6 +149,21 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
           const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
           return m(CommunitySwitcherCommunity, { community, address });
         }),
+        app.isLoggedIn() && m(Popover, {
+          portalAttrs: { class: 'community-menu-portal' },
+          class: 'community-menu-popover',
+          hasBackdrop: true,
+          content: m(CommunityMenu),
+          hasArrow: false,
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          closeOnOutsideClick: true,
+          trigger: m('a.CommunitySwitcherCommunity', [
+            m('.icon-inner', [
+              m('.name', '...')
+            ]),
+          ])
+        })
       ]),
     ]);
   }

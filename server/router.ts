@@ -136,7 +136,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
   router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
   router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));
-  router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
+  router.get('/bulkTags', bulkTags.bind(this, models));
 
   // offchain reactions
   router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));

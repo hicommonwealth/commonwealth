@@ -6,10 +6,10 @@ import OffchainTag from './OffchainTag';
 class ChainInfo {
   public readonly id: string;
   public readonly symbol: string;
-  public readonly name: string;
+  public name: string;
   public readonly network: ChainNetwork;
   public readonly iconUrl: string;
-  public readonly description: string;
+  public description: string;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
@@ -37,6 +37,18 @@ class ChainInfo {
       json.tags,
       json.ChainObjectVersion
     );
+  }
+
+  public async updateChainData(name: string, description: string,) {
+    const r = await $.post(`${app.serverUrl()}/updateChain`, {
+      'id': app.activeChainId(),
+      'name': name,
+      'description': description,
+      'jwt': app.login.jwt,
+    });
+    const updatedChain: ChainInfo = r.result;
+    this.name = updatedChain.name;
+    this.description = updatedChain.description;
   }
 
   public async updateFeaturedTags(tags: string[]) {

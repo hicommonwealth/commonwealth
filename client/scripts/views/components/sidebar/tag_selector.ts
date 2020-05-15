@@ -178,7 +178,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
     });
   });
 
-  const threadlessTags = app.tags.store.getAll().map((tag) => {
+  const threadlessTags = app.tags.getByCommunity(app.activeId()).forEach((tag) => {
     if (featuredTagIds.includes(`${tag.id}`)) {
       if (!featuredTags[`${tag.name}`]) {
         featuredTags[tag.name] = {
@@ -239,6 +239,7 @@ const NewTagButton: m.Component = {
       iconLeft: Icons.PLUS,
       onclick: async (e) => {
         e.preventDefault();
+        if (!isCommunityAdmin()) return;
         const tag = await inputModalWithText('New Tag:')();
         if (!tag) return;
         app.tags.add(tag).then(() => { m.redraw(); });
@@ -290,7 +291,7 @@ const TagSelector: m.Component<{
       }, featuredTagListing),
       showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
-      showFullListing && m(NewTagButton),
+      showFullListing && isCommunityAdmin() && m(NewTagButton),
       !showFullListing
         && (app.community || app.chain)
         && m(List, [
