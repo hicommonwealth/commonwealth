@@ -127,7 +127,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     }
     return m('.SubscriptionRow', [
       m('h4', `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
-      activeSubscription
+      activeSubscription && app.login.email
       && m(ImmediateEmailButton, { subscription: activeSubscription }),
       activeSubscription
         && m(Button, {
