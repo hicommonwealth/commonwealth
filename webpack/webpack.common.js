@@ -60,7 +60,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules'],
+    modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules', '../contracts'],
   },
   module: {
     rules: [
@@ -68,7 +68,8 @@ module.exports = {
         test: /\.tsx?$/,
         include: [
           path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared')
+          path.resolve(__dirname, '../shared'),
+          path.resolve(__dirname, '../contracts'),
         ],
         use: {
           loader: 'ts-loader'

@@ -4,13 +4,13 @@
 import { ApiPromise } from '@polkadot/api';
 import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';
 
-import { IBlockSubscriber } from '../interfaces';
+import { IEventSubscriber } from '../interfaces';
 import { SubstrateBlock } from './types';
 
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
+export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
   private _subscription;
   private _versionName: string;
   private _versionNumber: number;

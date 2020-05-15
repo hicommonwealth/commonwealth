@@ -5,7 +5,7 @@ import { ApiPromise } from '@polkadot/api';
 import { GenericEvent } from '@polkadot/types';
 import { Extrinsic, Event } from '@polkadot/types/interfaces';
 
-import { IBlockProcessor, CWEvent } from '../interfaces';
+import { IEventProcessor, CWEvent } from '../interfaces';
 import { SubstrateBlock, isEvent, ISubstrateEventData } from './types';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
@@ -13,7 +13,7 @@ import enrichEvent from './filters/enricher';
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
+export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
   private _lastBlockNumber: number;
   public get lastBlockNumber() { return this._lastBlockNumber; }
 

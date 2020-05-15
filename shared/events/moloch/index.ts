@@ -1,20 +1,35 @@
+import ethers from 'ethers';
+
 import Subscriber from './subscriber';
 import Poller from './poller';
 import Processor from './processor';
-import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
+import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import migrate from './migration';
 
 import { factory, formatFilename } from '../../../server/util/logging';
-import { IMolochEventData } from './types';
+import { IMolochEventData, MolochRawEvent } from './types';
+
+import { Moloch1 } from '../../../contracts/MolochV1/Moloch1';
+import { Moloch1Factory } from '../../../contracts/MolochV1/Moloch1Factory';
+import { Moloch2 } from '../../../contracts/MolochV2/Moloch2';
+import { Moloch2Factory } from '../../../contracts/MolochV2/Moloch2Factory';
+
 const log = factory.getLogger(formatFilename(__filename));
+
+export type MolochApi = Moloch1 | Moloch2;
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(): any {
-  // TODO
+export function createApi(ethNetwork = 'ropsten', contractVersion: 1 | 2, contractAddress: string): MolochApi {
+  const provider = ethers.getDefaultProvider(ethNetwork);
+  if (contractVersion === 1) {
+    return Moloch1Factory.connect(contractAddress, provider);
+  } else {
+    return Moloch2Factory.connect(contractAddress, provider);
+  }
 }
 
 /**
@@ -29,17 +44,19 @@ export function createApi(): any {
  * @returns An active block subscriber.
  */
 export default async function (
-  chain: string,
-  url = 'ws://localhost:9944',
-  handlers: IEventHandler[],
-  skipCatchup: boolean,
+  chain: string, // contract name
+  ethNetwork: string,
+  contractVersion: 1 | 2,
+  contractAddress: string,
+  handlers: IEventHandler<IMolochEventData>[],
+  skipCatchup: boolean = true,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
   performMigration?: boolean,
-): Promise<IBlockSubscriber<any, any>> {
-  const api = await createApi();
+): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
+  const api = createApi(ethNetwork, contractVersion, contractAddress);
 
   // helper function that sends an event through event handlers
-  const handleEventFn = async (event: any) => {
+  const handleEventFn = async (event: CWEvent<IMolochEventData>) => {
     let prevResult = null;
     /* eslint-disable-next-line no-restricted-syntax */
     for (const handler of handlers) {
@@ -57,32 +74,32 @@ export default async function (
   // helper function that sends a block through the event processor and
   // into the event handlers
   const processor = new Processor(api);
-  const processBlockFn = async (block: any) => {
+  const processEventFn = async (event: MolochRawEvent) => {
     // retrieve events from block
-    const events: CWEvent<IMolochEventData>[] = await processor.process(block);
+    const cwEvents: CWEvent<IMolochEventData>[] = await processor.process(event);
 
     // send all events through event-handlers in sequence
-    await Promise.all(events.map((event) => handleEventFn(event)));
+    await Promise.all(cwEvents.map((e) => handleEventFn(e)));
   };
 
   // special case to perform a migration on first run
   // returns early, does not initialize the subscription
   if (performMigration) {
     // TODO
-    log.info(`Starting event migration for Moloch contract at ${url}.`);
+    log.info(`Starting event migration for Moloch: ${chain}.`);
     const events = await migrate(api);
     await Promise.all(events.map((event) => handleEventFn(event)));
     return;
   }
 
-  const subscriber = new Subscriber(api);
+  const subscriber = new Subscriber(api, chain);
   const poller = new Poller(api);
 
   // helper function that runs after we've been offline/the server's been down,
   // and attempts to fetch events from skipped blocks
   const pollMissedBlocksFn = async () => {
     log.info('Detected offline time, polling missed blocks...');
-    // TODO
+    throw new Error('Moloch polling not supported.');
   };
 
   if (!skipCatchup) {
@@ -92,8 +109,8 @@ export default async function (
   }
 
   try {
-    log.info(`Subscribing to Substrate endpoint at ${url}...`);
-    subscriber.subscribe(processBlockFn);
+    log.info(`Subscribing to Moloch contract ${chain} on ${ethNetwork}...`);
+    subscriber.subscribe(processEventFn);
   } catch (e) {
     log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
   }

@@ -4,13 +4,13 @@
 import { ApiPromise } from '@polkadot/api';
 import { Hash } from '@polkadot/types/interfaces';
 
-import { IBlockPoller, IDisconnectedRange } from '../interfaces';
+import { IEventPoller, IDisconnectedRange } from '../interfaces';
 import { SubstrateBlock } from './types';
 
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {
+export default class extends IEventPoller<ApiPromise, SubstrateBlock> {
   /**
    * Connects to chain, fetches specified blocks and passes them
    * along for processing.

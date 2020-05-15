@@ -20,30 +20,30 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler {
+export abstract class IEventHandler<DBEventType = any> {
   // throws on error, returns a db event, or void
-  public abstract handle(event: CWEvent, dbEvent?: any): Promise<any>;
+  public abstract handle(event: CWEvent, dbEvent?: DBEventType): Promise<DBEventType>;
 }
 
 // parses events out of blocks into a standard format and
 // passes them through to the handler
-export abstract class IBlockProcessor<Api, Block> {
+export abstract class IEventProcessor<Api, RawEvent> {
   constructor(
     protected _api: Api,
   ) { }
 
   // throws on error
-  public abstract async process(block: Block): Promise<CWEvent[]>;
+  public abstract async process(block: RawEvent): Promise<CWEvent[]>;
 }
 
 // fetches blocks from chain in real-time via subscription for processing
-export abstract class IBlockSubscriber<Api, Block> {
+export abstract class IEventSubscriber<Api, RawEvent> {
   constructor(
     protected _api: Api,
   ) { }
 
   // throws on error
-  public abstract subscribe(cb: (block: Block) => any): void;
+  public abstract subscribe(cb: (event: RawEvent) => any): void;
 
   public abstract unsubscribe(): void;
 }
@@ -54,13 +54,13 @@ export interface IDisconnectedRange {
 }
 
 // fetches historical blocks from chain for processing
-export abstract class IBlockPoller<Api, Block> {
+export abstract class IEventPoller<Api, RawEvent> {
   constructor(
     protected _api: Api,
   ) { }
 
   // throws on error
-  public abstract async poll(range: IDisconnectedRange): Promise<Block[]>;
+  public abstract async poll(range: IDisconnectedRange): Promise<RawEvent[]>;
 }
 
 // a set of labels used to display notifications

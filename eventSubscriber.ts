@@ -1,13 +1,13 @@
-import subscribeEdgewareEvents from './shared/events/edgeware/index';
+import subscribeMolochEvents from './shared/events/moloch/index';
 import { IEventHandler, CWEvent } from './shared/events/interfaces';
 
-const url = process.env.NODE_URL || undefined;
-
-const chain = process.env.NODE_CHAIN || 'edgeware';
+const chain = process.env.NODE_CHAIN || 'moloch-local';
+const network = process.env.ETH_NETWORK || 'ropsten';
+const contractAddress = '';
 
 const DEV = process.env.NODE_ENV !== 'production';
-class StandaloneSubstrateEventHandler extends IEventHandler {
-  public async handle(event: CWEvent) {
+class StandaloneMolochEventHandler extends IEventHandler {
+  public async handle(event: CWEvent): Promise<any> {
     // just prints the event
     if (DEV) console.log(`Received event: ${JSON.stringify(event, null, 2)}`);
   }
@@ -15,4 +15,4 @@ class StandaloneSubstrateEventHandler extends IEventHandler {
 
 const skipCatchup = false;
 
-subscribeEdgewareEvents(chain, url, [ new StandaloneSubstrateEventHandler() ], skipCatchup);
+subscribeMolochEvents(chain, network, 1, contractAddress, [ new StandaloneMolochEventHandler() ]);

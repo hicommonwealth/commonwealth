@@ -1,18 +1,18 @@
 import { Web3Provider, AsyncSendable, JsonRpcSigner } from 'ethers/providers';
 import { ethers } from 'ethers';
 
-import { ERC20 } from 'controllers/chain/ethereum/contracts/ERC20';
-import { ERC20Factory } from 'controllers/chain/ethereum/contracts/ERC20Factory';
+import { ERC20 } from 'ERC20';
+import { ERC20Factory } from 'ERC20Factory';
 
-import { Moloch1 } from 'controllers/chain/ethereum/contracts/molochv1/Moloch1';
-import { Moloch1Factory } from 'controllers/chain/ethereum/contracts/molochv1/Moloch1Factory';
-import { GuildBank1 } from 'controllers/chain/ethereum/contracts/molochv1/GuildBank1';
-import { GuildBank1Factory } from 'controllers/chain/ethereum/contracts/molochv1/GuildBank1Factory';
+import { Moloch1 } from 'MolochV1/Moloch1';
+import { Moloch1Factory } from 'MolochV1/Moloch1Factory';
+import { GuildBank1 } from 'MolochV1/GuildBank1';
+import { GuildBank1Factory } from 'MolochV1/GuildBank1Factory';
 
-import { Moloch2 } from 'controllers/chain/ethereum/contracts/molochv2/Moloch2';
-import { Moloch2Factory } from 'controllers/chain/ethereum/contracts/molochv2/Moloch2Factory';
-import { GuildBank2 } from 'controllers/chain/ethereum/contracts/molochv2/GuildBank2';
-import { GuildBank2Factory } from 'controllers/chain/ethereum/contracts/molochv2/GuildBank2Factory';
+import { Moloch2 } from 'MolochV2/Moloch2';
+import { Moloch2Factory } from 'MolochV2/Moloch2Factory';
+import { GuildBank2 } from 'MolochV2/GuildBank2';
+import { GuildBank2Factory } from 'MolochV2/GuildBank2Factory';
 
 export default class MolochAPI {
   public readonly gasLimit: number = 3000000;
@@ -39,7 +39,7 @@ export default class MolochAPI {
     this._Contract = Moloch1Factory.connect(contractAddress, this._Signer);
   }
 
-  public updateSigner (userAddress: string) {
+  public updateSigner(userAddress: string) {
     this._Signer = this._Provider.getSigner(userAddress);
     this._Contract = Moloch1Factory.connect(this._contractAddress, this._Signer);
   }

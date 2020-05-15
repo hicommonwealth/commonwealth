@@ -1,8 +1,9 @@
 import { CWEvent } from '../interfaces';
 import { IMolochEventData } from './types';
+import { MolochApi } from '.';
 
 export default async function (
-  api: any
+  api: MolochApi
 ): Promise<CWEvent<IMolochEventData>[]> {
-  return null;
+  throw new Error('Moloch migration not implemented.');
 }
