@@ -436,6 +436,33 @@ export type ISubstrateSignalingProposalEvents =
   ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
   | ISubstrateSignalingVotingStarted | ISubstrateSignalingVotingCompleted;
 
+
+export function entityToFieldName(entity: SubstrateEntityKind): string | null {
+  switch (entity) {
+    case SubstrateEntityKind.DemocracyProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.DemocracyReferendum: {
+      return 'referendumIndex';
+    }
+    case SubstrateEntityKind.DemocracyPreimage: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.TreasuryProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.CollectiveProposal: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.SignalingProposal: {
+      return 'proposalHash';
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
 export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
   switch (event) {
     case SubstrateEventKind.DemocracyProposed:

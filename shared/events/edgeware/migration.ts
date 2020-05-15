@@ -27,7 +27,7 @@ import {
   ISubstrateSignalingVotingCompleted,
 } from './types';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 async function fetchDemocracyProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {

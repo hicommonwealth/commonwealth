@@ -1,14 +1,19 @@
 import { IChainEntityKind } from 'events/interfaces';
 
-import IdStore from './IdStore';
 import { ChainEntity } from '../models';
+import Store from './Store';
 
-class ChainEntityStore extends IdStore<ChainEntity> {
-  private _storeType: { [type: string]: { [id: number]: ChainEntity } } = { };
+class ChainEntityStore extends Store<ChainEntity> {
+  private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } = { };
+
+  public get(entity: ChainEntity) {
+    return this._store.find((e) => e.eq(entity));
+  }
 
   public add(entity: ChainEntity) {
     // override duplicates manually
-    if (this.getById(entity.id)) {
+    const existingEntity = this.get(entity);
+    if (existingEntity) {
       this.remove(entity);
     }
 
@@ -17,14 +22,14 @@ class ChainEntityStore extends IdStore<ChainEntity> {
     if (!this._storeType[entity.type]) {
       this._storeType[entity.type] = {};
     }
-    this._storeType[entity.type][entity.id] = entity;
+    this._storeType[entity.type][entity.stringId] = entity;
     return this;
   }
 
   public remove(entity: ChainEntity) {
     super.remove(entity);
-    if (this._storeType[entity.type] && this._storeType[entity.type][entity.id]) {
-      delete this._storeType[entity.type][entity.id];
+    if (this._storeType[entity.type] && this._storeType[entity.type][entity.stringId]) {
+      delete this._storeType[entity.type][entity.stringId];
     }
     return this;
   }

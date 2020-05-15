@@ -6,7 +6,7 @@ import * as net from 'net';
 import { WebsocketEventType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
 import { JWT_SECRET } from '../config';
 
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const ALIVE_TIMEOUT = 30 * 1000; // heartbeats are 15 seconds

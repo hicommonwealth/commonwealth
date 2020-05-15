@@ -1,4 +1,3 @@
-import SubstrateChain, { handleSubstrateEntityUpdate } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
@@ -10,6 +9,12 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identity';
+import SubstrateChain, {
+  handleSubstrateEntityUpdate,
+  initApiPromise,
+  initChainEntities,
+  initChainEntitySubscription
+} from './shared';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -51,6 +56,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
@@ -61,6 +67,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
     ]);
     await this._postModuleLoad();
+    const apiPromise = await initApiPromise(this.meta.chain.id, this.meta.url);
+    await initChainEntities(this.app, apiPromise, this.meta.chain.id);
+    await initChainEntitySubscription(this.app, apiPromise, this.meta.chain.id);
     await this.chain.initEventLoop();
 
     this._loaded = true;

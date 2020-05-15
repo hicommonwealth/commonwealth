@@ -6,7 +6,7 @@ import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchi
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
 import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
 
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
@@ -32,6 +32,11 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
 };
 
 const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
+  // XXX: remove this once no longer testing client-side entity fetching
+  log.error('skipping chain event listening');
+  return;
+
+  /* eslint-disable no-unreachable */
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');

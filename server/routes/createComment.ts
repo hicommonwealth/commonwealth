@@ -6,7 +6,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const createComment = async (models, req: Request, res: Response, next: NextFunction) => {

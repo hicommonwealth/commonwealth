@@ -10,7 +10,7 @@ import { SubstrateBlock } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import migrate from './migration';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 /**

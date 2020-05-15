@@ -5,7 +5,7 @@ import { switchMap, catchError, map, shareReplay, first, filter } from 'rxjs/ope
 import { of, combineLatest, Observable, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 
-import { ApiRx, WsProvider, SubmittableResult, Keyring } from '@polkadot/api';
+import { ApiRx, WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
   Moment,
@@ -42,13 +42,24 @@ import {
   ChainClass,
   ChainEntity,
   ChainEvent,
+  ChainEventType,
 } from 'models';
+
+import { CWEvent } from 'events/interfaces';
+import loadSubstrateEvents from 'events/edgeware/migration';
+import EdgewareEventSubscriber from 'events/edgeware/subscriber';
+import EdgewareEventProcessor from 'events/edgeware/processor';
+import { createApi as createApiPromise } from 'events/edgeware/index';
+import {
+  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
+  eventToEntity, entityToFieldName
+} from 'events/edgeware/types';
+
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
-import { SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents } from 'events/edgeware/types';
 import { SubstrateAccount } from './account';
 
 export type HandlerId = number;
@@ -74,6 +85,66 @@ function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
     window['wsProvider'] = options.provider;
     return new ApiRx(options);
   }
+}
+
+export async function initApiPromise(chain, url): Promise<ApiPromise> {
+  // TODO: figure out a way to link this provider/API combo up with the connection
+  //   event handling further down, regarding the "connected/disconnected" light,
+  //   error msgs, etc.
+  const provider = new WsProvider(url);
+  await new Promise((resolve) => {
+    provider.on('connected', () => resolve());
+  });
+  const apiPromise = await createApiPromise(provider, chain.startsWith('edgeware')).isReady;
+  return apiPromise;
+}
+
+// client event handler
+function handleCWEvent(app: IApp, chain: string, cwEvent: CWEvent): [ ChainEntity, ChainEvent ] | null {
+  // immediately return if no entity involved, event unrelated to proposals/etc
+  const entityKind = eventToEntity(cwEvent.data.kind);
+  if (!entityKind) return null;
+
+  // create event type
+  const eventType = new ChainEventType(
+    `${chain}-${cwEvent.data.kind.toString()}`,
+    chain,
+    cwEvent.data.kind.toString()
+  );
+
+  // create event
+  const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
+
+  // create entity
+  const fieldName = entityToFieldName(entityKind);
+  if (!fieldName) return null;
+  const fieldValue = event.data[fieldName];
+  const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
+  app.chainEntities.update(entity, event);
+  // eslint-disable-next-line no-use-before-define
+  handleSubstrateEntityUpdate(app.chain, entity, event);
+}
+
+export async function initChainEntities(app: IApp, api: ApiPromise, chain: string) {
+  const cwEvents = await loadSubstrateEvents(api);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const cwEvent of cwEvents) {
+    handleCWEvent(app, chain, cwEvent);
+  }
+}
+
+export async function initChainEntitySubscription(app: IApp, api: ApiPromise, chain: string) {
+  const subscriber = new EdgewareEventSubscriber(api);
+  const processor = new EdgewareEventProcessor(api);
+  // TODO: handle unsubscribing
+  console.log('Subscribing to chain events.');
+  subscriber.subscribe(async (block) => {
+    const cwEvents = await processor.process(block);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const cwEvent of cwEvents) {
+      const results = handleCWEvent(app, chain, cwEvent);
+    }
+  });
 }
 
 export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
