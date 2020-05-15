@@ -7,12 +7,12 @@ import HeaderNotificationRow from 'views/components/sidebar/notification_row';
 import { Notification } from 'models';
 
 const sortNotifications = (n: Notification[], prop: string, prop2: string) => {
-  return n.reduce((acc, obj) => {
+  return Object.values(n.reduce((acc, obj) => {
     const key = obj[prop][prop2];
     if (!acc[key]) acc[key] = [];
     acc[key].push(obj);
     return acc;
-  }, {});
+  }, {}));
 };
 
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
@@ -20,8 +20,7 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
     const notifications = app.login.notifications
       ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-    const sortedNotificationsObj = sortNotifications(notifications, 'subscription', 'objectId');
-    const sortedNotifications = Object.values(sortedNotificationsObj);
+    const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');
 
     return m(PopoverMenu, {
       transitionDuration: 0,
@@ -41,7 +40,11 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
             maxPages: 1, // prevents rollover/repeat
             pageData: () => sortedNotifications,
             item: (data, opts, index) => {
-              return m('li', `hello + ${index}`);
+              if (data.length > 1) {
+                return m('li', `BIG BOY ROW ${data.length}`);
+              } else {
+                return m(HeaderNotificationRow, { notification: data[0] });
+              }
             },
           })
           : m('li.no-notifications', 'No Notifications'),
