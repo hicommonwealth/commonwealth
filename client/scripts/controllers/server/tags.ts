@@ -72,7 +72,6 @@ class TagsController {
         'name': name,
         'jwt': app.login.jwt,
       });
-      debugger
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
