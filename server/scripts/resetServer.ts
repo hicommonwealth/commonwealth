@@ -5,7 +5,7 @@ import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
 import { EventSupportingChains } from '../../shared/events/interfaces';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [

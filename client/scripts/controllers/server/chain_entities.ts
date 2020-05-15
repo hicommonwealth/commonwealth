@@ -37,7 +37,7 @@ class ChainEntityController {
   }
 
   public update(entity: ChainEntity, event: ChainEvent) {
-    const existingEntity = this.store.getById(entity.id);
+    const existingEntity = this.store.get(entity);
     if (!existingEntity) {
       this._store.add(entity);
     } else {
@@ -46,7 +46,10 @@ class ChainEntityController {
     entity.addEvent(event);
   }
 
-  public refresh(chain) {
+  public refresh(chain: string, completed: boolean = false) {
+    // TODO: add a way on route to only get completed entities if set to true
+    //  for now, it duplicates the data from chain, but shouldn't affect the results.
+    if (completed) return Promise.resolve();
     return get('/bulkEntities', { chain }, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);

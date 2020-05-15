@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const createMembership = async (models, req: Request, res: Response, next: NextFunction) => {

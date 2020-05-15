@@ -7,7 +7,7 @@ import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';
 import { IBlockSubscriber } from '../interfaces';
 import { SubstrateBlock } from './types';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {

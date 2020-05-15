@@ -12,7 +12,12 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identity';
-import { handleSubstrateEntityUpdate } from '../substrate/shared';
+import {
+  handleSubstrateEntityUpdate,
+  initApiPromise,
+  initChainEntities,
+  initChainEntitySubscription
+} from '../substrate/shared';
 
 
 class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
@@ -84,6 +89,9 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.signaling.init(this.chain, this.accounts),
     ]);
     await this._postModuleLoad();
+    const apiPromise = await initApiPromise(this.meta.chain.id, this.meta.url);
+    await initChainEntities(this.app, apiPromise, this.meta.chain.id);
+    await initChainEntitySubscription(this.app, apiPromise, this.meta.chain.id);
     await this.chain.initEventLoop();
 
     this._loaded = true;

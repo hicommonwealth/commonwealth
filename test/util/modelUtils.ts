@@ -4,7 +4,7 @@ import 'chai/register-should';
 import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
 import { NotificationCategory } from 'models';
-import { factory, formatFilename } from '../../server/util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import app from '../../server-test';
 import models from '../../server/database';
 const ethUtil = require('ethereumjs-util');

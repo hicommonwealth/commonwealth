@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from './util/logging';
+import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sequelize = new Sequelize(DATABASE_URI, {

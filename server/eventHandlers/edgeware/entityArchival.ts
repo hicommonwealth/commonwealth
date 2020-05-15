@@ -6,7 +6,7 @@ import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../shared/events/edgeware/types';
 import { NotificationCategories, WebsocketMessageType, IWebsocketsPayload } from '../../../shared/types';
 
-import { factory, formatFilename } from '../../util/logging';
+import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {

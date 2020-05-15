@@ -10,9 +10,10 @@ import {
   ISubstrateTreasuryProposalEvents,
   ISubstrateCollectiveProposalEvents,
   ISubstrateSignalingProposalEvents,
+  entityToFieldName,
 } from '../../../shared/events/edgeware/types';
 
-import { factory, formatFilename } from '../../util/logging';
+import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -62,34 +63,9 @@ export default class extends IEventHandler {
 
     const entityKind = eventToEntity(event.data.kind);
     if (entityKind === null) return null;
-    switch (entityKind) {
-      case SubstrateEntityKind.DemocracyProposal: {
-        const proposalIndex = (event.data as ISubstrateDemocracyProposalEvents).proposalIndex;
-        return createOrUpdateModel('proposalIndex', proposalIndex);
-      }
-      case SubstrateEntityKind.DemocracyReferendum: {
-        const referendumIndex = (event.data as ISubstrateDemocracyReferendumEvents).referendumIndex;
-        return createOrUpdateModel('referendumIndex', referendumIndex);
-      }
-      case SubstrateEntityKind.DemocracyPreimage: {
-        const proposalHash = (event.data as ISubstrateDemocracyPreimageEvents).proposalHash;
-        return createOrUpdateModel('proposalHash', proposalHash);
-      }
-      case SubstrateEntityKind.TreasuryProposal: {
-        const proposalIndex = (event.data as ISubstrateTreasuryProposalEvents).proposalIndex;
-        return createOrUpdateModel('proposalIndex', proposalIndex);
-      }
-      case SubstrateEntityKind.CollectiveProposal: {
-        const proposalHash = (event.data as ISubstrateCollectiveProposalEvents).proposalHash;
-        return createOrUpdateModel('proposalHash', proposalHash);
-      }
-      case SubstrateEntityKind.SignalingProposal: {
-        const proposalHash = (event.data as ISubstrateSignalingProposalEvents).proposalHash;
-        return createOrUpdateModel('proposalHash', proposalHash);
-      }
-      default: {
-        return null;
-      }
-    }
+    const fieldName = entityToFieldName(entityKind);
+    if (!fieldName) return null;
+    const fieldValue = event.data[fieldName];
+    return createOrUpdateModel(fieldName, fieldValue);
   }
 }
