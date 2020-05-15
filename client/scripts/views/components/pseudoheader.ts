@@ -74,33 +74,11 @@ const PseudoHeader : m.Component<{}, {}> = {
           hoverCloseDelay: 0,
           position: 'bottom-end',
           trigger: m(Button, {
-            class: app.vm.activeAccount
-              ? 'login-selector'
-              : 'login-selector cui-button-icon',
+            class: 'login-selector cui-button-icon',
             intent: 'none',
-            label: app.vm.activeAccount
-              ? m('.login-selector-user', [
-                m(User, { user: app.vm.activeAccount, hideIdentityIcon: true }),
-                m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                  ? `@${app.vm.activeAccount.address}`
-                  : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-              ])
-              : m(Icon, { name: Icons.CHEVRON_DOWN }),
+            label: m(Icon, { name: Icons.CHEVRON_DOWN }),
           }),
           content: [
-            app.vm.activeAccount
-          && app.vm.activeAccount.chain
-          && m.route.get() !== accountURI
-          && [
-            m(MenuItem, {
-              label: 'Go to profile',
-              iconLeft: Icons.USER,
-              onclick: (e) => {
-                m.route.set(accountURI);
-              },
-            }),
-            m(MenuDivider),
-          ],
             m(MenuItem, {
               onclick: () => m.route.set('/settings'),
               iconLeft: Icons.SETTINGS,
