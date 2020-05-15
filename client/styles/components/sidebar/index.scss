@@ -11,9 +11,6 @@ $active-color: #e9e9f5;
     width: $sidebar-width - $switcher-width;
     z-index: 9;
     border-right: 1px solid #e8e8e8;
-    &.logged-out {
-        left: 0;
-    }
     .SidebarMenu {
         height: 100%;
     }
