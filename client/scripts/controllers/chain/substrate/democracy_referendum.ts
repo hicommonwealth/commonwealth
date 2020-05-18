@@ -136,7 +136,7 @@ export class SubstrateDemocracyReferendum
   }
   private _title: string;
   private _endBlock: number;
-  private readonly _proposalHash: string;
+  public readonly hash: string;
 
   private _passed: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public get passed() { return this._passed.value; }
@@ -166,7 +166,7 @@ export class SubstrateDemocracyReferendum
     this._Accounts = Accounts;
     this._Democracy = Democracy;
     this._endBlock = this.data.endBlock;
-    this._proposalHash = eventData.proposalHash;
+    this.hash = eventData.proposalHash;
 
     // see if preimage exists and populate data if it does
     const preimage = this._Democracy.app.chainEntities.getPreimage(eventData.proposalHash);
@@ -189,6 +189,9 @@ export class SubstrateDemocracyReferendum
   }
 
   public update(e: ChainEvent) {
+    if (this.completed) {
+      return;
+    }
     switch (e.data.kind) {
       case SubstrateEventKind.DemocracyStarted: {
         break;
@@ -206,11 +209,14 @@ export class SubstrateDemocracyReferendum
         break;
       }
       case SubstrateEventKind.DemocracyExecuted: {
+        if (!this.passed) {
+          this._passed.next(true);
+        }
         this.complete();
         break;
       }
       case SubstrateEventKind.PreimageNoted: {
-        const preimage = this._Democracy.app.chainEntities.getPreimage(this._proposalHash);
+        const preimage = this._Democracy.app.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
         }

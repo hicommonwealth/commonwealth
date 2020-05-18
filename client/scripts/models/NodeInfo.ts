@@ -1,6 +1,6 @@
 import ChainInfo from './ChainInfo';
 
-export class NodeInfo {
+class NodeInfo {
   public readonly id: number;
   public readonly chain: ChainInfo;
   public readonly url: string;

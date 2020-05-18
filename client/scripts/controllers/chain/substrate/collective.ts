@@ -3,7 +3,7 @@ import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
 import { SubstrateEntityKind } from 'events/edgeware/types';
-import { ProposalModule } from 'models';
+import { ProposalModule, ChainEntity } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
 import { default as SubstrateChain } from './shared';
@@ -28,6 +28,10 @@ class SubstrateCollective extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
+  protected _entityConstructor(entity: ChainEntity): SubstrateCollectiveProposal {
+    return new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, entity);
+  }
+
   // TODO: we may want to track membership here as well as in elections
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName: string): Promise<void> {
     this._Chain = ChainInfo;
@@ -35,8 +39,7 @@ class SubstrateCollective extends ProposalModule<
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
       const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
-      const proposals = entities
-        .map(async (e) => new SubstrateCollectiveProposal(ChainInfo, Accounts, this, e));
+      const proposals = entities.map((e) => this._entityConstructor(e));
 
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         const memberP = new Promise((memberResolve) => {

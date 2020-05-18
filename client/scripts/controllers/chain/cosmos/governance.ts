@@ -50,6 +50,10 @@ class CosmosGovernance extends ProposalModule<
 
   private _proposalSubscription: Unsubscribable;
 
+  protected _entityConstructor(entity): CosmosProposal {
+    throw new Error('not implemented');
+  }
+
   public async init(ChainInfo: CosmosChain, Accounts: CosmosAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;

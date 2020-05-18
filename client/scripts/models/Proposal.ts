@@ -1,7 +1,7 @@
 import moment from 'moment-twitter';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Coin } from 'shared/adapters/currency';
-import { IIdentifiable, ICompletable } from 'shared/adapters/shared';
+import { Coin } from 'adapters/currency';
+import { IIdentifiable, ICompletable } from 'adapters/shared';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
 import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
 import Account from './Account';

@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
+import '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
-const status = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const status = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [
     chains,

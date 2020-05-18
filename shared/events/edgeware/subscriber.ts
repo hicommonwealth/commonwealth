@@ -41,8 +41,7 @@ export default class extends IBlockSubscriber<ApiPromise, SubstrateBlock> {
           versionNumber: this._versionNumber,
           versionName: this._versionName,
         };
-        // TODO: add logging prefix output
-        log.debug(`Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`);
+        log.trace(`Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`);
         cb(block);
       });
     });

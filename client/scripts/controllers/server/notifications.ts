@@ -79,7 +79,7 @@ class NotificationsController {
     return post('/markNotificationsRead', {
       'notification_ids[]': notifications.map((n) => n.id),
     }, (result) => {
-      for (const n of notifications.filter((n) => !n.isRead)) {
+      for (const n of notifications.filter((notif) => !notif.isRead)) {
         n.markRead();
       }
     });
@@ -92,6 +92,10 @@ class NotificationsController {
         this._store.remove(n);
       }
     });
+  }
+
+  public update(n: Notification) {
+    this._store.add(n);
   }
 
   public refresh() {

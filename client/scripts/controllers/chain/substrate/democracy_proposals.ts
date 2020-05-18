@@ -6,7 +6,7 @@ import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateEntityKind } from 'events/edgeware/types';
-import { ProposalModule } from 'models';
+import { ProposalModule, ChainEntity } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
@@ -52,14 +52,20 @@ class SubstrateDemocracyProposals extends ProposalModule<
 
   private _Accounts: SubstrateAccounts;
 
+  public getByHash(hash: string) {
+    return this.store.getAll().find((proposal) => proposal.hash === hash);
+  }
+
+  protected _entityConstructor(entity: ChainEntity): SubstrateDemocracyProposal {
+    return new SubstrateDemocracyProposal(this._Chain, this._Accounts, this, entity);
+  }
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
       const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyProposal);
-      const proposals = entities
-        .map(async (e) => new SubstrateDemocracyProposal(ChainInfo, Accounts, this, e));
+      const proposals = entities.map((e) => this._entityConstructor(e));
 
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters
@@ -100,7 +106,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
       throw new Error(`deposit must be greater than ${+this.minimumDeposit}`);
     }
 
-    const txFunc = (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit);
+    const txFunc = (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit.asBN);
     if (!(await this._Chain.canPayFee(author, txFunc, deposit))) {
       throw new Error('insufficient funds');
     }
@@ -127,32 +133,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
       'noteImminentPreimage',
       title,
     );
-  }
-
-  /**
-   * Fetches a preimage for a given democracy proposal if it exists
-   *
-   * @param hash Preimage hash of democracy proposal
-   */
-  public getProposal(hash: string): Observable<Proposal> {
-    if (!this._Chain?.apiInitialized) return; // TODO
-    return this._Chain.query((api: ApiRx) => api.query.democracy.preimages(hash))
-      .pipe(map((preimageOpt) => {
-        if (preimageOpt && preimageOpt.isSome) {
-          const preimage = preimageOpt.unwrap();
-          if ((preimage as any).isAvailable) {
-            const { data } = (preimage as unknown as PreimageStatus).asAvailable;
-            return this._Chain.createType('Proposal', data.toU8a(true));
-          } else if (!(preimage as any).isMissing) {
-            const [ data ] = preimage;
-            return this._Chain.createType('Proposal', data.toU8a(true));
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      }));
   }
 }
 

@@ -10,11 +10,12 @@ import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout, LoadingLayout } from 'views/layouts';
 import { ChainInfo, CommunityInfo, NodeInfo,
-  OffchainTag, ChainClass, ChainNetwork, NotificationCategory } from 'models';
+  OffchainTag, ChainClass, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { default as moment } from 'moment-twitter';
 import { default as mixpanel } from 'mixpanel-browser';
 
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
@@ -420,9 +421,13 @@ $(() => {
   // initialize the app
   initAppState().then(() => {
     // setup notifications and websocket if not already set up
-    if (app.loginState === LoginState.LoggedIn && !app.socket) {
+    if (!app.socket) {
+      let jwt;
       // refresh notifications once
-      app.login.notifications.refresh().then(() => m.redraw());
+      if (app.loginState === LoginState.LoggedIn) {
+        app.login.notifications.refresh().then(() => m.redraw());
+        jwt = app.login.jwt;
+      }
 
       let wsUrl = app.serverUrl();
       if (app.serverUrl().indexOf('https')) {
@@ -447,8 +452,29 @@ $(() => {
 
       handleInviteLinkRedirect();
 
-      const socketPurpose = 'server';
-      app.socket = new WebsocketController(wsUrl, socketPurpose, app.login.jwt, null);
+      app.socket = new WebsocketController(wsUrl, jwt, null);
+      if (app.loginState === LoginState.LoggedIn) {
+        app.socket.addListener(
+          WebsocketMessageType.Notification,
+          (payload: IWebsocketsPayload<any>) => {
+            if (payload.data && payload.data.subscription_id) {
+              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
+              const subscription = app.login.notifications.subscriptions.find(
+                (sub) => sub.id === payload.data.subscription_id
+              );
+              // note that payload.data should have the correct JSON form
+              if (subscription) {
+                console.log('adding new notification from websocket:', payload.data);
+                const notification = Notification.fromJSON(payload.data, subscription);
+                app.login.notifications.update(notification);
+                m.redraw();
+              }
+            } else {
+              console.error('got invalid notification payload:', payload);
+            }
+          },
+        );
+      }
     }
     m.redraw();
   });

@@ -12,16 +12,14 @@ import {
 import { ApiRx } from '@polkadot/api';
 import {
   ISubstratePhragmenElection,
-  ISubstratePhragmenElectionState,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import { takeWhile, first, switchMap, flatMap, map } from 'rxjs/operators';
+import { takeWhile, first, flatMap, map } from 'rxjs/operators';
 import { combineLatest, of, Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, StorageKey } from '@polkadot/types';
-import { ProposalStore } from 'stores';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -129,7 +127,9 @@ export class SubstratePhragmenElection extends Proposal<
       takeWhile(({ completed }) => !completed && this.initialized, true),
     ).subscribe(({ completed, candidates }) => {
       this._exposedCandidates = candidates;
-      this.complete();
+      if (completed) {
+        this.complete();
+      }
     });
   }
 
@@ -159,26 +159,27 @@ export class SubstratePhragmenElection extends Proposal<
           })
         )
         // this branch is for edgeware
-        : api.query[this.moduleName].votesOf.entries().pipe(
-          flatMap((votes: Array<[StorageKey, Vec<AccountId>] & Codec>) => {
+        : api.query[this.moduleName].votesOf().pipe(
+          flatMap(([ voters, votes ]: [ Vec<AccountId>, Vec<Vec<AccountId>> ] & Codec) => {
             return combineLatest(
+              of(voters),
               of(votes),
               api.queryMulti(
-                votes.map(([ who ]) => [ api.query[this.moduleName].stakeOf, who.args[0] ])
+                voters.map((who) => [ api.query[this.moduleName].stakeOf, who ])
               ),
             );
           }),
-          map(([ votes, stakes ]: [ Array<[StorageKey, Vec<AccountId>] & Codec>, BalanceOf[] ]) => {
+          map(([ voters, votes, stakes ]: [ Vec<AccountId>, Vec<Vec<AccountId>>, BalanceOf[] ]) => {
             const votingData: { [voter: string]: PhragmenElectionVote } = {};
+            const voteDataArray = _.zip(voters, votes, stakes) as Array<[ AccountId, Vec<AccountId>, BalanceOf ]>;
             // eslint-disable-next-line no-restricted-syntax
-            for (const [ [ key, voterVotes ], stake ] of _.zip(votes, stakes)) {
-              const voter = key.args[0].toString();
+            for (const [ voter, voterVotes, stake ] of voteDataArray) {
               const vote = new PhragmenElectionVote(
-                this._Accounts.get(voter),
+                this._Accounts.get(voter.toString()),
                 voterVotes.map((v) => v.toString()),
                 this._Chain.coins(stake)
               );
-              votingData[voter] = vote;
+              votingData[voter.toString()] = vote;
             }
             return votingData;
           })

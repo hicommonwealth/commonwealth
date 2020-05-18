@@ -1,10 +1,9 @@
 import { successResponse } from '../util/apiHelpers';
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (req.query && req.query.lookupKey) {
     const existingAuth = await models.HedgehogAuthentication.findOne({
       where: {

@@ -201,7 +201,7 @@ const CouncilPage: m.Component<{}> = {
     const candidates: Array<[SubstrateAccount, number]> = app.chain &&
      ((app.chain as Substrate).phragmenElections.activeElection &&
        (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
-       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]).filter(([c, n]) => !councillors.includes(c));
+       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
 
     const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
     const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;
@@ -238,7 +238,9 @@ const CouncilPage: m.Component<{}> = {
         candidates.length === 0
           ? m('.no-proposals', 'No candidates')
           : m('.council-candidates', [
-            candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
+            candidates
+              .filter(([ account ]) => !councillors.includes(account))
+              .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
             m('.clear'),
           ]),
       ],
