@@ -264,7 +264,9 @@ const NewProposalForm = {
     const span = {
       xs: 12,
       sm: 12,
-      md: 7,
+      md: 11,
+      lg: 10,
+      xl: 8,
     };
 
     // default state options

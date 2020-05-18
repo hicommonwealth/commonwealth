@@ -15,9 +15,7 @@ const NewProposalPage = {
   view: (vnode) => {
     return m('.NewProposalPage', [
       m('.forum-container', [
-        m('.new-proposal-title', [
-          m('h2', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
-        ]),
+        m('h2.page-title', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
         m(NewProposalForm, {
           typeEnum: vnode.attrs.type,
           onChangeSlugEnum: (value) => {
