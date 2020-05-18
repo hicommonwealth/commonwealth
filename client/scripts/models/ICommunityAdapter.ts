@@ -1,5 +1,5 @@
 import { ApiStatus, IApp } from 'state';
-import { Coin } from 'shared/adapters/currency';
+import { Coin } from 'adapters/currency';
 import { IOffchainAccountsModule } from './interfaces';
 import Account from './Account';
 import CommunityInfo from './CommunityInfo';

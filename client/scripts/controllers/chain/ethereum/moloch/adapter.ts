@@ -22,6 +22,10 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
+
   public async init(onServerLoaded?) {
     const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
     // FIXME: This is breaking for me on moloch default (not local)
@@ -62,7 +66,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await this.governance.init(api, this.accounts, this.meta.chain.chainObjectId, useChainProposalData);
-    await this._initProposalComments();
+    await this._postModuleLoad();
 
     this._loaded = true;
   }

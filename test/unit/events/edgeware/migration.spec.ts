@@ -255,6 +255,7 @@ describe('Edgeware Event Migration Tests', () => {
       { blockNumber,
         data: {
           kind: SubstrateEventKind.CollectiveProposed,
+          collectiveName: 'council',
           proposalIndex: 15,
           proposalHash: 'council-hash',
           proposer: '',

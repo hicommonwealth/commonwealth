@@ -18,7 +18,7 @@ const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: A
         m(User, { user: [comments[0].author, comments[0].chain], linkify: true, hideAvatar: true, tooltip: true }),
         ' commented on ',
         link('a', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title),
-        ` ${createdAt.fromNow()}`
+        createdAt ? ` ${createdAt.fromNow()}` : '',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [

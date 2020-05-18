@@ -19,7 +19,7 @@ describe('Invite Tests', () => {
   const chain = 'ethereum';
   let adminJWT;
   let adminAddress;
-  let adminUserId
+  let adminUserId;
   let userJWT;
   let userAddress;
   let userUserId;
@@ -36,6 +36,7 @@ describe('Invite Tests', () => {
       chainOrCommObj: { offchain_community_id: community },
       role: 'admin',
     });
+
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
     userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
@@ -354,8 +355,6 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.community_id).to.be.equal(community);
       expect(res.body.result.updatedCode.invited_email).to.be.equal(userEmail);
       expect(res.body.result.updatedCode.used).to.be.true;
-      expect(res.body.result.membership.active).to.be.true;
-      expect(res.body.result.membership.community).to.be.equal(community);
     });
 
     it('should fail to accept an invite created by an admin as a user who does not own the address', async () => {

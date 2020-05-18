@@ -1,4 +1,4 @@
-import { Coin } from 'shared/adapters/currency';
+import { Coin } from 'adapters/currency';
 import { IVote } from './interfaces';
 import Account from './Account';
 

@@ -35,7 +35,6 @@ import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import addChainObjectQueries from './server/scripts/addChainObjectQueries';
 import ChainObjectFetcher from './server/util/chainObjectFetcher';
-import { UserRequest } from './server/types.js';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 
 // set up express async error handling hack
@@ -129,7 +128,7 @@ const setupMiddleware = () => {
   app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
 
   // store wss into request obj
-  app.use((req: UserRequest, res, next) => {
+  app.use((req: express.Request, res, next) => {
     req.wss = wss;
     next();
   });

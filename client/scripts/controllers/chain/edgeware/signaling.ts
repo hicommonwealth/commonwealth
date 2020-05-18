@@ -3,7 +3,7 @@ import { ApiRx } from '@polkadot/api';
 import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
-import { ProposalModule, } from 'models';
+import { ProposalModule, ChainEntity, } from 'models';
 import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -31,6 +31,10 @@ class EdgewareSignaling extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
+  protected _entityConstructor(entity: ChainEntity): EdgewareSignalingProposal {
+    return new EdgewareSignalingProposal(this._Chain, this._Accounts, this, entity);
+  }
+
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -47,8 +51,7 @@ class EdgewareSignaling extends ProposalModule<
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
         const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
-        const proposals = entities
-          .map(async (e) => new EdgewareSignalingProposal(ChainInfo, Accounts, this, e));
+        const proposals = entities.map((e) => this._entityConstructor(e));
         this._initialized = true;
         resolve();
       },

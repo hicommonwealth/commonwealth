@@ -1,6 +1,6 @@
 import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
-import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -18,6 +18,10 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
+
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EthereumChain(this.app);
@@ -28,7 +32,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
-    await this._initProposalComments();
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     if (this.webWallet) {

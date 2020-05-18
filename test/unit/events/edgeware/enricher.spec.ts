@@ -529,6 +529,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       excludeAddresses: [ 'alice' ],
       data: {
         kind,
+        collectiveName: 'council',
         proposer: 'alice',
         proposalIndex: 1,
         proposalHash: 'hash',
@@ -549,6 +550,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         proposalIndex: 1,
         threshold: 3,
@@ -565,6 +567,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         proposalIndex: 1,
         threshold: 3,
@@ -575,12 +578,13 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich collective-executed event', async () => {
     const kind = SubstrateEventKind.CollectiveExecuted;
-    const event = constructEvent([ 'hash', constructBool(true) ]);
+    const event = constructEvent([ 'hash', constructBool(true) ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         executionOk: true,
       }
@@ -588,12 +592,13 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich collective-member-executed event', async () => {
     const kind = SubstrateEventKind.CollectiveExecuted;
-    const event = constructEvent([ 'hash', constructBool(false) ]);
+    const event = constructEvent([ 'hash', constructBool(false) ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         executionOk: false,
       }
