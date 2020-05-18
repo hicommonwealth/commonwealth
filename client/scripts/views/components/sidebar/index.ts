@@ -185,10 +185,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           //     contentLeft: m(Icon, { name: Icons.BOX }),
           //   }),
           showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: NewProposalModal,
-              data: { typeEnum: ProposalType.MolochProposal }
-            }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/?type=${ProposalType.MolochProposal}`),
             label: 'New proposal'
           }),
           showMolochMenuOptions && m(ListItem, {

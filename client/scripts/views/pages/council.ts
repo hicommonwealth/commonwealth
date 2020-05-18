@@ -167,7 +167,7 @@ const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
       onclick: (e) => {
         e.preventDefault();
         if (app.modals.getList().length > 0) return;
-        app.modals.create({ modal: NewProposalModal, data: { typeEnum: ProposalType.PhragmenCandidacy } });
+        m.route.set(`/${app.activeChainId()}/new/proposal/?type=${ProposalType.PhragmenCandidacy}`);
       },
     }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
   }
