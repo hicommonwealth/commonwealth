@@ -3,7 +3,7 @@ import Infinite from 'mithril-infinite';
 import app from 'state';
 
 import { PopoverMenu, Button, Icons } from 'construct-ui';
-import HeaderNotificationRow from 'views/components/sidebar/notification_row';
+import { HeaderNotificationRow, HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
 import { Notification } from 'models';
 
 const sortNotifications = (n: Notification[], prop: string, prop2: string) => {
@@ -41,7 +41,7 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
             pageData: () => sortedNotifications,
             item: (data, opts, index) => {
               if (data.length > 1) {
-                return m('li', `BIG BOY ROW ${data.length}`);
+                return m(HeaderBatchNotificationRow, {notifications: data });
               } else {
                 return m(HeaderNotificationRow, { notification: data[0] });
               }

@@ -16,7 +16,7 @@ import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 import NewProposalButton from 'views/components/new_proposal_button';
-import NotificationRow from 'views/components/sidebar/notification_row';
+// import NotificationRow from 'views/components/sidebar/notification_row';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsDrowdownMenu from './notifications_dropdown_menu';
 
