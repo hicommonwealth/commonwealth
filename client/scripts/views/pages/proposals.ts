@@ -20,7 +20,7 @@ import { convictionToWeight, convictionToLocktime, convictions } from 'controlle
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import NewProposalModal from 'views/modals/proposals';
+import NewProposalPage from 'views/pages/new_proposal/index';
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {

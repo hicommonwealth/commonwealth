@@ -24,10 +24,10 @@ import Substrate from 'controllers/chain/substrate/main';
 import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import { createTXModal } from 'views/modals/tx_signing_modal';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
-import { createTXModal } from '../tx_signing_modal';
 
 
 // this should be titled the Substrate/Edgeware new proposal form

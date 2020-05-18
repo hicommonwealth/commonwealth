@@ -10,18 +10,18 @@ import { ProposalType, proposalSlugToFriendlyName } from 'identifiers';
 import { CompactModalExitButton } from 'views/modal';
 import NewProposalForm from './new_proposal_form';
 
-const NewProposalModal = {
+const NewProposalPage = {
   oncreate: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.typeEnum;
     vnode.state.titlePre = 'Create';
   },
   // confirmExit: confirmationModalWithText('Are you sure you want to exit?'),
   view: (vnode) => {
-    return m('.NewProposalModal', [
-      m('.compact-modal-title', [
-        m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
-        m(CompactModalExitButton),
-      ]),
+    return m('.NewProposalPage', [
+      // m('.compact-modal-title', [
+      //   m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
+      //   m(CompactModalExitButton),
+      // ]),
       m(NewProposalForm, {
         typeEnum: vnode.attrs.typeEnum,
         onChangeSlugEnum: (value) => {
@@ -56,4 +56,4 @@ const NewProposalModal = {
   }
 };
 
-export default NewProposalModal;
+export default NewProposalPage;

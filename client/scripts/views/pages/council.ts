@@ -17,7 +17,7 @@ import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elect
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import NewProposalModal from 'views/modals/proposals';
+import NewProposalPage from 'views/pages/new_proposal/index';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import ListingPage from 'views/pages/_listing_page';

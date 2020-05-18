@@ -358,7 +358,7 @@ $(() => {
     '/:scope/login':             importRoute(import('views/pages/login'), true),
     '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),
     '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
-    '/:scope/new/proposal/:type': importRoute(import('client/scripts/views/pages/new_proposal/index'), true),
+    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
     '/:scope/link_new_address':  importRoute(import('views/pages/link_new_address'), true),
