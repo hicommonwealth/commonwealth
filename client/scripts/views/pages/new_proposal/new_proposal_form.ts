@@ -25,10 +25,10 @@ import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'mod
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
+import { FormGroup, Button } from 'construct-ui';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
-import { FormGroup, Button } from 'construct-ui';
 
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -103,7 +103,9 @@ const NewProposalForm = {
         vnode.state.error = '';
         callback(result);
       };
-      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
+        return (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+      };
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(
@@ -267,7 +269,7 @@ const NewProposalForm = {
     }
 
     return m('.NewProposalForm', [
-      m('.compact-modal-body', [
+      m('.forum-container', [
         vnode.state.error && m('.error', vnode.state.error.message),
         hasCouncilMotionChooser && [
           m(DropdownFormField, {
@@ -368,10 +370,11 @@ const NewProposalForm = {
           ]),
         ],
         hasPhragmenInfo
-          && m('.council-slot-info', [,
+          && m('.council-slot-info', [
             m('p', [
-              `Becoming a candidate requires a deposit of ${formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)}. `,
-              'It will be returned if you are elected, or carried over to the next election if you are in the top ',
+              'Becoming a candidate requires a deposit of ',
+              formatCoin((app.chain as Substrate).phragmenElections.candidacyBond),
+              '. It will be returned if you are elected, or carried over to the next election if you are in the top ',
               `${(app.chain as Substrate).phragmenElections.desiredRunnersUp} runners-up.`
             ]),
           ]),
@@ -392,13 +395,15 @@ const NewProposalForm = {
         ],
         hasDepositChooser && [
           m(TextInputFormField, {
-            title: `Deposit (${app.chain.base === ChainBase.Substrate ? app.chain.currency : (app.chain as Cosmos).governance.minDeposit.denom})`,
+            title: `Deposit (${app.chain.base === ChainBase.Substrate
+              ? app.chain.currency
+              : (app.chain as Cosmos).governance.minDeposit.denom})`,
             options: {
               name: 'deposit',
               placeholder: `Min: ${app.chain.base === ChainBase.Substrate
                 ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                 : +(app.chain as Cosmos).governance.minDeposit}`,
-              oncreate: (vnode) => $(vnode.dom).val(app.chain.base === ChainBase.Substrate
+              oncreate: (vnode_) => $(vnode_.dom).val(app.chain.base === ChainBase.Substrate
                 ? (app.chain as Substrate).democracyProposals.minimumDeposit.inDollars
                 : +(app.chain as Cosmos).governance.minDeposit),
             },
