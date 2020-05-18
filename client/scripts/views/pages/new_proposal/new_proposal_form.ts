@@ -1,4 +1,4 @@
-import 'modals/new_proposal_modal.scss';
+import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';

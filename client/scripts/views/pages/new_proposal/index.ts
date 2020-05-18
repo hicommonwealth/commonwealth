@@ -1,4 +1,4 @@
-import 'modals/new_proposal_modal.scss';
+import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -12,18 +12,16 @@ import NewProposalForm from './new_proposal_form';
 
 const NewProposalPage = {
   oncreate: (vnode) => {
-    vnode.state.typeEnum = vnode.attrs.typeEnum;
+    vnode.state.typeEnum = vnode.attrs.type;
     vnode.state.titlePre = 'Create';
   },
-  // confirmExit: confirmationModalWithText('Are you sure you want to exit?'),
   view: (vnode) => {
     return m('.NewProposalPage', [
-      // m('.compact-modal-title', [
-      //   m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
-      //   m(CompactModalExitButton),
-      // ]),
+      m('.compact-modal-title', [
+        m('h3', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
+      ]),
       m(NewProposalForm, {
-        typeEnum: vnode.attrs.typeEnum,
+        typeEnum: vnode.attrs.type,
         onChangeSlugEnum: (value) => {
           if (value !== 'proposal') {
             vnode.state.titlePre = 'Note';
@@ -36,7 +34,7 @@ const NewProposalPage = {
         },
         callback: (proposal) => {
           $(vnode.dom).trigger('modalforceexit');
-          if (proposal && vnode.attrs.typeEnum !== ProposalType.PhragmenCandidacy) {
+          if (proposal && vnode.attrs.type !== ProposalType.PhragmenCandidacy) {
             mixpanel.track('Create Thread', {
               'Step No': 3,
               'Step' : 'Transaction Signed',
