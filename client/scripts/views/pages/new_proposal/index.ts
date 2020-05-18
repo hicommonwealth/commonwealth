@@ -1,11 +1,9 @@
 import 'pages/new_proposal_page.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
-import { slugify } from 'helpers';
 import { ProposalType, proposalSlugToFriendlyName } from 'identifiers';
 import NewProposalForm from './new_proposal_form';
 
@@ -32,7 +30,6 @@ const NewProposalPage = {
             m.redraw();
           },
           callback: (proposal) => {
-            $(vnode.dom).trigger('modalforceexit');
             if (proposal && vnode.attrs.type !== ProposalType.PhragmenCandidacy) {
               mixpanel.track('Create Thread', {
                 'Step No': 3,
