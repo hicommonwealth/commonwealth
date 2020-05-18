@@ -18,7 +18,8 @@ const sortNotifications = (n: Notification[], prop: string, prop2: string) => {
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
   view: (vnode) => {
     const notifications = app.login.notifications
-      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix()) : [];
+      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+      : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');
 

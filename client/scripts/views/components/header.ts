@@ -32,8 +32,7 @@ const Header: m.Component<{}> = {
       // new proposal
       m(NewProposalButton, { fluid: false }),
       // notifications menu
-      app.isLoggedIn()
-        && m(NotificationsDrowdownMenu),
+      app.isLoggedIn() && m(NotificationsDrowdownMenu),
       // invites menu
       app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
         iconLeft: Icons.MAIL,
