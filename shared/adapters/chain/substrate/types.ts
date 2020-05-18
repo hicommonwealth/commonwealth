@@ -1,10 +1,7 @@
 import BN from 'bn.js';
+import { u128, Compact } from '@polkadot/types';
 import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
-import { IMethod } from './shared';
-import { u128, Compact } from '@polkadot/types';
-import { Balance } from '@polkadot/types/interfaces';
-import { Registry } from '@polkadot/types/types';
 
 export class SubstrateCoin extends Coin {
   constructor(
@@ -36,24 +33,12 @@ export interface ISubstrateDemocracyProposal extends IIdentifiable {
   author: string;
 }
 
-export interface ISubstrateDemocracyProposalState extends ICompletable {
-  method: IMethod;
-  depositors: string[];
-}
-
 export interface ISubstrateDemocracyReferendum extends IIdentifiable {
   index: number;
   hash?: Uint8Array;
   endBlock: number;
   threshold?: DemocracyThreshold;
   executionDelay?: number;
-}
-
-export interface ISubstrateDemocracyReferendumState extends ICompletable {
-  method: IMethod;
-  votes: { [account: string]: [boolean, number, u128] }; // choice, weight (conviction idx), balance
-  passed: boolean;
-  executionBlock: number;
 }
 
 export interface ISubstrateTreasuryProposal extends IIdentifiable {
@@ -64,21 +49,10 @@ export interface ISubstrateTreasuryProposal extends IIdentifiable {
   proposer: string;
 }
 
-export interface ISubstrateTreasuryProposalState extends ICompletable {
-  approved: boolean;
-  awarded: boolean;
-}
-
 export interface ISubstrateCollectiveProposal extends IIdentifiable {
   hash: string;
   index: number;
-  method: IMethod;
   threshold: number;
-}
-
-export interface ISubstrateCollectiveProposalState extends ICompletable {
-  votes: { [voter: string]: boolean };
-  approved: boolean;
 }
 
 export interface ISubstratePhragmenElection extends IIdentifiable {

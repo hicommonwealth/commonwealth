@@ -18,6 +18,7 @@ export default function (
       switch (method) {
         case 'Slash': return SubstrateEventKind.Slash;
         case 'Reward': return SubstrateEventKind.Reward;
+        // NOTE: these are not supported yet on Edgeware, only kusama and edgeware-develop
         case 'Bonded': return SubstrateEventKind.Bonded;
         case 'Unbonded': return SubstrateEventKind.Unbonded;
         default: return null;
@@ -47,6 +48,7 @@ export default function (
         default: return null;
       }
     case 'elections':
+    case 'electionsPhragmen':
       switch (method) {
         case 'submitCandidacy': return SubstrateEventKind.ElectionCandidacySubmitted;
         case 'NewTerm': return SubstrateEventKind.ElectionNewTerm;
@@ -56,6 +58,8 @@ export default function (
         default: return null;
       }
     case 'collective':
+    case 'council':
+    case 'technicalCollective':
       switch (method) {
         case 'Proposed': return SubstrateEventKind.CollectiveProposed;
         case 'Approved': return SubstrateEventKind.CollectiveApproved;
@@ -74,13 +78,13 @@ export default function (
       }
     case 'treasuryReward':
       switch (method) {
-        case 'TreasuryMinting': {
-          if (versionNumber < 34) {
-            return SubstrateEventKind.TreasuryRewardMinting;
-          } else {
-            return SubstrateEventKind.TreasuryRewardMintingV2;
-          }
-        }
+        // case 'TreasuryMinting': {
+        //   if (versionNumber < 34) {
+        //     return SubstrateEventKind.TreasuryRewardMinting;
+        //   } else {
+        //     return SubstrateEventKind.TreasuryRewardMintingV2;
+        //   }
+        // }
         default: return null;
       }
     default:

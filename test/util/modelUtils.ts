@@ -10,9 +10,14 @@ import models from '../../server/database';
 const ethUtil = require('ethereumjs-util');
 const log = factory.getLogger(formatFilename(__filename));
 
-export const createAndVerifyAddress = async ({ chain }) => {
+export const generateEthAddress = () => {
   const keypair = wallet.generate();
   const address = `0x${keypair.getAddress().toString('hex')}`;
+  return { keypair, address };
+};
+
+export const createAndVerifyAddress = async ({ chain }) => {
+  const { keypair, address } = generateEthAddress();
   let res = await chai.request.agent(app)
     .post('/api/createAddress')
     .set('Accept', 'application/json')
@@ -31,7 +36,7 @@ export const createAndVerifyAddress = async ({ chain }) => {
   return { address_id, address, user_id, email };
 };
 
-interface ThreadArgs {
+export interface ThreadArgs {
   chain?: string;
   community?: string;
   address: string;
@@ -69,7 +74,7 @@ export const createThread = async (args: ThreadArgs) => {
   return res.body;
 };
 
-interface CommentArgs {
+export interface CommentArgs {
   chain?: string;
   community?: string;
   address: string;
@@ -101,7 +106,7 @@ export const createComment = async (args: CommentArgs) => {
   return res.body;
 };
 
-interface EditCommentArgs {
+export interface EditCommentArgs {
   jwt: any;
   comment_id: Number;
   text: any;
@@ -139,28 +144,77 @@ export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
   return res.body;
 };
 
-export const assignAdmin = async (address_id, chainOrCommObj) => {
-  const admin = await models['Role'].create({
-    ...chainOrCommObj,
-    address_id,
-    permission: 'admin',
+export interface AssignRoleArgs {
+  address_id: number;
+  chainOrCommObj: {
+    chain_id?: string,
+    offchain_community_id?: string,
+  };
+  role: string;
+}
+
+export const assignRole = async (args: AssignRoleArgs) => {
+  const role = await models['Role'].create({
+    ...args.chainOrCommObj,
+    address_id: args.address_id,
+    permission: args.role,
   });
 
-  return admin;
+  return role;
 };
 
-interface SubscriptionArgs {
+export interface SubscriptionArgs {
   object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;
 }
 export const createSubscription = async (args: SubscriptionArgs) => {
-  const { jwt, object_id, is_active, category } = args;
   const res = await chai.request(app)
     .post('/api/createSubscription')
     .set('Accept', 'application/json')
-    .send({ jwt, category, is_active, object_id, });
+    .send({ ...args });
   const subscription = res.body.result;
   return subscription;
+};
+
+export interface CommunityArgs {
+  jwt: any;
+  id: string;
+  name: string;
+  creator_id: number;
+  creator_address: string,
+  creator_chain: string,
+  description: string;
+  default_chain: string;
+  isAuthenticatedForum: string;
+  invitesEnabled: string;
+  privacyEnabled: string;
+}
+
+export const createCommunity = async (args: CommunityArgs) => {
+  const res = await chai.request(app)
+    .post('/api/createCommunity')
+    .set('Accept', 'application/json')
+    .send({ ...args });
+  const community = res.body.result;
+  return community;
+};
+
+export interface InviteArgs {
+  jwt: string;
+  invitedEmail?: string;
+  invitedAddress?: string;
+  chain?: string;
+  community?: string;
+  address: string;
+}
+
+export const createInvite = async (args: InviteArgs) => {
+  const res = await chai.request(app)
+    .post('/api/createInvite')
+    .set('Accept', 'application/json')
+    .send({ ...args });
+  const invite = res.body;
+  return invite;
 };

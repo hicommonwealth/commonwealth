@@ -52,6 +52,8 @@ const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDR
 const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
+const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION === 'true';
+
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -84,7 +86,7 @@ const sessionParser = session({
     db: models.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
-    expiration: 7 * 24 * 60 * 60 * 1000      // Set session expiration to 7 days
+    expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
   }),
   resave: false,
   saveUninitialized: true,
@@ -136,7 +138,9 @@ const setupMiddleware = () => {
 const templateFile = (() => {
   try {
     return fs.readFileSync('./build/index.html');
-  } catch (e) {}
+  } catch (e) {
+    console.error(`Failed to read template file: ${JSON.stringify(e)}`);
+  }
 })();
 
 const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
@@ -201,8 +205,23 @@ if (SHOULD_RESET_DB) {
       });
     });
 } else {
-  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP);
-  setupServer(app, wss, sessionParser);
+  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
+    .then(() => {
+      if (RUN_ENTITY_MIGRATION) {
+        models.sequelize.close()
+          .then(() => process.exit(0));
+      }
+    }, (err) => {
+      if (RUN_ENTITY_MIGRATION) {
+        console.error(`Entity migration failed: ${JSON.stringify(err)}`);
+        models.sequelize.close()
+          .then(() => (closeMiddleware()))
+          .then(() => process.exit(1));
+      } else {
+        console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
+      }
+    });
+  if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
   if (!NO_ARCHIVE) fetcher.enable();
 }
 

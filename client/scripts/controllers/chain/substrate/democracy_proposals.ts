@@ -4,12 +4,8 @@ import { Codec } from '@polkadot/types/types';
 import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal, PreimageStatus } from '@polkadot/types/interfaces';
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
-import {
-  ISubstrateDemocracyProposal,
-  ISubstrateDemocracyProposalState,
-  SubstrateCoin
-} from 'adapters/chain/substrate/types';
-import { SubstrateDemocracyProposalAdapter } from 'adapters/chain/substrate/subscriptions';
+import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { SubstrateEntityKind } from 'events/edgeware/types';
 import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -20,9 +16,7 @@ type NextExternal = [Hash, VoteThreshold] & Codec;
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiRx,
   ISubstrateDemocracyProposal,
-  ISubstrateDemocracyProposalState,
-  SubstrateDemocracyProposal,
-  SubstrateDemocracyProposalAdapter
+  SubstrateDemocracyProposal
 > {
   // SubstrateDemocracyProposals DATA
   // How often (in blocks) new public referenda are launched.
@@ -63,7 +57,10 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      this._adapter = new SubstrateDemocracyProposalAdapter();
+      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyProposal);
+      const proposals = entities
+        .map(async (e) => new SubstrateDemocracyProposal(ChainInfo, Accounts, this, e));
+
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters
         this._minimumDeposit = this._Chain.coins(api.consts.democracy.minimumDeposit as Balance);
@@ -80,14 +77,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
             this._nextExternal = nextExternal.unwrapOr(null);
             externalsResolve();
           });
-        });
-
-        const subP = this.initSubscription(
-          api,
-          (ps) => ps.map((p) => new SubstrateDemocracyProposal(ChainInfo, Accounts, this, p))
-        );
-
-        Promise.all([subP, externalsP]).then(() => {
+        }).then(() => {
           this._initialized = true;
           resolve();
         }).catch((err) => {

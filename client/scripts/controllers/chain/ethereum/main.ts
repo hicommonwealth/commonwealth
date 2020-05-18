@@ -13,7 +13,6 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
-  public readonly server = {};
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
@@ -29,12 +28,13 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+    await this._initProposalComments();
     await this.chain.initEventLoop();
 
     if (this.webWallet) {
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
         setActiveAccount(updatedAddress);
       });
     }
@@ -42,12 +42,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this._loaded = true;
   }
 
-  public deinit = async () => {
+  public async deinit() {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

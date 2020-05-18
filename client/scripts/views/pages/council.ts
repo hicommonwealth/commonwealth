@@ -13,7 +13,7 @@ import { ChainBase, ChainClass, IVote } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';

@@ -1,3 +1,4 @@
+import WebSocket from 'ws';
 import Sequelize from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -54,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData,
     webhook_data: WebhookContent,
-    wss?,
+    wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
     chainEventId?: number,

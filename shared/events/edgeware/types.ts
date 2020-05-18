@@ -24,6 +24,17 @@ export interface SubstrateBlock {
   versionName: string;
 }
 
+// Used for grouping EventKinds together for archival purposes
+export enum SubstrateEntityKind {
+  DemocracyProposal = 'democracy-proposal',
+  DemocracyReferendum = 'democracy-referendum',
+  DemocracyPreimage = 'democracy-preimage',
+  TreasuryProposal = 'treasury-proposal',
+  CollectiveProposal = 'collective-proposal',
+  SignalingProposal = 'signaling-proposal',
+}
+
+// Each kind of event we handle
 // In theory we could use a higher level type-guard here, like
 // `e instanceof GenericEvent`, but that makes unit testing
 // more difficult, as we need to then mock the original constructor.
@@ -175,6 +186,11 @@ export interface ISubstratePreimageNoted extends ISubstrateEvent {
   kind: SubstrateEventKind.PreimageNoted;
   proposalHash: string;
   noter: SubstrateAccountId;
+  preimage: {
+    method: string;
+    section: string;
+    args: string[];
+  };
 }
 
 export interface ISubstratePreimageUsed extends ISubstrateEvent {
@@ -211,7 +227,7 @@ export interface ISubstrateTreasuryProposed extends ISubstrateEvent {
   proposer: SubstrateAccountId;
   value: SubstrateBalanceString;
   beneficiary: SubstrateAccountId;
-  // can also fetch bond if needed
+  bond: SubstrateBalanceString;
 }
 
 export interface ISubstrateTreasuryAwarded extends ISubstrateEvent {
@@ -264,6 +280,12 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   proposalIndex: number;
   proposalHash: string;
   threshold: number;
+  // TODO: add end block?
+  call: {
+    method: string;
+    section: string;
+    args: string[];
+  };
 }
 
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
@@ -304,6 +326,11 @@ export interface ISubstrateSignalingNewProposal extends ISubstrateEvent {
   proposer: SubstrateAccountId;
   proposalHash: string;
   voteId: SubstrateBigIntString;
+  title: string;
+  description: string;
+  tallyType: string;
+  voteType: string;
+  choices: string[];
 }
 
 export interface ISubstrateSignalingCommitStarted extends ISubstrateEvent {
@@ -382,3 +409,74 @@ export type ISubstrateEventData =
 ;
 
 export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKind);
+
+/**
+ * The following auxiliary types and functions are used in migrations and should
+ * not be relied upon for general implementations.
+ */
+export type ISubstrateDemocracyProposalEvents =
+  ISubstrateDemocracyProposed | ISubstrateDemocracyTabled;
+export type ISubstrateDemocracyReferendumEvents =
+  ISubstrateDemocracyStarted | ISubstrateDemocracyPassed | ISubstrateDemocracyNotPassed
+  | ISubstrateDemocracyCancelled | ISubstrateDemocracyExecuted;
+export type ISubstrateDemocracyPreimageEvents =
+  ISubstratePreimageNoted | ISubstratePreimageUsed | ISubstratePreimageInvalid
+  | ISubstratePreimageMissing | ISubstratePreimageReaped;
+export type ISubstrateTreasuryProposalEvents =
+  ISubstrateTreasuryProposed | ISubstrateTreasuryRejected | ISubstrateTreasuryAwarded;
+export type ISubstrateCollectiveProposalEvents =
+  ISubstrateCollectiveProposed | ISubstrateCollectiveApproved
+  | ISubstrateCollectiveDisapproved | ISubstrateCollectiveExecuted;
+export type ISubstrateSignalingProposalEvents =
+  ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
+  | ISubstrateSignalingVotingStarted | ISubstrateSignalingVotingCompleted;
+
+export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
+  switch (event) {
+    case SubstrateEventKind.DemocracyProposed:
+    case SubstrateEventKind.DemocracyTabled: {
+      return SubstrateEntityKind.DemocracyProposal;
+    }
+
+    case SubstrateEventKind.DemocracyStarted:
+    case SubstrateEventKind.DemocracyPassed:
+    case SubstrateEventKind.DemocracyNotPassed:
+    case SubstrateEventKind.DemocracyCancelled:
+    case SubstrateEventKind.DemocracyExecuted: {
+      return SubstrateEntityKind.DemocracyReferendum;
+    }
+
+    case SubstrateEventKind.PreimageNoted:
+    case SubstrateEventKind.PreimageUsed:
+    case SubstrateEventKind.PreimageInvalid:
+    case SubstrateEventKind.PreimageMissing:
+    case SubstrateEventKind.PreimageReaped: {
+      return SubstrateEntityKind.DemocracyPreimage;
+    }
+
+    case SubstrateEventKind.TreasuryProposed:
+    case SubstrateEventKind.TreasuryRejected:
+    case SubstrateEventKind.TreasuryAwarded: {
+      return SubstrateEntityKind.TreasuryProposal;
+    }
+
+    case SubstrateEventKind.CollectiveProposed:
+    case SubstrateEventKind.CollectiveApproved:
+    case SubstrateEventKind.CollectiveDisapproved:
+    case SubstrateEventKind.CollectiveExecuted: {
+      return SubstrateEntityKind.CollectiveProposal;
+    }
+
+    // Signaling Events
+    case SubstrateEventKind.SignalingNewProposal:
+    case SubstrateEventKind.SignalingCommitStarted:
+    case SubstrateEventKind.SignalingVotingStarted:
+    case SubstrateEventKind.SignalingVotingCompleted: {
+      return SubstrateEntityKind.SignalingProposal;
+    }
+
+    default: {
+      return null;
+    }
+  }
+}

@@ -4,11 +4,12 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { UserRequest } from '../types';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const editComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -67,6 +68,10 @@ const editComment = async (models, req: UserRequest, res: Response, next: NextFu
     } else {
       log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
+    if (!proposal) {
+      throw new Error('No matching proposal found.');
+    }
+
     const cwUrl = getProposalUrl(prefix, proposal, comment);
 
     // dispatch notifications to subscribers of the comment/thread
