@@ -219,7 +219,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
       ? m('span', [ actorName, ` and ${length} others commented on `, m('span.commented-obj', decoded_title) ])
       : m('span', [ actorName, ` and ${length} others responded in `, m('span.commented-obj', decoded_title) ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [ actorName, ` and ${length} others created new threads `, m('span.commented-obj', decoded_title) ]);
+    notificationHeader = m('span', [ actorName, ` and ${length} others created new threads in `, m('span.commented-obj', community_name) ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', community_name) ])
