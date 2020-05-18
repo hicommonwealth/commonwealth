@@ -1,7 +1,10 @@
 @import 'client/styles/shared';
 
 .NewProposalPage {
-    width: 640px;
+    height: 100%;
+    .new-proposal-title h2 {
+        font-size: 22.5px;
+    }
     .error {
         @include error-text();
         margin-bottom: 15px;
@@ -12,6 +15,7 @@
 }
 
 .NewProposalForm {
+    max-width: 85%;
     textarea {
         min-height: 200px;
     }

@@ -28,6 +28,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
+import { FormGroup, Button } from 'construct-ui';
 
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -551,19 +552,22 @@ const NewProposalForm = {
           }),
         ]
       ]),
-      m('.compact-modal-actions', [
-        m('button', {
+      m(FormGroup, [
+        m(Button, {
           class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
-                  && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
-          type: 'submit',
+            && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
+          intent: 'primary',
+          label: proposalTypeEnum === ProposalType.OffchainThread
+            ? 'Create thread'
+            : 'Go to send transaction',
           onclick: (e) => {
             e.preventDefault();
             createNewProposal();
           },
           tabindex: 4,
-        }, proposalTypeEnum === ProposalType.OffchainThread ? 'Create thread' : 'Go to send transaction'),
-        m(SendingFrom, { author, showBalance: true }),
-      ])
+          type: 'submit',
+        }),
+      ]),
     ]);
   }
 };
