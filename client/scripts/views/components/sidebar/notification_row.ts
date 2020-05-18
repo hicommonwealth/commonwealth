@@ -193,6 +193,62 @@ export const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
   },
 };
 
+const getBatchNotificationFields = (category, data: IPostNotificationData, length) => {
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
+    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
+
+  const community_name = community_id
+    ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
+    : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
+
+  let notificationHeader;
+  let notificationBody;
+  const decoded_title = decodeURIComponent(root_title).trim();
+
+  if (comment_text) {
+    notificationBody = getCommentPreview(comment_text);
+  } else if (root_type === ProposalType.OffchainThread) {
+    notificationBody = null;
+  }
+
+  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
+
+  if (category === NotificationCategories.NewComment) {
+    // Needs logic for notifications issued to parents of nested comments
+    notificationHeader = parent_comment_id
+      ? m('span', [ actorName, ` and ${length} others commented on `, m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ` and ${length} others responded in `, m('span.commented-obj', decoded_title) ]);
+  } else if (category === NotificationCategories.NewThread) {
+    notificationHeader = m('span', [ actorName, ` and ${length} others created new threads `, m('span.commented-obj', decoded_title) ]);
+  } else if (category === `${NotificationCategories.NewMention}`) {
+    notificationHeader = (!comment_id)
+      ? m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', community_name) ])
+      : m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', decoded_title || community_name) ]);
+  } else if (category === `${NotificationCategories.NewReaction}`) {
+    notificationHeader = (!comment_id)
+      ? m('span', [ actorName, ` and ${length} others reacted to your post `, m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ` and ${length} others reacted to your post in `, m('span.commented-obj', decoded_title || community_name) ]);
+  }
+  const pseudoProposal = {
+    id: root_id,
+    title: root_title,
+    chain: chain_id,
+    community: community_id,
+  };
+  const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
+  const path = (getProposalUrl as any)(...args);
+  const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
+
+  return ({
+    author: [author_address, author_chain],
+    createdAt: moment.utc(created_at),
+    notificationHeader,
+    notificationBody,
+    path,
+    pageJump
+  });
+};
+
 interface IHeaderBatchNotificationRow {
   notifications: Notification[];
 }
@@ -229,7 +285,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
       notificationBody,
       path,
       pageJump
-    } = getNotificationFields(category, JSON.parse(notification.data));
+    } = getBatchNotificationFields(category, JSON.parse(notification.data), notifications.length);
 
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
@@ -268,7 +324,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         notificationBody,
         path,
         pageJump
-      } = getNotificationFields(category, JSON.parse(notification.data));
+      } = getBatchNotificationFields(category, JSON.parse(notification.data), notifications.length);
 
       return getHeaderNotificationRow(
         author,
