@@ -8,7 +8,6 @@ import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
 import { Button, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
-import { HeaderNotificationRow } from './sidebar/notification_row';
 import { initAppState } from '../../app';
 import { notifySuccess } from '../../controllers/app/notifications';
 import User from './widgets/user';

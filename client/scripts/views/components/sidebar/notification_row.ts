@@ -18,10 +18,6 @@ import User from 'views/components/widgets/user';
 import labelEdgewareEvent from '../../../../../shared/events/edgeware/filters/labeler';
 import { getProposalUrl } from '../../../../../shared/utils';
 
-interface IHeaderNotificationRow {
-  notification: Notification;
-}
-
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
@@ -93,104 +89,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     path,
     pageJump
   });
-};
-
-export const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
-  view: (vnode) => {
-    const { notification } = vnode.attrs;
-    const { category } = notification.subscription;
-    const getHeaderNotificationRow = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
-      return m('li.HeaderNotificationRow', {
-        class: notification.isRead ? '' : 'active',
-        onclick: async () => {
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          await m.route.set(target);
-          m.redraw.sync();
-          if (next) setTimeout(() => next(), 1);
-        },
-      }, [
-        m(User, { user: userAccount, avatarOnly: true, avatarSize: 36 }),
-        m('.comment-body', [
-          m('.comment-body-title', title),
-          excerpt && m('.comment-body-excerpt', excerpt),
-          m('.comment-body-created', createdAt.fromNow()),
-        ]),
-      ]);
-    };
-
-    const {
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    } = getNotificationFields(category, JSON.parse(notification.data));
-
-    if (category === NotificationCategories.ChainEvent) {
-      if (!notification.chainEvent) {
-        throw new Error('chain event notification does not have expected data');
-      }
-      // TODO: use different labelers depending on chain
-      const chainId = notification.chainEvent.type.chain;
-      const chainName = app.config.chains.getById(chainId).name;
-      const label = labelEdgewareEvent(
-        notification.chainEvent.blockNumber,
-        chainId,
-        notification.chainEvent.data,
-      );
-      return m('li.HeaderNotificationRow', {
-        class: notification.isRead ? '' : 'active',
-        onclick: async () => {
-          const notificationArray: Notification[] = [];
-          notificationArray.push(notification);
-          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
-          if (!label.linkUrl) return;
-          await m.route.set(label.linkUrl);
-          m.redraw.sync();
-        },
-      }, [
-        m('.comment-body', [
-          m('.comment-body-top', `${label.heading} on ${chainName}`),
-          m('.comment-body-bottom', `Block ${notification.chainEvent.blockNumber}`),
-          m('.comment-body-excerpt', label.label),
-        ]),
-      ]);
-    } else {
-      const {
-        author,
-        createdAt,
-        notificationHeader,
-        notificationBody,
-        path,
-        pageJump
-      } = getNotificationFields(category, JSON.parse(notification.data));
-
-      return getHeaderNotificationRow(
-        author,
-        createdAt,
-        notificationHeader,
-        notificationBody,
-        path,
-        pageJump
-      );
-    }
-
-    // else if (category === NotificationCategories.NewCommunity) {
-    //   //const { created_at, proposal_id } = JSON.parse(notification.data);
-    //   //const thread = app.threads.store.getByIdentifier(proposal_id);
-    //   const community = app.activeId();
-
-    //   return getHeaderHeaderNotificationRow(
-    //     moment.utc(created_at),
-    //     null,
-    //     `New community created`,
-    //     '',
-    //     `/${community}/`);
-    // }
-  },
 };
 
 const getBatchNotificationFields = (category, data: IPostNotificationData, length) => {

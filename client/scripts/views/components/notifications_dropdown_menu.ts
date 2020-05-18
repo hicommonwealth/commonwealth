@@ -3,7 +3,7 @@ import Infinite from 'mithril-infinite';
 import app from 'state';
 
 import { PopoverMenu, Button, Icons } from 'construct-ui';
-import { HeaderNotificationRow, HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
+import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
 import { Notification } from 'models';
 
 const sortNotifications = (n: Notification[], prop: string, prop2: string) => {
