@@ -40,11 +40,7 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
             maxPages: 1, // prevents rollover/repeat
             pageData: () => sortedNotifications,
             item: (data, opts, index) => {
-              if (data.length > 1) {
-                return m(HeaderBatchNotificationRow, {notifications: data });
-              } else {
-                return m(HeaderNotificationRow, { notification: data[0] });
-              }
+              return m(HeaderBatchNotificationRow, { notifications: data });
             },
           })
           : m('li.no-notifications', 'No Notifications'),

@@ -194,6 +194,9 @@ export const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
 };
 
 const getBatchNotificationFields = (category, data: IPostNotificationData, length) => {
+  if (length === 1) {
+    return getNotificationFields(category, data);
+  }
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
     parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
 
