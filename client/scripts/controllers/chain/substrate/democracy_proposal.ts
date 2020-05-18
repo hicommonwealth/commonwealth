@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
-  Proposal as ProposalModel, ProposalStatus, ProposalEndTime, DepositVote,
+  Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
 import {
@@ -30,7 +30,7 @@ const backportEventToAdapter = (
   };
 };
 
-class SubstrateDemocracyProposal extends ProposalModel<
+class SubstrateDemocracyProposal extends Proposal<
   ApiRx,
   SubstrateCoin,
   ISubstrateDemocracyProposal,
@@ -48,8 +48,7 @@ class SubstrateDemocracyProposal extends ProposalModel<
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _hash: string;
-  public get hash() { return this._hash; }
+  public readonly hash: string;
 
   public get votingType() {
     return VotingType.SimpleYesApprovalVoting;
@@ -106,7 +105,7 @@ class SubstrateDemocracyProposal extends ProposalModel<
     this._Proposals = Proposals;
     this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
     this._author = this._Accounts.fromAddress(eventData.proposer);
-    this._hash = eventData.proposalHash;
+    this.hash = eventData.proposalHash;
 
     // see if preimage exists and populate data if it does
     const preimage = this._Proposals.app.chainEntities.getPreimage(eventData.proposalHash);
@@ -142,7 +141,7 @@ class SubstrateDemocracyProposal extends ProposalModel<
         break;
       }
       case SubstrateEventKind.PreimageNoted: {
-        const preimage = this._Proposals.app.chainEntities.getPreimage(this._hash);
+        const preimage = this._Proposals.app.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._method = preimage.method;
           this._section = preimage.section;

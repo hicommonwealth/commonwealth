@@ -1,6 +1,5 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,7 +14,7 @@ export const Errors = {
   InvalidAddress: 'Tried to create this community with an invalid address',
 };
 
-const createCommunity = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }

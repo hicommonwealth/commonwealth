@@ -96,7 +96,7 @@ const CouncilVotingModal = {
               // votes array has type string[]
               vnode.state.votes = result;
             },
-            defaultSelection: defaultSelection[0]
+            defaultSelection
           }),
           candidates.length === 0 && m('.no-candidates', 'No candidates to vote for'),
           vnode.state.error && m('.voting-error', vnode.state.error),

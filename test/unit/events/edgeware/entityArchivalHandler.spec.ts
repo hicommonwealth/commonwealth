@@ -4,6 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import WebSocket from 'ws';
+import { EventEmitter } from 'events';
 
 import { resetDatabase } from '../../../../server-test';
 import models from '../../../../server/database';
@@ -11,18 +12,10 @@ import { CWEvent } from '../../../../shared/events/interfaces';
 import StorageHandler from '../../../../server/eventHandlers/storage';
 import EntityArchivalHandler from '../../../../server/eventHandlers/edgeware/entityArchival';
 import { SubstrateEventKind, SubstrateEntityKind } from '../../../../shared/events/edgeware/types';
+import { NotificationCategories, WebsocketMessageType } from '../../../../shared/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
-
-class FakeWebsocketServer {
-  constructor(
-    private readonly _emitValidator: (event: string | symbol, ...args: any[]) => void,
-  ) { }
-  public emit(event: string | symbol, ...args: any[]): void {
-    this._emitValidator(event, ...args);
-  }
-}
 
 const setupDbEvent = async (event: CWEvent) => {
   const storageHandler = new StorageHandler(models, 'edgeware');
@@ -47,11 +40,19 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const wss = new FakeWebsocketServer((wssEvent, data) => {
-      assert.equal(wssEvent, 'server-event');
-      // TODO: validate data
-    }) as unknown as WebSocket.Server;
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', wss);
+    const dbEventType = await dbEvent.getChainEventType();
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
+      assert.equal(payload.event, WebsocketMessageType.ChainEntity);
+      assert.deepEqual(payload.data.chainEvent, dbEvent.toJSON());
+      assert.deepEqual(payload.data.chainEventType, dbEventType.toJSON());
+      assert.equal(payload.data.chainEntity.chain, 'edgeware');
+      assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.DemocracyReferendum);
+      assert.equal(payload.data.chainEntity.type_id, '3');
+    });
+    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -89,12 +90,33 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const createDbEvent = await setupDbEvent(createEvent);
+    const createDbEventType = await createDbEvent.getChainEventType();
     const updateDbEvent = await setupDbEvent(updateEvent);
-    const wss = new FakeWebsocketServer((wssEvent, data) => {
-      assert.equal(wssEvent, 'server-event');
-      // TODO: validate data
-    }) as unknown as WebSocket.Server;
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', wss);
+    const updateDbEventType = await updateDbEvent.getChainEventType();
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    let nEmissions = 0;
+    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
+      assert.equal(payload.event, WebsocketMessageType.ChainEntity);
+      if (nEmissions === 0) {
+        assert.deepEqual(payload.data.chainEvent, createDbEvent.toJSON());
+        assert.deepEqual(payload.data.chainEventType, createDbEventType.toJSON());
+        assert.equal(payload.data.chainEntity.chain, 'edgeware');
+        assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.TreasuryProposal);
+        assert.equal(payload.data.chainEntity.type_id, '5');
+      } else if (nEmissions === 1) {
+        assert.deepEqual(payload.data.chainEvent, updateDbEvent.toJSON());
+        assert.deepEqual(payload.data.chainEventType, updateDbEventType.toJSON());
+        assert.equal(payload.data.chainEntity.chain, 'edgeware');
+        assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.TreasuryProposal);
+        assert.equal(payload.data.chainEntity.type_id, '5');
+      } else {
+        assert.fail('more than 2 emissions');
+      }
+      nEmissions++;
+    });
+    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
 
     // process event
     const handleCreateEvent = await eventHandler.handle(createEvent, createDbEvent);
@@ -123,11 +145,13 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const wss = new FakeWebsocketServer((wssEvent, data) => {
-      assert.equal(wssEvent, 'server-event');
-      // TODO: validate data
-    }) as unknown as WebSocket.Server;
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', wss);
+
+    // set up wss expected results
+    const mockWssServer = new EventEmitter();
+    mockWssServer.on(WebsocketMessageType.ChainEntity, (payload) => {
+      assert.fail('should not emit event');
+    });
+    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);

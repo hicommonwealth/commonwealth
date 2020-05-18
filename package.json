@@ -63,6 +63,7 @@
     "@types/chai": "^4.1.7",
     "@types/express": "^4.17.1",
     "@types/filesystem": "^0.0.29",
+    "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/mithril": "^2.0.2",
     "@types/mixpanel-browser": "^2.23.1",

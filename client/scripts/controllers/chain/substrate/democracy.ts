@@ -2,7 +2,7 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Vote as SrmlVote, BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ITXModalData, ProposalModule } from 'models';
+import { ITXModalData, ProposalModule, ChainEntity } from 'models';
 import { SubstrateEntityKind } from 'events/edgeware/types';
 import { default as SubstrateChain } from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -29,6 +29,13 @@ class SubstrateDemocracy extends ProposalModule<
   private _useRedesignLogic: boolean;
   public get isRedesignLogic() { return this._useRedesignLogic; }
 
+  public getByHash(hash: string) {
+    return this.store.getAll().find((referendum) => referendum.hash === hash);
+  }
+
+  protected _entityConstructor(entity: ChainEntity): SubstrateDemocracyReferendum {
+    return new SubstrateDemocracyReferendum(this._Chain, this._Accounts, this, entity);
+  }
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean): Promise<void> {
     this._Chain = ChainInfo;
@@ -36,8 +43,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
       const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
-      const proposals = entities
-        .map(async (e) => new SubstrateDemocracyReferendum(ChainInfo, Accounts, this, e));
+      const proposals = entities.map((e) => this._entityConstructor(e));
 
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters

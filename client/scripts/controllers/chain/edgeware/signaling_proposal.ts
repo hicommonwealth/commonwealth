@@ -116,12 +116,13 @@ export class EdgewareSignalingProposal
   }
 
   public get votingType() {
-    // TODO: support ranked-choice votes
-    return (this.data.voteType.toString() === 'binary')
-      ? VotingType.SimpleYesNoVoting // TODO: generalize this to what the options are
-      : (this.data.voteType.toString() === 'multioption')
-        ? VotingType.MultiOptionVoting
-        : VotingType.RankedChoiceVoting;
+    if (this.data.voteType.toString().toLowerCase() === 'binary') {
+      return VotingType.SimpleYesNoVoting;
+    } else if (this.data.voteType.toString().toLowerCase() === 'multioption') {
+      return VotingType.MultiOptionVoting;
+    } else {
+      return VotingType.RankedChoiceVoting;
+    }
   }
   public get votingUnit() {
     return VotingUnit.CoinVote;
@@ -179,13 +180,17 @@ export class EdgewareSignalingProposal
   }
 
   public update(e: ChainEvent) {
+    if (this.completed) {
+      return;
+    }
     switch (e.data.kind) {
       case SubstrateEventKind.SignalingNewProposal: {
         break;
       }
       case SubstrateEventKind.SignalingCommitStarted: {
         if (this.stage !== SignalingProposalStage.PreVoting) {
-          throw new Error('signaling stage out of order!');
+          console.error('signaling stage out of order!');
+          return;
         }
         this._stage.next(SignalingProposalStage.Commit);
         this._endBlock.next(e.data.endBlock);
@@ -193,7 +198,8 @@ export class EdgewareSignalingProposal
       }
       case SubstrateEventKind.SignalingVotingStarted: {
         if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
-          throw new Error('signaling stage out of order!');
+          console.error('signaling stage out of order!');
+          return;
         }
         this._stage.next(SignalingProposalStage.Voting);
         this._endBlock.next(e.data.endBlock);
@@ -201,7 +207,8 @@ export class EdgewareSignalingProposal
       }
       case SubstrateEventKind.SignalingVotingCompleted: {
         if (this.stage !== SignalingProposalStage.Voting) {
-          throw new Error('signaling stage out of order!');
+          console.error('signaling stage out of order!');
+          return;
         }
         this._stage.next(SignalingProposalStage.Completed);
         this.complete();

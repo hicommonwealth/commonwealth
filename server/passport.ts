@@ -2,7 +2,7 @@ import passport from 'passport';
 import passportLocal from 'passport-local';
 import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
-import { UserRequest } from './types';
+import { Request } from 'express';
 
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK } from './config';
 import { NotificationCategories } from '../shared/types';
@@ -42,8 +42,7 @@ function setupPassport(models) {
     callbackURL: GITHUB_OAUTH_CALLBACK,
     scope: 'gist',
     passReqToCallback: true,
-  }, async (req: UserRequest, accessToken, refreshToken, profile, cb) => {
-
+  }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     const githubAccount = await models.SocialAccount.findOne({
       where: { provider: 'github', provider_userid: profile.id }
     });
@@ -52,9 +51,9 @@ function setupPassport(models) {
     // transfer the Github link to the current user.
     if (githubAccount !== null) {
       // update profile data
-      if (accessToken !== githubAccount.access_token ||
-          refreshToken !== githubAccount.refresh_token ||
-          profile.username !== githubAccount.provider_username) {
+      if (accessToken !== githubAccount.access_token
+        || refreshToken !== githubAccount.refresh_token
+        || profile.username !== githubAccount.provider_username) {
         githubAccount.access_token = accessToken;
         githubAccount.refresh_token = refreshToken;
         githubAccount.provider_username = profile.username;

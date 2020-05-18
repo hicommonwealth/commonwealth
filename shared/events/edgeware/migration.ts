@@ -136,18 +136,16 @@ async function fetchTreasuryProposals(api: ApiPromise, blockNumber: number): Pro
 async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {
   log.info('Migrating collective proposals...');
   const councilProposals = await api.derive.council.proposals();
-  let proposals: DeriveCollectiveProposal[];
+  let technicalCommitteeProposals = [];
   if (api.query.technicalCommittee) {
-    const technicalCommitteeProposals = await api.derive.technicalCommittee.proposals();
-    proposals = [...councilProposals, ...technicalCommitteeProposals];
-  } else {
-    proposals = councilProposals;
+    technicalCommitteeProposals = await api.derive.technicalCommittee.proposals();
   }
-  const proposedEvents = proposals
+  const constructEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
     .filter((p) => p.proposal && p.votes)
     .map((p) => {
       return {
         kind: SubstrateEventKind.CollectiveProposed,
+        collectiveName: name,
         proposalIndex: +p.votes.index,
         proposalHash: p.hash.toString(),
         threshold: +p.votes.threshold,
@@ -161,6 +159,10 @@ async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): P
         proposer: '',
       } as ISubstrateCollectiveProposed;
     });
+  const proposedEvents = [
+    ...constructEvents(councilProposals, 'council'),
+    ...constructEvents(technicalCommitteeProposals, 'technicalCommittee')
+  ];
   log.info(`Found ${proposedEvents.length} collective proposals!`);
   return proposedEvents.map((data) => ({ blockNumber, data }));
 }

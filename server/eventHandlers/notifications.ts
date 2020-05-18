@@ -36,14 +36,11 @@ export default class extends IEventHandler {
       this._models,
       NotificationCategories.ChainEvent,
       dbEventType.id,
-      {
-        created_at: new Date(),
-      },
+      { chainEvent: dbEvent, chainEventType: dbEventType },
       { }, // TODO: add webhook data once specced out
       this._wss,
       event.excludeAddresses,
       event.includeAddresses,
-      dbEvent.id,
     );
     log.info(`Emitted ${dbNotifications.length} notifications.`);
     return dbEvent;

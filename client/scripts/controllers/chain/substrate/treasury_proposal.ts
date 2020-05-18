@@ -109,6 +109,9 @@ export class SubstrateTreasuryProposal
   }
 
   public update(e: ChainEvent) {
+    if (this.completed) {
+      return;
+    }
     switch (e.data.kind) {
       case SubstrateEventKind.TreasuryProposed: {
         break;

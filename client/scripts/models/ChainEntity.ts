@@ -28,7 +28,7 @@ class ChainEntity {
     this._updatedAt = moment(updatedAt);
 
     // TODO: move this into a chain event controller to avoid duplication
-    this._chainEvents = chainEvents
+    this._chainEvents = (chainEvents || [])
       .map((c) => ChainEvent.fromJSON(c))
       .sort(({ id: id1 }, { id: id2 }) => id1 - id2); // sort ascending
   }
@@ -46,11 +46,13 @@ class ChainEntity {
     );
   }
 
-  public update(updatedAt, chainEventJson) {
-    this._updatedAt = moment(updatedAt);
-
-    // TODO: avoid duplication here as well
-    this._chainEvents = chainEventJson.map((c) => ChainEvent.fromJSON(c));
+  public addEvent(chainEvent: ChainEvent, updatedAt?: moment.Moment) {
+    if (!this._chainEvents.find((e) => e.id === chainEvent.id)) {
+      this._chainEvents.push(chainEvent);
+      if (updatedAt) {
+        this._updatedAt = updatedAt;
+      }
+    }
   }
 }
 

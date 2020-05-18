@@ -1,10 +1,9 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const viewCount = async (models, cache: ViewCountCache, req: UserRequest, res: Response, next: NextFunction) => {
+const viewCount = async (models, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.object_id) {
     return next(new Error('Must provide object_id'));
   }
