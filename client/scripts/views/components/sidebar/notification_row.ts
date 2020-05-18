@@ -120,15 +120,6 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
       ]);
     };
 
-    const {
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    } = getNotificationFields(category, JSON.parse(notification.data));
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
