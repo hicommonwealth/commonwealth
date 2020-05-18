@@ -103,12 +103,11 @@ class TagsController {
     }
   }
 
-  public async refreshAll(communityId?, chainId?, reset = false) {
+  public async refreshAll(chainId, communityId, reset = false) {
     try {
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
-        chain: chainId,
-        community: communityId,
-        jwt: app.login.jwt,
+        chain: chainId || app.activeChainId(),
+        community: communityId || app.activeCommunityId(),
       });
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);

@@ -22,6 +22,7 @@ const modelFromServer = (thread) => {
     thread.kind,
     thread.version_history,
     thread.community,
+    thread.chain,
     thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),

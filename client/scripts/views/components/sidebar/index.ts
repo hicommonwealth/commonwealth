@@ -36,6 +36,8 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import { isRoleOfCommunity } from 'helpers/roles';
+import AdminPanel from '../admin_panel';
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
@@ -139,6 +141,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
               contentLeft: m(Icon, { name: Icons.BOX }),
             }),
+          // admin panel (all communities)
+          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
+          (app.community || app.chain) &&
+          m(AdminPanel),
           // // chat (all communities)
           // (app.community || app.chain) &&
           //   m(ListItem, {
