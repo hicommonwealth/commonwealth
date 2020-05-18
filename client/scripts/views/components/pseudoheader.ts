@@ -8,12 +8,13 @@ import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
 import { Button, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
-import NotificationRow from './sidebar/notification_row';
+import { HeaderNotificationRow } from './sidebar/notification_row';
 import { initAppState } from '../../app';
 import { notifySuccess } from '../../controllers/app/notifications';
 import User from './widgets/user';
 import LoginModal from '../modals/login_modal';
 import FeedbackModal from '../modals/feedback_modal';
+import NotificationsDrowdownMenu from './notifications_dropdown_menu';
 
 
 const PseudoHeader : m.Component<{}, {}> = {
@@ -41,32 +42,7 @@ const PseudoHeader : m.Component<{}, {}> = {
           onclick: () => app.modals.create({ modal: LoginModal }),
         }),
         // logged in: notifications menu
-        app.isLoggedIn() && m(PopoverMenu, {
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          trigger: m(Button, {
-            iconLeft: Icons.BELL,
-          }),
-          position: 'bottom-end',
-          closeOnContentClick: true,
-          menuAttrs: {
-            align: 'left',
-          },
-          class: 'notification-menu',
-          content: m('.notification-list', [
-            notifications.length > 0
-              ? m(Infinite, {
-                maxPages: 8,
-                pageData: () => notifications,
-                item: (data) => {
-                  return m(NotificationRow, {
-                    notification: data
-                  });
-                },
-              })
-              : m('li.no-notifications', 'No Notifications'),
-          ]),
-        }),
+        app.isLoggedIn() && m(NotificationsDrowdownMenu),
         // logged in: select address
         app.isLoggedIn() && m(PopoverMenu, {
           closeOnContentClick: true,
