@@ -166,7 +166,12 @@ const HeaderNotificationRow: m.Component<IHeaderNotificationRow> = {
         notificationBody,
         path,
         pageJump
-      } = getNotificationFields(category, JSON.parse(notification.data));
+      } = getNotificationFields(
+        category,
+        typeof notification.data === 'string'
+          ? JSON.parse(notification.data)
+          : notification.data
+      );
 
       return getHeaderNotificationRow(
         author,
