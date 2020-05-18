@@ -113,7 +113,7 @@ const ProposalsPage: m.Component<{}> = {
         visibleCosmosProposals && m('h4.proposals-subheader', [
           'Cosmos proposals',
           m('a.proposals-action', {
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/?type=${ProposalType.CosmosProposal}`),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
           }, 'New'),
         ]),
         visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),

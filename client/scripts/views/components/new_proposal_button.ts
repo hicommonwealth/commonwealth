@@ -68,7 +68,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
           (activeAccount instanceof CosmosAccount || activeAccount instanceof SubstrateAccount)
             && m(MenuDivider),
           activeAccount instanceof CosmosAccount && m(MenuItem, {
-            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal//?type=${ProposalType.CosmosProposal}`),
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
             label: 'New proposal'
           }),
           activeAccount instanceof SubstrateAccount && activeAccount.chainClass === ChainClass.Edgeware && m(MenuItem, {
@@ -76,16 +76,16 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
             label: 'New signaling proposal'
           }),
           activeAccount instanceof SubstrateAccount && m(MenuItem, {
-            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/?type=${ProposalType.SubstrateTreasuryProposal}`),
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateTreasuryProposal }),
             label: 'New treasury proposal'
           }),
           activeAccount instanceof SubstrateAccount && m(MenuItem, {
-            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/?type=${ProposalType.SubstrateDemocracyProposal}`),
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateDemocracyProposal }),
             label: 'New democracy proposal'
           }),
           activeAccount instanceof SubstrateAccount && m(MenuItem, {
             class: activeAccount.isCouncillor ? '' : 'disabled',
-            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/?type=${ProposalType.SubstrateCollectiveProposal}`),
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateCollectiveProposal }),
             label: 'New council motion'
           }),
         ],
