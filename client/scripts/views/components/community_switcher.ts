@@ -147,7 +147,7 @@ const CommunitySwitcher: m.Component<{}, { communityMenuVisible: boolean }> = {
         communityRoles.map((role) => {
           const address = app.login.addresses.find((a) => a.id === role.address_id);
           const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
-          return m(CommunitySwitcherCommunity, { community, address });
+          if (community) return m(CommunitySwitcherCommunity, { community, address });
         }),
         app.isLoggedIn() && m(Popover, {
           portalAttrs: { class: 'community-menu-portal' },
