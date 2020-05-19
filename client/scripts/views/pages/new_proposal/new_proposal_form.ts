@@ -69,7 +69,6 @@ const NewProposalForm = {
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
       if (hasDepositChooser) {
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.minimumDeposit;
-        console.log(dataLoaded);
       }
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
