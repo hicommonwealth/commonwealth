@@ -22,11 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     validate: {
       // roles should only have 1 of these properties
       eitherOffchainOrOnchain() {
-        if (!(this.chain_id === undefined || this.offchain_community_id === undefined)) {
-          throw new Error('Either chain_id or offchain_community_id!');
-        }
-        if (this.chain_id !== undefined && this.offchain_community_id !== undefined) {
-          throw new Error('Either chain_id or offchain_community_id not both!');
+        if (this.chain_id && this.offchain_community_id) {
+          throw new Error('Roles can have either chain_id or offchain_community_id, not both!');
         }
       }
     }
