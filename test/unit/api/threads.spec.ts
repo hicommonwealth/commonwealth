@@ -17,7 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 const markdownComment = require('../../util/fixtures/markdownComment');
 
-describe.only('Thread Tests', () => {
+describe('Thread Tests', () => {
   const community = 'staking';
   const chain = 'ethereum';
 
@@ -28,7 +28,7 @@ describe.only('Thread Tests', () => {
   let userAddress;
   let thread;
 
-  beforeEach(async () => {
+  before(async () => {
     await resetDatabase();
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
@@ -222,7 +222,7 @@ describe.only('Thread Tests', () => {
     });
   });
 
-  describe.only('/createComment', () => {
+  describe('/createComment', () => {
     const kind = 'forum';
 
     beforeEach(async () => {

@@ -14,6 +14,10 @@ import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
+const markdownThread = require('../../util/fixtures/markdownThread');
+const markdownComment = require('../../util/fixtures/markdownComment');
+const richTextThread = require('../../util/fixtures/richTextThread');
+const richTextComment = require('../../util/fixtures/richTextComment');
 
 const expectErrorOnResponse = (statusCode, errorMsg, response) => {
   expect(response.statusCode).to.be.equal(statusCode);
@@ -208,11 +212,6 @@ describe('Webhook Tests', () => {
   });
 
   describe('Integration Tests', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
-    const markdownComment = require('../../util/fixtures/markdownComment');
-    const richTextThread = require('../../util/fixtures/richTextThread');
-    const richTextComment = require('../../util/fixtures/richTextComment');
-
     before('reset database', async () => {
       await resetDatabase();
     });
@@ -230,13 +229,14 @@ describe('Webhook Tests', () => {
         jwt: jwtToken,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
+        kind: 'forum',
       });
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
-        proposalIdentifier: `discussion_${res.result.id}`,
+        root_id: `discussion_${res.result.id}`,
       });
       res = await modelUtils.createThread({
         chain,
@@ -244,13 +244,14 @@ describe('Webhook Tests', () => {
         jwt: jwtToken,
         title: decodeURIComponent(richTextThread.title),
         body: decodeURIComponent(richTextThread.body),
+        kind: 'forum',
       });
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
-        proposalIdentifier: `discussion_${res.result.id}`,
+        root_id: `discussion_${res.result.id}`,
       });
     });
   });
