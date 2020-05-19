@@ -107,6 +107,10 @@ const NewProposalForm = {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
 
+    if (hasAction && !(app.vm.activeAccount as SubstrateAccount).isCouncillor) {
+      dataLoaded = false;
+    }
+
     const createNewProposal = () => {
       const done = (result) => {
         vnode.state.error = '';
