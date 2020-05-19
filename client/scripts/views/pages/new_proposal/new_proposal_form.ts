@@ -25,7 +25,7 @@ import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'mod
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { FormGroup, Button, Grid, Col } from 'construct-ui';
+import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 
 
@@ -69,6 +69,7 @@ const NewProposalForm = {
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
       if (hasDepositChooser) {
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.minimumDeposit;
+        console.log(dataLoaded);
       }
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
@@ -92,13 +93,11 @@ const NewProposalForm = {
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
-      const props = ['bondMinimum', 'bondPct'];
-      dataLoaded = props.every((p) => Object.prototype.hasOwnProperty.call(treasury, p));
+      dataLoaded = !!treasury.bondMinimum && !!treasury.bondPct;
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
-      const props = ['candidacyBond', 'desiredRunnersUp'];
-      dataLoaded = props.every((p) => Object.prototype.hasOwnProperty.call(elections, p));
+      dataLoaded = !!elections.candidacyBond && !!elections.desiredRunnersUp;
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
       hasTitleAndDescription = true;
       hasDepositChooser = true;
@@ -294,7 +293,14 @@ const NewProposalForm = {
     const isCosmos = app.chain.base === ChainBase.CosmosSDK;
     const asCosmos = (app.chain as Cosmos);
 
-    if (!dataLoaded) return;
+    if (!dataLoaded) {
+      return m(Spinner, {
+        fill: true,
+        message: 'Proposal loading...',
+        size: 'xl',
+        style: 'visibility: visible; opacity: 1;'
+      });
+    }
 
     return m('.NewProposalForm', [
       m(Grid, [

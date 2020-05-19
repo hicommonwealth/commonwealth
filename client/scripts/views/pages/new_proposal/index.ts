@@ -9,10 +9,10 @@ import NewProposalForm from './new_proposal_form';
 
 const NewProposalPage = {
   oncreate: (vnode) => {
-    vnode.state.typeEnum = vnode.attrs.type;
-    vnode.state.titlePre = 'Create';
   },
   view: (vnode) => {
+    vnode.state.typeEnum = vnode.attrs.type;
+    vnode.state.titlePre = 'Create';
     return m('.NewProposalPage', [
       m('.forum-container', [
         m('h2.page-title', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
