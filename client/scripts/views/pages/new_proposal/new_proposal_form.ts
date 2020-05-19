@@ -27,8 +27,6 @@ import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { FormGroup, Button, Grid, Col } from 'construct-ui';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
-import { CompactModalExitButton } from '../../modal';
-import { slugify } from '../../../helpers';
 
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -41,32 +39,37 @@ const NewProposalForm = {
     const callback = vnode.attrs.callback;
     const author = app.vm.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntity = app.community || app.chain;
 
     if (!author) return m('div', 'Must be logged in');
     if (!callback) return m('div', 'Must have callback');
 
-    let hasCouncilMotionChooser;
-    let hasAction;
-    let hasToggle;
-    let hasPreimageInput;
-    let hasTitleAndDescription;
-    let hasTags;
-    let hasBeneficiaryAndAmount;
-    let hasPhragmenInfo;
-    let hasDepositChooser;
+    let hasCouncilMotionChooser : boolean;
+    let hasAction : boolean;
+    let hasToggle : boolean;
+    let hasPreimageInput : boolean;
+    let hasTitleAndDescription : boolean;
+    let hasTags : boolean;
+    let hasBeneficiaryAndAmount : boolean;
+    let hasPhragmenInfo : boolean;
+    let hasDepositChooser : boolean;
     // council motion
-    let hasVotingPeriodAndDelaySelector;
-    let hasReferendumSelector;
-    let hasExternalProposalSelector;
-    let hasTreasuryProposalSelector;
-    let hasThreshold;
+    let hasVotingPeriodAndDelaySelector : boolean;
+    let hasReferendumSelector : boolean;
+    let hasExternalProposalSelector : boolean;
+    let hasTreasuryProposalSelector : boolean;
+    let hasThreshold : boolean;
     // moloch proposal
-    let hasMolochFields;
+    let hasMolochFields : boolean;
+    // data loaded
+    let dataLoaded : boolean = true;
     if (proposalTypeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
       hasToggle = true;
       hasDepositChooser = (vnode.state.toggleValue === 'proposal');
+      if (hasDepositChooser) {
+        dataLoaded = !!(app.chain as Substrate).democracyProposals?.minimumDeposit;
+      }
     } else if (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal) {
       hasCouncilMotionChooser = true;
       hasAction = vnode.state.councilMotionType === 'createExternalProposal'
@@ -80,6 +83,7 @@ const NewProposalForm = {
       hasTreasuryProposalSelector = vnode.state.councilMotionType === 'createTreasuryApprovalMotion'
         || vnode.state.councilMotionType === 'createTreasuryRejectionMotion';
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
+      if (hasExternalProposalSelector) dataLoaded = !!(app.chain as Substrate).democracyProposals;
     } else if (proposalTypeEnum === ProposalType.EdgewareSignalingProposal) {
       hasTitleAndDescription = true;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
@@ -87,11 +91,18 @@ const NewProposalForm = {
       hasTags = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
+      const treasury = (app.chain as Substrate).treasury;
+      const props = ['bondMinimum', 'bondPct'];
+      dataLoaded = props.every((p) => Object.prototype.hasOwnProperty.call(treasury, p));
     } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
       hasPhragmenInfo = true;
+      const elections = (app.chain as Substrate).phragmenElections;
+      const props = ['candidacyBond', 'desiredRunnersUp'];
+      dataLoaded = props.every((p) => Object.prototype.hasOwnProperty.call(elections, p));
     } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
       hasTitleAndDescription = true;
       hasDepositChooser = true;
+      dataLoaded = !!(app.chain as Cosmos).governance;
     } else if (proposalTypeEnum === ProposalType.MolochProposal) {
       hasMolochFields = true;
     } else {
@@ -261,6 +272,7 @@ const NewProposalForm = {
         .then(done);
     };
 
+    // construct-ui grid options
     const span = {
       xs: 12,
       sm: 12,
@@ -276,6 +288,14 @@ const NewProposalForm = {
       vnode.state.councilMotionDescription = motions[0].description;
     }
 
+    // shorthands
+    const isSubstrate = app.chain.base === ChainBase.Substrate;
+    const asSubstrate = (app.chain as Substrate);
+    const isCosmos = app.chain.base === ChainBase.CosmosSDK;
+    const asCosmos = (app.chain as Cosmos);
+
+    if (!dataLoaded) return;
+
     return m('.NewProposalForm', [
       m(Grid, [
         m(Col, { span }, [
@@ -284,12 +304,12 @@ const NewProposalForm = {
             m(DropdownFormField, {
               title: 'Motion',
               choices: motions.map(
-                (m) => ({ name: 'councilMotionType', value: m.name, label: m.label })
+                (m_) => ({ name: 'councilMotionType', value: m_.name, label: m_.label })
               ),
               callback: (result) => {
                 if (vnode.state.councilMotionType === result) return;
                 vnode.state.councilMotionType = result;
-                vnode.state.councilMotionDescription = motions.find((m) => m.name === result).description;
+                vnode.state.councilMotionDescription = motions.find((m_) => m_.name === result).description;
                 m.redraw();
               },
             }),
@@ -299,18 +319,18 @@ const NewProposalForm = {
           // actions
           hasAction && m(EdgewareFunctionPicker),
           hasTags
-          && m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
-          }),
+            && m(AutoCompleteTagForm, {
+              results: activeEntity.meta.tags || [],
+              updateFormData: (tags: string[]) => {
+                vnode.state.form.tags = tags;
+              },
+              updateParentErrors: (err: string) => {
+                if (err) vnode.state.error = err;
+                else delete vnode.state.error;
+                m.redraw();
+              },
+              tabindex: 3,
+            }),
           hasTitleAndDescription && [
             m(TextInputFormField, {
               options: {
@@ -369,10 +389,10 @@ const NewProposalForm = {
             m('p', [
               'Bond: ',
               app.chain.chain.coins(
-                Math.max((vnode.state.form.amount ? vnode.state.form.amount.inDollars : 0)
-                  * (app.chain as Substrate).treasury.bondPct,
-                (app.chain as Substrate).treasury.bondMinimum.inDollars),
-                true
+                Math.max(
+                  (vnode.state.form.amount?.inDollars || 0) * (app.chain as Substrate).treasury.bondPct,
+                  (app.chain as Substrate).treasury.bondMinimum.inDollars
+                ), true
               ).format(),
               ` (${(app.chain as Substrate).treasury.bondPct * 100}% of requested amount, `,
               `minimum ${(app.chain as Substrate).treasury.bondMinimum.format()})`,
@@ -474,18 +494,17 @@ const NewProposalForm = {
                 m.redraw();
               },
             }),
-          hasTreasuryProposalSelector
-            && m(DropdownFormField, {
-              title: 'Treasury Proposal',
-              choices: (app.chain as Substrate).treasury.store.getAll().map(
-                (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
-              ),
-              callback: (result) => {
-                if (vnode.state.treasuryProposalIndex === result) return;
-                vnode.state.treasuryProposalIndex = result;
-                m.redraw();
-              },
-            }),
+          hasTreasuryProposalSelector && m(DropdownFormField, {
+            title: 'Treasury Proposal',
+            choices: (app.chain as Substrate).treasury.store.getAll().map(
+              (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
+            ),
+            callback: (result) => {
+              if (vnode.state.treasuryProposalIndex === result) return;
+              vnode.state.treasuryProposalIndex = result;
+              m.redraw();
+            },
+          }),
           hasThreshold && [
             m(TextInputFormField, {
               title: 'Threshold',
