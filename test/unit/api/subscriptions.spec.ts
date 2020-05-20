@@ -167,6 +167,7 @@ describe('Subscriptions Tests', () => {
   describe('Notification Routes', () => {
     let subscription;
     let thread;
+    let thread2;
     let notifications;
 
     it('emitting a notification', async () => {
@@ -188,6 +189,14 @@ describe('Subscriptions Tests', () => {
         address: newAddress,
         title: 'hi',
         body: 'hi you!',
+      });
+      thread2 = await modelUtils.createThread({
+        chain,
+        community,
+        jwt: newJWT,
+        address: newAddress,
+        title: 'hello',
+        body: 'hello you!',
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;
