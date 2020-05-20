@@ -9,6 +9,7 @@ import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import { sortNotifications } from 'client/scripts/helpers/notifications';
 
 chai.use(chaiHttp);
 const { expect } = chai;

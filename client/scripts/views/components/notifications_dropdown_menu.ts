@@ -5,15 +5,7 @@ import app from 'state';
 import { PopoverMenu, Button, Icons } from 'construct-ui';
 import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
 import { Notification } from 'models';
-
-const sortNotifications = (n: Notification[], prop: string, prop2: string) => {
-  return Object.values(n.reduce((acc, obj) => {
-    const key = obj[prop][prop2];
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(obj);
-    return acc;
-  }, {}));
-};
+import { sortNotifications } from 'client/scripts/helpers/notifications';
 
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
   view: (vnode) => {
