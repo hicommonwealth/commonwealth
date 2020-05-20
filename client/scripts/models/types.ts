@@ -78,4 +78,4 @@ export enum VotingUnit {
 export type ProposalEndTime = IFixedEndTime | IFixedBlockEndTime | IDynamicEndTime | IThresholdEndTime |
   INotStartedEndTime | IQueuedEndTime | IUnavailableEndTime;
 
-export type AnyProposal = Proposal<any, any, any, any, any>;
+export type AnyProposal = Proposal<any, any, any, any>;

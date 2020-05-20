@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const edgewareLockdropEvents = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const edgewareLockdropEvents = async (models, req: Request, res: Response, next: NextFunction) => {
   const filters : any = {};
   if (req.query.origin) filters.origin =
     models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('origin')),

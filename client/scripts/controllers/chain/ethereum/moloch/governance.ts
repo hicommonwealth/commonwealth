@@ -2,7 +2,6 @@ import BN from 'bn.js';
 
 import { ProposalModule, ITXModalData } from 'models';
 
-import { ICompletable } from 'adapters/shared';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import ChainObjectController from 'controllers/server/chain_objects';
 import { BigNumber } from 'ethers/utils';
@@ -14,9 +13,7 @@ import MolochAPI from './api';
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
   IMolochProposalResponse,
-  ICompletable,
-  MolochProposal,
-  null
+  MolochProposal
 > {
   // MEMBERS
   private _proposalCount: BN;
@@ -55,6 +52,10 @@ export default class MolochGovernance extends ProposalModule<
   public get fetcher() { return this._fetcher; }
 
   // INIT / DEINIT
+  protected _entityConstructor(entity): MolochProposal {
+    throw new Error('not implemented');
+  }
+
   public async init(
     api: MolochAPI,
     MolochMembers: MolochMembers,

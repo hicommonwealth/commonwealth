@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     chain_event_type_id: { type: DataTypes.STRING, allowNull: false },
     block_number: { type: DataTypes.INTEGER, allowNull: false },
-
+    entity_id: { type: DataTypes.INTEGER, allowNull: true },
     event_data: { type: DataTypes.JSONB, allowNull: false },
     created_at: { type: DataTypes.DATE, allowNull: false },
     updated_at: { type: DataTypes.DATE, allowNull: false },
@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   ChainEvent.associate = (models) => {
     // master event type
     models.ChainEvent.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
+    models.ChainEvent.belongsTo(models.ChainEntity, { foreignKey: 'entity_id', targetKey: 'id' });
   };
 
   return ChainEvent;

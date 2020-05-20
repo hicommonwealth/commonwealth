@@ -6,12 +6,13 @@ import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
-
-import { ChainClass, IChainAdapter, ChainBase } from 'models';
-import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
+import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
+import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identity';
+import { handleSubstrateEntityUpdate } from '../substrate/shared';
 
 
 class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
@@ -26,16 +27,16 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public signaling: EdgewareSignaling;
 
-  public readonly server = {
-    // proposals: new ProposalArchiveController(),
-  };
-
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
+
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    handleSubstrateEntityUpdate(this, entity, event);
+  }
 
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
@@ -82,17 +83,15 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),
     ]);
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     // this.server.proposals.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([

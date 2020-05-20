@@ -1,12 +1,10 @@
 import 'pages/validators.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import _ from 'lodash';
-import { StakingLedger } from '@polkadot/types/interfaces';
 import app, { ApiStatus } from 'state';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
@@ -18,21 +16,10 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Tabs from '../../components/widgets/tabs';
 import { createTXModal } from '../../modals/tx_signing_modal';
-
+import ListingPage from '../_listing_page';
 
 import * as CosmosValidationViews from './cosmos';
-import * as SubstrateValidationViews from './substrate';
-
-export interface IManageStakingModalState {
-  dynamic: {
-    exposures: any;
-    validators: IValidators | { [address: string]: ICosmosValidator };
-    bonded: SubstrateAccount;
-    stakingLedger: StakingLedger;
-  };
-  sending: boolean;
-  error: any;
-}
+import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
 
 export interface IValidatorAttrs {
   stash: string;
@@ -48,7 +35,7 @@ export interface IValidatorAttrs {
   onChangeHandler?: any;
 }
 
-interface IValidatorPageState {
+export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
   };
@@ -104,24 +91,35 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
+    currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
+    currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
+    activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
+    stakingLedger: (app.chain.base === ChainBase.Substrate && app.vm.activeAccount)
+      ? (app.vm.activeAccount as SubstrateAccount).stakingLedger
+      : null,
   }),
   view: (vnode) => {
     let vComponents = [];
-    let sender;
     switch (app.chain.class) {
-      case ChainClass.Kusama:
-        sender = app.vm.activeAccount as SubstrateAccount;
+      case ChainClass.Edgeware:
         vComponents = [
-          SubstrateValidationViews.ValidationPreHeader(vnode, app.chain as Substrate, sender),
-          SubstrateValidationViews.ValidatorPresentationComponent(vnode, app.chain as Substrate),
+          m(SubstratePreHeader, {
+            sender: app.vm.activeAccount as SubstrateAccount,
+            nominations: vnode.state.nominations,
+            nominationsHasChanged: vnode.state.nominationsHasChanged
+          }),
+          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
-      case ChainClass.Edgeware:
-        sender = app.vm.activeAccount as SubstrateAccount;
+      case ChainClass.Kusama:
         vComponents = [
-          SubstrateValidationViews.ValidationPreHeader(vnode, app.chain as Substrate, sender),
-          SubstrateValidationViews.ValidatorPresentationComponent(vnode, app.chain as Substrate),
+          m(SubstratePreHeader, {
+            sender: app.vm.activeAccount as SubstrateAccount,
+            nominations: vnode.state.nominations,
+            nominationsHasChanged: vnode.state.nominationsHasChanged
+          }),
+          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
       case ChainClass.CosmosHub:

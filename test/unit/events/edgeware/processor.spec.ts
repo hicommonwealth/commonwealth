@@ -77,8 +77,10 @@ describe('Edgeware Event Processor Tests', () => {
             isNone: false,
             unwrap: () => {
               return {
-                end: '123',
-                hash: 'hash',
+                proposalHash: 'hash',
+                voteThreshold: 'Supermajorityapproval',
+                end: 123,
+                delay: 20,
               };
             },
           };

@@ -1,3 +1,4 @@
+/*
 import { default as moment } from 'moment-twitter';
 import { Account } from 'models';
 import app from 'state';
@@ -63,3 +64,4 @@ class ChatController extends WebsocketController {
 }
 
 export default ChatController;
+*/

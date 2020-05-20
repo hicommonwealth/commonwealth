@@ -17,7 +17,7 @@ import {
 } from 'views/components/forms';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
@@ -102,7 +102,8 @@ const NewProposalForm = {
         vnode.state.error = '';
         callback(result);
       };
-      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any, any, any>).createTx(...a);
+      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
+        (a) => (proposalSlugToClass().get(proposalTypeEnum) as ProposalModule<any, any, any>).createTx(...a);
       let args = [];
       if (proposalTypeEnum === ProposalType.OffchainThread) {
         app.threads.create(
@@ -436,9 +437,9 @@ const NewProposalForm = {
         hasReferendumSelector
           && m(DropdownFormField, {
             title: 'Referendum',
-            choices: (app.chain as Substrate).democracy.store.getAll().map(
-              (r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })
-            ),
+            choices: (app.chain as Substrate).democracy.store.getAll()
+              .filter((r) => !r.completed)
+              .map((r) => ({ name: 'referendum', value: r.identifier, label: `${r.shortIdentifier}: ${r.title}` })),
             callback: (result) => {
               if (vnode.state.referendumId === result) return;
               vnode.state.referendumId = result;
@@ -462,9 +463,9 @@ const NewProposalForm = {
         hasTreasuryProposalSelector
           && m(DropdownFormField, {
             title: 'Treasury Proposal',
-            choices: (app.chain as Substrate).treasury.store.getAll().map(
-              (r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })
-            ),
+            choices: (app.chain as Substrate).treasury.store.getAll()
+              .filter((t) => !t.completed)
+              .map((r) => ({ name: 'external_proposal', value: r.identifier, label: r.shortIdentifier })),
             callback: (result) => {
               if (vnode.state.treasuryProposalIndex === result) return;
               vnode.state.treasuryProposalIndex = result;
@@ -553,8 +554,14 @@ const NewProposalForm = {
       ]),
       m('.compact-modal-actions', [
         m('button', {
+          // disable submission if not councillor or if no proposal available to select
           class: (proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
-                  && !(author as SubstrateAccount).isCouncillor) ? 'disabled' : '',
+              && !(author as SubstrateAccount).isCouncillor)
+            || (hasTreasuryProposalSelector
+              && !(app.chain as Substrate).treasury.store.getAll().some((t) => !t.completed))
+            || (hasReferendumSelector
+              && !(app.chain as Substrate).democracy.store.getAll().some((t) => !t.completed))
+            ? 'disabled' : '',
           type: 'submit',
           onclick: (e) => {
             e.preventDefault();

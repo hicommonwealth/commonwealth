@@ -12,6 +12,7 @@ export const NotificationCategories = {
   ThreadEdit: 'thread-edit',
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
+  EntityEvent: 'entity-event',
 };
 
 export enum ProposalType {
@@ -26,9 +27,34 @@ export enum ProposalType {
   MolochProposal = 'molochproposal',
 }
 
+export enum WebsocketEventType {
+  Connection = 'connection',
+  Message = 'message',
+  Upgrade = 'upgrade',
+  Close = 'close',
+}
+
+export enum WebsocketMessageType {
+  Message = 'message',
+  Heartbeat = 'heartbeat',
+  HeartbeatPong = 'heartbeat-pong',
+  Scrollback = 'scrollback',
+  Typing = 'typing',
+  Notification = 'notification',
+  ChainEntity = 'chain-entity',
+}
+
+export interface IWebsocketsPayload<T> {
+  event: WebsocketMessageType;
+  jwt?: string; // for outgoing payloads
+  chain?: string; // for incoming payloads
+  address?: string; // for incoming payloads
+  data?: T;
+}
+
 export interface IPostNotificationData {
   created_at: any;
-  root_id: number;
+  root_id: string;
   root_title: string;
   root_type: string;
   comment_id?: number;
@@ -47,6 +73,11 @@ export interface ICommunityNotificationData {
   author_address: string;
   chain: string;
   community: string;
+}
+
+export interface IChainEventNotificationData {
+  chainEvent: any;
+  chainEventType: any;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

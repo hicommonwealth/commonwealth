@@ -1,9 +1,8 @@
 import fs from 'fs';
 import Web3 from 'web3';
 import _ from 'lodash';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { INFURA_API_KEY } from '../config';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -103,7 +102,7 @@ const fetchSignals = async (network = 'mainnet', address, contract) => {
   return results;
 };
 
-export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export default async (models, req: Request, res: Response, next: NextFunction) => {
   const address = req.query.address;
   const network = req.query.network || 'mainnet';
 

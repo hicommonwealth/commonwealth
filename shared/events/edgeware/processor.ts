@@ -10,6 +10,9 @@ import { SubstrateBlock, isEvent } from './types';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
+import { factory, formatFilename } from '../../../server/util/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
   private _lastBlockNumber: number;
   public get lastBlockNumber() { return this._lastBlockNumber; }
@@ -42,7 +45,7 @@ export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
           const result = await enrichEvent(this._api, blockNumber, kind, data);
           return result;
         } catch (e) {
-          console.error(`Event enriching failed for ${kind}`);
+          log.error(`Event enriching failed for ${kind}`);
           return null;
         }
       } else {

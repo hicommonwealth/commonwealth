@@ -1,9 +1,8 @@
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
 
-const createRole = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createRole = async (models, req, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!chain && !community) return next(new Error('Invalid chain or community'));
   if (chain && community) return next(new Error('Invalid chain or community'));

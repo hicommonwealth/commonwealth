@@ -2,12 +2,13 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventData, SubstrateEventKind } from './edgeware/types';
+import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind } from './edgeware/types';
 
 // add other events here as union types
+export type IChainEntityKind = SubstrateEntityKind;
 export type IChainEventData = ISubstrateEventData;
 export type IChainEventKind = SubstrateEventKind;
-export const EventSupportingChains = ['edgeware', 'edgeware-local'];
+export const EventSupportingChains = ['edgeware', 'edgeware-local', 'kusama', 'kusama-local'];
 
 export interface CWEvent {
   blockNumber: number;
@@ -19,8 +20,8 @@ export interface CWEvent {
 
 // handles individual events by sending them off to storage/notifying
 export abstract class IEventHandler {
-  // throws on error
-  public abstract handle(event: CWEvent): Promise<void>;
+  // throws on error, returns a db event, or void
+  public abstract handle(event: CWEvent, dbEvent?: any): Promise<any>;
 }
 
 // parses events out of blocks into a standard format and
