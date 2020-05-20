@@ -109,6 +109,41 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
       expect(res.body.status).to.be.equal('Success');
     });
+
+    it('should pause and unpause an array of subscription', async () => {
+      const subscriptions = [];
+      const subscription1: NotificationSubscription = await modelUtils.createSubscription({
+        object_id: community,
+        jwt: jwtToken,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+      });
+      const subscription2: NotificationSubscription = await modelUtils.createSubscription({
+        object_id: community,
+        jwt: jwtToken,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+      });
+      const subscription3: NotificationSubscription = await modelUtils.createSubscription({
+        object_id: community,
+        jwt: jwtToken,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+      });
+      subscriptions.push(subscription1.id, subscription2.id, subscription3.id);
+      let res = await chai.request(app)
+        .post('/api/disableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptions });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+
+      res = await chai.request(app)
+        .post('/api/enableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptions });
+      expect(res.body.status).to.be.equal('Success');
+    });
   });
 
   describe('/deleteSubscription', () => {
