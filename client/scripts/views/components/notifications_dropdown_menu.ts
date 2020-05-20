@@ -5,7 +5,7 @@ import app from 'state';
 import { PopoverMenu, Button, Icons } from 'construct-ui';
 import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
 import { Notification } from 'models';
-import { sortNotifications } from 'client/scripts/helpers/notifications';
+import { sortNotifications } from 'helpers/notifications';
 
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
   view: (vnode) => {
