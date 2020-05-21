@@ -197,7 +197,6 @@ const ProfilePage: m.Component<{ address: string }, { loadCount: number }> = {
     if (!vnode.state.loadCount) vnode.state.loadCount = 0;
     if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
-    console.log(vnode.state.loadCount);
     if (!account) {
       if (vnode.state.loadCount < 3) {
         vnode.state.loadCount += 1;
