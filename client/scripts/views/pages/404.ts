@@ -9,12 +9,15 @@ const PageNotFound: m.Component<{}> = {
     mixpanel.track('PageVisit', { 'Page Name': '404Page' });
   },
   view: (vnode) => {
-    return m(EmptyState, {
-      class: '.PageNotFound',
-      icon: Icons.X_OCTAGON,
-      header: 'The page you were looking for could not be found.',
-      content: 'If it is not visible to the public, you may need to log in.'
-    });
+    return m('.forum-container', [
+      m(EmptyState, {
+        class: 'PageNotFound',
+        fill: false,
+        icon: Icons.X_OCTAGON,
+        header: 'The page you were looking for could not be found.',
+        content: 'If it is not visible to the public, you may need to log in.'
+      })
+    ]);
   }
 };
 

@@ -188,13 +188,14 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }> = {
+const ProfilePage: m.Component<{ address: string }, { loadCount: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
     if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
+    if (!account) console.log('no account');
     if (!account) return m(PageLoading);
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
