@@ -50,6 +50,7 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         title: 't',
         body: 't',
+        kind: 'forum',
       });
 
       const object_id = res.result.id;
@@ -189,6 +190,7 @@ describe('Subscriptions Tests', () => {
         address: newAddress,
         title: 'hi',
         body: 'hi you!',
+        kind: 'forum',
       });
       thread2 = await modelUtils.createThread({
         chain,

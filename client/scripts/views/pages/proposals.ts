@@ -20,7 +20,7 @@ import { convictionToWeight, convictionToLocktime, convictions } from 'controlle
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import NewProposalModal from 'views/modals/proposals';
+import NewProposalPage from 'views/pages/new_proposal/index';
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -113,10 +113,7 @@ const ProposalsPage: m.Component<{}> = {
         visibleCosmosProposals && m('h4.proposals-subheader', [
           'Cosmos proposals',
           m('a.proposals-action', {
-            onclick: (e) => app.modals.create({
-              modal: NewProposalModal,
-              data: { typeEnum: ProposalType.CosmosProposal }
-            })
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
           }, 'New'),
         ]),
         visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
