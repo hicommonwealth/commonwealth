@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
 import {
-  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem
+  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, Grid, Col
 } from 'construct-ui';
 
 import app from 'state';
@@ -225,10 +225,22 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
+    const span = {
+      xs: 12,
+      sm: 12,
+      md: 11,
+      lg: 10,
+      xl: 8,
+    };
+
     return m('.NewThreadPage', [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
-        m(NewThreadForm),
+        m(Grid, [
+          m(Col, { span }, [
+            m(NewThreadForm),
+          ])
+        ])
       ]),
     ]);
   },
