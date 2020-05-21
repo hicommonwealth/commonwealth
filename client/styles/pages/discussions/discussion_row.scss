@@ -24,6 +24,7 @@ $discussion-row-color: #999;
     // TODO: these sections are hidden for now
     .discussion-pre {
         margin-top: 3px;
+        margin-right: 16px;
         @include xs-max {
             display: none;
         }
@@ -41,9 +42,6 @@ $discussion-row-color: #999;
         @include xs-max {
             display: block;
         }
-    }
-    .discussion-pre, .discussion-pre-mobile {
-        display: none;
     }
     .discussion-content {
         position: relative;

@@ -86,6 +86,7 @@ const DiscussionRow: m.Component<IAttrs> = {
                     onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
                   });
                 }),
+                m(ThreadCaratMenu, { proposal }),
               ]),
             ]),
           ]),
@@ -100,14 +101,13 @@ const DiscussionRow: m.Component<IAttrs> = {
                 `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
                 [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
               ),
-            m(ThreadCaratMenu, { proposal }),
           ]),
           propType === OffchainThreadKind.Link
             && proposal.url
             && externalLink('a.discussion-link', proposal.url, [
               extractDomain(proposal.url),
               m.trust(' &rarr;'),
-          ]),
+            ]),
         ]),
       ]),
     ]);

@@ -58,10 +58,10 @@ const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstra
       const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
       const name = [
+        d2s(displayNameHex),
         !hideIdentityIcon && m(`span.identity-icon${
           isGood ? '.icon-ok-circled' : '.icon-minus-circled'
         }${isGood ? '.green' : isBad ? '.red' : '.gray'}`),
-        d2s(displayNameHex)
       ];
 
       return linkify
