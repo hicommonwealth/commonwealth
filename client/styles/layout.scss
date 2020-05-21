@@ -314,3 +314,16 @@ body.modal-open {
 .cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
     text-align: left;
 }
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
+}

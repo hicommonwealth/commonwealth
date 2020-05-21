@@ -300,7 +300,6 @@ const TagSelector: m.Component<{
             active: m.route.get() === `/${app.activeId()}/tags/`,
             label: 'Browse tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
           }),
         ]),
     ]);

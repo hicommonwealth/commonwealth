@@ -1,4 +1,15 @@
 .CommunityManagementDialog {
+    .cui-table.metadataManagementTable {
+        td {
+            padding: 10px 20px 0;
+        }
+        tr:first-child td {
+            padding-top: 18px;
+        }
+    }
+    .cui-button.save-changes-button {
+        margin: 24px 20px;
+    }
     .cui-dialog-content {
         width: 800px; // style override: default 600px
     }
@@ -11,11 +22,15 @@
             margin-left: 15px;
         }
     }
+    .ManageRoleRow {
+        padding: 8px 0;
+    }
 
     .AdminPanelContents {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        min-height: 450px;
         @media (min-width: 800px) {
             flex-direction: row;
         }
