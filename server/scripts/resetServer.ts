@@ -4,15 +4,16 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [
-  [ 'localhost:9944', 'edgeware-local' ],
-  [ 'berlin1.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin2.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin3.edgewa.re', 'edgeware-testnet' ],
-  [ 'mainnet1.edgewa.re', 'edgeware' ],
+  [ 'ws://localhost:9944', 'edgeware-local' ],
+  [ 'wss://berlin1.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin2.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin3.edgewa.re', 'edgeware-testnet' ],
+  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
   [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
@@ -401,8 +402,7 @@ const resetServer = (models, closeMiddleware) => {
       );
     };
 
-    await initChainEventTypes('edgeware');
-    await initChainEventTypes('edgeware-local');
+    await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
 
     closeMiddleware().then(() => {
       log.debug('Reset database and initialized default models');

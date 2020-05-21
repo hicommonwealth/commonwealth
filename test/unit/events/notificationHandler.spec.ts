@@ -4,12 +4,13 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { resetDatabase, closeServer } from '../../../../server-test';
-import models from '../../../../server/database';
-import { NotificationCategories } from '../../../../shared/types';
-import EdgewareEventHandler from '../../../../server/eventHandlers/edgeware';
-import { CWEvent } from '../../../../shared/events/interfaces';
-import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
+import { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
+import { NotificationCategories } from '../../../shared/types';
+import StorageHandler from '../../../server/eventHandlers/storage';
+import NotificationHandler from '../../../server/eventHandlers/notifications';
+import { CWEvent } from '../../../shared/events/interfaces';
+import { SubstrateEventKind } from '../../../shared/events/edgeware/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -49,6 +50,11 @@ const setupUserAndEventSubscriptions = async (email, address, chain) => {
   });
 };
 
+const setupDbEvent = async (event: CWEvent) => {
+  const storageHandler = new StorageHandler(models, 'edgeware');
+  return storageHandler.handle(event);
+};
+
 describe('Event Handler Tests', () => {
   before('reset database', async () => {
     await resetDatabase();
@@ -66,10 +72,6 @@ describe('Event Handler Tests', () => {
     );
   });
 
-  after('close database', async () => {
-    await closeServer();
-  });
-
   it('should create chain event and emit notification', async () => {
     // setup
     const event: CWEvent = {
@@ -83,24 +85,17 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const dbEvent = await setupDbEvent(event);
+    const eventHandler = new NotificationHandler(models);
 
     // process event
-    await eventHandler.handle(event);
+    const handledDbEvent = await eventHandler.handle(event, dbEvent);
+    assert.deepEqual(dbEvent, handledDbEvent);
 
     // expect results
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-democracy-started',
-        block_number: 10,
-      }
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].event_data, event.data);
-
     const notifications = await models['Notification'].findAll({
       where: {
-        chain_event_id: chainEvents[0].id,
+        chain_event_id: dbEvent.id,
       },
       include: [{
         model: models['Subscription'],
@@ -125,24 +120,17 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const dbEvent = await setupDbEvent(event);
+    const eventHandler = new NotificationHandler(models);
 
     // process event
-    await eventHandler.handle(event);
+    const handledDbEvent = await eventHandler.handle(event, dbEvent);
+    assert.deepEqual(dbEvent, handledDbEvent);
 
     // expect results
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-slash',
-        block_number: 11,
-      }
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].event_data, event.data);
-
     const notifications = await models['Notification'].findAll({
       where: {
-        chain_event_id: chainEvents[0].id,
+        chain_event_id: dbEvent.id,
       },
       include: [{
         model: models['Subscription'],
@@ -171,24 +159,17 @@ describe('Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const dbEvent = await setupDbEvent(event);
+    const eventHandler = new NotificationHandler(models);
 
     // process event
-    await eventHandler.handle(event);
+    const handledDbEvent = await eventHandler.handle(event, dbEvent);
+    assert.deepEqual(dbEvent, handledDbEvent);
 
     // expect results
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-democracy-started',
-        block_number: 12,
-      }
-    });
-    assert.lengthOf(chainEvents, 1);
-    assert.deepEqual(chainEvents[0].event_data, event.data);
-
     const notifications = await models['Notification'].findAll({
       where: {
-        chain_event_id: chainEvents[0].id,
+        chain_event_id: dbEvent.id,
       },
       include: [{
         model: models['Subscription'],
@@ -203,28 +184,28 @@ describe('Event Handler Tests', () => {
     assert.sameMembers(userEmails, ['alice@gmail.com']);
   });
 
-  it('should not create chain event for unknown event type', async () => {
-    const event = {
-      blockNumber: 13,
-
+  it('should not emit notifications with unknown db event', async () => {
+    const event: CWEvent = {
+      blockNumber: 12,
+      excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: 'democracy-exploded',
-        whoops: true,
+        kind: SubstrateEventKind.DemocracyStarted,
+        referendumIndex: 1,
+        proposalHash: 'hash',
+        voteThreshold: 'Supermajorityapproval',
+        endBlock: 101,
       }
     };
 
-    const eventHandler = new EdgewareEventHandler(models, null, 'edgeware');
+    const eventHandler = new NotificationHandler(models);
 
     // process event
-    await eventHandler.handle(event as unknown as CWEvent);
+    const notificationCount = await models['Notification'].count();
+    const handledEvent = await eventHandler.handle(event, null);
+    const postEventNotificationCount = await models['Notification'].count();
 
-    // confirm no event emitted
-    const chainEvents = await models['ChainEvent'].findAll({
-      where: {
-        chain_event_type_id: 'edgeware-democracy-exploded',
-        block_number: 12,
-      }
-    });
-    assert.lengthOf(chainEvents, 0);
+    // confirm nothing happened
+    assert.isUndefined(handledEvent);
+    assert.equal(notificationCount, postEventNotificationCount);
   });
 });

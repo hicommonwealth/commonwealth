@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createAddress = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.

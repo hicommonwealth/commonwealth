@@ -214,7 +214,7 @@ interface IButtonSelectorState {
 interface IButtonSelectorAttrs {
   callback?: any;
   choices: IButtonSelectorChoice[];
-  defaultSelection?: string;
+  defaultSelection?: string | string[];
   name?: string;
   subtitle?: string;
   title?: string;

@@ -22,6 +22,7 @@ import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import SelectedAddressesController from './controllers/server/selected_addresses';
+import ChainEntityController from './controllers/server/chain_entities';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -48,6 +49,7 @@ export interface IApp {
   threads: ThreadsController;
   reactions: ReactionsController;
   tags: TagsController;
+  chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -104,6 +106,7 @@ const app: IApp = {
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
+  chainEntities: new ChainEntityController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,

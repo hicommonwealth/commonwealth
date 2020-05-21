@@ -1,10 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 
-const updateChain = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
-
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.id) return next(new Error('Must provide chain id'));
   if (req.body.network) return next(new Error('Cannot change chain network'));

@@ -1,11 +1,10 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { successResponse } from '../util/apiHelpers';
 import { redirectWithLoginError, redirectWithLoginSuccess } from './finishEmailLogin';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export default async (models, req: Request, res: Response, next: NextFunction) => {
   const body = req.body;
 
   if (body.username && body.walletAddress) {

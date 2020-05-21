@@ -5,15 +5,13 @@ import faker from 'faker';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase, closeServer } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 
-const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
 
@@ -42,8 +40,16 @@ describe('Webhook Tests', () => {
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    await modelUtils.assignAdmin(result.address_id, { offchain_community_id: community });
-    await modelUtils.assignAdmin(result.address_id, { chain_id: chain });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { chain_id: chain },
+      role: 'admin',
+    });
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;

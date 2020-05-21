@@ -362,7 +362,8 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   },
   view: (vnode) => {
     let titler;
-    if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
+    // TODO: swap this to use EventSupportingChains somehow
+    if (vnode.state.chain.startsWith('edgeware') || vnode.state.chain.startsWith('kusama')) {
       titler = EdgewareTitlerFunc;
       vnode.state.eventKinds = SubstrateEventKinds;
     } else {

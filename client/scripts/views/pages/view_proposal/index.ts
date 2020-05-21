@@ -20,7 +20,8 @@ import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -46,7 +47,6 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 

@@ -1,13 +1,12 @@
 import chai from 'chai';
 import {
-  AccountId, PropIndex, Hash, ReferendumInfoTo239, BlockNumber,
-  ReferendumIndex, TreasuryProposal, Votes, Event, Extrinsic
+  AccountId, PropIndex, Hash, ReferendumInfoTo239, ReferendumInfo,
+  Proposal, TreasuryProposal, Votes, Event, Extrinsic,
 } from '@polkadot/types/interfaces';
-import { DeriveDispatch } from '@polkadot/api-derive/types';
+import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
-import { ProposalRecord } from 'edgeware-node-types/dist';
-
+import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist';
 import EdgewareEnricherFunc from '../../../../shared/events/edgeware/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
 import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
@@ -23,24 +22,42 @@ const api = constructFakeApi({
     [ 1, 'hash1', 'charlie' ],
     [ 2, 'hash2', 'dave' ]
   ] as unknown as Vec<ITuple<[PropIndex, Hash, AccountId]>>,
-  referendumInfoOf: async (idx) => +idx !== 1
-    ? constructOption()
-    : constructOption({
+  referendumInfoOf: async (idx) => +idx === 1
+    ? constructOption({
       end: 20,
-      hash: 'hash',
+      proposalHash: 'hash',
       threshold: 'Supermajorityapproval',
       delay: 10,
-    } as unknown as ReferendumInfoTo239),
+    } as unknown as ReferendumInfoTo239)
+    : +idx === 2
+      ? constructOption({
+        isOngoing: true,
+        isFinished: false,
+        asOngoing: {
+          end: 20,
+          proposalHash: 'hash',
+          threshold: 'Supermajorityapproval',
+          delay: 10,
+          tally: {
+            ayes: 100,
+            nays: 200,
+            turnout: 300,
+          }
+        },
+        asFinished: null,
+      } as unknown as ReferendumInfo)
+      : constructOption(),
   dispatchQueue: async () => [
     { index: 1, imageHash: 'hash1', at: 20 },
     { index: 2, imageHash: 'hash2', at: 30 },
   ] as unknown as DeriveDispatch[],
-  proposals: (idx) => +idx !== 1
+  treasuryProposals: (idx) => +idx !== 1
     ? constructOption()
     : constructOption({
       proposer: 'alice',
       value: 1000,
       beneficiary: 'bob',
+      bond: 2000,
     } as unknown as TreasuryProposal),
   voting: (hash) => hash.toString() !== 'hash'
     ? constructOption()
@@ -51,17 +68,45 @@ const api = constructFakeApi({
       nays: [ 'charlie', 'dave' ],
       end: 100,
     } as unknown as Votes),
-  proposalOf: (hash) => hash.toString() !== 'hash'
+  signalingProposalOf: (hash) => hash.toString() !== 'hash'
     ? constructOption()
     : constructOption({
       index: 1,
       author: 'alice',
       stage: 'Voting',
       transition_time: 20,
-      title: 'test proposal',
-      contents: 'this is a test proposal',
+      title: 'title',
+      contents: 'contents',
       vote_id: 101,
     } as unknown as ProposalRecord),
+  voteRecords: (vote_id) => +vote_id !== 101
+    ? constructOption()
+    : constructOption({
+      data: {
+        tally_type: 'onePerson',
+        vote_type: 'binary',
+      },
+      outcomes: [1, 2],
+    } as unknown as VoteRecord),
+  preimage: (hash) => hash.toString() !== 'hash'
+    ? undefined
+    : {
+      at: 30,
+      balance: 1000,
+      proposal: {
+        sectionName: 'section',
+        methodName: 'method',
+        args: ['arg1', 'arg2'],
+      },
+      proposer: 'alice',
+    } as unknown as DeriveProposalImage,
+  collectiveProposalOf: (hash) => hash.toString() !== 'hash'
+    ? constructOption()
+    : constructOption({
+      sectionName: 'section',
+      methodName: 'method',
+      args: ['arg1', 'arg2'],
+    } as unknown as Proposal)
 });
 
 class FakeEventData extends Array {
@@ -72,9 +117,10 @@ class FakeEventData extends Array {
   }
 }
 
-const constructEvent = (data: any[], typeDef: string[] = []): Event => {
+const constructEvent = (data: any[], section = '', typeDef: string[] = []): Event => {
   return {
     data: new FakeEventData(typeDef, ...data),
+    section,
   } as Event;
 };
 
@@ -95,7 +141,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   /** staking events */
   it('should enrich edgeware/old reward event', async () => {
     const kind = SubstrateEventKind.Reward;
-    const event = constructEvent([ 10000, 5 ], [ 'Balance', 'Balance' ]);
+    const event = constructEvent([ 10000, 5 ], 'staking', [ 'Balance', 'Balance' ]);
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
@@ -107,7 +153,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich new reward event', async () => {
     const kind = SubstrateEventKind.Reward;
-    const event = constructEvent([ 'Alice', 10000 ], [ 'AccountId', 'Balance' ]);
+    const event = constructEvent([ 'Alice', 10000 ], 'staking', [ 'AccountId', 'Balance' ]);
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
@@ -207,10 +253,11 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
-  it('should enrich democracy-started event', async () => {
+  it('should enrich old edgeware democracy-started event', async () => {
     const kind = SubstrateEventKind.DemocracyStarted;
     const event = constructEvent([ '1', 'Supermajorityapproval' ]);
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    console.log(result);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -222,6 +269,23 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+  it('should enrich new kusama democracy-started event', async () => {
+    const kind = SubstrateEventKind.DemocracyStarted;
+    const event = constructEvent([ '2', 'Supermajorityapproval' ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    console.log(result);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        referendumIndex: 2,
+        proposalHash: 'hash',
+        voteThreshold: 'Supermajorityapproval',
+        endBlock: 20,
+      }
+    });
+  });
+
   it('should enrich democracy-passed event', async () => {
     const kind = SubstrateEventKind.DemocracyPassed;
     const event = constructEvent([ '1' ]);
@@ -285,6 +349,11 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         proposalHash: 'hash',
         noter: 'alice',
+        preimage: {
+          method: 'method',
+          section: 'section',
+          args: ['arg1', 'arg2'],
+        }
       }
     });
   });
@@ -357,6 +426,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         proposer: 'alice',
         value: '1000',
         beneficiary: 'bob',
+        bond: '2000',
       }
     });
   });
@@ -452,28 +522,35 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   /** collective events */
   it('should enrich collective-proposed event', async () => {
     const kind = SubstrateEventKind.CollectiveProposed;
-    const event = constructEvent([ 'alice', '1', 'hash', '3' ]);
+    const event = constructEvent([ 'alice', '1', 'hash', '3' ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
       data: {
         kind,
+        collectiveName: 'council',
         proposer: 'alice',
         proposalIndex: 1,
         proposalHash: 'hash',
         threshold: 3,
+        call: {
+          method: 'method',
+          section: 'section',
+          args: ['arg1', 'arg2'],
+        }
       }
     });
   });
   it('should enrich collective-approved event', async () => {
     const kind = SubstrateEventKind.CollectiveApproved;
-    const event = constructEvent([ 'hash' ]);
+    const event = constructEvent([ 'hash' ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         proposalIndex: 1,
         threshold: 3,
@@ -484,12 +561,13 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich collective-disapproved event', async () => {
     const kind = SubstrateEventKind.CollectiveDisapproved;
-    const event = constructEvent([ 'hash' ]);
+    const event = constructEvent([ 'hash' ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         proposalIndex: 1,
         threshold: 3,
@@ -500,12 +578,13 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich collective-executed event', async () => {
     const kind = SubstrateEventKind.CollectiveExecuted;
-    const event = constructEvent([ 'hash', constructBool(true) ]);
+    const event = constructEvent([ 'hash', constructBool(true) ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         executionOk: true,
       }
@@ -513,12 +592,13 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
   it('should enrich collective-member-executed event', async () => {
     const kind = SubstrateEventKind.CollectiveExecuted;
-    const event = constructEvent([ 'hash', constructBool(false) ]);
+    const event = constructEvent([ 'hash', constructBool(false) ], 'council');
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
         kind,
+        collectiveName: 'council',
         proposalHash: 'hash',
         executionOk: false,
       }
@@ -538,6 +618,11 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         proposer: 'alice',
         proposalHash: 'hash',
         voteId: '101',
+        title: 'title',
+        description: 'contents',
+        tallyType: 'onePerson',
+        voteType: 'binary',
+        choices: ['1', '2'],
       }
     });
   });

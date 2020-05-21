@@ -1,4 +1,5 @@
-import 'pages/chat.scss';
+/*
+import 'components/community_chat.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -151,7 +152,7 @@ const Chat = {
                     if (!vnode.state.chat.isConnected) return;
                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
                     const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.vm.activeAccount, app.login.jwt);
+                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.vm.activeAccount.address, app.login.jwt);
                     vnode.state.oninput = false; // HACK: clear the typing debounce
                     $textarea.val('');
                   }
@@ -175,4 +176,5 @@ const ChatPage = {
   },
 };
 
-export default ChatPage;
+export default CommunityChatOuter;
+*/

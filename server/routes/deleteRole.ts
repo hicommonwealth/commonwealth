@@ -1,9 +1,8 @@
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
 
-const deleteRole = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const deleteRole = async (models, req, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.address_id) return next(new Error('Invalid address'));

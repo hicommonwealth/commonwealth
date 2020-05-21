@@ -1,5 +1,5 @@
-import { Coin } from 'shared/adapters/currency';
-import { IIdentifiable } from 'shared/adapters/shared';
+import { Coin } from 'adapters/currency';
+import { IIdentifiable } from 'adapters/shared';
 import Account from './Account';
 
 abstract class Identity<C extends Coin> implements IIdentifiable {

@@ -1,14 +1,15 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { parent_id, root_id, text } = req.body;
@@ -117,15 +118,17 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-    proposal = await models.Proposal.findOne({
-      where: { identifier: id, type: prefix }
-    });
+  } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    proposal = await proposalIdToEntity(models, chain.id, finalComment.root_id);
   } else {
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
-  if (!proposal || proposal.read_only) {
+  if (!proposal) {
+    await finalComment.destroy();
+    return next(new Error('Cannot comment; thread not found'));
+  }
+  if (proposal.read_only) {
     await finalComment.destroy();
     return next(new Error('Cannot comment when thread is read_only'));
   }
@@ -175,7 +178,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     root_id,
     {
       created_at: new Date(),
-      root_id: Number(proposal.id),
+      root_id: proposal.type_id || proposal.id,
       root_title: proposal.title || '',
       root_type: prefix,
       comment_id: Number(finalComment.id),
@@ -204,7 +207,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: Number(proposal.id),
+        root_id: proposal.type_id || proposal.id,
         root_title: proposal.title || '',
         root_type: prefix,
         comment_id: Number(finalComment.id),
@@ -250,7 +253,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(proposal.id),
+          root_id: proposal.type_id || proposal.id,
           root_title: proposal.title || '',
           root_type: prefix,
           comment_id: Number(finalComment.id),
@@ -260,6 +263,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
+        { }, // TODO: add webhook data for mentions
         req.wss,
         [ finalComment.Address.address ],
       );

@@ -1,14 +1,13 @@
 import sgMail from '@sendgrid/mail';
 import moment from 'moment';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const registerWaitingList = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const registerWaitingList = async (models, req: Request, res: Response, next: NextFunction) => {
   const email = req.body.email;
   const address = req.body.address;
   const chain = await models.Chain.findOne({ where: { id: req.body.chain }});

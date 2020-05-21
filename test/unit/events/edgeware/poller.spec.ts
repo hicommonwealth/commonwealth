@@ -45,7 +45,17 @@ const getMockApi = () => {
       return events[hash as unknown as number] || [];
     },
     'blockHash.multi': (blockNumbers: number[]) => {
-      return blockNumbers.map((n) => hashes[n - 100]);
+      return blockNumbers.map((n) => {
+        // fake a few values to test the size reduction actually works
+        if (n === 2600 || n === 2400) {
+          return hashes[5];
+        }
+        if (n >= 100 && n <= 110) {
+          return hashes[n - 100];
+        } else {
+          return new IMockHash(0);
+        }
+      });
     },
     getBlock: (hash) => {
       return {
@@ -140,5 +150,21 @@ describe('Edgeware Event Poller Tests', () => {
       startBlock: 100,
       endBlock: 99,
     }));
+  });
+
+  it('should reduce size of range if too large', async () => {
+    // setup mock data
+    const api = getMockApi();
+
+    // setup test class
+    const poller = new Poller(api);
+
+    // run test
+    const blocks = await poller.poll({ startBlock: 100, endBlock: 3000 });
+    assert.lengthOf(blocks, 1);
+    assert.equal(+blocks[0].header.number, 105);
+    assert.deepEqual(blocks[0].events, []);
+    assert.equal(blocks[0].versionNumber, 10);
+    assert.equal(blocks[0].versionName, 'edgeware');
   });
 });

@@ -1,55 +1,74 @@
 import { default as crypto } from 'crypto';
 import { default as sgMail } from '@sendgrid/mail';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 
+export const Errors = {
+  NoEmailAndAddress: 'Can only invite either an address or email, not both',
+  NoEmailOrAddress: 'Must invite an address or email',
+  MustBeAdminOrMod: 'Must be an admin/mod to invite new members',
+  AddressNotFound: 'Address not found',
+  IsAlreadyMember: 'Already a member of this community',
+  InvalidEmail: 'Invalid email',
+  FailedToSendEmail: 'Could not send invite email',
+};
+
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createInvite = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) return next(new Error('Not logged in'));
 
-  if (!req.body.invitedAddress && !req.body.invitedEmail) return next(new Error('Must invite an address or email'));
-  if (req.body.invitedAddress && req.body.invitedEmail) return next(new Error('Can only invite either an address or email, not both'));
-  const chainOrCommObj = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
+  if (!req.body.invitedAddress && !req.body.invitedEmail) {
+    return next(new Error(Errors.NoEmailOrAddress));
+  }
+
+  if (req.body.invitedAddress && req.body.invitedEmail) {
+    return next(new Error(Errors.NoEmailAndAddress));
+  }
+
+  const chainOrCommObj = chain
+    ? { chain_id: chain.id }
+    : { offchain_community_id: community.id };
 
   // check that invitesEnabled === true, or the user is an admin or mod
   if (!community.invitesEnabled) {
-    const adminAddress = await models.Address.findOne({
+    const address = await models.Address.findOne({
       where: {
         address: req.body.address,
         user_id: req.user.id,
       },
     });
-    if (!adminAddress) return next(new Error('Must be an admin/mod to invite new members'));
+
+    if (!address) return next(new Error(Errors.AddressNotFound));
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         ...chainOrCommObj,
-        address_id: adminAddress.id,
+        address_id: address.id,
         permission: ['admin', 'moderator']
       },
     });
-    if (!requesterIsAdminOrMod) return next(new Error('Must be an admin/mod to invite new members'));
+    if (requesterIsAdminOrMod.length === 0) return next(new Error(Errors.MustBeAdminOrMod));
   }
 
   const { invitedEmail } = req.body;
   if (req.body.invitedAddress) {
-    const existingAddress = await models.Address.findOne({ where: {
-      address: req.body.invitedAddress,
-      chain: req.body.invitedAddressChain,
-    } });
-    if (!existingAddress) return next(new Error('Not found'));
+    const existingAddress = await models.Address.findOne({
+      where: {
+        address: req.body.invitedAddress,
+      }
+    });
+    if (!existingAddress) return next(new Error(Errors.AddressNotFound));
     const existingRole = await models.Role.findOne({
       where: {
         ...chainOrCommObj,
         address_id: existingAddress.id,
       },
     });
-    if (existingRole) return next(new Error('Already a member of this community'));
+    if (existingRole) return next(new Error(Errors.IsAlreadyMember));
     const role = await models.Role.create({
       ...chainOrCommObj,
       address_id: existingAddress.id,
@@ -61,7 +80,7 @@ const createInvite = async (models, req: UserRequest, res: Response, next: NextF
   // validate the email
   const validEmailRegex = /\S+@\S+\.\S+/;
   if (!validEmailRegex.test(invitedEmail)) {
-    return next(new Error('Invalid email'));
+    return next(new Error(Errors.InvalidEmail));
   }
 
   const user = await models.User.findOne({
@@ -111,7 +130,7 @@ const createInvite = async (models, req: UserRequest, res: Response, next: NextF
     const message = await sgMail.send(msg);
     return res.json({ status: 'Success', result: invite.toJSON() });
   } catch (e) {
-    return res.status(500).json({ error: 'Could not send invite email', message: e.message });
+    return res.status(500).json({ error: Errors.FailedToSendEmail, message: e.message });
   }
 };
 

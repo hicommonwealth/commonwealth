@@ -1,11 +1,11 @@
-import SubstrateChain from 'controllers/chain/substrate/shared';
+import SubstrateChain, { handleSubstrateEntityUpdate } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-
-import { IChainAdapter, ChainBase, ChainClass } from 'models';
+import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
+import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -22,13 +22,17 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public treasury: SubstrateTreasury;
   public identities: SubstrateIdentities;
   public readonly webWallet: WebWalletController = new WebWalletController();
-  public readonly server = {};
 
   private _loaded: boolean = false;
   public get loaded() { return this._loaded; }
 
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Kusama;
+
+  // dispatches event updates to a given entity to the appropriate module
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    handleSubstrateEntityUpdate(this, entity, event);
+  }
 
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
@@ -56,17 +60,15 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     this._loaded = true;
   }
 
-  public deinit = async (): Promise<void> => {
+  public async deinit(): Promise<void> {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),
