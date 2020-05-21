@@ -4,7 +4,11 @@
     box-sizing: border-box;
 }
 html, body {
+    position: fixed;
+    height: 100%;
+    overflow: hidden;
     box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -17,6 +21,7 @@ html {
 .mithril-app {
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
 
 h1, h2, h3, h4, h5, h6 {
