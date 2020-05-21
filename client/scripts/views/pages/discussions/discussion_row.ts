@@ -65,44 +65,13 @@ const DiscussionRow: m.Component<IAttrs> = {
         m('.discussion-content', {
           class: proposal.title === '--' ? 'no-title' : ''
         }, [
-          m('.discussion-title', [
-            link('a',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                proposal.title
-              ]),
-            app.comments.nComments(proposal) > 0
-              && link(
-                'a.discussion-replies',
-                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
-              ),
-              m(ThreadCaratMenu, { proposal }),
-          ]),
-          propType === OffchainThreadKind.Link
-            && proposal.url
-            && externalLink('a.discussion-link', proposal.url, [
-              extractDomain(proposal.url),
-              m.trust(' &rarr;'),
-            ]),
-          propType === OffchainThreadKind.Forum
-            && (proposal as OffchainThread).body && m('.discussion-excerpt', [
-            (() => {
-              const body = (proposal as OffchainThread).body;
-              try {
-                const doc = JSON.parse(body);
-                doc.ops = doc.ops.slice(0, 3);
-                return m(QuillFormattedText, { doc, hideFormatting: true });
-              } catch (e) {
-                return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
-              }
-            })(),
-          ]),
           m('.discussion-meta', [
             m('.discussion-meta-left', [
               m(User, {
                 user: [proposal.author, proposal.authorChain],
                 linkify: true,
                 tooltip: true,
+                hideAvatar: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
@@ -119,6 +88,25 @@ const DiscussionRow: m.Component<IAttrs> = {
                 }),
               ]),
             ]),
+          ]),
+          m('.discussion-title', [
+            link('a',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
+                proposal.title
+              ]),
+            app.comments.nComments(proposal) > 0
+              && link(
+                'a.discussion-replies',
+                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
+              ),
+            m(ThreadCaratMenu, { proposal }),
+          ]),
+          propType === OffchainThreadKind.Link
+            && proposal.url
+            && externalLink('a.discussion-link', proposal.url, [
+              extractDomain(proposal.url),
+              m.trust(' &rarr;'),
           ]),
         ]),
       ]),
