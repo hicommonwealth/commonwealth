@@ -618,6 +618,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         chains,
         onChangeHandler: (v) => {
           vnode.state.selectedFilter = v;
+          m.redraw();
         },
       }),
       m('.forum-container', [
