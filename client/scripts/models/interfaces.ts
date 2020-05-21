@@ -1,9 +1,8 @@
 import BN from 'bn.js';
 import moment from 'moment-twitter';
 import { Observable } from 'rxjs';
-import { Coin } from 'shared/adapters/currency';
-import { IIdentifiable } from 'shared/adapters/shared';
-import { ProposalArchiveController } from '../controllers/server/proposals';
+import { Coin } from 'adapters/currency';
+import { IIdentifiable } from 'adapters/shared';
 import { TransactionStatus } from './types';
 import Account from './Account';
 import StorageModule from './StorageModule';
@@ -43,10 +42,6 @@ export interface IAccountsModule<C extends Coin, A extends Account<C>> extends S
 // Offchain stores and management for discussion features.
 export interface IOffchainAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
   get(address: string, chain?: string): A;
-}
-
-export interface IServerControllers {
-  proposals?: ProposalArchiveController;
 }
 
 export interface ITransactionResult {

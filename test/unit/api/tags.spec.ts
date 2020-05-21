@@ -3,7 +3,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase, closeServer } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
@@ -27,7 +27,11 @@ describe('Tag Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
@@ -74,7 +78,11 @@ describe('Tag Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;

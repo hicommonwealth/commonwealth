@@ -9,10 +9,13 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public class = ChainClass.Near;
   public chain: NearChain;
   public accounts: NearAccounts;
-  public readonly server = {};
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
+
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
 
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
@@ -23,15 +26,13 @@ export default class Near extends IChainAdapter<NearToken, any> {
       await this.chain.init(this.meta);
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+    await this._postModuleLoad();
 
     this._loaded = true;
   }
-  public deinit = async () => {
+  public async deinit() {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
 
     await this.accounts.deinit();
     await this.chain.deinit();

@@ -1,7 +1,6 @@
 import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
 
-const updateTags = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const updateTags = async (models, req, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.thread_id) return next(new Error('Must provide thread_id'));
   if (!req.body.address) return next(new Error('Must provide address'));

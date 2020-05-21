@@ -1,9 +1,10 @@
 import { ApiPromise } from '@polkadot/api';
 import {
-  Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex,
-  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic
+  Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
+  ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
+  ReferendumInfo
 } from '@polkadot/types/interfaces';
-import { ProposalRecord } from 'edgeware-node-types/dist/types';
+import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
@@ -132,21 +133,40 @@ export default async function (
 
       case SubstrateEventKind.DemocracyStarted: {
         const [ referendumIndex, voteThreshold ] = event.data as unknown as [ ReferendumIndex, VoteThreshold ] & Codec;
-
-        // query for edgeware only -- kusama has different type
-        const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239>>(referendumIndex);
+        const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239 | ReferendumInfo>>(
+          referendumIndex
+        );
         if (!infoOpt.isSome) {
           throw new Error(`could not find info for referendum ${+referendumIndex}`);
         }
-        return {
-          data: {
-            kind,
-            referendumIndex: +referendumIndex,
-            proposalHash: infoOpt.unwrap().hash.toString(),
-            voteThreshold: voteThreshold.toString(),
-            endBlock: +infoOpt.unwrap().end,
+        if ((infoOpt.unwrap() as any).isOngoing) {
+          // kusama
+          const info = infoOpt.unwrap() as ReferendumInfo;
+          if (!info.isOngoing) {
+            throw new Error(`kusama referendum ${+referendumIndex} not in ongoing state`);
           }
-        };
+          return {
+            data: {
+              kind,
+              referendumIndex: +referendumIndex,
+              proposalHash: info.asOngoing.proposalHash.toString(),
+              voteThreshold: voteThreshold.toString(),
+              endBlock: +info.asOngoing.end,
+            }
+          };
+        } else {
+          // edgeware
+          const info = infoOpt.unwrap() as ReferendumInfoTo239;
+          return {
+            data: {
+              kind,
+              referendumIndex: +referendumIndex,
+              proposalHash: info.proposalHash.toString(),
+              voteThreshold: voteThreshold.toString(),
+              endBlock: +info.end,
+            }
+          };
+        }
       }
 
       case SubstrateEventKind.DemocracyPassed: {
@@ -190,12 +210,21 @@ export default async function (
        */
       case SubstrateEventKind.PreimageNoted: {
         const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
+        const image = await api.derive.democracy.preimage(hash);
+        if (!image || !image.proposal) {
+          throw new Error(`could not find info for preimage ${hash.toString()}`);
+        }
         return {
           excludeAddresses: [ noter.toString() ],
           data: {
             kind,
             proposalHash: hash.toString(),
             noter: noter.toString(),
+            preimage: {
+              method: image.proposal.methodName,
+              section: image.proposal.sectionName,
+              args: image.proposal.args.map((a) => a.toString()),
+            }
           }
         };
       }
@@ -256,6 +285,7 @@ export default async function (
             proposer: proposal.proposer.toString(),
             value: proposal.value.toString(),
             beneficiary: proposal.beneficiary.toString(),
+            bond: proposal.bond.toString(),
           }
         };
       }
@@ -322,21 +352,32 @@ export default async function (
           hash,
           threshold,
         ] = event.data as unknown as [ AccountId, ProposalIndex, Hash, u32 ] & Codec;
+        const proposalOpt = await api.query[event.section].proposalOf<Option<Proposal>>(hash);
+        if (!proposalOpt.isSome) {
+          throw new Error('could not fetch method for collective proposal');
+        }
         return {
           excludeAddresses: [ proposer.toString() ],
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposer: proposer.toString(),
             proposalIndex: +index,
             proposalHash: hash.toString(),
             threshold: +threshold,
+            call: {
+              method: proposalOpt.unwrap().methodName,
+              section: proposalOpt.unwrap().sectionName,
+              args: proposalOpt.unwrap().args.map((c) => c.toString()),
+            }
           }
         };
       }
       case SubstrateEventKind.CollectiveApproved:
       case SubstrateEventKind.CollectiveDisapproved: {
         const [ hash ] = event.data as unknown as [ Hash ] & Codec;
-        const infoOpt = await api.query.council.voting<Option<Votes>>(hash);
+        const infoOpt = await api.query[event.section].voting<Option<Votes>>(hash);
         if (!infoOpt.isSome) {
           throw new Error('could not fetch info for collective proposal');
         }
@@ -344,6 +385,8 @@ export default async function (
         return {
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposalHash: hash.toString(),
             proposalIndex: +index,
             threshold: +threshold,
@@ -358,6 +401,8 @@ export default async function (
         return {
           data: {
             kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
             proposalHash: hash.toString(),
             executionOk: executionOk.isTrue,
           }
@@ -373,6 +418,10 @@ export default async function (
         if (!proposalInfoOpt.isSome) {
           throw new Error('unable to fetch signaling proposal info');
         }
+        const voteInfoOpt = await api.query.voting.voteRecords<Option<VoteRecord>>(proposalInfoOpt.unwrap().vote_id);
+        if (!voteInfoOpt.isSome) {
+          throw new Error('unable to fetch signaling proposal voting info');
+        }
         return {
           excludeAddresses: [ proposer.toString() ],
           data: {
@@ -380,7 +429,11 @@ export default async function (
             proposer: proposer.toString(),
             proposalHash: hash.toString(),
             voteId: proposalInfoOpt.unwrap().vote_id.toString(),
-            // TODO: add title/contents?
+            title: proposalInfoOpt.unwrap().title.toString(),
+            description: proposalInfoOpt.unwrap().contents.toString(),
+            tallyType: voteInfoOpt.unwrap().data.tally_type.toString(),
+            voteType: voteInfoOpt.unwrap().data.vote_type.toString(),
+            choices: voteInfoOpt.unwrap().outcomes.map((outcome) => outcome.toString()),
           }
         };
       }

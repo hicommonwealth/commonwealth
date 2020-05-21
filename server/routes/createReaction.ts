@@ -1,15 +1,16 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { UserRequest } from '../types';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createReaction = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { reaction, comment_id, thread_id } = req.body;
@@ -54,10 +55,7 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
         where: { id }
       });
     } else {
-      proposal = await models.Proposal.findOne({
-        where: { identifier: id, type: prefix }
-      });
-      if (!proposal) console.error('No matching proposal found.');
+      proposal = await proposalIdToEntity(models, chain.id, comment.root_id);
     }
     cwUrl = getProposalUrl(prefix, proposal, comment);
     root_type = prefix;
@@ -65,6 +63,9 @@ const createReaction = async (models, req: UserRequest, res: Response, next: Nex
     proposal = await models.OffchainThread.findByPk(Number(thread_id));
     cwUrl = getProposalUrl('discussion', proposal, comment);
     root_type = 'discussion';
+  }
+  if (!proposal) {
+    throw new Error('No matching proposal found.');
   }
 
   // dispatch notifications

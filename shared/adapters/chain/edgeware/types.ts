@@ -11,9 +11,3 @@ export interface IEdgewareSignalingProposal extends IIdentifiable {
   voteType: VoteType;
   choices: VoteOutcome[];
 }
-
-export interface IEdgewareSignalingProposalState extends ICompletable {
-  votes: { [account: string]: VoteOutcome[] };
-  endBlock: number;
-  stage: string;
-}

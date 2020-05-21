@@ -1,11 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const editTag = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const editTag = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) {
     return next(new Error('Not logged in'));

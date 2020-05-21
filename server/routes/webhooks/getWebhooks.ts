@@ -1,11 +1,10 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
-import { UserRequest } from '../../types';
 import Errors from './errors';
 import { factory, formatFilename } from '../../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const getWebhooks = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const getWebhooks = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };

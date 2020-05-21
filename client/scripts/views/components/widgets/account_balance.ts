@@ -4,7 +4,7 @@ import { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
 import { default as m } from 'mithril';
 
 import { Coin, formatCoin } from 'adapters/currency';
-import { SubstrateCoin } from 'shared/adapters/chain/substrate/types';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { makeDynamicComponent } from 'models/mithril';
 import { Account } from 'models';
 

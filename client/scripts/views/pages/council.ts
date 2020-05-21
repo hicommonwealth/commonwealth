@@ -13,11 +13,11 @@ import { ChainBase, ChainClass, IVote } from 'models';
 
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elections';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import NewProposalModal from 'views/modals/proposals';
+import NewProposalPage from 'views/pages/new_proposal/index';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import ListingPage from 'views/pages/_listing_page';
@@ -27,12 +27,13 @@ import ViewVotersModal from 'views/modals/view_voters_modal';
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
   title: string;
+  reelection: boolean;
 }
 
 const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
-    const { account, title } = vnode.attrs;
+    const { account, reelection, title } = vnode.attrs;
     const election = (app.chain as Substrate).phragmenElections;
 
     const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
@@ -90,6 +91,10 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
           m('.proposal-row-metadata', election.isMember(account)
             ? election.backing(account).format(true)
             : votes.length),
+        ]),
+        reelection && m('.item', [
+          m('.proposal-row-subheading', 'Candidate for re-election'),
+          m('.proposal-row-metadata', 'Yes' )
         ]),
       ]),
       m('.proposal-row-xs-clear'),
@@ -167,7 +172,7 @@ const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
       onclick: (e) => {
         e.preventDefault();
         if (app.modals.getList().length > 0) return;
-        app.modals.create({ modal: NewProposalModal, data: { typeEnum: ProposalType.PhragmenCandidacy } });
+        m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy});
       },
     }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
   }
@@ -189,10 +194,10 @@ const CouncilPage: m.Component<{}> = {
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || []).map((a) => app.chain.accounts.get(a));
-    const candidates: Array<[SubstrateAccount, number]> = app.chain
-      && ((app.chain as Substrate).phragmenElections.activeElection
-       && (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
-        .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]).filter(([c, n]) => !councillors.includes(c));
+    const candidates: Array<[SubstrateAccount, number]> = app.chain &&
+     ((app.chain as Substrate).phragmenElections.activeElection &&
+       (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
+       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
 
     const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
     const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;
@@ -216,7 +221,7 @@ const CouncilPage: m.Component<{}> = {
           ? m('.no-proposals', 'No members')
           : m('.councillors', [
             councillors.map(
-              (account) => m(CollectiveMember, { account, title: 'Councillor' })
+              (account) => m(CollectiveMember, { account, title: 'Councillor', reelection: true })
             ),
             m('.clear'),
           ]),
@@ -229,7 +234,9 @@ const CouncilPage: m.Component<{}> = {
         candidates.length === 0
           ? m('.no-proposals', 'No candidates')
           : m('.council-candidates', [
-            candidates.map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
+            candidates
+              .filter(([ account ]) => !councillors.includes(account))
+              .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
             m('.clear'),
           ]),
       ],

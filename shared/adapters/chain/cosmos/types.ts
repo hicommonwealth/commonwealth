@@ -1,6 +1,6 @@
 import BN from 'bn.js';
-import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from 'adapters/currency';
+import { IIdentifiable, ICompletable } from '../../shared';
 
 export class CosmosValidatorToken extends Coin {
   constructor(n: number | string | BN, inDollars: boolean = false) {

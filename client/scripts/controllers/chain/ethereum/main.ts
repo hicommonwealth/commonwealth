@@ -1,6 +1,6 @@
 import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
-import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -13,11 +13,14 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly class = ChainClass.Ethereum;
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
-  public readonly server = {};
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
+
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
 
   public async init(onServerLoaded?) {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
@@ -29,12 +32,13 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+    await this._postModuleLoad();
     await this.chain.initEventLoop();
 
     if (this.webWallet) {
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
         setActiveAccount(updatedAddress);
       });
     }
@@ -42,12 +46,9 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this._loaded = true;
   }
 
-  public deinit = async () => {
+  public async deinit() {
     this._loaded = false;
-    this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    super.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();

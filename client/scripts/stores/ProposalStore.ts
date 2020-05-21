@@ -1,4 +1,4 @@
-import { IIdentifiable } from 'shared/adapters/shared';
+import { IIdentifiable } from 'adapters/shared';
 import Store from './Store';
 
 class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {

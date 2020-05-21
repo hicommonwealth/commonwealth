@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const viewChainObjects = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const viewChainObjects = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.object_type) {
     return next(new Error('Must provide object_type'));
   }

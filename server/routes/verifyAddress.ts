@@ -1,10 +1,9 @@
 import sgMail from '@sendgrid/mail';
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const verifyAddress = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // Verify that a linked address is actually owned by its supposed user.
   //
   // We accept `signature` if the user is capable of directly signing

@@ -26,7 +26,7 @@ import Login from 'views/components/login';
 import TagSelector from 'views/components/sidebar/tag_selector';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import NewProposalModal from 'views/modals/proposals';
+import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
 // Moloch specific
@@ -186,10 +186,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           //     contentLeft: m(Icon, { name: Icons.BOX }),
           //   }),
           showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: NewProposalModal,
-              data: { typeEnum: ProposalType.MolochProposal }
-            }),
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal }),
             label: 'New proposal'
           }),
           showMolochMenuOptions && m(ListItem, {

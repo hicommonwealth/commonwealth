@@ -2,8 +2,7 @@
 import Web3 from 'web3';
 import fs from 'fs';
 import _ from 'lodash';
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import {
   getLocks,
   getSignals,
@@ -518,7 +517,7 @@ export const fetchStats = async (models, net) => {
   return results;
 };
 
-export default async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export default async (models, req: Request, res: Response, next: NextFunction) => {
   const results = await fetchStats(models, req.query.network);
   return res.json({ status: 'Success', results });
 };
