@@ -21,9 +21,8 @@ $discussion-row-color: #999;
         display: flex;
     }
 
-    // TODO: these sections are hidden for now
     .discussion-pre {
-        margin-top: 3px;
+        margin-top: 6px;
         margin-right: 16px;
         @include xs-max {
             display: none;
@@ -47,7 +46,7 @@ $discussion-row-color: #999;
         position: relative;
         flex: 1;
         .discussion-meta {
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .discussion-title {
             .discussion-edit-tags {
