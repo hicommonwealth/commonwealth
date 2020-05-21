@@ -362,7 +362,7 @@ $(() => {
     '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/link_new_address':  importRoute(import('views/pages/link_new_address'), true),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), true),
 
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
