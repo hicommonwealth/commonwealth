@@ -12,6 +12,7 @@ import Tabs from 'views/components/widgets/tabs';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import PageNotFound from '../404';
 
 // const SetProxyButton = {
 //   view: (vnode) => {
@@ -188,15 +189,23 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }, { loadCount: boolean }> = {
+const ProfilePage: m.Component<{ address: string }, { loadCount: number }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
+    if (!vnode.state.loadCount) vnode.state.loadCount = 0;
     if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
-    if (!account) console.log('no account');
-    if (!account) return m(PageLoading);
+    console.log(vnode.state.loadCount);
+    if (!account) {
+      if (vnode.state.loadCount < 3) {
+        vnode.state.loadCount += 1;
+        return m(PageLoading);
+      } else {
+        return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
+      }
+    }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->

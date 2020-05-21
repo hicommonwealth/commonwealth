@@ -4,18 +4,19 @@ import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
 import { EmptyState, Icon, Icons } from 'construct-ui';
 
-const PageNotFound: m.Component<{}> = {
+const PageNotFound: m.Component<{ message?: string }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': '404Page' });
   },
   view: (vnode) => {
+    const { message } = vnode.attrs;
     return m('.forum-container', [
       m(EmptyState, {
         class: 'PageNotFound',
-        fill: false,
         icon: Icons.X_OCTAGON,
+        fill: false,
         header: 'The page you were looking for could not be found.',
-        content: 'If it is not visible to the public, you may need to log in.'
+        content: message || 'If it is not visible to the public, you may need to log in.'
       })
     ]);
   }
