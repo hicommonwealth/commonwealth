@@ -49,6 +49,7 @@ describe('Subscriptions Tests', () => {
         jwt: jwtToken,
         title: 't',
         body: 't',
+        kind: 'forum',
       });
 
       const object_id = res.result.id;
@@ -152,6 +153,7 @@ describe('Subscriptions Tests', () => {
         address: newAddress,
         title: 'hi',
         body: 'hi you!',
+        kind: 'forum',
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;
