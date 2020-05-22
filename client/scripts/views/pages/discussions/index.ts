@@ -56,7 +56,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
-    // add chain compatability (node info?)
+    // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
     const allLastVisited = (typeof app.login.lastVisited === 'string')
@@ -239,12 +239,31 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
+    const selectedCommunity = app.community;
+
     return m('.DiscussionsPage', [
-      (app.chain || app.community) && [
-        vnode.attrs.activeTag
-          ? getSingleTagListing(vnode.attrs.activeTag)
-          : getHomepageListing(),
-      ],
+      m('.discussions-main', [
+        (app.chain || app.community) && [
+          vnode.attrs.activeTag
+            ? getSingleTagListing(vnode.attrs.activeTag)
+            : getHomepageListing(),
+        ],
+      ]),
+      m('.discussions-sidebar', [
+        m('h4', [
+          'About ',
+          selectedNode ? selectedNode.chain.name
+            : selectedCommunity ? selectedCommunity.meta.name : ''
+        ]),
+        m('p', [
+          selectedNode ? selectedNode.chain.description
+            : selectedCommunity ? selectedCommunity.meta.description : ''
+        ]),
+      ]),
     ]);
   },
 };

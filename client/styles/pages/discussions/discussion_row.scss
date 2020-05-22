@@ -4,8 +4,7 @@ $discussion-row-color: #999;
 
 .DiscussionRow {
     display: block;
-    display: block;
-    margin: 20px 0 40px;
+    margin: 20px 0 24px;
 
     a.discussion-tag {
         display: inline-block;
@@ -22,9 +21,9 @@ $discussion-row-color: #999;
         display: flex;
     }
 
-    // TODO: these sections are hidden for now
     .discussion-pre {
-        margin-top: 4px;
+        margin-top: 6px;
+        margin-right: 16px;
         @include xs-max {
             display: none;
         }
@@ -43,12 +42,12 @@ $discussion-row-color: #999;
             display: block;
         }
     }
-    .discussion-pre, .discussion-pre-mobile {
-        display: none;
-    }
     .discussion-content {
         position: relative;
         flex: 1;
+        .discussion-meta {
+            margin-bottom: 2px;
+        }
         .discussion-title {
             .discussion-edit-tags {
                 position: absolute;
@@ -123,15 +122,6 @@ $discussion-row-color: #999;
             color: #888;
             margin-left: 3px;
         }
-    }
-    .discussion-excerpt {
-        color: #999;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        font-size: 14px;
-        margin: 6px 0 8px;
     }
     .discussion-body-preview {
         font-size: 14px;

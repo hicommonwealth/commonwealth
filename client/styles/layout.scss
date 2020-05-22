@@ -4,7 +4,11 @@
     box-sizing: border-box;
 }
 html, body {
+    position: fixed;
+    height: 100%;
+    overflow: hidden;
     box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -17,6 +21,7 @@ html {
 .mithril-app {
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -238,19 +243,13 @@ body.modal-open {
 }
 
 .layout-content {
-    padding: 15px 40px;
     padding-top: $header-height + 15px;
+    padding-bottom: 40px;
+    padding-right: 40px;
     padding-left: $sidebar-width + 40px;
-    // &.logged-out {
-    //     padding-left: $sidebar-width;
-    // }
     &.navigation-hidden {
-        padding-left: $switcher-width + 40px;
-        padding-top: 15px;
+        padding: 15px 40px;
     }
-    // &.navigation-hidden.logged-out {
-    //     padding-left: 40px;
-    // }
 }
 
 @media (max-width: 680px) {
@@ -313,4 +312,17 @@ body.modal-open {
 // align text in menus to the left by default
 .cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
     text-align: left;
+}
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
 }

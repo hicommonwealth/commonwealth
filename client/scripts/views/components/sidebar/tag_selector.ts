@@ -4,7 +4,7 @@ import 'components/sidebar/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
-import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
+import { List, ListItem, Button, EmptyState, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
@@ -298,10 +298,14 @@ const TagSelector: m.Component<{
           m(ListItem, {
             class: 'TagRow',
             active: m.route.get() === `/${app.activeId()}/tags/`,
-            label: 'Browse tags',
+            label: 'All tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
           }),
+        ]),
+      // This placeholder module should only be shown in the sidebar
+      !showFullListing
+        && m('.no-tags-placeholder', [
+          'The community manager has not selected any discussion categories',
         ]),
     ]);
   },

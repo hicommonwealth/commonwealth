@@ -15,7 +15,7 @@ const jumpHighlightComment = (commentId, shouldScroll = true, animationDelayTime
 
   // scroll to comment if necessary, set highlight, wait, then fade out the highlight
   if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
+    $('.mithril-app').animate({ scrollTop: divTop }, scrollTime);
     $div.addClass('highlighted');
     setTimeout(() => {
       $div.addClass('highlightAnimationComplete');
