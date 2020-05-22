@@ -118,29 +118,6 @@ $active-color: #e9e9f5;
     }
 }
 
-// notifications menu (outside Sidebar, displayed in a cui-portal)
-.notification-menu {
-    .notification-list {
-        height: 640px;
-        background: #fff;
-        width: 340px;
-    }
-    .cui-menu {
-        max-width: 342px;
-        margin: 0;
-        padding: 0;
-        border-color: #d8dee0;
-        background: none;
-        overflow: hidden;
-    }
-    .cui-popover-arrow {
-        background: white;
-    }
-    .cui-list-item {
-        padding: 11px;
-    }
-}
-
 // TODO: use non-generic CSS here
 .cui-portal .cui-overlay-backdrop {
     background: rgba(47, 49, 54, 0.65);
