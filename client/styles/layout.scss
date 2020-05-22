@@ -243,18 +243,13 @@ body.modal-open {
 }
 
 .layout-content {
-    padding: 15px 40px;
     padding-top: $header-height + 15px;
+    padding-bottom: 40px;
+    padding-right: 40px;
     padding-left: $sidebar-width + 40px;
-    // &.logged-out {
-    //     padding-left: $sidebar-width;
-    // }
     &.navigation-hidden {
-        padding-top: 15px;
+        padding: 15px 40px;
     }
-    // &.navigation-hidden.logged-out {
-    //     padding-left: 40px;
-    // }
 }
 
 @media (max-width: 680px) {

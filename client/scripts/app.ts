@@ -330,18 +330,18 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute(import('views/pages/home'), false, true),
-    '/about':                    importRoute(import('views/pages/landing/about'), false),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/about':                    importRoute(import('views/pages/landing/about'), false, true),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), false, true),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false, true),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false),
+    '/login':                    importRoute(import('views/pages/login'), false, true),
     '/settings':                 importRoute(import('views/pages/settings'), false),
     '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false, true),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false, true),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),

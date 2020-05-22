@@ -1,27 +1,4 @@
 @import 'client/styles/shared';
 
 .HomePage {
-    .home-content {
-        background: #rgba4;
-        position: relative;
-        padding: 0 20px 60px;
-        width: 100%;
-        @include xs-max {
-            padding: 0 10px;
-            margin: 0;
-            width: 100%;
-        }
-
-        h2.lead-title {
-            font-weight: 600;
-            font-size: 28px;
-            line-height: 1.25;
-            margin-top: 0;
-        }
-        p.lead-description {
-            font-size: 16px;
-            line-height: 1.25;
-            margin: 6px 0 42px;
-        }
-    }
 }
