@@ -77,7 +77,11 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
-    return m('.NewThreadForm', [
+    return m('.NewThreadForm', {
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
+      },
+    }, [
       vnode.state.newType === 'Link' && m(Form, [
         typeSelector,
         m(FormGroup, [
@@ -92,6 +96,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Input, {
+            class: 'new-thread-title',
             placeholder: 'Title',
             onchange: (e) => {
               const { value } = e.target as any;
