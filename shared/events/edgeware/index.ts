@@ -74,11 +74,9 @@ export default async function (
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent) => {
     let prevResult = null;
-    /* eslint-disable-next-line no-restricted-syntax */
     for (const handler of handlers) {
       try {
         // pass result of last handler into next one (chaining db events)
-        /* eslint-disable-next-line no-await-in-loop */
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
         log.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
@@ -140,15 +138,14 @@ export default async function (
     // (i.e. don't try and fetch all events from block 0 onward)
     if (!offlineRange || !offlineRange.startBlock) {
       log.warn('Unable to determine offline time range.');
-      return;
-    }
-
-    // poll the missed blocks for events
-    try {
-      const blocks = await poller.poll(offlineRange);
-      await Promise.all(blocks.map(processBlockFn));
-    } catch (e) {
-      log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
+    } else {
+      // poll the missed blocks for events
+      try {
+        const blocks = await poller.poll(offlineRange);
+        await Promise.all(blocks.map(processBlockFn));
+      } catch (e) {
+        log.error(`Block polling failed after disconnect at block ${offlineRange.startBlock}`);
+      }
     }
   };
 

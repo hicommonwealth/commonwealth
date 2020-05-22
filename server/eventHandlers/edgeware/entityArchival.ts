@@ -74,7 +74,9 @@ export default class extends IEventHandler {
     const updateEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
       const dbEntity = await this._models.ChainEntity.findOne({
         where: {
-          type: type.toString(), type_id, chain: this._chain,
+          type: type.toString(),
+          type_id,
+          chain: this._chain,
         }
       });
       if (!dbEntity) {

@@ -1,7 +1,7 @@
 import subscribeEdgewareEvents from './shared/events/edgeware/index';
 import { IEventHandler, CWEvent } from './shared/events/interfaces';
 
-const url = process.env.NODE_URL || undefined;
+const url = process.env.NODE_URL || 'ws://localhost:9944';
 
 const chain = process.env.NODE_CHAIN || 'edgeware';
 
@@ -14,5 +14,5 @@ class StandaloneSubstrateEventHandler extends IEventHandler {
 }
 
 const skipCatchup = false;
-
+console.log(`Subscribing to ${chain} at ${url} with env ${DEV}`);
 subscribeEdgewareEvents(chain, url, [ new StandaloneSubstrateEventHandler() ], skipCatchup);
