@@ -142,6 +142,35 @@ export const editComment = async (args: EditCommentArgs) => {
   return res.body;
 };
 
+export interface EditTagArgs {
+  jwt: any;
+  address: string;
+  id: number;
+  name?: string;
+  description?: string;
+  featured_order?: boolean;
+  chain?: string;
+  community?: string;
+}
+
+export const editTag = async (args: EditTagArgs) => {
+  const { jwt, address, id, name, description, featured_order, chain, community } = args;
+  const res = await chai.request.agent(app)
+    .post('/api/editTag')
+    .set('Accept', 'application/json')
+    .send({
+      'id': id,
+      'cmomunity': community,
+      'chain': chain,
+      'name': name,
+      'description': description,
+      'featured_order': featured_order,
+      'address': address,
+      'jwt': jwt
+    });
+  return res.body;
+};
+
 export const createWebhook = async ({ chain, webhookUrl, jwt }) => {
   const res = await chai.request.agent(app)
     .post('/api/createWebhook')

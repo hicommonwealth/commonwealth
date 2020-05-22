@@ -40,7 +40,7 @@ class TagsController {
     return this._store.remove(tag);
   }
 
-  public async edit(tag: OffchainTag, featured_order?) {
+  public async edit(tag: OffchainTag, featured_order?: boolean) {
     try {
       const response = await $.post(`${app.serverUrl()}/editTag`, {
         'id': tag.id,

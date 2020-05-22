@@ -4,37 +4,42 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NotLoggedIn: 'Not logged in.',
+  NoTagId: 'Must supply tag ID.',
+  NotAdmin: 'Must be an admin to feature tags.',
+  TagNotFound: 'Tag not found.'
+};
+
 const editTag = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new Error(Errors.NotLoggedIn));
   }
   if (!req.body.id) {
-    return next(new Error('Must supply tag ID'));
+    return next(new Error(Errors.NoTagId));
   }
-  if (req.body.featured_order) {
-    const adminAddress = await models.Address.findOne({
-      where: {
-        address: req.body.address,
-        user_id: req.user.id,
-      },
-    });
-    const roleWhere = {
-      address_id: adminAddress.id,
-      permission: 'admin',
-    };
-    if (community) roleWhere['offchain_community_id'] = community.id;
-    else if (chain) roleWhere['chain_id'] = chain.id;
-    const requesterIsAdminOrMod = await models.Role.findAll({
-      where: roleWhere,
-    });
-    if (!requesterIsAdminOrMod) return next(new Error('Must be an admin to feature tags.'));
-  }
+  const adminAddress = await models.Address.findOne({
+    where: {
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
+  const roleWhere = {
+    address_id: adminAddress.id,
+    permission: 'admin',
+  };
+  if (community) roleWhere['offchain_community_id'] = community.id;
+  else if (chain) roleWhere['chain_id'] = chain.id;
+  const requesterIsAdminOrMod = await models.Role.findAll({
+    where: roleWhere,
+  });
+  if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdmin));
 
   const { description, featured_order, id, name } = req.body;
   try {
     const tag = await models.OffchainTag.findOne({ where: { id } });
-    if (!tag) return next(new Error('Tag not found'));
+    if (!tag) return next(new Error(Errors.TagNotFound));
     if (description) tag.description = description;
     if (name) tag.name = name;
     await tag.save();
