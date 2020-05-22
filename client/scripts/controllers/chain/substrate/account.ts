@@ -128,7 +128,6 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
         const validatorsInfo: IValidatorInfo = {};
-
         electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
           const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
           const isCommission = !!validatorPrefs.commission;
