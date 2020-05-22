@@ -9,7 +9,6 @@ import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
-import { sortNotifications } from 'client/scripts/helpers/notifications';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -129,36 +128,26 @@ describe('Subscriptions Tests', () => {
 
     it('should pause and unpause an array of subscription', async () => {
       const subscriptions = [];
-      const subscription1: NotificationSubscription = await modelUtils.createSubscription({
-        object_id: community,
-        jwt: jwtToken,
-        is_active: true,
-        category: NotificationCategories.NewThread,
-      });
-      const subscription2: NotificationSubscription = await modelUtils.createSubscription({
-        object_id: community,
-        jwt: jwtToken,
-        is_active: true,
-        category: NotificationCategories.NewThread,
-      });
-      const subscription3: NotificationSubscription = await modelUtils.createSubscription({
-        object_id: community,
-        jwt: jwtToken,
-        is_active: true,
-        category: NotificationCategories.NewThread,
-      });
-      subscriptions.push(subscription1.id, subscription2.id, subscription3.id);
+      for (let i = 0; i < 3; i++) {
+        subscriptions.push(modelUtils.createSubscription({
+          object_id: community,
+          jwt: jwtToken,
+          is_active: true,
+          category: NotificationCategories.NewThread,
+        }));
+      }
+      const subscriptionIds = (await Promise.all(subscriptions)).map((s) => s.id);
       let res = await chai.request(app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptions });
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
 
       res = await chai.request(app)
         .post('/api/enableSubscriptions')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptions });
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
       expect(res.body.status).to.be.equal('Success');
     });
 
@@ -239,7 +228,6 @@ describe('Subscriptions Tests', () => {
   describe('Notification Routes', () => {
     let subscription;
     let thread;
-    let thread2;
     let notifications;
 
     it('emitting a notification', async () => {
@@ -261,15 +249,6 @@ describe('Subscriptions Tests', () => {
         address: newAddress,
         title: 'hi',
         body: 'hi you!',
-        kind: 'forum',
-      });
-      thread2 = await modelUtils.createThread({
-        chain,
-        community,
-        jwt: newJWT,
-        address: newAddress,
-        title: 'hello',
-        body: 'hello you!',
         kind: 'forum',
       });
       expect(subscription).to.not.be.null;
