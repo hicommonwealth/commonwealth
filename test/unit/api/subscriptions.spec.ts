@@ -112,7 +112,7 @@ describe('Subscriptions Tests', () => {
     });
   });
 
-  describe('toggling immediate emails property on subscription model', () => {
+  describe('/enableImmediateEmails and /disableImmediateEmails', () => {
     let subscription: NotificationSubscription;
     beforeEach('creating a subscription', async () => {
       subscription = await modelUtils.createSubscription({
@@ -140,6 +140,54 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
       expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('both routes should fail when not passed ids', async () => {
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+    });
+
+    it('both routes should succeed with just a string id', async () => {
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('both routes should fail when requester does not own the subscription', async () => {
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
+      expect(res.body.error).to.not.be.null;
     });
   });
 
