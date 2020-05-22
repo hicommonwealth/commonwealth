@@ -98,7 +98,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         .sort((a, b) => a.name - b.name);
       vnode.state.noMatches = !results.length;
       const truncatedResults = vnode.state.noMatches
-        ? [{ name: `New tag '${result}'...` }]
+        ? [{ name: `New category '${result}'...` }]
         : results.slice(0, Math.min(10, results.length));
       return truncatedResults;
     };
@@ -107,7 +107,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       m('.top-wrap', [
         m('.left-panel', [
           m(AutoCompleteForm, {
-            placeholder: 'New tag',
+            placeholder: 'Select a category',
             results: vnode.attrs.results || [],
             applyDefaultHandler: true,
             onChangeHandler,
