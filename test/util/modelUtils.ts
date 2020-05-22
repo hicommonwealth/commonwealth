@@ -160,7 +160,7 @@ export const editTag = async (args: EditTagArgs) => {
     .set('Accept', 'application/json')
     .send({
       'id': id,
-      'cmomunity': community,
+      'community': community,
       'chain': chain,
       'name': name,
       'description': description,

@@ -19,6 +19,7 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
   if (!req.body.id) {
     return next(new Error(Errors.NoTagId));
   }
+
   const adminAddress = await models.Address.findOne({
     where: {
       address: req.body.address,
@@ -31,10 +32,10 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
   };
   if (community) roleWhere['offchain_community_id'] = community.id;
   else if (chain) roleWhere['chain_id'] = chain.id;
-  const requesterIsAdminOrMod = await models.Role.findAll({
+  const requesterIsAdminOrMod = await models.Role.findOne({
     where: roleWhere,
   });
-  if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdmin));
+  if (requesterIsAdminOrMod === null) return next(new Error(Errors.NotAdmin));
 
   const { description, featured_order, id, name } = req.body;
   try {

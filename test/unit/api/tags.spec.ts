@@ -15,8 +15,8 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Tag Tests', () => {
-  const community = 'meta';
-  const chain = 'edgeware';
+  const community = 'staking';
+  const chain = 'ethereum';
 
   let adminJWT;
   let adminAddress;
@@ -44,16 +44,31 @@ describe('Tag Tests', () => {
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
-  
 
   describe('/editTag', () => {
     const name = 'test name';
     const description = 'test description';
     const featured_order = true;
-    let tag;
 
     before(async () => {
-      //tag creation log
+      const markdownThread = require('../../util/fixtures/markdownThread');
+      const kind = 'forum';
+      const threadRes = await modelUtils.createThread({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        title: decodeURIComponent(markdownThread.title),
+        body: decodeURIComponent(markdownThread.body),
+        privacy: true,
+        readOnly: true,
+        tags: ['tag', 'tag2', 'tag3'],
+        kind,
+      });
+      expect(threadRes.status).to.be.equal('Success');
+      expect(threadRes.result).to.not.be.null;
+      expect(threadRes.result.Address).to.not.be.null;
+      expect(threadRes.result.Address.address).to.equal(userAddress);
+      tag = threadRes.result.tags[0];
     });
 
     it('should successfully edit tag names & descriptions', async () => {
@@ -67,10 +82,8 @@ describe('Tag Tests', () => {
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
-      expect(res.result.name).to.equal(encodeURIComponent(name));
-      expect(res.result.description).to.equal(encodeURIComponent(description));
-      expect(res.result.Address).to.not.be.null;
-      expect(res.result.Address.address).to.equal(userAddress);
+      expect(res.result.name).to.equal(name);
+      expect(res.result.description).to.equal(description);
     });
 
     it('should successfully feature existing tags', async () => {
@@ -81,9 +94,10 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         featured_order,
       });
-      expect(res).to.not.be.null;
-      expect(res.error).to.not.be.null;
-      expect(res.error).to.be.equal(TagErrors.UnsupportedKind);
+
+      expect(res.status).to.equal('Success');
+      expect(res.result).to.not.be.null;
+      // todo: check against a community's featured_tag prop
     });
 
     it('should fail to edit a tag without an id', async () => {
