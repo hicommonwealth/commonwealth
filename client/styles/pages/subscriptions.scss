@@ -1,6 +1,11 @@
 @import 'client/styles/shared';
 
 .SubscriptionsPage {
+  .Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
   .SubscriptionRow {
     border-left: 1px darken(#fafafa, 20) solid;
     border-bottom: 1px darken(#fafafa, 20) solid;

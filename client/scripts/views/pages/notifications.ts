@@ -1,5 +1,6 @@
 // import 'pages/_listing_page.scss';
 import 'pages/subscriptions.scss';
+// import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -523,15 +524,14 @@ interface ISubscriptionsPageSideBarAttrs {
   onChangeHandler: Function;
 }
 
-const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
+export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
   view: (vnode) => {
     const { selectedFilter, onChangeHandler, chains, communities } = vnode.attrs;
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, [
+    }, m('.SidebareMenu', [
       m(List, {
-        class: 'SidebarMenu',
         interactive: true,
         size: 'lg',
       }, [
@@ -575,7 +575,7 @@ const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
           });
         }),
       ])
-    ]);
+    ]));
   },
 };
 

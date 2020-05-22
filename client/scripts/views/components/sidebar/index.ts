@@ -37,6 +37,7 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { isRoleOfCommunity } from 'helpers/roles';
+import { SubscriptionsPageSideBar } from 'views/pages/notifications';
 import AdminPanel from '../admin_panel';
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
