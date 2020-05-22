@@ -9,12 +9,12 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import ListingPage from './_listing_page';
-import Tabs from '../components/widgets/tabs';
-import { DropdownFormField } from '../components/forms';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import _ from 'lodash';
+import ListingPage from './_listing_page';
+import Tabs from '../components/widgets/tabs';
+import { DropdownFormField } from '../components/forms';
 
 const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   oninit: (vnode) => {
