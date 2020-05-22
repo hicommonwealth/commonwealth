@@ -4,10 +4,10 @@ import 'components/widgets/user.scss';
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { formatAddressShort, link } from 'helpers';
+import { Tooltip } from 'construct-ui';
 
 import app from 'state';
 import { Account, Profile } from 'models';
-import Tooltip from 'views/components/tooltip';
 
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -58,10 +58,10 @@ const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstra
       const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
       const name = [
+        d2s(displayNameHex),
         !hideIdentityIcon && m(`span.identity-icon${
           isGood ? '.icon-ok-circled' : '.icon-minus-circled'
         }${isGood ? '.green' : isBad ? '.red' : '.gray'}`),
-        d2s(displayNameHex)
       ];
 
       return linkify
@@ -160,7 +160,9 @@ const User : m.Component<IAttrs> = {
       m('.user-address', formatAddressShort(profile.address)),
     ]);
 
-    return tooltip ? m(Tooltip, { content: tooltipPopover }, userFinal) : userFinal;
+    return tooltip
+      ? m(Tooltip, { content: tooltipPopover, hoverOpenDelay: 1000, trigger: userFinal, key: profile?.address || '-' })
+      : userFinal;
   }
 };
 

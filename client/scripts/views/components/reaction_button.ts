@@ -2,10 +2,10 @@ import 'components/reaction_button.scss';
 
 import { default as m, VnodeDOM } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
+import { Tooltip } from 'construct-ui';
 
 import app from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
-import Tooltip from 'views/components/tooltip';
 import User from 'views/components/widgets/user';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -103,7 +103,9 @@ const ReactionButton: m.Component<IAttrs, IState> = {
       m('span.reactions-icon', m.trust('&#x2191;')),
     ]);
 
-    return (tooltip && reactors.length) ? m(Tooltip, { content: tooltipPopover }, rxnButton) : rxnButton;
+    return (tooltip && reactors.length)
+      ? m(Tooltip, { content: tooltipPopover, trigger: rxnButton, hoverOpenDelay: 1000 })
+      : rxnButton;
   }
 };
 

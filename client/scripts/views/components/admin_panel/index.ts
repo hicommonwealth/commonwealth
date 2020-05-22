@@ -4,16 +4,14 @@ import { Dialog, Icon, Icons, ListItem } from 'construct-ui';
 import 'components/admin_panel.scss';
 import AdminPanelContents from './admin_panel_contents';
 
-const CommunityManagementPanel: m.Component<{}, {isOpen: boolean}> = {
+const AdminPanel: m.Component<{}, { isOpen: boolean }> = {
   oninit: (vnode) => {
     vnode.state.isOpen = false;
-  },
-  oncreate: (vnode) => {
   },
   view: (vnode) => {
     return [m(ListItem, {
       href: '#',
-      class: 'CommunityManagementPanel',
+      class: 'AdminPanel',
       onclick: (e) => {
         e.preventDefault();
         vnode.state.isOpen = true;
@@ -34,11 +32,11 @@ const CommunityManagementPanel: m.Component<{}, {isOpen: boolean}> = {
       isOpen: vnode.state.isOpen,
       inline: false,
       onClose: () => { vnode.state.isOpen = false; },
-      title:'Manage Community',
+      title: 'Manage Community',
       transitionDuration: 200,
       footer: null,
     })];
   },
 };
 
-export default CommunityManagementPanel;
+export default AdminPanel;

@@ -84,6 +84,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           ]),
       ]),
       m(Button, {
+        class: 'save-changes-button',
         label: 'Save changes',
         intent: 'primary',
         onclick: () => {

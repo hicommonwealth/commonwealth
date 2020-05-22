@@ -89,35 +89,16 @@ const Header: m.Component<{}> = {
             : m(Icon, { name: Icons.CHEVRON_DOWN }),
         }),
         content: [
-          app.vm.activeAccount
-            && app.vm.activeAccount.chain
-            && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`
-            && [
-              m(MenuItem, {
-                label: 'Go to profile',
-                iconLeft: Icons.USER,
-                onclick: (e) => {
-                  m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-                },
-              }),
-              m(MenuDivider),
-            ],
           m(MenuItem, {
-            onclick: () => m.route.set('/settings'),
-            iconLeft: Icons.SETTINGS,
-            label: 'Settings'
-          }),
-          (app.vm.activeAccount
-            || m.route.get() === '/settings')
-            && m(MenuItem, {
-              onclick: () => m.route.set('/notifications'),
-              iconLeft: Icons.BELL,
-              label: 'Manage Notifications'
-            }),
-          app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
-            onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
+            label: 'Go to profile',
             iconLeft: Icons.USER,
-            label: 'Admin'
+            onclick: (e) => {
+              m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+            },
+            disabled: !(
+              app.vm.activeAccount
+                && app.vm.activeAccount.chain
+                && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`)
           }),
           app.vm.activeAccount
           && m(MenuItem, {
@@ -136,6 +117,23 @@ const Header: m.Component<{}> = {
             iconLeft: Icons.LINK,
             label: 'Set on-chain ID'
           }),
+          m(MenuDivider),
+          m(MenuItem, {
+            onclick: () => m.route.set('/settings'),
+            iconLeft: Icons.SETTINGS,
+            label: 'Settings'
+          }),
+          app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
+            onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
+            iconLeft: Icons.USER,
+            label: 'Admin'
+          }),
+          (app.vm.activeAccount || m.route.get() === '/settings')
+            && m(MenuItem, {
+              onclick: () => m.route.set('/notifications'),
+              iconLeft: Icons.BELL,
+              label: 'Manage Notifications'
+            }),
           m(MenuItem, {
             onclick: () => app.modals.create({ modal: FeedbackModal }),
             iconLeft: Icons.SEND,
