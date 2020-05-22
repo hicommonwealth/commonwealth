@@ -136,7 +136,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
-            && m('h4', 'On-chain voting'),
+            && m('h4', 'Voting'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
               active: onProposalPage(m.route.get()),
@@ -187,28 +187,27 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             }),
             label: 'Approve tokens'
           }),
-          (app.community || app.chain)
-            && m('h4', 'More'),
-          // community management
+        ]),
+        m('.cui-list.list-bottom', [
           (app.community || app.chain)
             && m(ListItem, {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+              contentLeft: m(Icon, { name: Icons.USERS }),
             }),
-          // admin panel (all communities)
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
             && m(AdminPanel),
-          // // chat (all communities)
-          // (app.community || app.chain) &&
-          //   m(ListItem, {
-          //     active: onChatPage(m.route.get()),
-          //     label: 'Chat',
-          //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          //   }),
-          // TODO: add a "reserve tokens" option here, to apply to DAO?
         ]),
+        // // chat (all communities)
+        // (app.community || app.chain) &&
+        //   m(ListItem, {
+        //     active: onChatPage(m.route.get()),
+        //     label: 'Chat',
+        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   }),
+        // TODO: add a "reserve tokens" option here, to apply to DAO?
       ]),
     ]);
   },

@@ -7,8 +7,7 @@ $active-color: #e9e9f5;
     position: fixed;
     top: 0;
     bottom: 0;
-    left: $switcher-width;
-    width: $sidebar-width - $switcher-width;
+    width: $sidebar-width;
     z-index: 9;
     border-right: 1px solid #e8e8e8;
     .SidebarMenu {
@@ -17,6 +16,12 @@ $active-color: #e9e9f5;
     .SidebarMenu .cui-list {
         height: 100%;
         background: #f4f4f9;
+    }
+    .SidebarMenu .cui-list.list-bottom {
+        position: absolute;
+        bottom: 0;
+        height: initial;
+        padding-bottom: 20px;
     }
 
     // list styles
@@ -36,9 +41,6 @@ $active-color: #e9e9f5;
                 color: #5c6bc1 !important;
             }
         }
-    }
-    .TagSelector {
-        margin-bottom: 10px;
     }
 
     // individual menu items
