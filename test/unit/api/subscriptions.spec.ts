@@ -9,6 +9,7 @@ import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import Errors from '../../../server/routes/subscription/errors';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -149,13 +150,13 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, });
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
       res = await chai.request(app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, });
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
     it('both routes should succeed with just a string id', async () => {
@@ -182,12 +183,12 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
       res = await chai.request(app)
         .post('/api/disableImmediateEmails')
         .set('Accept', 'application/json')
         .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
-      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
     });
   });
 
