@@ -129,8 +129,8 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
         const validatorsInfo: IValidatorInfo = {};
 
-        electedInfo.info.map(({ accountId, exposure: _exposure, validatorPrefs }): any => {
-          const commissionPer = (validatorPrefs.commission) ? (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000 : 0;
+        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
           const isCommission = !!validatorPrefs.commission;
           const key = accountId.toString();
           const details = {
@@ -165,7 +165,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
             exposure: exposures[i],
             controller: controllers[i].toString(),
             isElected: true,
-            commissionPer: validatorsInfo[key] ? validatorsInfo[key].commissionPer : 0
+            commissionPer: validatorsInfo[key]
+              ? validatorsInfo[key].commissionPer
+              : 0
           };
         }
 
@@ -176,7 +178,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
             exposure: nextUpExposures[i],
             controller: nextUpControllers[i].toString(),
             isElected: false,
-            commissionPer: validatorsInfo[key] ? validatorsInfo[key].commissionPer : 0
+            commissionPer: validatorsInfo[key]
+              ? validatorsInfo[key].commissionPer
+              : 0
           };
         }
         return result;
