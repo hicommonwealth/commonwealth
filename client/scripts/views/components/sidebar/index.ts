@@ -196,9 +196,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
               contentLeft: m(Icon, { name: Icons.USERS }),
             }),
-          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-            && (app.community || app.chain)
-            && m(AdminPanel),
+          // isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          //   && (app.community || app.chain)
+          //   && m(AdminPanel),
+          m(AdminPanel)
         ]),
         // // chat (all communities)
         // (app.community || app.chain) &&

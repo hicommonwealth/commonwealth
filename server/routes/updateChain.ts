@@ -28,6 +28,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   if (req.body.icon_url) chain.IconUrl = req.body.icon_url;
   if (req.body.active !== undefined) chain.active = req.body.active;
   if (req.body.type) chain.type = req.body.type;
+  if (req.body.description) chain.description = req.body.description;
   if (req.body['featured_tags[]']) chain.featured_tags = req.body['featured_tags[]'];
 
   await chain.save();
