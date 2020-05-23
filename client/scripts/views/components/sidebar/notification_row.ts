@@ -161,7 +161,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
     const { category } = notifications[0].subscription;
     const getHeaderNotificationRow = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
       return m('li.HeaderNotificationRow', {
-        class: notifications[0].isRead ? '' : 'active',
+        class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {
           const notificationArray: Notification[] = [];
           app.login.notifications.markAsRead(notifications).then(() => m.redraw());
@@ -201,7 +201,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         notification.chainEvent.data,
       );
       return m('li.HeaderNotificationRow', {
-        class: notification.isRead ? '' : 'active',
+        class: notification.isRead ? '' : 'unread',
         onclick: async () => {
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
