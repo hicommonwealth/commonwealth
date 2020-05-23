@@ -25,6 +25,7 @@ describe('Thread Tests', () => {
   let adminJWT;
   let adminAddress;
   let userJWT;
+  let userId;
   let userAddress;
   let thread;
 
@@ -44,6 +45,7 @@ describe('Thread Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
+    userId = res.user_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -219,6 +221,51 @@ describe('Thread Tests', () => {
       expect(res.result.body).to.equal(encodeURIComponent(body));
       expect(res.result.Address).to.not.be.null;
       expect(res.result.Address.address).to.equal(userAddress);
+    });
+  });
+
+  describe('/bulkThreads', () => {
+    it('should pass with public chain', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          chain,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it('should pass with public community', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it.skip('should pass as admin of private community', async () => {
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: userJWT,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'true',
+        invitesEnabled: 'true',
+        id: 'test',
+        name: 'test community',
+        creator_id: userId,
+        creator_address: userAddress,
+        creator_chain: chain,
+        description: 'test enabled community',
+        default_chain: chain,
+      };
+
+      const testCommunity = await modelUtils.createCommunity(communityArgs);
+      console.dir(testCommunity);
     });
   });
 
