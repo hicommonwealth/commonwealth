@@ -75,12 +75,21 @@ const PresentationComponent = (state, chain: Substrate) => {
           const total = chain.chain.coins(validators[validator].exposure.total);
           const bonded = chain.chain.coins(validators[validator].exposure.own);
           const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN));
+          const commissionPer = validators[validator].commissionPer;
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
-          return m(ValidatorRow, { stash: validator, controller, total, bonded, nominated, nominators });
+          return m(ValidatorRow, {
+            stash: validator,
+            controller,
+            total,
+            bonded,
+            nominated,
+            nominators,
+            commissionPer
+          });
         }),
     ])
   }]);
