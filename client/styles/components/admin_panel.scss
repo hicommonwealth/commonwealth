@@ -45,11 +45,11 @@
                 display: inline-block;
                 padding-right: 6px;
 
-                .roleXIcon {
+                .role-x-icon {
                     padding-left: 2px;
                 }
             }
-            .metadataManagementTable {
+            .metadata-management-table {
                 table-layout: fixed;
             }
             .InputPropertyRow {
@@ -81,15 +81,15 @@
                 .UpgradeRolesForm, .WebhooksForm {
                     padding: 0 20px 10px;
                 }
-                .membersList {
+                .members-list {
                     min-height: 160px;
                     max-height: 160px;
                     overflow-y: scroll;
                 }
-                .AdminTabPanelButton {
+                .admin-tab-panel-button {
                     margin-top: 20px;
                 }
-                .ActiveWebhooks {
+                .active-webhooks {
                     min-height: 160px;
                     max-height: 160px;
                     overflow-y: scroll;

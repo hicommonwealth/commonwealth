@@ -34,7 +34,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       bordered: false,
       interactive: false,
       striped: false,
-      class: 'metadataManagementTable',
+      class: 'metadata-management-table',
     }, [
       m(InputPropertyRow, {
         title: 'Name',

@@ -31,7 +31,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         bordered: false,
         interactive: false,
         striped: false,
-        class: 'metadataManagementTable',
+        class: 'metadata-management-table',
       }, [
         m(InputPropertyRow, {
           title: 'Name',

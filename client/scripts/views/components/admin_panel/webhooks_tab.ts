@@ -72,7 +72,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         m('h3', 'Active webhooks:'),
         m(List, {
           interactive: false,
-          class: 'ActiveWebhooks'
+          class: 'active-webhooks'
         }, [
           webhooks.map((webhook) => {
             return m(ListItem, {
@@ -126,7 +126,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           placeholder: 'https://hooks.slack.com/services/',
         }),
         m(Button, {
-          class: 'AdminTabPanelButton',
+          class: 'admin-tab-panel-button',
           intent: 'none',
           label: 'Add webhook',
           onclick: createWebhook,

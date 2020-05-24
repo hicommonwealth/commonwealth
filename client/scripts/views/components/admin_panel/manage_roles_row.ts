@@ -21,7 +21,7 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
               m(Icon, {
                 name: Icons.X,
                 size: 'xs',
-                class: 'roleXIcon',
+                class: 'role-x-icon',
                 onclick: async () => {
                   const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
                     ...chainOrCommObj,

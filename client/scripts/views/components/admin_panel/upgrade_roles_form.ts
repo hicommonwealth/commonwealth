@@ -33,7 +33,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
       m('h3', 'Select Member:'),
       m(RadioGroup, {
         name: 'members/mods',
-        class: 'membersList',
+        class: 'members-list',
         options: names,
         value: vnode.state.user,
         onchange: (e: Event) => { vnode.state.user = (e.currentTarget as HTMLInputElement).value; },
@@ -46,7 +46,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
         onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
       }),
       m(Button, {
-        class: 'AdminTabPanelButton',
+        class: 'admin-tab-panel-button',
         label: 'Upgrade Member',
         onclick: () => {
           const indexOfName = names.indexOf(vnode.state.user);
