@@ -10,6 +10,9 @@ import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
+import { Errors as ChainError } from '../../../server/routes/updateChain';
+import { Errors as CommunityError } from '../../../server/routes/updateCommunity';
+
 chai.use(chaiHttp);
 const { expect } = chai;
 
@@ -117,7 +120,39 @@ describe('Update Community/Chain Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, network, });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal('Cannot change chain network');
+      expect(res.body.error).to.be.equal(ChainError.CantChangeNetwork);
+    });
+
+    it('should fail if no chain id', async () => {
+      const name = 'ethereum-testnet';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, name, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(ChainError.NoChainId);
+    });
+
+    it('should fail if no chain found', async () => {
+      const id = 'ethereum-testnet';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(ChainError.NoChainFound);
+    });
+
+    it('should fail if not admin ', async () => {
+      const id = 'ethereum';
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(ChainError.NotAdmin);
     });
   });
 
@@ -140,6 +175,45 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: offchainCommunity.id, description, });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.description).to.be.equal(description);
+    });
+
+    it('should fail without a community id', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CommunityError.NoCommunityId);
+    });
+
+    it('should fail with a wrong/invalid community id', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: 'CWLabs' });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CommunityError.CommunityNotFound);
+    });
+
+    it('should fail to change network', async () => {
+      const network = 'ethereum-testnet';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id ,network });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CommunityError.CantChangeNetwork);
+    });
+
+    it('should fail if not admin', async () => {
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, id: offchainCommunity.id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CommunityError.NotAdmin);
     });
   });
 });
