@@ -32,7 +32,7 @@ describe('Roles Test', () => {
     adminUserId = res.user_id;
   });
 
-  describe('createRole tests', () => {
+  describe('/createRole route tests', () => {
     it('should pass on joining public community', async () => {
       const res = await chai.request(app)
         .post('/api/createRole')
@@ -60,17 +60,32 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(createErrors.RoleAlreadyExists);
     });
 
-    it('should fail with invalid address_id', async () => {
+    it('should fail without address_id', async () => {
       const res = await chai.request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
           community,
-          address_id: 'loggedInAddrId',
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(createErrors.InvalidAddress);
+    });
+  });
+
+  describe('/upgradeMember route tests', () => {
+    it('should pass when admin upgrades new member', async () => {
+      let address;
+      const res = await chai.request(app)
+        .post('/api/upgradeMember')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          community,
+          address,
+          newRole: 'member',
+        });
+      console.dir(res.body);
     });
   });
 });
