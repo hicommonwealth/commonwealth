@@ -1,5 +1,5 @@
 .CommunityManagementDialog {
-    .cui-table.metadataManagementTable {
+    .cui-table .metadata-management-table {
         td {
             padding: 10px 20px 0;
             border-bottom: none !important;
@@ -31,13 +31,16 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        min-height: 450px;
         @media (min-width: 800px) {
             flex-direction: row;
         }
         .panel-left {
             width: 100%;
             border-right: 1px #c5cdd1 solid;
+            min-height: 450px;
+            max-height: 450px;
+            overflow-y: scroll;
+
             @media (min-width: 800px) {
                 width: 60%;
             }
