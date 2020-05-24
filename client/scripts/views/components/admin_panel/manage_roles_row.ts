@@ -16,7 +16,6 @@ const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
             return m('.RoleChild', [
               m(User, {
                 user: [role.Address.address, role.Address.chain],
-                linkify: true,
                 tooltip: true,
               }),
               m(Icon, {

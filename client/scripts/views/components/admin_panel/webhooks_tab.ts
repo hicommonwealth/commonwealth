@@ -127,7 +127,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         }),
         m(Button, {
           class: 'AdminTabPanelButton',
-          type: 'submit',
+          intent: 'none',
           label: 'Add webhook',
           onclick: createWebhook,
         }),
