@@ -569,6 +569,5 @@ describe('Invite Tests', () => {
       expect(res.body.result.id).to.be.equal(res2.body.result.id);
     });
 
-
   });
 });

@@ -12,6 +12,7 @@ import * as modelUtils from '../../util/modelUtils';
 
 import { Errors as createErrors } from '../../../server/routes/createRole';
 import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
+import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
 
 
 chai.use(chaiHttp);
@@ -214,5 +215,76 @@ describe('Roles Test', () => {
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(upgradeErrors.NoMember);
     });
+  });
+
+  describe('/deleteRole route tests', () => {
+    let memberAddress;
+    let memberAddressId;
+    let memberJwt;
+    let memberUserId;
+
+    beforeEach('Create a member role to delete', async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      memberAddress = res.address;
+      memberAddressId = res.address_id;
+      memberJwt = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      memberUserId = res.user_id;
+      const isMember = await modelUtils.assignRole({
+        address_id: memberAddressId,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'member',
+      });
+    });
+
+    it('should delete member role', async () => {
+      const res = await chai.request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          community,
+          address_id: memberAddressId,
+        });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should fail without address_id', async () => {
+      const res = await chai.request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          community,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
+    });
+
+    it('should fail with invalid address_id', async () => {
+      const res = await chai.request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          community,
+          address_id: 123456,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
+    });
+
+    it('should fail to delete role where there is none in chain community', async () => {
+      const res = await chai.request(app)
+        .post('/api/deleteRole')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: memberJwt,
+          chain,
+          address_id: memberAddressId,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(deleteErrors.RoleDNE);
+    });
+
   });
 });
