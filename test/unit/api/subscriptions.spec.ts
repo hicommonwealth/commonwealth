@@ -159,11 +159,43 @@ describe('Subscriptions Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    it('/viewNotifications', async () => {
-      // Get Notifications for Default User
-      expect(subscription).to.not.be.null;
-      expect(thread).to.not.be.null;
-      const res = await chai.request(app)
+    describe('/viewNotifications route tests', () => {
+      it('should pass with expected input', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should pass with unread_only property', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, unread_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should pass with active_only property', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, active_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+    });
+
+    it('/markNotificationsRead', async () => {
+      let res = await chai.request(app)
         .post('/api/viewNotifications')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
@@ -171,13 +203,10 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.length).to.be.greaterThan(0);
       notifications = res.body.result;
-    });
-
-    it('/markNotificationsRead', async () => {
       // Mark Notifications Read for Default User
       expect(notifications).to.not.be.null;
       const notification_ids = notifications.map((n) => { return n.id; });
-      const res = await chai.request(app)
+      res = await chai.request(app)
         .post('/api/markNotificationsRead')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
