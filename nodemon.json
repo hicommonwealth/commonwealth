@@ -1,0 +1,17 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    ".git",
+    "server/**/*.spec.ts"
+  ],
+  "verbose": true,
+  "watch": [
+    "server/**/*.ts",
+    "shared/**/*.ts"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "ts,js,json",
+  "delay": 0.25
+}
