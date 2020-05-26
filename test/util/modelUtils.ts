@@ -217,7 +217,6 @@ export interface CommunityArgs {
   jwt: any;
   id: string;
   name: string;
-  creator_id: number;
   creator_address: string,
   creator_chain: string,
   description: string;

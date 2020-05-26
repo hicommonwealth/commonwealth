@@ -96,7 +96,6 @@ describe('Invite Tests', () => {
         invitesEnabled: 'true',
         id: 'invites',
         name: 'invites community',
-        creator_id: userUserId,
         creator_address: userAddress,
         creator_chain: chain,
         description: 'Invites enabled community',

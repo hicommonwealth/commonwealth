@@ -13,9 +13,6 @@ export const Errors = {
 
 const editTag = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
-  }
   if (!req.body.id) {
     return next(new Error(Errors.NoTagId));
   }
@@ -50,15 +47,11 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
         ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
         : await models.Chain.findOne({ where: { id: chain.id } });
       let { featured_tags } = activeEntity;
-      if (featured_order === 'true') {
-        if (!featured_tags.includes(`${id}`)) {
-          featured_tags.push(`${id}`);
-        }
-      } else if (featured_order === 'false') {
-        if (featured_tags.includes(`${id}`)) {
-          const idx = featured_tags.indexOf(`${id}`);
-          featured_tags = featured_tags.slice(0, idx).concat(featured_tags.slice(idx + 1));
-        }
+      if (featured_order === 'true' && !featured_tags.includes(`${id}`)) {
+        featured_tags.push(`${id}`);
+      } else if (featured_order === 'false' && featured_tags.includes(`${id}`)) {
+        const idx = featured_tags.indexOf(`${id}`);
+        featured_tags = featured_tags.slice(0, idx).concat(featured_tags.slice(idx + 1));
       }
       activeEntity.featured_tags = featured_tags;
       await activeEntity.save();

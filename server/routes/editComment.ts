@@ -12,9 +12,6 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
   if (!req.body.id) {
     return next(new Error('Must provide id'));
   }
