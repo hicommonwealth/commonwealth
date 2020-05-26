@@ -57,9 +57,9 @@ export default class extends IEventHandler {
      * We should determine, using the event's type, what action to take, based
      * on whether it is a creation, modification, or unrelated event.
      */
-    const createEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
+    const createEntityFn = async (type: SubstrateEntityKind, type_id: string, completed = false) => {
       const dbEntity = await this._models.ChainEntity.create({
-        type: type.toString(), type_id, chain: this._chain,
+        type: type.toString(), type_id, chain: this._chain, completed
       });
       log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
 
@@ -71,10 +71,10 @@ export default class extends IEventHandler {
       return dbEvent;
     };
 
-    const updateEntityFn = async (type: SubstrateEntityKind, type_id: string) => {
+    const updateEntityFn = async (type: SubstrateEntityKind, type_id: string, completed = false) => {
       const dbEntity = await this._models.ChainEntity.findOne({
         where: {
-          type: type.toString(), type_id, chain: this._chain,
+          type: type.toString(), type_id, chain: this._chain
         }
       });
       if (!dbEntity) {
@@ -86,6 +86,12 @@ export default class extends IEventHandler {
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
+
+      // update completed state if necessary
+      if (!dbEntity.completed && completed) {
+        dbEntity.completed = true;
+        await dbEntity.save();
+      }
       await this.wssSend(dbEntity, dbEvent);
 
       return dbEvent;
@@ -99,7 +105,7 @@ export default class extends IEventHandler {
       }
       case SubstrateEventKind.DemocracyTabled: {
         const { proposalIndex } = event.data;
-        return updateEntityFn(SubstrateEntityKind.DemocracyProposal, proposalIndex.toString());
+        return updateEntityFn(SubstrateEntityKind.DemocracyProposal, proposalIndex.toString(), true);
       }
 
       // Democracy Referendum Events
@@ -107,25 +113,30 @@ export default class extends IEventHandler {
         const { referendumIndex } = event.data;
         return createEntityFn(SubstrateEntityKind.DemocracyReferendum, referendumIndex.toString());
       }
-      case SubstrateEventKind.DemocracyPassed:
+      case SubstrateEventKind.DemocracyPassed: {
+        const { referendumIndex } = event.data;
+        return updateEntityFn(SubstrateEntityKind.DemocracyReferendum, referendumIndex.toString());
+      }
       case SubstrateEventKind.DemocracyNotPassed:
       case SubstrateEventKind.DemocracyCancelled:
       case SubstrateEventKind.DemocracyExecuted: {
         const { referendumIndex } = event.data;
-        return updateEntityFn(SubstrateEntityKind.DemocracyReferendum, referendumIndex.toString());
+        return updateEntityFn(SubstrateEntityKind.DemocracyReferendum, referendumIndex.toString(), true);
       }
 
       // Preimage Events
       case SubstrateEventKind.PreimageNoted: {
         const { proposalHash } = event.data;
-        return createEntityFn(SubstrateEntityKind.DemocracyPreimage, proposalHash);
+        // we always mark preimages as "completed" -- we have no link between democracy proposals
+        // and preimages in the database, so we want to always fetch them for archival purposes,
+        // which requires marking them completed.
+        return createEntityFn(SubstrateEntityKind.DemocracyPreimage, proposalHash, true);
       }
       case SubstrateEventKind.PreimageUsed:
       case SubstrateEventKind.PreimageInvalid:
-      case SubstrateEventKind.PreimageMissing:
       case SubstrateEventKind.PreimageReaped: {
         const { proposalHash } = event.data;
-        return updateEntityFn(SubstrateEntityKind.DemocracyPreimage, proposalHash);
+        return updateEntityFn(SubstrateEntityKind.DemocracyPreimage, proposalHash, true);
       }
 
       // Treasury Events
@@ -136,7 +147,7 @@ export default class extends IEventHandler {
       case SubstrateEventKind.TreasuryRejected:
       case SubstrateEventKind.TreasuryAwarded: {
         const { proposalIndex } = event.data;
-        return updateEntityFn(SubstrateEntityKind.TreasuryProposal, proposalIndex.toString());
+        return updateEntityFn(SubstrateEntityKind.TreasuryProposal, proposalIndex.toString(), true);
       }
 
       // Elections Events -- no entities needed here given current spread of events,
@@ -150,11 +161,14 @@ export default class extends IEventHandler {
         const { proposalHash } = event.data;
         return createEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash);
       }
-      case SubstrateEventKind.CollectiveApproved:
+      case SubstrateEventKind.CollectiveApproved: {
+        const { proposalHash } = event.data;
+        return updateEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash);
+      }
       case SubstrateEventKind.CollectiveDisapproved:
       case SubstrateEventKind.CollectiveExecuted: {
         const { proposalHash } = event.data;
-        return updateEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash);
+        return updateEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash, true);
       }
 
       // Signaling Events
@@ -163,10 +177,13 @@ export default class extends IEventHandler {
         return createEntityFn(SubstrateEntityKind.SignalingProposal, proposalHash);
       }
       case SubstrateEventKind.SignalingCommitStarted:
-      case SubstrateEventKind.SignalingVotingStarted:
-      case SubstrateEventKind.SignalingVotingCompleted: {
+      case SubstrateEventKind.SignalingVotingStarted: {
         const { proposalHash } = event.data;
         return updateEntityFn(SubstrateEntityKind.SignalingProposal, proposalHash);
+      }
+      case SubstrateEventKind.SignalingVotingCompleted: {
+        const { proposalHash } = event.data;
+        return updateEntityFn(SubstrateEntityKind.SignalingProposal, proposalHash, true);
       }
 
       default: {

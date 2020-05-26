@@ -47,10 +47,11 @@ class ChainEntityController {
   }
 
   public refresh(chain: string, loadIncompleteEntities: boolean = false) {
-    // TODO: add a way on route to only get completed entities if set to true
-    //  for now, it duplicates the data from chain, but shouldn't affect the results.
-    if (!loadIncompleteEntities) return Promise.resolve();
-    return get('/bulkEntities', { chain }, (result) => {
+    const options: any = { chain };
+    if (!loadIncompleteEntities) {
+      options.completed = true;
+    }
+    return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);

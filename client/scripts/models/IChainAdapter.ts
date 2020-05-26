@@ -58,7 +58,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     await this.app.comments.refreshAll(this.id, null, true, true);
     await this.app.reactions.refreshAll(this.id, null, true);
 
-    // if we're loading entities from chain, only pull completed (for now, does nothing)
+    // if we're loading entities from chain, only pull completed
     await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();

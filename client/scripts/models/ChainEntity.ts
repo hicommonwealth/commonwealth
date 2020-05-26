@@ -35,10 +35,13 @@ class ChainEntity {
     this.createdAt = moment(createdAt);
     this._updatedAt = moment(updatedAt);
 
-    // TODO: move this into a chain event controller to avoid duplication
-    this._chainEvents = (chainEvents || [])
-      .map((c) => ChainEvent.fromJSON(c))
-      .sort(({ blockNumber: bn1 }, { blockNumber: bn2 }) => bn1 - bn2); // sort ascending
+    if (chainEvents && chainEvents.length > 0) {
+      this._chainEvents = chainEvents
+        .map((c) => ChainEvent.fromJSON(c))
+        .sort(({ blockNumber: bn1 }, { blockNumber: bn2 }) => bn1 - bn2); // sort ascending
+    } else {
+      this._chainEvents = [];
+    }
   }
 
   public static fromJSON(json) {
@@ -46,9 +49,9 @@ class ChainEntity {
       json.chain,
       json.type,
       json.type_id,
+      json.ChainEvents,
       json.created_at,
       json.updated_at,
-      json.ChainEvents,
       json.id,
       json.thread_id,
     );
