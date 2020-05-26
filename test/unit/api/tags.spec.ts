@@ -13,6 +13,7 @@ import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
+const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('Tag Tests', () => {
   const community = 'staking';
@@ -46,12 +47,11 @@ describe('Tag Tests', () => {
   });
 
   describe('/editTag', () => {
-    const name = 'test name';
-    const description = 'test description';
+    const updatedName = 'test name';
+    const updatedDescription = 'test description';
     const featured_order = true;
 
-    before(async () => {
-      const markdownThread = require('../../util/fixtures/markdownThread');
+    beforeEach(async () => {
       const kind = 'forum';
       const threadRes = await modelUtils.createThread({
         chain,
@@ -74,16 +74,16 @@ describe('Tag Tests', () => {
     it('should successfully edit tag names & descriptions', async () => {
       const res = await modelUtils.editTag({
         id: tag.id,
-        name,
-        description,
+        name: updatedName,
+        description: updatedDescription,
         address: adminAddress,
         jwt: adminJWT,
         community,
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
-      expect(res.result.name).to.equal(name);
-      expect(res.result.description).to.equal(description);
+      expect(res.result.name).to.equal(updatedName);
+      expect(res.result.description).to.equal(updatedDescription);
     });
 
     it('should successfully feature existing tags', async () => {
@@ -103,8 +103,8 @@ describe('Tag Tests', () => {
     it('should fail to edit a tag without an id', async () => {
       const res = await modelUtils.editTag({
         id: undefined,
-        name,
-        description,
+        name: updatedName,
+        description: updatedDescription,
         address: adminAddress,
         jwt: adminJWT,
         community,
@@ -117,8 +117,8 @@ describe('Tag Tests', () => {
     it('should fail to edit a non-existing tag', async () => {
       const res = await modelUtils.editTag({
         id: 99999,
-        name,
-        description,
+        name: updatedName,
+        description: updatedDescription,
         address: adminAddress,
         jwt: adminJWT,
         community,
@@ -131,8 +131,8 @@ describe('Tag Tests', () => {
     it('should fail when a non-admin attempts to edit', async () => {
       const res = await modelUtils.editTag({
         id: tag.id,
-        name,
-        description,
+        name: updatedName,
+        description: updatedDescription,
         address: userAddress,
         jwt: userJWT,
         community,
