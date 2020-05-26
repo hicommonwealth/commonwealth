@@ -41,14 +41,17 @@ export interface ThreadArgs {
   community?: string;
   address: string;
   jwt: any;
-  title: string;
+  title: any;
   body: any;
+  kind: string;
   tags?: string[];
   privacy?: boolean;
   readOnly?: boolean;
+  url?: string;
+  mentions?: any;
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chain, community, address, jwt, title, body, tags, privacy, readOnly } = args;
+  const { chain, community, address, jwt, title, body, tags, privacy, readOnly, kind, url, mentions } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -62,11 +65,12 @@ export const createThread = async (args: ThreadArgs) => {
       'address': address,
       'title': encodeURIComponent(title),
       'body': encodeURIComponent(body),
-      'kind': 'forum',
+      'kind': kind,
       'versionHistory': versionHistory,
       'attachments[]': undefined,
       'tags[]': tags || 'tag',
-      'url': undefined,
+      'mentions[]': mentions,
+      'url': url,
       'privacy': privacy || false,
       'readOnly': readOnly || false,
       'jwt': jwt,
@@ -81,10 +85,11 @@ export interface CommentArgs {
   jwt: any;
   text: any;
   parentCommentId?: any;
-  proposalIdentifier?: any;
+  root_id?: any;
+  mentions?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, community, address, jwt, text, parentCommentId, proposalIdentifier } = args;
+  const { chain, community, address, jwt, text, parentCommentId, root_id, mentions } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body: text };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -97,11 +102,12 @@ export const createComment = async (args: CommentArgs) => {
       'community': community,
       'address': address,
       'parent_id': parentCommentId,
-      'root_id': proposalIdentifier,
+      'root_id': root_id,
       'attachments[]': undefined,
-      'text': encodeURIComponent(text),
+      'text': text,
       'versionHistory': versionHistory,
       'jwt': jwt,
+      'mentions[]': mentions,
     });
   return res.body;
 };

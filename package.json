@@ -14,6 +14,7 @@
     "integration-test": "nyc ts-mocha --project test/tsconfig.node.json ./test/integration/**/*.spec.ts",
     "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/**/*.spec.ts ./test/integration/**/*.spec.ts",
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/unit/api/*.spec.ts",
+    "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "start-events": "ts-node -P ./tsconfig.node.json -T ./eventSubscriber.ts",

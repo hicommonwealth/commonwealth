@@ -5,19 +5,22 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NoThreadId: 'Must provide thread_id',
+  NoBodyOrAttachment: 'Forum posts must include body or attachment',
+  IncorrectOwner: 'Not owned by this user',
+};
+
 const editThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const { body, kind, thread_id, version_history, read_only, privacy } = req.body;
 
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
   if (!thread_id) {
-    return next(new Error('Must provide thread_id'));
+    return next(new Error(Errors.NoThreadId));
   }
 
   if (kind === 'forum') {
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-      return next(new Error('Forum posts must include body or attachment'));
+      return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
   const attachFiles = async () => {
@@ -44,7 +47,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
       where: { id: thread_id },
     });
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
-      return next(new Error('Not owned by this user'));
+      return next(new Error(Errors.IncorrectOwner));
     }
     const arr = thread.version_history;
     arr.unshift(version_history);
