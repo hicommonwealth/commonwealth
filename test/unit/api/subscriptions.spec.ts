@@ -110,22 +110,118 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
       expect(res.body.status).to.be.equal('Success');
     });
+
+    it('should pause and unpause a subscription with just the id as string (not array)', async () => {
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/disableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      res = await chai.request(app)
+        .post('/api/enableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should pause and unpause an array of subscription', async () => {
+      const subscriptions = [];
+      for (let i = 0; i < 3; i++) {
+        subscriptions.push(modelUtils.createSubscription({
+          object_id: community,
+          jwt: jwtToken,
+          is_active: true,
+          category: NotificationCategories.NewThread,
+        }));
+      }
+      const subscriptionIds = (await Promise.all(subscriptions)).map((s) => s.id);
+      let res = await chai.request(app)
+        .post('/api/disableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+
+      res = await chai.request(app)
+        .post('/api/enableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscriptionIds });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should fail to enable and disable subscriptions not owned by the requester', async () => {
+      expect(subscription).to.not.be.null;
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJWT = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      let res = await chai.request(app)
+        .post('/api/enableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+      res = await chai.request(app)
+        .post('/api/disableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+    });
+
+    it('should fail to enable and disable subscription when no subscriptions are passed to route', async () => {
+      let res = await chai.request(app)
+        .post('/api/enableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+      res = await chai.request(app)
+        .post('/api/disableSubscriptions')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.not.be.null;
+    });
   });
 
   describe('/deleteSubscription', () => {
-    it('should delete an active subscription', async () => {
-      const subscription: NotificationSubscription = await modelUtils.createSubscription({
+    let subscription;
+
+    beforeEach('make subscription', async () => {
+      subscription = await modelUtils.createSubscription({
         object_id: community,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
       });
+    });
+
+    it('should delete an active subscription', async () => {
       expect(subscription).to.not.be.null;
       const res = await chai.request(app)
         .post('/api/deleteSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, 'subscription_id': subscription.id });
       expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should fail to delete when no subscription id is passed', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/deleteSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken });
+      expect(res.body.error).to.not.be.null;
+    });
+
+    it('should fail to find a bad subscription id', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/deleteSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_id': 'hello' });
+      expect(res.body.error).to.not.be.null;
     });
   });
 
@@ -173,27 +269,62 @@ describe('Subscriptions Tests', () => {
       notifications = res.body.result;
     });
 
-    it('/markNotificationsRead', async () => {
-      // Mark Notifications Read for Default User
-      expect(notifications).to.not.be.null;
-      const notification_ids = notifications.map((n) => { return n.id; });
-      const res = await chai.request(app)
-        .post('/api/markNotificationsRead')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
+    describe('/markNotificationsRead', async () => {
+      it('should pass when query formatted correctly', async () => {
+        // Mark Notifications Read for Default User
+        expect(notifications).to.not.be.null;
+        const notification_ids = notifications.map((n) => { return n.id; });
+        const res = await chai.request(app)
+          .post('/api/markNotificationsRead')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+      });
+      it('should pass when notification id is string', async () => {
+        // Mark Notifications Read for Default User
+        expect(notifications).to.not.be.null;
+        const notification_ids = notifications.map((n) => { return n.id; });
+        const res = await chai.request(app)
+          .post('/api/markNotificationsRead')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, 'notification_ids[]': notification_ids[0].toString() });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+      });
+      it('should fail when no notifications are passed', async () => {
+        const res = await chai.request(app)
+          .post('/api/markNotificationsRead')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken });
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.not.be.null;
+      });
+      it('should fail when not the owner of the notification', async () => {
+        expect(notifications).to.not.be.null;
+        const notification_ids = notifications.map((n) => { return n.id; });
+        const result = await modelUtils.createAndVerifyAddress({ chain });
+        const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+        const res = await chai.request(app)
+          .post('/api/markNotificationsRead')
+          .set('Accept', 'application/json')
+          .send({ jwt: newJwt, 'notification_ids[]': notification_ids });
+        expect(res.body).to.not.be.null;
+        expect(res.body.error).to.not.be.null;
+      });
     });
 
-    it('/clearReadNotifications', async () => {
-      // Clear Read for Default User
-      expect(notifications).to.not.be.null;
-      const res = await chai.request(app)
-        .post('/api/clearReadNotifications')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
+    describe('/clearReadNotifications', async () => {
+      it('should pass when query formatted correctly', async () => {
+        // Clear Read for Default User
+        expect(notifications).to.not.be.null;
+        const res = await chai.request(app)
+          .post('/api/clearReadNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+      });
     });
   });
 });
