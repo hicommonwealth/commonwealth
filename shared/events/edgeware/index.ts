@@ -65,9 +65,11 @@ export default async function (
   performMigration?: boolean,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
   const provider = new WsProvider(url);
+  let unsubscribe: () => void;
   await new Promise((resolve) => {
-    provider.on('connected', () => resolve());
+    unsubscribe = provider.on('connected', () => resolve());
   });
+  if (unsubscribe) unsubscribe();
 
   const api = await createApi(provider, chain.startsWith('edgeware')).isReady;
 
