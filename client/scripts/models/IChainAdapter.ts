@@ -52,14 +52,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public async init(
     onServerLoaded? : () => void,
     initChainModuleFn?: () => Promise<void>,
-    loadEntities = false,
+    loadIncompleteEntities = false,
   ): Promise<void> {
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, true, true);
     await this.app.reactions.refreshAll(this.id, null, true);
 
     // if we're loading entities from chain, only pull completed (for now, does nothing)
-    await this.app.chainEntities.refresh(this.meta.chain.id, !loadEntities);
+    await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
     await initChainModuleFn();

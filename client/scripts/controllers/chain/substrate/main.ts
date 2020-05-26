@@ -9,12 +9,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateIdentities from './identity';
-import SubstrateChain, {
-  handleSubstrateEntityUpdate,
-  initApiPromise,
-  initChainEntities,
-  initChainEntitySubscription
-} from './shared';
+import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -40,6 +35,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async init(onServerLoaded?) {
+    const useClientChainEntities = true;
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
@@ -54,7 +50,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.init(async () => {
       await this.chain.resetApi(this.meta);
       await this.chain.initMetadata();
-    }, onServerLoaded);
+    }, onServerLoaded, !useClientChainEntities);
     await this.accounts.init(this.chain);
 
     await Promise.all([
@@ -66,10 +62,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
-    await this._postModuleLoad();
-    const apiPromise = await initApiPromise(this.meta.chain.id, this.meta.url);
-    await initChainEntities(this.app, apiPromise, this.meta.chain.id);
-    await initChainEntitySubscription(this.app, apiPromise, this.meta.chain.id);
+    await this._postModuleLoad(!useClientChainEntities);
+    if (useClientChainEntities) {
+      await this.chain.initChainEntities(this.meta.chain.id);
+    }
     await this.chain.initEventLoop();
 
     this._loaded = true;

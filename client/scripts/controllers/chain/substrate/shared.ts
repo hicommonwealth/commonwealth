@@ -24,7 +24,6 @@ import {
 } from '@polkadot/types/interfaces';
 
 import { Vec, Compact } from '@polkadot/types/codec';
-import { createType } from '@polkadot/types/create';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
 import { formatCoin, Coin } from 'adapters/currency';
@@ -49,7 +48,6 @@ import { CWEvent } from 'events/interfaces';
 import loadSubstrateEvents from 'events/edgeware/migration';
 import EdgewareEventSubscriber from 'events/edgeware/subscriber';
 import EdgewareEventProcessor from 'events/edgeware/processor';
-import { createApi as createApiPromise } from 'events/edgeware/index';
 import {
   SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
   eventToEntity, entityToFieldName
@@ -64,89 +62,23 @@ import { SubstrateAccount } from './account';
 
 export type HandlerId = number;
 
-// TODO: it may make sense to abstract this further, and keep api as a member
-//   of the main chain module, but not necessary for now.
-function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
-  if (app.chain) {
-    if (ChainBase.Substrate !== app.chain.base) {
-      throw new Error('Invalid chain selection');
-    }
-    const registry = new TypeRegistry();
-    const nodeUrl = node.url;
-    const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
-    const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1;
-    const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-    const options: ApiOptions = {
-      provider : new WsProvider(protocol + nodeUrl),
-      ...additionalOptions,
-      registry,
-    };
-    // tslint:disable-next-line
-    window['wsProvider'] = options.provider;
-    return new ApiRx(options);
-  }
-}
-
-export async function initApiPromise(chain, url): Promise<ApiPromise> {
-  // TODO: figure out a way to link this provider/API combo up with the connection
-  //   event handling further down, regarding the "connected/disconnected" light,
-  //   error msgs, etc.
-  const provider = new WsProvider(url);
+// creates a substrate API provider and waits for it to emit a connected event
+async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
+  const nodeUrl = node.url;
+  const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
+  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1;
+  const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+  const provider = new WsProvider(protocol + nodeUrl);
+  let unsubscribe: () => void;
   await new Promise((resolve) => {
-    provider.on('connected', () => resolve());
+    unsubscribe = provider.on('connected', () => resolve());
   });
-  const apiPromise = await createApiPromise(provider, chain.startsWith('edgeware')).isReady;
-  return apiPromise;
+  if (unsubscribe) unsubscribe();
+  window['wsProvider'] = provider;
+  return provider;
 }
 
-// client event handler
-function handleCWEvent(app: IApp, chain: string, cwEvent: CWEvent): [ ChainEntity, ChainEvent ] | null {
-  // immediately return if no entity involved, event unrelated to proposals/etc
-  const entityKind = eventToEntity(cwEvent.data.kind);
-  if (!entityKind) return null;
-
-  // create event type
-  const eventType = new ChainEventType(
-    `${chain}-${cwEvent.data.kind.toString()}`,
-    chain,
-    cwEvent.data.kind.toString()
-  );
-
-  // create event
-  const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-
-  // create entity
-  const fieldName = entityToFieldName(entityKind);
-  if (!fieldName) return null;
-  const fieldValue = event.data[fieldName];
-  const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
-  app.chainEntities.update(entity, event);
-  // eslint-disable-next-line no-use-before-define
-  handleSubstrateEntityUpdate(app.chain, entity, event);
-}
-
-export async function initChainEntities(app: IApp, api: ApiPromise, chain: string) {
-  const cwEvents = await loadSubstrateEvents(api);
-  // eslint-disable-next-line no-restricted-syntax
-  for (const cwEvent of cwEvents) {
-    handleCWEvent(app, chain, cwEvent);
-  }
-}
-
-export async function initChainEntitySubscription(app: IApp, api: ApiPromise, chain: string) {
-  const subscriber = new EdgewareEventSubscriber(api);
-  const processor = new EdgewareEventProcessor(api);
-  // TODO: handle unsubscribing
-  console.log('Subscribing to chain events.');
-  subscriber.subscribe(async (block) => {
-    const cwEvents = await processor.process(block);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cwEvent of cwEvents) {
-      const results = handleCWEvent(app, chain, cwEvent);
-    }
-  });
-}
-
+// dispatches an entity update to the appropriate module
 export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
   switch (entity.type) {
     case SubstrateEntityKind.DemocracyProposal: {
@@ -201,6 +133,7 @@ export interface ISubstrateTXData extends ITXData {
   isEd25519: boolean;
 }
 
+/* eslint-disable no-restricted-syntax */
 class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   // balances
   private _totalbalance: SubstrateCoin;
@@ -235,7 +168,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   public get denom() { return this.app.chain.currency; }
 
-  private readonly _eventHandlers = { };
   private readonly _silencedEvents = { };
 
   private _blockSubscription: Unsubscribable;
@@ -244,6 +176,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   private _suppressAPIDisconnectErrors: boolean = false;
   private _api: ApiRx;
+  private _apiPromise: ApiPromise;
 
   private _reservationFee: SubstrateCoin;
   public get reservationFee() { return this._reservationFee; }
@@ -273,24 +206,15 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
   public get registry() { return this._api.registry; }
 
-  public resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
-    const api = this.initApi(createApi(this.app, selectedNode, additionalOptions), selectedNode);
-    return api;
-  }
-
-  private _connectedCb: () => void;
-  private _disconnectedCb: () => void;
-  private _errorCb: (err) => void;
-
-  public initApi(api: ApiRx, node?: NodeInfo): Promise<ApiRx> {
-    this._connectedCb = () => {
+  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiRx> {
+    const connectedCb = () => {
       this.app.chain.networkStatus = ApiStatus.Connected;
       this.app.chain.networkError = null;
       this._suppressAPIDisconnectErrors = false;
       m.redraw();
     };
-    this._disconnectedCb = () => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+    const disconnectedCb = () => {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = true;
@@ -300,8 +224,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         m.redraw();
       }
     };
-    this._errorCb = (err) => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+    const errorCb = (err) => {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && selectedNode === this.app.chain.meta) {
         console.log('api error');
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = err.message;
@@ -313,21 +237,40 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         m.redraw();
       }
     };
-    api.on('connected', this._connectedCb);
-    api.on('disconnected', this._disconnectedCb);
-    api.on('error', this._errorCb);
-    this._api = api;
+    const provider = await createApiProvider(selectedNode);
+    if (provider.isConnected) connectedCb();
+    this._removeConnectedCb = provider.on('connected', connectedCb);
+    this._removeDisconnectedCb = provider.on('disconnected', disconnectedCb);
+    this._removeErrorCb = provider.on('error', errorCb);
+
+    // note that we reuse the same provider and type registry to create both an rxjs
+    // and a promise-based API -- this avoids creating multiple connections to the node
+    const registry = new TypeRegistry();
+    const options: ApiOptions = {
+      provider,
+      registry,
+      ...additionalOptions,
+    };
+    const apiRx = new ApiRx(options);
+    const apiPromise = new ApiPromise(options);
+    this._api = apiRx;
+    this._apiPromise = apiPromise;
     return this._api.isReady.toPromise();
   }
+
+  private _removeConnectedCb: () => void;
+  private _removeDisconnectedCb: () => void;
+  private _removeErrorCb: () => void;
 
   public deinitApi() {
     if (!this._api) return;
     try {
       this._api.disconnect();
-      if (this._connectedCb) this._api.off('connected', this._connectedCb);
-      if (this._disconnectedCb) this._api.off('disconnected', this._disconnectedCb);
-      if (this._errorCb) this._api.off('error', this._errorCb);
+      if (this._removeConnectedCb) this._removeConnectedCb();
+      if (this._removeDisconnectedCb) this._removeDisconnectedCb();
+      if (this._removeErrorCb) this._removeErrorCb();
       this._api = null;
+      this._apiPromise = null;
     } catch (e) {
       console.error('Error disconnecting from API, it might already be disconnected.');
     }
@@ -344,6 +287,54 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return !!this._api;
   }
 
+  // handle a single incoming chain event emitted from client connection with node
+  private _handleCWEvent(chain: string, cwEvent: CWEvent): void {
+    // immediately return if no entity involved, event unrelated to proposals/etc
+    const entityKind = eventToEntity(cwEvent.data.kind);
+    if (!entityKind) return;
+
+    // create event type
+    const eventType = new ChainEventType(
+      `${chain}-${cwEvent.data.kind.toString()}`,
+      chain,
+      cwEvent.data.kind.toString()
+    );
+
+    // create event
+    const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
+
+    // create entity
+    const fieldName = entityToFieldName(entityKind);
+    if (!fieldName) return;
+    const fieldValue = event.data[fieldName];
+    const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
+    this._app.chainEntities.update(entity, event);
+    this._app.chain.handleEntityUpdate(entity, event);
+  }
+
+  // load existing events and subscribe to future via client node connection
+  public async initChainEntities(chain: string) {
+    // get existing events
+    const existingEvents = await loadSubstrateEvents(this._apiPromise);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const cwEvent of existingEvents) {
+      this._handleCWEvent(chain, cwEvent);
+    }
+
+    // kick off subscription to future events
+    const subscriber = new EdgewareEventSubscriber(this._apiPromise);
+    const processor = new EdgewareEventProcessor(this._apiPromise);
+    // TODO: handle unsubscribing
+    console.log('Subscribing to chain events.');
+    subscriber.subscribe(async (block) => {
+      const incomingEvents = await processor.process(block);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cwEvent of incomingEvents) {
+        this._handleCWEvent(chain, cwEvent);
+      }
+    });
+  }
+
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {
     return this.api.pipe(switchMap((api: ApiRx) => fn(api)));
   }
@@ -352,14 +343,14 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     if (!this._api.tx) {
       return [];
     }
-    return Object.keys(this._api.tx).filter((m) => !!(m.trim()));
+    return Object.keys(this._api.tx).filter((mod) => !!(mod.trim()));
   }
 
   public listModuleFunctions(mod : string) {
     if (!mod || !this._api.tx) {
       return [];
     }
-    return Object.keys(this._api.tx[mod] || {}).filter((m) => !!(m.trim()));
+    return Object.keys(this._api.tx[mod] || {}).filter((modName) => !!(modName.trim()));
   }
 
   public generateArgumentInputs(mod: string, func: string) {
@@ -425,7 +416,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
         this.app.chain.block.height = +blockNumber;
         // TODO: this is still wrong on edgeware local -- fix chain spec to get 4s rather than 8s blocktimes
-        this.app.chain.block.duration = +minimumperiod * 2 / 1000;
+        this.app.chain.block.duration = (+minimumperiod * 2) / 1000;
 
         // chainProps needs to be set first so calls to coins() correctly populate the denom
         if (chainProps) {
@@ -481,41 +472,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     }
   }
 
-  public addEventHandler(
-    moduleName: string,
-    eventName: string,
-    callback: (event: Event, block?: number) => void
-  ): HandlerId {
-    if (!this._eventHandlers[moduleName]) {
-      this._eventHandlers[moduleName] = { };
-    }
-    if (!this._eventHandlers[moduleName][eventName]) {
-      this._eventHandlers[moduleName][eventName] = { nextId: 1 };
-    }
-    const id = this._eventHandlers[moduleName][eventName].nextId++;
-    this._eventHandlers[moduleName][eventName][id] = callback;
-    return id;
-  }
-
-  public removeEventHandler(moduleName: string, eventName: string, id: HandlerId): boolean {
-    if (this.isHandler(moduleName, eventName, id)) {
-      delete this._eventHandlers[moduleName][eventName][id];
-      return true;
-    }
-    return false;
-  }
-
-  public isHandler(moduleName: string, eventName: string, id: HandlerId): boolean {
-    return this._eventHandlers[moduleName]
-      && this._eventHandlers[moduleName][eventName]
-      && !!this._eventHandlers[moduleName][eventName][id];
-  }
-
   public deinitEventLoop() {
     this._eventsInitialized = false;
-    for (const event of Object.keys(this._eventHandlers)) {
-      delete this._eventHandlers[event];
-    }
     for (const event of Object.keys(this._silencedEvents)) {
       delete this._silencedEvents[event];
     }
@@ -536,8 +494,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       switchMap((api: ApiRx) => combineLatest(
         api.derive.chain.bestNumber(),
         api.query.timestamp.now()
-      )
-    )).subscribe(([blockNumber, timestamp]: [BlockNumber, Moment]) => {
+      ))
+    ).subscribe(([blockNumber, timestamp]: [BlockNumber, Moment]) => {
       // if app.chain has gone away, just return -- the subscription should be removed soon
       if (!this.app.chain) return;
 
@@ -571,8 +529,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     ).subscribe((events: Vec<EventRecord>) => {
       // if app.chain has gone away, just return -- the subscription should be removed soon
       if (!this.app.chain) return;
-
-      const blocknum = this.app.chain.block.height;
       events.forEach((record) => {
         // extract the phase, event and the event types
         const { event, phase } = record;
@@ -586,20 +542,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             console.log(`\t\t\t${types[index].type}: ${data.toString()}`);
           });
         }
-
-        // dispatch event to handler
-        if (this._eventHandlers[event.section] && this._eventHandlers[event.section][event.method]) {
-          const handlers = Object.keys(this._eventHandlers[event.section][event.method]);
-          handlers.map((id) => {
-            if (id !== 'nextId' && this.isHandler(event.section, event.method, +id)) {
-              this._eventHandlers[event.section][event.method][+id](event, blocknum);
-            }
-          });
-        }
       });
     },
     (err: string) => {
-      console.error('Failed to get chain events: ' + err);
+      console.error(`Failed to get chain events: ${err}`);
     });
     this._eventsInitialized = true;
   }
@@ -621,7 +567,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     } else {
       fees = await this.computeFees(sender.address, txFunc);
     }
-    console.log(`sender free balance: ${senderBalance.format(true)}, tx fees: ${fees.format(true)}, additional deposit: ${additionalDeposit ? additionalDeposit.format(true) : 'N/A'}`);
+    console.log(`sender free balance: ${senderBalance.format(true)}, tx fees: ${fees.format(true)}, `
+      + `additional deposit: ${additionalDeposit ? additionalDeposit.format(true) : 'N/A'}`);
     return netBalance.gte(fees);
   }
 
@@ -649,9 +596,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   ): ITXModalData {
     // TODO: check if author has funds for tx fee
     return {
-      author: author,
+      author,
       txType: txName,
-      cb: cb,
+      cb,
       txData: {
         unsignedData: (): Promise<ISubstrateTXData> => {
           return new Promise((resolve, reject) => {
@@ -686,9 +633,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
               }
               return combineLatest(
                 of(api),
-                signer ? txFunc(api).signAndSend(hexTxOrAddress) :
-                hexTxOrAddress ? api.tx(hexTxOrAddress).send()
-                  : txFunc(api).signAndSend(author.getKeyringPair())
+                signer ? txFunc(api).signAndSend(hexTxOrAddress)
+                  : hexTxOrAddress ? api.tx(hexTxOrAddress).send()
+                    : txFunc(api).signAndSend(author.getKeyringPair())
               );
             }),
             map(([api, result]: [ApiRx, SubmittableResult]) => {
@@ -756,13 +703,14 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         case 'Bytes': return u8aToHex(arg).toString().slice(0, 16);
         case 'Address': return formatAddressShort(this.createType('AccountId', arg).toString());
         // TODO: when do we actually see this Moment in practice? is this a correct decoding?
-        case 'Compact<Moment>': return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
+        case 'Compact<Moment>':
+          return moment(new Date(this.createType('Compact<Moment>', arg).toNumber())).utc().toString();
         case 'Compact<Balance>': return formatCoin(this.coins(this.createType('Compact<Balance>', arg)));
-        default: return arg.toString().length > 16 ? arg.toString().substr(0, 15) + '...' : arg.toString();
+        default: return arg.toString().length > 16 ? `${arg.toString().substr(0, 15)}...` : arg.toString();
       }
     });
     const name = method.meta ? method.meta.name : `${method.section}.${method.call}`;
-    return name + '(' + args.reduce((prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr, '') + ')';
+    return `${name}(${args.reduce((prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr, '')})`;
   }
 
   public get currentEra(): Observable<EraIndex> {
