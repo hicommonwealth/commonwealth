@@ -290,17 +290,6 @@ describe('Subscriptions Tests', () => {
       });
     });
 
-    it('/markNotificationsRead', async () => {
-      const res = await chai.request(app)
-        .post('/api/viewNotifications')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-      notifications = res.body.result;
-    });
-
     describe('/markNotificationsRead', async () => {
       it('should pass when query formatted correctly', async () => {
         // Mark Notifications Read for Default User
