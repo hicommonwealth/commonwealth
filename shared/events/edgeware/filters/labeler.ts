@@ -304,6 +304,16 @@ const labelEdgewareEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
+    case SubstrateEventKind.CollectiveVoted: {
+      const { vote, proposalHash, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
+      return {
+        heading: `Member Voted on ${collective} Proposal`,
+        label: `A council member has voted ${vote ? 'Yes' : 'No'} on a collective proposal.`,
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
+      };
+    }
     case SubstrateEventKind.CollectiveApproved: {
       const { proposalHash, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'

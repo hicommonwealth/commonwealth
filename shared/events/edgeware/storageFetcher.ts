@@ -21,6 +21,7 @@ import {
   ISubstratePreimageNoted,
   ISubstrateTreasuryProposed,
   ISubstrateCollectiveProposed,
+  ISubstrateCollectiveVoted,
   ISubstrateSignalingNewProposal,
   ISubstrateSignalingCommitStarted,
   ISubstrateSignalingVotingStarted,
@@ -140,7 +141,7 @@ async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): P
   if (api.query.technicalCommittee) {
     technicalCommitteeProposals = await api.derive.technicalCommittee.proposals();
   }
-  const constructEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
+  const constructProposedEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
     .filter((p) => p.proposal && p.votes)
     .map((p) => {
       return {
@@ -159,12 +160,36 @@ async function fetchCollectiveProposals(api: ApiPromise, blockNumber: number): P
         proposer: '',
       } as ISubstrateCollectiveProposed;
     });
+  const constructVotedEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
+    .filter((p) => p.proposal && p.votes)
+    .map((p) => {
+      return [
+        ...p.votes.ayes.map((who) => ({
+          kind: SubstrateEventKind.CollectiveVoted,
+          collectiveName: name,
+          proposalHash: p.hash.toString(),
+          voter: who.toString(),
+          vote: true,
+        } as ISubstrateCollectiveVoted)),
+        ...p.votes.nays.map((who) => ({
+          kind: SubstrateEventKind.CollectiveVoted,
+          collectiveName: name,
+          proposalHash: p.hash.toString(),
+          voter: who.toString(),
+          vote: false,
+        } as ISubstrateCollectiveVoted)),
+      ];
+    });
   const proposedEvents = [
-    ...constructEvents(councilProposals, 'council'),
-    ...constructEvents(technicalCommitteeProposals, 'technicalCommittee')
+    ...constructProposedEvents(councilProposals, 'council'),
+    ...constructProposedEvents(technicalCommitteeProposals, 'technicalCommittee')
   ];
-  log.info(`Found ${proposedEvents.length} collective proposals!`);
-  return proposedEvents.map((data) => ({ blockNumber, data }));
+  const votedEvents: ISubstrateCollectiveVoted[] = _.flatten([
+    constructVotedEvents(councilProposals, 'council'),
+    constructVotedEvents(technicalCommitteeProposals, 'technicalCommittee'),
+  ]);
+  log.info(`Found ${proposedEvents.length} collective proposals and ${votedEvents.length} votes!`);
+  return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber, data }));
 }
 
 async function fetchSignalingProposals(api: ApiPromise, blockNumber: number): Promise<CWEvent[]> {

@@ -74,6 +74,7 @@ export enum SubstrateEventKind {
   ElectionMemberRenounced = 'election-member-renounced',
 
   CollectiveProposed = 'collective-proposed',
+  CollectiveVoted = 'collective-voted',
   CollectiveApproved = 'collective-approved',
   CollectiveDisapproved = 'collective-disapproved',
   CollectiveExecuted = 'collective-executed',
@@ -289,6 +290,14 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   };
 }
 
+export interface ISubstrateCollectiveVoted extends ISubstrateEvent {
+  kind: SubstrateEventKind.CollectiveVoted;
+  collectiveName?: 'council' | 'technicalCommittee';
+  proposalHash: string;
+  voter: SubstrateAccountId;
+  vote: boolean;
+}
+
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveApproved;
   collectiveName?: 'council' | 'technicalCommittee';
@@ -392,6 +401,7 @@ export type ISubstrateEventData =
   | ISubstrateElectionMemberKicked
   | ISubstrateElectionMemberRenounced
   | ISubstrateCollectiveProposed
+  | ISubstrateCollectiveVoted
   | ISubstrateCollectiveApproved
   | ISubstrateCollectiveDisapproved
   | ISubstrateCollectiveExecuted
@@ -422,7 +432,7 @@ export type ISubstrateDemocracyPreimageEvents =
 export type ISubstrateTreasuryProposalEvents =
   ISubstrateTreasuryProposed | ISubstrateTreasuryRejected | ISubstrateTreasuryAwarded;
 export type ISubstrateCollectiveProposalEvents =
-  ISubstrateCollectiveProposed | ISubstrateCollectiveApproved
+  ISubstrateCollectiveProposed | ISubstrateCollectiveVoted | ISubstrateCollectiveApproved
   | ISubstrateCollectiveDisapproved | ISubstrateCollectiveExecuted;
 export type ISubstrateSignalingProposalEvents =
   ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
@@ -485,6 +495,7 @@ export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
     }
 
     case SubstrateEventKind.CollectiveProposed:
+    case SubstrateEventKind.CollectiveVoted:
     case SubstrateEventKind.CollectiveApproved:
     case SubstrateEventKind.CollectiveDisapproved:
     case SubstrateEventKind.CollectiveExecuted: {

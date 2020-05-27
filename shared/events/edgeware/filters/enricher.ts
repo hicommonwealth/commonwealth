@@ -374,6 +374,20 @@ export default async function (
           }
         };
       }
+      case SubstrateEventKind.CollectiveVoted: {
+        const [ voter, hash, vote ] = event.data as unknown as [ AccountId, Hash, bool ] & Codec;
+        return {
+          excludeAddresses: [ voter.toString() ],
+          data: {
+            kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
+            proposalHash: hash.toString(),
+            voter: voter.toString(),
+            vote: vote.isTrue,
+          }
+        };
+      }
       case SubstrateEventKind.CollectiveApproved:
       case SubstrateEventKind.CollectiveDisapproved: {
         const [ hash ] = event.data as unknown as [ Hash ] & Codec;

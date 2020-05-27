@@ -161,6 +161,7 @@ export default class extends IEventHandler {
         const { proposalHash } = event.data;
         return createEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash);
       }
+      case SubstrateEventKind.CollectiveVoted:
       case SubstrateEventKind.CollectiveApproved: {
         const { proposalHash } = event.data;
         return updateEntityFn(SubstrateEntityKind.CollectiveProposal, proposalHash);
