@@ -19,8 +19,9 @@ const PresentationComponent = (state, chain: Substrate) => {
         // m('th.val-age', 'Validator Age'),
         m('th.val-action', ''),
       ]),
-      Object.keys(validators).filter((validator) => (validators[validator].isElected === true))
-        .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+      Object.keys(validators).filter((validator) => (
+        validators[validator].isElected === true && validators[validator].isWaiting === false
+      )).sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
         .map((validator) => {
           const total = chain.chain.coins(validators[validator].exposure.total);
           const bonded = chain.chain.coins(validators[validator].exposure.own);
@@ -69,8 +70,9 @@ const PresentationComponent = (state, chain: Substrate) => {
         // m('th.val-age', 'Validator Age'),
         m('th.val-action', ''),
       ]),
-      Object.keys(validators).filter((validator) => (validators[validator].isElected !== true))
-        .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+      Object.keys(validators).filter((validator) => (
+        validators[validator].isElected === false && validators[validator].isWaiting === false
+      )).sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
         .map((validator) => {
           const total = chain.chain.coins(validators[validator].exposure.total);
           const bonded = chain.chain.coins(validators[validator].exposure.own);
@@ -89,6 +91,39 @@ const PresentationComponent = (state, chain: Substrate) => {
             nominated,
             nominators,
             commissionPer
+          });
+        }),
+    ])
+  }, {
+    name: 'Waiting Validators',
+    content: m('table.validators-table', [
+      m('tr.validators-heading', [
+        m('th.val-name', 'Name'),
+        m('th.val-commission', 'Commission'),
+        m('th.val-stash', 'Stash'),
+        m('th.val-total', 'Total Bonded'),
+        // m('th.val-age', 'Validator Age'),
+        m('th.val-action', ''),
+      ]),
+      Object.keys(validators).filter((validator) => (
+        validators[validator].isElected === false && validators[validator].isWaiting === true
+      )).sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+        .map((validator) => {
+          const total = chain.chain.coins(0);
+          const bonded = chain.chain.coins(0);
+          const nominated = chain.chain.coins(0);
+          const commissionPer = validators[validator].commissionPer;
+          const nominators = [];
+          const controller = validators[validator].controller;
+          return m(ValidatorRow, {
+            stash: validator,
+            controller,
+            total,
+            bonded,
+            nominated,
+            nominators,
+            commissionPer,
+            waiting: true
           });
         }),
     ])
