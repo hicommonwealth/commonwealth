@@ -16,8 +16,10 @@ const HomepageMarketingModules = {
               m('p', 'A next-generation blockchain focused on usability and performance'),
               m(Button, {
                 fluid: true,
-                label: 'Link to action',
+                label: 'Get started',
                 intent: 'primary',
+                compact: true,
+                size: 'sm',
                 onclick: (e) => {
                 }
               }),
@@ -29,8 +31,10 @@ const HomepageMarketingModules = {
               m('p', 'A next-generation blockchain focused on usability and performance'),
               m(Button, {
                 fluid: true,
-                label: 'Link to action',
+                label: 'Get started',
                 intent: 'primary',
+                compact: true,
+                size: 'sm',
                 onclick: (e) => {
                 }
               }),
@@ -42,8 +46,10 @@ const HomepageMarketingModules = {
               m('p', 'A next-generation blockchain focused on usability and performance'),
               m(Button, {
                 fluid: true,
-                label: 'Link to action',
+                label: 'Get started',
                 intent: 'primary',
+                compact: true,
+                size: 'sm',
                 onclick: (e) => {
                 }
               }),
@@ -75,39 +81,18 @@ const HomepageMarketingModules = {
             m('.col-block', [
               m('h3', 'Lorem ipsum'),
               m('p', 'A next-generation blockchain focused on usability and performance'),
-              m(Button, {
-                fluid: true,
-                label: 'Link to action',
-                intent: 'primary',
-                onclick: (e) => {
-                }
-              }),
             ]),
           ]),
           m(Col, { span: 4 }, [
             m('.col-block', [
               m('h3', 'Lorem ipsum'),
               m('p', 'A next-generation blockchain focused on usability and performance'),
-              m(Button, {
-                fluid: true,
-                label: 'Link to action',
-                intent: 'primary',
-                onclick: (e) => {
-                }
-              }),
             ]),
           ]),
           m(Col, { span: 4 }, [
             m('.col-block', [
               m('h3', 'Lorem ipsum'),
               m('p', 'A next-generation blockchain focused on usability and performance'),
-              m(Button, {
-                fluid: true,
-                label: 'Link to action',
-                intent: 'primary',
-                onclick: (e) => {
-                }
-              }),
             ]),
           ]),
         ]),
@@ -119,8 +104,9 @@ const HomepageMarketingModules = {
             m('.col-block.col-block-centered', [
               m('h4', 'Get started today'),
               m(Button, {
-                label: 'Link to action',
+                label: 'Sign in',
                 intent: 'primary',
+                compact: true,
                 onclick: (e) => {
                 }
               }),

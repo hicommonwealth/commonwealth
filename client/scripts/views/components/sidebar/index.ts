@@ -126,8 +126,8 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           (app.community || app.chain)
             && m(ListItem, {
               active: onDiscussionsPage(m.route.get()),
-              label: 'Homepage',
-              onclick: (e) => m.route.set(`/${app.activeId()}/`),
+              label: 'Latest Activity',
+              onclick: (e) => m.route.set(`/${app.activeId()}`),
             }),
           // discussions (all communities)
           (app.community || app.chain)
