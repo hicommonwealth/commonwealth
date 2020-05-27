@@ -9,7 +9,7 @@ import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent } from 'm
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
-import SubstrateIdentities from './identity';
+import SubstrateIdentities from './identities';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;

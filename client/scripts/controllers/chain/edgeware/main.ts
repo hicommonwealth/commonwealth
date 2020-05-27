@@ -11,7 +11,7 @@ import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'm
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
-import SubstrateIdentities from '../substrate/identity';
+import SubstrateIdentities from '../substrate/identities';
 import { handleSubstrateEntityUpdate } from '../substrate/shared';
 
 
