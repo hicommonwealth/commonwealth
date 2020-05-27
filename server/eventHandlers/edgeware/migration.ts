@@ -2,16 +2,7 @@
  * Processes events during migration, upgrading from simple notifications to entities.
  */
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
-import {
-  eventToEntity, SubstrateEntityKind,
-  ISubstrateDemocracyProposalEvents,
-  ISubstrateDemocracyReferendumEvents,
-  ISubstrateDemocracyPreimageEvents,
-  ISubstrateTreasuryProposalEvents,
-  ISubstrateCollectiveProposalEvents,
-  ISubstrateSignalingProposalEvents,
-  entityToFieldName,
-} from '../../../shared/events/edgeware/types';
+import { eventToEntity, entityToFieldName } from '../../../shared/events/edgeware/types';
 
 import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
