@@ -7,8 +7,6 @@ export const NODE_URL =
                            'ws://testnet2.edgewa.re:9944' :
                            'ws://localhost:9944');
 
-export const NO_ARCHIVE = !!process.env.NO_ARCHIVE;
-
 export const SERVER_URL =
   process.env.SERVER_URL || (process.env.NODE_ENV === 'production' ?
                              'https://commonwealth.im' :
@@ -53,4 +51,5 @@ export const LOGIN_RATE_LIMIT_MINS = 5;
 export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
-export const QUERY_URL_OVERRIDE = process.env.QUERY_URL_OVERRIDE;
+
+export const NO_EVENTS = process.env.NO_EVENTS || false;

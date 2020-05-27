@@ -27,11 +27,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   }
 
   public async init(onServerLoaded?) {
-    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
-    // FIXME: This is breaking for me on moloch default (not local)
-    // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
-    //   throw new Error('no chain object id found');
-    // }
+    const useChainProposalData = true;
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
     this.chain = new EthereumChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
@@ -65,7 +61,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     });
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
-    await this.governance.init(api, this.accounts, this.meta.chain.chainObjectId, useChainProposalData);
+    await this.governance.init(api, this.accounts, useChainProposalData);
     await this._postModuleLoad();
 
     this._loaded = true;

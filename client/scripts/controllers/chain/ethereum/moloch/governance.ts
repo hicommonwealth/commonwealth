@@ -3,7 +3,6 @@ import BN from 'bn.js';
 import { ProposalModule, ITXModalData } from 'models';
 
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import ChainObjectController from 'controllers/server/chain_objects';
 import { BigNumber } from 'ethers/utils';
 
 import MolochProposal from './proposal';
@@ -30,7 +29,6 @@ export default class MolochGovernance extends ProposalModule<
   private _api: MolochAPI;
   private _Members: MolochMembers;
   private _useChainProposalData: boolean;
-  private _fetcher: ChainObjectController<IMolochProposalResponse>;
 
   // GETTERS
   public get proposalCount() { return this._proposalCount; }
@@ -49,7 +47,6 @@ export default class MolochGovernance extends ProposalModule<
 
   public get api() { return this._api; }
   public get useChainProposalData() { return this._useChainProposalData; }
-  public get fetcher() { return this._fetcher; }
 
   // INIT / DEINIT
   protected _entityConstructor(entity): MolochProposal {
@@ -59,7 +56,6 @@ export default class MolochGovernance extends ProposalModule<
   public async init(
     api: MolochAPI,
     MolochMembers: MolochMembers,
-    chainObjectId: string,
     useChainProposalData = false,
   ) {
     this._Members = MolochMembers;
@@ -88,10 +84,7 @@ export default class MolochGovernance extends ProposalModule<
         proposalObjects.push(iProp);
       }
     } else {
-      console.log('Fetching moloch proposals from backend.');
-      this._fetcher = new ChainObjectController<IMolochProposalResponse>(chainObjectId);
-      const chainObjects = await this._fetcher.fetch();
-      proposalObjects = chainObjects.map(({ objectData }) => objectData);
+      throw new Error('chain object fetching from backend unsupported');
     }
     proposalObjects.map((p) => new MolochProposal(this._Members, this, p));
     this._proposalCount = new BN(proposalObjects.length);
@@ -186,13 +179,7 @@ export default class MolochGovernance extends ProposalModule<
       this._proposalCount = new BN(queueLength);
       return result;
     } else {
-      const newObjects = await this._fetcher.forceUpdate('ADD');
-      newObjects.map((p) => {
-        if (this.store.getByIdentifier(p.objectData.id)) return;
-        return new MolochProposal(this._Members, this, p.objectData);
-      });
-      this._proposalCount = new BN(this.store.getAll().length);
-      return this.store.getAll().find((p) => p.applicantAddress === applicantAddress.toLowerCase());
+      throw new Error('chain object fetching from backend unsupported');
     }
   }
 

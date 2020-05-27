@@ -12,9 +12,8 @@ class ChainInfo {
   public readonly description: string;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
-  public readonly chainObjectId: string;
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?) {
+  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -23,7 +22,6 @@ class ChainInfo {
     this.description = description;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
-    this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
   }
   public static fromJSON(json) {
     return new ChainInfo(
@@ -35,7 +33,6 @@ class ChainInfo {
       json.description,
       json.featured_tags,
       json.tags,
-      json.ChainObjectVersion
     );
   }
 

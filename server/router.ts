@@ -76,11 +76,6 @@ import logout from './routes/logout';
 import editTag from './routes/editTag';
 import bulkTags from './routes/bulkTags';
 
-import addChainObjectQuery from './routes/addChainObjectQuery';
-import deleteChainObjectQuery from './routes/deleteChainObjectQuery';
-import viewChainObjectQueries from './routes/viewChainObjectQueries';
-import viewChainObjects from './routes/viewChainObjects';
-import refreshChainObjects from './routes/refreshChainObjects';
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
@@ -90,7 +85,7 @@ import ViewCountCache from './util/viewCountCache';
 
 import bulkEntities from './routes/bulkEntities';
 
-function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
+function setupRouter(app, models, viewCountCache: ViewCountCache) {
   const router = express.Router();
 
   router.get('/status', status.bind(this, models));
@@ -219,15 +214,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/createHedgehogUser', createHedgehogUser.bind(this, models));
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  router.post('/addChainObjectQuery', passport.authenticate('jwt', { session: false }),
-    addChainObjectQuery.bind(this, models));
-  router.post('/deleteChainObjectQuery', passport.authenticate('jwt', { session: false }),
-    deleteChainObjectQuery.bind(this, models));
-  router.post('/viewChainObjectQueries', passport.authenticate('jwt', { session: false }),
-    viewChainObjectQueries.bind(this, models));
-  router.get('/viewChainObjects', viewChainObjects.bind(this, models));
-  router.get('/refreshChainObjects', refreshChainObjects.bind(this, models, fetcher));
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));

@@ -313,14 +313,7 @@ export default class MolochProposal extends Proposal<
       const rawProposal = await this._Gov.api.Contract.proposalQueue(this.data.identifier);
       this._data = this._Gov.convertChainProposal(+this.data.id, rawProposal);
     } else {
-      const newObjects = await this._Gov.fetcher.forceUpdate('UPDATE');
-      const thisObj = newObjects.find((p) => p.objectData.id === this.data.id);
-      if (thisObj) {
-        this._data = thisObj.objectData;
-        this._addOrUpdateVotes(this.data.votes);
-      } else {
-        console.error('did not find updated votes in graphql fetch');
-      }
+      throw new Error('chain object fetching from backend unsupported');
     }
 
     // compute new vote % data

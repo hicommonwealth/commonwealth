@@ -21,7 +21,7 @@ import { factory, formatFilename } from './server/util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
-import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_ARCHIVE, QUERY_URL_OVERRIDE } from './server/config';
+import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN, NO_EVENTS } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
 import { updateSupernovaStats } from './server/lockdrops/supernova';
@@ -33,8 +33,6 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
-import addChainObjectQueries from './server/scripts/addChainObjectQueries';
-import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 
 // set up express async error handling hack
@@ -67,7 +65,6 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler, {
   publicPath: '/build',
 }) : null;
-const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS, QUERY_URL_OVERRIDE);
 const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
@@ -155,7 +152,7 @@ if (DEV) {
 
 setupMiddleware();
 setupPassport(models);
-setupAPI(app, models, fetcher, viewCountCache);
+setupAPI(app, models, viewCountCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 
@@ -180,48 +177,26 @@ if (SHOULD_RESET_DB) {
   const cosmosRestUrl = 'http://gaia13k1.commonwealth.im:1318';
   const cosmosChainType = 'gaia13k1';
   updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
-} else if (SHOULD_ADD_TEST_QUERIES) {
-  import('./server/test/chainObjectQueries')
-    .then((object) => addChainObjectQueries(object.default, app, models))
-    .then(() => (models.sequelize.close()))
-    .then(() => (closeMiddleware()))
-    .then(() => {
-      log.info('Finished adding test queries to db.');
-      process.exit(0);
-    });
-} else if (!NO_ARCHIVE && SHOULD_UPDATE_CHAIN_OBJECTS_IMMEDIATELY) {
-  fetcher.fetch()
-    .then(() => {
-      closeMiddleware().then(() => {
-        log.info('Finished fetching chain objects.');
-        process.exit(0);
-      });
-    })
-    .catch((err) => {
-      closeMiddleware().then(() => {
-        console.error(err);
-        process.exit(1);
-      });
-    });
 } else {
-  setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
-    .then(() => {
-      if (RUN_ENTITY_MIGRATION) {
-        models.sequelize.close()
-          .then(() => process.exit(0));
-      }
-    }, (err) => {
-      if (RUN_ENTITY_MIGRATION) {
-        console.error(`Entity migration failed: ${JSON.stringify(err)}`);
-        models.sequelize.close()
-          .then(() => (closeMiddleware()))
-          .then(() => process.exit(1));
-      } else {
-        console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
-      }
-    });
+  if (!NO_EVENTS) {
+    setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
+      .then(() => {
+        if (RUN_ENTITY_MIGRATION) {
+          models.sequelize.close()
+            .then(() => process.exit(0));
+        }
+      }, (err) => {
+        if (RUN_ENTITY_MIGRATION) {
+          console.error(`Entity migration failed: ${JSON.stringify(err)}`);
+          models.sequelize.close()
+            .then(() => (closeMiddleware()))
+            .then(() => process.exit(1));
+        } else {
+          console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
+        }
+      });
+  }
   if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
-  if (!NO_ARCHIVE) fetcher.enable();
 }
 
 export default app;
