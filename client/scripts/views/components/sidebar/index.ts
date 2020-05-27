@@ -16,7 +16,7 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
-import { ChainClass, ChainBase, Notification } from 'models';
+import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
 import { OffchainCommunitiesStore } from 'stores';
 
 import { isMember } from 'views/components/membership_button';
@@ -34,6 +34,7 @@ import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
+import { SelectList } from 'construct-ui';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { isRoleOfCommunity } from 'helpers/roles';
@@ -107,20 +108,43 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         }, [
           // header
           m('.title-selector', [
-            m('.title-selector-left', [
-              (app.community || app.chain) ? [
-                m('.community-name', selectedNode
-                  ? selectedNode.chain.name
-                  : selectedCommunity ? selectedCommunity.meta.name : ''),
-                !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-                !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-                selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-              ] : m('.community-name', 'Commonwealth'),
-            ]),
-            m('.title-selector-right', [
-              app.isLoggedIn() && (app.community || app.chain)
-                && m(SubscriptionButton),
-            ]),
+            m(SelectList, {
+              closeOnSelect: true,
+              class: 'CommunitySelectList',
+              // header: null,
+              // footer: null,
+              items: (app.config.communities.getAll() as any).concat(app.config.chains.getAll()),
+              itemRender: (item) => {
+                return item instanceof ChainInfo
+                  ? m(ListItem, { label: item.name, selected: app.activeChainId() === item.id })
+                  : item instanceof CommunityInfo
+                    ? m(ListItem, { label: item.name, selected: app.activeCommunityId() === item.id })
+                    : null;
+              },
+              onSelect: (item: any) => {
+                m.route.set(`/${item.id}`);
+              },
+              filterable: false,
+              popoverAttrs: {
+                hasArrow: false
+              },
+              trigger: m(Button, {
+                align: 'left',
+                compact: true,
+                iconRight: Icons.CHEVRON_DOWN,
+                label: (app.community || app.chain) ? [
+                  m('span.community-name', selectedNode
+                    ? selectedNode.chain.name
+                    : selectedCommunity ? selectedCommunity.meta.name : ''),
+                  !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
+                  !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
+                  selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
+                ] : m('span.community-name', 'Select a community'),
+                style: 'min-width: 200px',
+              }),
+            }),
+            //   app.isLoggedIn() && (app.community || app.chain)
+            //     && m(SubscriptionButton),
           ]),
           // community homepage
           (app.community || app.chain)
