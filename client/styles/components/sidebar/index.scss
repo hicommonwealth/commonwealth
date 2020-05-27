@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
 $sidebar-padding: 16px;
-$active-color: #e9e9f5;
+$active-color: #ececec;
 
 .Sidebar {
     position: fixed;
@@ -15,7 +15,7 @@ $active-color: #e9e9f5;
     }
     .SidebarMenu .cui-list {
         height: 100%;
-        background: #f4f4f9;
+        background: #f8f8f8;
     }
     .SidebarMenu .cui-list.list-bottom {
         position: absolute;
@@ -29,11 +29,11 @@ $active-color: #e9e9f5;
         max-height: 100%;
         user-select: none;
         > h4 {
-            color: #546e7b;
+            color: #555;
             opacity: 0.6;
         }
         > .cui-list-item {
-            color: #546e7b;
+            color: #111;
             &:hover, &.cui-active, &.cui-selected {
                 background: $active-color;
             }
@@ -55,16 +55,17 @@ $active-color: #e9e9f5;
     .cui-list > .cui-list-item {
         font-size: 15px;
         border: none;
-        font-weight: 500;
+        font-weight: 600;
         padding: 4px $sidebar-padding;
         .cui-icon svg {
-            height: 14px;
-            width: 14px;
-            min-height: 14px;
-            min-width: 14px;
+            height: 15px;
+            width: 15px;
+            min-height: 15px;
+            min-width: 15px;
             position: relative;
             top: -1px;
             margin-right: -2px;
+            color: #222;
         }
     }
     .cui-list-item .cui-tag {
@@ -79,19 +80,20 @@ $active-color: #e9e9f5;
     }
     // top
     .cui-list .title-selector {
-        display: flex;
-        padding: 1px $sidebar-padding 0;
+        position: relative;
+        min-height: $header-height;
         margin-bottom: 20px;
         user-select: none;
-        border-bottom: 1px solid #eee;
         background: #fff !important;
-        color: #222 !important;
-        min-height: $header-height;
-        align-items: center;
-
         border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.04);
         cursor: pointer;
+        .cui-button {
+            width: 100%;
+            height: 100%;
+            padding: 24px 15px 23px;
+            color: #222;
+        }
         .title-selector-left {
             flex: 1;
             display: flex;
@@ -117,11 +119,75 @@ $active-color: #e9e9f5;
             float: right;
         }
     }
+    .cui-list .action-selector {
+        padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
+        // background: #fff !important;
+        cursor: default !important;
+        user-select: none;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
+        &:hover {
+            background: initial;
+        }
+    }
+    // bottom
+    .cui-list .login-selector {
+        position: absolute;
+        display: flex;
+        // position at bottom
+        bottom: 0;
+        width: $sidebar-width;
+        padding: 17px $sidebar-padding 18px;
+        border-top: 1px solid #eee;
+        z-index: 1;
+        // style the logic selector as additional menu space, not a selectable
+        background: #f8f8f8 !important;
+        cursor: initial !important;
+        user-select: none;
+
+        button.cui-button {
+            position: relative;
+        }
+        .User.avatar-only {
+            overflow: visible;
+            padding-right: 11px;
+            position: relative;
+        }
+        .login-selector-user {
+            line-height: 1.1;
+            .user-info {
+                position: relative;
+                .User {
+                    //white-space: normal; // prevent long usernames from overflowing
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 110px;
+                    font-size: 14px;
+                }
+                .user-address {
+                    font-size: 12px;
+                    margin: 0;
+                }
+            }
+        }
+    }
+    &.no-active-community .cui-list .title-selector {
+        border-bottom: none;
+    }
+    &.no-active-community .cui-list .login-selector {
+        border-top: none;
+    }
 }
 
 .CommunitySelectList {
     .cui-popover-content {
-        padding: 0;
-        min-width: 200px;
+        padding: 2px 0;
+    }
+    .cui-list-item {
+        min-width: 228px;
+        &.cui-selected {
+            color: #222;
+        }
     }
 }
