@@ -285,6 +285,46 @@ describe('Roles Test', () => {
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(deleteErrors.RoleDNE);
     });
+  });
 
+  describe('/bulkMembers route test', () => {
+    it('should pass with standard input', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkMembers')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: jwtToken
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.length).to.be.greaterThan(0);
+    });
+
+    it('should fail if community not visible to user', async () => {
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: jwtToken,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'true',
+        invitesEnabled: 'true',
+        id: 'test',
+        name: 'test community',
+        creator_id: adminUserId,
+        creator_address: loggedInAddr,
+        creator_chain: chain,
+        description: 'test enabled community',
+        default_chain: chain,
+      };
+      const testCommunity = await modelUtils.createCommunity(communityArgs);
+      const communityId = testCommunity.id;
+      const res = await chai.request.agent(app)
+        .get('/api/bulkMembers')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: jwtToken
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.length).to.be.greaterThan(0);
+    });
   });
 });
