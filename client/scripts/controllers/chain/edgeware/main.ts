@@ -1,5 +1,6 @@
 import EdgewareChain from 'controllers/chain/edgeware/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SubstrateStaking from 'controllers/chain/substrate/staking';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
@@ -18,6 +19,7 @@ import { handleSubstrateEntityUpdate } from '../substrate/shared';
 class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: EdgewareChain;
   public accounts: SubstrateAccounts;
+  public staking: SubstrateStaking;
   public phragmenElections: SubstratePhragmenElections;
   public council: SubstrateCouncil;
   public identities: SubstrateIdentities;
@@ -42,6 +44,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EdgewareChain(this.app); // edgeware chain this.appid
     this.accounts = new SubstrateAccounts(this.app);
+    this.staking = new SubstrateStaking(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
     this.council = new SubstrateCouncil(this.app);
     this.identities = new SubstrateIdentities(this.app);
@@ -74,6 +77,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       await this.chain.initMetadata();
     }, onServerLoaded);
     await this.accounts.init(this.chain);
+    await this.staking.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
       this.council.init(this.chain, this.accounts),

@@ -18,7 +18,9 @@ const ValidatorRow: m.Component<IValidatorAttrs, IValidatorState> = {
     return m('tr.ValidatorRow', [
       m('td.val-name', 'Validator'),
       m('td.val-commission', `${commissionPer}%`),
-      m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
+      (!vnode.attrs.waiting &&
+        m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true }))
+      ),
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-total', [
         formatCoin(vnode.attrs.total, true),

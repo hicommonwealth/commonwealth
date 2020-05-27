@@ -40,14 +40,16 @@ export interface IValidatorInfo {
     commissionPer: number
   };
 }
+export interface IValidatorValue {
+  exposure: Exposure,
+  controller: string,
+  isElected: boolean,
+  isWaiting?: boolean,
+  commissionPer: number
+}
 
 export interface IValidators {
-  [address: string]: {
-    exposure: Exposure,
-    controller: string,
-    isElected: boolean,
-    commissionPer: number
-  };
+  [address: string]: IValidatorValue;
 }
 
 class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
@@ -59,7 +61,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
   private _store: AccountsStore<SubstrateAccount> = new AccountsStore();
   public get store() { return this._store; }
 
-  private _Chain: SubstrateChain;
+  protected _Chain: SubstrateChain;
 
   public get(address: string, keytype?: string) {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {
