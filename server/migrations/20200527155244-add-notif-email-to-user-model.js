@@ -9,7 +9,7 @@ module.exports = {
         type: DataTypes.ENUM,
         values: ['daily', 'weekly', 'monthly', 'never'],
         allowNull: false,
-        defaultValue: 'never',
+        defaultValue: 'never', // TODO: do we want to strategically set this?
       }
     );
   },
