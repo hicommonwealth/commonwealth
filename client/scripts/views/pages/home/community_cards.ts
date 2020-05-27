@@ -1,4 +1,4 @@
-import 'components/homepage_communities.scss';
+import 'pages/home/community_cards.scss';
 
 import { default as m } from 'mithril';
 import { link } from 'helpers';
@@ -95,7 +95,7 @@ const LinkCard = {
   }
 };
 
-const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommunities }> = {
+const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedCommunities }> = {
   oninit: (vnode) => {
     vnode.state.justJoinedChains = [];
     vnode.state.justJoinedCommunities = [];
@@ -134,7 +134,7 @@ const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommuni
         .filter((c) => !isMember(null, c.id) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
     }
 
-    return m('.HomepageCommunities', [
+    return m('.HomepageCommunityCards', [
 
       // chains and communities
       m('.my-communities', [
@@ -155,4 +155,4 @@ const HomepageCommunities: m.Component<{}, { justJoinedChains, justJoinedCommuni
   }
 };
 
-export default HomepageCommunities;
+export default HomepageCommunityCards;
