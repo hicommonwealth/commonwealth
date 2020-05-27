@@ -95,42 +95,28 @@ interface IGetTagListingParams {
   removeFeaturedTag: Function
 }
 
-const getTagListing = (IGetTagListingParams) => {
-  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag } = IGetTagListingParams;
+const getTagListing = (args: IGetTagListingParams) => {
+  const { activeTag, featuredTagIds, addFeaturedTag, removeFeaturedTag } = args;
   const otherTags = {};
   const featuredTags = {};
 
   app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
-    const { tags } = thread;
-    tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
-      // addition to the TagStore, since said store will be more up-to-date
-      const existing = app.tags.getByIdentifier(tag.id);
-      if (!existing) app.tags.addToStore(tag);
-      const { id, name, description } = existing || tag;
-      const selected = name === activeTag;
-      if (featuredTagIds.includes(`${id}`)) {
-        if (featuredTags[name]) featuredTags[name].count += 1;
-        else {
-          featuredTags[name] = {
+    thread.tags.forEach((tag) => {
+      const listing = app.tags.getTagListing(tag, activeTag);
+      if (featuredTagIds.includes(`${listing.id}`)) {
+        if (featuredTags[listing.name]) {
+          featuredTags[listing.name].count += 1;
+        } else {
+          featuredTags[listing.name] = {
             count: 1,
-            description,
-            featured_order: featuredTagIds.indexOf(`${id}`),
-            id,
-            name,
-            selected,
+            featured_order: featuredTagIds.indexOf(`${listing.id}`),
+            ...listing,
           };
         }
-      } else if (otherTags[name]) {
-        otherTags[name].count += 1;
+      } else if (otherTags[listing.name]) {
+        otherTags[listing.name].count += 1;
       } else {
-        otherTags[name] = {
-          count: 1,
-          description,
-          id,
-          name,
-          selected,
-        };
+        otherTags[listing.name] = { count: 1, ...listing };
       }
     });
   });
