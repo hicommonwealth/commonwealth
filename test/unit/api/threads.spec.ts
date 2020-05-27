@@ -281,7 +281,6 @@ describe('Thread Tests', () => {
       };
 
       const testCommunity = await modelUtils.createCommunity(communityArgs);
-      console.dir(testCommunity);
     });
   });
 
