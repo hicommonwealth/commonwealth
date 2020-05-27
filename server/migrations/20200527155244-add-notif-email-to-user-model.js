@@ -26,7 +26,6 @@ module.exports = {
       }
     );
 
-    const query = 'DELETE FROM pg_enum WHERE enumlabel = \'emailNotificationInterval\'';
-    await queryInterface.sequelize.query(query);
+    await queryInterface.sequelize.query('DROP TYPE "enum_Users_emailNotificationInterval";');
   },
 };
