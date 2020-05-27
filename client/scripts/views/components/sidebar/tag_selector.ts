@@ -305,7 +305,7 @@ const TagSelector: m.Component<{
       // This placeholder module should only be shown in the sidebar
       !showFullListing
         && m('.no-tags-placeholder', [
-          'The community manager has not selected any discussion categories',
+          'The community manager has not selected any tags for the sidebar',
         ]),
     ]);
   },
