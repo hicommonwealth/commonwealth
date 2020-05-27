@@ -1,6 +1,8 @@
 @import 'client/styles/shared';
 
 .HomepageCommunityCards {
+    margin-top: 100px;
+
     h4 {
         margin-top: 32px;
         font-weight: 500;
@@ -10,7 +12,7 @@
     .home-card {
         display: flex;
         float: left;
-        width: calc(50% - 16px);
+        width: calc(25% - 16px);
         margin-right: 16px;
         margin-bottom: 12px;
         min-height: 72px;

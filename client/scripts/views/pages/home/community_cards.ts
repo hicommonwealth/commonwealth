@@ -135,15 +135,10 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
     }
 
     return m('.HomepageCommunityCards', [
-
-      // chains and communities
-      m('.my-communities', [
-        m('h4', 'My communities'),
+      m('h2', 'Find a public community'),
+      m('.communities-list', [
         myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
         myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
-      ]),
-      m('.more-communities', [
-        m('h4', 'More communities'),
         otherChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
         otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
       ]),

@@ -9,7 +9,7 @@ const HomepageHeader = {
     return m('.HomepageHeader', [
       m(Grid, [
         m(Col, { span: 5, class: 'header-col-left' }, [
-          m('h2', 'Commonwealth'),
+          m('h1', 'Commonwealth'),
           m('h3', 'The all-in-one platform for decentralized communities'),
           m('p.lead-copy', [
             'Commonwealth is an open-source platform for decentralized communities ',
