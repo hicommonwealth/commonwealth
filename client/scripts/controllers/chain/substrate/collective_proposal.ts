@@ -95,8 +95,10 @@ export class SubstrateCollectiveProposal
     switch (e.data.kind) {
       case SubstrateEventKind.CollectiveProposed: {
         // proposer always submits an implicit yes vote
-        const voter = this._Accounts.fromAddress(e.data.proposer);
-        this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, true));
+        if (e.data.proposer) {
+          const voter = this._Accounts.fromAddress(e.data.proposer);
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, true));
+        }
         break;
       }
       case SubstrateEventKind.CollectiveVoted: {
