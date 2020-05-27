@@ -326,3 +326,9 @@ body.modal-open {
     position: relative;
     top: 1px;
 }
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
