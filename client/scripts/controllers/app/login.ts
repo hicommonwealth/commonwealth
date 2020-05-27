@@ -66,7 +66,7 @@ export function clearActiveAddresses() {
   app.vm.activeAccount = null;
 }
 
-export function updateActiveAddresses(chain?: ChainInfo) {
+export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.login.activeAddresses = chain
@@ -79,7 +79,9 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
-  app.modals.create({ modal: SelectAddressModal });
+  if (!suppressAddressSelectionModal) {
+    app.modals.create({ modal: SelectAddressModal });
+  }
 
   // try to load a previously selected account for the chain/community
   // TODO: bring this back when default addresses are saved

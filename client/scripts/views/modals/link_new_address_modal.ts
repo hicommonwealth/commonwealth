@@ -105,10 +105,12 @@ const accountVerifiedCallback = async (account, vnode) => {
     await initAppState(false);
     // load addresses for the current chain/community
     if (app.community) {
-      updateActiveAddresses();
+      updateActiveAddresses(undefined, true);
     } else if (app.chain) {
-      updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain);
+      const chain = app.login.selectedNode
+        ? app.login.selectedNode.chain
+        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      updateActiveAddresses(chain, true);
     } else {
       notifyError('Signed in, but no chain or community found');
     }

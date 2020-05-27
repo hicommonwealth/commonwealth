@@ -199,7 +199,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
     // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
+    updateActiveAddresses(n.chain, true);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
