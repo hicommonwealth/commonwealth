@@ -14,8 +14,10 @@ const ValidatorRow: m.Component<IValidatorAttrs, IValidatorState> = {
     vnode.state.isNominating = vnode.attrs.hasNominated;
   },
   view: (vnode) => {
+    const commissionPer = Number(vnode.attrs.commissionPer).toFixed(2);
     return m('tr.ValidatorRow', [
       m('td.val-name', 'Validator'),
+      m('td.val-commission', `${commissionPer}%`),
       m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-total', [

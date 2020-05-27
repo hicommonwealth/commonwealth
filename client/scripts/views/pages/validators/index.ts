@@ -33,6 +33,7 @@ export interface IValidatorAttrs {
   nominated?: Coin;
   controller?: string;
   hasNominated?: boolean;
+  commissionPer?: number;
   onChangeHandler?: any;
 }
 

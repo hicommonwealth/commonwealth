@@ -3,7 +3,7 @@ import { Observable, combineLatest, of, Observer, empty, from } from 'rxjs';
 import { map, flatMap, auditTime, switchMap, first } from 'rxjs/operators';
 
 import { ApiRx } from '@polkadot/api';
-import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive/types';
+import { DeriveStakingValidators, DeriveAccountInfo, DeriveStakingElected } from '@polkadot/api-derive/types';
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
@@ -32,11 +32,19 @@ function addressFromMnemonic(mnemonic: string, chain: SubstrateChain): string {
   return `${(chain.keyring()).addFromMnemonic(mnemonic).address}`;
 }
 
+export interface IValidatorInfo {
+  [key: string]: {
+    isCommission: boolean,
+    commissionPer: number
+  };
+}
+
 export interface IValidators {
   [address: string]: {
     exposure: Exposure,
     controller: string,
     isElected: boolean,
+    commissionPer: number
   };
 }
 
@@ -110,12 +118,27 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         of(api),
         api.derive.staking.validators(),
         api.query.staking.currentEra<EraIndex>(),
+        api.derive.staking.electedInfo()
       )),
 
       // fetch balances alongside validators
-      flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, EraIndex]) => {
+      flatMap(([api, { nextElected, validators: currentSet }, era, electedInfo]: [ApiRx, DeriveStakingValidators, EraIndex, DeriveStakingElected]) => {
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
+        const validatorsInfo: IValidatorInfo = {};
+
+        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          const isCommission = !!validatorPrefs.commission;
+          const key = accountId.toString();
+          const details = {
+            commissionPer,
+            isCommission
+          };
+          validatorsInfo[key] = details;
+          return details;
+        });
+
         // Different runtimes call for different access to stakers: old vs. new
         const stakersCall = (api.query.staking.stakers) ? api.query.staking.stakers : api.query.staking.erasStakers;
         // Different staking functions call for different function arguments: old vs. new
@@ -127,26 +150,35 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
           stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
           api.query.staking.bonded.multi(toBeElected.map((elt) => elt.toString())),
           stakersCall.multi(toBeElected.map((elt) => stakersCallArgs(elt.toString()))),
+          of(validatorsInfo)
         );
       }),
       auditTime(100),
-      map(([currentSet, toBeElected, controllers, exposures, nextUpControllers, nextUpExposures]:
-        [ AccountId[], AccountId[], Vec<AccountId>, Exposure[], Vec<AccountId>, Exposure[] ]) => {
+      map(([currentSet, toBeElected, controllers, exposures, nextUpControllers, nextUpExposures, validatorsInfo]:
+        [ AccountId[], AccountId[], Vec<AccountId>, Exposure[], Vec<AccountId>, Exposure[], IValidatorInfo ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
-          result[currentSet[i].toString()] = {
+          const key = currentSet[i].toString();
+          result[key] = {
             exposure: exposures[i],
             controller: controllers[i].toString(),
             isElected: true,
+            commissionPer: validatorsInfo[key]
+              ? validatorsInfo[key].commissionPer
+              : 0
           };
         }
 
         // add set of next elected
         for (let i = 0; i < toBeElected.length; ++i) {
-          result[toBeElected[i].toString()] = {
+          const key = toBeElected[i].toString();
+          result[key] = {
             exposure: nextUpExposures[i],
             controller: nextUpControllers[i].toString(),
             isElected: false,
+            commissionPer: validatorsInfo[key]
+              ? validatorsInfo[key].commissionPer
+              : 0
           };
         }
         return result;
@@ -245,7 +277,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public get bonded(): Observable<SubstrateAccount> {
-    if( !this._Chain?.apiInitialized) return;
+    if (!this._Chain?.apiInitialized) return;
     return this._Chain.query((api: ApiRx) => api.query.staking.bonded(this.address))
       .pipe(map((accountId) => {
         if (accountId && accountId.isSome) {
@@ -293,7 +325,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         if (delegatedTo.isEmpty || delegatedTo.toString() === this.address) {
           return null;
         } else {
-          //console.log('set delegation for acct: ' + this.address);
+          // console.log('set delegation for acct: ' + this.address);
           return [ this._Accounts.fromAddress(delegatedTo.toString()), conviction.index ];
         }
       }));
@@ -303,10 +335,8 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get nominees(): Observable<SubstrateAccount[]> {
     return this._Accounts.validators.pipe(
       map((validators: IValidators) => Object.entries(validators)
-        .filter(([ stash, { exposure }]) =>
-          exposure.others.findIndex(({ who }) => who.toString() === this.address) !== -1)
-        .map(([ stash ]) => this._Accounts.get(stash))
-      ),
+        .filter(([ stash, { exposure }]) => exposure.others.findIndex(({ who }) => who.toString() === this.address) !== -1)
+        .map(([ stash ]) => this._Accounts.get(stash))),
     );
   }
 

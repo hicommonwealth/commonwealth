@@ -12,6 +12,7 @@ const PresentationComponent = (state, chain: Substrate) => {
     content: m('table.validators-table', [
       m('tr.validators-heading', [
         m('th.val-name', 'Name'),
+        m('th.val-commission', 'Commission'),
         m('th.val-controller', 'Controller'),
         m('th.val-stash', 'Stash'),
         m('th.val-total', 'Total Bonded'),
@@ -29,6 +30,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
+          const commissionPer = validators[validator].commissionPer;
           const hasNominated: boolean = app.user.activeAccount && nominators
             && !!nominators.find(({ stash }) => stash === app.user.activeAccount.address);
           // add validator to collection if hasNominated already
@@ -44,6 +46,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             nominated,
             nominators,
             hasNominated,
+            commissionPer,
             onChangeHandler: (result) => {
               if (state.nominations.indexOf(result) === -1) {
                 state.nominations.push(result);
@@ -59,6 +62,7 @@ const PresentationComponent = (state, chain: Substrate) => {
     content: m('table.validators-table', [
       m('tr.validators-heading', [
         m('th.val-name', 'Name'),
+        m('th.val-commission', 'Commission'),
         m('th.val-controller', 'Controller'),
         m('th.val-stash', 'Stash'),
         m('th.val-total', 'Total Bonded'),
@@ -71,12 +75,21 @@ const PresentationComponent = (state, chain: Substrate) => {
           const total = chain.chain.coins(validators[validator].exposure.total);
           const bonded = chain.chain.coins(validators[validator].exposure.own);
           const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN));
+          const commissionPer = validators[validator].commissionPer;
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
-          return m(ValidatorRow, { stash: validator, controller, total, bonded, nominated, nominators });
+          return m(ValidatorRow, {
+            stash: validator,
+            controller,
+            total,
+            bonded,
+            nominated,
+            nominators,
+            commissionPer
+          });
         }),
     ])
   }]);
