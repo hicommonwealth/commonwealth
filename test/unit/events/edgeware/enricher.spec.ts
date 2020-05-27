@@ -552,10 +552,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         collectiveName: 'council',
         proposalHash: 'hash',
-        proposalIndex: 1,
-        threshold: 3,
-        ayes: [ 'alice', 'bob' ],
-        nays: [ 'charlie', 'dave' ],
       }
     });
   });
@@ -569,10 +565,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         collectiveName: 'council',
         proposalHash: 'hash',
-        proposalIndex: 1,
-        threshold: 3,
-        ayes: [ 'alice', 'bob' ],
-        nays: [ 'charlie', 'dave' ],
       }
     });
   });

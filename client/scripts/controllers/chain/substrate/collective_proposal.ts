@@ -99,19 +99,11 @@ export class SubstrateCollectiveProposal
       case SubstrateEventKind.CollectiveDisapproved: {
         console.log('disapproved', e);
         this._approved.next(false);
-        this._updateVotes(
-          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
-          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
-        );
         this.complete();
         break;
       }
       case SubstrateEventKind.CollectiveApproved: {
         this._approved.next(true);
-        this._updateVotes(
-          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
-          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
-        );
         break;
       }
       case SubstrateEventKind.CollectiveExecuted: {

@@ -305,22 +305,22 @@ const labelEdgewareEvent: LabelerFilter = (
       };
     }
     case SubstrateEventKind.CollectiveApproved: {
-      const { proposalHash, proposalIndex, ayes, nays, collectiveName } = data;
+      const { proposalHash, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Approved`,
-        label: `${collective} proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
+        label: `A ${collective} proposal was approved.`,
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveDisapproved: {
-      const { proposalIndex, ayes, nays, collectiveName, proposalHash } = data;
+      const { collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Disapproved`,
-        label: `${collective} proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
+        label: `A ${collective} proposal was disapproved.`,
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }

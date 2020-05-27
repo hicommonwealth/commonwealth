@@ -293,20 +293,12 @@ export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveApproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
-  proposalIndex: number;
-  threshold: number;
-  ayes: SubstrateAccountId[];
-  nays: SubstrateAccountId[];
 }
 
 export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveDisapproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
-  proposalIndex: number;
-  threshold: number;
-  ayes: SubstrateAccountId[];
-  nays: SubstrateAccountId[];
 }
 
 export interface ISubstrateCollectiveExecuted extends ISubstrateEvent {
