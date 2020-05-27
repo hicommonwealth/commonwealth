@@ -11,7 +11,7 @@ const Homepage: m.Component<{}, {}> = {
       m('.container', [
         m(Header),
         m(Communities),
-        m(MarketingModules),
+        // m(MarketingModules),
       ]),
     ]);
   }
