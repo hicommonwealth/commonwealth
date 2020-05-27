@@ -7,7 +7,8 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NotLoggedIn: 'Not logged in.',
   NoTagId: 'Must supply tag ID.',
-  NotAdmin: 'Must be an admin to feature tags.',
+  NotAdmin: 'Must be an admin to edit or feature tags.',
+  NotVerified: 'Must have a verified address to edit or feature tags',
   TagNotFound: 'Tag not found.'
 };
 
@@ -23,16 +24,25 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
       user_id: req.user.id,
     },
   });
+  if (!adminAddress.verified) {
+    return next(new Error(Errors.NotVerified));
+  }
+
   const roleWhere = {
     address_id: adminAddress.id,
     permission: 'admin',
   };
-  if (community) roleWhere['offchain_community_id'] = community.id;
-  else if (chain) roleWhere['chain_id'] = chain.id;
+  if (community) {
+    roleWhere['offchain_community_id'] = community.id;
+  } else if (chain) {
+    roleWhere['chain_id'] = chain.id;
+  }
   const requesterIsAdminOrMod = await models.Role.findOne({
     where: roleWhere,
   });
-  if (requesterIsAdminOrMod === null) return next(new Error(Errors.NotAdmin));
+  if (requesterIsAdminOrMod === null) {
+    return next(new Error(Errors.NotAdmin));
+  }
 
   const { description, featured_order, id, name } = req.body;
   try {
