@@ -27,10 +27,6 @@ const CommunityMenuChain: m.Component<{ chain: string, nodeList: NodeInfo[], add
       class: active ? 'active' : '',
       onclick: (e) => {
         e.preventDefault();
-        if (address) {
-          localStorage.setItem('initAddress', address.address);
-          localStorage.setItem('initChain', address.chain);
-        }
         m.route.set(`/${chain}/`);
       }
     }, [
@@ -61,10 +57,6 @@ const CommunityMenuCommunity: m.Component<{ community: CommunityInfo, address: A
       class: active ? 'active' : '',
       onclick: (e) => {
         e.preventDefault();
-        if (address) {
-          localStorage.setItem('initAddress', address.address);
-          localStorage.setItem('initChain', address.chain);
-        }
         m.route.set(`/${community.id}/`);
       },
     }, [

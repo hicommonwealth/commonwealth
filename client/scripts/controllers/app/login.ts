@@ -7,6 +7,7 @@ import app from 'state';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SelectAddressModal from 'views/modals/select_address_modal';
 import {
   ChainInfo,
   SocialAccount,
@@ -37,9 +38,6 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
     app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
   } else if (app.activeChainId()) {
     app.login.selectedAddresses.setByChain(app.activeChainId(), account);
-  } else {
-    localStorage.setItem('initChain', account.chain.id);
-    localStorage.setItem('initAddress', account.address);
   }
 }
 
@@ -81,27 +79,19 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
-  const initAddress = localStorage.getItem('initAddress');
-  const initChain = localStorage.getItem('initChain');
-  if (initAddress && initChain) {
-    const account = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
-    if (account) {
-      localStorage.removeItem('initAddress');
-      localStorage.removeItem('initChain');
-      setActiveAccount(account);
-      return;
-    }
-  }
+  app.modals.create({ modal: SelectAddressModal });
 
   // try to load a previously selected account for the chain/community
-  if (chain) {
-    const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
-    app.vm.activeAccount = app.login.activeAddresses
-      .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
-  } else if (app.activeCommunityId()) {
-    const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
-    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
-  }
+  // TODO: bring this back when default addresses are saved
+
+  // if (chain) {
+  //   const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
+  //   app.vm.activeAccount = app.login.activeAddresses
+  //     .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
+  // } else if (app.activeCommunityId()) {
+  //   const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
+  //   app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
+  // }
 }
 
 // called from the server, which returns public keys
