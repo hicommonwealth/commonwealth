@@ -3,13 +3,39 @@
 $sidebar-padding: 16px;
 $active-color: #ececec;
 
+.CommunityLabel {
+    text-align: left;
+    .community-name-row {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .community-id {
+        color: #777;
+    }
+    .icon-globe, .icon-lock {
+        margin-left: 2px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .ChainStatusIndicator {
+        display: inline-block;
+        margin-left: 8px;
+        margin-right: -2px;
+        position: relative;
+        top: -1px;
+    }
+}
+
 .Sidebar {
     position: fixed;
     top: 0;
     bottom: 0;
     width: $sidebar-width;
     z-index: 9;
-    border-right: 1px solid #e8e8e8;
     .SidebarMenu {
         height: 100%;
     }
@@ -56,7 +82,7 @@ $active-color: #ececec;
         font-size: 15px;
         border: none;
         font-weight: 600;
-        padding: 4px $sidebar-padding;
+        padding: 5px $sidebar-padding;
         .cui-icon svg {
             height: 15px;
             width: 15px;
@@ -84,39 +110,17 @@ $active-color: #ececec;
         min-height: $header-height;
         margin-bottom: 20px;
         user-select: none;
-        background: #fff !important;
         border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.04);
+        box-shadow: 1px 0px 4px rgba(0,0,0,0.04);
         cursor: pointer;
         .cui-button {
             width: 100%;
             height: 100%;
-            padding: 24px 15px 23px;
+            padding: 0 15px;
             color: #222;
         }
-        .title-selector-left {
-            flex: 1;
-            display: flex;
-        }
-        .community-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            font-weight: 700;
-            line-height: 1.25;
-        }
-        .icon-lock {
-            margin-left: 2px;
-        }
-        .ChainStatusIndicator {
-            display: inline-block;
-            margin-left: 8px;
-            margin-right: -2px;
-            position: relative;
-            top: -1px;
-        }
-        .SubscriptionButton {
-            float: right;
+        .CommunityLabel {
+            margin: 18px 0 14px;
         }
     }
     .cui-list .action-selector {

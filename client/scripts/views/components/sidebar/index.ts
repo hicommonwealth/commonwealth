@@ -45,16 +45,42 @@ import { IPostNotificationData, ICommunityNotificationData } from 'shared/types'
 import { isRoleOfCommunity } from 'helpers/roles';
 import AdminPanel from '../admin_panel';
 
-const Sidebar: m.Component<{ activeTag: string }, {}> = {
+const CommunityLabel = {
   view: (vnode) => {
-    const { activeTag } = vnode.attrs;
     const nodes = app.config.nodes.getAll();
-    const activeAccount = app.vm.activeAccount;
     const activeNode = app.chain?.meta;
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
+
+    if (selectedNode) return m('.CommunityLabel', [
+      m('.community-name-row', [
+        m('span.community-name', selectedNode.chain.name),
+        m(ChainStatusIndicator, { hideLabel: true }),
+      ]),
+      m('.community-id', `/${selectedNode.chain.id}`),
+    ]);
+
+    if (selectedCommunity) return m('.CommunityLabel', [
+      m('.community-name-row', [
+        m('span.community-name', selectedCommunity.meta.name),
+        selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
+        !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
+      ]),
+      m('.community-id', `/${selectedCommunity.meta.id}`),
+    ]);
+
+    return m('.CommunityLabel.CommunityLabelPlaceholder', [
+      m('span.community-name', 'Select a community'),
+    ]);
+  }
+};
+
+const Sidebar: m.Component<{ activeTag: string }, {}> = {
+  view: (vnode) => {
+    const { activeTag } = vnode.attrs;
+    const activeAccount = app.vm.activeAccount;
 
     // chain menu
     const chains = {};
@@ -156,14 +182,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 basic: true,
                 compact: true,
                 iconRight: Icons.CHEVRON_DOWN,
-                label: (app.community || app.chain) ? [
-                  m('span.community-name', selectedNode
-                    ? selectedNode.chain.name
-                    : selectedCommunity ? selectedCommunity.meta.name : ''),
-                  !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-                  !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-                  selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-                ] : m('span.community-name', 'Select a community'),
+                label: m(CommunityLabel),
                 style: 'min-width: 200px',
               }),
             }),
@@ -175,7 +194,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             && m(ListItem, {
               contentLeft: m(Icon, { name: Icons.HOME }),
               active: onDiscussionsPage(m.route.get()),
-              label: 'Latest Activity',
+              label: 'Home',
               onclick: (e) => m.route.set(`/${app.activeId()}`),
             }),
           // discussions (all communities)
