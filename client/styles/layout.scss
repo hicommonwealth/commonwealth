@@ -243,12 +243,12 @@ body.modal-open {
 }
 
 .layout-content {
-    padding-top: $header-height + 15px;
-    padding-bottom: 40px;
-    padding-right: 40px;
-    padding-left: $sidebar-width + 40px;
+    padding-top: $header-height + $layout-padding-top;
+    padding-bottom: $layout-padding;
+    padding-right: $layout-padding;
+    padding-left: $sidebar-width + $layout-padding;
     &.navigation-hidden {
-        padding: 15px 40px;
+        padding: $layout-padding-top $layout-padding $layout-padding $layout-padding;
     }
 }
 
