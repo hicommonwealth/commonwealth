@@ -296,7 +296,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: false,
         readOnly: false,
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag'],
         kind,
       });
       expect(res2.status).to.be.equal('Success');
@@ -418,7 +418,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: true,
         readOnly: true,
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag', ],
         kind,
       });
       expect(res2.status).to.be.equal('Success');
