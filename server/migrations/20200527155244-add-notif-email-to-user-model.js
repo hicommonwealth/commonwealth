@@ -1,27 +1,32 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: async (queryInterface, DataTypes) => {
     await queryInterface.addColumn(
       'Users',
       'emailNotificationInterval',
       {
         type: DataTypes.ENUM,
-        allowNull: true,
-        defaultValue: null,
+        values: ['daily', 'weekly', 'monthly', 'never'],
+        allowNull: false,
+        defaultValue: 'never',
       }
     );
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: async (queryInterface, DataTypes) => {
     await queryInterface.removeColumn(
       'Users',
       'emailNotificationInterval',
       {
         type: DataTypes.ENUM,
+        values: ['daily', 'weekly', 'monthly', 'never'],
         allowNull: true,
         defaultValue: null,
       }
     );
-  }
+
+    const query = 'DELETE FROM pg_enum WHERE enumlabel = \'emailNotificationInterval\'';
+    await queryInterface.sequelize.query(query);
+  },
 };
