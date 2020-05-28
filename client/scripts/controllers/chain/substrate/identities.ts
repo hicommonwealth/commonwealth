@@ -1,6 +1,6 @@
 import { IApp } from 'state';
 import { StorageModule } from 'models';
-import { ProposalStore } from 'stores';
+import { PersistentStore } from 'stores';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Call,
@@ -18,9 +18,9 @@ import { ApiRx } from '@polkadot/api';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateIdentity from './identity';
+import SubstrateIdentity, { ISubstrateIdentity } from './identity';
 
-class SubstrateIdentityStore extends ProposalStore<SubstrateIdentity> { }
+class SubstrateIdentityStore extends PersistentStore<ISubstrateIdentity, SubstrateIdentity> { }
 
 export type SuperCodec = [ AccountId, Data ] & Codec;
 export type IdentityInfoProps = {
@@ -39,7 +39,7 @@ class SubstrateIdentities implements StorageModule {
   private _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
-  private _store: SubstrateIdentityStore = new SubstrateIdentityStore();
+  private _store: SubstrateIdentityStore;
   public get store() { return this._store; }
 
   private _Chain: SubstrateChain;
@@ -78,7 +78,7 @@ class SubstrateIdentities implements StorageModule {
   // given an account, fetch the corresponding identity (works on sub-accounts)
   public get(who: SubstrateAccount): Observable<SubstrateIdentity> {
     // check immediately if we have the id
-    const existingIdentity = this.store.getByIdentifier(who.address);
+    const existingIdentity = this.store.getById(who.address);
     if (existingIdentity) {
       return of(existingIdentity);
     }
@@ -105,15 +105,31 @@ class SubstrateIdentities implements StorageModule {
       (api: ApiRx) => api.query.identity.identityOf<Option<Registration>>(acctToFetch.address)
     ).pipe(
       takeWhile((id) => !id.isSome, true),
-      map((id) => id.isSome
-        ? new SubstrateIdentity(this._Chain, this._Accounts, this, acctToFetch, id.unwrap())
-        : null),
+      map((id) => {
+        if (id.isSome) {
+          const substrateId = new SubstrateIdentity(this._Chain, this._Accounts, this, acctToFetch);
+          substrateId.setRegistration(id.unwrap());
+          this._store.add(substrateId);
+          return substrateId;
+        } else {
+          return null;
+        }
+      })
     );
   }
 
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+    this._store = new SubstrateIdentityStore(
+      this._app.chain.id,
+      'identity',
+      (s: ISubstrateIdentity) => {
+        const id = new SubstrateIdentity(ChainInfo, Accounts, this, Accounts.fromAddress(s.address));
+        id.deserialize(s);
+        return id;
+      }
+    );
     return new Promise((resolve) => {
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // init consts
@@ -164,7 +180,7 @@ class SubstrateIdentities implements StorageModule {
     let requiredBalance = this.basicDeposit.add(this.fieldDeposit.muln(info.additional.length));
 
     // compare with preexisting deposit from old registration, if exists
-    const oldId = this.store.getByIdentifier(who.address);
+    const oldId = this.store.getById(who.address);
     if (oldId && oldId.deposit.lt(requiredBalance)) {
       requiredBalance = requiredBalance.sub(oldId.deposit);
     } else if (oldId && oldId.deposit.gte(requiredBalance)) {

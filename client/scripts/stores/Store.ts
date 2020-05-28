@@ -16,6 +16,16 @@ abstract class Store<T> {
     return this;
   }
 
+  public update(item: T): Store<T> {
+    const index = this._store.indexOf(item);
+    if (index === -1) {
+      console.error('Attempting to update an object that was not found in the store');
+      return this;
+    }
+    this._store[index] = item;
+    return this;
+  }
+
   public clear() {
     this._store = [];
   }
