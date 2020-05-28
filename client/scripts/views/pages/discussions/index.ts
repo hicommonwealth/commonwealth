@@ -42,17 +42,18 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       Scope: app.activeId(),
     });
     // Infinite Scroll
+    const scrollableEle = $('.mithril-app');
     const onscroll = _.debounce(() => {
-      const scrollHeight = $(document).height();
-      const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > (scrollHeight - 400)) {
+      const listingHeight = (document.getElementsByClassName('discussions-listing')[0] as HTMLDivElement).offsetHeight;
+      const scrollPos = scrollableEle.height() + scrollableEle.scrollTop();
+      if (scrollPos > (listingHeight - 400)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
           m.redraw();
         }
       }
     }, 400);
-    $(window).on('scroll', onscroll);
+    scrollableEle.on('scroll', onscroll);
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
