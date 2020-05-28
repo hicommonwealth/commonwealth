@@ -7,7 +7,7 @@ import { Hash } from '@polkadot/types/interfaces';
 import { IBlockPoller, IDisconnectedRange } from '../interfaces';
 import { SubstrateBlock } from './types';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IBlockPoller<ApiPromise, SubstrateBlock> {

@@ -4,7 +4,7 @@ import { NotificationCategories, ProposalType } from '../../shared/types';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

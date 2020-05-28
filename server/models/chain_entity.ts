@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     type: { type: DataTypes.STRING, allowNull: false },
     type_id: { type: DataTypes.STRING, allowNull: false },
     thread_id: { type: DataTypes.INTEGER, allowNull: true },
+    completed: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
     created_at: { type: DataTypes.DATE, allowNull: false },
     updated_at: { type: DataTypes.DATE, allowNull: false },

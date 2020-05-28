@@ -74,6 +74,7 @@ export enum SubstrateEventKind {
   ElectionMemberRenounced = 'election-member-renounced',
 
   CollectiveProposed = 'collective-proposed',
+  CollectiveVoted = 'collective-voted',
   CollectiveApproved = 'collective-approved',
   CollectiveDisapproved = 'collective-disapproved',
   CollectiveExecuted = 'collective-executed',
@@ -289,24 +290,24 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   };
 }
 
+export interface ISubstrateCollectiveVoted extends ISubstrateEvent {
+  kind: SubstrateEventKind.CollectiveVoted;
+  collectiveName?: 'council' | 'technicalCommittee';
+  proposalHash: string;
+  voter: SubstrateAccountId;
+  vote: boolean;
+}
+
 export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveApproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
-  proposalIndex: number;
-  threshold: number;
-  ayes: SubstrateAccountId[];
-  nays: SubstrateAccountId[];
 }
 
 export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
   kind: SubstrateEventKind.CollectiveDisapproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
-  proposalIndex: number;
-  threshold: number;
-  ayes: SubstrateAccountId[];
-  nays: SubstrateAccountId[];
 }
 
 export interface ISubstrateCollectiveExecuted extends ISubstrateEvent {
@@ -400,6 +401,7 @@ export type ISubstrateEventData =
   | ISubstrateElectionMemberKicked
   | ISubstrateElectionMemberRenounced
   | ISubstrateCollectiveProposed
+  | ISubstrateCollectiveVoted
   | ISubstrateCollectiveApproved
   | ISubstrateCollectiveDisapproved
   | ISubstrateCollectiveExecuted
@@ -430,11 +432,38 @@ export type ISubstrateDemocracyPreimageEvents =
 export type ISubstrateTreasuryProposalEvents =
   ISubstrateTreasuryProposed | ISubstrateTreasuryRejected | ISubstrateTreasuryAwarded;
 export type ISubstrateCollectiveProposalEvents =
-  ISubstrateCollectiveProposed | ISubstrateCollectiveApproved
+  ISubstrateCollectiveProposed | ISubstrateCollectiveVoted | ISubstrateCollectiveApproved
   | ISubstrateCollectiveDisapproved | ISubstrateCollectiveExecuted;
 export type ISubstrateSignalingProposalEvents =
   ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
   | ISubstrateSignalingVotingStarted | ISubstrateSignalingVotingCompleted;
+
+
+export function entityToFieldName(entity: SubstrateEntityKind): string | null {
+  switch (entity) {
+    case SubstrateEntityKind.DemocracyProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.DemocracyReferendum: {
+      return 'referendumIndex';
+    }
+    case SubstrateEntityKind.DemocracyPreimage: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.TreasuryProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.CollectiveProposal: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.SignalingProposal: {
+      return 'proposalHash';
+    }
+    default: {
+      return null;
+    }
+  }
+}
 
 export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
   switch (event) {
@@ -466,6 +495,7 @@ export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
     }
 
     case SubstrateEventKind.CollectiveProposed:
+    case SubstrateEventKind.CollectiveVoted:
     case SubstrateEventKind.CollectiveApproved:
     case SubstrateEventKind.CollectiveDisapproved:
     case SubstrateEventKind.CollectiveExecuted: {

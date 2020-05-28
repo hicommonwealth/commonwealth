@@ -1,4 +1,3 @@
-import SubstrateChain, { handleSubstrateEntityUpdate } from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
@@ -9,6 +8,7 @@ import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent } from 'm
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
+import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
 import SubstrateIdentities from './identities';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
@@ -35,6 +35,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async init(onServerLoaded?) {
+    const useClientChainEntities = true;
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
@@ -49,8 +50,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.init(async () => {
       await this.chain.resetApi(this.meta);
       await this.chain.initMetadata();
-    }, onServerLoaded);
+    }, onServerLoaded, !useClientChainEntities);
     await this.accounts.init(this.chain);
+
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
@@ -60,7 +62,10 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
-    await this._postModuleLoad();
+    await this._postModuleLoad(!useClientChainEntities);
+    if (useClientChainEntities) {
+      await this.chain.initChainEntities(this.meta.chain.id);
+    }
     await this.chain.initEventLoop();
 
     this._loaded = true;
