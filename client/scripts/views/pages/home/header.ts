@@ -3,6 +3,8 @@ import 'pages/home/header.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Grid, Col, Form, FormGroup } from 'construct-ui';
+import app from 'state';
+import LoginModal from 'views/modals/login_modal';
 
 const HomepageHeader = {
   view: (vnode) => {
@@ -37,6 +39,7 @@ const HomepageHeader = {
                 label: 'Sign in with crypto wallet',
                 fluid: true,
                 intent: 'primary',
+                onclick: () => app.modals.create({ modal: LoginModal }),
               }),
             ]),
           ]),

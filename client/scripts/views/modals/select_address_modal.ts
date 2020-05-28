@@ -6,6 +6,7 @@ import $ from 'jquery';
 import app from 'state';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
+import { isMember } from 'views/components/membership_button';
 import { isSameAccount } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
@@ -29,15 +30,26 @@ const SelectAddressOption: m.Component<{ account }> = {
 
 const SelectAddressModal = {
   view: (vnode) => {
+    const memberAddresses = app.login.activeAddresses.filter((account) => {
+      return isMember(app.activeChainId(), app.activeCommunityId());
+    });
+    const otherAddresses = app.login.activeAddresses.filter((account) => {
+      return !isMember(app.activeChainId(), app.activeCommunityId());
+    });
+
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
         m('h3', 'Select address'),
       ]),
       m('.compact-modal-body', [
-        m('.modal-header', 'You have multiple addresses to use with this community. Select one to log in:'),
-        app.login.activeAddresses.map((account) => {
-          return m(SelectAddressOption, { account });
-        }),
+        m('.select-existing-address', [
+          m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
+          memberAddresses.map((account) => m(SelectAddressOption, { account })),
+        ]),
+        m('.join-with-new-address', [
+          m('.modal-header', 'Select an address to join this community:'),
+          otherAddresses.map((account) => m(SelectAddressOption, { account })),
+        ]),
       ]),
     ]);
   }

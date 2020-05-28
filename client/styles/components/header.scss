@@ -24,27 +24,6 @@
     > .cui-button {
         margin-left: 10px;
     }
-
-    .login-selector {
-        .User.avatar-only {
-            overflow: visible;
-            padding-right: 11px;
-            position: relative;
-        }
-        .login-selector-user {
-            display: flex;
-            .User {
-                //white-space: normal; // prevent long usernames from overflowing
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 110px;
-            }
-            .user-address {
-                margin-left: 6px;
-            }
-        }
-    }
 }
 
 // notifications menu (outside header, displayed in a cui-portal)

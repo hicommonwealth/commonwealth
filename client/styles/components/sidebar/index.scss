@@ -83,7 +83,7 @@ $active-color: #ececec;
         border: none;
         font-weight: 600;
         padding: 5px $sidebar-padding;
-        .cui-icon svg {
+        > .cui-list-item-content-left > .cui-icon svg {
             height: 15px;
             width: 15px;
             min-height: 15px;
@@ -149,20 +149,28 @@ $active-color: #ececec;
         cursor: initial !important;
         user-select: none;
 
+        .login-selector-left {
+            flex: 1;
+            display: flex;
+        }
+        .login-selector-right {
+            padding-left: 8px;
+        }
+
         button.cui-button {
             position: relative;
         }
         .User.avatar-only {
             overflow: visible;
-            padding-right: 11px;
+            padding-right: 13px;
             position: relative;
+            top: -1px;
         }
         .login-selector-user {
             line-height: 1.1;
             .user-info {
                 position: relative;
                 .User {
-                    //white-space: normal; // prevent long usernames from overflowing
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -171,6 +179,8 @@ $active-color: #ececec;
                 }
                 .user-address {
                     font-size: 12px;
+                    font-weight: 400;
+                    color: #777;
                     margin: 0;
                 }
             }
