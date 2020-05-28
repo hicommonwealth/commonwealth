@@ -8,6 +8,7 @@ import app from 'state';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import { isMember } from 'views/components/membership_button';
 import {
   ChainInfo,
   SocialAccount,
@@ -79,7 +80,19 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
       .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
-  if (!suppressAddressSelectionModal) {
+  const memberAddresses = app.login.activeAddresses.filter((address) => {
+    return chain
+      ? isMember(chain.id, null, address)
+      : isMember(null, app.community.meta.id, address);
+  });
+
+  if (memberAddresses.length === 0) {
+    // no member addresses - preview the community
+  } else if (memberAddresses.length === 1) {
+    // one member address - start the community with that address (don't check for default address)
+    setActiveAccount(app.login.activeAddresses[0]);
+  } else if (memberAddresses.length > 1 && !suppressAddressSelectionModal) {
+    // more than one member address - show modal to choose (TODO: check for default address)
     app.modals.create({ modal: SelectAddressModal });
   }
 
