@@ -163,6 +163,22 @@ describe('Thread Tests', () => {
       expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
     });
 
+    it('should fail to create a thread without tags', async () => {
+      const tRes = await modelUtils.createThread({
+        chain,
+        address: adminAddress,
+        jwt: adminJWT,
+        title,
+        body,
+        readOnly,
+        kind,
+        tags: []
+      });
+      expect(tRes).to.not.be.null;
+      expect(tRes.error).to.not.be.null;
+      expect(tRes.error).to.be.equal(ThreadErrors.IncorrectNumberOfTags);
+    });
+
     it('should fail to create a thread with too many tags', async () => {
       const tRes = await modelUtils.createThread({
         chain,
@@ -172,11 +188,11 @@ describe('Thread Tests', () => {
         body,
         readOnly,
         kind,
-        tags: ['1', '2', '3', '4']
+        tags: ['1', '2']
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.TooManyTags);
+      expect(tRes.error).to.be.equal(ThreadErrors.IncorrectNumberOfTags);
     });
 
     it('should fail to create a comment on a readOnly thread', async () => {

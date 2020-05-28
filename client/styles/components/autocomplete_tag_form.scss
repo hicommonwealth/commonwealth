@@ -36,6 +36,7 @@
     }
 
     .left-panel {
+        margin-right: 8px;
         @include xxs-max {
             margin-bottom: 8px;
             font-size: 14px;

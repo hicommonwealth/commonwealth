@@ -300,12 +300,13 @@ const TagSelector: m.Component<{
             active: m.route.get() === `/${app.activeId()}/tags/`,
             label: 'All tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
           }),
         ]),
       // This placeholder module should only be shown in the sidebar
       !showFullListing
         && m('.no-tags-placeholder', [
-          'The community manager has not selected any discussion categories',
+          'The community manager has not selected any tags for the sidebar',
         ]),
     ]);
   },

@@ -24,7 +24,6 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       const CommunityButton = m(Button, {
         class: 'NewProposalButton',
         label: 'New post',
-        iconLeft: Icons.PLUS,
         intent: 'primary',
         fluid,
         disabled: !activeAccount,

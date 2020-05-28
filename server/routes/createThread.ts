@@ -11,7 +11,7 @@ export const Errors = {
   ForumMissingTitle: 'Forum posts must include a title',
   QuestionMissingTitle: 'Questions must include a title',
   RequestMissingTitle: 'Requests must include a title',
-  TooManyTags: 'Forum posts are allowed three tags max.',
+  IncorrectNumberOfTags: 'Forum posts must have exactly one tag',
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
@@ -37,8 +37,8 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     if (!title || !title.trim()) {
       return next(new Error(Errors.ForumMissingTitle));
     }
-    if (tags.length > 3) {
-      return next(new Error(Errors.TooManyTags));
+    if (tags.length !== 1) {
+      return next(new Error(Errors.IncorrectNumberOfTags));
     }
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachments));
