@@ -8,6 +8,14 @@ $active-color: #ececec;
     flex: 1;
     display: flex;
     font-weight: 400;
+
+    &.CommunityLabelPlaceholder {
+        padding: 8px 0;
+        .community-name {
+            color: #aaa;
+        }
+    }
+
     .community-label-left {
         padding-right: 12px;
     }
