@@ -173,8 +173,8 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
       return item instanceof ChainInfo
         ? app.activeChainId() === item.id
         : item instanceof CommunityInfo
-        ? app.activeCommunityId() === item.id
-        : null;
+          ? app.activeCommunityId() === item.id
+          : null;
     });
 
     return m('.Sidebar', {
@@ -192,7 +192,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               closeOnSelect: true,
               class: 'CommunitySelectList',
               activeIndex: currentIndex,
-              items: selectableCommunities,
+              items: (selectableCommunities as any).concat('home'),
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
@@ -204,10 +204,13 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                       label: m(CommunityLabel, { community: item }),
                       selected: app.activeCommunityId() === item.id
                     })
-                    : null;
+                    : m(ListItem, {
+                      class: 'select-list-back-home',
+                      label: 'Back to home',
+                    });
               },
               onSelect: (item: any) => {
-                m.route.set(`/${item.id}`);
+                m.route.set(item.id ? `/${item.id}` : '/');
               },
               filterable: false,
               checkmark: false,

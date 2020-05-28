@@ -212,7 +212,14 @@ $active-color: #ececec;
 
 .CommunitySelectList {
     .cui-popover-content {
-        padding: 6px 0;
+        padding: 6px 0 6px;
+    }
+    .select-list-back-home {
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+    .cui-list {
+        max-height: 90vh;
     }
     .cui-list-item {
         min-width: 280px;
