@@ -241,7 +241,7 @@ describe('Thread Tests', () => {
   });
 
   describe('/bulkThreads', () => {
-    it('should pass with public chain', async () => {
+    it('should return bulk threads for a public chain', async () => {
       const res = await chai.request.agent(app)
         .get('/api/bulkThreads')
         .set('Accept', 'application/json')
@@ -253,7 +253,7 @@ describe('Thread Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
     });
-    it('should pass with public community', async () => {
+    it('should return bulk threads for a public community', async () => {
       const res = await chai.request.agent(app)
         .get('/api/bulkThreads')
         .set('Accept', 'application/json')

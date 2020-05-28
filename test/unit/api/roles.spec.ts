@@ -41,7 +41,7 @@ describe('Roles Test', () => {
   });
 
   describe('/createRole route tests', () => {
-    it('should pass on joining public community', async () => {
+    it('should create a member role for a public community', async () => {
       const user = await modelUtils.createAndVerifyAddress({ chain });
       const res = await chai.request(app)
         .post('/api/createRole')
@@ -56,7 +56,7 @@ describe('Roles Test', () => {
       expect(res.body.result.offchain_community_id).to.be.equal(community);
     });
 
-    it('should fail on joining public community a second time', async () => {
+    it('should fail to create duplicate role for a public community a user is a member of', async () => {
       const res = await chai.request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
@@ -69,7 +69,7 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(createErrors.RoleAlreadyExists);
     });
 
-    it('should fail without address_id', async () => {
+    it('should fail to create a role without address_id', async () => {
       const res = await chai.request(app)
         .post('/api/createRole')
         .set('Accept', 'application/json')
@@ -172,7 +172,7 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(upgradeErrors.InvalidRole);
     });
 
-    it('should fail when not an admin requests', async () => {
+    it('should fail when a non-admin upgrades a member', async () => {
       const res = await chai.request(app)
         .post('/api/upgradeMember')
         .set('Accept', 'application/json')
@@ -248,7 +248,7 @@ describe('Roles Test', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('should fail without address_id', async () => {
+    it('should fail to delete role without address_id', async () => {
       const res = await chai.request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
@@ -260,7 +260,7 @@ describe('Roles Test', () => {
       expect(res.body.error).to.be.equal(deleteErrors.InvalidAddress);
     });
 
-    it('should fail with invalid address_id', async () => {
+    it('should fail to delete role with invalid address_id', async () => {
       const res = await chai.request(app)
         .post('/api/deleteRole')
         .set('Accept', 'application/json')
@@ -288,7 +288,7 @@ describe('Roles Test', () => {
   });
 
   describe('/bulkMembers route test', () => {
-    it('should pass with standard input', async () => {
+    it('should grab bulk members for a public community', async () => {
       const res = await chai.request.agent(app)
         .get('/api/bulkMembers')
         .set('Accept', 'application/json')
@@ -300,7 +300,7 @@ describe('Roles Test', () => {
       expect(res.body.result.length).to.be.greaterThan(0);
     });
 
-    it('should fail if community not visible to user', async () => {
+    it('should fail to grab bulk members if community is not visible to user', async () => {
       const communityArgs: modelUtils.CommunityArgs = {
         jwt: jwtToken,
         isAuthenticatedForum: 'false',

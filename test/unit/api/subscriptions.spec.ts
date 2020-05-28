@@ -255,8 +255,8 @@ describe('Subscriptions Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    describe('/viewNotifications route tests', () => {
-      it('should pass with expected input', async () => {
+    describe('/viewNotifications: return notifications to user', () => {
+      it('should return all notifications with just a user\'s jwt', async () => {
         const res = await chai.request(app)
           .post('/api/viewNotifications')
           .set('Accept', 'application/json')
@@ -267,7 +267,7 @@ describe('Subscriptions Tests', () => {
         notifications = res.body.result;
       });
 
-      it('should pass with unread_only property', async () => {
+      it('should return only unread notifications', async () => {
         const res = await chai.request(app)
           .post('/api/viewNotifications')
           .set('Accept', 'application/json')
@@ -278,7 +278,7 @@ describe('Subscriptions Tests', () => {
         notifications = res.body.result;
       });
 
-      it('should pass with active_only property', async () => {
+      it('should return only notifications with active_only turned on', async () => {
         const res = await chai.request(app)
           .post('/api/viewNotifications')
           .set('Accept', 'application/json')
