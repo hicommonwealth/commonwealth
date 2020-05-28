@@ -11,11 +11,13 @@ const PresentationComponent = (state, chain: Substrate) => {
     name: 'Current Validators',
     content: m('table.validators-table', [
       m('tr.validators-heading', [
-        m('th.val-name', 'Name'),
-        m('th.val-commission', 'Commission'),
         m('th.val-controller', 'Controller'),
         m('th.val-stash', 'Stash'),
-        m('th.val-total', 'Total Bonded'),
+        m('th.val-total', 'Total Stake'),
+        m('th.val-total', 'Own Stake'),
+        m('th.val-total', 'Other Stake'),
+        m('th.val-commission', 'Commission'),
+        m('th.val-points', 'Points'),
         // m('th.val-age', 'Validator Age'),
         m('th.val-action', ''),
       ]),
@@ -23,14 +25,15 @@ const PresentationComponent = (state, chain: Substrate) => {
         validators[validator].isElected === true && validators[validator].isWaiting === false
       )).sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
         .map((validator) => {
-          const total = chain.chain.coins(validators[validator].exposure.total);
-          const bonded = chain.chain.coins(validators[validator].exposure.own);
-          const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN));
+          const total = chain.chain.coins(validators[validator].exposure.total); // total stake
+          const bonded = chain.chain.coins(validators[validator].exposure.own); // own stake
+          const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN)); // other stake
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
+          const eraPoints = validators[validator].eraPoints;
           const commissionPer = validators[validator].commissionPer;
           const hasNominated: boolean = app.vm.activeAccount && nominators
             && !!nominators.find(({ stash }) => stash === app.vm.activeAccount.address);
@@ -48,6 +51,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             nominators,
             hasNominated,
             commissionPer,
+            eraPoints,
             onChangeHandler: (result) => {
               if (state.nominations.indexOf(result) === -1) {
                 state.nominations.push(result);
@@ -62,11 +66,13 @@ const PresentationComponent = (state, chain: Substrate) => {
     name: 'Next Up',
     content: m('table.validators-table', [
       m('tr.validators-heading', [
-        m('th.val-name', 'Name'),
-        m('th.val-commission', 'Commission'),
         m('th.val-controller', 'Controller'),
         m('th.val-stash', 'Stash'),
-        m('th.val-total', 'Total Bonded'),
+        m('th.val-total', 'Total Stake'),
+        m('th.val-total', 'Own Stake'),
+        m('th.val-total', 'Other Stake'),
+        m('th.val-commission', 'Commission'),
+        m('th.val-points', 'Points'),
         // m('th.val-age', 'Validator Age'),
         m('th.val-action', ''),
       ]),
@@ -83,6 +89,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
+          const eraPoints = validators[validator].eraPoints;
           return m(ValidatorRow, {
             stash: validator,
             controller,
@@ -90,7 +97,8 @@ const PresentationComponent = (state, chain: Substrate) => {
             bonded,
             nominated,
             nominators,
-            commissionPer
+            commissionPer,
+            eraPoints
           });
         }),
     ])
@@ -98,10 +106,9 @@ const PresentationComponent = (state, chain: Substrate) => {
     name: 'Waiting Validators',
     content: m('table.validators-table', [
       m('tr.validators-heading', [
-        m('th.val-name', 'Name'),
-        m('th.val-commission', 'Commission'),
         m('th.val-stash', 'Stash'),
-        m('th.val-total', 'Total Bonded'),
+        m('th.val-points', 'Nominations'),
+        m('th.val-commission', 'Commission'),
         // m('th.val-age', 'Validator Age'),
         m('th.val-action', ''),
       ]),
@@ -115,6 +122,7 @@ const PresentationComponent = (state, chain: Substrate) => {
           const commissionPer = validators[validator].commissionPer;
           const nominators = [];
           const controller = validators[validator].controller;
+          const eraPoints = validators[validator].eraPoints;
           return m(ValidatorRow, {
             stash: validator,
             controller,
@@ -123,7 +131,8 @@ const PresentationComponent = (state, chain: Substrate) => {
             nominated,
             nominators,
             commissionPer,
-            waiting: true
+            waiting: true,
+            eraPoints
           });
         }),
     ])

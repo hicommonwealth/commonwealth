@@ -45,7 +45,8 @@ export interface IValidatorValue {
   controller: string,
   isElected: boolean,
   isWaiting?: boolean,
-  commissionPer: number
+  commissionPer?: number,
+  eraPoints?: string
 }
 
 export interface IValidators {
