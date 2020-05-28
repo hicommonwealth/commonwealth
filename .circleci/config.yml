@@ -31,7 +31,7 @@ jobs:
           name: "set env var for no client"
           command: echo 'export NO_CLIENT="true"' >> $BASH_ENV
       - run:
-          name: run api tests
-          command: yarn test-api
+          name: run tests
+          command: yarn test-suite
       - store_artifacts:
           path: coverage

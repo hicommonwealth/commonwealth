@@ -8,8 +8,21 @@ import BN from 'bn.js';
 import { ApiRx, WsProvider, SubmittableResult, Keyring } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import {
-  Moment, Balance, EventRecord, Event, BlockNumber, Index, Hash, AccountId, ChainProperties, DispatchError
+  Moment,
+  Balance,
+  EventRecord,
+  Event,
+  BlockNumber,
+  Index,
+  Hash,
+  AccountId,
+  ChainProperties,
+  DispatchError,
+  ActiveEraInfo,
+  EraIndex,
+  SessionIndex
 } from '@polkadot/types/interfaces';
+
 import { Vec, Compact } from '@polkadot/types/codec';
 import { createType } from '@polkadot/types/create';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
@@ -27,13 +40,15 @@ import {
   ITXData,
   ChainBase,
   ChainClass,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
-import addressDefaults from '@polkadot/util-crypto/address/defaults';
+import { SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents } from 'events/edgeware/types';
 import { SubstrateAccount } from './account';
 
 export type HandlerId = number;
@@ -59,6 +74,54 @@ function createApi(app: IApp, node: NodeInfo, additionalOptions?): ApiRx {
     window['wsProvider'] = options.provider;
     return new ApiRx(options);
   }
+}
+
+export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
+  switch (entity.type) {
+    case SubstrateEntityKind.DemocracyProposal: {
+      return chain.democracyProposals.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.DemocracyReferendum: {
+      return chain.democracy.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.DemocracyPreimage: {
+      if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+        console.log('dispatching preimage noted, from entity', entity);
+        const proposal = chain.democracyProposals.getByHash(entity.typeId);
+        if (proposal) {
+          proposal.update(event);
+        }
+        const referendum = chain.democracy.getByHash(entity.typeId);
+        if (referendum) {
+          referendum.update(event);
+        }
+      }
+      break;
+    }
+    case SubstrateEntityKind.TreasuryProposal: {
+      return chain.treasury.updateProposal(entity, event);
+    }
+    case SubstrateEntityKind.CollectiveProposal: {
+      const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
+      if (collectiveName && collectiveName === 'technicalCommittee' && chain.class === ChainClass.Kusama) {
+        return chain.technicalCommittee.updateProposal(entity, event);
+      } else {
+        return chain.council.updateProposal(entity, event);
+      }
+    }
+    case SubstrateEntityKind.SignalingProposal: {
+      if (chain.class === ChainClass.Edgeware) {
+        return chain.signaling.updateProposal(entity, event);
+      } else {
+        console.error('Received signaling update on non-edgeware chain!');
+        break;
+      }
+    }
+    default:
+      break;
+  }
+  // force titles to update?
+  m.redraw();
 }
 
 export interface ISubstrateTXData extends ITXData {
@@ -629,6 +692,45 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     });
     const name = method.meta ? method.meta.name : `${method.section}.${method.call}`;
     return name + '(' + args.reduce((prev, curr, idx) => prev + (idx > 0 ? ', ' : '') + curr, '') + ')';
+  }
+
+  public get currentEra(): Observable<EraIndex> {
+    return this.query((api: ApiRx) => api.query.staking.currentEra())
+      .pipe(map((era: EraIndex) => {
+        if (era) {
+          return era;
+        } else {
+          return null;
+        }
+      }));
+  }
+
+  public get activeEra(): Observable<ActiveEraInfo> {
+    return this.query((api: ApiRx) => {
+      if (api.query.staking.activeEra) {
+        return api.query.staking.activeEra();
+      } else {
+        return of(null);
+      }
+    })
+      .pipe(map((era: ActiveEraInfo) => {
+        if (era) {
+          return era;
+        } else {
+          return null;
+        }
+      }));
+  }
+
+  public get session(): Observable<SessionIndex> {
+    return this.query((api: ApiRx) => api.query.session.currentIndex())
+      .pipe(map((sessionInx) => {
+        if (sessionInx) {
+          return sessionInx;
+        } else {
+          return null;
+        }
+      }));
   }
 }
 

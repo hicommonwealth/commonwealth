@@ -6,7 +6,6 @@ import OffchainAccounts, { OffchainAccount } from './account';
 class Community extends ICommunityAdapter<Coin, OffchainAccount> {
   private _loaded: boolean = false;
   public accounts: OffchainAccounts;
-  public readonly server = {};
 
   get loaded() { return this._loaded; }
 
@@ -19,6 +18,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     await this.app.threads.refreshAll(null, this.id, true);
     await this.app.comments.refreshAll(null, this.id, true);
     await this.app.reactions.refreshAll(null, this.id, true);
+    await this.app.tags.refreshAll(null, this.id, true);
     this._serverLoaded = true;
     this._loaded = true;
   }

@@ -10,6 +10,7 @@ import { PopoverMenu, Icon, Icons } from 'construct-ui';
 import Near from 'controllers/chain/near/main';
 import { WalletAccount } from 'nearlib';
 
+import { NotificationCategories } from 'types';
 import app, { LoginState } from 'state';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
@@ -19,7 +20,8 @@ import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import OffchainAccounts from 'controllers/chain/community/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import {
   OffchainThread,
   OffchainThreadKind,
@@ -45,7 +47,6 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import PreviewModal from 'views/modals/preview_modal';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury';
 import { formatCoin } from 'adapters/currency';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 
@@ -62,6 +63,7 @@ import {
   ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
+import { ThreadSubscriptionButton } from '../discussions/thread_carat_menu';
 
 interface IProposalHeaderAttrs {
   commentCount: number;
@@ -94,6 +96,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
 
+    const notificationSubscription = app.login.notifications.subscriptions
+      .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
+
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
@@ -108,7 +113,18 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 ))
             && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
+          m(ProposalHeaderSpacer),
           m(ProposalHeaderDelete, { proposal }),
+          app.isLoggedIn() && m(PopoverMenu, {
+            transitionDuration: 0,
+            closeOnOutsideClick: true,
+            closeOnContentClick: true,
+            menuAttrs: { size: 'default' },
+            content: m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+            trigger: m('.ProposalHeaderCaretMenu', [
+              m('a', notificationSubscription ? 'Notifications on' : 'Notifications off'),
+            ]),
+          })
         ]),
         m('.proposal-title', [
           m(ProposalHeaderTitle, { proposal }),
@@ -278,7 +294,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           m(ProposalBodySpacer),
           m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
           m(ProposalBodySpacer),
-          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, }),
+          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
         ],
       ]),
       m('.comment-body-content', [
@@ -303,7 +319,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 interface IProposalCommentsState {
   commentError: any;
   dom;
-  jumpedToHighlightedComment: boolean;
+  highlightedComment: boolean;
 }
 
 interface IProposalCommentsAttrs {
@@ -327,8 +343,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
-    if (vnode.state.dom && comments?.length > 0 && !vnode.state.jumpedToHighlightedComment) {
-      vnode.state.jumpedToHighlightedComment = true;
+    if (vnode.state.dom && comments?.length > 0 && !vnode.state.highlightedComment) {
+      vnode.state.highlightedComment = true;
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
         : null;
@@ -360,6 +376,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             getSetGlobalReplyStatus,
             parent: comment,
             proposal,
+            callback: createdCommentCallback,
           }),
           !!child.childComments.length
             && m('.child-comments-wrap', recursivelyGatherChildComments(child, replyParent2))
@@ -376,6 +393,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             getSetGlobalReplyStatus,
             parent: proposal,
             proposal,
+            callback: createdCommentCallback,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length
@@ -422,7 +440,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -584,10 +602,10 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
             : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('body').scrollTop();
+          const scrollTop = $('.mithril-app').scrollTop();
           const replyTop = $reply.offset().top;
           if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-            $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
+            $('.mithril-app').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
 
           // highlight the reply form
           const animationDelayTime = 2000;

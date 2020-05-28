@@ -1,8 +1,17 @@
 @import 'client/styles/shared';
 
 .DiscussionsPage {
-    padding-top: 80px;
-    max-width: 640px;
+    display: flex;
+    justify-content: space-between;
+    .discussions-main {
+        flex: 1;
+        max-width: 720px;
+    }
+    .discussions-sidebar {
+        width: 300px;
+        padding-right: 20px;
+    }
+
     h4 {
         font-size: 14px;
         color: #a0a0a0;

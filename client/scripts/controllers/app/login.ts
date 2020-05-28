@@ -7,6 +7,8 @@ import app from 'state';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SelectAddressModal from 'views/modals/select_address_modal';
+import { isMember } from 'views/components/membership_button';
 import {
   ChainInfo,
   SocialAccount,
@@ -37,9 +39,6 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
     app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
   } else if (app.activeChainId()) {
     app.login.selectedAddresses.setByChain(app.activeChainId(), account);
-  } else {
-    localStorage.setItem('initChain', account.chain.id);
-    localStorage.setItem('initAddress', account.address);
   }
 }
 
@@ -68,7 +67,7 @@ export function clearActiveAddresses() {
   app.vm.activeAccount = null;
 }
 
-export function updateActiveAddresses(chain?: ChainInfo) {
+export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.login.activeAddresses = chain
@@ -81,27 +80,33 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
-  const initAddress = localStorage.getItem('initAddress');
-  const initChain = localStorage.getItem('initChain');
-  if (initAddress && initChain) {
-    const account = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
-    if (account) {
-      localStorage.removeItem('initAddress');
-      localStorage.removeItem('initChain');
-      setActiveAccount(account);
-      return;
-    }
+  const memberAddresses = app.login.activeAddresses.filter((address) => {
+    return chain
+      ? isMember(chain.id, null, address)
+      : isMember(null, app.community.meta.id, address);
+  });
+
+  if (memberAddresses.length === 0) {
+    // no member addresses - preview the community
+  } else if (memberAddresses.length === 1) {
+    // one member address - start the community with that address (don't check for default address)
+    setActiveAccount(app.login.activeAddresses[0]);
+  } else if (memberAddresses.length > 1 && !suppressAddressSelectionModal) {
+    // more than one member address - show modal to choose (TODO: check for default address)
+    app.modals.create({ modal: SelectAddressModal });
   }
 
   // try to load a previously selected account for the chain/community
-  if (chain) {
-    const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
-    app.vm.activeAccount = app.login.activeAddresses
-      .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
-  } else if (app.activeCommunityId()) {
-    const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
-    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
-  }
+  // TODO: bring this back when default addresses are saved
+
+  // if (chain) {
+  //   const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
+  //   app.vm.activeAccount = app.login.activeAddresses
+  //     .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
+  // } else if (app.activeCommunityId()) {
+  //   const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
+  //   app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
+  // }
 }
 
 // called from the server, which returns public keys

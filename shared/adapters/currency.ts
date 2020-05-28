@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 
 // duplicated in helpers.ts
-function formatNumberShort(num: number) {
+export function formatNumberShort(num: number) {
   const round = (n, digits?) => {
     if (digits === undefined) digits = 2;
     return Math.round(n * Math.pow(10, digits)) / Math.pow(10, digits);

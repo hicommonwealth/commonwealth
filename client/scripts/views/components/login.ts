@@ -17,25 +17,26 @@ interface IAttrs {
 }
 
 interface IState {
-  disabled?: boolean;
-  success?: boolean;
-  failure?: boolean;
-  error?: Error | string;
+  disabled: boolean;
+  success: boolean;
+  failure: boolean;
+  error: Error | string;
+  forceRegularLogin: boolean; // show regular login form from NEAR page
 }
 
 const Login: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
     const creatingAccount = !!vnode.attrs.creatingAccount;
 
-    if (app.chain && app.chain.base === ChainBase.NEAR) {
+    if (app.chain && app.chain.base === ChainBase.NEAR && !vnode.state.forceRegularLogin) {
       return m('.Login', {
         onclick: (e) => {
           e.stopPropagation();
         }
       }, [
         m('h4', 'Log in or sign up'),
-        m('a.btn.login-wallet-button.formular-button-black', {
-          href: '#',
+        m(Button, {
+          class: 'login-button-black',
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('menuclose');
@@ -54,11 +55,22 @@ const Login: m.Component<IAttrs, IState> = {
             }
             const redirectUrl = `${window.location.origin}/${app.activeChainId()}/finishNearLogin`;
             wallet.requestSignIn('commonwealth', 'commonwealth', redirectUrl, redirectUrl);
-          }
-        }, [
-          m('img.login-wallet-icon', { src: '/static/img/near_transparent_white.png' }),
-          'Go to NEAR wallet',
-        ])
+          },
+          label: [
+            m('img.login-wallet-icon', { src: '/static/img/near_transparent_white.png' }),
+            'Go to NEAR wallet',
+          ]
+        }),
+        m('.more-options', [
+          m('a', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              vnode.state.forceRegularLogin = true;
+            }
+          }, 'More options'),
+        ]),
       ]);
     }
 
@@ -129,7 +141,7 @@ const Login: m.Component<IAttrs, IState> = {
           intent: 'primary',
           fluid: true,
           href: `${app.serverUrl()}/auth/github`,
-          class: 'login-with-github',
+          class: 'login-button-black',
           onclick: (e) => {
             localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
               timestamp: (+new Date()).toString(),
@@ -141,7 +153,7 @@ const Login: m.Component<IAttrs, IState> = {
         m(Button, {
           intent: 'primary',
           fluid: true,
-          class: 'login-with-web3',
+          class: 'login-button-black login-with-web3',
           onclick: (e) => {
             e.preventDefault();
             $(e.target).trigger('menuclose');

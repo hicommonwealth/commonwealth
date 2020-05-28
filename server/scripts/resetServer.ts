@@ -3,32 +3,34 @@ import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
+import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [
-  [ 'localhost:9944', 'edgeware-local' ],
-  [ 'berlin1.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin2.edgewa.re', 'edgeware-testnet' ],
-  [ 'berlin3.edgewa.re', 'edgeware-testnet' ],
-  [ 'mainnet1.edgewa.re', 'edgeware' ],
-  //[ 'localhost:9944', 'kusama-local' ],
+  [ 'ws://localhost:9944', 'edgeware-local' ],
+  [ 'wss://berlin1.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin2.edgewa.re', 'edgeware-testnet' ],
+  [ 'wss://berlin3.edgewa.re', 'edgeware-testnet' ],
+  [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
+  // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
-  [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
-  [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
+  // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
+  // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
   // [ '157.230.218.41:9944', 'edgeware-testnet' ],
   // [ '157.230.125.18:9944', 'edgeware-testnet' ],
   // [ '206.189.33.216:9944', 'edgeware-testnet' ],
-  [ 'localhost:26657', 'cosmos-local' ],
-  [ 'gaia13k1.commonwealth.im:26657', 'cosmos-testnet' ],
-  [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
+  // [ 'localhost:26657', 'cosmos-local' ],
+  // [ 'gaia13k1.commonwealth.im:26657', 'cosmos-testnet' ],
+  // [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.nearprotocol.com', 'near' ],
-  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1'],
-  [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
+  // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1'],
+  // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
-  [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
+  // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
 ];
 const resetServer = (models, closeMiddleware) => {
   log.debug('Resetting database...');
@@ -274,6 +276,14 @@ const resetServer = (models, closeMiddleware) => {
       verified: true,
       keytype: 'sr25519',
     });
+    await models.Address.create({
+      address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
+      chain: 'edgeware',
+      verification_token: crypto.randomBytes(18).toString('hex'),
+      verification_token_expires: new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000),
+      verified: true,
+      keytype: 'sr25519',
+    });
     // Notification Categories
     await models.NotificationCategory.create({
       name: NotificationCategories.NewCommunity,
@@ -294,6 +304,10 @@ const resetServer = (models, closeMiddleware) => {
     await models.NotificationCategory.create({
       name: NotificationCategories.NewReaction,
       description: 'someone reacts to a post',
+    });
+    await models.NotificationCategory.create({
+      name: NotificationCategories.ChainEvent,
+      description: 'a chain event occurs',
     });
 
     // Admins need to be subscribed to mentions
@@ -358,12 +372,37 @@ const resetServer = (models, closeMiddleware) => {
       permission: 'admin',
     });
     await models.Role.create({
+      address_id: 4,
+      chain_id: 'edgeware',
+      permission: 'admin',
+    });
+    await models.Role.create({
       address_id: 3,
+      offchain_community_id: 'staking',
+      permission: 'admin',
+    });
+    await models.Role.create({
+      address_id: 4,
       offchain_community_id: 'staking',
       permission: 'admin',
     });
 
     await Promise.all(nodes.map(([ url, chain, address ]) => (models.ChainNode.create({ chain, url, address }))));
+
+    // initialize chain event types
+    const initChainEventTypes = (chain) => {
+      return Promise.all(
+        SubstrateEventKinds.map((event_name) => {
+          return models.ChainEventType.create({
+            id: `${chain}-${event_name}`,
+            chain,
+            event_name,
+          });
+        })
+      );
+    };
+
+    await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
 
     closeMiddleware().then(() => {
       log.debug('Reset database and initialized default models');

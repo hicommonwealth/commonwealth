@@ -56,16 +56,14 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       const { tags } = vnode.state;
       const { updateFormData } = vnode.attrs;
       const formInput = (document.getElementsByClassName('autocomplete-entry')[0] as HTMLInputElement);
-      if (tags.length === 3) {
+      if (tags.length === 1) {
         clearAutoComplete(formInput);
-        vnode.attrs.updateParentErrors('You may only add up to 3 tags.');
+        vnode.attrs.updateParentErrors('You can only select a single tag');
         return;
       }
-      // eslint-disable-next-line no-restricted-syntax
       for (const t of tags) {
         if (t.toLowerCase() === tag.toLowerCase()) {
           clearAutoComplete(formInput);
-          // vnode.attrs.updateParentErrors('You may not add duplicate tags.');
           return;
         }
       }
@@ -107,7 +105,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       m('.top-wrap', [
         m('.left-panel', [
           m(AutoCompleteForm, {
-            placeholder: 'New tag',
+            placeholder: 'Select a category',
             results: vnode.attrs.results || [],
             applyDefaultHandler: true,
             onChangeHandler,

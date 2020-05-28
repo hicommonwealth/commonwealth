@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import 'pages/discussions/index.scss';
 
+import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -30,6 +31,8 @@ interface IDiscussionPageState {
   lookback?: number;
   postsDepleted?: boolean;
   lastVisitedUpdated?: boolean;
+  hasOlderPosts?: boolean;
+  defaultLookback: number;
 }
 
 const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
@@ -38,11 +41,22 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       'Page Name': 'DiscussionsPage',
       Scope: app.activeId(),
     });
-    if (m.route.param('lookback')) vnode.state.lookback = +m.route.param('lookback');
+    // Infinite Scroll
+    const onscroll = _.debounce(() => {
+      const scrollHeight = $(document).height();
+      const scrollPos = $(window).height() + $(window).scrollTop();
+      if (scrollPos > (scrollHeight - 400)) {
+        if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
+          vnode.state.lookback += vnode.state.defaultLookback;
+          m.redraw();
+        }
+      }
+    }, 400);
+    $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
-    // add chain compatability (node info?)
+    // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
     const allLastVisited = (typeof app.login.lastVisited === 'string')
@@ -147,7 +161,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         return ago - (ago % week);
       });
       const weekIndexes = Object.keys(proposalsByWeek);
-      const hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
+      vnode.state.hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
 
       // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
       // for easy comparison with weekly indexes' msecAgo
@@ -163,7 +177,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         .map((str) => Number(str)));
 
       // determine lookback length
-      const defaultLookback = 20;
+      vnode.state.defaultLookback = 20;
+      const { defaultLookback } = vnode.state;
       vnode.state.lookback = (!vnode.state.lookback || isNaN(vnode.state.lookback))
         ? defaultLookback
         : vnode.state.lookback;
@@ -217,30 +232,38 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
           m('.no-threads', 'No threads'),
         ],
         allProposals.length !== 0
-        && getRecentPostsSortedByWeek(),
-        hasOlderPosts
-        && !vnode.state.postsDepleted
-        && m('a.extra-items.discussion-group-wrap', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            vnode.state.lookback += defaultLookback;
-            updateRoute(m.route.get(), { lookback: vnode.state.lookback });
-          },
-        }, 'Show more'),
+        && getRecentPostsSortedByWeek()
       ]);
     };
 
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
+    const selectedCommunity = app.community;
+
     return m('.DiscussionsPage', [
-      (app.chain || app.community) && [
-        vnode.attrs.activeTag
-          ? getSingleTagListing(vnode.attrs.activeTag)
-          : getHomepageListing(),
-      ],
+      m('.discussions-main', [
+        (app.chain || app.community) && [
+          vnode.attrs.activeTag
+            ? getSingleTagListing(vnode.attrs.activeTag)
+            : getHomepageListing(),
+        ],
+      ]),
+      m('.discussions-sidebar', [
+        m('h4', [
+          'About ',
+          selectedNode ? selectedNode.chain.name
+            : selectedCommunity ? selectedCommunity.meta.name : ''
+        ]),
+        m('p', [
+          selectedNode ? selectedNode.chain.description
+            : selectedCommunity ? selectedCommunity.meta.description : ''
+        ]),
+      ]),
     ]);
   },
 };

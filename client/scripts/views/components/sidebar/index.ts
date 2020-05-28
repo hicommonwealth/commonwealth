@@ -6,9 +6,10 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import {
   List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  Button, Tag, Menu, MenuHeading, Popover } from 'construct-ui';
+  SelectList, Button, Tag, Menu, MenuHeading, Popover
+} from 'construct-ui';
 
-import { ApiStatus, default as app } from 'state';
+import app, { ApiStatus } from 'state';
 import { featherIcon, link } from 'helpers';
 import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
@@ -16,18 +17,21 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
-import { ChainClass, ChainBase, Notification } from 'models';
+import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
 import { OffchainCommunitiesStore } from 'stores';
 
 import { isMember } from 'views/components/membership_button';
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import CommunityMenu from 'views/components/sidebar/community_menu';
+import User from 'views/components/widgets/user';
 import TagSelector from 'views/components/sidebar/tag_selector';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import NewProposalModal from 'views/modals/proposals';
+import SelectAddressModal from 'views/modals/select_address_modal';
+import NewProposalPage from 'views/pages/new_proposal/index';
+import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
@@ -36,17 +40,78 @@ import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import { isRoleOfCommunity } from 'helpers/roles';
 
-const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolean }> = {
+import { initAppState } from 'app';
+import { notifySuccess } from 'controllers/app/notifications';
+import LoginModal from 'views/modals/login_modal';
+import EditProfileModal from 'views/modals/edit_profile_modal';
+import FeedbackModal from 'views/modals/feedback_modal';
+import EditIdentityModal from 'views/modals/edit_identity_modal';
+import AdminPanel from 'views/components/admin_panel';
+
+const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo }> = {
   view: (vnode) => {
-    const { activeTag } = vnode.attrs;
+    const { chain, community } = vnode.attrs;
+
+    if (chain) return m('.CommunityLabel', [
+      m('.community-label-left', [
+        m(ChainIcon, { chain }),
+      ]),
+      m('.community-label-right', [
+        m('.community-name-row', [
+          m('span.community-name', chain.name),
+          chain.id === app.activeChainId() && m(ChainStatusIndicator, { hideLabel: true }),
+        ]),
+        m('.community-id', `/${chain.id}`),
+      ]),
+    ]);
+
+    if (community) return m('.CommunityLabel', [
+      m('.community-label-left', [
+        m(CommunityIcon, { community }),
+      ]),
+      m('.community-label-right', [
+        m('.community-name-row', [
+          m('span.community-name', community.name),
+          community.id === app.activeCommunityId() && [
+            community.privacyEnabled && m('span.icon-lock'),
+            !community.privacyEnabled && m('span.icon-globe'),
+          ],
+        ]),
+        m('.community-id', `/${community.id}`),
+      ]),
+    ]);
+
+    return m('.CommunityLabel.CommunityLabelPlaceholder', [
+      m('span.community-name', 'Select a community'),
+    ]);
+  }
+};
+
+const CurrentCommunityLabel: m.Component<{}> = {
+  view: (vnode) => {
     const nodes = app.config.nodes.getAll();
-    const activeAccount = app.vm.activeAccount;
     const activeNode = app.chain?.meta;
     const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
+
+    if (selectedNode) {
+      return m(CommunityLabel, { chain: selectedNode.chain });
+    } else if (selectedCommunity) {
+      return m(CommunityLabel, { community: selectedCommunity.meta });
+    } else {
+      return m(CommunityLabel);
+    }
+  }
+};
+
+const Sidebar: m.Component<{ activeTag: string }, {}> = {
+  view: (vnode) => {
+    const { activeTag } = vnode.attrs;
+    const activeAccount = app.vm.activeAccount;
 
     // chain menu
     const chains = {};
@@ -94,6 +159,24 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
 
+    const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+      .concat(app.config.chains.getAll())
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((item) => {
+        // only show chains with nodes
+        return (item instanceof ChainInfo)
+          ? app.config.nodes.getByChain(item.id)?.length
+          : true;
+      });
+
+    const currentIndex = selectableCommunities.findIndex((item) => {
+      return item instanceof ChainInfo
+        ? app.activeChainId() === item.id
+        : item instanceof CommunityInfo
+          ? app.activeCommunityId() === item.id
+          : null;
+    });
+
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
@@ -104,62 +187,72 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
           size: 'lg',
         }, [
           // header
-          // TODO: remove (app.community || app.chain)
-          m(Popover, {
-            class: 'community-menu-popover',
-            isOpen: vnode.state.communityMenuVisible,
-            hasBackdrop: true,
-            content: m(CommunityMenu),
-            onClose: () => {
-              vnode.state.communityMenuVisible = false;
-            },
-            hasArrow: false,
-            closeOnEscapeKey: true,
-            closeOnContentClick: true,
-            trigger: m('.title-selector', (app.community || app.chain) ? [
-              m('.community-name', selectedNode
-                ? selectedNode.chain.name
-                : selectedCommunity ? selectedCommunity.meta.name : ''),
-              !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-              !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-              selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-            ] : 'Commonwealth'),
-          }),
+          m('.title-selector', [
+            m(SelectList, {
+              closeOnSelect: true,
+              class: 'CommunitySelectList',
+              activeIndex: currentIndex,
+              items: (selectableCommunities as any).concat('home'),
+              itemRender: (item) => {
+                return item instanceof ChainInfo
+                  ? m(ListItem, {
+                    label: m(CommunityLabel, { chain: item }),
+                    selected: app.activeChainId() === item.id
+                  })
+                  : item instanceof CommunityInfo
+                    ? m(ListItem, {
+                      label: m(CommunityLabel, { community: item }),
+                      selected: app.activeCommunityId() === item.id
+                    })
+                    : m(ListItem, {
+                      class: 'select-list-back-home',
+                      label: 'Back to home',
+                    });
+              },
+              onSelect: (item: any) => {
+                m.route.set(item.id ? `/${item.id}` : '/');
+              },
+              filterable: false,
+              checkmark: false,
+              popoverAttrs: {
+                hasArrow: false
+              },
+              trigger: m(Button, {
+                align: 'left',
+                basic: true,
+                compact: true,
+                iconRight: Icons.CHEVRON_DOWN,
+                label: m(CurrentCommunityLabel),
+                style: 'min-width: 200px',
+              }),
+            }),
+            //   app.isLoggedIn() && (app.community || app.chain)
+            //     && m(SubscriptionButton),
+          ]),
+          // community homepage
+          (app.community || app.chain)
+            && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.HOME }),
+              active: onDiscussionsPage(m.route.get()),
+              label: 'Home',
+              onclick: (e) => m.route.set(`/${app.activeId()}`),
+            }),
           // discussions (all communities)
           (app.community || app.chain)
-            && m('h4', 'Off-chain'),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onDiscussionsPage(m.route.get()),
-              label: 'Discussions',
-              onclick: (e) => m.route.set(`/${app.activeId()}/`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
-            }),
+            && m('h4', 'Discussions'),
           (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onMembersPage(m.route.get()),
-              label: 'Members',
-              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
-            }),
-          // // chat (all communities)
-          // (app.community || app.chain) &&
-          //   m(ListItem, {
-          //     active: onChatPage(m.route.get()),
-          //     label: 'Chat',
-          //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          //   }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
-            && m('h4', 'On-chain voting'),
+            && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
+                || showMolochMenuOptions)
+            && m('h4', 'On-chain Voting'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
               active: onProposalPage(m.route.get()),
               label: 'Proposals',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [
                 allSubstrateGovernanceProposals > 0
                   && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
@@ -169,47 +262,204 @@ const Sidebar: m.Component<{ activeTag: string }, { communityMenuVisible: boolea
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.TRELLO }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [], // TODO
             }),
           // validators (substrate and cosmos only)
           // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
           //   m(ListItem, {
+          //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
           //     active: onValidatorsPage(m.route.get()),
           //     label: 'Validators',
           //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-          //     contentLeft: m(Icon, { name: Icons.BOX }),
           //   }),
           showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: NewProposalModal,
-              data: { typeEnum: ProposalType.MolochProposal }
-            }),
-            label: 'New proposal'
+            onclick: (e) => {
+              m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+            },
+            label: 'New proposal',
+            contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
             }),
-            label: 'Update delegate key'
+            label: 'Update delegate key',
+            contentLeft: m(Icon, { name: Icons.KEY }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
             }),
-            label: 'Rage quit'
+            label: 'Rage quit',
+            contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: TokenApprovalModal,
             }),
-            label: 'Approve tokens'
+            label: 'Approve tokens',
+            contentLeft: m(Icon, { name: Icons.POWER }),
           }),
-          // TODO: add a "reserve tokens" option here, to apply to DAO?
+          (app.community || app.chain)
+            && m('h4', 'More'),
+          (app.community || app.chain)
+            && m(ListItem, {
+              active: onMembersPage(m.route.get()),
+              label: 'Members',
+              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+              contentLeft: m(Icon, { name: Icons.USERS }),
+            }),
+          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+            && (app.community || app.chain)
+            && m(AdminPanel),
+          // login selector
+          !app.isLoggedIn()
+          // if logged out
+            ? m(ListItem, {
+              class: 'login-selector',
+              label: m('.login-selector-user', [
+                m(Button, {
+                  intent: 'primary',
+                  iconLeft: Icons.USER,
+                  size: 'sm',
+                  fluid: true,
+                  label: 'Log in',
+                  onclick: () => app.modals.create({ modal: LoginModal }),
+                }),
+              ]),
+            })
+          // if logged in
+            : m(ListItem, {
+              class: 'login-selector',
+              label: [
+                m('.login-selector-left', app.vm.activeAccount
+                  // if address selected
+                  ? [
+                    m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
+                    m('.login-selector-user', [
+                      m('.user-info', [
+                        m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
+                        m('.user-address', app.vm.activeAccount.chain.id === 'near'
+                          ? `@${app.vm.activeAccount.address}`
+                          : `${app.vm.activeAccount.address.slice(0, 6)}...`)
+                      ])
+                    ]),
+                  ]
+                  // if no address is selected
+                  : app.login.activeAddresses.length === 0 ? m(Button, {
+                    intent: 'none',
+                    iconLeft: Icons.USER_PLUS,
+                    size: 'sm',
+                    fluid: true,
+                    label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+                    onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+                  })
+                  // if addresses are available, but none is selected
+                    : m(Button, {
+                      label: 'Select an address',
+                      fluid: true,
+                      size: 'sm',
+                      onclick: () => app.modals.create({ modal: SelectAddressModal }),
+                    })),
+                m('.login-selector-right', [
+                  // logged in
+                  app.isLoggedIn() && m(PopoverMenu, {
+                    closeOnContentClick: true,
+                    transitionDuration: 0,
+                    hoverCloseDelay: 0,
+                    position: 'bottom-end',
+                    trigger: m(Button, {
+                      class: app.vm.activeAccount ? 'address-menu' : 'address-menu cui-button-icon',
+                      intent: 'none',
+                      size: 'sm',
+                      fluid: true,
+                      label: m(Icon, { name: Icons.SETTINGS }),
+                    }),
+                    content: [
+                      m(MenuItem, {
+                        label: 'Go to profile',
+                        iconLeft: Icons.USER,
+                        onclick: (e) => {
+                          m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+                        },
+                        disabled: !(
+                          app.vm.activeAccount
+                            && app.vm.activeAccount.chain
+                            && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`)
+                      }),
+                      app.vm.activeAccount
+                        && m(MenuItem, {
+                          onclick: () => app.modals.create({
+                            modal: EditProfileModal,
+                            data: app.vm.activeAccount
+                          }),
+                          iconLeft: Icons.EDIT,
+                          label: 'Edit Profile'
+                        }),
+                      m(MenuItem, {
+                        onclick: async () => app.modals.create({
+                          modal: EditIdentityModal,
+                          data: { account: app.vm.activeAccount },
+                        }),
+                        iconLeft: Icons.LINK,
+                        label: 'Set on-chain ID'
+                      }),
+                      m(MenuDivider),
+                      (app.chain || app.community) && m(MenuItem, {
+                        onclick: async () => app.modals.create({
+                          modal: SelectAddressModal,
+                        }),
+                        iconLeft: Icons.USER,
+                        label: 'Switch address'
+                      }),
+                      m(MenuItem, {
+                        onclick: () => m.route.set('/settings'),
+                        iconLeft: Icons.SETTINGS,
+                        label: 'Settings'
+                      }),
+                      app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
+                        onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
+                        iconLeft: Icons.USER,
+                        label: 'Admin'
+                      }),
+                      m(MenuItem, {
+                        onclick: () => app.modals.create({ modal: FeedbackModal }),
+                        iconLeft: Icons.SEND,
+                        label: 'Send feedback',
+                      }),
+                      m(MenuItem, {
+                        onclick: () => {
+                          $.get(`${app.serverUrl()}/logout`).then(async () => {
+                            await initAppState();
+                            notifySuccess('Logged out');
+                            m.route.set('/');
+                            m.redraw();
+                          }).catch((err) => {
+                            // eslint-disable-next-line no-restricted-globals
+                            location.reload();
+                          });
+                          mixpanel.reset();
+                        },
+                        iconLeft: Icons.X_SQUARE,
+                        label: 'Logout'
+                      }),
+                    ]
+                  }),
+                ])
+              ]
+            }),
         ]),
+        // // chat (all communities)
+        // (app.community || app.chain) &&
+        //   m(ListItem, {
+        //     active: onChatPage(m.route.get()),
+        //     label: 'Chat',
+        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   }),
       ]),
     ]);
   },

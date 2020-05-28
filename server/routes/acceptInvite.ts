@@ -1,13 +1,17 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const acceptInvite = async (models, req: UserRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
+export const Errors = {
+  NoInviteCodeFound: (code) => `Cannot find invite code: ${code}`,
+  NoAddressFound: (address) => `Cannot find Address: ${address}`,
+  WrongOwner: 'Logged in user does not own address accepting invite',
+  NoCommunityFound: (community) => `Cannot find community: ${community}`,
+  RoleCreationFailure: 'Failed to create new Role',
+  CodeUpdateFailure: 'Failed to Update Code',
+};
 
+const acceptInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   const { inviteCode, address, reject } = req.body;
 
   const code = await models.InviteCode.findOne({
@@ -16,7 +20,7 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
       used: false,
     }
   });
-  if (!code) return next(new Error(`Cannot find invite code: ${inviteCode}`));
+  if (!code) return next(new Error(Errors.NoInviteCodeFound(inviteCode)));
 
   if (reject === 'true') {
     const rejectedCode = await code.update({
@@ -30,12 +34,15 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
       address,
     }
   });
-  if (!addressObj) return next(new Error(`Cannot find Address: ${address}`));
+  if (!addressObj) return next(new Error(Errors.NoAddressFound(address)));
 
   const userAddresses = await req.user.getAddresses();
-  const isUser = userAddresses.filter((add) => add.address === addressObj.address);
-  if (!isUser) {
-    return next(new Error('User logged in does not own address accepting invite'));
+  const isUser = userAddresses
+    .filter((addr) => addr.verified)
+    .filter((add) => add.address === addressObj.address);
+
+  if (isUser.length === 0) {
+    return next(new Error(Errors.WrongOwner));
   }
 
   const community = await models.OffchainCommunity.findOne({
@@ -43,19 +50,19 @@ const acceptInvite = async (models, req: UserRequest, res: Response, next: NextF
       id: code.community_id,
     }
   });
-  if (!community) return next(new Error(`Cannot find community: ${code.community_id}`));
+  if (!community) return next(new Error(Errors.NoCommunityFound(code.community_id)));
 
   const role = await models.Role.create({
     address_id: addressObj.id,
     offchain_community_id: community.id,
     permission: 'member',
   });
-  if (!role) return next(new Error('Failed to create new Role'));
+  if (!role) return next(new Error(Errors.RoleCreationFailure));
 
   const updatedCode = await code.update({
     used: true,
   });
-  if (!updatedCode) return next(new Error('Failed to Update Code'));
+  if (!updatedCode) return next(new Error(Errors.CodeUpdateFailure));
 
   return res.json({ status: 'Success', result: { updatedCode, role } });
 };

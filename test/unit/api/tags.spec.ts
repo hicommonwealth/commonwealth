@@ -3,13 +3,14 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase, closeServer } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
+const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('Tag Tests', () => {
   before('reset database', async () => {
@@ -17,7 +18,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Bulk Tags', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';
     let adminJWT;
@@ -27,7 +27,11 @@ describe('Tag Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
@@ -38,6 +42,7 @@ describe('Tag Tests', () => {
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
         tags: ['tag', 'tag2', 'tag3'],
+        kind: 'forum',
       });
       expect(res2.result).to.not.be.null;
     });
@@ -51,7 +56,6 @@ describe('Tag Tests', () => {
           jwt: adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      console.dir(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
@@ -60,7 +64,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Update Tags', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';
     let adminJWT;
@@ -75,7 +78,11 @@ describe('Tag Tests', () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.assignAdmin(res.address_id, community);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
@@ -85,6 +92,7 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
+        kind: 'forum',
       });
       thread = res2.result;
       expect(thread).to.not.be.null;

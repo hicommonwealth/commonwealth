@@ -1,11 +1,11 @@
 import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
-import { Coin } from 'shared/adapters/currency';
+import { Coin } from 'adapters/currency';
+import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
-import { IChainModule, IAccountsModule, IServerControllers, IBlockInfo } from './interfaces';
+import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
-import Account from './Account';
-import NodeInfo from './NodeInfo';
+import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -14,22 +14,60 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
-  public abstract server: IServerControllers;
 
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
 
+  protected async _postModuleLoad(): Promise<void> {
+    await this.app.comments.refreshAll(this.id, null, true, false, true);
+    // await this.app.reactions.refreshAll(this.id, null, false);
+
+    // attach listener for entity update events
+    this.app.socket.addListener(
+      WebsocketMessageType.ChainEntity,
+      (payload: IWebsocketsPayload<any>) => {
+        if (payload
+          && payload.data
+          && payload.data.chainEntity.chain === this.meta.chain.id
+        ) {
+          const { chainEntity, chainEvent, chainEventType } = payload.data;
+
+          // add fake "include" for construction purposes
+          chainEvent.ChainEventType = chainEventType;
+          const eventModel = ChainEvent.fromJSON(chainEvent);
+
+          let existingEntity = this.app.chainEntities.store.getById(chainEntity.id);
+          if (!existingEntity) {
+            existingEntity = ChainEntity.fromJSON(chainEntity);
+          }
+          this.app.chainEntities.update(existingEntity, eventModel);
+          this.handleEntityUpdate(existingEntity, eventModel);
+        }
+      }
+    );
+  }
+
   public async init(onServerLoaded? : () => void, initChainModuleFn?: () => Promise<void>): Promise<void> {
     await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true);
+    await this.app.comments.refreshAll(this.id, null, true, true);
     await this.app.reactions.refreshAll(this.id, null, true);
+    await this.app.tags.refreshAll(this.id, null, true);
+    await this.app.chainEntities.refresh(this.meta.chain.id);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
     await initChainModuleFn();
     this.app.chainModuleReady.next(true);
   }
 
-  public abstract deinit: () => Promise<void>;
+  public async deinit(): Promise<void> {
+    this._serverLoaded = false;
+    this.app.threads.deinit();
+    this.app.comments.deinit();
+    this.app.reactions.deinit();
+    this.app.chainEntities.deinit();
+  }
+
+  public abstract handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void;
 
   public abstract base: ChainBase;
   public abstract class: ChainClass;

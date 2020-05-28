@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
-import { UserRequest } from '../types';
 import { factory, formatFilename } from '../util/logging';
+import '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
-const status = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const status = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [
     chains,
@@ -123,7 +123,18 @@ const status = async (models, req: UserRequest, res: Response, next: NextFunctio
         created_at: { [Op.gt]: new Date(time as string) }
       }
     });
+    const activeThreads = [];
+    threadNum.rows.forEach((r) => {
+      if (!activeThreads.includes(r.id)) activeThreads.push(r.id);
+    });
+    commentNum.rows.forEach((r) => {
+      if (r.root_id.includes('discussion')) {
+        const id = Number(r.root_id.split('_')[1]);
+        if (!activeThreads.includes(id)) activeThreads.push(id);
+      }
+    });
     unseenPosts[name] = {
+      'activePosts': activeThreads.length,
       'threads': threadNum.count,
       'comments': commentNum.count
     };

@@ -5,17 +5,19 @@ import faker from 'faker';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import wallet from 'ethereumjs-wallet';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase, closeServer } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
 
-const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
+const markdownThread = require('../../util/fixtures/markdownThread');
+const markdownComment = require('../../util/fixtures/markdownComment');
+const richTextThread = require('../../util/fixtures/richTextThread');
+const richTextComment = require('../../util/fixtures/richTextComment');
 
 const expectErrorOnResponse = (statusCode, errorMsg, response) => {
   expect(response.statusCode).to.be.equal(statusCode);
@@ -42,8 +44,16 @@ describe('Webhook Tests', () => {
     let result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     jwtToken = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
-    await modelUtils.assignAdmin(result.address_id, { offchain_community_id: community });
-    await modelUtils.assignAdmin(result.address_id, { chain_id: chain });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
+    await modelUtils.assignRole({
+      address_id: result.address_id,
+      chainOrCommObj: { chain_id: chain },
+      role: 'admin',
+    });
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;
@@ -202,11 +212,6 @@ describe('Webhook Tests', () => {
   });
 
   describe('Integration Tests', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
-    const markdownComment = require('../../util/fixtures/markdownComment');
-    const richTextThread = require('../../util/fixtures/richTextThread');
-    const richTextComment = require('../../util/fixtures/richTextComment');
-
     before('reset database', async () => {
       await resetDatabase();
     });
@@ -224,13 +229,14 @@ describe('Webhook Tests', () => {
         jwt: jwtToken,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
+        kind: 'forum',
       });
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(markdownComment.text),
-        proposalIdentifier: `discussion_${res.result.id}`,
+        root_id: `discussion_${res.result.id}`,
       });
       res = await modelUtils.createThread({
         chain,
@@ -238,13 +244,14 @@ describe('Webhook Tests', () => {
         jwt: jwtToken,
         title: decodeURIComponent(richTextThread.title),
         body: decodeURIComponent(richTextThread.body),
+        kind: 'forum',
       });
       res = await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
         text: decodeURIComponent(richTextComment.text),
-        proposalIdentifier: `discussion_${res.result.id}`,
+        root_id: `discussion_${res.result.id}`,
       });
     });
   });

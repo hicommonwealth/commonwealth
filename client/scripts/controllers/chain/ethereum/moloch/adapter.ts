@@ -17,11 +17,14 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
-  public readonly server = { };
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
+
+  public handleEntityUpdate(e): void {
+    throw new Error('not implemented');
+  }
 
   public async init(onServerLoaded?) {
     const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
@@ -50,33 +53,32 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     if (this.webWallet) {
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+        const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
         setActiveAccount(updatedAddress);
       });
     }
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
-      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0])
+      const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
       setActiveAccount(updatedAddress);
       api.updateSigner(accounts[0]);
     });
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
     await this.governance.init(api, this.accounts, this.meta.chain.chainObjectId, useChainProposalData);
+    await this._postModuleLoad();
 
     this._loaded = true;
   }
 
-  public deinit = async () => {
+  public async deinit() {
+    super.deinit();
     this.governance.deinit();
     this.ethAccounts.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
     console.log('Ethereum/Moloch stopped.');
 
     return Promise.resolve();

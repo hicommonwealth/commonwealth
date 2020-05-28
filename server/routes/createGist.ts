@@ -2,8 +2,7 @@ import request from 'superagent';
 
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { u8aConcat, stringToU8a, compactAddLength } from '@polkadot/util';
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 
 export const hashTwo = (left: string, right: string) => {
   return blake2AsHex(
@@ -14,7 +13,7 @@ export const hashTwo = (left: string, right: string) => {
   );
 };
 
-const createGist = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const createGist = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Not logged in'));
   }

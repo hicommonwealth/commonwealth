@@ -5,10 +5,10 @@
     top: 0;
     left: $sidebar-width;
     &.logged-out {
-        left: $sidebar-width - $switcher-width;
+        left: $sidebar-width;
     }
     right: 0;
-    height: 60px;
+    height: $header-height;
     padding: 0 40px;
     display: flex;
     align-items: center;
@@ -21,17 +21,37 @@
     .header-breadcrumb {
         flex: 1;
     }
-    .cui-button, .user-button {
+    > .cui-button {
         margin-left: 10px;
     }
+}
 
-    .cui-button.login-selector {
-        .login-selector-user {
-            display: flex;
-            line-height: 1.1;
-            .user-address {
-                margin-left: 4px;
-            }
-        }
+// notifications menu (outside header, displayed in a cui-portal)
+.notification-menu {
+    .notification-list {
+        height: 480px;
+        background: #fff;
+        width: 340px;
+    }
+    .cui-menu {
+        max-width: 342px;
+        margin: 0;
+        padding: 0;
+        border-color: #d8dee0;
+        background: none;
+        overflow: hidden;
+    }
+    .cui-popover-arrow {
+        background: white;
+    }
+    .cui-list-item {
+        padding: 11px;
+    }
+    .no-notifications {
+        list-style: none;
+        text-align: center;
+        padding-top: 230px;
+        color: #546e7d;
+        font-weight: 600;
     }
 }

@@ -1,6 +1,5 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories, ProposalType } from '../../shared/types';
-import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -8,7 +7,17 @@ import { getProposalUrl } from '../../shared/utils';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createThread = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export const Errors = {
+  ForumMissingTitle: 'Forum posts must include a title',
+  QuestionMissingTitle: 'Questions must include a title',
+  RequestMissingTitle: 'Requests must include a title',
+  IncorrectNumberOfTags: 'Forum posts must have exactly one tag',
+  NoBodyOrAttachments: 'Forum posts must include body or attachment',
+  LinkMissingTitleOrUrl: 'Links must include a title and URL',
+  UnsupportedKind: 'Only forum threads, questions, and requests supported',
+};
+
+const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { title, body, kind, url, privacy, readOnly } = req.body;
@@ -26,37 +35,37 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
-      return next(new Error('Forum posts must include a title'));
+      return next(new Error(Errors.ForumMissingTitle));
     }
-    if (tags.length > 3) {
-      return next(new Error('Forum posts are allowed three tags max.'));
+    if (tags.length !== 1) {
+      return next(new Error(Errors.IncorrectNumberOfTags));
     }
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-      return next(new Error('Forum posts must include body or attachment'));
+      return next(new Error(Errors.NoBodyOrAttachments));
     }
     try {
       const quillDoc = JSON.parse(decodeURIComponent(body));
       if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === ''
           && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-        return next(new Error('Forum posts must include body or attachment'));
+        return next(new Error(Errors.NoBodyOrAttachments));
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
     }
   } else if (kind === 'question') {
     if (!title || !title.trim()) {
-      return next(new Error('Questions must include a title'));
+      return next(new Error(Errors.QuestionMissingTitle));
     }
   } else if (kind === 'request') {
     if (!title || !title.trim()) {
-      return next(new Error('Requests must include a title'));
+      return next(new Error(Errors.RequestMissingTitle));
     }
   } else if (kind === 'link') {
     if (!title || !title.trim() || !url) {
-      return next(new Error('Requests must include a title and URL'));
+      return next(new Error(Errors.LinkMissingTitleOrUrl));
     }
   } else {
-    return next(new Error('Only forum threads, questions, and requests supported'));
+    return next(new Error(Errors.UnsupportedKind));
   }
 
   // New threads get an empty version history initialized, which is passed
@@ -189,30 +198,29 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
       community: finalThread.community,
     },
     req.wss,
+    [ finalThread.Address.address ],
   );
 
   // grab mentions to notify tagged users
   let mentionedAddresses;
-  if (mentions?.length) {
-    try {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        mention = mention.split(',');
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      }));
-    } catch (err) {
-      log.error(err);
-    }
+  if (mentions?.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      const user = await models.Address.findOne({
+        where: {
+          chain: mention[0],
+          address: mention[1],
+        },
+        include: [ models.User, models.Role ]
+      });
+      return user;
+    }));
+    // filter null results
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
   // notify mentioned users, given permissions are in place
-  if (mentionedAddresses?.length) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
+  if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
     if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
     let shouldNotifyMentionedUser = true;
@@ -240,7 +248,8 @@ const createThread = async (models, req: UserRequest, res: Response, next: NextF
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.chain,
       },
-      req.wss
+      req.wss,
+      [ finalThread.Address.address ],
     );
   }));
 

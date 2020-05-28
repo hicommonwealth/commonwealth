@@ -63,7 +63,6 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
-import bulkProposals from './routes/bulkProposals';
 import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
 import deleteChainNode from './routes/deleteChainNode';
@@ -73,6 +72,7 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
+import createTag from './routes/createTag';
 import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
 import deleteTag from './routes/deleteTag';
@@ -90,6 +90,8 @@ import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 
+import bulkEntities from './routes/bulkEntities';
+
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
 
@@ -100,9 +102,6 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   router.post('/deleteAddress', passport.authenticate('jwt', { session: false }), deleteAddress.bind(this, models));
   router.post('/selectNode', passport.authenticate('jwt', { session: false }), selectNode.bind(this, models));
-
-  // proposals
-  router.get('/bulkProposals', bulkProposals.bind(this, models));
 
   // chains
   router.post('/addChainNode', passport.authenticate('jwt', { session: false }), addChainNode.bind(this, models));
@@ -129,10 +128,11 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/bulkComments', bulkComments.bind(this, models));
 
   // offchain tags
+  router.post('/createTag', passport.authenticate('jwt', { session: false }), createTag.bind(this, models));
   router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
   router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
   router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));
-  router.get('/bulkTags', passport.authenticate('jwt', { session: false }), bulkTags.bind(this, models));
+  router.get('/bulkTags', bulkTags.bind(this, models));
 
   // offchain reactions
   router.post('/createReaction', passport.authenticate('jwt', { session: false }), createReaction.bind(this, models));
@@ -235,6 +235,8 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   router.get('/edgewareLockdropLookup', edgewareLockdropLookup.bind(this, models));
   router.get('/edgewareLockdropStats', edgewareLockdropStats.bind(this, models));
+
+  router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   app.use('/api', router);
 }

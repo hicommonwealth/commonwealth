@@ -7,7 +7,7 @@ import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
 import {
-  AccountData, Balance, BalanceLock, BalanceLockTo212,
+  AccountData, Balance, BalanceLock, BalanceLockTo212, EraIndex,
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
@@ -111,31 +111,24 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       switchMap((api: ApiRx) => combineLatest(
         of(api),
         api.derive.staking.validators(),
+        api.query.staking.currentEra(),
       )),
 
       // fetch balances alongside validators
-      flatMap(([api, { nextElected, validators: currentSet }]: [ApiRx, DeriveStakingValidators]) => {
+      flatMap(([api, { nextElected, validators: currentSet }, era]: [ApiRx, DeriveStakingValidators, EraIndex]) => {
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
-        console.log(toBeElected);
-
-        // TODO: api.query.staking.stakers should be replaced with erasStakers as part of
-        //  Kusama staking API upgrade (which we have not implemented)
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = (api.query.staking.stakers) ? api.query.staking.stakers : api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) => (api.query.staking.stakers) ? account : [era.toString(), account];
         return combineLatest(
           of(currentSet),
           of(toBeElected),
-          api.queryMulti(currentSet.map(
-            (v) => [ api.query.staking.bonded, v.toString() ]
-          )),
-          api.queryMulti(currentSet.map(
-            (v) => [ api.query.staking.stakers, v.toString() ]
-          )),
-          api.queryMulti(toBeElected.map(
-            (v) => [ api.query.staking.bonded, v.toString() ]
-          )),
-          api.queryMulti(toBeElected.map(
-            (v) => [ api.query.staking.stakers, v.toString() ]
-          )),
+          api.query.staking.bonded.multi(currentSet.map((elt) => elt.toString())),
+          stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
+          api.query.staking.bonded.multi(toBeElected.map((elt) => elt.toString())),
+          stakersCall.multi(toBeElected.map((elt) => stakersCallArgs(elt.toString()))),
         );
       }),
       auditTime(100),
@@ -237,7 +230,21 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   // The amount staked by this account & accounts who have nominated it
   public get stakingExposure(): Observable<Exposure> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.query.staking.stakers(this.address)) as Observable<Exposure>;
+    return this._Chain.api.pipe(
+      switchMap((api: ApiRx) => combineLatest(
+        of(api),
+        api.query.staking.currentEra(),
+      )),
+      flatMap(([api, era]: [ApiRx, EraIndex]) => {
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = (api.query.staking.stakers)
+          ? api.query.staking.stakers
+          : api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) => (api.query.staking.stakers) ? [account] : [era.toString(), account];
+        return stakersCall(...stakersCallArgs(this.address));
+      })
+    ) as Observable<Exposure>;
   }
 
   public get bonded(): Observable<SubstrateAccount> {
@@ -387,9 +394,16 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   public get balanceTransferFee(): Observable<SubstrateCoin> {
     if (this.chainClass === ChainClass.Edgeware) {
       // grab const tx fee on edgeware
-      return this._Chain.api.pipe(
-        map((api: ApiRx) => this._Chain.coins(api.consts.balances.transferFee as Balance))
-      );
+      return from(this._Chain.api.pipe(map((api: ApiRx) => (api.consts.balances.transferFee as Balance)))
+        .toPromise()
+        .then((txFee) => {
+          if (txFee) {
+            return Promise.resolve(this._Chain.coins(txFee));
+          } else {
+            const dummyTxFunc = (api: ApiRx) => api.tx.balances.transfer(this.address, '0');
+            return this._Chain.computeFees(this.address, dummyTxFunc);
+          }
+        }));
     } else {
       // compute fee on Kusama
       const dummyTxFunc = (api: ApiRx) => api.tx.balances.transfer(this.address, '0');
@@ -511,29 +525,21 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  // Nickname module is not used by chains we are supporting now
-  //
-  // public get nickname(): Observable<string> {
-  //   if (!this._Chain?.apiInitialized) return;
-  //   return this._Chain.query((api: ApiRx) => api.derive.accounts.info(this.address))
-  //     .pipe(map((id: DeriveAccountInfo) => {
-  //       return id.nickname;
-  //     }));
-  // }
+  public claimNominatorPayoutTx(era, validators) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.staking.payoutNominator(era, validators),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
+    );
+  }
 
-  // public async setNickname(name: string): Promise<any> {
-  //   if (!this._Chain?.apiInitialized) return Promise.resolve();
-  //   // check if user has enough funds to register a nickname
-  //   const fundsAvailable = await this.canWithdraw(this._Chain.reservationFee, false);
-  //   if (!fundsAvailable) {
-  //     throw new Error('not enough liquid funds');
-  //   }
-
-  //   return this._Chain.createTXModalData(
-  //     this,
-  //     (api: ApiRx) => api.tx.nicks.setName(name),
-  //     'setName',
-  //     `set nickname to ${name}`
-  //   );
-  // }
+  public claimValidatorPayoutTx(era) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.staking.payoutValidator(era),
+      'unlock',
+      `${this.address} attempts to unlock from democracy`,
+    );
+  }
 }

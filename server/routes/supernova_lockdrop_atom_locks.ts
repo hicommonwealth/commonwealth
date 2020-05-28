@@ -1,9 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const supernovaLockdropATOMLocks = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const supernovaLockdropATOMLocks = async (models, req: Request, res: Response, next: NextFunction) => {
   const filters : any = {};
   if (req.query.address) filters.address =
     models.sequelize.where(models.sequelize.fn('LOWER', models.sequelize.col('address')),

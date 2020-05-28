@@ -1,14 +1,23 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from '../../shared/types';
-import { UserRequest } from '../types';
 
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
+import proposalIdToEntity from '../util/proposalIdToEntity';
+
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const createComment = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+export const Errors = {
+  MissingRootId: 'Must provide root_id',
+  InvalidParent: 'Invalid parent',
+  MissingTextOrAttachment: 'Must provide text or attachment',
+  ThreadNotFound: 'Cannot comment; thread not found',
+  CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
+};
+
+const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { parent_id, root_id, text } = req.body;
@@ -30,21 +39,21 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         chain: chain.id,
       }
     });
-    if (!parentCommentIsVisibleToUser) return next(new Error('Invalid parent'));
+    if (!parentCommentIsVisibleToUser) return next(new Error(Errors.InvalidParent));
   }
 
   if (!root_id) {
-    return next(new Error('Must provide root_id'));
+    return next(new Error(Errors.MissingRootId));
   }
   if ((!text || !text.trim())
       && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-    return next(new Error('Must provide text or attachment'));
+    return next(new Error(Errors.MissingTextOrAttachment));
   }
   try {
     const quillDoc = JSON.parse(decodeURIComponent(text));
     if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === ''
         && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-      return next(new Error('Must provide text or attachment'));
+      return next(new Error(Errors.MissingTextOrAttachment));
     }
   } catch (e) {
     // check always passes if the comment text isn't a Quill document
@@ -117,17 +126,19 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     proposal = await models.OffchainThread.findOne({
       where: { id }
     });
-  } else if (prefix.includes('proposal') || prefix.includes('referendum')) {
-    proposal = await models.Proposal.findOne({
-      where: { identifier: id, type: prefix }
-    });
+  } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    proposal = await proposalIdToEntity(models, chain.id, finalComment.root_id);
   } else {
     log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
   }
 
-  if (!proposal || proposal.read_only) {
+  if (!proposal) {
     await finalComment.destroy();
-    return next(new Error('Cannot comment when thread is read_only'));
+    return next(new Error(Errors.ThreadNotFound));
+  }
+  if (proposal.read_only) {
+    await finalComment.destroy();
+    return next(new Error(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
@@ -150,22 +161,20 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
 
   // grab mentions to notify tagged users
   let mentionedAddresses;
-  if (mentions && mentions.length) {
-    try {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        mention = mention.split(',');
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      }));
-    } catch (err) {
-      log.error(err);
-    }
+  if (mentions && mentions.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      const user = await models.Address.findOne({
+        where: {
+          chain: mention[0],
+          address: mention[1],
+        },
+        include: [ models.User, models.Role ]
+      });
+      return user;
+    }));
+
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
   // dispatch notifications to root thread
@@ -175,7 +184,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
     root_id,
     {
       created_at: new Date(),
-      root_id: Number(proposal.id),
+      root_id: proposal.type_id || proposal.id,
       root_title: proposal.title || '',
       root_type: prefix,
       comment_id: Number(finalComment.id),
@@ -193,6 +202,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       community: finalComment.community,
     },
     req.wss,
+    [ finalComment.Address.address ],
   );
 
   // if child comment, dispatch notification to parent author
@@ -203,7 +213,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
       `comment-${parent_id}`,
       {
         created_at: new Date(),
-        root_id: Number(proposal.id),
+        root_id: proposal.type_id || proposal.id,
         root_title: proposal.title || '',
         root_type: prefix,
         comment_id: Number(finalComment.id),
@@ -223,11 +233,12 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         community: finalComment.community,
       },
       req.wss,
+      [ finalComment.Address.address ],
     );
   }
 
   // notify mentioned users if they have permission to view the originating forum
-  if (mentionedAddresses?.length) {
+  if (mentionedAddresses?.length > 0) {
     await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
@@ -248,7 +259,7 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
         `user-${mentionedAddress.User.id}`,
         {
           created_at: new Date(),
-          root_id: Number(proposal.id),
+          root_id: proposal.type_id || proposal.id,
           root_title: proposal.title || '',
           root_type: prefix,
           comment_id: Number(finalComment.id),
@@ -258,7 +269,9 @@ const createComment = async (models, req: UserRequest, res: Response, next: Next
           author_address: finalComment.Address.address,
           author_chain: finalComment.Address.chain,
         },
-        req.wss
+        { }, // TODO: add webhook data for mentions
+        req.wss,
+        [ finalComment.Address.address ],
       );
     }));
   }

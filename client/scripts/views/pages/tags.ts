@@ -12,7 +12,7 @@ import TagSelector from 'views/components/sidebar/tag_selector';
 const TagsPage = {
   view: (vnode) => {
     return m('.TagsPage', [
-      m(TagSelector, { activeTag: null, showFullListing: true }),
+      m(TagSelector, { activeTag: null, showFullListing: true, hideEditButton: false }),
     ]);
   },
 };

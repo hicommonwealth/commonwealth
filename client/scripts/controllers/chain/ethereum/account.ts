@@ -4,10 +4,10 @@ import { Wallet } from 'ethereumjs-wallet';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 import { IApp } from 'state';
-import { formatCoin, Coin } from 'shared/adapters/currency';
+import { formatCoin, Coin } from 'adapters/currency';
 import { Account, IAccountsModule, ITXModalData } from 'models';
 import { AccountsStore } from 'stores';
-import { EthereumCoin } from 'shared/adapters/chain/ethereum/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import EthereumChain from './chain';
 import { toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex, ecsign, toRpcSig } from 'ethereumjs-util';

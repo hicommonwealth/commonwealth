@@ -1,14 +1,14 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Tooltip, Button, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
+import { Tooltip, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass } from 'models';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import NewProposalModal from 'views/modals/proposals';
+import NewThreadModal from 'views/modals/new_thread_modal';
 
 const NewProposalButton: m.Component<{ fluid: boolean }> = {
   view: (vnode) => {
@@ -16,90 +16,89 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     const fluid = !!vnode.attrs.fluid;
 
     if (!app.isLoggedIn()) return;
+    if (!app.chain && !app.community) return;
+    if (!app.activeId()) return;
 
     // just a button for communities, or chains without governance
     if (app.community) {
-      return m(Button, {
+      const CommunityButton = m(Button, {
         class: 'NewProposalButton',
         label: 'New post',
         iconLeft: Icons.PLUS,
-        size: 'sm',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+        onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
+      return activeAccount
+        ? CommunityButton
+        : m(Tooltip, {
+          content: 'Link an address to post',
+          trigger: CommunityButton
+        });
     }
 
-    // a button with popover menu for chains
-    return m(PopoverMenu, {
-      class: 'NewProposalButton',
-      transitionDuration: 0,
-      trigger: activeAccount ? m(Button, {
-        iconLeft: Icons.CHEVRON_DOWN,
-        label: 'New post',
-        size: 'sm',
+    const ProposalButtonGroup = m(ButtonGroup, [
+      m(Button, {
+        disabled: !activeAccount,
         intent: 'primary',
+        label: 'New post',
         fluid,
-      }) : m(Tooltip, {
-        content: 'Link an address to post',
-        trigger: m(Button, {
-          iconLeft: Icons.CHEVRON_DOWN,
-          size: 'xs',
-          intent: 'primary',
-          class: 'cui-disabled',
-          style: 'cursor: pointer !important',
-          fluid,
-        }),
+        onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
-      position: 'bottom-end',
-      closeOnContentClick: true,
-      menuAttrs: {
-        align: 'left',
-      },
-      content: [
-        app.activeId() && m(MenuItem, {
-          onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
-          label: 'New thread',
+      m(PopoverMenu, {
+        class: 'NewProposalButton',
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        trigger: m(Button, {
+          disabled: !activeAccount,
+          iconLeft: Icons.CHEVRON_DOWN,
+          intent: 'primary',
         }),
+        position: 'bottom-end',
+        closeOnContentClick: true,
+        menuAttrs: {
+          align: 'left',
+        },
+        content: [
+          m(MenuItem, {
+            onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
+            label: 'New post',
+          }),
+          (activeAccount instanceof CosmosAccount || activeAccount instanceof SubstrateAccount)
+            && m(MenuDivider),
+          activeAccount instanceof CosmosAccount && m(MenuItem, {
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
+            label: 'New proposal'
+          }),
+          activeAccount instanceof SubstrateAccount && activeAccount.chainClass === ChainClass.Edgeware && m(MenuItem, {
+            onclick: () => { m.route.set(`/${activeAccount.chain.id}/new/signaling`); },
+            label: 'New signaling proposal'
+          }),
+          activeAccount instanceof SubstrateAccount && m(MenuItem, {
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateTreasuryProposal }),
+            label: 'New treasury proposal'
+          }),
+          activeAccount instanceof SubstrateAccount && m(MenuItem, {
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateDemocracyProposal }),
+            label: 'New democracy proposal'
+          }),
+          activeAccount instanceof SubstrateAccount && m(MenuItem, {
+            class: activeAccount.isCouncillor ? '' : 'disabled',
+            onclick: (e) => m.route.set(`/${activeAccount.chain.id}/new/proposal/:type`, { type: ProposalType.SubstrateCollectiveProposal }),
+            label: 'New council motion'
+          }),
+        ],
+      }),
+    ]);
 
-        m(MenuDivider),
-        activeAccount instanceof CosmosAccount && m(MenuItem, {
-          onclick: (e) => app.modals.create({
-            modal: NewProposalModal,
-            data: { typeEnum: ProposalType.CosmosProposal }
-          }),
-          label: 'New proposal'
-        }),
-        activeAccount instanceof SubstrateAccount && activeAccount.chainClass === ChainClass.Edgeware && m(MenuItem, {
-          onclick: () => { m.route.set(`/${activeAccount.chain.id}/new/signaling`); },
-          label: 'New signaling proposal'
-        }),
-
-        activeAccount instanceof SubstrateAccount && m(MenuItem, {
-          onclick: (e) => app.modals.create({
-            modal: NewProposalModal,
-            data: { typeEnum: ProposalType.SubstrateTreasuryProposal }
-          }),
-          label: 'New treasury proposal'
-        }),
-        activeAccount instanceof SubstrateAccount && m(MenuItem, {
-          onclick: (e) => app.modals.create({
-            modal: NewProposalModal,
-            data: { typeEnum: ProposalType.SubstrateDemocracyProposal }
-          }),
-          label: 'New democracy proposal'
-        }),
-        activeAccount instanceof SubstrateAccount && m(MenuItem, {
-          class: activeAccount.isCouncillor ? '' : 'disabled',
-          onclick: (e) => app.modals.create({
-            modal: NewProposalModal,
-            data: { typeEnum: ProposalType.SubstrateCollectiveProposal }
-          }),
-          label: 'New council motion'
-        }),
-      ],
-    });
+    // a button with popover menu for chains
+    return activeAccount
+      ? ProposalButtonGroup
+      : m(Tooltip, {
+        content: 'Link an address to post',
+        trigger: ProposalButtonGroup
+      });
   }
 };
 

@@ -132,14 +132,14 @@ const MembershipButton: m.Component<{
             }
           }),
         ],
-        menuAttrs: { size: 'xs' },
+        menuAttrs: { size: 'sm' },
         trigger: m(Button, {
           class: 'MembershipButton',
           disabled: vnode.state.loading,
           intent: hasAnyExistingRole ? 'primary' : 'none',
           iconLeft: Icons.CHEVRON_DOWN,
           label: hasAnyExistingRole ? 'Joined' : 'Join',
-          size: 'xs',
+          size: 'sm',
         }),
       });
     }
@@ -151,7 +151,7 @@ const MembershipButton: m.Component<{
       intent: hasAnyExistingRole ? 'primary' : 'none',
       iconLeft: Icons.CHECK,
       label: hasAnyExistingRole ? 'Joined' : 'Join',
-      size: 'xs',
+      size: 'sm',
     });
   },
 };

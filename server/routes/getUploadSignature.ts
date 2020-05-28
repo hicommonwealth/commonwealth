@@ -1,8 +1,7 @@
 import AWS from 'aws-sdk';
 import uuidv4 from 'uuid/v4';
 
-import { Response, NextFunction } from 'express';
-import { UserRequest } from '../types';
+import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -10,7 +9,7 @@ AWS.config.update({
   signatureVersion: 'v4'
 });
 
-const getUploadSignature = async (models, req: UserRequest, res: Response, next: NextFunction) => {
+const getUploadSignature = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error('Must be logged in'));
   }

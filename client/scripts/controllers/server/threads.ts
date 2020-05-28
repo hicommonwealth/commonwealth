@@ -22,6 +22,7 @@ const modelFromServer = (thread) => {
     thread.kind,
     thread.version_history,
     thread.community,
+    thread.chain,
     thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
@@ -103,8 +104,8 @@ class ThreadsController {
     privacy?: boolean
   ) {
     const newBody = body || proposal.body;
-    const newReadOnly = readOnly || false;
-    const newPrivacy = privacy || false;
+    const newReadOnly = readOnly || proposal.readOnly;
+    const newPrivacy = privacy || proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
 

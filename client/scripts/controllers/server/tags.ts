@@ -62,6 +62,30 @@ class TagsController {
     }
   }
 
+  public async add(name: string,) {
+    try {
+      const chainOrCommObj = (app.activeChainId())
+        ? { 'chain': app.activeChainId() }
+        : { 'community': app.activeCommunityId() };
+      const response = await $.post(`${app.serverUrl()}/createTag`, {
+        ...chainOrCommObj,
+        'name': name,
+        'jwt': app.login.jwt,
+      });
+      const result = modelFromServer(response.result);
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+      this._store.add(result);
+      return result;
+    } catch (err) {
+      console.log('Failed to edit tag');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to edit tag');
+    }
+  }
+
   public async remove(tag) {
     try {
       const response = await $.post(`${app.serverUrl()}/deleteTag`, {
@@ -79,14 +103,12 @@ class TagsController {
     }
   }
 
-  public async refreshAll(communityId?, chainId?, reset = false) {
+  public async refreshAll(chainId, communityId, reset = false) {
     try {
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
-        chain: chainId,
-        community: communityId,
-        jwt: app.login.jwt,
+        chain: chainId || app.activeChainId(),
+        community: communityId || app.activeCommunityId(),
       });
-      console.log(response.result);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -95,7 +117,6 @@ class TagsController {
       }
       const tags = (app.chain) ? response.result.filter((tag) => !tag.communityId) : response.result;
       tags.forEach((t) => this._store.add(modelFromServer(t)));
-      console.log(this._store);
       this._initialized = true;
     } catch (err) {
       console.log('Failed to load offchain tags');

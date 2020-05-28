@@ -11,7 +11,7 @@
 
 .ProposalHeader {
     .proposal-header {
-        padding: $padding $gutter;
+        padding: $padding-top $gutter $padding;
     }
     .proposal-body {
         padding: $padding $gutter ($padding + 6px);
@@ -25,6 +25,7 @@
 
 
     // proposal-tags
+    .ProposalHeaderCaretMenu,
     .ProposalHeaderTags {
         display: inline-block;
         font-size: 14px;
@@ -33,6 +34,7 @@
             top: -1px;
         }
         a {
+            cursor: pointer;
             color: #888;
             text-decoration: none;
             margin-right: 10px;

@@ -4,7 +4,7 @@ import 'components/sidebar/tag_selector.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import dragula from 'dragula';
-import { List, ListItem, Button, Icon, Icons } from 'construct-ui';
+import { List, ListItem, Button, EmptyState, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { link, pluralize } from 'helpers';
@@ -13,6 +13,59 @@ import { OffchainThreadKind } from 'models';
 import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
+import { inputModalWithText } from '../../modals/input_modal';
+
+
+interface IEditTagForm {
+  description: string,
+  featured: boolean,
+  id: number,
+  name: string,
+}
+
+const ToggleFeaturedTagButton: m.Component<{
+  id, description, featured, name, addFeaturedTag, removeFeaturedTag
+}, {form: IEditTagForm}> = {
+  view: (vnode) => {
+    if (!isCommunityAdmin()) return null;
+    const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
+
+    vnode.state.form = { description, id, name, featured };
+
+    const updateTag = async (form) => {
+      const tagInfo = {
+        id,
+        description: form.description,
+        featured: form.featured,
+        name: form.name,
+        communityId: app.activeCommunityId(),
+        chainId: app.activeChainId(),
+      };
+
+      if (form.featured) {
+        addFeaturedTag(`${id}`);
+      } else {
+        removeFeaturedTag(`${id}`);
+      }
+      await app.tags.edit(tagInfo, form.featured);
+
+      m.redraw();
+    };
+
+    return m(Button, {
+      defaultChecked: vnode.state.form.featured,
+      class: 'ToggleFeaturedTagButton',
+      label: vnode.state.form.featured ? 'Unpin' : 'Pin to sidebar',
+      iconLeft: vnode.state.form.featured ? null : Icons.STAR,
+      size: 'xs',
+      onclick: async (e) => {
+        e.preventDefault();
+        vnode.state.form.featured = !vnode.state.form.featured;
+        await updateTag(vnode.state.form);
+      },
+    });
+  },
+};
 
 interface ITagRowAttrs {
   count: number,
@@ -50,7 +103,9 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
         m('span.tag-name', name),
       ],
       contentRight: [
-        !hideEditButton && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton && count && m('.tag-count', pluralize(count, 'post')),
+        !hideEditButton
+          && m(ToggleFeaturedTagButton, { description, featured, id, name, addFeaturedTag, removeFeaturedTag }),
         !hideEditButton && isCommunityAdmin() && m(Button, {
           class: 'edit-button',
           size: 'xs',
@@ -123,6 +178,27 @@ export const getTagListing = (params: IGetTagListingParams) => {
     });
   });
 
+  const threadlessTags = app.tags.getByCommunity(app.activeId()).forEach((tag) => {
+    if (featuredTagIds.includes(`${tag.id}`)) {
+      if (!featuredTags[`${tag.name}`]) {
+        featuredTags[tag.name] = {
+          count: null,
+          description: tag.description,
+          featured_order: featuredTagIds.indexOf(`${tag.id}`),
+          id: tag.id,
+          name: tag.name,
+        };
+      }
+    } else if (!otherTags[tag.name]) {
+      otherTags[tag.name] = {
+        count: null,
+        description: tag.description,
+        id: tag.id,
+        name: tag.name,
+      };
+    }
+  });
+
   const otherTagListing = Object.keys(otherTags)
     .sort((a, b) => otherTags[b].count - otherTags[a].count)
     .map((name, idx) => m(TagRow, {
@@ -153,6 +229,23 @@ export const getTagListing = (params: IGetTagListingParams) => {
     : [];
 
   return ({ featuredTagListing, otherTagListing });
+};
+
+const NewTagButton: m.Component = {
+  view: (vnode) => {
+    return m(Button, {
+      class: '',
+      label: 'Create New Tag',
+      iconLeft: Icons.PLUS,
+      onclick: async (e) => {
+        e.preventDefault();
+        if (!isCommunityAdmin()) return;
+        const tag = await inputModalWithText('New Tag:')();
+        if (!tag) return;
+        app.tags.add(tag).then(() => { m.redraw(); });
+      },
+    });
+  },
 };
 
 const TagSelector: m.Component<{
@@ -198,16 +291,22 @@ const TagSelector: m.Component<{
       }, featuredTagListing),
       showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
+      showFullListing && isCommunityAdmin() && m(NewTagButton),
       !showFullListing
         && (app.community || app.chain)
         && m(List, [
           m(ListItem, {
             class: 'TagRow',
             active: m.route.get() === `/${app.activeId()}/tags/`,
-            label: 'Browse tags',
+            label: 'All tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
+            contentLeft: m(Icon, { name: Icons.HASH }),
           }),
+        ]),
+      // This placeholder module should only be shown in the sidebar
+      !showFullListing
+        && m('.no-tags-placeholder', [
+          'The community manager has not selected any tags for the sidebar',
         ]),
     ]);
   },
