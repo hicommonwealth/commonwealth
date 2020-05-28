@@ -5,38 +5,12 @@
         margin: 12px 0;
         font-size: 18px;
     }
-    .cui-input {
-        margin: 12px 0;
+    .form-divider {
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 5px;
     }
-    .cui-button {
-        margin: 2px 0;
-    }
-
-    // web3 login button with icon for NEAR
-    .login-button-black {
-        background: #444;
-        color: #fff;
-        box-shadow: none !important;
-        border: none !important;
-        &:hover, &:focus {
-            background: #222;
-        }
-    }
-    .more-options {
-        margin-top: 24px;
-        margin-bottom: -12px;
-        a {
-            color: #777;
-            text-decoration: none;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-    }
-    img.login-wallet-icon {
-        width: 15px;
-        display: inline-block;
-        margin: -3px 0;
-        margin-right: 10px;
+    .cui-form .cui-form-group {
+        margin-top: 8px;
     }
 }

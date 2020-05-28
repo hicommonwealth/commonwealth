@@ -1,10 +1,10 @@
 import 'components/login.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 import { WalletAccount } from 'nearlib';
-import { Button, Input, Icons } from 'construct-ui';
+import { Button, Input, Icons, Form, FormGroup } from 'construct-ui';
 
 import app from 'state';
 import { ChainBase } from 'models';
@@ -14,6 +14,7 @@ import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 interface IAttrs {
   creatingAccount?: boolean;
+  hideHeader?: boolean;
 }
 
 interface IState {
@@ -26,7 +27,7 @@ interface IState {
 
 const Login: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const creatingAccount = !!vnode.attrs.creatingAccount;
+    const { hideHeader, creatingAccount } = vnode.attrs;
 
     if (app.chain && app.chain.base === ChainBase.NEAR && !vnode.state.forceRegularLogin) {
       return m('.Login', {
@@ -34,7 +35,7 @@ const Login: m.Component<IAttrs, IState> = {
           e.stopPropagation();
         }
       }, [
-        m('h4', 'Log in or sign up'),
+        !hideHeader && m('h4', 'Log in or sign up'),
         m(Button, {
           class: 'login-button-black',
           onclick: (e) => {
@@ -79,91 +80,102 @@ const Login: m.Component<IAttrs, IState> = {
         e.stopPropagation();
       }
     }, [
-      m('h4', creatingAccount ? 'Create account' : 'Log in or create account'),
-      m('form.login-option', [
-        m(Input, {
-          fluid: true,
-          name: 'email',
-          placeholder: 'Email',
-          autocomplete: 'off',
-          onclick: (e) => {
-            e.stopPropagation();
-          },
-          oncreate: (vvnode) => {
-            $(vvnode.dom).focus();
-          }
-        }),
-        m(Button, {
-          intent: 'positive',
-          fluid: true,
-          disabled: vnode.state.disabled,
-          type: 'submit',
-          onclick: (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const email = $(vnode.dom).find('[name="email"]').val().toString();
-            const path = m.route.get();
-            if (!email) return;
-            vnode.state.disabled = true;
-            vnode.state.success = false;
-            vnode.state.failure = false;
-            $.post(`${app.serverUrl()}/login`, { email, path }).then((response) => {
-              vnode.state.disabled = false;
-              if (response.status === 'Success') {
-                vnode.state.success = true;
-              } else {
-                vnode.state.failure = true;
-                vnode.state.error = response.message;
-              }
-              m.redraw();
-            }).catch((err: any) => {
-              vnode.state.disabled = false;
-              vnode.state.failure = true;
-              vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
-              m.redraw();
-            });
-          },
-          label: creatingAccount
-            ? (vnode.state.disabled ? 'Creating account...' : 'Sign up')
-            : (vnode.state.disabled ? 'Logging in...' : 'Log in with email')
-        }),
-        vnode.state.success && m('.login-message.success', [
-          creatingAccount
-            ? 'Check your email to finish creating your account.'
-            : 'Check your email to finish logging in.'
+      !hideHeader && m('h4', creatingAccount ? 'Create account' : 'Log in or create account'),
+      m(Form, { gutter: 10 }, [
+        m(FormGroup, { span: 9 }, [
+          m(Input, {
+            fluid: true,
+            name: 'email',
+            placeholder: 'Email',
+            autocomplete: 'off',
+            onclick: (e) => {
+              e.stopPropagation();
+            },
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
+            }
+          }),
         ]),
-        vnode.state.failure && m('.login-message.failure', [
-          vnode.state.error || 'An error occurred.'
+        m(FormGroup, { span: 3 }, [
+          m(Button, {
+            intent: 'primary',
+            fluid: true,
+            disabled: vnode.state.disabled,
+            type: 'submit',
+            onclick: (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const email = $(vnode.dom).find('[name="email"]').val().toString();
+              const path = m.route.get();
+              if (!email) return;
+              vnode.state.disabled = true;
+              vnode.state.success = false;
+              vnode.state.failure = false;
+              $.post(`${app.serverUrl()}/login`, { email, path }).then((response) => {
+                vnode.state.disabled = false;
+                if (response.status === 'Success') {
+                  vnode.state.success = true;
+                } else {
+                  vnode.state.failure = true;
+                  vnode.state.error = response.message;
+                }
+                m.redraw();
+              }).catch((err: any) => {
+                vnode.state.disabled = false;
+                vnode.state.failure = true;
+                vnode.state.error = (err && err.responseJSON && err.responseJSON.error) || err.statusText;
+                m.redraw();
+              });
+            },
+            label: creatingAccount
+              ? (vnode.state.disabled ? 'Creating account...' : 'Sign up')
+              : (vnode.state.disabled ? 'Logging in...' : 'Log in')
+          }),
+        ])
+      ]),
+      vnode.state.success && m('.login-message.success', [
+        creatingAccount
+          ? 'Check your email to finish creating your account.'
+          : 'Check your email to finish logging in.'
+      ]),
+      vnode.state.failure && m('.login-message.failure', [
+        vnode.state.error || 'An error occurred.'
+      ]),
+
+      m('.form-divider', 'or'),
+      m(Form, { gutter: 10 }, [
+        m(FormGroup, { span: 12 }, [
+          m(Button, {
+            intent: 'primary',
+            fluid: true,
+            href: `${app.serverUrl()}/auth/github`,
+            onclick: (e) => {
+              localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
+                timestamp: (+new Date()).toString(),
+                path: m.route.get()
+              }));
+            },
+            label: creatingAccount ? 'Sign up with Github' : 'Log in with Github'
+          }),
         ]),
       ]),
-      m('form.login-option', [
-        m(Button, {
-          intent: 'primary',
-          fluid: true,
-          href: `${app.serverUrl()}/auth/github`,
-          class: 'login-button-black',
-          onclick: (e) => {
-            localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
-              timestamp: (+new Date()).toString(),
-              path: m.route.get()
-            }));
-          },
-          label: creatingAccount ? 'Sign up with Github' : 'Log in with Github'
-        }),
-        m(Button, {
-          intent: 'primary',
-          fluid: true,
-          class: 'login-button-black login-with-web3',
-          onclick: (e) => {
-            e.preventDefault();
-            $(e.target).trigger('menuclose');
-            app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
-          },
-          label: creatingAccount
-            ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`
-            : `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
-        }),
-      ])
+      m(Form, { gutter: 10 }, [
+        m(FormGroup, { span: 12 }, [
+          m(Button, {
+            intent: 'primary',
+            fluid: true,
+            class: 'login-with-web3',
+            onclick: (e) => {
+              e.preventDefault();
+              $(e.target).trigger('menuclose');
+              app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
+            },
+            label: creatingAccount
+              ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`
+              : `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
+          }),
+        ]),
+      ]),
     ]);
   },
 };
