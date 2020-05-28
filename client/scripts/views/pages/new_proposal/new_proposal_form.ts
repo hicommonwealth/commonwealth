@@ -305,6 +305,8 @@ const NewProposalForm = {
       });
     }
 
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
     return m('.NewProposalForm', [
       m(Grid, [
         m(Col, { span }, [
@@ -329,7 +331,8 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTags
             && m(AutoCompleteTagForm, {
-              results: activeEntity.meta.tags || [],
+              results: activeEntityInfo.tags || [],
+              featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tags: string[]) => {
                 vnode.state.form.tags = tags;
               },

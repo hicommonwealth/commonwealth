@@ -7,6 +7,7 @@ import { AutoCompleteForm } from './autocomplete_input';
 
 interface IAutoCompleteTagFormAttrs {
   results: any;
+  featuredTags;
   updateFormData?: CallableFunction;
   updateParentErrors: CallableFunction;
   tabindex?: number;
@@ -100,13 +101,13 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         : results.slice(0, Math.min(10, results.length));
       return truncatedResults;
     };
-
     return m('.AutoCompleteTagForm', [
       m('.top-wrap', [
         m('.left-panel', [
           m(AutoCompleteForm, {
             placeholder: 'Select a category',
-            results: vnode.attrs.results || [],
+            results: vnode.attrs.results,
+            featuredTags: vnode.attrs.featuredTags,
             applyDefaultHandler: true,
             onChangeHandler,
             rowComponentFunc,

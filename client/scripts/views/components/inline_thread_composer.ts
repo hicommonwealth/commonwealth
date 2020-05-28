@@ -38,7 +38,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     if (!form) vnode.state.form = { title, url };
     else if (!autoTitleOverride) vnode.state.form = Object.assign(form, { title, url });
     else Object.assign(vnode.state.form, { url });
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
     if (title === '404: Not Found' || title === '500: Server Error') {
       vnode.state.error.url = title;
@@ -96,7 +96,8 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         onkeyboardSubmit: createLink,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntity.meta.tags || [],
+        results: activeEntityInfo.tags || [],
+        featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
         updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
@@ -158,7 +159,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
     const { closed } = vnode.state;
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (!vnode.state.error) vnode.state.error = {};
     if (closed) return null;
     vnode.state.form = vnode.state.form ? Object.assign(vnode.state.form, { title }) : { title };
@@ -185,7 +186,8 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         onkeyboardSubmit: createThread,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntity.meta.tags || [],
+        results: activeEntityInfo.tags || [],
+        featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
         updateFormData: (tags: string[]) => {
           vnode.state.form.tags = tags;
         },

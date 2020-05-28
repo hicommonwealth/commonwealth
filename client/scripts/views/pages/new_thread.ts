@@ -35,6 +35,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
   view: (vnode) => {
     const author = app.vm.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
 
     // init
     if (vnode.state.form === undefined) vnode.state.form = {};
@@ -121,7 +123,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
+            results: activeEntityInfo.tags || [],
+            featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
             updateFormData: (tags: string[]) => {
               vnode.state.form.tags = tags;
             },
@@ -180,7 +183,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
+            results: activeEntityInfo.tags || [],
+            featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
             updateFormData: (tags: string[]) => {
               vnode.state.form.tags = tags;
             },

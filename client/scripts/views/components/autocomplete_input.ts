@@ -3,6 +3,7 @@ import { TextInputFormField } from './forms';
 
 export interface IAutoCompleteFormAttrs {
   results: any[];
+  featuredTags?: any[];
   title?: string;
   placeholder: string;
   applyDefaultHandler?: boolean;
@@ -75,7 +76,7 @@ export const AutoCompleteForm: m.Component<IAutoCompleteFormAttrs, IAutoComplete
   view: (vnode) => m(AutoCompletePureForm, {
     title: vnode.attrs.title,
     placeholder: vnode.attrs.placeholder,
-    results: vnode.state.filteredResults || [],
+    results: vnode.state.filteredResults || vnode.attrs.featuredTags,
     onChangeHandler: (result) => {
       // pass in a change handler that does a modified autocomplete
       if (vnode.attrs.onChangeHandler) vnode.state.filteredResults = vnode.attrs.onChangeHandler(result) || [];
