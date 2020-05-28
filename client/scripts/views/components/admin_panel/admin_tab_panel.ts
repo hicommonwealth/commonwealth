@@ -2,7 +2,7 @@ import m from 'mithril';
 
 import { Tabs, TabItem } from 'construct-ui';
 import UpgradeRolesForm from './upgrade_roles_form';
-import WebhooksTab from './webhooks_tab';
+import WebhooksForm from './webhooks_form';
 
 interface IAdminTabPanelAttrs {
   defaultTab: number;
@@ -39,7 +39,7 @@ const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
           onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
         }),
       (vnode.state.index === 2) &&
-        m(WebhooksTab, { webhooks: vnode.attrs.webhooks }),
+        m(WebhooksForm, { webhooks: vnode.attrs.webhooks }),
     ]);
   },
 };

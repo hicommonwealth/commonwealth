@@ -140,11 +140,4 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
   }
 };
 
-const WebhooksTab: m.Component<{webhooks: IWebhookData[]}> = {
-  view: (vnode) => {
-    const { webhooks } = vnode.attrs;
-    return m(WebhooksForm, { webhooks });
-  }
-};
-
-export default WebhooksTab;
+export default WebhooksForm;
