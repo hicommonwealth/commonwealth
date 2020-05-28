@@ -186,10 +186,10 @@ class CommentsController {
         chain: chainId,
         community: communityId,
       };
-      if (CommentRefreshOption.ResetAndLoadOffchainComments) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;
       }
-      if (CommentRefreshOption.LoadProposalComments) {
+      if (reset === CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
