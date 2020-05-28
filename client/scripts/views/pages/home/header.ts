@@ -12,10 +12,10 @@ const HomepageHeader = {
       m(Grid, [
         m(Col, { span: 5, class: 'header-col-left' }, [
           m('h1', 'Commonwealth'),
-          m('h3', 'The all-in-one platform for decentralized communities'),
+          m('h3', 'Discuss, fund, and grow decentralized communities'),
           m('p.lead-copy', [
-            'Commonwealth is an open-source platform for decentralized communities ',
-            'to chat together, plan initiatives, and fund community growth.'
+            'Commonwealth is an open-source platform for communities ',
+            'to chat together, plan initiatives, and fund community growth'
           ]),
           m(Form, { gutter: 10 }, [
             m(FormGroup, { span: 9 }, [
