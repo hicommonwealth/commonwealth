@@ -41,7 +41,7 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag'],
         kind: 'forum',
       });
       expect(res2.result).to.not.be.null;
@@ -59,7 +59,7 @@ describe('Tag Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.length).to.be.equal(3);
+      expect(res.body.result.length).to.be.equal(1);
     });
   });
 

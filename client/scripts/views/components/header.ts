@@ -22,7 +22,10 @@ const Header: m.Component<{}> = {
     return m('.Header', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
     }, [
-      m('.placeholder'),
+      (app.chain || app.community) && m('.placeholder', [
+        m('h4', app.chain ? app.chain.meta?.chain?.name : app.community.meta.name),
+        m('.subtitle', app.chain ? app.chain.meta?.chain?.description : app.community.meta.description),
+      ]),
       // new proposal
       m(NewProposalButton, { fluid: false }),
       // notifications menu

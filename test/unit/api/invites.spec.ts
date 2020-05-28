@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
 import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
 import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
+import { Errors as CreateInviteLinkErrors } from 'server/routes/createInviteLink';
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
@@ -400,6 +401,60 @@ describe('Invite Tests', () => {
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(AcceptInviteErrors.NoInviteCodeFound(''));
     });
+
+    it('should fail to accept invite with invalid address', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedEmail: userEmail,
+          community,
+          address: adminAddress,
+        });
+      expect(invite.body.status).to.be.equal('Success');
+      const res = await chai.request(app)
+        .post('/api/acceptInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          reject: false,
+          inviteCode: invite.body.result.id,
+          address: '1234',
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(AcceptInviteErrors.NoAddressFound('1234'));
+    });
+
+    it('should successfully reject an invite', async () => {
+      if (!process.env.SENDGRID_API_KEY) return;
+
+      const invite = await chai.request(app)
+        .post('/api/createInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: adminJWT,
+          invitedEmail: userEmail,
+          community,
+          address: adminAddress,
+        });
+      expect(invite.body.status).to.be.equal('Success');
+      const res = await chai.request(app)
+        .post('/api/acceptInvite')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: userJWT,
+          reject: 'true',
+          inviteCode: invite.body.result.id,
+          address: userAddress,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.used).to.be.true;
+      expect(res.body.result.community_id).to.be.equal(community);
+      expect(res.body.result.invited_email).to.be.equal(userEmail);
+    });
   });
 
   describe('/createInviteLink', () => {
@@ -436,5 +491,83 @@ describe('Invite Tests', () => {
       expect(res.body.result.multi_use).to.be.null;
       expect(res.body.result.active).to.be.true;
     });
+
+    it('should fail to create an invite link without a community', async () => {
+      const res = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          time: 'none',
+          uses: 'none',
+          jwt: userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.NoCommunityId);
+    });
+
+    it('should fail to create an invite link without a time', async () => {
+      const res = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          community_id: community,
+          uses: 'none',
+          jwt: userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.NoTimeLimit);
+    });
+
+    it('should fail to create an invite link without uses', async () => {
+      const res = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          community_id: community,
+          time: 'none',
+          jwt: userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
+    });
+
+    it('should fail to create an invite link with invalid uses', async () => {
+      const res = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          community_id: community,
+          time: 'none',
+          uses: 'hello',
+          jwt: userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(CreateInviteLinkErrors.InvalidUses);
+    });
+
+    it('should fail to create a new forever invite link if one already exists', async () => {
+      const res = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          community_id: community,
+          time: 'none',
+          uses: 'none',
+          jwt: userJWT,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      const res2 = await chai.request(app)
+        .post('/api/createInviteLink')
+        .set('Accept', 'application/json')
+        .send({
+          community_id: community,
+          time: 'none',
+          uses: 'none',
+          jwt: userJWT,
+        });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.id).to.be.equal(res2.body.result.id);
+    });
+
   });
 });
