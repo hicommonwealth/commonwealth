@@ -79,17 +79,25 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
   }
 };
 
-const LinkCard = {
+const LockdropToolsCard = {
   view: (vnode) => {
-    return m('.home-card', [
-      m('h3', vnode.attrs.title),
+    return m('.LockdropToolsCard.home-card', [
+      m('h3', 'Edgeware Lockdrop Tools'),
       m(Button, {
         interactive: true,
         compact: true,
         size: 'sm',
         intent: 'primary',
-        onclick: (e) => m.route.set(vnode.attrs.target),
-        label: m.trust(`${vnode.attrs.link} &rarr;`),
+        onclick: (e) => m.route.set('/edgeware/stats'),
+        label: m.trust('Lockdrop stats &rarr;'),
+      }),
+      m(Button, {
+        interactive: true,
+        compact: true,
+        size: 'sm',
+        intent: 'primary',
+        onclick: (e) => m.route.set('/edgeware/unlock'),
+        label: m.trust('Unlock tool &rarr;'),
       }),
     ]);
   }
@@ -143,8 +151,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
         otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
       ]),
       // other
-      m(LinkCard, { title: 'Edgeware Lockdrop Statistics', link: 'Go to statistics', target: '/edgeware/stats' }),
-      m(LinkCard, { title: 'Edgeware Lockdrop Unlock Tool', link: 'Go to unlock tool', target: '/unlock', }),
+      m(LockdropToolsCard),
       m('.clear'),
     ]);
   }

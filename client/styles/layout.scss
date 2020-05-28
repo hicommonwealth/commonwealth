@@ -332,3 +332,11 @@ body.modal-open {
     height: 18px;
     width: 34px;
 }
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
