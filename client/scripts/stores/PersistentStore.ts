@@ -24,20 +24,23 @@ export function clearLocalStorage(prefix: string = 'cwstore', maxAge: number = 1
   const nItems = localStorage.length;
   for (let i = 0; i < nItems; ++i) {
     const key = localStorage.key(i);
-    if (key.startsWith(prefix)) {
+    if (key && key.startsWith(prefix)) {
       const storageItem: IStorageItem<any> = JSON.parse(localStorage.getItem(key));
-      if (now - storageItem.timestamp > maxAge) {
+      if ((now - storageItem.timestamp) > maxAge) {
         localStorage.removeItem(key);
         nCleared++;
+
+        // decrement loop counter on remove, because the removal changes the length of the map
+        --i;
       }
     }
   }
-  console.log(`Viewed ${nItems} items in localStorage and cleared ${nItems}.`);
+  console.log(`Viewed ${nItems} items in localStorage and cleared ${nCleared}.`);
 }
 
 // T is the object we are keeping in the store, SerializedT is a JSON.parse-able object
 // that can be used to reconstruct T via the constructorFunc.
-class PersistentStore<SerializedT, T extends IHasId & ISerializable<SerializedT>> extends IdStore<T> {
+class PersistentStore<SerializedT extends IHasId, T extends IHasId & ISerializable<SerializedT>> extends IdStore<T> {
   constructor(
     public readonly chain: string,
     public readonly name: string,
@@ -63,6 +66,13 @@ class PersistentStore<SerializedT, T extends IHasId & ISerializable<SerializedT>
   public remove(n: T) {
     super.remove(n);
     localStorage.removeItem(this._getKey(n.id.toString()));
+    return this;
+  }
+
+  public update(n: T) {
+    super.update(n);
+    const storageItem: IStorageItem<SerializedT> = { data: n.serialize(), timestamp: Date.now() };
+    localStorage.setItem(this._getKey(n.id.toString()), JSON.stringify(storageItem));
     return this;
   }
 
