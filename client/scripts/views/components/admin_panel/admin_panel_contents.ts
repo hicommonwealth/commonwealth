@@ -64,16 +64,16 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
         isCommunity
           ? vnode.state.loadingFinished
             && m(CommunityMetadataManagementTable, {
-              community: app.community.meta,
               admins,
+              community: app.community.meta,
               mods,
-              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
               onChangeHandler: vnode.attrs.onChangeHandler,
+              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
             })
           : vnode.state.loadingFinished
             && m(ChainMetadataManagementTable, {
-              chain: app.config.chains.getById(app.activeChainId()),
               admins,
+              chain: app.config.chains.getById(app.activeChainId()),
               mods,
               onChangeHandler: vnode.attrs.onChangeHandler,
               onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
@@ -82,9 +82,9 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
       m('.panel-right', [
         vnode.state.loadingFinished
           && m(AdminTabPanel, {
-            roleData: vnode.state.roleData,
             defaultTab: 1,
             onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+            roleData: vnode.state.roleData,
             webhooks: vnode.state.webhooks,
           }),
       ]),
