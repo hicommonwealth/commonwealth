@@ -21,7 +21,9 @@ interface ITextOptions {
   name?: string;
   placeholder?: string;
   oncreate?: any;
-  oninput?: any;
+  oninput?: Function;
+  onfocus?: Function;
+  onblur?: Function;
   tabindex?: number;
   value?: string | number;
 }

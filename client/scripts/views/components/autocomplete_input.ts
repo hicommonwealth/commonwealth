@@ -39,6 +39,8 @@ export interface IAutoCompleteFormState {
 export const AutoCompletePureForm: m.Component<IAutoCompleteFormAttrs> = {
   view: (vnode) => {
     const { results } = vnode.attrs;
+    const isTagged = !!document.getElementsByClassName('tag').length;
+    console.log(results.map(vnode.attrs.rowComponentFunc));
     return m('.AutoCompletePureForm', [
       m('.autocomplete-wrap', [
         m(TextInputFormField, {
@@ -47,6 +49,13 @@ export const AutoCompletePureForm: m.Component<IAutoCompleteFormAttrs> = {
             class: 'autocomplete-entry',
             placeholder: vnode.attrs.placeholder,
             tabindex: vnode.attrs.tabindex,
+            onfocus: (e) => { if (!isTagged) return vnode.attrs.onChangeHandler(e); },
+            // onblur: () => {
+            //   const resultsEle = (document.getElementsByClassName('results')[0] as HTMLInputElement);
+            //   const autoWrap = (document.getElementsByClassName('autocomplete-wrap')[0] as HTMLInputElement);
+            //   resultsEle.classList.remove('show');
+            //   autoWrap.classList.remove('displaying-results');
+            // },
           },
           callback: vnode.attrs.onChangeHandler,
         }),
@@ -73,34 +82,38 @@ export const AutoCompletePureForm: m.Component<IAutoCompleteFormAttrs> = {
  * }),
  */
 export const AutoCompleteForm: m.Component<IAutoCompleteFormAttrs, IAutoCompleteFormState> = {
-  view: (vnode) => m(AutoCompletePureForm, {
-    title: vnode.attrs.title,
-    placeholder: vnode.attrs.placeholder,
-    results: vnode.state.filteredResults || vnode.attrs.featuredTags,
-    onChangeHandler: (result) => {
-      // pass in a change handler that does a modified autocomplete
-      if (vnode.attrs.onChangeHandler) vnode.state.filteredResults = vnode.attrs.onChangeHandler(result) || [];
-      // or default to a simple autocomplete that simply checks substring inclusion
-      else vnode.state.filteredResults = vnode.attrs.results.filter((c) => (c.indexOf(result) !== -1));
-      // return vnode.state.filteredResults;
-      const resultsEle = (document.getElementsByClassName('results')[0] as HTMLInputElement);
-      const autoWrap = (document.getElementsByClassName('autocomplete-wrap')[0] as HTMLInputElement);
-      if (vnode.state.filteredResults.length) {
-        resultsEle.classList.add('show');
-        autoWrap.classList.add('displaying-results');
-      } else {
-        resultsEle.classList.remove('show');
-        autoWrap.classList.remove('displaying-results');
-      }
-      m.redraw();
-    },
-    rowComponentFunc: (rowData) => ((vnode.attrs.rowComponentFunc)
-    // use passed down row component creation function for autocompleted options
-      ? vnode.attrs.rowComponentFunc(rowData)
-    // default to simple 'p' tag
-      : m('p', rowData)),
-    tabindex: vnode.attrs.tabindex
-  }),
+  view: (vnode) => {
+    return m(AutoCompletePureForm, {
+      title: vnode.attrs.title,
+      placeholder: vnode.attrs.placeholder,
+      results: vnode.state.filteredResults?.length
+        ? vnode.state.filteredResults
+        : vnode.attrs.featuredTags,
+      onChangeHandler: (result) => {
+        // pass in a change handler that does a modified autocomplete
+        if (vnode.attrs.onChangeHandler) vnode.state.filteredResults = vnode.attrs.onChangeHandler(result) || [];
+        // or default to a simple autocomplete that simply checks substring inclusion
+        else vnode.state.filteredResults = vnode.attrs.results.filter((c) => (c.indexOf(result) !== -1));
+        // return vnode.state.filteredResults;
+        const resultsEle = (document.getElementsByClassName('results')[0] as HTMLInputElement);
+        const autoWrap = (document.getElementsByClassName('autocomplete-wrap')[0] as HTMLInputElement);
+        if (vnode.state.filteredResults.length || vnode.attrs.featuredTags.length) {
+          resultsEle.classList.add('show');
+          autoWrap.classList.add('displaying-results');
+        } else {
+          resultsEle.classList.remove('show');
+          autoWrap.classList.remove('displaying-results');
+        }
+        m.redraw();
+      },
+      rowComponentFunc: (rowData) => ((vnode.attrs.rowComponentFunc)
+      // use passed down row component creation function for autocompleted options
+        ? vnode.attrs.rowComponentFunc(rowData)
+      // default to simple 'p' tag
+        : m('p', rowData)),
+      tabindex: vnode.attrs.tabindex
+    });
+  }
 };
 
 export default AutoCompleteForm;
