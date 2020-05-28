@@ -355,7 +355,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                     iconLeft: Icons.USER_PLUS,
                     size: 'sm',
                     fluid: true,
-                    label: `Link new ${(app.chain?.chain?.denom) || ''} address`,
+                    label: `Link new address`,
                     onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
                   })
                   // if addresses are available, but none is selected
