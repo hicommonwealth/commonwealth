@@ -12,7 +12,12 @@ import { notifyError } from 'controllers/app/notifications';
 
 export enum CommentParent {
   Proposal = 'proposal',
-  Comment = 'comment'
+  Comment = 'comment',
+}
+
+export enum CommentRefreshOption {
+  ResetAndLoadOffchainComments = 'ResetAndLoadOffchainComments',
+  LoadProposalComments = 'LoadProposalComments',
 }
 
 const modelFromServer = (comment) => {
@@ -175,32 +180,23 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(
-    chainId: string,
-    communityId: string,
-    reset = false,
-    offchainThreadsOnly = false,
-    proposalsOnly = false
-  ) {
+  public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
     try {
       const args: any = {
         chain: chainId,
         community: communityId,
       };
-      if (offchainThreadsOnly && proposalsOnly) {
-        throw new Error('cannot select mutually exclusive offchain threads and proposals only options');
-      }
-      if (offchainThreadsOnly) {
+      if (CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;
       }
-      if (proposalsOnly) {
+      if (CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);
       }
-      if (reset) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         this._store.clear();
       }
       await Promise.all(response.result.map(async (comment) => {
