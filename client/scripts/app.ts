@@ -480,7 +480,6 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );

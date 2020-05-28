@@ -5,7 +5,7 @@ import {
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS
 } from '../../shared/types';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const updateProfile = async (models, req: Request, res: Response, next: NextFunction) => {

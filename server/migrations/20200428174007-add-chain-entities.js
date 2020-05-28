@@ -17,6 +17,11 @@ module.exports = {
           allowNull: true,
           references: { model: 'OffchainThreads', key: 'id' },
         },
+        completed: {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, {

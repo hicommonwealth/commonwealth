@@ -10,7 +10,7 @@ import { SubstrateBlock, isEvent } from './types';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IBlockProcessor<ApiPromise, SubstrateBlock> {
