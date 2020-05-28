@@ -5,14 +5,29 @@ $active-color: #ececec;
 
 .CommunityLabel {
     text-align: left;
-    .community-name-row {
+    flex: 1;
+    display: flex;
+    font-weight: 400;
+    .community-label-left {
+        padding-right: 12px;
+    }
+    .community-label-right {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .community-name-row,
+    .community-id {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
+    }
+    .community-name-row {
         font-weight: 600;
         line-height: 1.25;
     }
     .community-id {
+        font-size: 13px;
         color: #777;
     }
     .icon-globe, .icon-lock {
@@ -118,9 +133,10 @@ $active-color: #ececec;
             height: 100%;
             padding: 0 15px;
             color: #222;
+            background: #f8f8f8 !important;
         }
         .CommunityLabel {
-            margin: 18px 0 14px;
+            margin: 17px 0 13px;
         }
     }
     .cui-list .action-selector {
@@ -196,10 +212,11 @@ $active-color: #ececec;
 
 .CommunitySelectList {
     .cui-popover-content {
-        padding: 2px 0;
+        padding: 6px 0;
     }
     .cui-list-item {
-        min-width: 228px;
+        min-width: 280px;
+        padding: 10px 15px;
         &.cui-selected {
             color: #222;
         }

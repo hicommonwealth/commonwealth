@@ -21,7 +21,7 @@ import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'm
 import { OffchainCommunitiesStore } from 'stores';
 
 import { isMember } from 'views/components/membership_button';
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
 import User from 'views/components/widgets/user';
@@ -50,7 +50,46 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import AdminPanel from 'views/components/admin_panel';
 
-const CommunityLabel = {
+const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo }> = {
+  view: (vnode) => {
+    const { chain, community } = vnode.attrs;
+
+    if (chain) return m('.CommunityLabel', [
+      m('.community-label-left', [
+        m(ChainIcon, { chain }),
+      ]),
+      m('.community-label-right', [
+        m('.community-name-row', [
+          m('span.community-name', chain.name),
+          chain.id === app.activeChainId() && m(ChainStatusIndicator, { hideLabel: true }),
+        ]),
+        m('.community-id', `/${chain.id}`),
+      ]),
+    ]);
+
+    if (community) return m('.CommunityLabel', [
+      m('.community-label-left', [
+        m(CommunityIcon, { community }),
+      ]),
+      m('.community-label-right', [
+        m('.community-name-row', [
+          m('span.community-name', community.name),
+          community.id === app.activeCommunityId() && [
+            community.privacyEnabled && m('span.icon-lock'),
+            !community.privacyEnabled && m('span.icon-globe'),
+          ],
+        ]),
+        m('.community-id', `/${community.id}`),
+      ]),
+    ]);
+
+    return m('.CommunityLabel.CommunityLabelPlaceholder', [
+      m('span.community-name', 'Select a community'),
+    ]);
+  }
+};
+
+const CurrentCommunityLabel: m.Component<{}> = {
   view: (vnode) => {
     const nodes = app.config.nodes.getAll();
     const activeNode = app.chain?.meta;
@@ -59,26 +98,13 @@ const CommunityLabel = {
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
-    if (selectedNode) return m('.CommunityLabel', [
-      m('.community-name-row', [
-        m('span.community-name', selectedNode.chain.name),
-        m(ChainStatusIndicator, { hideLabel: true }),
-      ]),
-      m('.community-id', `/${selectedNode.chain.id}`),
-    ]);
-
-    if (selectedCommunity) return m('.CommunityLabel', [
-      m('.community-name-row', [
-        m('span.community-name', selectedCommunity.meta.name),
-        selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-        !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-      ]),
-      m('.community-id', `/${selectedCommunity.meta.id}`),
-    ]);
-
-    return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Select a community'),
-    ]);
+    if (selectedNode) {
+      return m(CommunityLabel, { chain: selectedNode.chain });
+    } else if (selectedCommunity) {
+      return m(CommunityLabel, { community: selectedCommunity.meta });
+    } else {
+      return m(CommunityLabel);
+    }
   }
 };
 
@@ -169,10 +195,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               items: selectableCommunities,
               itemRender: (item) => {
                 return item instanceof ChainInfo
-                  ? m(ListItem, { label: item.name, selected: app.activeChainId() === item.id })
+                  ? m(ListItem, {
+                    label: m(CommunityLabel, { chain: item }),
+                    selected: app.activeChainId() === item.id
+                  })
                   : item instanceof CommunityInfo
-                  ? m(ListItem, { label: item.name, selected: app.activeCommunityId() === item.id })
-                  : null;
+                    ? m(ListItem, {
+                      label: m(CommunityLabel, { community: item }),
+                      selected: app.activeCommunityId() === item.id
+                    })
+                    : null;
               },
               onSelect: (item: any) => {
                 m.route.set(`/${item.id}`);
@@ -187,7 +219,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 basic: true,
                 compact: true,
                 iconRight: Icons.CHEVRON_DOWN,
-                label: m(CommunityLabel),
+                label: m(CurrentCommunityLabel),
                 style: 'min-width: 200px',
               }),
             }),

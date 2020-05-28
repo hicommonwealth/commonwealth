@@ -2,7 +2,7 @@ import 'pages/home/community_cards.scss';
 
 import { default as m } from 'mithril';
 import { link } from 'helpers';
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import MembershipButton, { isMember } from 'views/components/membership_button';
 import app from 'state';
 import { Button, Icons } from 'construct-ui';
