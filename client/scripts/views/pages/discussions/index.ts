@@ -82,10 +82,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const getSingleTagListing = (tag) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-listing.tag-listing', [
-          m('h4.tag-name', [
-            tag,
-            getBackHomeButton(),
-          ]),
           m(ProposalsLoadingRow),
         ]);
       }
@@ -134,10 +130,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       if (!tagObj) return;
 
       return m('.discussions-listing.tag-listing', [
-        m('h4.tag-name', [
-          tag,
-          getBackHomeButton(),
-        ]),
         tagObj.description
         && m('h4', [
           tagObj.description,

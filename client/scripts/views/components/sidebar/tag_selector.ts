@@ -300,7 +300,7 @@ const TagSelector: m.Component<{
             active: m.route.get() === `/${app.activeId()}/tags/`,
             label: 'All tags',
             onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.HASH }),
+            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
           }),
         ]),
       // This placeholder module should only be shown in the sidebar

@@ -221,7 +221,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 align: 'left',
                 basic: true,
                 compact: true,
-                iconRight: Icons.CHEVRON_DOWN,
                 label: m(CurrentCommunityLabel),
                 style: 'min-width: 200px',
               }),
