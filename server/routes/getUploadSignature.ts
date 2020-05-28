@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import uuidv4 from 'uuid/v4';
 
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 AWS.config.update({
