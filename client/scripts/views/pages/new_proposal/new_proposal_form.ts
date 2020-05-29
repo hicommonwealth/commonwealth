@@ -125,7 +125,7 @@ const NewProposalForm = {
           OffchainThreadKind.Forum,
           vnode.state.form.title,
           vnode.state.form.description,
-          vnode.state.form.categoryId
+          vnode.state.form.categoryId,
         ).then(done)
           .then(() => { m.redraw(); })
           .catch((err) => { console.error(err); });

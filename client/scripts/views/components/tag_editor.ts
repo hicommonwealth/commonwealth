@@ -10,42 +10,39 @@ interface ITagEditorAttrs {
   popoverMenu?: boolean;
 }
 
-const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
+const TagWindow: m.Component<{ tag: OffchainTag, onChangeHandler: Function}> = {
   view: (vnode) => {
-    const { onChangeHandler, tags } = vnode.attrs;
+    const { onChangeHandler, tag } = vnode.attrs;
     return m(TagInput, {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('input').focus();
       },
       contentLeft: m(Icon, { name: Icons.TAG }),
-      tags: tags && (tags.length !== 0)
-        && vnode.attrs.tags.map((tag) => {
-          return m(Tag, {
-            label: `#${tag}`,
-            onRemove: () => {
-              onChangeHandler(tags.filter((t) => t !== tag));
-            },
-          });
-        }),
+      tags: tag && [
+        m(Tag, {
+          label: `#${tag}`,
+          // onRemove: () => {
+          //   onChangeHandler(tags.filter((t) => t !== tag));
+          // },
+        })
+      ],
       intent: 'none',
       size: 'lg',
       onAdd: (value: string) => {
-        if (!tags.includes(value)) {
-          tags.push(value);
-          onChangeHandler(tags);
+        if (tag.name !== value) {
+          onChangeHandler(value);
         }
       },
     });
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}> = {
+const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tag: OffchainTag}> = {
   oninit: (vnode) => {
     vnode.state.isOpen = false;
-    vnode.state.tags = [];
   },
   oncreate: (vnode) => {
-    vnode.attrs.thread.tags.map((tag) => vnode.state.tags.push(tag.name));
+    vnode.state.tag = vnode.attrs.thread.tag;
   },
   view: (vnode) => {
     return m('TagEditor', [
@@ -65,8 +62,8 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
         content: m(TagWindow, {
-          tags: vnode.state.tags,
-          onChangeHandler: (tags: string[]) => { vnode.state.tags = tags; },
+          tag: vnode.state.tag,
+          onChangeHandler: (tag: OffchainTag) => { vnode.state.tag = tag; },
         }),
         hasBackdrop: true,
         isOpen: vnode.state.isOpen,
@@ -86,11 +83,11 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
               $.post(`${app.serverUrl()}/updateTags`, {
                 'jwt': app.login.jwt,
                 'thread_id': vnode.attrs.thread.id,
-                'tags[]': vnode.state.tags,
+                'tag': vnode.state.tag,
                 'address': app.vm.activeAccount.address,
               }).then((r) => {
-                const tags: OffchainTag[] = r.result;
-                vnode.attrs.onChangeHandler(tags);
+                const tag: OffchainTag = r.result;
+                vnode.attrs.onChangeHandler(tag);
               });
               vnode.state.isOpen = false;
             },

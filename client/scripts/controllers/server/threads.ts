@@ -58,7 +58,7 @@ class ThreadsController {
     chainId: string,
     communityId: string,
     title: string,
-    tag: string[],
+    tag?: string[],
     body?: string,
     url?: string,
     attachments?: string[],

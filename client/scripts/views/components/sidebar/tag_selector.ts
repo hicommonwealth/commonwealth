@@ -146,36 +146,34 @@ export const getTagListing = (params: IGetTagListingParams) => {
   const featuredTags = {};
 
   app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
-    const { tags } = thread;
-    tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
-      // addition to the TagStore, since said store will be more up-to-date
-      const existing = app.tags.getByIdentifier(tag.id);
-      if (!existing) app.tags.addToStore(tag);
-      const { id, name, description } = existing || tag;
+    const { tag } = thread;
+    // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
+    // addition to the TagStore, since said store will be more up-to-date
+    const existing = app.tags.getByIdentifier(tag.id);
+    if (!existing) app.tags.addToStore(tag);
+    const { id, name, description } = existing || tag;
 
-      if (featuredTagIds.includes(`${id}`)) {
-        if (featuredTags[name]) featuredTags[name].count += 1;
-        else {
-          featuredTags[name] = {
-            count: 1,
-            description,
-            featured_order: featuredTagIds.indexOf(`${id}`),
-            id,
-            name,
-          };
-        }
-      } else if (otherTags[name]) {
-        otherTags[name].count += 1;
-      } else {
-        otherTags[name] = {
+    if (featuredTagIds.includes(`${id}`)) {
+      if (featuredTags[name]) featuredTags[name].count += 1;
+      else {
+        featuredTags[name] = {
           count: 1,
           description,
+          featured_order: featuredTagIds.indexOf(`${id}`),
           id,
           name,
         };
       }
-    });
+    } else if (otherTags[name]) {
+      otherTags[name].count += 1;
+    } else {
+      otherTags[name] = {
+        count: 1,
+        description,
+        id,
+        name,
+      };
+    }
   });
 
   const threadlessTags = app.tags.getByCommunity(app.activeId()).forEach((tag) => {
