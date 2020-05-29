@@ -7,6 +7,7 @@ import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import { Errors as emailErrors } from '../../../server/routes/updateUserEmailInterval';
+import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
@@ -113,8 +114,32 @@ describe('User Model Routes', () => {
           jwt: jwtToken,
           email,
         });
-      console.dir(res.body);
-      expect(res.body.error).to.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.email).to.be.equal(email);
+    });
+
+    it('should fail to update without email', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateEmail')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(updateEmailErrors.NoEmail);
+    });
+
+    it('should fail with an invalid email', async () => {
+      const email = 'testatcommonwealthdotim';
+      const res = await chai.request(app)
+        .post('/api/updateEmail')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          email,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(updateEmailErrors.InvalidEmail);
     });
   });
 });
