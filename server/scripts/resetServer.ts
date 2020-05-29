@@ -316,18 +316,21 @@ const resetServer = (models, closeMiddleware) => {
       category_id: NotificationCategories.NewMention,
       object_id: `user-${dillon.id}`,
       is_active: true,
+      immediate_email: true,
     });
     await models.Subscription.create({
       subscriber_id: raymond.id,
       category_id: NotificationCategories.NewMention,
       object_id: `user-${raymond.id}`,
       is_active: true,
+      immediate_email: true,
     });
     await models.Subscription.create({
       subscriber_id: drew.id,
       category_id: NotificationCategories.NewMention,
       object_id: `user-${drew.id}`,
       is_active: true,
+      immediate_email: true,
     });
 
     // Communities

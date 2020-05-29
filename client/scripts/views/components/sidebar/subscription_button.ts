@@ -29,7 +29,7 @@ const SubscriptionButton = {
             });
           }
         },
-        label: communitySubscription ? 'Turn off notifications' : 'Turn on notifications',
+        label: communitySubscription ? 'Turn off new thread notifications' : 'Turn on new thread notifications',
       }),
       trigger: m(Icon, { name: Icons.CHEVRON_DOWN, class: 'SubscriptionButton' }),
     });

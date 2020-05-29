@@ -1,7 +1,9 @@
 import _ from 'underscore';
 import WebSocket from 'ws';
 import Sequelize from 'sequelize';
+import sgMail from '@sendgrid/mail';
 import send, { WebhookContent } from '../webhookNotifier';
+import { SENDGRID_API_KEY } from '../config';
 import {
   WebsocketMessageType, IWebsocketsPayload,
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
@@ -9,6 +11,9 @@ import {
 
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../util/logging';
+import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+sgMail.setApiKey(SENDGRID_API_KEY);
+
 const log = factory.getLogger(formatFilename(__filename));
 
 module.exports = (sequelize, DataTypes) => {
@@ -17,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     category_id: { type: DataTypes.STRING, allowNull: false },
     object_id: { type: DataTypes.STRING, allowNull: false },
     is_active: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false },
+    immediate_email: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
   }, {
     underscored: true,
     paranoid: true,
@@ -95,6 +101,7 @@ module.exports = (sequelize, DataTypes) => {
 
     // create notifications (data should always exist, but we check anyway)
     if (!notification_data) return [];
+    const msg = createNotificationEmailObject((notification_data as IPostNotificationData), category_id);
     const notifications: any[] = await Promise.all(subscribers.map(async (subscription) => {
       const notificationObj: any = {
         subscription_id: subscription.id,
@@ -106,6 +113,11 @@ module.exports = (sequelize, DataTypes) => {
         notificationObj.notification_data = JSON.stringify(notification_data);
       }
       const notification = await models.Notification.create(notificationObj);
+
+      // send immediate email to subscriber if turned on
+      if (subscription.immediate_email) {
+        sendImmediateNotificationEmail(subscription, msg);
+      }
       return notification;
     }));
 
