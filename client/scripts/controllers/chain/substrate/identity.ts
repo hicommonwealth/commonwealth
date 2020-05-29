@@ -14,7 +14,7 @@ import { Codec } from '@polkadot/types/types';
 import { Vec, Option } from '@polkadot/types';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
-import { Observable, Unsubscribable } from 'rxjs';
+import { Observable, Unsubscribable, BehaviorSubject } from 'rxjs';
 import { map, takeWhile, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import SubstrateChain from './shared';
@@ -58,9 +58,10 @@ export default class SubstrateIdentity
   private _deposit: SubstrateCoin;
   public get deposit() { return this._deposit; }
 
-  // set to false if identity was killed or cleared
-  private _exists: boolean;
-  public get exists() { return this._exists; }
+  // set to false if identity was killed or cleared, null if unresolved
+  private _exists: BehaviorSubject<boolean> = new BehaviorSubject(null);
+  public get exists() { return this._exists.value; }
+  public get exists$() { return this._exists.asObservable(); }
 
   // fetch all sub-accounts
   // all sub-accounts have names, but we don't currently fetch them, because
@@ -76,15 +77,13 @@ export default class SubstrateIdentity
   }
 
   private _subscription: Unsubscribable;
+  public get subscribed() { return !!this._subscription; }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
   private _Identities: SubstrateIdentities;
 
-  private _updateQuality(judgements: RegistrationJudgement[]) {
-  }
-
-  private _update(updateStore = false) {
+  private _update() {
     // update username
     const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
     this.username = d2s(this._info.display);
@@ -101,31 +100,42 @@ export default class SubstrateIdentity
     } else if (!this._quality) {
       this._quality = IdentityQuality.Unknown;
     }
-    if (updateStore) {
+    if (this._Identities.store.getById(this.id)) {
       this._Identities.store.update(this);
+    } else {
+      this._Identities.store.add(this);
     }
   }
 
   // keeps track of changing registration info
-  private _subscribe() {
+  public subscribe() {
+    if (this.subscribed) {
+      return;
+    }
     this._subscription = this._Chain.query((api: ApiRx) => api.query.identity.identityOf(this.account.address)
-      .pipe(
-        takeWhile((rOpt: Option<Registration>) => rOpt.isSome, true),
-      ))
-      .subscribe((rOpt: Option<Registration>) => {
-        if (rOpt.isSome) {
-          const { judgements, deposit, info } = rOpt.unwrap();
-          this._judgements = judgements;
-          this._info = info;
-          this._deposit = this._Chain.coins(deposit);
-          this._update(true);
-        } else {
-          this._exists = false;
-          this._judgements = [];
-          this._quality = IdentityQuality.Unknown;
-          this._deposit = this._Chain.coins(0);
+      // TODO: re-enable this pipe to close identity registration subscriptions immediately, rather than wait for them
+      // Leaving it like this means more open subscriptions, but also we can update usernames in real-time.
+      //   to potentially load.
+      // .pipe(
+      //   takeWhile((rOpt: Option<Registration>) => rOpt.isSome, true),
+      // )
+    ).subscribe((rOpt: Option<Registration>) => {
+      if (rOpt.isSome) {
+        const { judgements, deposit, info } = rOpt.unwrap();
+        this._judgements = judgements;
+        this._info = info;
+        this._deposit = this._Chain.coins(deposit);
+        this._update();
+        if (!this.exists) {
+          this._exists.next(true);
         }
-      });
+      } else {
+        this._exists.next(false);
+        this._judgements = [];
+        this._quality = IdentityQuality.Unknown;
+        this._deposit = this._Chain.coins(0);
+      }
+    });
   }
 
   // unused -- subscription auto-terminated if account is killed
@@ -147,23 +157,12 @@ export default class SubstrateIdentity
   }
 
   public deserialize(data: ISubstrateIdentity): void {
-    console.log(`Revived identity from localStorage: ${data.username}.`);
+    // console.log(`Revived identity from localStorage: ${data.username}.`);
     this._deposit = this._Chain.coins(new BN(data.deposit, 'hex'));
     this._quality = data.quality;
     this.username = data.username;
-    this._exists = data.exists;
-    this._subscribe();
-  }
-
-  public setRegistration(registration: Registration): void {
-    const { judgements, deposit, info } = registration;
-    this._judgements = judgements;
-    this._info = info;
-    this._deposit = this._Chain.coins(deposit);
-    this._update();
-    console.log(`Fetched identity from chain: ${this.username}.`);
-    this._exists = true;
-    this._subscribe();
+    this._exists.next(data.exists);
+    this.subscribe();
   }
 
   constructor(
@@ -178,7 +177,6 @@ export default class SubstrateIdentity
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Identities = Identities;
-    this._exists = false;
   }
 
   public subName(sub: SubstrateAccount): Observable<string> {

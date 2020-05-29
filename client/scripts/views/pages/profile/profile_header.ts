@@ -19,18 +19,18 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity | undefined) => {
+const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity | null) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
     // wait for info to load before making it clickable, if identity exists
-    class: !currentIdentity || currentIdentity.info ? '' : 'disabled',
+    class: !currentIdentity || !currentIdentity.exists || currentIdentity.info ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
         data: { account: account as SubstrateAccount, currentIdentity },
       });
     },
-  }, currentIdentity ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
+  }, currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
 };
 
 export interface IProfileHeaderAttrs {

@@ -4,7 +4,6 @@ import { PersistentStore } from 'stores';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Call,
-  Registration,
   AccountId,
   RegistrarInfo,
   IdentityJudgement,
@@ -12,8 +11,8 @@ import {
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, Option, Data } from '@polkadot/types';
-import { Unsubscribable, Observable, of } from 'rxjs';
-import { first, takeWhile, map } from 'rxjs/operators';
+import { Unsubscribable, Observable, of, never } from 'rxjs';
+import { first, takeWhile, flatMap, filter } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
@@ -75,6 +74,9 @@ class SubstrateIdentities implements StorageModule {
     this.store.clear();
   }
 
+  // cache for identity queries that haven't yet resolved conclusively as existing
+  private _identityQueriesInProgress: { [address: string]: SubstrateIdentity } = {};
+
   // given an account, fetch the corresponding identity (works on sub-accounts)
   public get(who: SubstrateAccount): Observable<SubstrateIdentity> {
     // check immediately if we have the id
@@ -86,7 +88,7 @@ class SubstrateIdentities implements StorageModule {
     // NOTE: the block of code below is commented out, because we do not necessarily want to
     //   resolve sub-addresses to their super-identities -- this is a decision requiring discussion.
     // check for a super-identity (maybe they passed in a sub address)
-    let acctToFetch = who;
+    // let acctToFetch = who;
     // const superId = await this._Chain.query(
     //   (api: ApiRx) => api.query.identity.superOf<Option<SuperCodec>>(who.address).pipe(first())
     // ).toPromise();
@@ -100,20 +102,35 @@ class SubstrateIdentities implements StorageModule {
     // }
 
     // check on chain for registration we haven't seen yet & wait for it to appear
-    // if we have a super address to fetch, grab that instead
-    return this._Chain.query(
-      (api: ApiRx) => api.query.identity.identityOf<Option<Registration>>(acctToFetch.address)
-    ).pipe(
-      takeWhile((id) => !id.isSome, true),
-      map((id) => {
-        if (id.isSome) {
-          const substrateId = new SubstrateIdentity(this._Chain, this._Accounts, this, acctToFetch);
-          substrateId.setRegistration(id.unwrap());
-          this._store.add(substrateId);
-          return substrateId;
-        } else {
-          return null;
+    let id = this._identityQueriesInProgress[who.address];
+    let identityExists$: Observable<boolean>;
+    if (!id) {
+      // Create a new "empty" identity and wait to see if it exists
+      id = new SubstrateIdentity(this._Chain, this._Accounts, this, who);
+      id.subscribe();
+      this._identityQueriesInProgress[who.address] = id;
+      identityExists$ = id.exists$;
+    } else {
+      // we've already created the identity and are waiting to see if it exists
+      identityExists$ = id.exists$;
+    }
+    return identityExists$.pipe(
+      filter((v) => typeof v === 'boolean'),
+      takeWhile((v) => !v, true),
+      flatMap((v) => {
+        // if true, then it should be in the store, and we can remove it from this cache.
+        // the takeWhile above means the observable closes immediately after the identity exists.
+        if (v === true) {
+          delete this._identityQueriesInProgress[who.address];
+          return of(id);
         }
+
+        // if false, we keep it in the cache, and it will replay this "nonexistent" identity
+        // value indefinitely (until it is registered)
+        if (v === false) return of(id);
+
+        // should never be null/undefined
+        return never();
       })
     );
   }

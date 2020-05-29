@@ -45,10 +45,10 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
   }),
   view: (vnode) => {
     const { profile, linkify, account } = vnode.attrs;
-
     // return polkadot identity if possible
-    const displayName = vnode.state.dynamic.identity?.username;
-    const quality = vnode.state.dynamic.identity?.quality;
+    const identity = vnode.state.dynamic.identity;
+    const displayName = identity?.exists ? identity.username : undefined;
+    const quality = identity?.exists ? identity.quality : undefined;
     if (displayName && quality) {
       const name = [ m(`span.identity-icon${
         quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
