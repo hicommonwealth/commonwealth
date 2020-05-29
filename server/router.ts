@@ -36,6 +36,7 @@ import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
 import updateUserEmailInterval from './routes/updateUserEmailInterval';
+import updateEmail from './routes/updateEmail';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -162,6 +163,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   // user model update
   router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
+  router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
 
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));

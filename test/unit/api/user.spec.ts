@@ -81,4 +81,40 @@ describe('User Model Routes', () => {
       expect(res.body.error).to.be.equal(emailErrors.NoEmail);
     });
   });
+
+  describe('/updateEmail', () => {
+    const community = 'staking';
+    const chain = 'ethereum';
+    let jwtToken;
+    let userAddress;
+    let userEmail;
+
+    beforeEach('create new user', async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      userAddress = res.address;
+      userEmail = res.email;
+      jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+      expect(userAddress).to.not.be.null;
+      expect(jwtToken).to.not.be.null;
+      expect(isAdmin).to.not.be.null;
+    });
+
+    it('should add an email to user with just an address', async () => {
+      const email = 'test@commonwealth.im';
+      const res = await chai.request(app)
+        .post('/api/updateEmail')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          email,
+        });
+      console.dir(res.body);
+      expect(res.body.error).to.be.null;
+    });
+  });
 });
