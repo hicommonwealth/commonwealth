@@ -55,7 +55,7 @@ export const newThread = (
     return ({ title: NewThreadErrors.NoTitle });
   }
   if (!form.tag) {
-    return ({ tags: NewThreadErrors.NoTag });
+    return ({ tag: NewThreadErrors.NoTag });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
     return ({ url: NewThreadErrors.NoUrl });
@@ -76,7 +76,7 @@ export const newThread = (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tags, title, url } = form;
+  const { tag, title, url } = form;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();
@@ -99,7 +99,7 @@ export const newThread = (
         communityId,
         title,
         bodyText,
-        tags,
+        tag,
         url,
         attachments,
         mentions,
@@ -122,13 +122,11 @@ export const newThread = (
       const tagNames = Array.isArray(activeEntity?.meta?.tags)
         ? activeEntity.meta.tags.map((t) => t.name)
         : [];
-      result.tags.forEach((tag) => {
-        if (!tagNames.includes(tag.name)) {
-          activeEntity.meta.tags.push(tag);
-        }
-      });
+      if (!tagNames.includes(result.tag.name)) {
+        activeEntity.meta.tags.push(result.tag);
+      }
     } catch (e) {
-      console.log(`Error adding new ${activeEntity} tags.`);
+      console.log(`Error adding new tag to ${activeEntity}.`);
     }
 
     mixpanel.track('Create Thread', {

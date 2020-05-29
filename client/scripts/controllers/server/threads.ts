@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';
-import { ProposalStore, TagsStore } from 'stores';
+import { ProposalStore } from 'stores';
 import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
 import { default as $ } from 'jquery';
@@ -18,7 +18,7 @@ const modelFromServer = (thread) => {
     attachments,
     thread.id,
     moment(thread.created_at),
-    thread.tags,
+    thread.tag,
     thread.kind,
     thread.version_history,
     thread.community,
@@ -58,8 +58,8 @@ class ThreadsController {
     chainId: string,
     communityId: string,
     title: string,
+    tag: string[],
     body?: string,
-    tags?: string[],
     url?: string,
     attachments?: string[],
     mentions?: string[],
@@ -80,7 +80,7 @@ class ThreadsController {
       'versionHistory': versionHistory,
       'attachments[]': attachments,
       'mentions[]': mentions,
-      'tags[]': tags,
+      'tag': tag,
       'url': url,
       'privacy': privacy,
       'readOnly': readOnly,

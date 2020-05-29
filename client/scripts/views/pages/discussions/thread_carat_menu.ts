@@ -53,7 +53,7 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
           && m(TagEditor, {
             thread: proposal,
             popoverMenu: true,
-            onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); } }),
+            onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); } }),
         m(ThreadSubscriptionButton, { proposal }),
       ],
       trigger: m(Icon, {

@@ -11,7 +11,6 @@ export const Errors = {
   ForumMissingTitle: 'Forum posts must include a title',
   QuestionMissingTitle: 'Questions must include a title',
   RequestMissingTitle: 'Requests must include a title',
-  IncorrectNumberOfTags: 'Forum posts must have exactly one tag',
   NoBodyOrAttachments: 'Forum posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
   UnsupportedKind: 'Only forum threads, questions, and requests supported',
@@ -20,25 +19,17 @@ export const Errors = {
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { title, body, kind, url, privacy, readOnly } = req.body;
+  const { tag, title, body, kind, url, privacy, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
     : typeof req.body['mentions[]'] === 'undefined'
       ? []
       : req.body['mentions[]'];
-  const tags = typeof req.body['tags[]'] === 'string'
-    ? [req.body['tags[]']]
-    : typeof req.body['tags[]'] === 'undefined'
-      ? []
-      : req.body['tags[]'];
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
       return next(new Error(Errors.ForumMissingTitle));
-    }
-    if (tags.length !== 1) {
-      return next(new Error(Errors.IncorrectNumberOfTags));
     }
     if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
       return next(new Error(Errors.NoBodyOrAttachments));
@@ -115,7 +106,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   }
 
   // New Tag table entries created
-  await Promise.all(tags.map(async (tag) => {
+  if (typeof tag === 'string') {
     let offchainTag;
     try {
       [offchainTag] = await models.OffchainTag.findOrCreate({
@@ -136,7 +127,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     } catch (err) {
       log.error(err);
     }
-  }));
+  }
 
   let finalThread;
   try {
@@ -147,7 +138,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
         models.OffchainAttachment,
         {
           model: models.OffchainTag,
-          as: 'tags',
+          as: 'tag',
           through: {
             model: models.TaggedThread,
           },
