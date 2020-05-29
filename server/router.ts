@@ -37,11 +37,13 @@ import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
 import updateUserEmailInterval from './routes/updateUserEmailInterval';
 
-import viewSubscriptions from './routes/viewSubscriptions';
-import createSubscription from './routes/createSubscription';
-import deleteSubscription from './routes/deleteSubscription';
-import enableSubscriptions from './routes/enableSubscriptions';
-import disableSubscriptions from './routes/disableSubscriptions';
+import viewSubscriptions from './routes/subscription/viewSubscriptions';
+import createSubscription from './routes/subscription/createSubscription';
+import deleteSubscription from './routes/subscription/deleteSubscription';
+import enableSubscriptions from './routes/subscription/enableSubscriptions';
+import disableSubscriptions from './routes/subscription/disableSubscriptions';
+import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
+import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
 import viewNotifications from './routes/viewNotifications';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
@@ -203,6 +205,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
     markNotificationsRead.bind(this, models));
   router.post('/clearReadNotifications', passport.authenticate('jwt', { session: false }),
     clearReadNotifications.bind(this, models));
+  router.post('/enableImmediateEmails', passport.authenticate('jwt', { session: false }),
+    enableImmediateEmails.bind(this, models));
+  router.post('/disableImmediateEmails', passport.authenticate('jwt', { session: false }),
+    disableImmediateEmails.bind(this, models));
 
   // settings
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
