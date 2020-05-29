@@ -8,6 +8,7 @@ import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import { Errors as emailErrors } from '../../../server/routes/updateUserEmailInterval';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
+import { ConfigurationServicePlaceholders } from 'aws-sdk/lib/config_service_placeholders';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
@@ -41,8 +42,27 @@ describe('User Model Routes', () => {
       expect(isAdmin).to.not.be.null;
     });
 
-    it.skip('should update user\'s email interval', async () => {
-      // not sure how to initialize the user model with an email, or add one later
+    it('should update user\'s email interval', async () => {
+      const email = 'test@commonwealth.im';
+      const interval = 'daily';
+      let res = await chai.request(app)
+        .post('/api/updateEmail')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          email,
+        });
+      res = await chai.request(app)
+        .post('/api/updateUserEmailInterval')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          interval,
+        });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.email).to.be.equal(email);
+      expect(res.body.result.emailNotificationInterval).to.be.equal(interval);
     });
 
     it('should fail when no new interval is passed in', async () => {
