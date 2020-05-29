@@ -6,6 +6,7 @@ import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTag } from 'models';
 import TagEditor from 'views/components/tag_editor';
 import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
@@ -32,6 +33,26 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
   },
 };
 
+export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
+  view: (vnode) => {
+    const { proposal } = vnode.attrs;
+    return m(MenuItem, {
+      onclick: async (e) => {
+        e.preventDefault();
+        const carat = (document.getElementsByClassName('cui-popover-trigger-active')[0] as HTMLButtonElement)
+        if (carat) carat.click();
+        const confirmed = await confirmationModalWithText('Delete this entire thread?')();
+        if (!confirmed) return;
+        app.threads.delete(proposal).then(() => {
+          m.route.set(`/${app.activeId()}/`);
+        });
+      },
+      label: 'Delete thread',
+      iconLeft: Icons.DELETE
+    });
+  }
+};
+
 interface IThreadCaratMenuAttrs {
   proposal: OffchainThread;
 }
@@ -39,7 +60,7 @@ interface IThreadCaratMenuAttrs {
 const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    const canEditTags = app.vm.activeAccount
+    const canEditThread = app.vm.activeAccount
       && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
           || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
           || proposal.author === app.vm.activeAccount.address);
@@ -49,11 +70,11 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
       closeOnOutsideClick: true,
       menuAttrs: { size: 'sm' },
       content: [
-        canEditTags
-          && m(TagEditor, {
-            thread: proposal,
-            popoverMenu: true,
-            onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); } }),
+        canEditThread && m(TagEditor, {
+          thread: proposal,
+          popoverMenu: true,
+          onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); } }),
+        canEditThread && m(ThreadDeletionButton, { proposal }),
         m(ThreadSubscriptionButton, { proposal }),
       ],
       trigger: m(Icon, {

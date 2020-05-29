@@ -55,6 +55,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         console.log('selected');
         vnode.state.selectedTag = item;
         vnode.attrs.updateFormData(item);
+        manuallyClosePopover();
       },
       trigger: m(Button, {
         align: 'left',
