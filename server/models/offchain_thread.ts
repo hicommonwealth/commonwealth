@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     author_id: { type: DataTypes.INTEGER, allowNull: false },
     title: { type: DataTypes.TEXT, allowNull: false },
     body: { type: DataTypes.TEXT, allowNull: true },
+    tag_id: { type: DataTypes.INTEGER, allowNull: false },
     kind: { type: DataTypes.TEXT, allowNull: false },
     url: { type: DataTypes.TEXT, allowNull: true },
     pinned: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
@@ -29,11 +30,9 @@ module.exports = (sequelize, DataTypes) => {
       constraints: false,
       scope: { attachable: 'thread' },
     });
-    models.OffchainThread.belongsToMany(models.OffchainTag, {
-      through: models.TaggedThread,
-      as: 'tags',
-      foreignKey: 'thread_id',
-      otherKey: 'tag_id',
+    models.OffchainThread.belongsTo(models.OffchainTag, {
+      as: 'tag',
+      foreignKey: 'tag_id',
     });
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',

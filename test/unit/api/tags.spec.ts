@@ -41,7 +41,7 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
-        tags: ['tag'],
+        tag: 'tag',
         kind: 'forum',
       });
       expect(res2.result).to.not.be.null;

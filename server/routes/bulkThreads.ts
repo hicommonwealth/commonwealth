@@ -41,11 +41,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
       models.Address,
       {
         model: models.OffchainTag,
-        as: 'tags',
-        through: {
-          model: models.TaggedThread,
-          as: 'taggedThreads',
-        },
+        as: 'tag'
       },
     ],
     order: [['created_at', 'DESC']],

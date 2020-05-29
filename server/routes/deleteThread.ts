@@ -18,8 +18,8 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
-    const associatedTags = await thread.getTags();
-    thread.removeTags(associatedTags);
+    const associatedTag = await thread.getTags();
+    thread.removeTags(associatedTag);
     // actually delete
     await thread.destroy();
     return res.json({ status: 'Success' });

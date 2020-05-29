@@ -22,9 +22,8 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
   view: (vnode) => {
     const TagItem = (tag: OffchainTag, index?: number) => {
       return m(ListItem, {
-        contentRight: m('.tagItem', { style: `color:${Colors.BLUE_GREY200}` }, tag.name),
+        contentLeft: m('.tagItem', `# ${tag.name}`),
         key: index,
-        label: tag.name,
         selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name
       });
     };
@@ -32,7 +31,10 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     const featuredTags = vnode.attrs.featuredTags.map((tag) => TagItem(tag));
 
     return m(SelectList, {
-      emptyContent: featuredTags,
+      emptyContent: m('.no-matching-tags', {
+        onclick: () => null
+      }, 'No matching tags found'),
+      initialContent: featuredTags,
       itemRender: TagItem,
       items: vnode.attrs.tags,
       onSelect: (item: OffchainTag) => {

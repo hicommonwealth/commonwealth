@@ -20,11 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.OffchainTag.belongsToMany(models.OffchainThread, {
-      through: models.TaggedThread,
+    models.OffchainTag.hasMany(models.OffchainThread, {
       as: 'threads',
       foreignKey: 'tag_id',
-      otherKey: 'thread_id',
     });
   };
 

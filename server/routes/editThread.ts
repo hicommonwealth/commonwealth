@@ -60,7 +60,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tags' } ],
+      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
     });
 
     // dispatch notifications to subscribers of the given chain/community

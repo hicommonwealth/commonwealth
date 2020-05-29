@@ -86,6 +86,27 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     read_only: readOnly || false,
   };
 
+  // New Tag table entries created
+  if (typeof tag === 'string') {
+    let offchainTag;
+    try {
+      [offchainTag] = await models.OffchainTag.findOrCreate({
+        where: {
+          name: tag,
+          community_id: community?.id || null,
+          chain_id: chain?.id || null,
+        },
+      });
+    } catch (err) {
+      log.error(err);
+    }
+  } else if (typeof tag === 'number') {
+    // Todo: ensure this gets hit
+    threadContent['tag_id'] = tag;
+  } else {
+    return next(Error('Must pass either a numeric tag id or new tag name as string'))
+  }
+
   const thread = await models.OffchainThread.create(threadContent);
 
   // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
@@ -105,30 +126,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     })));
   }
 
-  // New Tag table entries created
-  if (typeof tag === 'string') {
-    let offchainTag;
-    try {
-      [offchainTag] = await models.OffchainTag.findOrCreate({
-        where: {
-          name: tag,
-          community_id: community?.id || null,
-          chain_id: chain?.id || null,
-        },
-      });
-    } catch (err) {
-      log.error(err);
-    }
-    try {
-      await models.TaggedThread.create({
-        tag_id: offchainTag.id,
-        thread_id: thread.id,
-      });
-    } catch (err) {
-      log.error(err);
-    }
-  }
-
   let finalThread;
   try {
     finalThread = await models.OffchainThread.findOne({
@@ -139,9 +136,6 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
         {
           model: models.OffchainTag,
           as: 'tag',
-          through: {
-            model: models.TaggedThread,
-          },
         }
       ],
     });

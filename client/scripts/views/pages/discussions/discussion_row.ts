@@ -77,7 +77,7 @@ const DiscussionRow: m.Component<IAttrs> = {
             ]),
             m('.discussion-meta-right', [
               m('.discussion-tags', [
-                m(Tag, {
+                proposal.tag && m(Tag, {
                   rounded: true,
                   intent: 'none',
                   label: proposal.tag.name,
