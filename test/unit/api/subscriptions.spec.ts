@@ -255,18 +255,39 @@ describe('Subscriptions Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    it('/viewNotifications', async () => {
-      // Get Notifications for Default User
-      expect(subscription).to.not.be.null;
-      expect(thread).to.not.be.null;
-      const res = await chai.request(app)
-        .post('/api/viewNotifications')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-      notifications = res.body.result;
+    describe('/viewNotifications: return notifications to user', () => {
+      it('should return all notifications with just a user\'s jwt', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should return only unread notifications', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, unread_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should return only notifications with active_only turned on', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, active_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
     });
 
     describe('/markNotificationsRead', async () => {

@@ -2,7 +2,7 @@ import 'pages/home/index.scss';
 
 import { default as m } from 'mithril';
 import MarketingModules from './marketing_modules';
-import Communities from './community_cards';
+import CommunityCards from './community_cards';
 import Header from './header';
 
 const Homepage: m.Component<{}, {}> = {
@@ -10,7 +10,7 @@ const Homepage: m.Component<{}, {}> = {
     return m('.Homepage', [
       m('.container', [
         m(Header),
-        m(Communities),
+        m(CommunityCards),
         // m(MarketingModules),
       ]),
     ]);

@@ -30,6 +30,7 @@ import createReaction from './routes/createReaction';
 import deleteReaction from './routes/deleteReaction';
 import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
+import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
@@ -110,6 +111,9 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/updateChain', passport.authenticate('jwt', { session: false }), updateChain.bind(this, models));
 
   // offchain communities
+  router.post('/starCommunity', passport.authenticate('jwt', { session: false }), starCommunity.bind(this, models));
+
+  // offchain community admin routes
   router.post('/createCommunity', passport.authenticate('jwt', { session: false }), createCommunity.bind(this, models));
   router.post('/deleteCommunity', passport.authenticate('jwt', { session: false }), deleteCommunity.bind(this, models));
   router.post('/updateCommunity', passport.authenticate('jwt', { session: false }), updateCommunity.bind(this, models));

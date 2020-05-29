@@ -2,7 +2,7 @@ import 'pages/home/community_cards.scss';
 
 import { default as m } from 'mithril';
 import { link } from 'helpers';
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import MembershipButton, { isMember } from 'views/components/membership_button';
 import app from 'state';
 import { Button, Icons } from 'construct-ui';
@@ -15,7 +15,7 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
     const updatedThreads = app.login.unseenPosts[chain]?.activePosts || 0;
 
     return m('.home-card', [
-      // m(ChainIcon, { chain: nodeList[0].chain }),
+      m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chainInfo.name),
       isMember(chain, null) && justJoinedChains.indexOf(chain) === -1 && [
         app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
@@ -30,66 +30,74 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
         onclick: (e) => m.route.set(`/${chain}`),
         label: m.trust('Go to community &rarr;')
       }),
-      app.isLoggedIn() && m('.chain-membership', [
-        m(MembershipButton, {
-          chain,
-          onMembershipChanged: (created) => {
-            if (created && !isMember(chain, null)) justJoinedChains.push(chain);
-          }
-        })
-      ]),
+      // app.isLoggedIn() && m('.chain-membership', [
+      //   m(MembershipButton, {
+      //     chain,
+      //     onMembershipChanged: (created) => {
+      //       if (created && !isMember(chain, null)) justJoinedChains.push(chain);
+      //     }
+      //   })
+      // ]),
     ]);
   }
 };
 
 const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
   view: (vnode) => {
-    const { justJoinedCommunities } = vnode.attrs;
-    const c = vnode.attrs.community;
-    const visitedCommunity = !!app.login.unseenPosts[c.id];
-    const updatedThreads = app.login.unseenPosts[c.id]?.activePosts || 0;
+    const { justJoinedCommunities, community } = vnode.attrs;
+    const visitedCommunity = !!app.login.unseenPosts[community.id];
+    const updatedThreads = app.login.unseenPosts[community.id]?.activePosts || 0;
 
     return m('.home-card', [
+      m(CommunityIcon, { community }),
       m('h3', [
-        c.name,
-        c.privacyEnabled && m('span.icon-lock'),
+        community.name,
+        community.privacyEnabled && m('span.icon-lock'),
       ]),
-      isMember(null, c.id) && justJoinedCommunities.indexOf(c.id) === -1 && [
+      isMember(null, community.id) && justJoinedCommunities.indexOf(community.id) === -1 && [
         app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
         updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
-      m('p.card-description', c.description),
+      m('p.card-description', community.description),
       m(Button, {
         interactive: true,
         compact: true,
         size: 'sm',
         intent: 'primary',
-        onclick: (e) => m.route.set(`/${c.id}`),
+        onclick: (e) => m.route.set(`/${community.id}`),
         label: m.trust('Go to community &rarr;'),
       }),
-      app.isLoggedIn() && [
-        m(MembershipButton, {
-          community: c.id,
-          onMembershipChanged: (created) => {
-            if (created && !isMember(null, c.id)) justJoinedCommunities.push(c.id);
-          }
-        })
-      ],
+      // app.isLoggedIn() && [
+      //   m(MembershipButton, {
+      //     community: community.id,
+      //     onMembershipChanged: (created) => {
+      //       if (created && !isMember(null, community.id)) justJoinedCommunities.push(community.id);
+      //     }
+      //   })
+      // ],
     ]);
   }
 };
 
-const LinkCard = {
+const LockdropToolsCard = {
   view: (vnode) => {
-    return m('.home-card', [
-      m('h3', vnode.attrs.title),
+    return m('.LockdropToolsCard.home-card', [
+      m('h3', 'Edgeware Lockdrop Tools'),
       m(Button, {
         interactive: true,
         compact: true,
         size: 'sm',
         intent: 'primary',
-        onclick: (e) => m.route.set(vnode.attrs.target),
-        label: m.trust(`${vnode.attrs.link} &rarr;`),
+        onclick: (e) => m.route.set('/edgeware/stats'),
+        label: m.trust('Lockdrop stats &rarr;'),
+      }),
+      m(Button, {
+        interactive: true,
+        compact: true,
+        size: 'sm',
+        intent: 'primary',
+        onclick: (e) => m.route.set('/edgeware/unlock'),
+        label: m.trust('Unlock tool &rarr;'),
       }),
     ]);
   }
@@ -143,8 +151,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
         otherCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),
       ]),
       // other
-      m(LinkCard, { title: 'Edgeware Lockdrop Statistics', link: 'Go to statistics', target: '/edgeware/stats' }),
-      m(LinkCard, { title: 'Edgeware Lockdrop Unlock Tool', link: 'Go to unlock tool', target: '/unlock', }),
+      m(LockdropToolsCard),
       m('.clear'),
     ]);
   }

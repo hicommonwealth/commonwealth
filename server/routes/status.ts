@@ -87,6 +87,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
+  // get starred communities for user
+  const starredCommunities = await models.StarredCommunity.findAll({
+    where: { user_id: req.user.id }
+  });
+
   // get invites for user
   const invites = await models.InviteCode.findAll({
     where: {
@@ -161,6 +166,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
       selectedAddresses: JSON.parse(selectedAddresses),
+      starredCommunities,
       unseenPosts
     }
   });

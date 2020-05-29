@@ -55,6 +55,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       app.login.roles = data.roles || [];
+
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
@@ -63,6 +64,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
 
       // add roles data for user
       if (data.roles) {
@@ -199,7 +201,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
     // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
+    updateActiveAddresses(n.chain, true);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite

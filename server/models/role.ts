@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     offchain_community_id: { type: DataTypes.STRING, allowNull: true },
     chain_id: { type: DataTypes.STRING, allowNull: true },
+    is_user_default: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false, },
     permission: {
       type: DataTypes.ENUM,
       values: ['admin', 'moderator', 'member'],

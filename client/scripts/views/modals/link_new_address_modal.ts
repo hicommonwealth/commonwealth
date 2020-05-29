@@ -21,7 +21,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { EthereumAccount } from 'controllers/chain/ethereum/account';
 import { Account, ChainBase, ChainNetwork } from 'models';
 
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon } from 'views/components/chain_icon';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import CodeBlock from 'views/components/widgets/code_block';
 import { TextInputFormField, CheckboxFormField } from 'views/components/forms';
@@ -105,10 +105,12 @@ const accountVerifiedCallback = async (account, vnode) => {
     await initAppState(false);
     // load addresses for the current chain/community
     if (app.community) {
-      updateActiveAddresses();
+      updateActiveAddresses(undefined, true);
     } else if (app.chain) {
-      updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain);
+      const chain = app.login.selectedNode
+        ? app.login.selectedNode.chain
+        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+      updateActiveAddresses(chain, true);
     } else {
       notifyError('Signed in, but no chain or community found');
     }

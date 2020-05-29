@@ -1,11 +1,17 @@
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
+import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+
+export const Errors = {
+  NotLoggedIn: 'Not logged in',
+  InvalidAddress: 'Invalid address',
+  RoleDNE: 'Role does not exist',
+};
 
 const deleteRole = async (models, req, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.address_id) return next(new Error('Invalid address'));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -14,7 +20,7 @@ const deleteRole = async (models, req, res: Response, next: NextFunction) => {
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) return next(new Error('Invalid address'));
+  if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
   const existingRole = await models.Role.findOne({ where: chain ? {
     address_id: req.body.address_id,
@@ -23,7 +29,7 @@ const deleteRole = async (models, req, res: Response, next: NextFunction) => {
     address_id: req.body.address_id,
     offchain_community_id: community.id,
   } });
-  if (!existingRole) return next(new Error('Role does not exist'));
+  if (!existingRole) return next(new Error(Errors.RoleDNE));
 
   await existingRole.destroy();
 

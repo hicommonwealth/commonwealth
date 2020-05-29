@@ -326,3 +326,36 @@ body.modal-open {
     position: relative;
     top: 1px;
 }
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
+
+// menu styles
+.cui-menu {
+    border: solid 1px #eee;
+    > .cui-menu-divider {
+        border-bottom: solid 1px #eee;
+    }
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
+}
