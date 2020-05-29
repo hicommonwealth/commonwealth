@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.SocialAccount);
-    models.User.hasMany(models.Membership);
+    models.User.hasMany(models.StarredCommunity);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
   };
 

@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     models.OffchainCommunity.belongsTo(models.Address, { foreignKey: 'creator_id', targetKey: 'id', });
     models.OffchainCommunity.hasMany(models.OffchainTag, { as: 'tags', foreignKey: 'community_id', targetKey: 'id', });
     models.OffchainCommunity.hasMany(models.OffchainThread, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainCommunity.hasMany(models.Membership, { foreignKey: 'chain', targetKey: 'id' });
+    models.OffchainCommunity.hasMany(models.StarredCommunity, { foreignKey: 'community', targetKey: 'id' });
   };
 
   return OffchainCommunity;

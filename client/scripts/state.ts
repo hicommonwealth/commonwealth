@@ -10,6 +10,7 @@ import {
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
+  StarredCommunity,
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -23,6 +24,7 @@ import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import SelectedAddressesController from './controllers/server/selected_addresses';
 import ChainEntityController from './controllers/server/chain_entities';
+import CommunitiesController from './controllers/server/communities';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -50,6 +52,7 @@ export interface IApp {
   reactions: ReactionsController;
   tags: TagsController;
   chainEntities: ChainEntityController;
+  communities: CommunitiesController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -73,6 +76,7 @@ export interface IApp {
     notifications: NotificationsController;
     lastVisited: object;
     selectedAddresses: SelectedAddressesController;
+    starredCommunities: StarredCommunity[];
     unseenPosts: object;
   };
   config: {
@@ -107,6 +111,7 @@ const app: IApp = {
   reactions: new ReactionsController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
+  communities: new CommunitiesController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -127,6 +132,7 @@ const app: IApp = {
     lastVisited: {},
     selectedAddresses: new SelectedAddressesController(),
     unseenPosts: {},
+    starredCommunities: [],
     notifications: new NotificationsController(),
   },
   config: {

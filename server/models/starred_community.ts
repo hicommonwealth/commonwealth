@@ -1,9 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
-  const Membership = sequelize.define('Membership', {
+  const StarredCommunity = sequelize.define('StarredCommunity', {
     user_id: { type: DataTypes.INTEGER, allowNull: false },
     chain: { type: DataTypes.STRING, allowNull: true },
     community: { type: DataTypes.STRING, allowNull: true },
-    active: { type: DataTypes.BOOLEAN, defaultValue: true },
     created_at: { type: DataTypes.DATE, allowNull: false },
     updated_at: { type: DataTypes.DATE, allowNull: false },
   }, {
@@ -15,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     ],
   });
 
-  Membership.associate = (models) => {
-    models.Membership.belongsTo(models.User);
-    models.Membership.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.Membership.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
+  StarredCommunity.associate = (models) => {
+    models.StarredCommunity.belongsTo(models.User);
+    models.StarredCommunity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.StarredCommunity.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
   };
 
-  return Membership;
+  return StarredCommunity;
 };
