@@ -41,7 +41,7 @@ describe('User Model Routes', () => {
     });
 
     it.skip('should update user\'s email interval', async () => {
-
+      // not sure how to initialize the user model with an email, or add one later
     });
 
     it('should fail when no new interval is passed in', async () => {
