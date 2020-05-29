@@ -16,7 +16,21 @@
     border-bottom: 1px solid #e7e7e7;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
     z-index: 10;
-
+    .placeholder {
+        h4 {
+            margin: 1px 0 0 0;
+            font-weight: 600;
+        }
+        .subtitle {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 300px;
+            width: calc(100vw - #{$sidebar-width + 300px});
+            max-width: 720px;
+        }
+    }
     .placeholder,
     .header-breadcrumb {
         flex: 1;

@@ -3,6 +3,7 @@ import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
+import { CommentRefreshOption } from 'controllers/server/comments';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
@@ -19,7 +20,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   get serverLoaded() { return this._serverLoaded; }
 
   protected async _postModuleLoad(): Promise<void> {
-    await this.app.comments.refreshAll(this.id, null, true, false, true);
+    await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.LoadProposalComments);
     // await this.app.reactions.refreshAll(this.id, null, false);
 
     // attach listener for entity update events
@@ -49,7 +50,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
   public async init(onServerLoaded? : () => void, initChainModuleFn?: () => Promise<void>): Promise<void> {
     await this.app.threads.refreshAll(this.id, null, true);
-    await this.app.comments.refreshAll(this.id, null, true, true);
+    await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);
     await this.app.tags.refreshAll(this.id, null, true);
     await this.app.chainEntities.refresh(this.meta.chain.id);
