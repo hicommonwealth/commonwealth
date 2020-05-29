@@ -234,13 +234,13 @@ const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
           onclick: () => { vnode.state.index = 2; },
         }),
       ]),
-      (vnode.state.index === 1) &&
-        m(UpgradeRolesForm, {
+      (vnode.state.index === 1)
+        && m(UpgradeRolesForm, {
           roleData: vnode.attrs.roleData,
           onRoleUpgrade: (x, y) => vnode.attrs.onRoleUpgrade(x, y),
         }),
-      (vnode.state.index === 2) &&
-        m(WebhooksForm, { webhooks: vnode.attrs.webhooks }),
+      (vnode.state.index === 2)
+        && m(WebhooksForm, { webhooks: vnode.attrs.webhooks }),
     ]);
   },
 };
