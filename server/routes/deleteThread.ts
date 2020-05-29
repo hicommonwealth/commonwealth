@@ -26,7 +26,7 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       include: [ { model: models.OffchainThread, as: 'threads' } ]
     });
     const featuredTags = (thread.Chain || thread.OffchainCommunity).featured_tags;
-    if (tag && !featuredTags.includes(`${tag.id}` && tag.threads.length <= 1)) {
+    if (tag && !featuredTags.includes(`${tag.id}`) && tag.threads.length <= 1) {
       tag.destroy();
     }
 

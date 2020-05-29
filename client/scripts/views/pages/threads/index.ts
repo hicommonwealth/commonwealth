@@ -50,7 +50,6 @@ export const newThread = (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
-  console.log(form);
   if (!form.title) {
     return ({ title: NewThreadErrors.NoTitle });
   }

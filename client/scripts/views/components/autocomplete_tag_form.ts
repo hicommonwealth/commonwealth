@@ -6,11 +6,12 @@ import { OffchainTag } from 'client/scripts/models';
 
 
 interface IAutoCompleteTagFormAttrs {
+  defaultActiveIndex?: number;
   tags: OffchainTag[];
   featuredTags: OffchainTag[];
   tabindex?: number;
   updateFormData: Function;
-  updateParentErrors: Function;
+  updateParentErrors?: Function;
 }
 
 interface IAutoCompleteTagFormState {
@@ -20,6 +21,7 @@ interface IAutoCompleteTagFormState {
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
+    const { defaultActiveIndex, tags, updateFormData } = vnode.attrs;
     const TagItem = (tag: OffchainTag, index?: number, onclick?: (e: Event) => void) => {
       return m(ListItem, {
         allowOnContentClick: true,
@@ -37,9 +39,9 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     const selectTag = (e: Event) => {
       const { innerText } = (e.target as HTMLElement);
-      const tag = vnode.attrs.tags.filter((t) => t.name === innerText.slice(2))[0];
+      const tag = tags.filter((t) => t.name === innerText.slice(2))[0];
       vnode.state.selectedTag = tag;
-      vnode.attrs.updateFormData(tag);
+      updateFormData(tag);
       manuallyClosePopover();
     };
 
@@ -47,14 +49,14 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     return m(SelectList, {
       closeOnSelect: false,
+      defaultActiveIndex,
       emptyContent: m('.no-matching-tags', { onclick: selectTag }, 'No matching tags found'),
       initialContent: featuredTags,
       itemRender: TagItem,
-      items: vnode.attrs.tags,
+      items: tags,
       onSelect: (item: OffchainTag) => {
-        console.log('selected');
         vnode.state.selectedTag = item;
-        vnode.attrs.updateFormData(item);
+        updateFormData(item);
         manuallyClosePopover();
       },
       trigger: m(Button, {
