@@ -1,9 +1,7 @@
 import m from 'mithril';
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { Table, Button } from 'construct-ui';
-import InputPropertyRow from './input_property_row';
-import ManageRolesRow from './manage_roles_row';
-import TogglePropertyRow from './toggle_property_row';
+import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
   name: string;
