@@ -33,7 +33,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     };
 
     const manuallyClosePopover = () => {
-      const button = document.getElementsByClassName('cui-popover-trigger-active')[0]
+      const button = document.getElementsByClassName('tag-selection-drop-menu')[0];
       if (button) (button as HTMLButtonElement).click();
     };
 
@@ -61,6 +61,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       },
       trigger: m(Button, {
         align: 'left',
+        class: 'tag-selection-drop-menu',
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
         sublabel: 'Category',

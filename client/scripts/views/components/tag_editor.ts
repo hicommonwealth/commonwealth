@@ -8,7 +8,6 @@ import AutoCompleteTagForm from './autocomplete_tag_form';
 interface ITagEditorAttrs {
   thread: OffchainThread;
   onChangeHandler: Function;
-  popoverMenu?: boolean;
 }
 
 const TagWindow: m.Component<{ currentTag: OffchainTag, onChangeHandler: Function }> = {
@@ -26,9 +25,12 @@ const TagWindow: m.Component<{ currentTag: OffchainTag, onChangeHandler: Functio
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tag: OffchainTag}> = {
+const TagEditor: m.Component<ITagEditorAttrs, { tag: OffchainTag, isOpen: boolean }> = {
   oncreate: (vnode) => {
     vnode.state.tag = vnode.attrs.thread.tag;
+  },
+  oninit: (vnode) => {
+    if (vnode.state.isOpen === undefined) vnode.state.isOpen = true;
   },
   view: (vnode) => {
     return m(Dialog, {
@@ -40,7 +42,7 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tag: OffchainTag
         onChangeHandler: (tag: OffchainTag) => { vnode.state.tag = tag; },
       }),
       hasBackdrop: true,
-      isOpen: vnode.state.isOpen,
+      isOpen: true,
       inline: false,
       onClose: () => { vnode.state.isOpen = false; },
       title: 'Edit Tags',

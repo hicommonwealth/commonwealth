@@ -55,15 +55,14 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
 
 interface ITagEditorButtonAttrs {
   popoverMenu: boolean,
-  proposal: OffchainThread,
-  onChangeHandler: Function
+  openTagEditor: Function
 }
 
 export const TagEditorButton: m.Component<ITagEditorButtonAttrs, { isOpen: boolean }> = {
   view: (vnode) => {
-    return vnode.state.isOpen
-      ? m(TagEditor)
-      : m('.TagEditorButton', [
+    const { openTagEditor } = vnode.attrs;
+    return [
+      m('.TagEditorButton', [
         vnode.attrs.popoverMenu
           ? m(MenuItem, {
             iconLeft: Icons.TAG,
@@ -71,19 +70,18 @@ export const TagEditorButton: m.Component<ITagEditorButtonAttrs, { isOpen: boole
             label: 'Edit Tags',
             onclick: (e) => {
               e.preventDefault();
-              vnode.state.isOpen = true;
-              m.redraw();
+              openTagEditor();
             },
           })
           : m('a', {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
-              vnode.state.isOpen = true;
-              m.redraw();
+              openTagEditor();
             },
           }, [ 'Edit tags' ])
-      ]);
+      ]),
+    ];
   }
 };
 
@@ -91,7 +89,7 @@ interface IThreadCaratMenuAttrs {
   proposal: OffchainThread;
 }
 
-const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
+const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { isOpen: boolean }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     const canEditThread = app.vm.activeAccount
@@ -99,25 +97,34 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
           || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
           || proposal.author === app.vm.activeAccount.address);
 
-    return m(PopoverMenu, {
-      transitionDuration: 0,
-      closeOnOutsideClick: true,
-      menuAttrs: { size: 'sm' },
-      content: [
-        canEditThread && m(TagEditorButton, {
-          popoverMenu: true,
-          proposal,
-          onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); }
+    const openTagEditor = () => {
+      vnode.state.isOpen = true;
+    };
+
+    return [
+      m(PopoverMenu, {
+        transitionDuration: 0,
+        closeOnOutsideClick: true,
+        menuAttrs: { size: 'sm' },
+        content: [
+          canEditThread && m(TagEditorButton, {
+            popoverMenu: true,
+            openTagEditor,
+          }),
+          canEditThread && m(ThreadDeletionButton, { proposal }),
+          m(ThreadSubscriptionButton, { proposal }),
+        ],
+        trigger: m(Icon, {
+          name: Icons.CHEVRON_DOWN,
+          class: 'discussion-edit-tags',
+          style: 'margin-right: 6px;'
         }),
-        canEditThread && m(ThreadDeletionButton, { proposal }),
-        m(ThreadSubscriptionButton, { proposal }),
-      ],
-      trigger: m(Icon, {
-        name: Icons.CHEVRON_DOWN,
-        class: 'discussion-edit-tags',
-        style: 'margin-right: 6px;'
       }),
-    });
+      vnode.state.isOpen && m(TagEditor, {
+        thread: vnode.attrs.proposal,
+        onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+      })
+    ];
   },
 };
 
