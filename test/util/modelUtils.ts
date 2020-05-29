@@ -3,7 +3,6 @@ import chai from 'chai';
 import 'chai/register-should';
 import moment from 'moment';
 import wallet from 'ethereumjs-wallet';
-import { NotificationCategory } from 'models';
 import { factory, formatFilename } from '../../server/util/logging';
 import app from '../../server-test';
 import models from '../../server/database';
@@ -44,14 +43,14 @@ export interface ThreadArgs {
   title: any;
   body: any;
   kind: string;
-  tags?: string[];
+  tag?: string;
   privacy?: boolean;
   readOnly?: boolean;
   url?: string;
   mentions?: any;
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chain, community, address, jwt, title, body, tags, privacy, readOnly, kind, url, mentions } = args;
+  const { chain, community, address, jwt, title, body, tag, privacy, readOnly, kind, url, mentions } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -68,7 +67,7 @@ export const createThread = async (args: ThreadArgs) => {
       'kind': kind,
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tags[]': tags || 'tag',
+      'tag': tag,
       'mentions[]': mentions,
       'url': url,
       'privacy': privacy || false,

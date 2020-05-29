@@ -165,7 +165,7 @@ describe('Thread Tests', () => {
       expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
     });
 
-    it('should fail to create a thread without tags', async () => {
+    it('should fail to create a thread without a tag', async () => {
       const tRes = await modelUtils.createThread({
         chain,
         address: adminAddress,
@@ -174,28 +174,27 @@ describe('Thread Tests', () => {
         body,
         readOnly,
         kind,
-        tags: []
+        tag: undefined,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.IncorrectNumberOfTags);
     });
 
-    it('should fail to create a thread with too many tags', async () => {
-      const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title,
-        body,
-        readOnly,
-        kind,
-        tags: ['1', '2']
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.IncorrectNumberOfTags);
-    });
+    // Test is likely no longer relevant, now that a tag is a single string
+    // it('should fail to create a thread with too many tags', async () => {
+    //   const tRes = await modelUtils.createThread({
+    //     chain,
+    //     address: adminAddress,
+    //     jwt: adminJWT,
+    //     title,
+    //     body,
+    //     readOnly,
+    //     kind,
+    //     tag
+    //   });
+    //   expect(tRes).to.not.be.null;
+    //   expect(tRes.error).to.not.be.null;
+    // });
 
     it('should fail to create a comment on a readOnly thread', async () => {
       const tRes = await modelUtils.createThread({
@@ -296,7 +295,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: false,
         readOnly: false,
-        tags: ['tag'],
+        tag: 'tag',
         kind,
       });
       expect(res2.status).to.be.equal('Success');
@@ -418,7 +417,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: true,
         readOnly: true,
-        tags: ['tag', ],
+        tag: 'tag',
         kind,
       });
       expect(res2.status).to.be.equal('Success');

@@ -106,7 +106,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         m('.proposal-header-meta', [
           m(ProposalHeaderTags, { proposal }),
           proposal instanceof OffchainThread
-            && (proposal.tags?.length > 0
+            && (proposal.tag
                 || (app.vm.activeAccount?.address === (proposal as OffchainThread).author)
                 || isRoleOfCommunity(
                   app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()
