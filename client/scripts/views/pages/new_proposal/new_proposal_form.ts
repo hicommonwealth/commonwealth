@@ -331,10 +331,10 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTags
             && m(AutoCompleteTagForm, {
-              results: activeEntityInfo.tags || [],
+              tags: activeEntityInfo.tags || [],
               featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tags: string[]) => {
-                vnode.state.form.tags = tags;
+              updateFormData: (tag: string) => {
+                vnode.state.form.tag = tag;
               },
               updateParentErrors: (err: string) => {
                 if (err) vnode.state.error = err;

@@ -7,39 +7,43 @@ import { OffchainTag } from 'client/scripts/models';
 
 interface IAutoCompleteTagFormAttrs {
   tags: OffchainTag[];
-  featuredTags: number[];
+  featuredTags: OffchainTag[];
   tabindex?: number;
+  updateFormData: Function;
+  updateParentErrors: Function;
 }
 
 interface IAutoCompleteTagFormState {
   error: string;
-  selectedTag: number;
+  selectedTag: OffchainTag;
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    const TagItem = (tag: OffchainTag, index: number) => {
+    const TagItem = (tag: OffchainTag, index?: number) => {
       return m(ListItem, {
         contentRight: m('.tagItem', { style: `color:${Colors.BLUE_GREY200}` }, tag.name),
         key: index,
         label: tag.name,
-        selected: this.selectedItem && this.selectedItem.name === tag.name,
+        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name
       });
     };
 
+    const featuredTags = vnode.attrs.featuredTags.map((tag) => TagItem(tag));
+
     return m(SelectList, {
-      emptyContent: vnode.attrs.featuredTags,
+      emptyContent: featuredTags,
       itemRender: TagItem,
       items: vnode.attrs.tags,
       onSelect: (item: OffchainTag) => {
-        vnode.state.selectedTag = item.id;
+        vnode.state.selectedTag = item;
       },
       trigger: m(Button, {
         align: 'left',
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
         sublabel: 'Category',
-        label: this.selectedItem && this.selectedItem.name,
+        label: vnode.state.selectedTag && vnode.state.selectedTag.name,
       })
     });
   },

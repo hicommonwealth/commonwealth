@@ -9,7 +9,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { OffchainThreadKind, CommunityInfo, NodeInfo, OffchainTag } from 'models';
 
 import { notifyInfo } from 'controllers/app/notifications';
 import PreviewModal from 'views/modals/preview_modal';
@@ -22,13 +22,19 @@ import AutoCompleteTagForm from '../components/autocomplete_tag_form';
 import PageLoading from './loading';
 
 interface IState {
-  form,
+  form: IThreadForm,
   error,
   quillEditorState,
   hasComment,
   autoTitleOverride,
   newType,
   uploadsInProgress,
+}
+
+interface IThreadForm {
+  tag?: OffchainTag | string;
+  url?: string;
+  title?: string;
 }
 
 export const NewThreadForm: m.Component<{}, IState> = {
@@ -123,10 +129,10 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntityInfo.tags || [],
+            tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
+            updateFormData: (tag: string) => {
+              vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {
               if (err) vnode.state.error = err;
@@ -183,10 +189,10 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntityInfo.tags || [],
+            tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
+            updateFormData: (tag: string) => {
+              vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {
               if (err) vnode.state.error = err;

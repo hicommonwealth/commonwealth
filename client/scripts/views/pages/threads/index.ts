@@ -38,11 +38,12 @@ export const newThread = (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
+  console.log(form);
   if (!form.title) {
     return ({ title: 'Title cannot be blank' });
   }
-  if (form.tags?.length > 3) {
-    return ({ tags: 'Threads may only have up to three tags' });
+  if (!form.tag) {
+    return ({ tags: 'Thread must have a tag' });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
     return ({ url: 'URL cannot be blank' });

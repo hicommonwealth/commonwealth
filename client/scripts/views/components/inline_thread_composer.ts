@@ -7,7 +7,7 @@ import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, OffchainTag } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
@@ -25,9 +25,15 @@ interface ILinkPostState {
   autoTitleOverride: boolean;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
   titleSelected: boolean;
+}
+
+interface IThreadForm {
+  tag?: OffchainTag | string;
+  url?: string;
+  title?: string;
 }
 
 const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
@@ -52,7 +58,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       || Object.values(vnode.state.error).length
       || !vnode.state.form.title
       || !vnode.state.form.url
-      || !vnode.state.form.tags
+      || !vnode.state.form.tag
     );
 
     const createLink = (e?) => {
@@ -96,9 +102,11 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         onkeyboardSubmit: createLink,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntityInfo.tags || [],
+        tags: activeEntityInfo.tags || [],
         featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
+        updateFormData: (tag) => {
+          vnode.state.form.tag = tag;
+        },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
           else delete vnode.state.error;
@@ -147,7 +155,7 @@ interface ITextPostState {
   uploadsInProgress: number;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
 }
 
@@ -186,10 +194,10 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         onkeyboardSubmit: createThread,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntityInfo.tags || [],
+        tags: activeEntityInfo.tags || [],
         featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tags: string[]) => {
-          vnode.state.form.tags = tags;
+        updateFormData: (tag) => {
+          vnode.state.form.tag = tag;
         },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
