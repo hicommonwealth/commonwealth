@@ -6,51 +6,79 @@ import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import { Errors as emailErrors } from '../../../server/routes/updateUserEmailInterval';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
 
-describe('Tag Tests', () => {
+describe('User Model Routes', () => {
   before('reset database', async () => {
     await resetDatabase();
   });
 
-  describe('User Model Routes', () => {
+  describe('/updateUserEmailInterval', () => {
     const community = 'staking';
     const chain = 'ethereum';
-    let adminJWT;
-    let adminAddress;
+    let jwtToken;
+    let userAddress;
+    let userEmail;
 
-    describe('/updateUserEmailInterval', () => {
+    beforeEach('create new user', async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      userAddress = res.address;
+      userEmail = res.email;
+      jwtToken = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+      expect(userAddress).to.not.be.null;
+      expect(jwtToken).to.not.be.null;
+      expect(isAdmin).to.not.be.null;
+    });
 
-      beforeEach('create new user', async () => {
-        const res = await modelUtils.createAndVerifyAddress({ chain });
-        adminAddress = res.address;
-        adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-        const isAdmin = await modelUtils.assignRole({
-          address_id: res.address_id,
-          chainOrCommObj: { offchain_community_id: community },
-          role: 'admin',
+    it.skip('should update user\'s email interval', async () => {
+
+    });
+
+    it('should fail when no new interval is passed in', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateUserEmailInterval')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
         });
-        console.dir(res.email);
-        expect(adminAddress).to.not.be.null;
-        expect(adminJWT).to.not.be.null;
-        expect(isAdmin).to.not.be.null;
-      });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(emailErrors.NoInterval);
+    });
 
-      it('should update user\'s email interval', async () => {
+    it('should fail when invalid interval is passed in', async () => {
+      const interval = 'every other day';
+      const res = await chai.request(app)
+        .post('/api/updateUserEmailInterval')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          interval,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(emailErrors.InvalidInterval);
+    });
 
-      });
-
-      it('should fail when no new interval is passed in', async () => {
-
-      });
-
-      it('should fail when user doesn\'t have an email associated', async () => {
-
-      });
+    it('should fail when user doesn\'t have an email associated', async () => {
+      const interval = 'weekly';
+      const res = await chai.request(app)
+        .post('/api/updateUserEmailInterval')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          interval,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(emailErrors.NoEmail);
     });
   });
 });
