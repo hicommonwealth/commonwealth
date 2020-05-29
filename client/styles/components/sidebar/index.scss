@@ -235,5 +235,8 @@ $active-color: #ececec;
         &.cui-selected {
             color: #222;
         }
+        &.starred .cui-button .cui-icon svg {
+            fill: currentColor;
+        }
     }
 }

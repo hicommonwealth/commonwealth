@@ -196,13 +196,27 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
+                    class: app.communities.isStarred(item.id, null) ? 'starred' : '',
                     label: m(CommunityLabel, { chain: item }),
-                    selected: app.activeChainId() === item.id
+                    selected: app.activeChainId() === item.id,
+                    contentRight: app.isLoggedIn() && m(Button, {
+                      label: m(Icon, { name: Icons.STAR }),
+                      onclick: (e) => {
+                        app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                      }
+                    }),
                   })
                   : item instanceof CommunityInfo
                     ? m(ListItem, {
+                      class: app.communities.isStarred(null, item.id) ? 'starred' : '',
                       label: m(CommunityLabel, { community: item }),
-                      selected: app.activeCommunityId() === item.id
+                      selected: app.activeCommunityId() === item.id,
+                      contentRight: app.isLoggedIn() && m(Button, {
+                        label: m(Icon, { name: Icons.STAR }),
+                        onclick: (e) => {
+                          app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                        },
+                      }),
                     })
                     : m(ListItem, {
                       class: 'select-list-back-home',
