@@ -85,9 +85,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     private: privacy || false,
     read_only: readOnly || false,
   };
-
+  console.log(tag);
+  console.log(typeof tag);
   // New Tag table entries created
-  if (typeof tag === 'string') {
+  if (typeof Number(tag) === 'number') {
+    threadContent['tag_id'] = tag;
+  } else if (typeof tag === 'string') {
     let offchainTag;
     try {
       [offchainTag] = await models.OffchainTag.findOrCreate({
@@ -97,14 +100,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
           chain_id: chain?.id || null,
         },
       });
+      threadContent['tag_id'] = tag;
     } catch (err) {
       log.error(err);
     }
-  } else if (typeof tag === 'number') {
-    // Todo: ensure this gets hit
-    threadContent['tag_id'] = tag;
   } else {
-    return next(Error('Must pass either a numeric tag id or new tag name as string'))
+    return next(Error('Must pass either a numeric tag id or new tag name as string'));
   }
 
   const thread = await models.OffchainThread.create(threadContent);

@@ -26,7 +26,7 @@ interface IState {
 }
 
 interface IThreadForm {
-  tag?: OffchainTag;
+  tag?: OffchainTag | string;
   url?: string;
   title?: string;
 }
@@ -125,7 +125,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           m(AutoCompleteTagForm, {
             tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tag: OffchainTag) => {
+            updateFormData: (tag: OffchainTag | string) => {
               vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {
@@ -186,7 +186,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           m(AutoCompleteTagForm, {
             tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tag: OffchainTag) => {
+            updateFormData: (tag: OffchainTag | string) => {
               vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {

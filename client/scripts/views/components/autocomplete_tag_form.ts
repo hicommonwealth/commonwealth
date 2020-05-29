@@ -20,24 +20,34 @@ interface IAutoCompleteTagFormState {
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    const TagItem = (tag: OffchainTag, index?: number) => {
+    const TagItem = (tag: OffchainTag, index?: number, onclick?: (e: Event) => void) => {
       return m(ListItem, {
+        allowOnContentClick: true,
         contentLeft: m('.tagItem', `# ${tag.name}`),
         key: index,
-        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name
+        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name,
+        onclick
       });
     };
 
-    const featuredTags = vnode.attrs.featuredTags.map((tag) => TagItem(tag));
+    const selectTag = (e: Event) => {
+      const { innerText } = (e.target as HTMLElement);
+      const tag = vnode.attrs.tags.filter((t) => t.name === innerText.slice(2))[0];
+      vnode.state.selectedTag = tag;
+      vnode.attrs.updateFormData(tag);
+      console.log(vnode.state.selectedTag);
+      m.redraw();
+    };
+
+    const featuredTags = vnode.attrs.featuredTags.map((tag, idx) => TagItem(tag, idx, selectTag));
 
     return m(SelectList, {
-      emptyContent: m('.no-matching-tags', {
-        onclick: () => null
-      }, 'No matching tags found'),
+      emptyContent: m('.no-matching-tags', { onclick: selectTag }, 'No matching tags found'),
       initialContent: featuredTags,
       itemRender: TagItem,
       items: vnode.attrs.tags,
       onSelect: (item: OffchainTag) => {
+        console.log('selected');
         vnode.state.selectedTag = item;
         vnode.attrs.updateFormData(item);
       },

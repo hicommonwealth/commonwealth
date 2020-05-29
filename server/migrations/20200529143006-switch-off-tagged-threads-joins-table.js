@@ -10,8 +10,6 @@ module.exports = {
         handledThreads[thread_id] = Number(tag_id);
       }
     }));
-    console.log(handledThreads);
-    console.log(Object.keys(handledThreads));
     await Promise.all(Object.keys(handledThreads).map(async (thread_id) => {
       const tag_id = handledThreads[thread_id];
       const query = `UPDATE "OffchainThreads" SET tag_id=${tag_id} WHERE id=${thread_id};`;
