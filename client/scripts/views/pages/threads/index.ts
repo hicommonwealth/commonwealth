@@ -7,11 +7,16 @@ import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
 
-export const formDataIncomplete = (state) => {
-  return Object.values(state.error).length
-  || !state.form.title
-  || !state.form.url
-  || !state.form.tag;
+enum NewThreadErrors {
+  NoBody = 'Thread body cannot be blank',
+  NoTag = 'Thread must have a tag',
+  NoTitle = 'Title cannot be blank',
+  NoUrl = 'URL cannot be blank',
+}
+
+export const formDataIncomplete = (state) : string => {
+  if (!state.form.title) return NewThreadErrors.NoTitle;
+  if (!state.form.tag) return NewThreadErrors.NoTag;
 };
 
 export const parseMentionsForServer = (text, isMarkdown) => {
@@ -47,16 +52,16 @@ export const newThread = (
 ) => {
   console.log(form);
   if (!form.title) {
-    return ({ title: 'Title cannot be blank' });
+    return ({ title: NewThreadErrors.NoTitle });
   }
   if (!form.tag) {
-    return ({ tags: 'Thread must have a tag' });
+    return ({ tags: NewThreadErrors.NoTag });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
-    return ({ url: 'URL cannot be blank' });
+    return ({ url: NewThreadErrors.NoUrl });
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
-    return ({ editor: 'Thread cannot be blank' });
+    return ({ editor: NewThreadErrors.NoBody });
   }
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];

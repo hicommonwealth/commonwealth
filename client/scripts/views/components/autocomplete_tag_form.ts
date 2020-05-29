@@ -37,6 +37,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       items: vnode.attrs.tags,
       onSelect: (item: OffchainTag) => {
         vnode.state.selectedTag = item;
+        vnode.attrs.updateFormData(item);
       },
       trigger: m(Button, {
         align: 'left',

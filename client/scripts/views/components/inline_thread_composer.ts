@@ -31,7 +31,7 @@ interface ILinkPostState {
 }
 
 interface IThreadForm {
-  tag?: OffchainTag | string;
+  tag?: OffchainTag;
   url?: string;
   title?: string;
 }
@@ -96,7 +96,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       m(AutoCompleteTagForm, {
         tags: activeEntityInfo.tags || [],
         featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tag) => {
+        updateFormData: (tag: OffchainTag) => {
           vnode.state.form.tag = tag;
         },
         updateParentErrors: (err: string) => {
@@ -189,7 +189,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       m(AutoCompleteTagForm, {
         tags: activeEntityInfo.tags || [],
         featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tag) => {
+        updateFormData: (tag: OffchainTag) => {
           vnode.state.form.tag = tag;
         },
         updateParentErrors: (err: string) => {

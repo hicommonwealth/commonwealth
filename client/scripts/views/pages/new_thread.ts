@@ -4,7 +4,7 @@ import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col } from 'construct-ui';
+import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip } from 'construct-ui';
 
 import app from 'state';
 import { OffchainTag } from 'models';
@@ -26,7 +26,7 @@ interface IState {
 }
 
 interface IThreadForm {
-  tag?: OffchainTag | string;
+  tag?: OffchainTag;
   url?: string;
   title?: string;
 }
@@ -125,7 +125,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           m(AutoCompleteTagForm, {
             tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tag: string) => {
+            updateFormData: (tag: OffchainTag) => {
               vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {
@@ -138,7 +138,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
+            class: !author ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
             onclick: () => {
@@ -186,7 +186,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           m(AutoCompleteTagForm, {
             tags: activeEntityInfo.tags || [],
             featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tag: string) => {
+            updateFormData: (tag: OffchainTag) => {
               vnode.state.form.tag = tag;
             },
             updateParentErrors: (err: string) => {
@@ -199,9 +199,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || vnode.state.uploadsInProgress > 0 || formDataIncomplete(vnode.state)
-              ? 'disabled'
-              : '',
+            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
