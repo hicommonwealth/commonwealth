@@ -8,7 +8,7 @@ import app from 'state';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
-import AdminTabPanel from './admin_tab_panel';
+import AdminPanelTabs from './admin_panel_tabs';
 
 interface IAdminPanelContentsState {
   roleData: RoleInfo[];
@@ -84,7 +84,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
       ]),
       m('.panel-right', [
         vnode.state.loadingFinished
-          && m(AdminTabPanel, {
+          && m(AdminPanelTabs, {
             defaultTab: 1,
             onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
             roleData: vnode.state.roleData,
@@ -115,7 +115,7 @@ const AdminPanel: m.Component<{}, { isOpen: boolean }> = {
       basic: false,
       closeOnEscapeKey: true,
       closeOnOutsideClick: true,
-      class: 'CommunityManagementDialog',
+      class: 'AdminPanelDialog',
       content: m(AdminPanelContents, {
         onChangeHandler: (v) => { vnode.state.isOpen = v; },
       }),

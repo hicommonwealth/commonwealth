@@ -127,7 +127,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
           placeholder: 'https://hooks.slack.com/services/',
         }),
         m(Button, {
-          class: 'admin-tab-panel-button',
+          class: 'admin-panel-tab-button',
           intent: 'none',
           label: 'Add webhook',
           onclick: createWebhook,
@@ -183,7 +183,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
         onchange: (e: Event) => { vnode.state.role = (e.currentTarget as HTMLInputElement).value; },
       }),
       m(Button, {
-        class: 'admin-tab-panel-button',
+        class: 'admin-panel-tab-button',
         label: 'Upgrade Member',
         onclick: () => {
           const indexOfName = names.indexOf(vnode.state.user);
@@ -205,19 +205,19 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
   }
 };
 
-interface IAdminTabPanelAttrs {
+interface IAdminPanelTabsAttrs {
   defaultTab: number;
   roleData: any[];
   onRoleUpgrade: Function;
   webhooks;
 }
 
-const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
+const AdminPanelTabs: m.Component<IAdminPanelTabsAttrs, {index: number, }> = {
   oninit: (vnode) => {
     vnode.state.index = vnode.attrs.defaultTab;
   },
   view: (vnode) => {
-    return m('.AdminTabPanel', [
+    return m('.AdminPanelTabs', [
       m(Tabs, {
         align: 'left',
         bordered: true,
@@ -245,4 +245,4 @@ const AdminTabPanel: m.Component<IAdminTabPanelAttrs, {index: number, }> = {
   },
 };
 
-export default AdminTabPanel;
+export default AdminPanelTabs;
