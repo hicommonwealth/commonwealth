@@ -7,6 +7,13 @@ import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
 
+export const formDataIncomplete = (state) => {
+  return Object.values(state.error).length
+  || !state.form.title
+  || !state.form.url
+  || !state.form.tag;
+};
+
 export const parseMentionsForServer = (text, isMarkdown) => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');

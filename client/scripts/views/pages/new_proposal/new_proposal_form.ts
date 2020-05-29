@@ -19,7 +19,6 @@ import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
 import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
 import Cosmos from 'controllers/chain/cosmos/main';

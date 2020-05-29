@@ -4,20 +4,14 @@ import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import {
-  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, Grid, Col
-} from 'construct-ui';
+import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThreadKind, CommunityInfo, NodeInfo, OffchainTag } from 'models';
+import { OffchainTag } from 'models';
 
 import { notifyInfo } from 'controllers/app/notifications';
-import PreviewModal from 'views/modals/preview_modal';
-import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
-import { newThread, getLinkTitle, detectURL, newLink } from 'views/pages/threads';
-import { re_weburl } from '../../lib/url-validation';
-import { updateLastVisited } from '../../controllers/app/login';
+import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from '../components/autocomplete_tag_form';
 import PageLoading from './loading';
 
@@ -144,6 +138,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
+            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
             onclick: () => {
@@ -204,7 +199,9 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            disabled: !author || vnode.state.uploadsInProgress > 0,
+            class: !author || vnode.state.uploadsInProgress > 0 || formDataIncomplete(vnode.state)
+              ? 'disabled'
+              : '',
             intent: 'primary',
             onclick: () => {
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
