@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
 
 const updateTags = async (models, req, res: Response, next: NextFunction) => {
@@ -27,39 +28,29 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
   });
   const isAdminOrMod = roles.length > 0;
   const isAuthor = (thread.author_id === userAddress.id);
-
-  let tags: string[] = [];
-  if (req.body['tags[]']) {
-    if (typeof req.body['tags[]'] === 'string') {
-      tags = [req.body['tags[]']];
-    } else if (typeof req.body['tags[]'] === 'object') {
-      tags = req.body['tags[]'];
-    }
+  if (!isAdminOrMod && !isAuthor) {
+    return next(new Error(`You do not have permission to edit this post's tags`));
   }
 
-  const activeTags = await thread.getTags();
-  if (!isAdminOrMod && !isAuthor) return res.json({ result: activeTags });
-
   // remove deleted tags
-  const oldTags = activeTags.filter((activeTag) => !tags.includes(activeTag.name));
-  await Promise.all(oldTags.map((tag) => thread.removeTag(tag)));
-
-  // create new tags
-  const activeNames: any[] = activeTags.map((a) => a.name);
-  await Promise.all(tags.filter((tag) => !activeNames.includes(tag)).map(async (tag) => {
-    const [newTag] = await models.OffchainTag.findOrCreate({
+  let newTag;
+  if (req.body.tag_id) {
+    thread.tag_id = req.body.tag_id;
+    thread.save();
+    newTag = await models.OffchainTag.findOne({
+      where: { id: req.body.tag_id }
+    });
+  } else if (req.body.new_tag_name) {
+    [newTag] = await models.OffchainTag.findOrCreate({
       where: {
-        name: tag,
+        name: req.body.new_tag_name,
         community_id: thread.community || null,
         chain_id: thread.community ? null : thread.chain,
       },
     });
-    await thread.addTag(newTag);
-  }));
+  }
 
-  // return new tags
-  const finalTags = await thread.getTags();
-  return res.json({ status: 'Success', result: finalTags });
+  return res.json({ status: 'Success', result: newTag });
 };
 
 export default updateTags;

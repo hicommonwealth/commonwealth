@@ -69,10 +69,8 @@ describe('Tag Tests', () => {
     let adminJWT;
     let adminAddress;
     let thread;
-    const noTags: string[] = [];
-    const oneTag: string[] = ['tag'];
-    const someTags: string[] = ['tag', 'tag3'];
-    const mostTags: string[] = ['tag', 'tag2', 'tag3', 'tag4'];
+    const noTags: string = undefined;
+    const oneTag: string = 'tag';
 
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
@@ -98,7 +96,7 @@ describe('Tag Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    it('Should update thread to no tags', async () => {
+    it('Should fail to update thread with no tags', async () => {
       const res = await chai.request(app)
         .post('/api/updateTags')
         .set('Accept', 'application/json')
@@ -106,14 +104,14 @@ describe('Tag Tests', () => {
           'jwt': adminJWT,
           'thread_id': thread.id,
           'address': adminAddress,
-          'tags[]': noTags,
+          'tag': noTags,
         });
       expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.status).to.not.be.equal('Success');
       expect(res.body.result).to.not.be.null;
     });
 
-    it('Should add 1 tag to thread', async () => {
+    it('Should successfully add tag to thread', async () => {
       const res = await chai.request(app)
         .post('/api/updateTags')
         .set('Accept', 'application/json')
@@ -121,47 +119,13 @@ describe('Tag Tests', () => {
           'jwt': adminJWT,
           'thread_id': thread.id,
           'address': adminAddress,
-          'tags[]': oneTag,
+          'tag': oneTag,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
-      const tags = res.body.result;
-      expect(tags.length).to.be.equal(1);
-    });
-
-    it('Should add 4 tags', async () => {
-      const res = await chai.request(app)
-        .post('/api/updateTags')
-        .set('Accept', 'application/json')
-        .send({
-          'jwt': adminJWT,
-          'thread_id': thread.id,
-          'address': adminAddress,
-          'tags[]': mostTags,
-        });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result).to.not.be.null;
-      const tags = res.body.result;
-      expect(tags.length).to.be.equal(4);
-    });
-
-    it('Should update thread to 2 tags', async () => {
-      const res = await chai.request(app)
-        .post('/api/updateTags')
-        .set('Accept', 'application/json')
-        .send({
-          'jwt': adminJWT,
-          'thread_id': thread.id,
-          'address': adminAddress,
-          'tags[]': someTags,
-        });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result).to.not.be.null;
-      const tags = res.body.result;
-      expect(tags.length).to.be.equal(2);
+      const tag = res.body.result;
+      expect(tag).to.be.equal(oneTag);
     });
   });
 });
