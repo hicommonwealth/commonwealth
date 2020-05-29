@@ -216,7 +216,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('both routes should fail when not passed ids', async () => {
+    it('should fail to enable and disable immediate emails when not passed ids', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai.request(app)
         .post('/api/enableImmediateEmails')
@@ -232,7 +232,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
-    it('both routes should succeed with just a string id', async () => {
+    it('should successfully enable and disable with just a string id', async () => {
       expect(subscription).to.not.be.null;
       let res = await chai.request(app)
         .post('/api/enableImmediateEmails')
@@ -247,7 +247,7 @@ describe('Subscriptions Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('both routes should fail when requester does not own the subscription', async () => {
+    it('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
       expect(subscription).to.not.be.null;
