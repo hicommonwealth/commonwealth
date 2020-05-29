@@ -137,10 +137,8 @@ class ThreadsController {
     const _this = this;
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.login.jwt,
-        thread_id: proposal.id,
-        community: app.activeCommunityId(),
-        chain: app.activeChainId(),
+        'jwt': app.login.jwt,
+        'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
         resolve(result);

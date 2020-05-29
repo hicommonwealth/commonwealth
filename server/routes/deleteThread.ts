@@ -3,7 +3,7 @@ import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const deleteThread = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id, community, chain } = req.body;
+  const { thread_id } = req.body;
   if (!req.user) {
     return next(new Error('Not logged in'));
   }
@@ -20,16 +20,16 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
+
     const tag = await models.OffchainTag.findOne({
       where: { id: thread.tag_id },
-      include: [ models.OffchainThread ]
+      include: [ { model: models.OffchainThread, as: 'threads' } ]
     });
-
     const featuredTags = (thread.Chain || thread.OffchainCommunity).featured_tags;
-    console.log(tag);
-    if (tag && !featuredTags.includes(`${tag.id}` && !tag.threads?.length)) {
+    if (tag && !featuredTags.includes(`${tag.id}` && tag.threads.length <= 1)) {
       tag.destroy();
     }
+
     await thread.destroy();
     return res.json({ status: 'Success' });
   } catch (e) {
