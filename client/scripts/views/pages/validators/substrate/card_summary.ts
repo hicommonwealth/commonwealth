@@ -14,15 +14,15 @@ interface IValidatorAttrs {
 const ActionForm: m.Component<IValidatorAttrs, IValidatorState> = {
   view: (vnode) => {
     const { total, value, title } = vnode.attrs;
-    const per = (value.muln(10000).div(total).toNumber() / 100);
-    const perText = per < 0 || per > 100
+    const percentage: number = (value.muln(10000).div(total).toNumber() / 100);
+    const percentageText: string = percentage < 0 || percentage > 100
       ? ''
-      : `${per.toFixed(2)}%`;
+      : `${percentage.toFixed(2)}%`;
 
     return m('.validators-preheader-item', [
       m('h3', title),
       m('.preheader-item-text', `${formatNumber(value)}/${formatNumber(total)}`),
-      m('.preheader-item-sub-text', perText)
+      m('.preheader-item-sub-text', percentageText)
     ]);
   },
 };
