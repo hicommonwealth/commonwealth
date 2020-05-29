@@ -139,6 +139,8 @@ class ThreadsController {
       $.post(`${app.serverUrl()}/deleteThread`, {
         jwt: app.login.jwt,
         thread_id: proposal.id,
+        community: app.activeCommunityId(),
+        chain: app.activeChainId(),
       }).then((result) => {
         _this.store.remove(proposal);
         resolve(result);

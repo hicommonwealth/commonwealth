@@ -32,7 +32,7 @@ interface IThreadForm {
 }
 
 export const NewThreadForm: m.Component<{}, IState> = {
-  view: (vnode) => {
+  view: (vnode: VnodeDOM<{}, IState>) => {
     const author = app.vm.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
@@ -146,7 +146,13 @@ export const NewThreadForm: m.Component<{}, IState> = {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
               if (!Object.values(vnode.state.error).length) {
-                Object.assign(vnode.state.error, newLink(vnode.state.form, vnode.state.quillEditorState, author));
+                newLink(vnode.state.form, vnode.state.quillEditorState, author);
+              }
+              if (!vnode.state.error) {
+                $(vnode.dom).trigger('modalcomplete');
+                setTimeout(() => {
+                  $(vnode.dom).trigger('modalexit');
+                }, 0);
               }
             },
           }),
@@ -203,6 +209,12 @@ export const NewThreadForm: m.Component<{}, IState> = {
             intent: 'primary',
             onclick: () => {
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              if (!vnode.state.error) {
+                $(vnode.dom).trigger('modalcomplete');
+                setTimeout(() => {
+                  $(vnode.dom).trigger('modalexit');
+                }, 0);
+              }
             },
             label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
           }),
