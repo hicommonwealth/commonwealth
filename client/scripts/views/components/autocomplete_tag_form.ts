@@ -1,30 +1,23 @@
 import 'components/autocomplete_tag_form.scss';
 
 import { default as m } from 'mithril';
-import { symbols } from '../../helpers';
-import { AutoCompleteForm } from './autocomplete_input';
 import { SelectList, ListItem, Colors, Button, Icons } from 'construct-ui';
 import { OffchainTag } from 'client/scripts/models';
 
 
 interface IAutoCompleteTagFormAttrs {
-  results: OffchainTag[];
-  featuredTags;
-  updateFormData?: CallableFunction;
-  updateParentErrors: CallableFunction;
+  tags: OffchainTag[];
+  featuredTags: number[];
   tabindex?: number;
 }
 
 interface IAutoCompleteTagFormState {
   error: string;
-  noMatches: boolean;
-  tags: string[];
+  selectedTag: number;
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    if (!vnode.state.tags) vnode.state.tags = [];
-
     const TagItem = (tag: OffchainTag, index: number) => {
       return m(ListItem, {
         contentRight: m('.tagItem', { style: `color:${Colors.BLUE_GREY200}` }, tag.name),
@@ -37,7 +30,10 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     return m(SelectList, {
       emptyContent: vnode.attrs.featuredTags,
       itemRender: TagItem,
-      items: vnode.state.tags,
+      items: vnode.attrs.tags,
+      onSelect: (item: OffchainTag) => {
+        vnode.state.selectedTag = item.id;
+      },
       trigger: m(Button, {
         align: 'left',
         compact: true,
