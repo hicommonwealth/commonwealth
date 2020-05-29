@@ -13,12 +13,11 @@ const Errors = {
 const updateUserEmailInterval = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.interval) return next(new Error(Errors.NoInterval));
-  if (!req.body.email) return next(new Error(Errors.NoEmail));
   const { email, interval } = req.body;
 
   const user = await models.User.findOne({
     where: {
-      email,
+      id: req.user.id,
     }
   });
   if (!user) return next(new Error(Errors.NoUser));
