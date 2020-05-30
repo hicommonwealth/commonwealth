@@ -86,18 +86,6 @@ class SubstrateStaking extends SubstrateAccounts {
             eraPoints: eraPoints[key]
           };
         }
-
-        // add set of next elected
-        for (let i = 0; i < toBeElected.length; ++i) {
-          const key = toBeElected[i].toString();
-          result[key] = {
-            exposure: nextUpExposures[i],
-            controller: nextUpControllers[i].toString(),
-            isElected: false,
-            isWaiting: false,
-            eraPoints: eraPoints[key]
-          };
-        }
         // add set of next elected
         for (let i = 0; i < toBeElected.length; ++i) {
           const key = toBeElected[i].toString();
