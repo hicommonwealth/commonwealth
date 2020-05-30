@@ -19,7 +19,7 @@ const ActionForm: m.Component<IValidatorAttrs, IValidatorState> = {
       ? ''
       : `${percentage.toFixed(2)}%`;
 
-    return m('.validators-preheader-item', [
+    return percentageText && m('.validators-preheader-item', [
       m('h3', title),
       m('.preheader-item-text', `${formatNumber(value)}/${formatNumber(total)}`),
       m('.preheader-item-sub-text', percentageText)

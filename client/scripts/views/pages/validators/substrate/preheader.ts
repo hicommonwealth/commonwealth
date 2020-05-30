@@ -41,7 +41,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
-      eraProgress } = sessionInfo;
+      eraProgress, isEpoch } = sessionInfo;
     const nominators: string[] = [];
     let elected: number = 0;
     let waiting: number = 0;
@@ -98,11 +98,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Last Block'),
           m('.preheader-item-text', formatNumber((app.chain as Substrate).block.height)),
         ]),
-        m(CardSummary, {
-          title: 'Epoch',
-          total: sessionLength,
-          value: sessionProgress
-        }),
+        (isEpoch
+          && m(CardSummary, {
+            title: 'Epoch',
+            total: sessionLength,
+            value: sessionProgress
+          })),
         m(CardSummary, {
           title: 'Era',
           total: eraLength,
@@ -111,7 +112,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       ]),
       m('.validators-preheader', [
         m('.validators-preheader-item', [
-          m('h3', 'Epoch'),
+          m('h3', 'Epoch / Session'),
           m('.preheader-item-text', `#${formatNumber(currentIndex)}`),
         ]),
         m('.validators-preheader-item', [
