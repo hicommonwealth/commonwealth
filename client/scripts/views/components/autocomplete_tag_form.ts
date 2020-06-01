@@ -23,16 +23,12 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
   view: (vnode) => {
     const { defaultActiveIndex, featuredTags, tags, updateFormData } = vnode.attrs;
 
-    const itemListRender = (items: any[]) => {
-      const listItem = (tag) => m(ListItem, {
+    const itemRender = (tag) => {
+      return m(ListItem, {
+        class: featuredTags.includes(tag) ? 'featured-tags' : 'other-tags',
         contentLeft: m('.tagItem', `# ${tag.name}`),
-        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name,    
+        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name,
       });
-      return m(List, [
-        featuredTags.map((tag) => listItem(tag)),
-        m('.divider-line', '---'),
-        tags.map((tag) => listItem(tag))
-      ]);
     };
 
     // const manuallyClosePopover = () => {
@@ -47,13 +43,11 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       updateFormData(tag);
     };
 
-    // const featuredTags = vnode.attrs.featuredTags.map((tag, idx) => TagItem(tag, idx, selectTag));
-
     return m(SelectList, {
+      class: 'AutocompleteTagForm',
       defaultActiveIndex,
       emptyContent: m('.no-matching-tags', { onclick: selectTag }, 'No matching tags found'),
-      itemListRender,
-      itemRender: () => null,
+      itemRender,
       items: featuredTags.concat(tags),
       onSelect: (item: OffchainTag) => {
         vnode.state.selectedTag = item;
