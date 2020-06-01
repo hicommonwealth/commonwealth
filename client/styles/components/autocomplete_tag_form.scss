@@ -1,11 +1,7 @@
 @import 'client/styles/shared';
 
 .AutocompleteTagForm {
-  .featured-tags {
-    padding-bottom: 5px;
-    border-bottom: 1px solid $lighttextgrey;
-  }
-  .other-tags {
-    margin-top: 5px;
+  .featured-tag + .other-tag {
+    border-top: 3px solid red;
   }
 }

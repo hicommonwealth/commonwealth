@@ -85,8 +85,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     private: privacy || false,
     read_only: readOnly || false,
   };
-  console.log(tag);
-  console.log(typeof tag);
+
   // New Tag table entries created
   if (typeof Number(tag) === 'number') {
     threadContent['tag_id'] = tag;
@@ -134,10 +133,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       include: [
         models.Address,
         models.OffchainAttachment,
-        {
-          model: models.OffchainTag,
-          as: 'tag',
-        }
+        { model: models.OffchainTag, as: 'tag' }
       ],
     });
   } catch (err) {
