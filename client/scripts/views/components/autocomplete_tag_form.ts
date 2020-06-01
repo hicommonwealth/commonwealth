@@ -21,7 +21,7 @@ interface IAutoCompleteTagFormState {
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    const { featuredTags, tags, updateFormData } = vnode.attrs;
+    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
 
     const itemRender = (tag) => {
       return m(ListItem, {
@@ -51,7 +51,6 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       vnode.state.selectedTag = newTag;
       updateFormData(newTag);
       manuallyClosePopover();
-      m.redraw();
     };
 
     const sortTags = (tags_: OffchainTag[]) => {
@@ -81,10 +80,11 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         class: 'tag-selection-drop-menu',
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
-        sublabel: 'Category',
         label: vnode.state.selectedTag
           ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
           : '',
+        sublabel: 'Category',
+        tabindex
       })
     });
   },

@@ -94,6 +94,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
               vnode.state.form.url = value;
               if (detectURL(value)) getUrlForLinkPost();
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -106,6 +107,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
               if (vnode.state.error.title) delete vnode.state.error.title;
               vnode.state.form.title = value;
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -116,9 +118,11 @@ export const NewThreadForm: m.Component<{}, IState> = {
             },
             placeholder: 'Comment (optional)',
             editorNamespace: 'new-link',
+            tabindex: 3,
           }) : m('a.add-comment', {
             href: '#',
             onclick: (e) => { vnode.state.hasComment = true; },
+            tabindex: 2,
           }, 'Add comment'),
         ]),
         m(FormGroup, [
@@ -141,6 +145,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
             class: !author ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
+            name: 'submission',
             onclick: () => {
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
@@ -176,6 +181,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
             onchange: (e) => {
               vnode.state.form.title = (e as any).target.value;
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -217,6 +223,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
               }
             },
             label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
+            name: 'submission',
+            tabindex: 4
           }),
         ]),
         error
