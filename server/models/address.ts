@@ -143,7 +143,7 @@ export default (
     signatureParams: string,
   ): Promise<boolean> => {
     if (!chain) {
-      console.error('no chain provided to verifySignature');
+      log.error('no chain provided to verifySignature');
       return false;
     }
 
@@ -153,7 +153,7 @@ export default (
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
         if (addressModel.keytype !== 'sr25519' && addressModel.keytype !== 'ed25519') {
-          console.error('invalid keytype');
+          log.error('invalid keytype');
           return false;
         }
         keyringOptions.type = addressModel.keytype;
@@ -174,7 +174,7 @@ export default (
           const verificationTokenValid = verificationToken.indexOf(addressModel.verification_token) !== -1;
           if (!verificationTokenValid) return false;
         } catch (e) {
-          console.error('Invalid signatureParams');
+          log.error('Invalid signatureParams');
           return false;
         }
         const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
@@ -228,7 +228,7 @@ export default (
       );
     } else {
       // invalid network
-      console.error(`invalid network: ${chain.network}`);
+      log.error(`invalid network: ${chain.network}`);
       isValid = false;
     }
 
