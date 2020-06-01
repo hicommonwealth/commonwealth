@@ -88,7 +88,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   // New Tag table entries created
   if (typeof Number(tag) === 'number') {
-    threadContent['tag_id'] = tag;
+    threadContent['tag_id'] = Number(tag);
   } else if (typeof tag === 'string') {
     let offchainTag;
     try {
@@ -99,7 +99,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
           chain_id: chain?.id || null,
         },
       });
-      threadContent['tag_id'] = offchainTag.name;
+      threadContent['tag_id'] = offchainTag.id;
     } catch (err) {
       log.error(err);
     }

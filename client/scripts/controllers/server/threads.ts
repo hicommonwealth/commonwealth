@@ -52,7 +52,7 @@ class ThreadsController {
     return result;
   }
 
-  public create(
+  public async create(
     address: string,
     kind: string,
     chainId: string,
@@ -69,31 +69,32 @@ class ThreadsController {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
-    return $.post(`${app.serverUrl()}/createThread`, {
-      'author_chain': app.vm.activeAccount.chain.id,
-      'chain': chainId,
-      'community': communityId,
-      'address': address,
-      'title': encodeURIComponent(title),
-      'body': encodeURIComponent(body),
-      'kind': kind,
-      'versionHistory': versionHistory,
-      'attachments[]': attachments,
-      'mentions[]': mentions,
-      'tag': (tag as OffchainTag).id || tag,
-      'url': url,
-      'privacy': privacy,
-      'readOnly': readOnly,
-      'jwt': app.login.jwt,
-    }).then((response) => {
+    try {
+      const response = await $.post(`${app.serverUrl()}/createThread`, {
+        'author_chain': app.vm.activeAccount.chain.id,
+        'chain': chainId,
+        'community': communityId,
+        'address': address,
+        'title': encodeURIComponent(title),
+        'body': encodeURIComponent(body),
+        'kind': kind,
+        'versionHistory': versionHistory,
+        'attachments[]': attachments,
+        'mentions[]': mentions,
+        'tag': (tag as OffchainTag).id || tag,
+        'url': url,
+        'privacy': privacy,
+        'readOnly': readOnly,
+        'jwt': app.login.jwt,
+      });
       const result = modelFromServer(response.result);
       this._store.add(result);
       return result;
-    }, (err) => {
+    } catch (err) {
       console.log('Failed to create thread');
       throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
         : 'Failed to create thread');
-    });
+    }
   }
 
   public async edit(
