@@ -99,7 +99,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
           chain_id: chain?.id || null,
         },
       });
-      threadContent['tag_id'] = tag;
+      threadContent['tag_id'] = offchainTag.name;
     } catch (err) {
       log.error(err);
     }

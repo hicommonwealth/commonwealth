@@ -4,4 +4,8 @@
   .featured-tag + .other-tag {
     border-top: 1px solid blue;
   }
+  .no-matching-tags {
+    color: blue;
+    text-decoration: none;
+  }
 }

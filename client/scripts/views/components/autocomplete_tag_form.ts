@@ -45,10 +45,13 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       if (button) (button as HTMLButtonElement).click();
     };
 
-    const addTag = (tag: string) => {
-      vnode.state.selectedTag = tag;
-      updateFormData(tag);
+    const addTag = () => {
+      const input = (document.getElementsByClassName('autocomplete-tag-input')[0].firstChild as HTMLInputElement);
+      const newTag = input.value;
+      vnode.state.selectedTag = newTag;
+      updateFormData(newTag);
       manuallyClosePopover();
+      m.redraw();
     };
 
     const sortTags = (tags_: OffchainTag[]) => {
@@ -58,11 +61,9 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     const EmptyContent: m.Component<{}, {}> = {
       view: (vnode_) => {
-        const input = (document.getElementsByClassName('autocomplete-tag-input')[0] as HTMLInputElement);
-        const query = input.innerText;
         return m('a.no-matching-tags', {
           href: '#',
-          onclick: () => addTag(query),
+          onclick: () => addTag(),
         }, 'No matches found. Add tag?');
       }
     };
