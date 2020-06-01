@@ -43,6 +43,8 @@ const DepositeEVMBalanceModal = {
                 try {
                   if ((app.chain as Substrate).chain.hasEVM) {
                     await createTXModal((account as SubstrateAccount).depositEVMBalanceTx(data.deposit));
+                  } else {
+                    console.log('No EVM module found');
                   }
                 } catch (error) {
                   if (typeof error === 'string') {

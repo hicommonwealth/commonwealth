@@ -346,9 +346,11 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   public get evmAccount(): Observable<Codec> {
     if (!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api
-      .query.evm.accounts(this.evmAddress))
-      .pipe(map((account) => (account)));
+    return this._Chain.query((api: ApiRx) => {
+      return (api.query.evm)
+        ? api.query.evm.accounts(this.evmAddress)
+        : of(null);
+    });
   }
 
   public get evmNonce(): Observable<Number> {

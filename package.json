@@ -99,7 +99,7 @@
     "dotenv": "^8.2.0",
     "dragula": "^3.7.2",
     "dropzone": "^5.5.1",
-    "edgeware-node-types": "^2.1.0",
+    "edgeware-node-types": "^2.2.0",
     "eslint": "^6.8.0",
     "eslint-loader": "^2.1.1",
     "ethereumjs-util": "^6.1.0",
