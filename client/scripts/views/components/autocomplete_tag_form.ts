@@ -16,7 +16,7 @@ interface IAutoCompleteTagFormAttrs {
 
 interface IAutoCompleteTagFormState {
   error: string;
-  selectedTag: OffchainTag;
+  selectedTag: OffchainTag | string;
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
@@ -27,7 +27,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       return m(ListItem, {
         class: featuredTags.includes(tag) ? 'featured-tag' : 'other-tag',
         contentLeft: m('.tagItem', `# ${tag.name}`),
-        selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name,
+        selected: vnode.state.selectedTag && (vnode.state.selectedTag as OffchainTag).name === tag.name,
       });
     };
 
@@ -45,9 +45,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     //   if (button) (button as HTMLButtonElement).click();
     // };
 
-    const selectTag = (e: Event) => {
-      const { innerText } = (e.target as HTMLElement);
-      const tag = tags.filter((t) => t.name === innerText.slice(2))[0];
+    const addTag = (tag: string) => {
       vnode.state.selectedTag = tag;
       updateFormData(tag);
     };
@@ -57,9 +55,21 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         .concat(tags_.filter((tag) => !featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1));
     };
 
+    const EmptyContent: m.Component<{}, {}> = {
+      view: (vnode_) => {
+        const input = (document.getElementsByClassName('autocomplete-tag-input')[0] as HTMLInputElement);
+        const query = input.innerText;
+        return m('a.no-matching-tags', {
+          href: '#',
+          onclick: () => addTag(query),
+        }, 'No matches found. Add tag?');
+      }
+    };
+
     return m(SelectList, {
       class: 'AutocompleteTagForm',
-      emptyContent: m('.no-matching-tags', { onclick: selectTag }, 'No matching tags found'),
+      emptyContent: m(EmptyContent),
+      inputAttrs: { class: 'autocomplete-tag-input' },
       itemPredicate,
       itemRender,
       items: sortTags(tags),
@@ -70,7 +80,8 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
         sublabel: 'Category',
-        label: vnode.state.selectedTag && vnode.state.selectedTag.name,
+        label: vnode.state.selectedTag
+          && ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string)),
       })
     });
   },
