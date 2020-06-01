@@ -3,7 +3,7 @@ import * as Sequelize from 'sequelize';
 import { OffchainCommunityAttributes } from './offchain_community';
 
 export interface InviteCodeAttributes {
-  id?: number;
+  id?: string;
   community_id: string;
   community_name?: string;
   creator_id: number;
@@ -29,7 +29,7 @@ export default (
   dataTypes: Sequelize.DataTypes,
 ): InviteCodeModel => {
   const InviteCode = sequelize.define<InviteCodeInstance, InviteCodeAttributes>('InviteCode', {
-    id: { type: dataTypes.STRING, primaryKey: true, autoIncrement: true },
+    id: { type: dataTypes.STRING, primaryKey: true },
     community_id: { type: dataTypes.STRING, allowNull: false },
     community_name: { type: dataTypes.STRING, allowNull: true },
     creator_id: { type: dataTypes.INTEGER, allowNull: false },

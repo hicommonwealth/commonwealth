@@ -8,7 +8,7 @@ export interface ChainNodeAttributes {
   address: string;
 
   // associations
-  Chain: ChainAttributes;
+  Chain?: ChainAttributes;
 }
 
 export interface ChainNodeInstance extends Sequelize.Instance<ChainNodeAttributes>, ChainNodeAttributes {

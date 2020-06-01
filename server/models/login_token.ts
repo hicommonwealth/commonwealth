@@ -24,13 +24,14 @@ export interface LoginTokenInstance extends Sequelize.Instance<LoginTokenAttribu
 }
 
 export interface LoginTokenModel extends Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> {
-  createForEmail: (email: string, path?: string) => Promise<LoginTokenInstance>;
+  createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;
 }
+
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
-): Sequelize.Model<LoginTokenInstance, LoginTokenAttributes> => {
-  const LoginToken = sequelize.define<LoginTokenInstance, LoginTokenAttributes>('LoginToken', {
+): LoginTokenModel => {
+  const LoginToken: LoginTokenModel = sequelize.define<LoginTokenInstance, LoginTokenAttributes>('LoginToken', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     token: { type: dataTypes.STRING, allowNull: false },
     email: { type: dataTypes.STRING, allowNull: true },
@@ -44,15 +45,14 @@ export default (
     indexes: [
       { fields: ['token', 'email'] },
     ],
-    classMethods: {
-      createForEmail: async (email: string, path?: string): Promise<LoginTokenInstance> => {
-        const token = crypto.randomBytes(24).toString('hex');
-        const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
-        const result = await LoginToken.create({ email, expires, token, redirect_path: path });
-        return result;
-      }
-    }
   });
+
+  LoginToken.createForEmail = async (email: string, path?: string): Promise<LoginTokenInstance> => {
+    const token = crypto.randomBytes(24).toString('hex');
+    const expires = new Date(+(new Date()) + LOGIN_TOKEN_EXPIRES_IN * 60 * 1000);
+    const result = await LoginToken.create({ email, expires, token, redirect_path: path });
+    return result;
+  };
 
   LoginToken.associate = (models) => {
     models.LoginToken.hasMany(models.SocialAccount);
