@@ -71,6 +71,7 @@
     "@types/mocha": "^5.2.6",
     "@types/moment": "^2.13.0",
     "@types/react": "^16.9.2",
+    "@types/sequelize": "^4.28.8",
     "@types/toastr": "^2.1.35",
     "@types/underscore": "^1.9.4",
     "@types/websocket": "^1.0.0",
