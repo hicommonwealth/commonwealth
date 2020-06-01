@@ -2,9 +2,7 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
-
-import 'construct-ui/src/utils/focus-manager/index.scss';
-import 'construct-ui/src/components/index.scss';
+import 'construct.scss';
 
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
