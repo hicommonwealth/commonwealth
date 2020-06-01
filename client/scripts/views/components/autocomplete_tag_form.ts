@@ -21,7 +21,7 @@ interface IAutoCompleteTagFormState {
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    const { defaultActiveIndex, featuredTags, tags, updateFormData } = vnode.attrs;
+    const { featuredTags, tags, updateFormData } = vnode.attrs;
 
     const itemRender = (tag) => {
       return m(ListItem, {
@@ -29,6 +29,15 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         contentLeft: m('.tagItem', `# ${tag.name}`),
         selected: vnode.state.selectedTag && vnode.state.selectedTag.name === tag.name,
       });
+    };
+
+    const itemPredicate = (query: string, item: OffchainTag) => {
+      return item.name.toLowerCase().includes(query.toLowerCase());
+    };
+
+    const onSelect = (item: OffchainTag) => {
+      vnode.state.selectedTag = item;
+      updateFormData(item);
     };
 
     // const manuallyClosePopover = () => {
@@ -43,16 +52,18 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       updateFormData(tag);
     };
 
+    const sortTags = (tags_: OffchainTag[]) => {
+      return tags_.filter((tag) => featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1)
+        .concat(tags_.filter((tag) => !featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1));
+    };
+
     return m(SelectList, {
       class: 'AutocompleteTagForm',
-      defaultActiveIndex,
       emptyContent: m('.no-matching-tags', { onclick: selectTag }, 'No matching tags found'),
+      itemPredicate,
       itemRender,
-      items: featuredTags.concat(tags),
-      onSelect: (item: OffchainTag) => {
-        vnode.state.selectedTag = item;
-        updateFormData(item);
-      },
+      items: sortTags(tags),
+      onSelect,
       trigger: m(Button, {
         align: 'left',
         class: 'tag-selection-drop-menu',
