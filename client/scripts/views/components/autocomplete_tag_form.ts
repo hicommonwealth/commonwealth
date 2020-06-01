@@ -40,14 +40,15 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       updateFormData(item);
     };
 
-    // const manuallyClosePopover = () => {
-    //   const button = document.getElementsByClassName('tag-selection-drop-menu')[0];
-    //   if (button) (button as HTMLButtonElement).click();
-    // };
+    const manuallyClosePopover = () => {
+      const button = document.getElementsByClassName('tag-selection-drop-menu')[0];
+      if (button) (button as HTMLButtonElement).click();
+    };
 
     const addTag = (tag: string) => {
       vnode.state.selectedTag = tag;
       updateFormData(tag);
+      manuallyClosePopover();
     };
 
     const sortTags = (tags_: OffchainTag[]) => {
@@ -81,7 +82,8 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         iconRight: Icons.CHEVRON_DOWN,
         sublabel: 'Category',
         label: vnode.state.selectedTag
-          && ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string)),
+          ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
+          : '',
       })
     });
   },

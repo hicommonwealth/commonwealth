@@ -123,8 +123,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            tags: activeEntityInfo.tags || [],
-            featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+            tags: app.tags.getByCommunity(app.activeId()),
+            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
             updateFormData: (tag: OffchainTag | string) => {
               vnode.state.form.tag = tag;
             },
@@ -190,8 +190,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            tags: activeEntityInfo.tags || [],
-            featuredTags: activeEntityInfo.tags.filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+            tags: app.tags.getByCommunity(app.activeId()),
+            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
             updateFormData: (tag: OffchainTag | string) => {
               vnode.state.form.tag = tag;
             },

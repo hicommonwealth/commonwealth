@@ -15,10 +15,10 @@ const TagWindow: m.Component<{ currentTag: OffchainTag, onChangeHandler: Functio
     const { onChangeHandler, currentTag } = vnode.attrs;
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
     const featuredTags = activeMeta.featuredTags.map((t) => {
-      return activeMeta.tags.find((t_) => Number(t) === t_.id);
+      return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
     return m(AutoCompleteTagForm, {
-      tags: activeMeta.tags,
+      tags: app.tags.getByCommunity(app.activeId()),
       featuredTags,
       updateFormData: onChangeHandler,
     });
