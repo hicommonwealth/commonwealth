@@ -1,9 +1,36 @@
-module.exports = (sequelize, DataTypes) => {
-  const Webhook = sequelize.define('Webhook', {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    url: { type: DataTypes.STRING, allowNull: false },
-    chain_id: { type: DataTypes.STRING, allowNull: true },
-    offchain_community_id: { type: DataTypes.STRING, allowNull: true },
+import * as Sequelize from 'sequelize';
+
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+
+export interface WebhookAttributes {
+  id?: number;
+  url: string;
+  chain_id?: string;
+  offchain_community_id?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+}
+
+export interface WebhookInstance extends Sequelize.Instance<WebhookAttributes>, WebhookAttributes {
+
+}
+
+export interface WebhookModel extends Sequelize.Model<WebhookInstance, WebhookAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): WebhookModel => {
+  const Webhook = sequelize.define<WebhookInstance, WebhookAttributes>('Webhook', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    url: { type: dataTypes.STRING, allowNull: false },
+    chain_id: { type: dataTypes.STRING, allowNull: true },
+    offchain_community_id: { type: dataTypes.STRING, allowNull: true },
   }, {
     underscored: true,
     indexes: [

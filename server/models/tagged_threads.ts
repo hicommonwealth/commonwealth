@@ -1,7 +1,28 @@
-module.exports = (sequelize, DataTypes) => {
-  const TaggedThread = sequelize.define('TaggedThread', {
-    tag_id: { type: DataTypes.STRING, allowNull: false },
-    thread_id: { type: DataTypes.INTEGER, allowNull: false },
+import * as Sequelize from 'sequelize';
+
+export interface TaggedThreadAttributes {
+  tag_id: string;
+  thread_id: number;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+export interface TaggedThreadInstance
+extends Sequelize.Instance<TaggedThreadAttributes>, TaggedThreadAttributes {
+
+}
+
+export interface TaggedThreadModel extends Sequelize.Model<TaggedThreadInstance, TaggedThreadAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): TaggedThreadModel => {
+  const TaggedThread = sequelize.define<TaggedThreadInstance, TaggedThreadAttributes>('TaggedThread', {
+    tag_id: { type: dataTypes.STRING, allowNull: false },
+    thread_id: { type: dataTypes.INTEGER, allowNull: false },
   }, {
     timestamps: true,
     underscored: true,
