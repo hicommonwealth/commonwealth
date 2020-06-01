@@ -35,6 +35,8 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
+import updateUserEmailInterval from './routes/updateUserEmailInterval';
+import updateEmail from './routes/updateEmail';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -158,6 +160,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   router.post('/addMember', passport.authenticate('jwt', { session: false }), addMember.bind(this, models));
   router.post('/upgradeMember', passport.authenticate('jwt', { session: false }), upgradeMember.bind(this, models));
+
+  // user model update
+  router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
+  router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
 
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
