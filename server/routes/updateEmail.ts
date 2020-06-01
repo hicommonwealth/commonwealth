@@ -10,7 +10,6 @@ export const Errors = {
 };
 
 const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.email) return next(new Error(Errors.NoEmail));
   const { email } = req.body;
 

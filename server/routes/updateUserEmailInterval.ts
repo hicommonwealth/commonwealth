@@ -11,7 +11,6 @@ export const Errors = {
 };
 
 const updateUserEmailInterval = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.interval) return next(new Error(Errors.NoInterval));
   const { email, interval } = req.body;
 
