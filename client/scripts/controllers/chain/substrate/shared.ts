@@ -64,10 +64,14 @@ export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  const nodeUrl = node.url;
+  let nodeUrl = node.url;
   const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
+  nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
   const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1;
-  const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+  const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
+  if (nodeUrl.indexOf(':9944') !== -1) {
+    nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
+  }
   const provider = new WsProvider(protocol + nodeUrl);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
