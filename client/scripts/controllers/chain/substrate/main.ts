@@ -1,4 +1,5 @@
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SubstrateStaking from 'controllers/chain/substrate/staking';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
@@ -15,6 +16,7 @@ import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
   public accounts: SubstrateAccounts;
+  public staking: SubstrateStaking;
   public phragmenElections: SubstratePhragmenElections;
   public council: SubstrateCouncil;
   public technicalCommittee: SubstrateTechnicalCommittee;
@@ -33,6 +35,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.class = _class;
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
+    this.staking = new SubstrateStaking(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
     this.council = new SubstrateCouncil(this.app);
     this.technicalCommittee = new SubstrateTechnicalCommittee(this.app);
@@ -51,6 +54,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await this.staking.init(this.chain);
     await super.initApi();
   }
 

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -35,6 +35,8 @@ export interface IValidatorAttrs {
   hasNominated?: boolean;
   commissionPer?: number;
   onChangeHandler?: any;
+  waiting?: boolean;
+  eraPoints?: string
 }
 
 export interface IValidatorPageState {
@@ -93,7 +95,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,

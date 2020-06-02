@@ -1,4 +1,5 @@
 export { default as AccountsStore } from './AccountsStore';
+export { default as StakingStore } from './StakingStore';
 export { default as ChainStore } from './ChainStore';
 export { default as CommentsStore } from './CommentsStore';
 export { default as IdStore } from './IdStore';

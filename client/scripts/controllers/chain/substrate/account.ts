@@ -38,14 +38,17 @@ export interface IValidatorInfo {
     commissionPer: number
   };
 }
+export interface IValidatorValue {
+  exposure: Exposure,
+  controller: string,
+  isElected: boolean,
+  isWaiting?: boolean,
+  commissionPer?: number,
+  eraPoints?: string
+}
 
 export interface IValidators {
-  [address: string]: {
-    exposure: Exposure,
-    controller: string,
-    isElected: boolean,
-    commissionPer: number
-  };
+  [address: string]: IValidatorValue;
 }
 
 class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
@@ -126,7 +129,6 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         // set of not yet but future validators
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
         const validatorsInfo: IValidatorInfo = {};
-
         electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
           const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
           const isCommission = !!validatorPrefs.commission;
