@@ -14,32 +14,32 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
     return m('.ManageRoleRow', [
-          vnode.attrs.roledata?.map((role) => {
-            return m('.RoleChild', [
-              m(User, {
-                user: [role.Address.address, role.Address.chain],
-                tooltip: true,
-              }),
-              m(Icon, {
-                name: Icons.X,
-                size: 'xs',
-                class: 'role-x-icon',
-                onclick: async () => {
-                  const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
-                    ...chainOrCommObj,
-                    new_role: 'member',
-                    address: role.Address.address,
-                    jwt: app.login.jwt,
-                  });
-                  if (res.status !== 'Success') {
-                    throw new Error(`Got unsuccessful status: ${res.status}`);
-                  }
-                  const newRole = res.result;
-                  vnode.attrs.onRoleUpdate(role, newRole);
-                },
-              }),
-            ]);
+      vnode.attrs.roledata?.map((role) => {
+        return m('.RoleChild', [
+          m(User, {
+            user: [role.Address.address, role.Address.chain],
+            tooltip: true,
           }),
+          m(Icon, {
+            name: Icons.X,
+            size: 'xs',
+            class: 'role-x-icon',
+            onclick: async () => {
+              const res = await $.post(`${app.serverUrl()}/upgradeMember`, {
+                ...chainOrCommObj,
+                new_role: 'member',
+                address: role.Address.address,
+                jwt: app.login.jwt,
+              });
+              if (res.status !== 'Success') {
+                throw new Error(`Got unsuccessful status: ${res.status}`);
+              }
+              const newRole = res.result;
+              vnode.attrs.onRoleUpdate(role, newRole);
+            },
+          }),
+        ]);
+      }),
     ]);
   }
 };
@@ -54,9 +54,7 @@ interface IInputPropertyRowAttrs {
 
 export const InputPropertyRow: m.Component<IInputPropertyRowAttrs> = {
   view: (vnode) => {
-    return m('tr', {
-      class: 'InputPropertyRow',
-    }, [
+    return m('tr.InputPropertyRow', [
       m('td', { class: 'title-column', }, vnode.attrs.title),
       m('td', [
         m(Input, {
@@ -87,9 +85,7 @@ export const TogglePropertyRow: m.Component<ITogglePropertyRowAttrs, IToggleProp
     vnode.state.checked = vnode.attrs.defaultValue;
   },
   view: (vnode) => {
-    return m('tr', {
-      class: 'TogglePropertyRow',
-    }, [
+    return m('tr.TogglePropertyRow', [
       m('td', vnode.attrs.title),
       m('td', [
         m(Switch, {
