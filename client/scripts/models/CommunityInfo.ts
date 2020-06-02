@@ -58,6 +58,20 @@ class CommunityInfo {
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
 
+  public addFeaturedTag(tag: string) {
+    this.featuredTags.push(tag);
+  }
+
+  public removeFeaturedTag(tag: string) {
+    if (this.featuredTags.includes(tag)) {
+      console.dir(`before: ${this.featuredTags.length}`);
+      console.dir(this.featuredTags);
+      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+      console.dir(`after: ${this.featuredTags.length}`);
+      console.dir(this.featuredTags);
+    }
+  }
+
   public async updateFeaturedTags(tags: string[]) {
     try {
       await $.post(`${app.serverUrl()}/updateCommunity`, {
