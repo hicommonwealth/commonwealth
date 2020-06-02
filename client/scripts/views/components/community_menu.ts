@@ -118,6 +118,22 @@ const CommunityMenu: m.Component<{}> = {
         return m(CommunityMenuCommunity, { community, address });
       }),
       app.login.roles.length > 0 && m('hr'),
+      m(CommunityMenuLink, {
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/notifications');
+        },
+        icon: Icons.BELL,
+        label: 'Manage Notifications',
+      }),
+      m(CommunityMenuLink, {
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set('/');
+        },
+        icon: Icons.HOME,
+        label: 'Home'
+      }),
     ]);
   }
 };

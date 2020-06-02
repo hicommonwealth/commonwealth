@@ -8,6 +8,14 @@ $active-color: #ececec;
     flex: 1;
     display: flex;
     font-weight: 400;
+
+    &.CommunityLabelPlaceholder {
+        padding: 8px 0;
+        .community-name {
+            color: #aaa;
+        }
+    }
+
     .community-label-left {
         padding-right: 12px;
     }
@@ -226,6 +234,9 @@ $active-color: #ececec;
         padding: 10px 15px;
         &.cui-selected {
             color: #222;
+        }
+        &.starred .cui-button .cui-icon svg {
+            fill: currentColor;
         }
     }
 }

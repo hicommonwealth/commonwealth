@@ -426,7 +426,7 @@ describe('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it('Should turn off privacy', async () => {
+    it('should turn off privacy', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -452,7 +452,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off read_only', async () => {
+    it('should turn off read_only', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -478,7 +478,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off both read_only and privacy', async () => {
+    it('should turn off both read_only and privacy', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -504,7 +504,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off, and then on, both read_only and privacy', async () => {
+    it('should turn off, and then on, both read_only and privacy', async () => {
       // turning off privacy properties
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
@@ -552,7 +552,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should fail to turn a public thread private', async () => {
+    it('should fail to turn a public thread private', async () => {
       // turning off privacy
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };

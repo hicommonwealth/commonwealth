@@ -147,6 +147,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -158,6 +159,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    if (onNotificationsPage(m.route.get())) return;
 
     const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
@@ -196,13 +198,27 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
+                    class: app.communities.isStarred(item.id, null) ? 'starred' : '',
                     label: m(CommunityLabel, { chain: item }),
-                    selected: app.activeChainId() === item.id
+                    selected: app.activeChainId() === item.id,
+                    contentRight: app.isLoggedIn() && m(Button, {
+                      label: m(Icon, { name: Icons.STAR }),
+                      onclick: (e) => {
+                        app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                      }
+                    }),
                   })
                   : item instanceof CommunityInfo
                     ? m(ListItem, {
+                      class: app.communities.isStarred(null, item.id) ? 'starred' : '',
                       label: m(CommunityLabel, { community: item }),
-                      selected: app.activeCommunityId() === item.id
+                      selected: app.activeCommunityId() === item.id,
+                      contentRight: app.isLoggedIn() && m(Button, {
+                        label: m(Icon, { name: Icons.STAR }),
+                        onclick: (e) => {
+                          app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                        },
+                      }),
                     })
                     : m(ListItem, {
                       class: 'select-list-back-home',

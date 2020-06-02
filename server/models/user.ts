@@ -2,6 +2,12 @@ module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     email: { type: DataTypes.STRING },
     emailVerified: { type: DataTypes.DATE, allowNull: true },
+    emailNotificationInterval: {
+      type: DataTypes.ENUM,
+      values: ['daily', 'weekly', 'monthly', 'never'],
+      allowNull: false,
+      defaultValue: 'never',
+    },
     isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: DataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     selectedAddresses: { type: DataTypes.TEXT, allowNull: false, defaultValue: '{}' },
@@ -17,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     models.User.belongsTo(models.ChainNode, { as: 'selectedNode', constraints: false });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.SocialAccount);
-    models.User.hasMany(models.Membership);
+    models.User.hasMany(models.StarredCommunity);
     models.User.belongsToMany(models.Chain, { through: models.WaitlistRegistration });
   };
 
