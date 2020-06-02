@@ -62,7 +62,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
   private _store: AccountsStore<SubstrateAccount> = new AccountsStore();
   public get store() { return this._store; }
 
-  protected _Chain: SubstrateChain;
+  private _Chain: SubstrateChain;
 
   public get(address: string, keytype?: string) {
     if (keytype && keytype !== 'ed25519' && keytype !== 'sr25519') {

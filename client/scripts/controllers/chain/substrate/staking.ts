@@ -3,17 +3,33 @@ import BN from 'bn.js';
 import { IApp } from 'state';
 import { Vec } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
+import { StorageModule } from 'models';
+import { StakingStore } from 'stores';
 import { formatNumber } from '@polkadot/util';
 import { Observable, combineLatest, of } from 'rxjs';
 import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints } from '@polkadot/types/interfaces';
 import { InterfaceTypes } from '@polkadot/types/types';
 import { DeriveStakingValidators, DeriveStakingElected, DeriveSessionProgress } from '@polkadot/api-derive/types';
-import SubstrateAccounts, { IValidators } from './account';
+import { IValidators } from './account';
+import SubstrateChain from './shared';
 
-class SubstrateStaking extends SubstrateAccounts {
+class SubstrateStaking implements StorageModule {
+  private _initialized: boolean = false;
+
+  public get initialized() { return this._initialized; }
+
+  // STORAGE
+  private _store = new StakingStore();
+  public get store() { return this._store; }
+
+  private _Chain: SubstrateChain;
+
+  private _app: IApp;
+  public get app() { return this._app; }
+
   constructor(app: IApp) {
-    super(app);
+    this._app = app;
   }
   public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]): InterfaceTypes[K] {
     return this._Chain.registry.createType(type, ...params);
@@ -116,6 +132,14 @@ class SubstrateStaking extends SubstrateAccounts {
   }
   public query(address: string): Observable<any> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
+  }
+  public deinit() {
+    this._initialized = false;
+  }
+  public init(ChainInfo: SubstrateChain): Promise<void> {
+    this._Chain = ChainInfo;
+    this._initialized = true;
+    return Promise.resolve();
   }
 }
 
