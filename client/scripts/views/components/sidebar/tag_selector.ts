@@ -303,11 +303,6 @@ const TagSelector: m.Component<{
             contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
           }),
         ]),
-      // This placeholder module should only be shown in the sidebar
-      !showFullListing
-        && m('.no-tags-placeholder', [
-          'The community manager has not selected any tags for the sidebar',
-        ]),
     ]);
   },
 };
