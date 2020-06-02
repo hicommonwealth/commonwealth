@@ -9,7 +9,7 @@ import { Account, RoleInfo } from 'models';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { isMember } from 'views/components/membership_button';
-import { isSameAccount, formatAsTitleCase } from 'helpers';
+import { isSameAccount, formatAsTitleCase, getRoleInCommunity } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
 interface ISelectAddressOptionAttrs {
@@ -33,6 +33,7 @@ const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
       m(ProfileBlock, { account }),
       role && m('.role-permission', [
         m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
+        role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
       ]),
     ]);
   }
@@ -41,10 +42,7 @@ const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
 const SelectAddressModal = {
   view: (vnode) => {
     const activeAddressesByRole: Array<[Account<any>, RoleInfo]> = app.login.activeAddresses.map((account) => {
-      const addressId = app.login.addresses?.find((a) => {
-        return a.address === account.address && a.chain === account.chain.id;
-      })?.id;
-      const role = app.login.roles?.find((r) => r.address_id === addressId);
+      const role = getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
       return [account, role];
     });
 

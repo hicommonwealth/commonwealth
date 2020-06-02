@@ -5,14 +5,16 @@ class RoleInfo {
   public readonly address_id: number;
   public readonly chain_id: string;
   public readonly offchain_community_id: string;
-  public readonly permission: RolePermission;
+  public permission: RolePermission;
+  public is_user_default: boolean;
 
-  constructor(id, address_id, chain_id, offchain_community_id, permission) {
+  constructor(id, address_id, chain_id, offchain_community_id, permission, is_user_default) {
     this.id = id;
     this.address_id = address_id;
     this.chain_id = chain_id;
     this.offchain_community_id = offchain_community_id;
     this.permission = permission;
+    this.is_user_default = is_user_default;
   }
 }
 

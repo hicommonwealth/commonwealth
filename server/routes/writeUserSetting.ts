@@ -20,24 +20,12 @@ const writeUserSetting = async (models, req: Request, res: Response, next: NextF
     const str = JSON.stringify(obj);
     req.user.lastVisited = str;
     await req.user.save();
-
-  } else if (key === 'selectedAddresses') {
-    try {
-      JSON.parse(value);
-    } catch (e) {
-      return next(new Error('value is not valid JSON'));
-    }
-    req.user.selectedAddresses = value;
-    await req.user.save();
-
   } else if (key === 'disableRichText' && value === 'true') {
     req.user.disableRichText = true;
     await req.user.save();
-
   } else if (key === 'disableRichText' && value === 'false') {
     req.user.disableRichText = false;
     await req.user.save();
-
   } else {
     return next(new Error('Invalid setting'));
   }

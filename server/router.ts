@@ -61,6 +61,7 @@ import getInviteLinks from './routes/getInviteLinks';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
+import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
 import registerWaitingList from './routes/registerWaitingList';
@@ -176,6 +177,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // roles
   router.post('/createRole', passport.authenticate('jwt', { session: false }), createRole.bind(this, models));
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));
+  router.post('/setDefaultRole', passport.authenticate('jwt', { session: false }), setDefaultRole.bind(this, models));
 
   // offchain profiles
   router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));

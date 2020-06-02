@@ -2,6 +2,7 @@ import { default as m } from 'mithril';
 import { default as moment } from 'moment-twitter';
 
 import app from 'state';
+import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -87,6 +88,34 @@ export function orderAccountsByAddress(a, b) {
 
 export function isSameAccount(a, b) {
   return a && b && a.chain && b.chain && a.chain.id === b.chain.id && a.address === b.address;
+}
+
+export function getRoleInCommunity(account: Account<any>, chain: string, community: string) {
+  const address_id = app.login.addresses?.find((a) => {
+    return a.address === account.address && a.chain === account.chain.id;
+  })?.id;
+
+  return app.login.roles?.find((r) => {
+    const addressMatches = r.address_id === address_id;
+    const communityMatches = chain ? r.chain_id === chain : r.offchain_community_id === community;
+    return addressMatches && communityMatches;
+  });
+}
+
+export function getAllRolesInCommunity(chain: string, community: string) {
+  return app.login.roles?.filter((r) => {
+    return chain ? r.chain_id === chain : r.offchain_community_id === community;
+  });
+}
+
+export function getDefaultAddressInCommunity(chain: string, community: string) {
+  const role = app.login.roles?.find((r) => {
+    const communityMatches = chain ? r.chain_id === chain : r.offchain_community_id === community;
+    return communityMatches && r.is_user_default;
+  });
+
+  if (!role) return;
+  return app.login.addresses?.find((a) => a.id === role.address_id);
 }
 
 /*
