@@ -176,14 +176,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [], // TODO
             }),
-          // validators (substrate and cosmos only)
-          // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-          //   m(ListItem, {
-          //     active: onValidatorsPage(m.route.get()),
-          //     label: 'Validators',
-          //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-          //     contentLeft: m(Icon, { name: Icons.BOX }),
-          //   }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal }),
             label: 'New proposal'
@@ -206,6 +198,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             }),
             label: 'Approve tokens'
           }),
+          (app.community || app.chain)
+            && m('h4', 'Staking'),
+          // validators (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+            m(ListItem, {
+              active: onValidatorsPage(m.route.get()),
+              label: 'Validators',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+              contentLeft: m(Icon, { name: Icons.BOX }),
+            }),
           // TODO: add a "reserve tokens" option here, to apply to DAO?
         ]),
       ]),

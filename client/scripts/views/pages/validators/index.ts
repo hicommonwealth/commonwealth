@@ -14,9 +14,6 @@ import PageLoading from 'views/pages/loading';
 import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
-import Tabs from '../../components/widgets/tabs';
-import { createTXModal } from '../../modals/tx_signing_modal';
-import ListingPage from '../_listing_page';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
@@ -34,6 +31,8 @@ export interface IValidatorAttrs {
   hasNominated?: boolean;
   commissionPer?: number;
   onChangeHandler?: any;
+  waiting?: boolean;
+  eraPoints?: string
 }
 
 export interface IValidatorPageState {
@@ -92,7 +91,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).accounts.validators : null,
+    validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
