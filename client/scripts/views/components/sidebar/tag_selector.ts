@@ -256,16 +256,22 @@ const TagSelector: m.Component<{
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
 
-    if (!vnode.state.featuredTagIds) {
-      vnode.state.featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
-    }
+    vnode.state.featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
     const featuredTagIds = vnode.state.featuredTagIds || [];
     const addFeaturedTag = (tagId: string) => {
-      vnode.state.featuredTagIds.push(tagId);
+      if (app.community) {
+        app.community.meta.addFeaturedTag(tagId);
+      } else if (app.chain) {
+        app.chain.meta.chain.addFeaturedTag(tagId);
+      }
       m.redraw();
     };
     const removeFeaturedTag = (tagId: string) => {
-      vnode.state.featuredTagIds = vnode.state.featuredTagIds.filter((t) => Number(t) !== Number(tagId));
+      if (app.community) {
+        app.community.meta.removeFeaturedTag(tagId);
+      } else if (app.chain) {
+        app.chain.meta.chain.removeFeaturedTag(tagId);
+      }
       m.redraw();
     };
 
