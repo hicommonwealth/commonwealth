@@ -25,9 +25,12 @@ const PresentationComponent = (state, chain: Substrate) => {
         validators[validator].isElected === true && validators[validator].isWaiting === false
       )).sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
         .map((validator) => {
-          const total = chain.chain.coins(validators[validator].exposure.total); // total stake
-          const bonded = chain.chain.coins(validators[validator].exposure.own); // own stake
-          const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN)); // other stake
+          // total stake
+          const total = chain.chain.coins(validators[validator].exposure.total);
+          // own stake
+          const bonded = chain.chain.coins(validators[validator].exposure.own);
+          // other stake
+          const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN));
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
