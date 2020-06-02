@@ -10,7 +10,7 @@ import {
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link } from 'helpers';
+import { featherIcon, link, SwitchIcon } from 'helpers';
 import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -237,7 +237,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 align: 'left',
                 basic: true,
                 compact: true,
-                label: m(CurrentCommunityLabel),
+                label: [
+                  m(CurrentCommunityLabel),
+                  m(SwitchIcon),
+                ],
                 style: 'min-width: 200px',
               }),
             }),

@@ -57,6 +57,31 @@ export function featherIcon(icon, size, stroke, color) {
   ]);
 }
 
+export const SwitchIcon = {
+  view: (vnode) => {
+    return m('svg.SwitchIcon', {
+      width: '10px',
+      height: '24px',
+      viewBox: '0 0 10 24',
+    }, [
+      m('g', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
+      }, [
+        m('polyline', {
+          stroke: '#979797',
+          points: '1 5 5 1 9 5'
+        }),
+        m('polyline', {
+          stroke: '#979797',
+          transform: 'translate(5.000000, 21.000000) scale(1, -1) translate(-5.000000, -21.000000) ',
+          points: '1 23 5 19 9 23'
+        })
+      ]),
+    ]);
+  }
+};
+
 export const symbols = {
   times: '\u00d7',
   middot: '\u00b7',

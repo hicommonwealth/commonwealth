@@ -143,8 +143,22 @@ $active-color: #ececec;
             color: #222;
             background: #f8f8f8 !important;
         }
-        .CommunityLabel {
-            margin: 17px 0 13px;
+        .cui-button-label {
+            width: 100%;
+
+            .CommunityLabel {
+                margin: 17px 0 13px;
+            }
+            svg.SwitchIcon {
+                position: absolute;
+                right: 6px;
+                top: 21px;
+                // svg attributes
+                fill: none;
+                polyline {
+                    stroke: #aaa;
+                }
+            }
         }
     }
     .cui-list .action-selector {
