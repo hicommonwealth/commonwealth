@@ -1,9 +1,9 @@
-import { CWEvent, IStorageFetcher } from '../interfaces';
+import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../interfaces';
 import { IMolochEventData } from './types';
 import { MolochApi } from '.';
 
 export default class extends IStorageFetcher<MolochApi> {
-  public async fetch(): Promise<CWEvent<IMolochEventData>[]> {
+  public async fetch(range?: IDisconnectedRange): Promise<CWEvent<IMolochEventData>[]> {
     throw new Error('Moloch migration not implemented.');
   }
 }

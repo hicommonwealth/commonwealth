@@ -3,7 +3,7 @@ import ethers from 'ethers';
 import Subscriber from './subscriber';
 import Processor from './processor';
 import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
-import storageFetcher from './storageFetcher';
+import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';
@@ -50,7 +50,6 @@ export default async function (
   handlers: IEventHandler<IMolochEventData>[],
   skipCatchup: boolean = true,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
-  performMigration?: boolean,
 ): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
   const api = createApi(ethNetwork, contractVersion, contractAddress);
 
@@ -81,28 +80,25 @@ export default async function (
     await Promise.all(cwEvents.map((e) => handleEventFn(e)));
   };
 
-  // special case to perform a migration on first run
-  // returns early, does not initialize the subscription
-  if (performMigration) {
-    // TODO
-    log.info(`Starting event migration for Moloch: ${chain}.`);
-    const events = await migrate(api);
-    await Promise.all(events.map((event) => handleEventFn(event)));
-    return;
-  }
-
   const subscriber = new Subscriber(api, chain);
-  const poller = new Poller(api);
 
   // helper function that runs after we've been offline/the server's been down,
-  // and attempts to fetch events from skipped blocks
-  const pollMissedBlocksFn = async () => {
-    log.info('Detected offline time, polling missed blocks...');
-    throw new Error('Moloch polling not supported.');
+  // and attempts to fetch skipped events
+  const pollMissedEventsFn = async () => {
+    log.info('Fetching missed events since last startup...');
+    const offlineRange = await discoverReconnectRange();
+    if (!offlineRange) {
+      log.warn('No offline range found, skipping event catchup.');
+      return;
+    }
+
+    const fetcher = new StorageFetcher(api);
+    const cwEvents = await fetcher.fetch(offlineRange);
+    await Promise.all(cwEvents.map((e) => handleEventFn(e)));
   };
 
   if (!skipCatchup) {
-    pollMissedBlocksFn();
+    pollMissedEventsFn();
   } else {
     log.info('Skipping event catchup on startup!');
   }
