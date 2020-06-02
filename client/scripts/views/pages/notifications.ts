@@ -10,12 +10,53 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import _ from 'lodash';
 import ListingPage from './_listing_page';
 import Tabs from '../components/widgets/tabs';
 import { DropdownFormField } from '../components/forms';
+
+const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmailStatus: boolean, }> = {
+  oninit: (vnode) => {
+    vnode.state.updateEmailStatus = false;
+    vnode.state.interval = app.login.emailInterval;
+    vnode.state.email = app.login.email;
+  },
+  view: (vnode) => {
+    return m('.EmailPanel', [
+      m('.EmailUpdate', [
+        m(Input, {
+          defaultValue: vnode.state.email || null,
+          onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
+        }),
+        m(Button, {
+          label: 'Update Email',
+          iconRight: vnode.state.updateEmailStatus ? Icons.CHECK_CIRCLE : null,
+          onclick: async () => {
+            try {
+              if (vnode.state.email === app.login.email) return;
+              const response = await $.post(`${app.serverUrl()}/updateEmail`, {
+                'email': vnode.state.email,
+                'jwt': app.login.jwt,
+              });
+              app.login.email = response.result.email;
+              vnode.state.updateEmailStatus = true;
+            } catch (err) {
+              console.log('Failed to update email');
+              throw new Error((err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to update email');
+            }
+          }
+        }),
+      ]),
+      m('.EmailInterval', [
+        m('div', app.login.emailInterval),
+      ]),
+    ]);
+  },
+};
 
 const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   oninit: (vnode) => {
@@ -44,6 +85,7 @@ const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[]
           app.login.notifications.clearAllRead().then(() => m.redraw());
         }
       }),
+      m(EmailPanel),
     ]);
   }
 };

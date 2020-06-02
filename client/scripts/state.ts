@@ -65,6 +65,7 @@ export interface IApp {
   loginState: LoginState;
   login: {
     email?: string;
+    emailInterval?: string;
     jwt?: string;
     addresses: AddressInfo[];
     roles: RoleInfo[];
