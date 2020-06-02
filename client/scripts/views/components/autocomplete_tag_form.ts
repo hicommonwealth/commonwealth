@@ -49,7 +49,8 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     const addTag = () => {
       const input = (document.getElementsByClassName('autocomplete-tag-input')[0].firstChild as HTMLInputElement);
       const newTag = input.value;
-      vnode.state.selectedTag = newTag;
+      tags.push({ name: newTag, id: NaN, description: '' });
+      setTimeout(() => { vnode.state.selectedTag = newTag; }, 1);
       updateFormData(newTag);
       manuallyClosePopover();
     };
