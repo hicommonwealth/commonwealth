@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
     lastVisited: { type: DataTypes.TEXT, allowNull: false, defaultValue: '{}' },
-    selectedAddresses: { type: DataTypes.TEXT, allowNull: false, defaultValue: '{}' },
     disableRichText: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
   }, {
     underscored: true,

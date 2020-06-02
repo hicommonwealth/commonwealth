@@ -8,13 +8,12 @@ import {
   WebsocketMessageType, IWebsocketsPayload,
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
 } from '../../shared/types';
+import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
-import { factory, formatFilename } from '../util/logging';
-import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 sgMail.setApiKey(SENDGRID_API_KEY);
-
-const log = factory.getLogger(formatFilename(__filename));
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define('Subscription', {

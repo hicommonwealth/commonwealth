@@ -6,7 +6,7 @@ import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchi
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
 import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
 
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {

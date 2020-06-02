@@ -5,6 +5,7 @@ import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
 
+import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -30,16 +31,43 @@ function createAccount(account: Account<any>) {
 }
 
 export async function setActiveAccount(account: Account<any>, suppressNotification?) {
-  if (!suppressNotification) {
-    notifySuccess('Switched account');
-  }
-  app.vm.activeAccount = account;
+  return new Promise((resolve, reject) => {
+    const chain = app.activeChainId();
+    const community = app.activeCommunityId();
+    const role = getRoleInCommunity(account, chain, community);
 
-  if (app.activeCommunityId()) {
-    app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
-  } else if (app.activeChainId()) {
-    app.login.selectedAddresses.setByChain(app.activeChainId(), account);
-  }
+    if (!role) {
+      if (!suppressNotification) {
+        notifySuccess('Switched account');
+      }
+      app.vm.activeAccount = account;
+      resolve();
+    } else {
+      $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+        address: account.address,
+        author_chain: account.chain.id,
+        chain,
+        jwt: app.login.jwt,
+        auth: true,
+      } : {
+        address: account.address,
+        author_chain: account.chain.id,
+        community,
+        jwt: app.login.jwt,
+        auth: true,
+      }).then((response) => {
+        // update is_user_default
+        getAllRolesInCommunity(chain, community).forEach((r) => { r.is_user_default = false; });
+        role.is_user_default = true;
+
+        if (!suppressNotification) {
+          notifySuccess('Switched account');
+        }
+        app.vm.activeAccount = account;
+        resolve();
+      }).catch((err) => reject());
+    }
+  });
 }
 
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
@@ -91,22 +119,20 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
   } else if (memberAddresses.length === 1) {
     // one member address - start the community with that address (don't check for default address)
     setActiveAccount(app.login.activeAddresses[0]);
-  } else if (memberAddresses.length > 1 && !suppressAddressSelectionModal) {
-    // more than one member address - show modal to choose (TODO: check for default address)
-    app.modals.create({ modal: SelectAddressModal });
+  } else {
+    const existingAddress = chain
+      ? getDefaultAddressInCommunity(chain.id, null)
+      : getDefaultAddressInCommunity(null, app.community.meta.id);
+
+    if (existingAddress) {
+      const account = app.login.activeAddresses.find((a) => {
+        return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
+      });
+      if (account) setActiveAccount(account);
+    } else if (!suppressAddressSelectionModal) {
+      app.modals.create({ modal: SelectAddressModal });
+    }
   }
-
-  // try to load a previously selected account for the chain/community
-  // TODO: bring this back when default addresses are saved
-
-  // if (chain) {
-  //   const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
-  //   app.vm.activeAccount = app.login.activeAddresses
-  //     .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
-  // } else if (app.activeCommunityId()) {
-  //   const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
-  //   app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
-  // }
 }
 
 // called from the server, which returns public keys
@@ -119,7 +145,6 @@ export function updateActiveUser(data) {
     app.login.socialAccounts = [];
     app.login.isSiteAdmin = false;
     app.login.lastVisited = {};
-    app.login.selectedAddresses.reset();
     app.login.unseenPosts = {};
     app.login.activeAddresses = [];
     app.vm.activeAccount = null;
@@ -136,7 +161,6 @@ export function updateActiveUser(data) {
     app.login.isSiteAdmin = data.isAdmin;
     app.login.disableRichText = data.disableRichText;
     app.login.lastVisited = data.lastVisited;
-    app.login.selectedAddresses.reset(data.selectedAddresses);
     app.login.unseenPosts = data.unseenPosts;
   }
 }

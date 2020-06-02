@@ -2,9 +2,7 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
-
-import 'construct-ui/src/utils/focus-manager/index.scss';
-import 'construct-ui/src/components/index.scss';
+import 'construct.scss';
 
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
@@ -482,7 +480,6 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );

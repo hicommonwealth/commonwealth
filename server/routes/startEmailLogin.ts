@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const startEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {

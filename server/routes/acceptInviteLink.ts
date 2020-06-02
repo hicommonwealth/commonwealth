@@ -1,7 +1,7 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { SERVER_URL } from '../config';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const redirectWithError = (res, message: string) => {
