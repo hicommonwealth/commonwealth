@@ -2,7 +2,7 @@
  * Determines which chain entities each event affects and updates state accordingly.
  */
 import WebSocket from 'ws';
-import { factory, formatFilename } from '../../util/logging';
+import { factory, formatFilename } from '../../../shared/logging';
 import { CWEvent, IEventHandler } from '../../../shared/events/interfaces';
 import { IMolochEventData } from '../../../shared/events/moloch/types';
 import { WebsocketMessageType, IWebsocketsPayload } from '../../../shared/types';

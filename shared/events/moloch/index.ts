@@ -6,7 +6,7 @@ import Processor from './processor';
 import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import migrate from './migration';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';
 
 import { Moloch1 } from '../../../contracts/MolochV1/Moloch1';

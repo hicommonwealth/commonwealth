@@ -3,7 +3,7 @@
  */
 import { IEventPoller, IDisconnectedRange } from '../interfaces';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 import { MolochApi } from '.';
 import { MolochRawEvent } from './types';
 const log = factory.getLogger(formatFilename(__filename));

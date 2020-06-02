@@ -50,7 +50,7 @@ import EdgewareEventSubscriber from 'events/edgeware/subscriber';
 import EdgewareEventProcessor from 'events/edgeware/processor';
 import {
   SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-  eventToEntity, entityToFieldName
+  eventToEntity, entityToFieldName, ISubstrateEventData
 } from 'events/edgeware/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -292,7 +292,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   // handle a single incoming chain event emitted from client connection with node
-  private _handleCWEvent(chain: string, cwEvent: CWEvent): void {
+  private _handleCWEvent(chain: string, cwEvent: CWEvent<ISubstrateEventData>): void {
     // immediately return if no entity involved, event unrelated to proposals/etc
     const entityKind = eventToEntity(cwEvent.data.kind);
     if (!entityKind) return;

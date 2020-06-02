@@ -5,7 +5,7 @@ import { IEventProcessor, CWEvent } from '../interfaces';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';
 import { MolochApi } from '.';
 const log = factory.getLogger(formatFilename(__filename));
