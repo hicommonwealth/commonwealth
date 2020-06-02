@@ -81,7 +81,7 @@ class ThreadsController {
         'versionHistory': versionHistory,
         'attachments[]': attachments,
         'mentions[]': mentions,
-        'tag': (tag as OffchainTag).id || tag,
+        'tag': typeof Number((tag as OffchainTag)?.id) === 'number' || tag,
         'url': url,
         'privacy': privacy,
         'readOnly': readOnly,

@@ -64,6 +64,12 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       view: (vnode_) => {
         return m('a.no-matching-tags', {
           href: '#',
+          onkeyup: (e) => {
+            if (e.keyCode === 13) {
+              e.preventDefault();
+              (document.querySelector('a.no-matching-tags') as HTMLLinkElement).click();
+            }
+          },
           onclick: () => addTag(),
         }, 'No matches found. Add tag?');
       }
