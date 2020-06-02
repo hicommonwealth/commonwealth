@@ -58,12 +58,14 @@ $active-color: #ececec;
     top: 0;
     bottom: 0;
     width: $sidebar-width;
+    border-left: 7px solid $theme-accent-dark;
     z-index: 9;
     .SidebarMenu {
         height: 100%;
     }
     .SidebarMenu .cui-list {
         height: 100%;
+        overflow-x: hidden;
         background: #f8f8f8;
     }
     .SidebarMenu .cui-list.list-bottom {
