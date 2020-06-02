@@ -50,9 +50,9 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import AdminPanel from 'views/components/admin_panel';
 
-const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo }> = {
+const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo, showStatus?: boolean }> = {
   view: (vnode) => {
-    const { chain, community } = vnode.attrs;
+    const { chain, community, showStatus } = vnode.attrs;
 
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
@@ -61,7 +61,7 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
       m('.community-label-right', [
         m('.community-name-row', [
           m('span.community-name', chain.name),
-          chain.id === app.activeChainId() && m(ChainStatusIndicator, { hideLabel: true }),
+          showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
         ]),
         m('.community-id', `/${chain.id}`),
       ]),
@@ -74,7 +74,7 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
       m('.community-label-right', [
         m('.community-name-row', [
           m('span.community-name', community.name),
-          community.id === app.activeCommunityId() && [
+          showStatus === true && [
             community.privacyEnabled && m('span.icon-lock'),
             !community.privacyEnabled && m('span.icon-globe'),
           ],
@@ -99,11 +99,11 @@ const CurrentCommunityLabel: m.Component<{}> = {
     const selectedCommunity = app.community;
 
     if (selectedNode) {
-      return m(CommunityLabel, { chain: selectedNode.chain });
+      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true });
     } else if (selectedCommunity) {
-      return m(CommunityLabel, { community: selectedCommunity.meta });
+      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true });
     } else {
-      return m(CommunityLabel);
+      return m(CommunityLabel, { showStatus: true });
     }
   }
 };
@@ -370,7 +370,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                     iconLeft: Icons.USER_PLUS,
                     size: 'sm',
                     fluid: true,
-                    label: `Link new address`,
+                    label: 'Link new address',
                     onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
                   })
                   // if addresses are available, but none is selected
