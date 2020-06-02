@@ -64,11 +64,7 @@ class CommunityInfo {
 
   public removeFeaturedTag(tag: string) {
     if (this.featuredTags.includes(tag)) {
-      console.dir(`before: ${this.featuredTags.length}`);
-      console.dir(this.featuredTags);
       this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
-      console.dir(`after: ${this.featuredTags.length}`);
-      console.dir(this.featuredTags);
     }
   }
 
