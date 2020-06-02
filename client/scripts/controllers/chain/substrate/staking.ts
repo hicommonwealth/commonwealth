@@ -19,12 +19,10 @@ class SubstrateStaking extends SubstrateAccounts {
     return this._Chain.registry.createType(type, ...params);
   }
   public get validatorCount(): Observable<SessionIndex> {
-    return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount())
-      .pipe(map((count) => count));
+    return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
   }
   public get sessionInfo(): Observable<DeriveSessionProgress> {
-    return this._Chain.query((api: ApiRx) => api.derive.session.progress())
-      .pipe(map((res) => res));
+    return this._Chain.query((api: ApiRx) => api.derive.session.progress());
   }
   public get validators(): Observable<IValidators> {
     return this._Chain.api.pipe(
@@ -114,16 +112,10 @@ class SubstrateStaking extends SubstrateAccounts {
     );
   }
   public info(address: string): Observable<any> {
-    return this._Chain.query((api: ApiRx) => api.derive.accounts.info(address))
-      .pipe(
-        map((info) => info)
-      );
+    return this._Chain.query((api: ApiRx) => api.derive.accounts.info(address));
   }
   public query(address: string): Observable<any> {
-    return this._Chain.query((api: ApiRx) => api.derive.staking.query(address))
-      .pipe(
-        map((info) => info)
-      );
+    return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
   }
 }
 
