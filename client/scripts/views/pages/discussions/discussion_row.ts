@@ -54,17 +54,21 @@ const DiscussionRow: m.Component<IAttrs> = {
             tooltip: true,
           }),
         ]),
-        m('.discussion-pre-mobile', [
-          m(User, {
-            user: [proposal.author, proposal.authorChain],
-            avatarOnly: true,
-            avatarSize: 16,
-            tooltip: true,
-          }),
-        ]),
         m('.discussion-content', {
           class: proposal.title === '--' ? 'no-title' : ''
         }, [
+          m('.discussion-title', [
+            link('a',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
+                proposal.title
+              ]),
+            app.comments.nComments(proposal) > 0
+              && link(
+                'a.discussion-replies',
+                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
+              ),
+          ]),
           m('.discussion-meta', [
             m('.discussion-meta-left', [
               m(User, {
@@ -90,18 +94,20 @@ const DiscussionRow: m.Component<IAttrs> = {
               ]),
             ]),
           ]),
-          m('.discussion-title', [
-            link('a',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                proposal.title
-              ]),
-            app.comments.nComments(proposal) > 0
-              && link(
-                'a.discussion-replies',
-                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
-              ),
-          ]),
+          propType === OffchainThreadKind.Forum
+            && (proposal as OffchainThread).body
+            && m('.discussion-excerpt', [
+              (() => {
+                const body = (proposal as OffchainThread).body;
+                try {
+                  const doc = JSON.parse(body);
+                  doc.ops = doc.ops.slice(0, 3);
+                  return m(QuillFormattedText, { doc, hideFormatting: true });
+                } catch (e) {
+                  return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+                }
+              })(),
+            ]),
           propType === OffchainThreadKind.Link
             && proposal.url
             && externalLink('a.discussion-link', proposal.url, [

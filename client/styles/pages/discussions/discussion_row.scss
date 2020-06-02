@@ -4,7 +4,7 @@ $discussion-row-color: #999;
 
 .DiscussionRow {
     display: block;
-    margin: 20px 0 24px;
+    margin: 20px 0 40px;
 
     a.discussion-tag {
         display: inline-block;
@@ -22,37 +22,45 @@ $discussion-row-color: #999;
     }
 
     .discussion-pre {
-        margin-top: 6px;
-        margin-right: 16px;
-        @include xs-max {
-            display: none;
-        }
+        margin-top: 5px;
+        margin-right: 25px;
         .User.avatar-only {
-            // ensure tooltip appears above avatar circle
-            display: block;
-        }
-    }
-    .discussion-pre-mobile {
-        display: none;
-        .User {
-            position: relative;
-            top: 2px;
-        }
-        @include xs-max {
-            display: block;
+            display: block; // ensure tooltip appears above avatar circle
         }
     }
     .discussion-content {
         position: relative;
         flex: 1;
-        .discussion-meta {
-            margin-bottom: 2px;
-        }
         .discussion-title {
+            margin-bottom: 1px;
             .discussion-edit-tags {
                 position: absolute;
                 right: -7px;
             }
+        }
+        .discussion-title a {
+            color: #111;
+            font-size: 16px;
+            text-decoration: none;
+            font-weight: 600;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .discussion-title a.discussion-replies {
+            text-decoration: none;
+            margin-left: 8px;
+            color: #888;
+            user-select: none;
+            white-space: nowrap;
+            .cui-icon {
+                position: relative;
+                top: -1px;
+                color: #888;
+                margin-left: 3px;
+            }
+        }
+        .discussion-meta {
         }
     }
 
@@ -101,40 +109,23 @@ $discussion-row-color: #999;
             text-decoration: underline;
         }
     }
-    .discussion-title a {
-        color: #111;
-        font-size: 15px;
-        text-decoration: none;
-        font-weight: 600;
-        &:hover {
-            text-decoration: underline;
+    .discussion-excerpt {
+        margin-top: 18px;
+        font-size: 14.5px;
+        .QuillFormattedText,
+        .MarkdownFormattedText {
+            line-height: 1.5;
         }
-    }
-    .discussion-title a.discussion-replies {
-        text-decoration: none;
-        margin-left: 8px;
-        color: #888;
-        user-select: none;
-        white-space: nowrap;
-        .cui-icon {
-            position: relative;
-            top: -1px;
-            color: #888;
-            margin-left: 3px;
-        }
-    }
-    .discussion-body-preview {
-        font-size: 14px;
-        color: $discussion-row-color;
+        // show max 3 lines
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
     }
 
     .no-title {
         padding-top: 0;
         margin-top: -6px;
-    }
-    .no-title .discussion-excerpt {
-        color: #111;
-        font-size: 16px;
     }
     .no-title .discussion-title {
         display: none;
