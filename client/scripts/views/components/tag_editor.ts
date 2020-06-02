@@ -7,6 +7,7 @@ import AutoCompleteTagForm from './autocomplete_tag_form';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
+  popoverMenu?: boolean;
   onChangeHandler: Function;
 }
 
@@ -30,46 +31,59 @@ const TagEditor: m.Component<ITagEditorAttrs, { tag: OffchainTag, isOpen: boolea
     vnode.state.tag = vnode.attrs.thread.tag;
   },
   oninit: (vnode) => {
-    if (vnode.state.isOpen === undefined) vnode.state.isOpen = true;
+    if (vnode.state.isOpen === undefined) vnode.state.isOpen = false;
   },
   view: (vnode) => {
-    return m(Dialog, {
-      basic: false,
-      closeOnEscapeKey: true,
-      closeOnOutsideClick: true,
-      content: m(TagWindow, {
-        currentTag: vnode.state.tag,
-        onChangeHandler: (tag: OffchainTag) => { vnode.state.tag = tag; },
-      }),
-      hasBackdrop: true,
-      isOpen: true,
-      inline: false,
-      onClose: () => { vnode.state.isOpen = false; },
-      title: 'Edit Tags',
-      transitionDuration: 200,
-      footer: m(`.${Classes.ALIGN_RIGHT}`, [
-        m(Button, {
-          label: 'Close',
-          onclick: () => { vnode.state.isOpen = false; },
+    return m('TagEditor', [
+      vnode.attrs.popoverMenu
+        ? m(MenuItem, {
+          iconLeft: Icons.TAG,
+          fluid: true,
+          label: 'Edit Tags',
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        })
+        : m('a', {
+          href: '#',
+          onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
+        }, [ 'Edit tags' ]),
+      m(Dialog, {
+        basic: false,
+        closeOnEscapeKey: true,
+        closeOnOutsideClick: true,
+        content: m(TagWindow, {
+          currentTag: vnode.state.tag,
+          onChangeHandler: (tag: OffchainTag) => { vnode.state.tag = tag; },
         }),
-        m(Button, {
-          label: 'Submit',
-          intent: 'primary',
-          onclick: () => {
-            $.post(`${app.serverUrl()}/updateTags`, {
-              'jwt': app.login.jwt,
-              'thread_id': vnode.attrs.thread.id,
-              'tag': vnode.state.tag.id,
-              'address': app.vm.activeAccount.address,
-            }).then((r) => {
-              const tag: OffchainTag = r.result;
-              vnode.attrs.onChangeHandler(tag);
-            });
-            vnode.state.isOpen = false;
-          },
-        }),
-      ])
-    });
+        hasBackdrop: true,
+        isOpen: vnode.state.isOpen,
+        inline: false,
+        onClose: () => { vnode.state.isOpen = false; },
+        title: 'Edit Tags',
+        transitionDuration: 200,
+        footer: m(`.${Classes.ALIGN_RIGHT}`, [
+          m(Button, {
+            label: 'Close',
+            onclick: () => { vnode.state.isOpen = false; },
+          }),
+          m(Button, {
+            label: 'Submit',
+            intent: 'primary',
+            onclick: () => {
+              $.post(`${app.serverUrl()}/updateTags`, {
+                'jwt': app.login.jwt,
+                'thread_id': vnode.attrs.thread.id,
+                'tag': vnode.state.tag.id,
+                'address': app.vm.activeAccount.address,
+              }).then((r) => {
+                const tag: OffchainTag = r.result;
+                vnode.attrs.onChangeHandler(tag);
+              });
+              vnode.state.isOpen = false;
+            },
+          }),
+        ])
+      })
+    ]);
   }
 };
 
