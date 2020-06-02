@@ -87,7 +87,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   };
 
   // New Tag table entries created
-  if (typeof Number(tag) === 'number') {
+  if (!Number.isNaN(Number(tag))) {
     threadContent['tag_id'] = Number(tag);
   } else if (typeof tag === 'string') {
     let offchainTag;
@@ -99,33 +99,40 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
           chain_id: chain?.id || null,
         },
       });
-      console.log(offchainTag);
-      console.log(typeof offchainTag.id)
       threadContent['tag_id'] = offchainTag.id;
     } catch (err) {
-      log.error(err);
+      return next(err);
     }
   } else {
     return next(Error('Must pass either a numeric tag id or new tag name as string'));
   }
-
-  const thread = await models.OffchainThread.create(threadContent);
+  console.log(threadContent);
+  let thread;
+  try {
+    thread = await models.OffchainThread.create(threadContent);
+  } catch (err) {
+    return next(err);
+  }
 
   // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
-  if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-    await models.OffchainAttachment.create({
-      attachable: 'thread',
-      attachment_id: thread.id,
-      url: req.body['attachments[]'],
-      description: 'image',
-    });
-  } else if (req.body['attachments[]']) {
-    await Promise.all(req.body['attachments[]'].map((u) => models.OffchainAttachment.create({
-      attachable: 'thread',
-      attachment_id: thread.id,
-      url: u,
-      description: 'image',
-    })));
+  try {
+    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+      await models.OffchainAttachment.create({
+        attachable: 'thread',
+        attachment_id: thread.id,
+        url: req.body['attachments[]'],
+        description: 'image',
+      });
+    } else if (req.body['attachments[]']) {
+      await Promise.all(req.body['attachments[]'].map((u) => models.OffchainAttachment.create({
+        attachable: 'thread',
+        attachment_id: thread.id,
+        url: u,
+        description: 'image',
+      })));
+    }
+  } catch (err) {
+    return next(err);
   }
 
   let finalThread;
@@ -149,14 +156,12 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     object_id: `discussion_${finalThread.id}`,
     is_active: true,
   });
-
   await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewReaction,
     object_id: `discussion_${finalThread.id}`,
     is_active: true,
   });
-
   const location = finalThread.community || finalThread.chain;
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(

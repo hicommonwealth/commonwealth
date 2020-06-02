@@ -77,7 +77,12 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   else if (chain) Object.assign(commentContent, { chain: chain.id });
   if (parent_id) Object.assign(commentContent, { parent_id });
 
-  const comment = await models.OffchainComment.create(commentContent);
+  let comment;
+  try {
+    comment = await models.OffchainComment.create(commentContent);
+  } catch (e) {
+    console.error(e);
+  }
 
   let parentComment;
   if (parent_id) {
@@ -97,20 +102,24 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   // To-do: attachments can likely be handled like mentions (see lines 10 & 11)
-  if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-    await models.OffchainAttachment.create({
-      attachable: 'comment',
-      attachment_id: comment.id,
-      url: req.body['attachments[]'],
-      description: 'image',
-    });
-  } else if (req.body['attachments[]']) {
-    await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
-      attachable: 'comment',
-      attachment_id: comment.id,
-      url,
-      description: 'image',
-    })));
+  try {
+    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+      await models.OffchainAttachment.create({
+        attachable: 'comment',
+        attachment_id: comment.id,
+        url: req.body['attachments[]'],
+        description: 'image',
+      });
+    } else if (req.body['attachments[]']) {
+      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
+        attachable: 'comment',
+        attachment_id: comment.id,
+        url,
+        description: 'image',
+      })));
+    }
+  } catch (err) {
+    return next(err);
   }
   // fetch attached objects to return to user
   const finalComment = await models.OffchainComment.findOne({

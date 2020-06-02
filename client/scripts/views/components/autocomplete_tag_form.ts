@@ -38,7 +38,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     const onSelect = (item: OffchainTag) => {
       vnode.state.selectedTag = item;
-      updateFormData(item);
+      updateFormData(item.id);
     };
 
     const manuallyClosePopover = () => {
