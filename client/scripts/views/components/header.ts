@@ -456,16 +456,19 @@ const ActionMenu : m.Component<IMenuAttrs> = {
           (activeAcct instanceof MolochMember) && m('li', {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
+              data: { account: activeAcct, delegateKey: activeAcct.delegateKey },
             })
           }, 'Update delegate key'),
           (activeAcct instanceof MolochMember) && m('li', {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
+              data: { account: activeAcct }
             })
           }, 'Rage quit'),
           (activeAcct instanceof MolochMember) && m('li', {
             onclick: (e) => app.modals.create({
               modal: TokenApprovalModal,
+              data: { account: activeAcct },
             })
           }, 'Approve tokens'),
           // TODO: add a "reserve tokens" option here, in case you want to apply to DAO?

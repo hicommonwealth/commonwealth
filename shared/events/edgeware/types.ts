@@ -1,10 +1,10 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 
 export const EdgewareEventChains = [
-  'edgeware',
-  'edgeware-local',
-  'kusama',
-  'kusama-local',
+  // 'edgeware',
+  // 'edgeware-local',
+  // 'kusama',
+  // 'kusama-local',
 ];
 
 /**

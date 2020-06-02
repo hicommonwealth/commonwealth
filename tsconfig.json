@@ -21,10 +21,10 @@
     "./client",
     "./client/scripts",
     "./shared/adapters",
-    "./test"
+    "./test",
+    "./contracts"
   ],
   "exclude": [
     "./node_modules",
-    "contracts/*"
   ]
 }

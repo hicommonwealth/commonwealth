@@ -10,7 +10,6 @@ import BN from 'bn.js';
 
 interface IAttrs {
   account: MolochMember;
-  balance: MolochShares;
 }
 
 interface IState {

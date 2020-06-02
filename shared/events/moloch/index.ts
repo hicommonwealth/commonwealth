@@ -1,4 +1,4 @@
-import ethers from 'ethers';
+import { getDefaultProvider } from 'ethers';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
@@ -23,7 +23,7 @@ export type MolochApi = Moloch1 | Moloch2;
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
 export function createApi(ethNetwork = 'ropsten', contractVersion: 1 | 2, contractAddress: string): MolochApi {
-  const provider = ethers.getDefaultProvider(ethNetwork);
+  const provider = getDefaultProvider(ethNetwork);
   if (contractVersion === 1) {
     return Moloch1Factory.connect(contractAddress, provider);
   } else {
@@ -51,6 +51,7 @@ export default async function (
   skipCatchup: boolean = true,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
+  console.log(contractAddress);
   const api = createApi(ethNetwork, contractVersion, contractAddress);
 
   // helper function that sends an event through event handlers
@@ -85,6 +86,10 @@ export default async function (
   // helper function that runs after we've been offline/the server's been down,
   // and attempts to fetch skipped events
   const pollMissedEventsFn = async () => {
+    if (!discoverReconnectRange) {
+      log.warn('No function to discover offline time found, skipping event catchup.');
+      return;
+    }
     log.info('Fetching missed events since last startup...');
     const offlineRange = await discoverReconnectRange();
     if (!offlineRange) {

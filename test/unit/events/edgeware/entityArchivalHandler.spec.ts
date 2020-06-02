@@ -11,7 +11,7 @@ import models from '../../../../server/database';
 import { CWEvent } from '../../../../shared/events/interfaces';
 import StorageHandler from '../../../../server/eventHandlers/storage';
 import EntityArchivalHandler from '../../../../server/eventHandlers/edgeware/entityArchival';
-import { SubstrateEventKind, SubstrateEntityKind } from '../../../../shared/events/edgeware/types';
+import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../../shared/events/edgeware/types';
 import { NotificationCategories, WebsocketMessageType } from '../../../../shared/types';
 
 chai.use(chaiHttp);
@@ -28,7 +28,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   it('should create chain entity from event', async () => {
-    const event: CWEvent = {
+    const event: CWEvent<ISubstrateEventData> = {
       blockNumber: 10,
       data: {
         kind: SubstrateEventKind.DemocracyStarted,
@@ -67,7 +67,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   it('should update chain entity from event', async () => {
-    const createEvent: CWEvent = {
+    const createEvent: CWEvent<ISubstrateEventData> = {
       blockNumber: 20,
       data: {
         kind: SubstrateEventKind.TreasuryProposed,
@@ -79,7 +79,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
       },
     };
 
-    const updateEvent: CWEvent = {
+    const updateEvent: CWEvent<ISubstrateEventData> = {
       blockNumber: 25,
       data: {
         kind: SubstrateEventKind.TreasuryAwarded,
@@ -134,7 +134,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   it('should ignore unrelated events', async () => {
-    const event: CWEvent = {
+    const event: CWEvent<ISubstrateEventData> = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {

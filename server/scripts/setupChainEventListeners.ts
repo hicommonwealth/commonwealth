@@ -66,11 +66,12 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         entityArchivalHandler = new MolochEntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
         subscribeFn = (evtHandlers) => subscribeMolochEvents(
           node.chain,
-          'TODO',
+          'ropsten',
+          1,
+          '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
           evtHandlers,
-          skipCatchup,
-          () => discoverReconnectRange(models, node.chain),
-          migrate,
+          // skipCatchup,
+          // () => discoverReconnectRange(models, node.chain),
         );
       }
       const storageHandler = new EventStorageHandler(models, node.chain);

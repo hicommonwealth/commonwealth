@@ -7,7 +7,7 @@ import 'chai/register-should';
 import { resetDatabase } from '../../../../server-test';
 import models from '../../../../server/database';
 import { CWEvent } from '../../../../shared/events/interfaces';
-import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
+import { SubstrateEventKind, ISubstrateEventData } from '../../../../shared/events/edgeware/types';
 import StorageHandler from '../../../../server/eventHandlers/storage';
 import MigrationHandler from '../../../../server/eventHandlers/edgeware/migration';
 
@@ -26,7 +26,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
 
   it('should create new event', async () => {
     // setup
-    const event: CWEvent = {
+    const event: CWEvent<ISubstrateEventData> = {
       blockNumber: 10,
       data: {
         kind: SubstrateEventKind.DemocracyStarted,
@@ -69,7 +69,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
         noter: 'Alice',
       }
     };
-    const currentEvent: CWEvent = {
+    const currentEvent: CWEvent<ISubstrateEventData> = {
       blockNumber: 10,
       data: {
         kind: SubstrateEventKind.PreimageNoted,
@@ -106,7 +106,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
   });
 
   it('should ignore irrelevant events', async () => {
-    const event: CWEvent = {
+    const event: CWEvent<ISubstrateEventData> = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
@@ -136,7 +136,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+    const dbEvent = await eventHandler.handle(event as unknown as CWEvent<ISubstrateEventData>);
     assert.equal(dbEvent, null);
   });
 });

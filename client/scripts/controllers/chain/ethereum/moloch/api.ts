@@ -26,9 +26,9 @@ export default class MolochAPI {
 
   public get contractAddress() { return this._contractAddress; }
   public get userAddress() { return this._userAddress; }
-  public get Contract() { return this._Contract; }
-  public get Provider() { return this._Provider; }
-  public get Signer() { return this._Signer; }
+  public get Contract(): Moloch1 { return this._Contract; }
+  public get Provider(): Web3Provider { return this._Provider; }
+  public get Signer(): JsonRpcSigner { return this._Signer; }
   public get tokenContract() { return this._tokenContract; }
 
   constructor(contractAddress: string, web3Provider: AsyncSendable, userAddress: string) {
