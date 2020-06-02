@@ -13,14 +13,17 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
     const chainOrCommObj = app.community
       ? { community: app.activeCommunityId() }
       : { chain: app.activeChainId() };
+
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
+        const isSelf = role.Address.address === app.vm.activeAccount?.address
+          && role.Address.chain === app.vm.activeAccount?.chain.id;
         return m('.RoleChild', [
           m(User, {
             user: [role.Address.address, role.Address.chain],
             tooltip: true,
           }),
-          m(Icon, {
+          !isSelf && m(Icon, {
             name: Icons.X,
             size: 'xs',
             class: 'role-x-icon',
