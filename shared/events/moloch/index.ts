@@ -1,10 +1,9 @@
 import ethers from 'ethers';
 
 import Subscriber from './subscriber';
-import Poller from './poller';
 import Processor from './processor';
 import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
-import migrate from './migration';
+import storageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';

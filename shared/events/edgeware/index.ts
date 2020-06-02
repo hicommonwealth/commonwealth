@@ -8,7 +8,7 @@ import Poller from './poller';
 import Processor from './processor';
 import { SubstrateBlock, ISubstrateEventData } from './types';
 import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
-import fetchFromStorage from './storageFetcher';
+import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -105,7 +105,8 @@ export default async function (
   if (performMigration) {
     const version = await api.rpc.state.getRuntimeVersion();
     log.info(`Starting event migration for ${version.specName}:${version.specVersion} at ${url}.`);
-    const events = await fetchFromStorage(api);
+    const fetcher = new StorageFetcher(api);
+    const events = await fetcher.fetch();
     await Promise.all(events.map((event) => handleEventFn(event)));
     return;
   }

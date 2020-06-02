@@ -45,7 +45,7 @@ import {
 } from 'models';
 
 import { CWEvent } from 'events/interfaces';
-import fetchSubstrateEvents from 'events/edgeware/storageFetcher';
+import EdgewareStorageFetcher from 'events/edgeware/storageFetcher';
 import EdgewareEventSubscriber from 'events/edgeware/subscriber';
 import EdgewareEventProcessor from 'events/edgeware/processor';
 import {
@@ -319,7 +319,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   // load existing events and subscribe to future via client node connection
   public async initChainEntities(chain: string) {
     // get existing events
-    const existingEvents = await fetchSubstrateEvents(this._apiPromise);
+    const fetcher = new EdgewareStorageFetcher(this._apiPromise);
+    const existingEvents = await fetcher.fetch();
     // eslint-disable-next-line no-restricted-syntax
     for (const cwEvent of existingEvents) {
       this._handleCWEvent(chain, cwEvent);

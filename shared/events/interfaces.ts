@@ -48,6 +48,15 @@ export abstract class IEventSubscriber<Api, RawEvent> {
   public abstract unsubscribe(): void;
 }
 
+// synthesizes events from chain storage
+export abstract class IStorageFetcher<Api> {
+  constructor(
+    protected _api: Api,
+  ) { }
+
+  public abstract fetch(): Promise<CWEvent[]>;
+}
+
 export interface IDisconnectedRange {
   startBlock: number;
   endBlock?: number;
