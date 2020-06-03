@@ -156,7 +156,7 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === communityOrChain.id);
 
-    return [
+    return m('.ChainOrCommunitySubscriptionButton.NewThreadRow', [
       m('h4', 'New Threads:'),
       m(Button, {
         label: communitySubscription ? 'Notifications on' : 'Notifications off',
@@ -171,7 +171,7 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
             subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain.id).then(() => m.redraw());
           }
         },
-      })];
+      })]);
   }
 };
 

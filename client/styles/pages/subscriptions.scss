@@ -35,13 +35,12 @@
     }
   }
 
-  .ChainSubscriptionRow, .CommunitySubscriptionRow {
+  .NewThreadRow {
     display: flex;
     flex-direction: row;
-
-    .ChainOrCommunitySubscriptionButton {
-      height: 34px;
-      margin: auto 20px;
+    align-items: center;
+    h4 {
+      margin-right: 12px;
     }
   }
 
