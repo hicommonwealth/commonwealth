@@ -50,7 +50,7 @@ const DiscussionRow: m.Component<IAttrs> = {
           m(User, {
             user: [proposal.author, proposal.authorChain],
             avatarOnly: true,
-            avatarSize: 30,
+            avatarSize: 35,
             tooltip: true,
           }),
         ]),

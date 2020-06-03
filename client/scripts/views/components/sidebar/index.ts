@@ -292,7 +292,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.USERS }),
+              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),

@@ -59,6 +59,7 @@ $active-color: #ececec;
     bottom: 0;
     width: $sidebar-width;
     border-left: 7px solid $theme-accent-dark;
+    border-right: 1px solid #ececec;
     z-index: 9;
     .SidebarMenu {
         height: 100%;
@@ -140,7 +141,6 @@ $active-color: #ececec;
         margin-bottom: 20px;
         user-select: none;
         border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 0px 4px rgba(0,0,0,0.04);
         cursor: pointer;
         .cui-button {
             width: 100%;

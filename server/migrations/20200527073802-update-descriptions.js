@@ -10,7 +10,7 @@ module.exports = {
         "UPDATE \"Chains\" SET description='A global, open-source platform for decentralized applications' WHERE id='ethereum';"
       ),
       queryInterface.sequelize.query(
-        "UPDATE \"Chains\" SET description='An canary network for Polkadot' WHERE id='kusama';"
+        "UPDATE \"Chains\" SET description='A canary network for Polkadot' WHERE id='kusama';"
       ),
       queryInterface.sequelize.query(
         "UPDATE \"Chains\" SET description='An ecosystem of creators and operators building decentralized applications' WHERE id='metacartel';"
