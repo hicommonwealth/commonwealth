@@ -24,6 +24,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
     vnode.state.email = app.login.email;
   },
   view: (vnode) => {
+    const options = ['daily', 'weekly', 'monthly', 'never'];
     return m('.EmailPanel', [
       m('.EmailUpdate', [
         m(Input, {
@@ -52,7 +53,27 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
         }),
       ]),
       m('.EmailInterval', [
-        m('div', app.login.emailInterval),
+        m('h4', 'Receive notification emails:'),
+        m(Select, {
+          defaultValue: vnode.state.interval,
+          options,
+          onchange: async (e) => {
+            vnode.state.interval = (e.target as any).value;
+            try {
+              if (vnode.state.interval === app.login.emailInterval) return;
+              const response = await $.post(`${app.serverUrl()}/updateUserEmailInterval`, {
+                'interval': vnode.state.interval,
+                'jwt': app.login.jwt,
+              });
+              app.login.emailInterval = response.result.emailNotificationInterval;
+            } catch (err) {
+              console.log('Failed to update email notification interval');
+              throw new Error((err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to update email notification interval');
+            }
+          },
+        })
       ]),
     ]);
   },
