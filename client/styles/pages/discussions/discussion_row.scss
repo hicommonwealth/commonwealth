@@ -6,6 +6,9 @@ $discussion-row-color: #999;
     display: block;
     margin: 20px 0 40px;
 
+    padding-bottom: 30px;
+    border-bottom: 1px solid #ececec;
+
     a.discussion-tag {
         display: inline-block;
         font-size: 14px;
@@ -96,6 +99,20 @@ $discussion-row-color: #999;
                 color: darken($discussion-row-color, 8%);
                 text-decoration: underline;
             }
+        }
+    }
+    .discussion-commenters {
+        display: flex;
+        margin: 24px 0 0;
+        .commenters-avatars {
+            .User {
+                margin-right: -8px;
+                margin-top: -1px;
+            }
+        }
+        .commenters-label {
+            margin-left: 20px;
+            color: #999;
         }
     }
     a.discussion-link {

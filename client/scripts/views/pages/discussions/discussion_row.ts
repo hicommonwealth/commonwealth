@@ -108,6 +108,15 @@ const DiscussionRow: m.Component<IAttrs> = {
                 }
               })(),
             ]),
+          app.comments.nComments(proposal) > 0
+            && m('.discussion-commenters', [
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
+                return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
+              })),
+              m('.commenters-label', [
+                pluralize(app.comments.nComments(proposal), 'reply'),
+              ]),
+            ]),
           propType === OffchainThreadKind.Link
             && proposal.url
             && externalLink('a.discussion-link', proposal.url, [
