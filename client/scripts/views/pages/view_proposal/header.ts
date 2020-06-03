@@ -167,7 +167,7 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
           intent: 'none',
           size: 'xs',
           onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-          label: `#${proposal.tag.name}`
+          label: `#${proposal.tag?.name}`
         })
       ]),
       canEdit && proposal.tag && m(ProposalHeaderSpacer),

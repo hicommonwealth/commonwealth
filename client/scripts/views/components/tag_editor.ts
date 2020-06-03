@@ -11,9 +11,15 @@ interface ITagEditorAttrs {
   onChangeHandler: Function;
 }
 
-const TagWindow: m.Component<{ currentTag: OffchainTag, onChangeHandler: Function }> = {
+interface ITagEditorState {
+  tagName: string;
+  tagId: number;
+  isOpen: boolean;
+}
+
+const TagWindow: m.Component<{ onChangeHandler: Function }> = {
   view: (vnode) => {
-    const { onChangeHandler, currentTag } = vnode.attrs;
+    const { onChangeHandler } = vnode.attrs;
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
     const featuredTags = activeMeta.featuredTags.map((t) => {
       return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
@@ -26,9 +32,10 @@ const TagWindow: m.Component<{ currentTag: OffchainTag, onChangeHandler: Functio
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, { tag: OffchainTag, isOpen: boolean }> = {
+const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
   oncreate: (vnode) => {
-    vnode.state.tag = vnode.attrs.thread.tag;
+    vnode.state.tagName = vnode.attrs.thread.tag.name;
+    vnode.state.tagId = vnode.attrs.thread.tag.id;
   },
   oninit: (vnode) => {
     if (vnode.state.isOpen === undefined) vnode.state.isOpen = false;
@@ -51,8 +58,10 @@ const TagEditor: m.Component<ITagEditorAttrs, { tag: OffchainTag, isOpen: boolea
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
         content: m(TagWindow, {
-          currentTag: vnode.state.tag,
-          onChangeHandler: (tag: OffchainTag) => { vnode.state.tag = tag; },
+          onChangeHandler: (tagName, tagId?) => {
+            vnode.state.tagName = tagName;
+            if (tagId) vnode.state.tagId = tagId;
+          }
         }),
         hasBackdrop: true,
         isOpen: vnode.state.isOpen,
@@ -69,12 +78,15 @@ const TagEditor: m.Component<ITagEditorAttrs, { tag: OffchainTag, isOpen: boolea
             label: 'Submit',
             intent: 'primary',
             onclick: () => {
+              debugger
               $.post(`${app.serverUrl()}/updateTags`, {
                 'jwt': app.login.jwt,
                 'thread_id': vnode.attrs.thread.id,
-                'tag': vnode.state.tag.id,
+                'tag_id': vnode.state.tagId,
+                'tag_name': vnode.state.tagName,
                 'address': app.vm.activeAccount.address,
               }).then((r) => {
+                console.log(r.result);
                 const tag: OffchainTag = r.result;
                 vnode.attrs.onChangeHandler(tag);
               });
