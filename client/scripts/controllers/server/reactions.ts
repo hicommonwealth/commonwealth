@@ -57,14 +57,12 @@ class ReactionsController {
   }
 
   public async refresh(post: any, chainId: string, communityId: string) {
-    const options = {
-      chain: chainId,
-      community: communityId,
-    };
+    const options = { chain: chainId, community: communityId };
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).identifier;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
+      // TODO: Remove any verbs from these route names '/reactions'
       const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);

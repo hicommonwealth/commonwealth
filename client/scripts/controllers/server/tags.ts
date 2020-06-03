@@ -17,24 +17,12 @@ const modelFromServer = (tag) => {
 
 class TagsController {
   private _store: TagsStore = new TagsStore();
-
   private _initialized: boolean = false;
-
   public get store() { return this._store; }
-
   public get initialized() { return this._initialized; }
-
-  public getByIdentifier(id) {
-    return this._store.getById(id);
-  }
-
-  public getByCommunity(communityId) {
-    return this._store.getByCommunity(communityId);
-  }
-
-  public addToStore(tag: OffchainTag) {
-    return this._store.add(modelFromServer(tag));
-  }
+  public getByIdentifier(id) { return this._store.getById(id); }
+  public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
+  public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
 
   public async edit(tag: OffchainTag, featured_order?) {
     try {

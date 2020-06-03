@@ -151,6 +151,7 @@ class ThreadsController {
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
+    // TODO: Restful call to threads, '/threads'
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,

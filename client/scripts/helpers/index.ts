@@ -115,6 +115,7 @@ export function isSameAccount(a, b) {
   return a && b && a.chain && b.chain && a.chain.id === b.chain.id && a.address === b.address;
 }
 
+// TODO: Move into roles helper file
 export function getRoleInCommunity(account: Account<any>, chain: string, community: string) {
   const address_id = app.login.addresses?.find((a) => {
     return a.address === account.address && a.chain === account.chain.id;
@@ -127,6 +128,7 @@ export function getRoleInCommunity(account: Account<any>, chain: string, communi
   });
 }
 
+// TODO: Move into roles helper file
 export function getAllRolesInCommunity(chain: string, community: string) {
   return app.login.roles?.filter((r) => {
     return chain ? r.chain_id === chain : r.offchain_community_id === community;
