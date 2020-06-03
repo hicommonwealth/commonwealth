@@ -77,19 +77,12 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
           m(Button, {
             label: 'Submit',
             intent: 'primary',
-            onclick: () => {
-              debugger
-              $.post(`${app.serverUrl()}/updateTags`, {
-                'jwt': app.login.jwt,
-                'thread_id': vnode.attrs.thread.id,
-                'tag_id': vnode.state.tagId,
-                'tag_name': vnode.state.tagName,
-                'address': app.vm.activeAccount.address,
-              }).then((r) => {
-                console.log(r.result);
-                const tag: OffchainTag = r.result;
-                vnode.attrs.onChangeHandler(tag);
-              });
+            onclick: async () => {
+              const { tagName, tagId } = vnode.state;
+              const { thread } = vnode.attrs;
+              const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
+              console.log(tag);
+              vnode.attrs.onChangeHandler(tag);
               vnode.state.isOpen = false;
             },
           }),

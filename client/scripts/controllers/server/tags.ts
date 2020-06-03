@@ -62,6 +62,29 @@ class TagsController {
     }
   }
 
+  public async update(threadId: number, tagName: string, tagId?: number) {
+    try {
+      const response = await $.post(`${app.serverUrl()}/updateTags`, {
+        'jwt': app.login.jwt,
+        'thread_id': threadId,
+        'tag_id': tagId,
+        'tag_name': tagName,
+        'address': app.vm.activeAccount.address,
+      });
+      const result = modelFromServer(response.result);
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+      this._store.add(result);
+      return result;
+    } catch (err) {
+      console.log('Failed to i[date] tag');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to update tag');
+    }
+  }
+
   public async add(name: string,) {
     try {
       const chainOrCommObj = (app.activeChainId())
