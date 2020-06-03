@@ -64,6 +64,14 @@ class CommentsController {
     return this._store.nComments(proposal);
   }
 
+  public uniqueCommenters<T extends IUniqueId>(proposal: T) {
+    // Returns an array of [chain, address] arrays
+    // TODO: Use a better comparator to determine uniqueness
+    const comments = this._store.getByProposal(proposal);
+    return _.uniq(comments.map((c) => `${c.authorChain}#${c.author}`))
+      .map((slug) => slug.split(/#/));
+  }
+
   public lastCommented<T extends IUniqueId>(proposal: T) {
     const comments = this._store.getByProposal(proposal);
     if (comments.length === 0) return null;

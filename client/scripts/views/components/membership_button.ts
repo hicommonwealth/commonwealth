@@ -11,10 +11,11 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
-export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any>) => {
+export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any> | undefined) => {
+  if (!app.isLoggedIn()) return false;
   if (!app.login.roles) return false;
 
-  const addressinfo = (address instanceof Account)
+  const addressinfo: AddressInfo | undefined = (address instanceof Account)
     ? app.login.addresses.find((a) => address.address === a.address && address.chain.id === a.chain)
     : address;
   const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);

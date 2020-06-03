@@ -10,7 +10,7 @@ import {
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link } from 'helpers';
+import { featherIcon, link, SwitchIcon } from 'helpers';
 import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -164,6 +164,18 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => {
+        // sort starred communities at top
+        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
+        if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
+        return 0;
+      })
+      .sort((a, b) => {
+        // sort current community at top
+        if (a instanceof ChainInfo && app.activeChainId() === a.id) return -1;
+        if (a instanceof CommunityInfo && app.activeCommunityId() === a.id) return -1;
+        return 0;
+      })
       .filter((item) => {
         // only show chains with nodes
         return (item instanceof ChainInfo)
@@ -193,32 +205,34 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             m(SelectList, {
               closeOnSelect: true,
               class: 'CommunitySelectList',
-              activeIndex: currentIndex,
               items: (selectableCommunities as any).concat('home'),
+              defaultActiveIndex: -1,
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
                     class: app.communities.isStarred(item.id, null) ? 'starred' : '',
                     label: m(CommunityLabel, { chain: item }),
                     selected: app.activeChainId() === item.id,
-                    contentRight: app.isLoggedIn() && m(Button, {
-                      label: m(Icon, { name: Icons.STAR }),
+                    contentRight: app.isLoggedIn() && isMember(item.id, null) && m('.community-star-toggle', {
                       onclick: (e) => {
                         app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
                       }
-                    }),
+                    }, [
+                      m(Icon, { name: Icons.STAR }),
+                    ]),
                   })
                   : item instanceof CommunityInfo
                     ? m(ListItem, {
                       class: app.communities.isStarred(null, item.id) ? 'starred' : '',
                       label: m(CommunityLabel, { community: item }),
                       selected: app.activeCommunityId() === item.id,
-                      contentRight: app.isLoggedIn() && m(Button, {
-                        label: m(Icon, { name: Icons.STAR }),
+                      contentRight: app.isLoggedIn() && isMember(null, item.id) && m('.community-star-toggle', {
                         onclick: (e) => {
                           app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
                         },
-                      }),
+                      }, [
+                        m(Icon, { name: Icons.STAR }),
+                      ]),
                     })
                     : m(ListItem, {
                       class: 'select-list-back-home',
@@ -237,7 +251,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 align: 'left',
                 basic: true,
                 compact: true,
-                label: m(CurrentCommunityLabel),
+                label: [
+                  m(CurrentCommunityLabel),
+                  m(SwitchIcon),
+                ],
                 style: 'min-width: 200px',
               }),
             }),
@@ -254,14 +271,12 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             }),
           // discussions (all communities)
           (app.community || app.chain)
-            && m('h4', 'Discussions'),
-          (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
             && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
                 || showMolochMenuOptions)
-            && m('h4', 'On-chain Voting'),
+            && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
               contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
@@ -277,7 +292,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.TRELLO }),
+              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
@@ -326,7 +341,15 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.USERS }),
+              contentLeft: m(Icon, { name: 'hexagon' }),
+            }),
+          (app.community || app.chain)
+            && m(ListItem, {
+              class: 'TagRow',
+              active: m.route.get() === `/${app.activeId()}/tags/`,
+              label: 'Tags',
+              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+              contentLeft: m(Icon, { name: 'hexagon' }),
             }),
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
