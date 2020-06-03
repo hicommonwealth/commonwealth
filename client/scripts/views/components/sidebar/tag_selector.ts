@@ -292,17 +292,6 @@ const TagSelector: m.Component<{
       showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
       showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
       showFullListing && isCommunityAdmin() && m(NewTagButton),
-      !showFullListing
-        && (app.community || app.chain)
-        && m(List, [
-          m(ListItem, {
-            class: 'TagRow',
-            active: m.route.get() === `/${app.activeId()}/tags/`,
-            label: 'All tags',
-            onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            contentLeft: m(Icon, { name: Icons.MORE_HORIZONTAL }),
-          }),
-        ]),
     ]);
   },
 };
