@@ -31,7 +31,8 @@ interface ILinkPostState {
 }
 
 interface IThreadForm {
-  tag?: OffchainTag | string;
+  tagName?: string;
+  tagId?: number;
   url?: string;
   title?: string;
 }
@@ -96,8 +97,9 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       m(AutoCompleteTagForm, {
         tags: app.tags.getByCommunity(app.activeId()),
         featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tag: OffchainTag | string) => {
-          vnode.state.form.tag = tag;
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
         },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
@@ -189,8 +191,9 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       m(AutoCompleteTagForm, {
         tags: app.tags.getByCommunity(app.activeId()),
         featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tag: OffchainTag | string) => {
-          vnode.state.form.tag = tag;
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
         },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;

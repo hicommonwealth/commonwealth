@@ -15,6 +15,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
       id: req.body.thread_id,
     },
   });
+
   const roles: any[] = await models.Role.findAll({
     where: thread.community ? {
       permission: ['admin', 'moderator'],
@@ -40,16 +41,17 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
     newTag = await models.OffchainTag.findOne({
       where: { id: req.body.tag_id }
     });
-  } else if (req.body.new_tag_name) {
+  } else if (req.body.tag_name) {
     [newTag] = await models.OffchainTag.findOrCreate({
       where: {
-        name: req.body.new_tag_name,
+        name: req.body.tag_name,
         community_id: thread.community || null,
         chain_id: thread.community ? null : thread.chain,
       },
     });
+    thread.tag_id = newTag.id;
+    thread.save();
   }
-
   return res.json({ status: 'Success', result: newTag });
 };
 

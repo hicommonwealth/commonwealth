@@ -60,7 +60,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
         content: m(TagWindow, {
           onChangeHandler: (tagName, tagId?) => {
             vnode.state.tagName = tagName;
-            if (tagId) vnode.state.tagId = tagId;
+            vnode.state.tagId = tagId;
           }
         }),
         hasBackdrop: true,

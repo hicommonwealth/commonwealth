@@ -333,8 +333,9 @@ const NewProposalForm = {
             && m(AutoCompleteTagForm, {
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tag: string) => {
-                vnode.state.form.tag = tag;
+              updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.form.tagName = tagName;
+                vnode.state.form.tagId = tagId;
               },
               updateParentErrors: (err: string) => {
                 if (err) vnode.state.error = err;
