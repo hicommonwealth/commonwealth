@@ -2,6 +2,7 @@ import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
+import { clearLocalStorage } from 'stores/PersistentStore';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
@@ -55,6 +56,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     initChainModuleFn?: () => Promise<void>,
     loadIncompleteEntities = false,
   ): Promise<void> {
+    clearLocalStorage();
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);

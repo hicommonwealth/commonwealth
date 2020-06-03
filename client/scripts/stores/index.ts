@@ -11,5 +11,6 @@ export { default as ReactionsStore } from './ReactionsStore';
 export { default as Store } from './Store';
 export { default as TagsStore } from './TagsStore';
 export { default as ChainEntityStore } from './ChainEntityStore';
+export { default as PersistentStore } from './PersistentStore';
 
-export { UpdateType, IStoreUpdate, IHasId, IHasAddress } from './interfaces';
+export { UpdateType, IHasId, ISerializable, IHasAddress } from './interfaces';

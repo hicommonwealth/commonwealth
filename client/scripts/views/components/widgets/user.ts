@@ -11,12 +11,8 @@ import Tooltip from 'views/components/tooltip';
 
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { Registration } from '@polkadot/types/interfaces';
-import { Data } from '@polkadot/types/primitive';
-import { u8aToString } from '@polkadot/util';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
-import { from } from 'rxjs';
-import SubstrateIdentity from 'client/scripts/controllers/chain/substrate/identity';
+import Substrate from 'controllers/chain/substrate/main';
+import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
 
 interface IAttrs {
   user: Account<any> | [string, string];
@@ -49,20 +45,16 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
   }),
   view: (vnode) => {
     const { profile, linkify, account } = vnode.attrs;
-
     // return polkadot identity if possible
-    const displayNameHex = vnode.state.dynamic.identity?.info?.display;
-    const judgements = vnode.state.dynamic.identity?.judgements || [];
-    if (displayNameHex && judgements) {
-      // Polkadot identity judgements. See:
-      // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
-      // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
-      const isGood = _.some(judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable');
-      const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
-      const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
+    const identity = vnode.state.dynamic.identity;
+    const displayName = identity?.exists ? identity.username : undefined;
+    const quality = identity?.exists ? identity.quality : undefined;
+    if (displayName && quality) {
       const name = [ m(`span.identity-icon${
-        isGood ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${isGood ? '.green' : isBad ? '.red' : '.gray'}`), d2s(displayNameHex) ];
+        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
+      }${quality === IdentityQuality.Good
+        ? '.green' : quality === IdentityQuality.Bad
+          ? '.red' : '.gray'}`), displayName ];
 
       return linkify
         ? link(
