@@ -25,6 +25,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
   },
   view: (vnode) => {
     return m('.EmailPanel', [
+      m('h2', 'Email Settings:'),
       m('.EmailUpdate', [
         m('h4', 'Email:'),
         m(Input, {
@@ -81,9 +82,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
   },
 };
 
-const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
-  oninit: (vnode) => {
-  },
+const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   view: (vnode) => {
     let notifications: any[];
     if (app.loginStatusLoaded) {
@@ -91,24 +90,55 @@ const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[]
     }
     const { subscriptions } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
-    return m('.UserSubscriptions', [
-      m(EmailPanel),
+    return m('.UserNotifications', [
       m('h2', 'Notifications:'),
-      m(Button, {
-        label: 'Mark all as read',
-        onclick: (e) => {
-          e.preventDefault();
-          if (notifications.length < 1) return;
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
-        }
-      }),
-      m(Button, {
-        label: 'Clear all read',
-        onclick: (e) => {
-          e.preventDefault();
-          app.login.notifications.clearAllRead().then(() => m.redraw());
-        }
-      }),
+      m('.MarkAllButtons', [
+        m('h4', 'For all current notifications:'),
+        m(Button, {
+          label: 'Mark all as read',
+          onclick: (e) => {
+            e.preventDefault();
+            if (notifications.length < 1) return;
+            app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          }
+        }),
+        m(Button, {
+          label: 'Clear all read',
+          onclick: (e) => {
+            e.preventDefault();
+            app.login.notifications.clearAllRead().then(() => m.redraw());
+          }
+        }),
+      ]),
+      mentionsSubscription
+        && m('.MentionsButton', [
+          m('h4', 'Mentions:'),
+          m(Button, {
+            label: mentionsSubscription.isActive ? 'On' : 'Off',
+            intent: mentionsSubscription.isActive ? 'positive' : 'none',
+            onclick: async (e) => {
+              e.preventDefault();
+              if (mentionsSubscription.isActive) {
+                await app.login.notifications.disableSubscriptions([mentionsSubscription]);
+              } else {
+                await app.login.notifications.enableSubscriptions([mentionsSubscription]);
+              }
+              m.redraw();
+            }
+          }),
+        ]),
+    ]);
+  },
+};
+
+const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
+  oninit: (vnode) => {
+  },
+  view: (vnode) => {
+    return m('.UserSubscriptions', [
+      m('h1', 'User Settings'),
+      m(EmailPanel),
+      m(UserNotifications, { subscriptions: vnode.attrs.subscriptions, })
     ]);
   }
 };
@@ -311,22 +341,11 @@ interface IActiveSubscriptionsState {
   subscriptions: NotificationSubscription[];
 }
 
-const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
+const ActiveSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }, IActiveSubscriptionsState> = {
   oninit: (vnode) => {
-    vnode.state.subscriptions = [];
-  },
-  oncreate: async (vnode) => {
-    if (!app.isLoggedIn) m.route.set('/');
-    $.get(`${app.serverUrl()}/viewSubscriptions`, {
-      jwt: app.login.jwt,
-    }).then((result) => {
-      result.result.forEach((sub) => {
-        vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
-      });
-      m.redraw();
-    }, (error) => {
-      m.route.set('/');
-    });
+    vnode.state.subscriptions = vnode.attrs.subscriptions.filter(
+      (s) => s.category !== NotificationCategories.NewMention
+    );
   },
   view: (vnode) => {
     const subscriptions = vnode.state.subscriptions;
@@ -668,7 +687,20 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         .filter((c) => chainIds.includes(c.id))
     );
     vnode.state.selectedFilter = 'default';
-    vnode.state.subscriptions = app.login.notifications.subscriptions;
+    vnode.state.subscriptions = [];
+  },
+  oncreate: async (vnode) => {
+    if (!app.isLoggedIn) m.route.set('/');
+    $.get(`${app.serverUrl()}/viewSubscriptions`, {
+      jwt: app.login.jwt,
+    }).then((result) => {
+      result.result.forEach((sub) => {
+        vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
+      });
+      m.redraw();
+    }, (error) => {
+      m.route.set('/');
+    });
   },
   view: (vnode) => {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
@@ -690,7 +722,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         (selectedFilter === 'default')
           && m(UserSubscriptions, { subscriptions }),
         (selectedFilter === 'active')
-          && m(ActiveSubscriptions),
+          && m(ActiveSubscriptions, { subscriptions }),
         (chainIds.includes(selectedFilter))
           && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
         (communityIds.includes(selectedFilter))

@@ -56,7 +56,6 @@
     width: 50%;
   }
 
-
   .EmailPanel {
     .EmailUpdate {
       display: flex;
@@ -79,4 +78,18 @@
       }
     }
   }
+
+  .UserNotifications {
+    .MarkAllButtons, .MentionsButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      button {
+        margin-left: 12px;
+      }
+    }
+
+  }
+  
 }
