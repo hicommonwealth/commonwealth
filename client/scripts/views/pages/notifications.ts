@@ -24,10 +24,11 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
     vnode.state.email = app.login.email;
   },
   view: (vnode) => {
-    const options = ['daily', 'weekly', 'monthly', 'never'];
     return m('.EmailPanel', [
       m('.EmailUpdate', [
+        m('h4', 'Email:'),
         m(Input, {
+          contentLeft: m(Icon, { name: Icons.MAIL }),
           defaultValue: vnode.state.email || null,
           onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
         }),
@@ -56,7 +57,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
         m('h4', 'Receive notification emails:'),
         m(Select, {
           defaultValue: vnode.state.interval,
-          options,
+          options: ['daily', 'weekly', 'monthly', 'never'],
           onchange: async (e) => {
             vnode.state.interval = (e.target as any).value;
             try {
@@ -67,6 +68,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
               });
               app.login.emailInterval = response.result.emailNotificationInterval;
             } catch (err) {
+              vnode.state.interval = app.login.emailInterval;
               console.log('Failed to update email notification interval');
               throw new Error((err.responseJSON && err.responseJSON.error)
                 ? err.responseJSON.error
@@ -90,6 +92,7 @@ const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[]
     const { subscriptions } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     return m('.UserSubscriptions', [
+      m(EmailPanel),
       m('h2', 'Notifications:'),
       m(Button, {
         label: 'Mark all as read',
@@ -106,7 +109,6 @@ const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[]
           app.login.notifications.clearAllRead().then(() => m.redraw());
         }
       }),
-      m(EmailPanel),
     ]);
   }
 };

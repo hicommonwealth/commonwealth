@@ -55,4 +55,28 @@
   .DropdownFormField {
     width: 50%;
   }
+
+
+  .EmailPanel {
+    .EmailUpdate {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      h4, div, button {
+        padding-right: 12px;
+      }
+      .cui-input {
+        min-width: max-content;
+        width: 240px;
+      }
+    }
+    .EmailInterval {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      h4 {
+        padding-right: 12px;
+      }
+    }
+  }
 }
