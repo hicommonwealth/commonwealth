@@ -47,7 +47,6 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     };
 
     const addTag = () => {
-      debugger
       const input = (document.getElementsByClassName('autocomplete-tag-input')[0].firstChild as HTMLInputElement);
       const newTag = input.value;
       tags.push({ name: newTag, id: undefined, description: '' });

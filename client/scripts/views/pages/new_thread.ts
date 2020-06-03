@@ -37,7 +37,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
     const author = app.vm.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
-
+    if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
     // init
     if (vnode.state.form === undefined) vnode.state.form = {};
@@ -192,8 +192,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
             oncreateBind: (state) => {
               vnode.state.quillEditorState = state;
             },
+            editorNamespace: 'new-discussion',
             tabindex: 2,
-            editorNamespace: 'new-link',
           }),
         ]),
         m(FormGroup, [
