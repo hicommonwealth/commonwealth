@@ -50,10 +50,11 @@ export const newThread = (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
+  console.log(form);
   if (!form.title) {
     return ({ title: NewThreadErrors.NoTitle });
   }
-  if (!form.tag) {
+  if (!form.tagName) {
     return ({ tag: NewThreadErrors.NoTag });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
@@ -75,7 +76,7 @@ export const newThread = (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tag, title, url } = form;
+  const { tagName, tagId, title, url } = form;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();
@@ -97,7 +98,8 @@ export const newThread = (
         chainId,
         communityId,
         title,
-        tag,
+        tagName,
+        tagId,
         bodyText,
         url,
         attachments,

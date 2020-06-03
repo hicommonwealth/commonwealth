@@ -19,7 +19,7 @@ export const Errors = {
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { tag, title, body, kind, url, privacy, readOnly } = req.body;
+  const { tagName, tagId, title, body, kind, url, privacy, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -87,14 +87,14 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   };
 
   // New Tag table entries created
-  if (!Number.isNaN(Number(tag))) {
-    threadContent['tag_id'] = Number(tag);
-  } else if (typeof tag === 'string') {
+  if (tagId) {
+    threadContent['tag_id'] = Number(tagId);
+  } else if (tagName) {
     let offchainTag;
     try {
       [offchainTag] = await models.OffchainTag.findOrCreate({
         where: {
-          name: tag,
+          name: tagName,
           community_id: community?.id || null,
           chain_id: chain?.id || null,
         },
@@ -104,9 +104,9 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       return next(err);
     }
   } else {
-    return next(Error('Must pass either a numeric tag id or new tag name as string'));
+    return next(Error('Must pass a tagName string and/or a numeric tagId'));
   }
-  console.log(threadContent);
+
   let thread;
   try {
     thread = await models.OffchainThread.create(threadContent);

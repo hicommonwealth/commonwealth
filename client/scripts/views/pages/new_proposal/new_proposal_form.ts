@@ -123,7 +123,8 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
-          vnode.state.form.tag,
+          vnode.state.form.tagName,
+          vnode.state.form.tagId,
           vnode.state.form.title,
           vnode.state.form.description,
           vnode.state.form.categoryId,
