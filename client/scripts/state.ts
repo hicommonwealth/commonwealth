@@ -22,7 +22,6 @@ import ReactionsController from './controllers/server/reactions';
 import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
-import SelectedAddressesController from './controllers/server/selected_addresses';
 import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
 
@@ -75,7 +74,6 @@ export interface IApp {
     disableRichText: boolean;
     notifications: NotificationsController;
     lastVisited: object;
-    selectedAddresses: SelectedAddressesController;
     starredCommunities: StarredCommunity[];
     unseenPosts: object;
   };
@@ -130,7 +128,6 @@ const app: IApp = {
     isSiteAdmin: false,
     disableRichText: null,
     lastVisited: {},
-    selectedAddresses: new SelectedAddressesController(),
     unseenPosts: {},
     starredCommunities: [],
     notifications: new NotificationsController(),

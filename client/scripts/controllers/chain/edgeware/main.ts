@@ -39,6 +39,10 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async init(onServerLoaded?) {
+    // if set to true, loads chain entity data from the node directly on the client
+    // if set to false, chain entity data is loaded from the server
+    // in both cases, archived proposals (no longer on chain) are loaded from the server
+    const useClientChainEntities = true;
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new EdgewareChain(this.app); // edgeware chain this.appid
     this.accounts = new SubstrateAccounts(this.app);
@@ -72,7 +76,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
         typesAlias: { voting: { Tally: 'VotingTally' } },
       });
       await this.chain.initMetadata();
-    }, onServerLoaded);
+    }, onServerLoaded, !useClientChainEntities);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
@@ -83,7 +87,10 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
       this.signaling.init(this.chain, this.accounts),
     ]);
-    await this._postModuleLoad();
+    if (useClientChainEntities) {
+      await this.chain.initChainEntities(this.meta.chain.id);
+    }
+    await this._postModuleLoad(!useClientChainEntities);
     await this.chain.initEventLoop();
 
     this._loaded = true;

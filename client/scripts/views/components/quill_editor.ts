@@ -43,6 +43,10 @@ const instantiateEditor = (
   const Clipboard = Quill.import('modules/clipboard');
   let quill;
 
+  // Set up markdown mode helper
+  // TODO: Avoid using jquery to inspect
+  const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
+
   // Remove existing editor, if there is one
   $editor.empty();
   $editor.siblings('.ql-toolbar').remove();
@@ -122,18 +126,27 @@ const instantiateEditor = (
       const left = window.pageXOffset;
 
       if (e.defaultPrevented || !(this as any).quill.isEnabled()) return;
+      const plainText = e.clipboardData.getData('text/plain').replace(/\n/g, '\n\n').replace(/\n\n+/g, '\n\n');
       const range = (this as any).quill.getSelection();
       let delta = new Delta().retain(range.index);
       (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop
                                           || document.body.scrollTop || 0).toString()}px`;
       (this as any).container.focus();
       setTimeout(() => {
-        (this as any).quill.selection.update(Quill.sources.SILENT);
+        const editor = (this as any).quill;
+        editor.selection.update(Quill.sources.SILENT);
         delta = delta.concat((this as any).convert()).delete(range.length);
-        (this as any).quill.updateContents(delta, Quill.sources.USER);
-        (this as any).quill.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-        const bounds = (this as any).quill.getBounds(delta.length() - range.length, Quill.sources.SILENT);
-        (this as any).quill.scrollingContainer.scrollTop = bounds.top;
+
+        // transform pasted text
+        if (isMarkdownMode()) {
+          delta = new Delta().retain(range.index).delete(range.length).insert(plainText);
+        }
+
+        // update editor with pasted content and selection
+        editor.updateContents(delta, Quill.sources.USER);
+        editor.setSelection(delta.length() - range.length, Quill.sources.SILENT);
+        const bounds = editor.getBounds(delta.length() - range.length, Quill.sources.SILENT);
+        editor.scrollingContainer.scrollTop = bounds.top;
 
         // scroll window to previous position after paste
         window.scrollTo({ top, left });
@@ -231,7 +244,6 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
   // Setup custom keyboard bindings, override Quill default bindings where necessary
-  const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
   const bindings = {
     // Don't insert hard tabs
     'tab': {

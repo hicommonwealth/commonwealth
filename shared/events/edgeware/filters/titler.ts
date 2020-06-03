@@ -187,6 +187,12 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'A new collective proposal is introduced.',
       };
     }
+    case SubstrateEventKind.CollectiveVoted: {
+      return {
+        title: 'Collective Proposal Vote',
+        description: 'A collective proposal receives a vote.',
+      };
+    }
     case SubstrateEventKind.CollectiveApproved: {
       return {
         title: 'Collective Proposal Approved',

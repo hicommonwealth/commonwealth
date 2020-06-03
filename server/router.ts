@@ -35,6 +35,8 @@ import createCommunity from './routes/createCommunity';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
+import updateUserEmailInterval from './routes/updateUserEmailInterval';
+import updateEmail from './routes/updateEmail';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -59,6 +61,7 @@ import getInviteLinks from './routes/getInviteLinks';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
+import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
 import registerWaitingList from './routes/registerWaitingList';
@@ -159,6 +162,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/addMember', passport.authenticate('jwt', { session: false }), addMember.bind(this, models));
   router.post('/upgradeMember', passport.authenticate('jwt', { session: false }), upgradeMember.bind(this, models));
 
+  // user model update
+  router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
+  router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
+
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
 
@@ -170,6 +177,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // roles
   router.post('/createRole', passport.authenticate('jwt', { session: false }), createRole.bind(this, models));
   router.post('/deleteRole', passport.authenticate('jwt', { session: false }), deleteRole.bind(this, models));
+  router.post('/setDefaultRole', passport.authenticate('jwt', { session: false }), setDefaultRole.bind(this, models));
 
   // offchain profiles
   router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));

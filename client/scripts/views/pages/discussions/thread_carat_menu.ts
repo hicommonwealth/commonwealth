@@ -96,6 +96,7 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { isOpen: boolean }> =
       && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
           || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
           || proposal.author === app.vm.activeAccount.address);
+    if (!app.isLoggedIn()) return;
 
     const openTagEditor = () => {
       vnode.state.isOpen = true;

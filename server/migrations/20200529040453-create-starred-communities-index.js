@@ -1,8 +1,12 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.addIndex('StarredCommunities', ['chain', 'community', 'user_id']);
+  up: async (queryInterface, Sequelize) => {
+    try {
+      await queryInterface.addIndex('StarredCommunities', ['chain', 'community', 'user_id']);
+    } catch (e) {
+      return;
+    }
   },
 
   down: (queryInterface, Sequelize) => {

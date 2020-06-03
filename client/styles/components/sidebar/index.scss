@@ -58,12 +58,15 @@ $active-color: #ececec;
     top: 0;
     bottom: 0;
     width: $sidebar-width;
+    border-left: 7px solid $theme-accent-dark;
+    border-right: 1px solid #ececec;
     z-index: 9;
     .SidebarMenu {
         height: 100%;
     }
     .SidebarMenu .cui-list {
         height: 100%;
+        overflow-x: hidden;
         background: #f8f8f8;
     }
     .SidebarMenu .cui-list.list-bottom {
@@ -83,11 +86,15 @@ $active-color: #ececec;
         }
         > .cui-list-item {
             color: #111;
-            &:hover, &.cui-active, &.cui-selected {
+            &:hover {
                 background: $active-color;
             }
-            &.cui-selected .cui-icon svg {
-                color: #5c6bc1 !important;
+            &.cui-active {
+                background: $theme-base-color;
+                color: #fff;
+                .cui-icon svg {
+                    color: #fff !important;
+                }
             }
         }
     }
@@ -102,9 +109,9 @@ $active-color: #ececec;
         letter-spacing: 0.15px;
     }
     .cui-list > .cui-list-item {
-        font-size: 15px;
+        font-size: 14.5px;
+        font-weight: 500;
         border: none;
-        font-weight: 600;
         padding: 5px $sidebar-padding;
         > .cui-list-item-content-left > .cui-icon svg {
             height: 15px;
@@ -134,7 +141,6 @@ $active-color: #ececec;
         margin-bottom: 20px;
         user-select: none;
         border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 0px 4px rgba(0,0,0,0.04);
         cursor: pointer;
         .cui-button {
             width: 100%;
@@ -143,8 +149,22 @@ $active-color: #ececec;
             color: #222;
             background: #f8f8f8 !important;
         }
-        .CommunityLabel {
-            margin: 17px 0 13px;
+        .cui-button-label {
+            width: 100%;
+
+            .CommunityLabel {
+                margin: 17px 0 13px;
+            }
+            svg.SwitchIcon {
+                position: absolute;
+                right: 6px;
+                top: 21px;
+                // svg attributes
+                fill: none;
+                polyline {
+                    stroke: #aaa;
+                }
+            }
         }
     }
     .cui-list .action-selector {
@@ -230,12 +250,16 @@ $active-color: #ececec;
         max-height: 90vh;
     }
     .cui-list-item {
-        min-width: 280px;
+        min-width: 260px;
         padding: 10px 15px;
         &.cui-selected {
-            color: #222;
+            color: #444;
+            opacity: 0.7;
+            .ChainIcon, .CommunityIcon {
+                opacity: 0.7;
+            }
         }
-        &.starred .cui-button .cui-icon svg {
+        &.starred .community-star-toggle .cui-icon svg {
             fill: currentColor;
         }
     }

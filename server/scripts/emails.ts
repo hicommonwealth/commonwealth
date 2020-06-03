@@ -1,6 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import { SENDGRID_API_KEY } from '../config';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
 const log = factory.getLogger(formatFilename(__filename));
 

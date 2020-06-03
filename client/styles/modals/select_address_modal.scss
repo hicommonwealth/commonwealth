@@ -13,6 +13,7 @@
 }
 
 .SelectAddressOption {
+    position: relative;
     display: block;
     padding: 12px 20px 10px;
     border: 1px solid #eee;
@@ -28,5 +29,14 @@
         display: block;
         float: right;
         color: #aaa;
+    }
+    .role-permission {
+        position: absolute;
+        top: 21px;
+        right: 20px;
+        color: #aaa;
+        .cui-tag {
+            font-weight: 600;
+        }
     }
 }

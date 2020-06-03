@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 import '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -56,14 +56,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     });
   }
   // TODO: fetch all this data with a single query
-  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited, selectedAddresses] = await Promise.all([
+  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
     user.getAddresses().filter((address) => !!address.verified),
     user.getSocialAccounts(),
     user.getSelectedNode(),
     user.isAdmin,
     user.disableRichText,
     user.lastVisited,
-    user.selectedAddresses,
   ]);
 
   // look up my roles & private communities
@@ -165,7 +164,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       isAdmin,
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
-      selectedAddresses: JSON.parse(selectedAddresses),
       starredCommunities,
       unseenPosts
     }

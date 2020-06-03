@@ -304,23 +304,33 @@ const labelEdgewareEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
+    case SubstrateEventKind.CollectiveVoted: {
+      const { vote, proposalHash, collectiveName } = data;
+      const collective = collectiveName && collectiveName === 'technicalCommittee'
+        ? 'Technical Committee' : 'Council';
+      return {
+        heading: `Member Voted on ${collective} Proposal`,
+        label: `A council member has voted ${vote ? 'Yes' : 'No'} on a collective proposal.`,
+        linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
+      };
+    }
     case SubstrateEventKind.CollectiveApproved: {
-      const { proposalHash, proposalIndex, ayes, nays, collectiveName } = data;
+      const { proposalHash, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Approved`,
-        label: `${collective} proposal ${proposalIndex} was approved by vote ${ayes.length}-${nays.length}.`,
+        label: `A ${collective} proposal was approved.`,
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
     case SubstrateEventKind.CollectiveDisapproved: {
-      const { proposalIndex, ayes, nays, collectiveName, proposalHash } = data;
+      const { collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
       return {
         heading: `${collective} Proposal Disapproved`,
-        label: `${collective} proposal ${proposalIndex} was disapproved by vote ${ayes.length}-${nays.length}.`,
+        label: `A ${collective} proposal was disapproved.`,
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
