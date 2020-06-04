@@ -78,7 +78,7 @@ class TagsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to i[date] tag');
+      console.log('Failed to update tag');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Failed to update tag');

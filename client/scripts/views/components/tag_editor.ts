@@ -81,7 +81,6 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
               const { tagName, tagId } = vnode.state;
               const { thread } = vnode.attrs;
               const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
-              console.log(tag);
               vnode.attrs.onChangeHandler(tag);
               vnode.state.isOpen = false;
             },
