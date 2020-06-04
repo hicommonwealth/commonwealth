@@ -3,5 +3,5 @@
 .PageNotFound {
     top: -15px !important;
     height: calc(100vh - #{$header-height} - 30px) !important;
-    width: calc(100vw - #{$sidebar-width} - #{$switcher-width}) !important;
+    width: calc(100vw - #{$sidebar-width}) !important;
 }

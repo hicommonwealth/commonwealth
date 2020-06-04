@@ -189,21 +189,15 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }, { loadCount: number }> = {
+const ProfilePage: m.Component<{ address: string }, { }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    if (!vnode.state.loadCount) vnode.state.loadCount = 0;
     if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
     if (!account) {
-      if (vnode.state.loadCount < 3) {
-        vnode.state.loadCount += 1;
-        return m(PageLoading);
-      } else {
-        return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
-      }
+      return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
