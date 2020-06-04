@@ -33,6 +33,8 @@ interface IDiscussionPageState {
   lastVisitedUpdated?: boolean;
   hasOlderPosts?: boolean;
   defaultLookback: number;
+  onscroll?: Function;
+  scrollableEle: any;
 }
 
 const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
@@ -42,18 +44,25 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       Scope: app.activeId(),
     });
     // Infinite Scroll
-    const scrollableEle = $('.mithril-app');
-    const onscroll = _.debounce(() => {
-      const listingHeight = (document.getElementsByClassName('discussions-listing')[0] as HTMLDivElement).offsetHeight;
-      const scrollPos = scrollableEle.height() + scrollableEle.scrollTop();
-      if (scrollPos > (listingHeight - 400)) {
+    vnode.state.scrollableEle = document.getElementsByClassName('mithril-app')[0];
+    vnode.state.onscroll = _.debounce(() => {
+      const discussionListing = (document.getElementsByClassName('discussions-listing')[0] as HTMLDivElement);
+      if (!discussionListing) return;
+      const listingHeight = discussionListing.scrollHeight;
+      const scrollPos = vnode.state.scrollableEle.scrollTop;
+      if (listingHeight - scrollPos < 800) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
           m.redraw();
         }
       }
-    }, 400);
-    scrollableEle.on('scroll', onscroll);
+    }, 200);
+    if (vnode.state.scrollableEle) vnode.state.scrollableEle.addEventListener('scroll', vnode.state.onscroll);
+  },
+  onremove: (vnode) => {
+    if (vnode.state.scrollableEle) {
+      vnode.state.scrollableEle.removeEventListener('scroll', vnode.state.onscroll);
+    }
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
