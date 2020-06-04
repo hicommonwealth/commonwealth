@@ -252,11 +252,14 @@ $active-color: #ececec;
     .cui-list-item {
         min-width: 260px;
         padding: 10px 15px;
-        &.cui-selected {
-            color: #444;
-            opacity: 0.7;
-            .ChainIcon, .CommunityIcon {
-                opacity: 0.7;
+        &.cui-selected, &.cui-selected:hover {
+            background: lighten(#3960f4, 7%);
+            color: #fff;
+            .community-id {
+                color: #fff;
+            }
+            .cui-icon svg {
+                color: #fff !important;
             }
         }
         &.starred .community-star-toggle .cui-icon svg {

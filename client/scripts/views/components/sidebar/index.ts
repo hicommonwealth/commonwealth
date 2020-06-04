@@ -170,25 +170,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
         return 0;
       })
-      .sort((a, b) => {
-        // sort current community at top
-        if (a instanceof ChainInfo && app.activeChainId() === a.id) return -1;
-        if (a instanceof CommunityInfo && app.activeCommunityId() === a.id) return -1;
-        return 0;
-      })
       .filter((item) => {
         // only show chains with nodes
         return (item instanceof ChainInfo)
           ? app.config.nodes.getByChain(item.id)?.length
           : true;
       });
-
     const currentIndex = selectableCommunities.findIndex((item) => {
-      return item instanceof ChainInfo
-        ? app.activeChainId() === item.id
-        : item instanceof CommunityInfo
-          ? app.activeCommunityId() === item.id
-          : null;
+      if (item instanceof ChainInfo) return app.activeChainId() === item.id;
+      if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;
+      return false;
     });
 
     return m('.Sidebar', {
@@ -206,7 +197,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               closeOnSelect: true,
               class: 'CommunitySelectList',
               items: (selectableCommunities as any).concat('home'),
-              defaultActiveIndex: -1,
+              activeIndex: currentIndex,
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
