@@ -2,8 +2,8 @@
 module.exports = async function (callback) {
   let Web3 = require('web3');
   const truffleContract = require('truffle-contract')
-  let Moloch1Contract = truffleContract(require('./build/contracts/Moloch1.json'));
-  let TokenContract = truffleContract(require('./build/contracts/Token.json'));
+  let Moloch1Contract = truffleContract(require('../build/contracts/Moloch1.json'));
+  let TokenContract = truffleContract(require('../build/contracts/Token.json'));
   var provider = new Web3.providers.HttpProvider("http://localhost:9545");
   var web3 = new Web3(provider);
   Moloch1Contract.setProvider(web3.currentProvider);
@@ -20,7 +20,8 @@ module.exports = async function (callback) {
     await tokenInstance.approve(instance.address, 5, { from: applicant });
     await instance.submitProposal(applicant, 5, 5, 'hello', { from: summoner });
     console.log('Done!');
+    callback()
   } catch (err) {
-    console.error(err);
+    callback(err);
   }
 }
