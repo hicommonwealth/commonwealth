@@ -37,21 +37,24 @@ export const createAndVerifyAddress = async ({ chain }) => {
 };
 
 export interface ThreadArgs {
-  chain?: string;
-  community?: string;
-  address: string;
-  jwt: any;
-  title: any;
-  body: any;
-  kind: string;
-  tag?: string;
-  privacy?: boolean;
-  readOnly?: boolean;
-  url?: string;
-  mentions?: any;
+  jwt: any,
+  address: string,
+  kind: string,
+  chainId: string,
+  communityId: string,
+  title: string,
+  tagName: string,
+  tagId: number,
+  body?: string,
+  url?: string,
+  attachments?: string[],
+  mentions?: string[],
+  privacy?: boolean,
+  readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chain, community, address, jwt, title, body, tag, privacy, readOnly, kind, url, mentions } = args;
+  const { chainId, communityId, address, jwt, title, body, tagName, tagId,
+    privacy, readOnly, kind, url, mentions, attachments } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
   const versionHistory : string = JSON.stringify(firstVersion);
@@ -59,16 +62,17 @@ export const createThread = async (args: ThreadArgs) => {
     .post('/api/createThread')
     .set('Accept', 'application/json')
     .send({
-      'author_chain': chain,
-      'chain': community ? undefined : chain,
-      'community': community,
+      'author_chain': chainId,
+      'chain': communityId ? undefined : chainId,
+      'community': communityId,
       'address': address,
       'title': encodeURIComponent(title),
       'body': encodeURIComponent(body),
       'kind': kind,
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tag': tag,
+      'tag_name': tagName,
+      'tag_id': tagId,
       'mentions[]': mentions,
       'url': url,
       'privacy': privacy || false,
