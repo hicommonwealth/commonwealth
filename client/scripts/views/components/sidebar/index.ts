@@ -341,7 +341,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: 'octagon' }),
+              contentLeft: m(Icon, { name: 'hexagon' }),
             }),
           (app.community || app.chain)
             && m(ListItem, {
@@ -349,7 +349,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: m.route.get() === `/${app.activeId()}/tags/`,
               label: 'Tags',
               onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-              contentLeft: m(Icon, { name: 'octagon' }),
+              contentLeft: m(Icon, { name: 'hexagon' }),
             }),
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
