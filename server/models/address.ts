@@ -134,7 +134,7 @@ module.exports = (sequelize, DataTypes) => {
       const generatedAddress = getCosmosAddress(pk);
       if (generatedAddress === addressModel.address) {
         const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
-        isValid = secp256k1.verify(signHash, signature, pk);
+        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
       } else {
         isValid = false;
       }

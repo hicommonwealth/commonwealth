@@ -1164,6 +1164,11 @@
   resolved "https://registry.yarnpkg.com/@tendermint/amino-js/-/amino-js-0.5.1.tgz#018fb5c8bc162c6d7be0547222964be8e52c1cea"
   integrity sha512-BUb6gNE/mVYuuQ8/Nst/5S6z532wgoZJGwYYhTlIfAMJDXeVFxsOPltd2VYzTZl01OkUUOgNCoewx0zFss+nOA==
 
+"@typechain/ethers-v4@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v4/-/ethers-v4-1.0.0.tgz#290c8dd31a5ea042f9da44d58c3c17f22550afe6"
+  integrity sha512-tN9XV0ezbLaEuK6jC5gW6AiH4ihq9lMl1ifJr700oBjknKKNDO6jUSzUE56gJzhW/fuyGsb4zsCHwf3JCkBd9w==
+
 "@typechain/truffle-v5@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@typechain/truffle-v5/-/truffle-v5-2.0.2.tgz#709a78ffb120f52c693818fea72e0b0d146c3454"

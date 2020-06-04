@@ -2,7 +2,7 @@ import subscribeMolochEvents from './shared/events/moloch/index';
 import { IEventHandler, CWEvent } from './shared/events/interfaces';
 
 const chain = process.env.NODE_CHAIN || 'moloch-local';
-const network = process.env.ETH_NETWORK || 'ropsten';
+const network = process.env.ETH_NETWORK || 'ws://localhost:9545';
 const contractAddress = '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7';
 
 const DEV = process.env.NODE_ENV !== 'production';

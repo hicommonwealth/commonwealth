@@ -1,4 +1,5 @@
-import { getDefaultProvider } from 'ethers';
+import { providers } from 'ethers';
+import Web3 from 'web3';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
@@ -8,10 +9,10 @@ import StorageFetcher from './storageFetcher';
 import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';
 
-import { Moloch1 } from '../../../contracts/MolochV1/Moloch1';
-import { Moloch1Factory } from '../../../contracts/MolochV1/Moloch1Factory';
-import { Moloch2 } from '../../../contracts/MolochV2/Moloch2';
-import { Moloch2Factory } from '../../../contracts/MolochV2/Moloch2Factory';
+import { Moloch1 } from '../../../eth/types/Moloch1';
+import { Moloch1Factory } from '../../../eth/types/Moloch1Factory';
+import { Moloch2 } from '../../../eth/types/Moloch2';
+import { Moloch2Factory } from '../../../eth/types/Moloch2Factory';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -22,13 +23,17 @@ export type MolochApi = Moloch1 | Moloch2;
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(ethNetwork = 'ropsten', contractVersion: 1 | 2, contractAddress: string): MolochApi {
-  const provider = getDefaultProvider(ethNetwork);
-  if (contractVersion === 1) {
-    return Moloch1Factory.connect(contractAddress, provider);
-  } else {
-    return Moloch2Factory.connect(contractAddress, provider);
-  }
+export function createApi(
+  ethNetworkUrl: string,
+  contractVersion: 1 | 2,
+  contractAddress: string
+): Promise<MolochApi> {
+  const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl);
+  const provider = new providers.Web3Provider(web3Provider);
+  const contract = contractVersion === 1
+    ? Moloch1Factory.connect(contractAddress, provider)
+    : Moloch2Factory.connect(contractAddress, provider);
+  return contract.deployed();
 }
 
 /**
@@ -44,7 +49,7 @@ export function createApi(ethNetwork = 'ropsten', contractVersion: 1 | 2, contra
  */
 export default async function (
   chain: string, // contract name
-  ethNetwork: string,
+  ethNetworkUrl: string,
   contractVersion: 1 | 2,
   contractAddress: string,
   handlers: IEventHandler<IMolochEventData>[],
@@ -52,7 +57,7 @@ export default async function (
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
   console.log(contractAddress);
-  const api = createApi(ethNetwork, contractVersion, contractAddress);
+  const api = await createApi(ethNetworkUrl, contractVersion, contractAddress);
 
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IMolochEventData>) => {
@@ -109,7 +114,7 @@ export default async function (
   }
 
   try {
-    log.info(`Subscribing to Moloch contract ${chain} on ${ethNetwork}...`);
+    log.info(`Subscribing to Moloch contract ${chain} on ${ethNetworkUrl}...`);
     subscriber.subscribe(processEventFn);
   } catch (e) {
     log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
