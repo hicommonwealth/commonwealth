@@ -10,7 +10,7 @@ import {
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link } from 'helpers';
+import { featherIcon, link, SwitchIcon } from 'helpers';
 import { ProposalType } from 'identifiers';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -50,9 +50,9 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import AdminPanel from 'views/components/admin_panel';
 
-const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo }> = {
+const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo, showStatus?: boolean }> = {
   view: (vnode) => {
-    const { chain, community } = vnode.attrs;
+    const { chain, community, showStatus } = vnode.attrs;
 
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
@@ -61,7 +61,7 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
       m('.community-label-right', [
         m('.community-name-row', [
           m('span.community-name', chain.name),
-          chain.id === app.activeChainId() && m(ChainStatusIndicator, { hideLabel: true }),
+          showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
         ]),
         m('.community-id', `/${chain.id}`),
       ]),
@@ -74,7 +74,7 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
       m('.community-label-right', [
         m('.community-name-row', [
           m('span.community-name', community.name),
-          community.id === app.activeCommunityId() && [
+          showStatus === true && [
             community.privacyEnabled && m('span.icon-lock'),
             !community.privacyEnabled && m('span.icon-globe'),
           ],
@@ -99,11 +99,11 @@ const CurrentCommunityLabel: m.Component<{}> = {
     const selectedCommunity = app.community;
 
     if (selectedNode) {
-      return m(CommunityLabel, { chain: selectedNode.chain });
+      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true });
     } else if (selectedCommunity) {
-      return m(CommunityLabel, { community: selectedCommunity.meta });
+      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true });
     } else {
-      return m(CommunityLabel);
+      return m(CommunityLabel, { showStatus: true });
     }
   }
 };
@@ -147,6 +147,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -158,10 +159,23 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    if (onNotificationsPage(m.route.get())) return;
 
     const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
       .concat(app.config.chains.getAll())
       .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => {
+        // sort starred communities at top
+        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
+        if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
+        return 0;
+      })
+      .sort((a, b) => {
+        // sort current community at top
+        if (a instanceof ChainInfo && app.activeChainId() === a.id) return -1;
+        if (a instanceof CommunityInfo && app.activeCommunityId() === a.id) return -1;
+        return 0;
+      })
       .filter((item) => {
         // only show chains with nodes
         return (item instanceof ChainInfo)
@@ -191,18 +205,34 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             m(SelectList, {
               closeOnSelect: true,
               class: 'CommunitySelectList',
-              activeIndex: currentIndex,
               items: (selectableCommunities as any).concat('home'),
+              defaultActiveIndex: -1,
               itemRender: (item) => {
                 return item instanceof ChainInfo
                   ? m(ListItem, {
+                    class: app.communities.isStarred(item.id, null) ? 'starred' : '',
                     label: m(CommunityLabel, { chain: item }),
-                    selected: app.activeChainId() === item.id
+                    selected: app.activeChainId() === item.id,
+                    contentRight: app.isLoggedIn() && isMember(item.id, null) && m('.community-star-toggle', {
+                      onclick: (e) => {
+                        app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                      }
+                    }, [
+                      m(Icon, { name: Icons.STAR }),
+                    ]),
                   })
                   : item instanceof CommunityInfo
                     ? m(ListItem, {
+                      class: app.communities.isStarred(null, item.id) ? 'starred' : '',
                       label: m(CommunityLabel, { community: item }),
-                      selected: app.activeCommunityId() === item.id
+                      selected: app.activeCommunityId() === item.id,
+                      contentRight: app.isLoggedIn() && isMember(null, item.id) && m('.community-star-toggle', {
+                        onclick: (e) => {
+                          app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                        },
+                      }, [
+                        m(Icon, { name: Icons.STAR }),
+                      ]),
                     })
                     : m(ListItem, {
                       class: 'select-list-back-home',
@@ -221,7 +251,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                 align: 'left',
                 basic: true,
                 compact: true,
-                label: m(CurrentCommunityLabel),
+                label: [
+                  m(CurrentCommunityLabel),
+                  m(SwitchIcon),
+                ],
                 style: 'min-width: 200px',
               }),
             }),
@@ -238,14 +271,12 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             }),
           // discussions (all communities)
           (app.community || app.chain)
-            && m('h4', 'Discussions'),
-          (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
             && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
                 || showMolochMenuOptions)
-            && m('h4', 'On-chain Voting'),
+            && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
               contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
@@ -261,7 +292,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.TRELLO }),
+              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
@@ -310,7 +341,15 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.USERS }),
+              contentLeft: m(Icon, { name: 'hexagon' }),
+            }),
+          (app.community || app.chain)
+            && m(ListItem, {
+              class: 'TagRow',
+              active: m.route.get() === `/${app.activeId()}/tags/`,
+              label: 'Tags',
+              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+              contentLeft: m(Icon, { name: 'hexagon' }),
             }),
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
@@ -354,7 +393,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
                     iconLeft: Icons.USER_PLUS,
                     size: 'sm',
                     fluid: true,
-                    label: `Link new address`,
+                    label: 'Link new address',
                     onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
                   })
                   // if addresses are available, but none is selected

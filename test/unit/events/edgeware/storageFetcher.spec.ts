@@ -18,9 +18,10 @@ import {
   ISubstrateCollectiveProposed,
   ISubstrateSignalingNewProposal,
   ISubstrateSignalingVotingStarted,
-  ISubstrateSignalingVotingCompleted
+  ISubstrateSignalingVotingCompleted,
+  ISubstrateCollectiveVoted
 } from '../../../../shared/events/edgeware/types';
-import migrate from '../../../../shared/events/edgeware/migration';
+import fetch from '../../../../shared/events/edgeware/storageFetcher';
 
 const { assert } = chai;
 
@@ -92,6 +93,8 @@ const api = constructFakeApi({
     votes: {
       index: '15',
       threshold: '4',
+      ayes: ['Alice'],
+      nays: ['Bob'],
     },
     hash: 'council-hash',
     proposal: {
@@ -182,7 +185,7 @@ const api = constructFakeApi({
 describe('Edgeware Event Migration Tests', () => {
   /** staking events */
   it('should generate all events', async () => {
-    const events = await migrate(api);
+    const events = await fetch(api);
     assert.sameDeepMembers(events, [
       { blockNumber,
         data: {
@@ -266,6 +269,24 @@ describe('Edgeware Event Migration Tests', () => {
             args: [ 'proposal-arg-1', 'proposal-arg-2' ],
           }
         } as ISubstrateCollectiveProposed
+      },
+      { blockNumber,
+        data: {
+          kind: SubstrateEventKind.CollectiveVoted,
+          collectiveName: 'council',
+          proposalHash: 'council-hash',
+          voter: 'Alice',
+          vote: true,
+        } as ISubstrateCollectiveVoted
+      },
+      { blockNumber,
+        data: {
+          kind: SubstrateEventKind.CollectiveVoted,
+          collectiveName: 'council',
+          proposalHash: 'council-hash',
+          voter: 'Bob',
+          vote: false,
+        } as ISubstrateCollectiveVoted
       },
       { blockNumber,
         data: {

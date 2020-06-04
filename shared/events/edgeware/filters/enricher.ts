@@ -374,24 +374,29 @@ export default async function (
           }
         };
       }
+      case SubstrateEventKind.CollectiveVoted: {
+        const [ voter, hash, vote ] = event.data as unknown as [ AccountId, Hash, bool ] & Codec;
+        return {
+          excludeAddresses: [ voter.toString() ],
+          data: {
+            kind,
+            collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
+              ? event.section : undefined,
+            proposalHash: hash.toString(),
+            voter: voter.toString(),
+            vote: vote.isTrue,
+          }
+        };
+      }
       case SubstrateEventKind.CollectiveApproved:
       case SubstrateEventKind.CollectiveDisapproved: {
         const [ hash ] = event.data as unknown as [ Hash ] & Codec;
-        const infoOpt = await api.query[event.section].voting<Option<Votes>>(hash);
-        if (!infoOpt.isSome) {
-          throw new Error('could not fetch info for collective proposal');
-        }
-        const { index, threshold, ayes, nays } = infoOpt.unwrap();
         return {
           data: {
             kind,
             collectiveName: event.section === 'council' || event.section === 'technicalCommittee'
               ? event.section : undefined,
             proposalHash: hash.toString(),
-            proposalIndex: +index,
-            threshold: +threshold,
-            ayes: ayes.map((v) => v.toString()),
-            nays: nays.map((v) => v.toString()),
           }
         };
       }

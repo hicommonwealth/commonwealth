@@ -9,6 +9,7 @@ import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import Errors from '../../../server/routes/subscription/errors';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -185,6 +186,85 @@ describe('Subscriptions Tests', () => {
     });
   });
 
+  describe('/enableImmediateEmails and /disableImmediateEmails', () => {
+    let subscription: NotificationSubscription;
+    beforeEach('creating a subscription', async () => {
+      subscription = await modelUtils.createSubscription({
+        object_id: community,
+        jwt: jwtToken,
+        is_active: true,
+        category: NotificationCategories.NewThread,
+      });
+    });
+
+    it('should turn on immediate emails, /enableImmediateEmails', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should turn off immediate emails, /disableImmediateEmails', async () => {
+      expect(subscription).to.not.be.null;
+      const res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': [subscription.id] });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should fail to enable and disable immediate emails when not passed ids', async () => {
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
+    });
+
+    it('should successfully enable and disable with just a string id', async () => {
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, 'subscription_ids[]': subscription.id.toString() });
+      expect(res.body.status).to.be.equal('Success');
+    });
+
+    it('should fail to enable and disable immediate emails when requester does not own the subscription', async () => {
+      const result = await modelUtils.createAndVerifyAddress({ chain });
+      const newJwt = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
+      expect(subscription).to.not.be.null;
+      let res = await chai.request(app)
+        .post('/api/enableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
+      expect(res.body).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
+      res = await chai.request(app)
+        .post('/api/disableImmediateEmails')
+        .set('Accept', 'application/json')
+        .send({ jwt: newJwt, 'subscription_ids[]': [subscription.id] });
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
+    });
+  });
+
   describe('/deleteSubscription', () => {
     let subscription;
 
@@ -255,18 +335,39 @@ describe('Subscriptions Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    it('/viewNotifications', async () => {
-      // Get Notifications for Default User
-      expect(subscription).to.not.be.null;
-      expect(thread).to.not.be.null;
-      const res = await chai.request(app)
-        .post('/api/viewNotifications')
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.length).to.be.greaterThan(0);
-      notifications = res.body.result;
+    describe('/viewNotifications: return notifications to user', () => {
+      it('should return all notifications with just a user\'s jwt', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should return only unread notifications', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, unread_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
+
+      it('should return only notifications with active_only turned on', async () => {
+        const res = await chai.request(app)
+          .post('/api/viewNotifications')
+          .set('Accept', 'application/json')
+          .send({ jwt: jwtToken, active_only: true, });
+        expect(res.body).to.not.be.null;
+        expect(res.body.status).to.be.equal('Success');
+        expect(res.body.result.length).to.be.greaterThan(0);
+        notifications = res.body.result;
+      });
     });
 
     describe('/markNotificationsRead', async () => {

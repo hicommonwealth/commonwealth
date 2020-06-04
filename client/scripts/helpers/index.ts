@@ -2,6 +2,7 @@ import { default as m } from 'mithril';
 import { default as moment } from 'moment-twitter';
 
 import app from 'state';
+import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -56,6 +57,31 @@ export function featherIcon(icon, size, stroke, color) {
   ]);
 }
 
+export const SwitchIcon = {
+  view: (vnode) => {
+    return m('svg.SwitchIcon', {
+      width: '10px',
+      height: '24px',
+      viewBox: '0 0 10 24',
+    }, [
+      m('g', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
+      }, [
+        m('polyline', {
+          stroke: '#979797',
+          points: '1 5 5 1 9 5'
+        }),
+        m('polyline', {
+          stroke: '#979797',
+          transform: 'translate(5.000000, 21.000000) scale(1, -1) translate(-5.000000, -21.000000) ',
+          points: '1 23 5 19 9 23'
+        })
+      ]),
+    ]);
+  }
+};
+
 export const symbols = {
   times: '\u00d7',
   middot: '\u00b7',
@@ -87,6 +113,34 @@ export function orderAccountsByAddress(a, b) {
 
 export function isSameAccount(a, b) {
   return a && b && a.chain && b.chain && a.chain.id === b.chain.id && a.address === b.address;
+}
+
+export function getRoleInCommunity(account: Account<any>, chain: string, community: string) {
+  const address_id = app.login.addresses?.find((a) => {
+    return a.address === account.address && a.chain === account.chain.id;
+  })?.id;
+
+  return app.login.roles?.find((r) => {
+    const addressMatches = r.address_id === address_id;
+    const communityMatches = chain ? r.chain_id === chain : r.offchain_community_id === community;
+    return addressMatches && communityMatches;
+  });
+}
+
+export function getAllRolesInCommunity(chain: string, community: string) {
+  return app.login.roles?.filter((r) => {
+    return chain ? r.chain_id === chain : r.offchain_community_id === community;
+  });
+}
+
+export function getDefaultAddressInCommunity(chain: string, community: string) {
+  const role = app.login.roles?.find((r) => {
+    const communityMatches = chain ? r.chain_id === chain : r.offchain_community_id === community;
+    return communityMatches && r.is_user_default;
+  });
+
+  if (!role) return;
+  return app.login.addresses?.find((a) => a.id === role.address_id);
 }
 
 /*

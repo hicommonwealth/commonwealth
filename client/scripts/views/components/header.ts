@@ -4,7 +4,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import Infinite from 'mithril-infinite';
-import { Button, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivider } from 'construct-ui';
+import { Button, ButtonGroup, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivider } from 'construct-ui';
 
 import app from 'state';
 
@@ -15,6 +15,30 @@ import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 
+const ToggleViewButton = {
+  view: (vnode) => {
+    const min = m.route.param('min');
+    console.log(min);
+
+    return m(ButtonGroup, {
+      class: 'ToggleViewButton',
+    }, [
+      m(Button, {
+        iconLeft: Icons.ALIGN_LEFT,
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+      m(Button, {
+        iconLeft: Icons.ALIGN_JUSTIFY,
+        onclick: (e) => {
+          // TODO
+        }
+      }),
+    ]);
+  }
+};
+
 const Header: m.Component<{}> = {
   view: (vnode) => {
     // user menu
@@ -22,7 +46,12 @@ const Header: m.Component<{}> = {
     return m('.Header', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
     }, [
-      m('.placeholder'),
+      (app.chain || app.community) && m('.placeholder', [
+        m('h4', app.chain ? app.chain.meta?.chain?.name : app.community.meta.name),
+        m('.subtitle', app.chain ? app.chain.meta?.chain?.description : app.community.meta.description),
+      ]),
+      // toggle view
+      m(ToggleViewButton),
       // new proposal
       m(NewProposalButton, { fluid: false }),
       // notifications menu

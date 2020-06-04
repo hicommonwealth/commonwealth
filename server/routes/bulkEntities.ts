@@ -34,6 +34,9 @@ const bulkEntities = async (models, req: Request, res: Response, next: NextFunct
   if (req.query.type_id) {
     entityFindOptions.where.type_id = req.query.type_id;
   }
+  if (req.query.completed) {
+    entityFindOptions.where.completed = true;
+  }
   const entities = await models.ChainEntity.findAll(entityFindOptions);
   return res.json({ status: 'Success', result: entities.map((e) => e.toJSON()) });
 };

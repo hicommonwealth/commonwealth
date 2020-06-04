@@ -2,9 +2,7 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
-
-import 'construct-ui/src/utils/focus-manager/index.scss';
-import 'construct-ui/src/components/index.scss';
+import 'construct.scss';
 
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
@@ -55,6 +53,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       app.login.roles = data.roles || [];
+
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
@@ -63,6 +62,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
 
       // add roles data for user
       if (data.roles) {
@@ -337,7 +337,7 @@ $(() => {
     // Login page
     '/login':                    importRoute(import('views/pages/login'), false, true),
     '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
+    '/notifications':            importRoute(import('views/pages/notifications'), false),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false, true),
@@ -346,7 +346,7 @@ $(() => {
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
+    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), true),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
     '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
@@ -480,7 +480,6 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );

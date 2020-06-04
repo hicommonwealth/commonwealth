@@ -5,7 +5,7 @@ import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
 import { EventSupportingChains } from '../../shared/events/interfaces';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const nodes = [
@@ -316,18 +316,21 @@ const resetServer = (models, closeMiddleware) => {
       category_id: NotificationCategories.NewMention,
       object_id: `user-${dillon.id}`,
       is_active: true,
+      immediate_email: true,
     });
     await models.Subscription.create({
       subscriber_id: raymond.id,
       category_id: NotificationCategories.NewMention,
       object_id: `user-${raymond.id}`,
       is_active: true,
+      immediate_email: true,
     });
     await models.Subscription.create({
       subscriber_id: drew.id,
       category_id: NotificationCategories.NewMention,
       object_id: `user-${drew.id}`,
       is_active: true,
+      immediate_email: true,
     });
 
     // Communities

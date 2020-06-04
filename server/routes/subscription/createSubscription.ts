@@ -1,20 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from '../util/logging';
+import Errors from './errors';
+import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new Error(Errors.NotLoggedIn));
   }
   if (!req.body.category || req.body.object_id === undefined) {
-    return next(new Error('Must provide category and object id'));
+    return next(new Error(Errors.NoCategoryAndObjectId));
   }
 
   const category = await models.NotificationCategory.findOne({
     where: { name: req.body.category }
   });
   if (!category) {
-    return next(new Error('invalid notification category'));
+    return next(new Error(Errors.InvalidNotificationCategory));
   }
 
   const subscription = await models.Subscription.create({

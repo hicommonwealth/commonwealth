@@ -17,10 +17,10 @@ module.exports = (sequelize, DataTypes) => {
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain', targetKey: 'id' });
-    models.Chain.hasMany(models.Membership, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.hasMany(models.OffchainTag, { as: 'tags', foreignKey: 'chain_id', targetKey: 'id', });
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain', targetKey: 'id' });
+    models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.belongsToMany(models.User, { through: models.WaitlistRegistration });
 
     // currently we have a 1-to-1 mapping from chain <--> chain_object_version

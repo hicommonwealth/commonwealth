@@ -25,6 +25,7 @@ describe('Thread Tests', () => {
   let adminJWT;
   let adminAddress;
   let userJWT;
+  let userId;
   let userAddress;
   let thread;
 
@@ -44,6 +45,7 @@ describe('Thread Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
+    userId = res.user_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -238,6 +240,50 @@ describe('Thread Tests', () => {
     });
   });
 
+  describe('/bulkThreads', () => {
+    it('should return bulk threads for a public chain', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          chain,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it('should return bulk threads for a public community', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it.skip('should pass as admin of private community', async () => {
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: userJWT,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'true',
+        invitesEnabled: 'true',
+        id: 'test',
+        name: 'test community',
+        creator_id: userId,
+        creator_address: userAddress,
+        creator_chain: chain,
+        description: 'test enabled community',
+        default_chain: chain,
+      };
+
+      const testCommunity = await modelUtils.createCommunity(communityArgs);
+    });
+  });
+
   describe('/createComment', () => {
     const kind = 'forum';
 
@@ -250,7 +296,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: false,
         readOnly: false,
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag'],
         kind,
       });
       expect(res2.status).to.be.equal('Success');
@@ -372,7 +418,7 @@ describe('Thread Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: true,
         readOnly: true,
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag', ],
         kind,
       });
       expect(res2.status).to.be.equal('Success');
@@ -380,7 +426,7 @@ describe('Thread Tests', () => {
       thread = res2.result;
     });
 
-    it('Should turn off privacy', async () => {
+    it('should turn off privacy', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -406,7 +452,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off read_only', async () => {
+    it('should turn off read_only', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -432,7 +478,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off both read_only and privacy', async () => {
+    it('should turn off both read_only and privacy', async () => {
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
@@ -458,7 +504,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off, and then on, both read_only and privacy', async () => {
+    it('should turn off, and then on, both read_only and privacy', async () => {
       // turning off privacy properties
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
@@ -506,7 +552,7 @@ describe('Thread Tests', () => {
       expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should fail to turn a public thread private', async () => {
+    it('should fail to turn a public thread private', async () => {
       // turning off privacy
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };

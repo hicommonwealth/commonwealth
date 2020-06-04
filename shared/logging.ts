@@ -27,5 +27,5 @@ const factoryControl = control.getLoggerFactoryControl(0);
 
 // Change the loglevel for all LogGroups for this factory to Debug
 // (so all existing/new loggers from this factory will log to Debug)
-const DEV = process.env.NODE_ENV !== 'production';
-factoryControl.change({ group: 'all', logLevel: DEV ? 'Debug' : 'Info' } as LogGroupControlSettings);
+const logLevel = process.env.NODE_ENV !== 'production' ? 'Debug' : 'Info';
+factoryControl.change({ group: 'all', logLevel } as LogGroupControlSettings);

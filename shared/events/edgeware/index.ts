@@ -8,9 +8,9 @@ import Poller from './poller';
 import Processor from './processor';
 import { SubstrateBlock } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
-import migrate from './migration';
+import fetchFromStorage from './storageFetcher';
 
-import { factory, formatFilename } from '../../../server/util/logging';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 /**
@@ -65,9 +65,11 @@ export default async function (
   performMigration?: boolean,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
   const provider = new WsProvider(url);
+  let unsubscribe: () => void;
   await new Promise((resolve) => {
-    provider.on('connected', () => resolve());
+    unsubscribe = provider.on('connected', () => resolve());
   });
+  if (unsubscribe) unsubscribe();
 
   const api = await createApi(provider, chain.startsWith('edgeware')).isReady;
 
@@ -103,7 +105,7 @@ export default async function (
   if (performMigration) {
     const version = await api.rpc.state.getRuntimeVersion();
     log.info(`Starting event migration for ${version.specName}:${version.specVersion} at ${url}.`);
-    const events = await migrate(api);
+    const events = await fetchFromStorage(api);
     await Promise.all(events.map((event) => handleEventFn(event)));
     return;
   }
