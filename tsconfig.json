@@ -10,7 +10,7 @@
     "paths": {
       "@polkadot/api/augment": ["./node_modules/edgeware-node-types/dist/augment-api.d.ts"],
       "@polkadot/types/augment": ["./node_modules/edgeware-node-types/dist/augment-types.d.ts"],
-      "*": ["./*", "shared/*", "client/scripts/*", "eth/types/*", "eth/types/**/*"]
+      "*": ["./*", "shared/*", "client/scripts/*", "eth/types/*"]
     },
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -22,7 +22,8 @@
     "./client/scripts",
     "./shared/adapters",
     "./test",
-    "./eth/types"
+    "./eth/types",
+    "./eth/test"
   ],
   "exclude": [
     "./node_modules",

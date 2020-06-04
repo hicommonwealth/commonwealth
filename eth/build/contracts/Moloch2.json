@@ -51698,9 +51698,211 @@
     "name": "solc",
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1591291997604": {
+      "events": {
+        "0xc215fed6680bb02d323dc3f8b8f85241572607538426059c9232601bd293c3be": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "proposalIndex",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "applicantAddress",
+              "type": "address"
+            }
+          ],
+          "name": "CancelProposal",
+          "type": "event"
+        },
+        "0x3f6fc303a82367bb4947244ba21c569a5ed2e870610f1a693366142309d7cbea": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "proposalIndex",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "applicant",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "memberAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tributeOffered",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "sharesRequested",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "didPass",
+              "type": "bool"
+            }
+          ],
+          "name": "ProcessProposal",
+          "type": "event"
+        },
+        "0x667cb7a1818eacd2e3a421e734429ba9c4c7dec85e578e098b6d72cd2bfbf2f6": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "memberAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "sharesToBurn",
+              "type": "uint256"
+            }
+          ],
+          "name": "Ragequit",
+          "type": "event"
+        },
+        "0x2d105ebbc222c190059b3979356e13469f6a29a350add74ac3bf4f22f16301d6": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "proposalIndex",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegateKey",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "memberAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "applicant",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tributeOffered",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "sharesRequested",
+              "type": "uint256"
+            }
+          ],
+          "name": "SubmitProposal",
+          "type": "event"
+        },
+        "0x29bf0061f2faa9daa482f061b116195432d435536d8af4ae6b3c5dd78223679b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "proposalIndex",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "delegateKey",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "memberAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "uintVote",
+              "type": "uint8"
+            }
+          ],
+          "name": "SubmitVote",
+          "type": "event"
+        },
+        "0x03995a801b13c36325306deef859ef977ce61c6e15a794281bf969d204825227": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "summoner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "shares",
+              "type": "uint256"
+            }
+          ],
+          "name": "SummonComplete",
+          "type": "event"
+        },
+        "0xde7b64a369e10562cc2e71f0f1f944eaf144b75fead6ecb51fac9c4dd6934885": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "memberAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newDelegateKey",
+              "type": "address"
+            }
+          ],
+          "name": "UpdateDelegateKey",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
+      "transactionHash": "0xc92892b8471a1c29636f51c38c2afbabb7042d6590d261cc16d23ce0117863d5"
+    }
+  },
   "schemaVersion": "3.2.0",
-  "updatedAt": "2020-06-04T17:21:38.704Z",
+  "updatedAt": "2020-06-04T17:36:53.809Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

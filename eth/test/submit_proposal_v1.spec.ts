@@ -6,8 +6,12 @@ contract("SubmitProposalV1", async (accounts) => {
   it("should give account 0 one token", async () => {
     const instance = await MolochV1.deployed();
     const member = await instance.members(accounts[0]);
-    assert.isTrue(member.exists);
-    assert.equal(member.shares, 1);
+    // NOTE: the typegen is wrong here, what we receive is not an Array but an Object
+    //   with numeric keys akin to an Array. So we destructure the result like an Object.
+    const { 0: delegateKey, 1: shares, 2: exists } = member;
+    assert.isTrue(exists);
+    assert.equal(+shares, 1);
+    assert.equal(delegateKey, accounts[0]);
   });
 
   it("should create a proposal for account 1", async () => {
@@ -36,10 +40,11 @@ contract("SubmitProposalV1", async (accounts) => {
     const proposalQueueLength = await instance.getProposalQueueLength();
     assert.equal(+proposalQueueLength, 1);
     const proposal = await instance.proposalQueue(0);
-    assert.equal(proposal.proposer, summoner);
-    assert.equal(proposal.applicant, applicant);
-    assert.equal(+proposal.sharesRequested, 5);
-    assert.equal(+proposal.tokenTribute, 5);
-    assert.equal(proposal.details, 'hello');
+    const { 0: proposer, 1: applicantAddr, 2: sharesRequested, 9: tokenTribute, 10: details } = proposal;
+    assert.equal(proposer, summoner);
+    assert.equal(applicantAddr, applicant);
+    assert.equal(+sharesRequested, 5);
+    assert.equal(+tokenTribute, 5);
+    assert.equal(details, 'hello');
   });
 });
