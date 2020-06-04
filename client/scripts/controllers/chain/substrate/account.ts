@@ -44,7 +44,7 @@ export interface IValidatorValue {
   exposure: Exposure,
   controller: string,
   isElected: boolean,
-  isWaiting?: boolean,
+  toBeElected?: boolean,
   commissionPer?: number,
   eraPoints?: string
 }

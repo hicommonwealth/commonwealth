@@ -32,7 +32,8 @@ export interface IValidatorAttrs {
   commissionPer?: number;
   onChangeHandler?: any;
   waiting?: boolean;
-  eraPoints?: string
+  eraPoints?: string;
+  toBeElected?: boolean;
 }
 
 export interface IValidatorPageState {
