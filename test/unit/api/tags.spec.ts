@@ -13,13 +13,19 @@ const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('Tag Tests', () => {
+  const community = 'staking';
+  const chain = 'ethereum';
+  const title = 'test title';
+  const body = 'test body';
+  const tagName = 'test tag';
+  const tagId = undefined;
+  const kind = 'forum';
+
   before('reset database', async () => {
     await resetDatabase();
   });
 
   describe('Bulk Tags', () => {
-    const community = 'staking';
-    const chain = 'ethereum';
     let adminJWT;
     let adminAddress;
 
@@ -36,13 +42,15 @@ describe('Tag Tests', () => {
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
       const res2 = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: community,
         address: adminAddress,
         jwt: adminJWT,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        tag: 'tag',
-        kind: 'forum',
+        title,
+        body,
+        tagName,
+        tagId,
+        kind,
       });
       expect(res2.result).to.not.be.null;
     });
@@ -64,8 +72,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Update Tags', () => {
-    const community = 'staking';
-    const chain = 'ethereum';
     let adminJWT;
     let adminAddress;
     let thread;
@@ -85,12 +91,15 @@ describe('Tag Tests', () => {
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
       const res2 = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: community,
         address: adminAddress,
         jwt: adminJWT,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        kind: 'forum',
+        title,
+        body,
+        tagName,
+        tagId,
+        kind,
       });
       thread = res2.result;
       expect(thread).to.not.be.null;
