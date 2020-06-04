@@ -16,7 +16,7 @@ import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line

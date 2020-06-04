@@ -542,6 +542,22 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+  it('should enrich collective-voted event', async () => {
+    const kind = SubstrateEventKind.CollectiveVoted;
+    const event = constructEvent([ 'alice', 'hash', constructBool(true), '1', '0' ], 'council');
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        collectiveName: 'council',
+        proposalHash: 'hash',
+        voter: 'alice',
+        vote: true,
+      }
+    });
+  });
   it('should enrich collective-approved event', async () => {
     const kind = SubstrateEventKind.CollectiveApproved;
     const event = constructEvent([ 'hash' ], 'council');
@@ -552,10 +568,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         collectiveName: 'council',
         proposalHash: 'hash',
-        proposalIndex: 1,
-        threshold: 3,
-        ayes: [ 'alice', 'bob' ],
-        nays: [ 'charlie', 'dave' ],
       }
     });
   });
@@ -569,10 +581,6 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         collectiveName: 'council',
         proposalHash: 'hash',
-        proposalIndex: 1,
-        threshold: 3,
-        ayes: [ 'alice', 'bob' ],
-        nays: [ 'charlie', 'dave' ],
       }
     });
   });

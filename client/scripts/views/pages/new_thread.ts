@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
 import {
-  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem
+  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, Grid, Col
 } from 'construct-ui';
 
 import app from 'state';
@@ -77,7 +77,11 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
-    return m('.NewThreadForm', [
+    return m('.NewThreadForm', {
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
+      },
+    }, [
       vnode.state.newType === 'Link' && m(Form, [
         typeSelector,
         m(FormGroup, [
@@ -92,6 +96,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Input, {
+            class: 'new-thread-title',
             placeholder: 'Title',
             onchange: (e) => {
               const { value } = e.target as any;
@@ -225,10 +230,22 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
+    const span = {
+      xs: 12,
+      sm: 12,
+      md: 11,
+      lg: 10,
+      xl: 8,
+    };
+
     return m('.NewThreadPage', [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
-        m(NewThreadForm),
+        m(Grid, [
+          m(Col, { span }, [
+            m(NewThreadForm),
+          ])
+        ])
       ]),
     ]);
   },

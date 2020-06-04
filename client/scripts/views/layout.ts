@@ -8,7 +8,6 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import Header from 'views/components/header';
 import Sidebar from 'views/components/sidebar';
-import CommunitySwitcher from 'views/components/community_switcher';
 import PageNotFound from 'views/pages/404';
 import { AppModals } from 'views/modal';
 import AppToasts from 'views/toast';
@@ -21,7 +20,6 @@ export const LoadingLayout: m.Component<{ activeTag: string, hideNavigation: boo
     const { activeTag, hideNavigation } = vnode.attrs;
 
     return m('.mithril-app', [
-      m(CommunitySwitcher),
       !hideNavigation && m(Sidebar),
       !hideNavigation && m(Header),
       m('.layout-content', {
@@ -48,7 +46,6 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, hideNaviga
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return m('.mithril-app', [
-        m(CommunitySwitcher),
         !hideNavigation && m(Sidebar),
         !hideNavigation && m(Header),
         m('.layout-content', {
@@ -79,7 +76,6 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, hideNaviga
     }
 
     return m('.mithril-app', [
-      m(CommunitySwitcher),
       !hideNavigation && m(Sidebar),
       !hideNavigation && m(Header),
       m('.layout-content', {

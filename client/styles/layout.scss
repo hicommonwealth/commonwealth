@@ -4,7 +4,11 @@
     box-sizing: border-box;
 }
 html, body {
+    position: fixed;
+    height: 100%;
+    overflow: hidden;
     box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -17,6 +21,7 @@ html {
 .mithril-app {
     height: 100%;
     width: 100%;
+    overflow-y: scroll;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -238,19 +243,13 @@ body.modal-open {
 }
 
 .layout-content {
-    padding: 15px 40px;
-    padding-top: $header-height + 15px;
-    padding-left: $sidebar-width + 40px;
-    // &.logged-out {
-    //     padding-left: $sidebar-width;
-    // }
+    padding-top: $header-height + $layout-padding-top;
+    padding-bottom: $layout-padding;
+    padding-right: $layout-padding;
+    padding-left: $sidebar-width + $layout-padding;
     &.navigation-hidden {
-        padding-left: $switcher-width + 40px;
-        padding-top: 15px;
+        padding: $layout-padding-top $layout-padding $layout-padding $layout-padding;
     }
-    // &.navigation-hidden.logged-out {
-    //     padding-left: 40px;
-    // }
 }
 
 @media (max-width: 680px) {
@@ -313,4 +312,50 @@ body.modal-open {
 // align text in menus to the left by default
 .cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
     text-align: left;
+}
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
+}
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
+
+// menu styles
+.cui-menu {
+    border: solid 1px #eee;
+    > .cui-menu-divider {
+        border-bottom: solid 1px #eee;
+    }
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
 }

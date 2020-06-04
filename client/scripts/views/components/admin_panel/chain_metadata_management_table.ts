@@ -1,9 +1,9 @@
 import m from 'mithril';
 import { ChainNetwork } from 'client/scripts/models';
 import { Button, Table } from 'construct-ui';
-import InputPropertyRow from './input_property_row';
-import ManageRolesRow from './manage_roles_row';
+
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
+import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface IChainMetadataManagementState {
   name: string;
@@ -31,7 +31,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         bordered: false,
         interactive: false,
         striped: false,
-        class: 'metadataManagementTable',
+        class: 'metadata-management-table',
       }, [
         m(InputPropertyRow, {
           title: 'Name',
@@ -84,6 +84,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           ]),
       ]),
       m(Button, {
+        class: 'save-changes-button',
         label: 'Save changes',
         intent: 'primary',
         onclick: () => {

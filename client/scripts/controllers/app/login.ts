@@ -5,8 +5,11 @@ import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import app from 'state';
 
+import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
+import SelectAddressModal from 'views/modals/select_address_modal';
+import { isMember } from 'views/components/membership_button';
 import {
   ChainInfo,
   SocialAccount,
@@ -28,19 +31,43 @@ function createAccount(account: Account<any>) {
 }
 
 export async function setActiveAccount(account: Account<any>, suppressNotification?) {
-  if (!suppressNotification) {
-    notifySuccess('Switched account');
-  }
-  app.vm.activeAccount = account;
+  return new Promise((resolve, reject) => {
+    const chain = app.activeChainId();
+    const community = app.activeCommunityId();
+    const role = getRoleInCommunity(account, chain, community);
 
-  if (app.activeCommunityId()) {
-    app.login.selectedAddresses.setByCommunity(app.activeCommunityId(), account);
-  } else if (app.activeChainId()) {
-    app.login.selectedAddresses.setByChain(app.activeChainId(), account);
-  } else {
-    localStorage.setItem('initChain', account.chain.id);
-    localStorage.setItem('initAddress', account.address);
-  }
+    if (!role) {
+      if (!suppressNotification) {
+        notifySuccess('Switched account');
+      }
+      app.vm.activeAccount = account;
+      resolve();
+    } else {
+      $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+        address: account.address,
+        author_chain: account.chain.id,
+        chain,
+        jwt: app.login.jwt,
+        auth: true,
+      } : {
+        address: account.address,
+        author_chain: account.chain.id,
+        community,
+        jwt: app.login.jwt,
+        auth: true,
+      }).then((response) => {
+        // update is_user_default
+        getAllRolesInCommunity(chain, community).forEach((r) => { r.is_user_default = false; });
+        role.is_user_default = true;
+
+        if (!suppressNotification) {
+          notifySuccess('Switched account');
+        }
+        app.vm.activeAccount = account;
+        resolve();
+      }).catch((err) => reject());
+    }
+  });
 }
 
 export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
@@ -68,7 +95,7 @@ export function clearActiveAddresses() {
   app.vm.activeAccount = null;
 }
 
-export function updateActiveAddresses(chain?: ChainInfo) {
+export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.login.activeAddresses = chain
@@ -81,26 +108,30 @@ export function updateActiveAddresses(chain?: ChainInfo) {
       .filter((addr) => addr);
 
   // select the address that the new chain should be initialized with
-  const initAddress = localStorage.getItem('initAddress');
-  const initChain = localStorage.getItem('initChain');
-  if (initAddress && initChain) {
-    const account = app.login.activeAddresses.filter((a) => a.address === initAddress && a.chain.id === initChain)[0];
-    if (account) {
-      localStorage.removeItem('initAddress');
-      localStorage.removeItem('initChain');
-      setActiveAccount(account);
-      return;
-    }
-  }
+  const memberAddresses = app.login.activeAddresses.filter((address) => {
+    return chain
+      ? isMember(chain.id, null, address)
+      : isMember(null, app.community.meta.id, address);
+  });
 
-  // try to load a previously selected account for the chain/community
-  if (chain) {
-    const defaultAddress = app.login.selectedAddresses.getByChain(chain.id);
-    app.vm.activeAccount = app.login.activeAddresses
-      .filter((a) => a.address === defaultAddress && a.chain.id === chain.id)[0];
-  } else if (app.activeCommunityId()) {
-    const defaultAddress = app.login.selectedAddresses.getByCommunity(app.activeCommunityId());
-    app.vm.activeAccount = app.login.activeAddresses.filter((a) => a.address === defaultAddress)[0];
+  if (memberAddresses.length === 0) {
+    // no member addresses - preview the community
+  } else if (memberAddresses.length === 1) {
+    // one member address - start the community with that address (don't check for default address)
+    setActiveAccount(app.login.activeAddresses[0]);
+  } else {
+    const existingAddress = chain
+      ? getDefaultAddressInCommunity(chain.id, null)
+      : getDefaultAddressInCommunity(null, app.community.meta.id);
+
+    if (existingAddress) {
+      const account = app.login.activeAddresses.find((a) => {
+        return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
+      });
+      if (account) setActiveAccount(account);
+    } else if (!suppressAddressSelectionModal) {
+      app.modals.create({ modal: SelectAddressModal });
+    }
   }
 }
 
@@ -114,7 +145,6 @@ export function updateActiveUser(data) {
     app.login.socialAccounts = [];
     app.login.isSiteAdmin = false;
     app.login.lastVisited = {};
-    app.login.selectedAddresses.reset();
     app.login.unseenPosts = {};
     app.login.activeAddresses = [];
     app.vm.activeAccount = null;
@@ -130,7 +160,6 @@ export function updateActiveUser(data) {
     app.login.isSiteAdmin = data.isAdmin;
     app.login.disableRichText = data.disableRichText;
     app.login.lastVisited = data.lastVisited;
-    app.login.selectedAddresses.reset(data.selectedAddresses);
     app.login.unseenPosts = data.unseenPosts;
   }
 }

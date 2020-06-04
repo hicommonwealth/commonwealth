@@ -120,8 +120,10 @@ const FinishNearLogin: m.Component<{}, IState> = {
             .then(async () => {
               if (!app.isLoggedIn()) {
                 await initAppState();
-                updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain
-                  : app.config.nodes.getByChain(app.activeChainId())[0].chain);
+                const chain = app.login.selectedNode
+                  ? app.login.selectedNode.chain
+                  : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+                updateActiveAddresses(chain, true);
               }
               setActiveAccount(acct, true);
             })

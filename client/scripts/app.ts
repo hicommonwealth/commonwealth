@@ -2,9 +2,7 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
-
-import 'construct-ui/src/utils/focus-manager/index.scss';
-import 'construct-ui/src/components/index.scss';
+import 'construct.scss';
 
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
@@ -55,6 +53,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       app.login.roles = data.roles || [];
+
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
@@ -63,6 +62,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
 
       // add roles data for user
       if (data.roles) {
@@ -199,7 +199,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
     // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
+    updateActiveAddresses(n.chain, true);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
@@ -330,23 +330,23 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute(import('views/pages/home'), false, true),
-    '/about':                    importRoute(import('views/pages/landing/about'), false),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/about':                    importRoute(import('views/pages/landing/about'), false, true),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), false, true),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false, true),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false),
+    '/login':                    importRoute(import('views/pages/login'), false, true),
     '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
+    '/notifications':            importRoute(import('views/pages/notifications'), false),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false, true),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false, true),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
+    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), true),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
     '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
@@ -359,9 +359,10 @@ $(() => {
     '/:scope/login':             importRoute(import('views/pages/login'), true),
     '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),
     '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
+    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/link_new_address':  importRoute(import('views/pages/link_new_address'), true),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), true),
 
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
@@ -479,7 +480,6 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );

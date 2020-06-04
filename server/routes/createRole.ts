@@ -2,15 +2,22 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 
+export const Errors = {
+  InvalidChainComm: 'Invalid chain or community',
+  NotLoggedIn: 'Not logged in',
+  InvalidAddress: 'Invalid address',
+  RoleAlreadyExists: 'Role already exists',
+};
+
 const createRole = async (models, req, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error('Invalid chain or community'));
-  if (chain && community) return next(new Error('Invalid chain or community'));
-  if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.address_id) return next(new Error('Invalid address'));
+  if (!chain && !community) return next(new Error(Errors.InvalidChainComm));
+  if (chain && community) return next(new Error(Errors.InvalidChainComm));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
 
   // cannot join private communities using this route
-  if (community && community.privacyEnabled) return next(new Error('Invalid chain or community'));
+  if (community && community.privacyEnabled) return next(new Error(Errors.InvalidChainComm));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -19,7 +26,7 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) return next(new Error('Invalid address'));
+  if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
   const existingRole = await models.Role.findOne({ where: chain ? {
     address_id: req.body.address_id,
@@ -28,7 +35,7 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
     address_id: req.body.address_id,
     offchain_community_id: community.id,
   } });
-  if (existingRole) return next(new Error('Role already exists'));
+  if (existingRole) return next(new Error(Errors.RoleAlreadyExists));
 
   const newRole = await models.Role.create(chain ? {
     address_id: req.body.address_id,

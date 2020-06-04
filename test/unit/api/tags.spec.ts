@@ -10,6 +10,7 @@ import * as modelUtils from '../../util/modelUtils';
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
+const markdownThread = require('../../util/fixtures/markdownThread');
 
 describe('Tag Tests', () => {
   before('reset database', async () => {
@@ -17,7 +18,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Bulk Tags', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';
     let adminJWT;
@@ -41,7 +41,8 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag'],
+        kind: 'forum',
       });
       expect(res2.result).to.not.be.null;
     });
@@ -58,12 +59,11 @@ describe('Tag Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.length).to.be.equal(3);
+      expect(res.body.result.length).to.be.equal(1);
     });
   });
 
   describe('Update Tags', () => {
-    const markdownThread = require('../../util/fixtures/markdownThread');
     const community = 'staking';
     const chain = 'ethereum';
     let adminJWT;
@@ -92,6 +92,7 @@ describe('Tag Tests', () => {
         jwt: adminJWT,
         title: decodeURIComponent(markdownThread.title),
         body: decodeURIComponent(markdownThread.body),
+        kind: 'forum',
       });
       thread = res2.result;
       expect(thread).to.not.be.null;

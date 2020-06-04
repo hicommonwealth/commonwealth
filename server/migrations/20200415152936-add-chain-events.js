@@ -37,6 +37,7 @@ const SubstrateEventKinds = {
   ElectionMemberRenounced: 'election-member-renounced',
 
   CollectiveProposed: 'collective-proposed',
+  CollectiveVoted: 'collective-voted',
   CollectiveApproved: 'collective-approved',
   CollectiveDisapproved: 'collective-disapproved',
   CollectiveExecuted: 'collective-executed',

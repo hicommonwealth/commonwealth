@@ -36,12 +36,13 @@
     }
 
     .left-panel {
+        margin-right: 8px;
         @include xxs-max {
             margin-bottom: 8px;
             font-size: 14px;
         }
         .AutoCompletePureForm {
-            width: 150px;
+            width: 170px;
             margin: 0;
             @include xxs-max {
                 margin: 0;

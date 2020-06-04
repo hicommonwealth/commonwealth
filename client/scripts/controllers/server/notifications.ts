@@ -59,6 +59,26 @@ class NotificationsController {
     });
   }
 
+  public enableImmediateEmails(subscriptions: NotificationSubscription[]) {
+    return post('/enableImmediateEmails', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      for (const s of subscriptions) {
+        s.enableImmediateEmail();
+      }
+    });
+  }
+
+  public disableImmediateEmails(subscriptions: NotificationSubscription[]) {
+    return post('/disableImmediateEmails', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      for (const s of subscriptions) {
+        s.disableImmediateEmail();
+      }
+    });
+  }
+
   public deleteSubscription(subscription: NotificationSubscription) {
     return post('/deleteSubscription', {
       'subscription_id': subscription.id,

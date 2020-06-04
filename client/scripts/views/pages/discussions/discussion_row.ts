@@ -50,15 +50,7 @@ const DiscussionRow: m.Component<IAttrs> = {
           m(User, {
             user: [proposal.author, proposal.authorChain],
             avatarOnly: true,
-            avatarSize: 30,
-            tooltip: true,
-          }),
-        ]),
-        m('.discussion-pre-mobile', [
-          m(User, {
-            user: [proposal.author, proposal.authorChain],
-            avatarOnly: true,
-            avatarSize: 16,
+            avatarSize: 35,
             tooltip: true,
           }),
         ]),
@@ -76,26 +68,6 @@ const DiscussionRow: m.Component<IAttrs> = {
                 `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
                 [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
               ),
-              m(ThreadCaratMenu, { proposal }),
-          ]),
-          propType === OffchainThreadKind.Link
-            && proposal.url
-            && externalLink('a.discussion-link', proposal.url, [
-              extractDomain(proposal.url),
-              m.trust(' &rarr;'),
-            ]),
-          propType === OffchainThreadKind.Forum
-            && (proposal as OffchainThread).body && m('.discussion-excerpt', [
-            (() => {
-              const body = (proposal as OffchainThread).body;
-              try {
-                const doc = JSON.parse(body);
-                doc.ops = doc.ops.slice(0, 3);
-                return m(QuillFormattedText, { doc, hideFormatting: true });
-              } catch (e) {
-                return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
-              }
-            })(),
           ]),
           m('.discussion-meta', [
             m('.discussion-meta-left', [
@@ -103,6 +75,7 @@ const DiscussionRow: m.Component<IAttrs> = {
                 user: [proposal.author, proposal.authorChain],
                 linkify: true,
                 tooltip: true,
+                hideAvatar: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
@@ -117,9 +90,39 @@ const DiscussionRow: m.Component<IAttrs> = {
                     onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
                   });
                 }),
+                m(ThreadCaratMenu, { proposal }),
               ]),
             ]),
           ]),
+          propType === OffchainThreadKind.Forum
+            && (proposal as OffchainThread).body
+            && m('.discussion-excerpt', [
+              (() => {
+                const body = (proposal as OffchainThread).body;
+                try {
+                  const doc = JSON.parse(body);
+                  doc.ops = doc.ops.slice(0, 3);
+                  return m(QuillFormattedText, { doc, hideFormatting: true });
+                } catch (e) {
+                  return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+                }
+              })(),
+            ]),
+          app.comments.nComments(proposal) > 0
+            && m('.discussion-commenters', [
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
+                return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
+              })),
+              m('.commenters-label', [
+                pluralize(app.comments.nComments(proposal), 'reply'),
+              ]),
+            ]),
+          propType === OffchainThreadKind.Link
+            && proposal.url
+            && externalLink('a.discussion-link', proposal.url, [
+              extractDomain(proposal.url),
+              m.trust(' &rarr;'),
+            ]),
         ]),
       ]),
     ]);

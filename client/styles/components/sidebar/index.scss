@@ -1,22 +1,79 @@
 @import 'client/styles/shared';
 
 $sidebar-padding: 16px;
-$active-color: #e9e9f5;
+$active-color: #ececec;
+
+.CommunityLabel {
+    text-align: left;
+    flex: 1;
+    display: flex;
+    font-weight: 400;
+
+    &.CommunityLabelPlaceholder {
+        padding: 8px 0;
+        .community-name {
+            color: #aaa;
+        }
+    }
+
+    .community-label-left {
+        padding-right: 12px;
+    }
+    .community-label-right {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .community-name-row,
+    .community-id {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    .community-name-row {
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .community-id {
+        font-size: 13px;
+        color: #777;
+    }
+    .icon-globe, .icon-lock {
+        margin-left: 2px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .ChainStatusIndicator {
+        display: inline-block;
+        margin-left: 8px;
+        margin-right: -2px;
+        position: relative;
+        top: -1px;
+    }
+}
 
 .Sidebar {
     position: fixed;
     top: 0;
     bottom: 0;
-    left: $switcher-width;
-    width: $sidebar-width - $switcher-width;
+    width: $sidebar-width;
+    border-left: 7px solid $theme-accent-dark;
+    border-right: 1px solid #ececec;
     z-index: 9;
-    border-right: 1px solid #e8e8e8;
     .SidebarMenu {
         height: 100%;
     }
     .SidebarMenu .cui-list {
         height: 100%;
-        background: #f4f4f9;
+        overflow-x: hidden;
+        background: #f8f8f8;
+    }
+    .SidebarMenu .cui-list.list-bottom {
+        position: absolute;
+        bottom: 0;
+        height: initial;
+        padding-bottom: 20px;
     }
 
     // list styles
@@ -24,21 +81,22 @@ $active-color: #e9e9f5;
         max-height: 100%;
         user-select: none;
         > h4 {
-            color: #546e7b;
+            color: #555;
             opacity: 0.6;
         }
         > .cui-list-item {
-            color: #546e7b;
-            &:hover, &.cui-active, &.cui-selected {
+            color: #111;
+            &:hover {
                 background: $active-color;
             }
-            &.cui-selected .cui-icon svg {
-                color: #5c6bc1 !important;
+            &.cui-active {
+                background: $theme-base-color;
+                color: #fff;
+                .cui-icon svg {
+                    color: #fff !important;
+                }
             }
         }
-    }
-    .TagSelector {
-        margin-bottom: 10px;
     }
 
     // individual menu items
@@ -51,18 +109,19 @@ $active-color: #e9e9f5;
         letter-spacing: 0.15px;
     }
     .cui-list > .cui-list-item {
-        font-size: 15px;
-        border: none;
+        font-size: 14.5px;
         font-weight: 500;
-        padding: 4px $sidebar-padding;
-        .cui-icon svg {
-            height: 14px;
-            width: 14px;
-            min-height: 14px;
-            min-width: 14px;
+        border: none;
+        padding: 5px $sidebar-padding;
+        > .cui-list-item-content-left > .cui-icon svg {
+            height: 15px;
+            width: 15px;
+            min-height: 15px;
+            min-width: 15px;
             position: relative;
             top: -1px;
             margin-right: -2px;
+            color: #222;
         }
     }
     .cui-list-item .cui-tag {
@@ -77,69 +136,131 @@ $active-color: #e9e9f5;
     }
     // top
     .cui-list .title-selector {
-        display: flex;
-        padding: 1px $sidebar-padding 0;
-        margin-bottom: 12px;
+        position: relative;
+        min-height: $header-height;
+        margin-bottom: 20px;
+        user-select: none;
+        border-bottom: 1px solid #e7e7e7;
+        cursor: pointer;
+        .cui-button {
+            width: 100%;
+            height: 100%;
+            padding: 0 15px;
+            color: #222;
+            background: #f8f8f8 !important;
+        }
+        .cui-button-label {
+            width: 100%;
+
+            .CommunityLabel {
+                margin: 17px 0 13px;
+            }
+            svg.SwitchIcon {
+                position: absolute;
+                right: 6px;
+                top: 21px;
+                // svg attributes
+                fill: none;
+                polyline {
+                    stroke: #aaa;
+                }
+            }
+        }
+    }
+    .cui-list .action-selector {
+        padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
+        // background: #fff !important;
+        cursor: default !important;
         user-select: none;
         border-bottom: 1px solid #eee;
-        background: #fff !important;
-        color: #222 !important;
-        min-height: $header-height;
-        align-items: center;
+        margin-bottom: 10px;
+        &:hover {
+            background: initial;
+        }
+    }
+    // bottom
+    .cui-list .login-selector {
+        position: absolute;
+        display: flex;
+        // position at bottom
+        bottom: 0;
+        width: $sidebar-width;
+        padding: 17px $sidebar-padding 18px;
+        border-top: 1px solid #eee;
+        z-index: 1;
+        // style the logic selector as additional menu space, not a selectable
+        background: #f8f8f8 !important;
+        cursor: initial !important;
+        user-select: none;
 
-        border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-        .title-selector-left {
+        .login-selector-left {
             flex: 1;
             display: flex;
         }
-        .community-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            font-weight: 700;
-            line-height: 1.25;
+        .login-selector-right {
+            padding-left: 8px;
         }
-        .icon-lock {
-            margin-left: 2px;
+
+        button.cui-button {
+            position: relative;
         }
-        .ChainStatusIndicator {
-            display: inline-block;
-            margin-left: 8px;
-            margin-right: -2px;
+        .User.avatar-only {
+            overflow: visible;
+            padding-right: 13px;
             position: relative;
             top: -1px;
         }
-        .SubscriptionButton {
-            float: right;
+        .login-selector-user {
+            line-height: 1.1;
+            .user-info {
+                position: relative;
+                .User {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 110px;
+                    font-size: 14px;
+                }
+                .user-address {
+                    font-size: 12px;
+                    font-weight: 400;
+                    color: #777;
+                    margin: 0;
+                }
+            }
         }
     }
+    &.no-active-community .cui-list .title-selector {
+        border-bottom: none;
+    }
+    &.no-active-community .cui-list .login-selector {
+        border-top: none;
+    }
 }
 
-// notifications menu (outside Sidebar, displayed in a cui-portal)
-.notification-menu {
-    .notification-list {
-        height: 640px;
-        background: #fff;
-        width: 340px;
+.CommunitySelectList {
+    .cui-popover-content {
+        padding: 6px 0 6px;
     }
-    .cui-menu {
-        max-width: 342px;
-        margin: 0;
-        padding: 0;
-        border-color: #d8dee0;
-        background: none;
-        overflow: hidden;
+    .select-list-back-home {
+        padding-top: 2px;
+        padding-bottom: 2px;
     }
-    .cui-popover-arrow {
-        background: white;
+    .cui-list {
+        max-height: 90vh;
     }
     .cui-list-item {
-        padding: 11px;
+        min-width: 260px;
+        padding: 10px 15px;
+        &.cui-selected {
+            color: #444;
+            opacity: 0.7;
+            .ChainIcon, .CommunityIcon {
+                opacity: 0.7;
+            }
+        }
+        &.starred .community-star-toggle .cui-icon svg {
+            fill: currentColor;
+        }
     }
-}
-
-// TODO: use non-generic CSS here
-.cui-portal .cui-overlay-backdrop {
-    background: rgba(47, 49, 54, 0.65);
 }

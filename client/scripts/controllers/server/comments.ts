@@ -12,7 +12,12 @@ import { notifyError } from 'controllers/app/notifications';
 
 export enum CommentParent {
   Proposal = 'proposal',
-  Comment = 'comment'
+  Comment = 'comment',
+}
+
+export enum CommentRefreshOption {
+  ResetAndLoadOffchainComments = 'ResetAndLoadOffchainComments',
+  LoadProposalComments = 'LoadProposalComments',
 }
 
 const modelFromServer = (comment) => {
@@ -57,6 +62,14 @@ class CommentsController {
 
   public nComments<T extends IUniqueId>(proposal: T) {
     return this._store.nComments(proposal);
+  }
+
+  public uniqueCommenters<T extends IUniqueId>(proposal: T) {
+    // Returns an array of [chain, address] arrays
+    // TODO: Use a better comparator to determine uniqueness
+    const comments = this._store.getByProposal(proposal);
+    return _.uniq(comments.map((c) => `${c.authorChain}#${c.author}`))
+      .map((slug) => slug.split(/#/));
   }
 
   public lastCommented<T extends IUniqueId>(proposal: T) {
@@ -185,32 +198,23 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(
-    chainId: string,
-    communityId: string,
-    reset = false,
-    offchainThreadsOnly = false,
-    proposalsOnly = false
-  ) {
+  public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
     try {
       const args: any = {
         chain: chainId,
         community: communityId,
       };
-      if (offchainThreadsOnly && proposalsOnly) {
-        throw new Error('cannot select mutually exclusive offchain threads and proposals only options');
-      }
-      if (offchainThreadsOnly) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;
       }
-      if (proposalsOnly) {
+      if (reset === CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);
       }
-      if (reset) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         this._store.clear();
       }
       await Promise.all(response.result.map(async (comment) => {

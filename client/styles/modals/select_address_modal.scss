@@ -1,0 +1,42 @@
+@import 'client/styles/shared';
+
+.SelectAddressModal {
+    .compact-modal-title h3 {
+        font-size: 17px;
+    }
+    .modal-header {
+        margin-bottom: 20px;
+    }
+    .compact-modal-body {
+        padding: 24px 28px 32px !important;
+    }
+}
+
+.SelectAddressOption {
+    position: relative;
+    display: block;
+    padding: 12px 20px 10px;
+    border: 1px solid #eee;
+    border-bottom: none;
+    &:last-child {
+        border: 1px solid #eee;
+    }
+    &:hover {
+        background: #fafafa;
+        cursor: pointer;
+    }
+    .ProfileBlock span.balance {
+        display: block;
+        float: right;
+        color: #aaa;
+    }
+    .role-permission {
+        position: absolute;
+        top: 21px;
+        right: 20px;
+        color: #aaa;
+        .cui-tag {
+            font-weight: 600;
+        }
+    }
+}
