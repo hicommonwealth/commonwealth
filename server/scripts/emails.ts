@@ -4,6 +4,7 @@ import { SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
 const { Op } = Sequelize;
+// import models from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 import { IPostNotificationData, NotificationCategories } from '../../shared/types';
@@ -54,12 +55,13 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 // regular notification email service
 
 export const createRegularNotificationEmailObject = async (user, notifications) => {
-  let text = '';
+  let text = '<h1>Unread Notifications: </h1>';
   notifications.forEach((n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
       chain_id, community_id, author_address, author_chain } = n.notification_data;
     const decodedTitle = decodeURIComponent(root_title).trim();
-    const subjectLine = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
+    const { category_id } = n.Subscription;
+    const content = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
           : (category_id === NotificationCategories.NewThread) ? `New Thread in '${decodedTitle}'`
@@ -73,21 +75,21 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
     };
     const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
     const path = (getProposalUrl as any)(...args);
-    text += ``
+    text += `<li><a href=${path}>${content}</a></li>`;
   });
 
-  const subjectLine = '';
+  const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
   const msg = {
     to: null,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
-    text: null,
-    html: null,
+    text,
+    html: text,
   };
   return msg;
 };
 
-export const sendRegularNotificationEmail = async (user, models) => {
+export const sendRegularNotificationEmail = async (models, user) => {
   const NOTLIVE = true;
 
   const subscriptions = await models.Subscription.findAll({
@@ -105,7 +107,7 @@ export const sendRegularNotificationEmail = async (user, models) => {
     }
   });
 
-  const msg = await createRegularNotificationEmailObject(user, notifications);
+  const msg = await createRegularNotificationEmailObject(models, user, notifications);
   try {
     if (NOTLIVE) {
       log.info(msg.text);
