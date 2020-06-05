@@ -125,6 +125,11 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       (!vnode.attrs.waiting
         && m('td.val-points', vnode.attrs.eraPoints || '-')
       ),
+      (vnode.attrs.waiting
+        && m('td.val-points', vnode.attrs.toBeElected
+          ? 'PolkadotJS'
+          : '')
+      ),
       // m('td.val-action', [
       //   m('button.nominate-validator.formular-button-primary', {
       //     class: app.user.activeAccount ? '' : 'disabled',
