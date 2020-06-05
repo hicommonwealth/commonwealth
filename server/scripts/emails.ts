@@ -55,63 +55,71 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 // regular notification email service
 
 export const createRegularNotificationEmailObject = async (user, notifications) => {
-  console.dir('create regular notification email object');
-  let text = '<h1>Unread Notifications: </h1>';
-  notifications.forEach((n) => {
-    const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-      chain_id, community_id, author_address, author_chain } = n.notification_data;
-    const decodedTitle = decodeURIComponent(root_title).trim();
-    const { category_id } = n.Subscription;
-    const content = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
-      : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
-        : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
-          : (category_id === NotificationCategories.NewThread) ? `New Thread in '${decodedTitle}'`
-            : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
-              : 'New notification on Commonwealth';
-    const pseudoProposal = {
-      id: root_id,
-      title: root_title,
-      chain: chain_id,
-      community: community_id,
-    };
-    const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-    const path = (getProposalUrl as any)(...args);
-    text += `<li><a href=${path}>${content}</a></li>`;
-  });
+  try {
+    console.dir('create regular notification email object');
+    let text = '<h1>Unread Notifications: </h1>';
+    notifications.forEach((n) => {
+      const { created_at, root_id, root_title, root_type, comment_id, comment_text,
+        chain_id, community_id, author_address, author_chain } = n.notification_data;
+      const decodedTitle = decodeURIComponent(root_title).trim();
+      const { category_id } = n.Subscription;
+      const content = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
+        : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
+          : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
+            : (category_id === NotificationCategories.NewThread) ? `New Thread in '${decodedTitle}'`
+              : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
+                : 'New notification on Commonwealth';
+      console.dir(n);
+      const pseudoProposal = {
+        id: root_id,
+        title: root_title,
+        chain: chain_id,
+        community: community_id,
+      };
+      const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
+      const path = (getProposalUrl as any)(...args);
+      text += `<li><a href=${path}>${content}</a></li>`;
+    });
+    console.dir('post-notifications');
 
-  const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
-  const msg = {
-    to: null,
-    from: 'Commonwealth <no-reply@commonwealth.im>',
-    subject: subjectLine,
-    text,
-    html: text,
-  };
-  return msg;
+    const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
+    const msg = {
+      to: null,
+      from: 'Commonwealth <no-reply@commonwealth.im>',
+      subject: subjectLine,
+      text,
+      html: text,
+    };
+    console.dir(msg);
+    return msg;
+  } catch {
+    console.dir('failed :(((');
+  }
 };
 
 export const sendRegularNotificationEmail = async (models, user) => {
   const NOTLIVE = true;
-  console.dir('inside send regular notification emails');
-
-  const subscriptions = await models.Subscription.findAll({
-    where: {
-      subscriber_id: user.id,
-    },
-  });
-  const subscriptionIds = subscriptions.map((s) => s.id);
-  const notifications = await models.Notifications.findAll({
-    where: {
-      subscription_id: {
-        [Op.in]: subscriptionIds,
-      },
-      is_read: false,
-    }
-  });
-  log.info(notifications.length);
-
-  const msg = await createRegularNotificationEmailObject(user, notifications);
   try {
+    console.dir('inside send regular notification emails');
+
+    const subscriptions = await models.Subscription.findAll({
+      where: {
+        subscriber_id: user.id,
+      },
+    });
+    const subscriptionIds = subscriptions.map((s) => s.id);
+    console.dir(subscriptionIds);
+    const notifications = await models.Notification.findAll({
+      where: {
+        subscription_id: {
+          [Op.in]: subscriptionIds,
+        },
+        is_read: false,
+      }
+    });
+    console.dir('notifications acquired');
+    const msg = await createRegularNotificationEmailObject(user, notifications);
+
     if (NOTLIVE) {
       log.info('not live!');
       log.info(msg.text);
@@ -120,23 +128,25 @@ export const sendRegularNotificationEmail = async (models, user) => {
       msg.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
       await sgMail.send(msg);
     }
-  } catch (e) {
-    log.error(e);
+  } catch {
+    console.dir('failed :((');
   }
 };
 
 export const sendBatchedNotificationEmails = async (models, interval: string) => {
-  console.dir('inside send batched notification emails');
-  console.dir(interval);
-  const users = await models.User.findAll({
-    where: {
-      emailNotificationInterval: interval,
-    }
-  });
-  console.dir(users);
-  console.dir('hi');
-  await Promise.all(users.forEach(async (user) => {
-    sendRegularNotificationEmail(models, user);
-  }));
-  console.dir('done');
+  try {
+    console.dir('inside send batched notification emails');
+    console.dir(interval);
+    const users = await models.User.findAll({
+      where: {
+        emailNotificationInterval: interval,
+      }
+    });
+    console.dir(users);
+    await Promise.all(users.forEach(async (user) => {
+      sendRegularNotificationEmail(models, user);
+    }));
+  } catch {
+    console.dir('failed');
+  }
 };
