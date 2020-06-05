@@ -46,6 +46,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     const thread = await models.OffchainThread.findOne({
       where: { id: thread_id },
     });
+    if (!thread) return next(new Error('No thread with that id found'));
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error(Errors.IncorrectOwner));
     }

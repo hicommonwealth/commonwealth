@@ -43,7 +43,7 @@ describe('Tag Tests', () => {
       expect(isAdmin).to.not.be.null;
       const res2 = await modelUtils.createThread({
         chainId: chain,
-        communityId: community,
+        communityId: undefined,
         address: adminAddress,
         jwt: adminJWT,
         title,
@@ -63,7 +63,6 @@ describe('Tag Tests', () => {
           chain,
           jwt: adminJWT,
         });
-      expect(res.body.result).to.not.be.null;
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
@@ -75,8 +74,6 @@ describe('Tag Tests', () => {
     let adminJWT;
     let adminAddress;
     let thread;
-    const noTags: string = undefined;
-    const oneTag: string = 'tag';
 
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
@@ -105,7 +102,7 @@ describe('Tag Tests', () => {
       expect(thread).to.not.be.null;
     });
 
-    it('Should fail to update thread with no tags', async () => {
+    it('Should fail to update thread without a tag name', async () => {
       const res = await chai.request(app)
         .post('/api/updateTags')
         .set('Accept', 'application/json')
@@ -113,7 +110,7 @@ describe('Tag Tests', () => {
           'jwt': adminJWT,
           'thread_id': thread.id,
           'address': adminAddress,
-          'tag': noTags,
+          'tag_name': undefined,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.not.be.equal('Success');
@@ -128,13 +125,12 @@ describe('Tag Tests', () => {
           'jwt': adminJWT,
           'thread_id': thread.id,
           'address': adminAddress,
-          'tag': oneTag,
+          'tag_name': tagName,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
-      const tag = res.body.result;
-      expect(tag).to.be.equal(oneTag);
+      expect(res.body.result.name).to.be.equal(tagName);
     });
   });
 });

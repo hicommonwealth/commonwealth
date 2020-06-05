@@ -5,6 +5,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.thread_id) return next(new Error('Must provide thread_id'));
   if (!req.body.address) return next(new Error('Must provide address'));
+  if (!req.body.tag_name) return next(new Error('Must provide tag_name'));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find((a) => a.verified && a.address === req.body.address);
@@ -41,7 +42,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
     newTag = await models.OffchainTag.findOne({
       where: { id: req.body.tag_id }
     });
-  } else if (req.body.tag_name) {
+  } else {
     [newTag] = await models.OffchainTag.findOrCreate({
       where: {
         name: req.body.tag_name,

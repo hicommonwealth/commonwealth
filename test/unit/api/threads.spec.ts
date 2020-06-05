@@ -443,11 +443,11 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
+          'privacy': privacy,
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
@@ -468,7 +468,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -493,7 +493,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -519,7 +519,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -540,7 +540,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -566,7 +566,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -587,7 +587,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(thread.body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -604,8 +604,7 @@ describe('Thread Tests', () => {
     it('should fail to edit an admin\'s post as a user', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const thread_body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body: thread_body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -615,7 +614,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': encodeURIComponent(thread_body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -628,8 +627,7 @@ describe('Thread Tests', () => {
 
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
-      const thread_body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body: thread_body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -639,7 +637,7 @@ describe('Thread Tests', () => {
         .send({
           'thread_id': null,
           'kind': thread_kind,
-          'body': encodeURIComponent(thread_body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -654,8 +652,7 @@ describe('Thread Tests', () => {
     it('should fail to edit a thread without passing a body', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const thread_body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body: thread_body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
@@ -728,7 +725,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         kind,
         chainId: chain,
-        communityId: community,
+        communityId: undefined,
         title,
         tagName,
         tagId,
@@ -736,7 +733,7 @@ describe('Thread Tests', () => {
         jwt: userJWT,
       });
       const object_id = res.result.id;
-
+      expect(object_id).to.not.be.null;
       // should track first view
       res = await chai.request(app)
         .post('/api/viewCount')
