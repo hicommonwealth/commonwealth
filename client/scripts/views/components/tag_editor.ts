@@ -83,6 +83,7 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
             label: 'Submit',
             intent: 'primary',
             onclick: () => {
+              // TODO: Change to PUT /tags
               $.post(`${app.serverUrl()}/updateTags`, {
                 'jwt': app.login.jwt,
                 'thread_id': vnode.attrs.thread.id,

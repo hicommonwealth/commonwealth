@@ -26,6 +26,7 @@ class TagsController {
 
   public async edit(tag: OffchainTag, featured_order?) {
     try {
+      // TODO: Change to PUT /tag
       const response = await $.post(`${app.serverUrl()}/editTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -55,6 +56,7 @@ class TagsController {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
         : { 'community': app.activeCommunityId() };
+      // TODO: Change to POST /tag
       const response = await $.post(`${app.serverUrl()}/createTag`, {
         ...chainOrCommObj,
         'name': name,
@@ -76,6 +78,7 @@ class TagsController {
 
   public async remove(tag) {
     try {
+      // TODO: Change to DELETE /tag
       const response = await $.post(`${app.serverUrl()}/deleteTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -93,6 +96,7 @@ class TagsController {
 
   public async refreshAll(chainId, communityId, reset = false) {
     try {
+      // TODO: Change to GET /tags
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
         chain: chainId || app.activeChainId(),
         community: communityId || app.activeCommunityId(),

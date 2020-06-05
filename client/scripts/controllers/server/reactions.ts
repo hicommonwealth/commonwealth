@@ -45,6 +45,7 @@ class ReactionsController {
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
+      // TODO: Change to POST /reaction
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
       const { result } = response;
       this._store.add(modelFromServer(result));
@@ -89,6 +90,7 @@ class ReactionsController {
   public async delete(reaction) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /reaction
       $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.login.jwt,
         reaction_id: reaction.id,
@@ -105,6 +107,7 @@ class ReactionsController {
 
   public async refreshAll(chainId: string, communityId: string, reset = false) {
     try {
+      // TODO: Change to GET /reactions
       const response = await $.get(`${app.serverUrl()}/bulkReactions`, {
         chain: chainId,
         community: communityId,

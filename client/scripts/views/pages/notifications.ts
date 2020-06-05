@@ -252,6 +252,7 @@ const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
+    // TODO: Change to GET /subscriptions
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.login.jwt,
     }).then((result) => {

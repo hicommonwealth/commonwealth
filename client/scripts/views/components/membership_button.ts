@@ -34,6 +34,7 @@ const MembershipButton: m.Component<{
     if (!app.login.roles) return;
 
     const createRoleWithAddress = (a, e) => {
+      // TODO: Change to POST /role
       $.post('/api/createRole', {
         jwt: app.login.jwt,
         address_id: a.id,
@@ -66,7 +67,7 @@ const MembershipButton: m.Component<{
         m.redraw();
         return;
       }
-
+      // TODO: Change to DELETE /role
       $.post('/api/deleteRole', {
         jwt: app.login.jwt,
         address_id: a.id,

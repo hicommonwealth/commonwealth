@@ -51,6 +51,7 @@ class ChainEntityController {
     if (!loadIncompleteEntities) {
       options.completed = true;
     }
+    // TODO: Change to GET /entities
     return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);

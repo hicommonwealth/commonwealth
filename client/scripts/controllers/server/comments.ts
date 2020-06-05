@@ -84,6 +84,7 @@ class CommentsController {
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
+      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chain,
@@ -117,6 +118,7 @@ class CommentsController {
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     try {
+      // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         'address': app.vm.activeAccount.address,
         'author_chain': app.vm.activeAccount.chain.id,
@@ -145,6 +147,7 @@ class CommentsController {
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
+        // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
           community: communityId,
@@ -175,6 +178,7 @@ class CommentsController {
   public async delete(comment) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.login.jwt,
         comment_id: comment.id,
@@ -202,6 +206,7 @@ class CommentsController {
       if (reset === CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
+      // TODO: Change to GET /comments
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);

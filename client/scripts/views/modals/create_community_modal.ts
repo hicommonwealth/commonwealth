@@ -107,6 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
+            // TODO: Change to POST /community
             $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
               creator_chain: vnode.state.selectedChain,
