@@ -55,6 +55,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 // regular notification email service
 
 export const createRegularNotificationEmailObject = async (user, notifications) => {
+  console.dir('create regular notification email object');
   let text = '<h1>Unread Notifications: </h1>';
   notifications.forEach((n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
@@ -91,6 +92,7 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
 
 export const sendRegularNotificationEmail = async (models, user) => {
   const NOTLIVE = true;
+  console.dir('inside send regular notification emails');
 
   const subscriptions = await models.Subscription.findAll({
     where: {
@@ -106,12 +108,15 @@ export const sendRegularNotificationEmail = async (models, user) => {
       is_read: false,
     }
   });
+  log.info(notifications.length);
 
-  const msg = await createRegularNotificationEmailObject(models, user, notifications);
+  const msg = await createRegularNotificationEmailObject(user, notifications);
   try {
     if (NOTLIVE) {
+      log.info('not live!');
       log.info(msg.text);
     } else {
+      log.info('live!?!?!?');
       msg.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
       await sgMail.send(msg);
     }
@@ -121,12 +126,17 @@ export const sendRegularNotificationEmail = async (models, user) => {
 };
 
 export const sendBatchedNotificationEmails = async (models, interval: string) => {
+  console.dir('inside send batched notification emails');
+  console.dir(interval);
   const users = await models.User.findAll({
     where: {
       emailNotificationInterval: interval,
     }
   });
+  console.dir(users);
+  console.dir('hi');
   await Promise.all(users.forEach(async (user) => {
     sendRegularNotificationEmail(models, user);
   }));
+  console.dir('done');
 };
