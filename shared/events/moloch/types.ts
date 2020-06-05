@@ -1,4 +1,20 @@
 import { Event } from 'ethers';
+import { Moloch1 } from '../../../eth/types/Moloch1';
+import { Moloch2 } from '../../../eth/types/Moloch2';
+
+type UnPromisify<T> = T extends Promise<infer U> ? U : T;
+export type Moloch1Proposal = UnPromisify<ReturnType<Moloch1['functions']['proposalQueue']>>;
+export type Moloch2Proposal = UnPromisify<ReturnType<Moloch2['functions']['proposals']>>;
+
+export type MolochApi = Moloch1 | Moloch2;
+
+export function molochApiVersion(api: MolochApi): 1 | 2 {
+  const result = api instanceof Moloch1
+    ? 1 : api instanceof Moloch2
+      ? 2 : null;
+  if (result === null) throw new Error('unknown moloch API');
+  return result;
+}
 
 export const MolochEventChains = [ 'moloch', 'moloch-local' ];
 
@@ -30,7 +46,7 @@ type Balance = string;
 export interface IMolochSubmitProposal extends IMolochEvent {
   kind: MolochEventKind.SubmitProposal;
   proposalIndex: number;
-  delegateKey: Address;
+  delegateKey?: Address;
   member: Address;
   applicant: Address;
   tokenTribute: Balance;
@@ -40,7 +56,7 @@ export interface IMolochSubmitProposal extends IMolochEvent {
 export interface IMolochSubmitVote extends IMolochEvent {
   kind: MolochEventKind.SubmitVote;
   proposalIndex: number;
-  delegateKey: Address;
+  delegateKey?: Address;
   member: Address;
   vote: number;
 }

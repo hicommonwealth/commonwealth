@@ -7,23 +7,13 @@ import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '..
 import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
-import { IMolochEventData, MolochRawEvent } from './types';
+import { IMolochEventData, MolochRawEvent, MolochApi } from './types';
 
-import { Moloch1 } from '../../../eth/types/Moloch1';
 import { Moloch1Factory } from '../../../eth/types/Moloch1Factory';
-import { Moloch2 } from '../../../eth/types/Moloch2';
 import { Moloch2Factory } from '../../../eth/types/Moloch2Factory';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export type MolochApi = Moloch1 | Moloch2;
-export function molochApiVersion(api: MolochApi): 1 | 2 {
-  const result = api instanceof Moloch1
-    ? 1 : api instanceof Moloch2
-      ? 2 : null;
-  if (result === null) throw new Error('unknown moloch API');
-  return result;
-}
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
