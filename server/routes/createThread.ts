@@ -111,7 +111,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   try {
     thread = await models.OffchainThread.create(threadContent);
   } catch (err) {
-    return next(err);
+    return next(new Error(err));
   }
 
   // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
@@ -150,18 +150,22 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   }
 
   // auto-subscribe thread creator to replies & reactions
-  await models.Subscription.create({
-    subscriber_id: req.user.id,
-    category_id: NotificationCategories.NewComment,
-    object_id: `discussion_${finalThread.id}`,
-    is_active: true,
-  });
-  await models.Subscription.create({
-    subscriber_id: req.user.id,
-    category_id: NotificationCategories.NewReaction,
-    object_id: `discussion_${finalThread.id}`,
-    is_active: true,
-  });
+  try {
+    await models.Subscription.create({
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewComment,
+      object_id: `discussion_${finalThread.id}`,
+      is_active: true,
+    });
+    await models.Subscription.create({
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewReaction,
+      object_id: `discussion_${finalThread.id}`,
+      is_active: true,
+    });
+  } catch (err) {
+    return next(new Error(err));
+  }
   const location = finalThread.community || finalThread.chain;
   // dispatch notifications to subscribers of the given chain/community
   await models.Subscription.emitNotifications(
@@ -195,14 +199,18 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
   if (mentions?.length > 0) {
     mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
       mention = mention.split(',');
-      const user = await models.Address.findOne({
-        where: {
-          chain: mention[0],
-          address: mention[1],
-        },
-        include: [ models.User, models.Role ]
-      });
-      return user;
+      try {
+        const user = await models.Address.findOne({
+          where: {
+            chain: mention[0],
+            address: mention[1],
+          },
+          include: [ models.User, models.Role ]
+        });
+        return user;
+      } catch (err) {
+        return next(new Error(err));
+      }
     }));
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);

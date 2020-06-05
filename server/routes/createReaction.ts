@@ -78,7 +78,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       root_type = 'discussion';
     }
   } catch (err) {
-    throw new Error(CreateReactionErrors.NoProposalMatch);
+    return next(new Error(CreateReactionErrors.NoProposalMatch));
   }
 
   // dispatch notifications

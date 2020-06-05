@@ -417,15 +417,15 @@ describe('Thread Tests', () => {
   describe('/editThread', () => {
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
-        address: userAddress,
+        address: adminAddress,
         kind,
         chainId: chain,
-        communityId: community,
+        communityId: undefined,
         title,
         tagName,
         tagId,
         body,
-        jwt: userJWT,
+        jwt: adminJWT,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
@@ -451,10 +451,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should turn off read_only', async () => {
@@ -476,10 +475,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should turn off both read_only and privacy', async () => {
@@ -501,10 +499,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should turn off, and then on, both read_only and privacy', async () => {
@@ -527,10 +524,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
 
       // turning on read_only
       readOnly = true;
@@ -548,10 +544,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should fail to turn a public thread private', async () => {
@@ -574,10 +569,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
 
       // failing to turn on privacy, thread.private stays false.
       privacy = true;
@@ -595,10 +589,9 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(false);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should fail to edit an admin\'s post as a user', async () => {

@@ -85,7 +85,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     );
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(e);
+    return next(new Error(e));
   }
 
   // Todo: dispatch notifications conditional on a new mention
