@@ -96,7 +96,7 @@ class SubstrateStaking implements StorageModule {
             exposure: exposures[i],
             controller: controllers[i].toString(),
             isElected: true,
-            isWaiting: false,
+            toBeElected: false,
             eraPoints: eraPoints[key]
           };
         }
@@ -107,7 +107,7 @@ class SubstrateStaking implements StorageModule {
             exposure: nextUpExposures[i],
             controller: nextUpControllers[i].toString(),
             isElected: false,
-            isWaiting: false,
+            toBeElected: true,
             eraPoints: eraPoints[key]
           };
         }
@@ -118,7 +118,7 @@ class SubstrateStaking implements StorageModule {
             exposure: null,
             controller: null,
             isElected: false,
-            isWaiting: true,
+            toBeElected: false,
             eraPoints: eraPoints[key]
           };
         }
