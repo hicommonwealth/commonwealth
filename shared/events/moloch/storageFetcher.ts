@@ -60,6 +60,7 @@ export default class extends IStorageFetcher<MolochApi> {
         events.push(processedEvent);
       }
     } else {
+      // TODO: Moloch2
       return [];
     }
     return events;
@@ -74,6 +75,7 @@ export default class extends IStorageFetcher<MolochApi> {
     this._summoningTime = (await this._api.summoningTime()).toNumber();
 
     // we work backwards through the proposal queue ...
+    // TODO: how do we handle votes?
     const queueLength = (await this._api.getProposalQueueLength()).toNumber();
     const results: CWEvent<IMolochEventData>[] = [];
     /* eslint-disable no-await-in-loop, for-direction */
