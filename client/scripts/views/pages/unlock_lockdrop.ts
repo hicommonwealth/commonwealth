@@ -12,6 +12,7 @@ import {
   formatNumber,
   getParticipationSummary,
 } from '../stats/stats_helpers';
+import Sublayout from 'views/sublayout';
 
 const LockdropV1 = '0x1b75b90e60070d37cfa9d87affd124bb345bf70a';
 const LockdropV2 = '0xfec6f679e32d45e22736ad09dfdf6e3368704e31';
@@ -193,7 +194,9 @@ const UnlockPage = {
     }
   },
   view: (vnode) => {
-    return m('.UnlockPage', [
+    return m(Sublayout, {
+      class: 'UnlockPage',
+    }, [
       m('.container', [
         m('.content', [
           m('h3', 'Unlock with Metamask'),

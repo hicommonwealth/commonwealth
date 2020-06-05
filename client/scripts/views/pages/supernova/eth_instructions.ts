@@ -19,7 +19,7 @@ const ETHInstructions: m.Component<IAttrs> = {
     return m('.ETHInstructions', {
       key: vnode.attrs.method,
       oncreate: (vvnode) => {
-        $('.mithril-app').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
+        $('html, body').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
       }
     }, [
       (vnode.attrs.method === 'myCrypto') ? [

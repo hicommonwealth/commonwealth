@@ -1,4 +1,4 @@
-import 'components/header.scss';
+import 'components/header/index.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
@@ -14,12 +14,10 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import CommunitySelector from './community_selector';
 
 const ToggleViewButton = {
   view: (vnode) => {
-    const min = m.route.param('min');
-    console.log(min);
-
     return m(ButtonGroup, {
       class: 'ToggleViewButton',
     }, [
@@ -46,9 +44,8 @@ const Header: m.Component<{}> = {
     return m('.Header', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
     }, [
-      (app.chain || app.community) && m('.placeholder', [
-        m('h4', app.chain ? app.chain.meta?.chain?.name : app.community.meta.name),
-        m('.subtitle', app.chain ? app.chain.meta?.chain?.description : app.community.meta.description),
+      m('.placeholder', [
+        m(CommunitySelector),
       ]),
       // toggle view
       m(ToggleViewButton),

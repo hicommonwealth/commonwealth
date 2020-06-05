@@ -2,13 +2,16 @@ import 'pages/404.scss';
 
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
+import Sublayout from 'views/sublayout';
 
 const PageNotFound: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': '404Page' });
   },
   view: (vnode) => {
-    return m('.PageNotFound', [
+    return m(Sublayout, {
+      class: 'PageNotFound',
+    }, [
       m('.home-header', [
         m('.container', [
           m('.row.row-narrow', [

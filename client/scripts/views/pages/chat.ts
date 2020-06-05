@@ -170,7 +170,9 @@ const ChatPage = {
     const room = activeEntity.id;
     const name = app.chain ? app.chain.meta.chain.name : app.community.meta.name;
 
-    return m('.ChatPage', [
+    return m(Sublayout, {
+      class: 'ChatPage',
+    }, [
       m(Chat, { room, name }),
     ]);
   },

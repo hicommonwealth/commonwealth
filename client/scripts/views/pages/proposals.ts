@@ -9,14 +9,13 @@ import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
+import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-
-import ListingPage from 'views/pages/_listing_page';
 import ConvictionsTable from 'views/components/proposals/convictions_table';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import ProposalRow from 'views/components/proposal_row';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
@@ -70,58 +69,9 @@ const ProposalsPage: m.Component<{}> = {
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
 
-    return m(ListingPage, {
+    return m(Sublayout, {
       class: 'ProposalsPage',
-      title: 'Governance Proposals',
-      subtitle: 'Vote on network changes',
-      content: [
-        !visibleReferenda
-          && !visibleCouncilProposals
-          && !visibleDemocracyProposals
-          && !visibleCosmosProposals
-          && !visibleMolochProposals
-          && m('.no-proposals', 'No referenda, motions, or proposals'),
-        //
-        (visibleDispatchQueue.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-        visibleDispatchQueue && visibleDispatchQueue.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        //
-        (visibleReferenda.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-        visibleReferenda && visibleReferenda.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        (visibleCouncilProposals.length > 0) && m('h4.proposals-subheader', 'Council motions'),
-        visibleCouncilProposals && visibleCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        (visibleDemocracyProposals.length > 0) && m('h4.proposals-subheader', [
-          'Democracy Proposed Referenda',
-        ]),
-        visibleDemocracyProposals
-          && visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        (visibleSignalingProposals.length > 0) && m('h4.proposals-subheader', [
-          'Signaling proposals',
-        ]),
-        visibleSignalingProposals
-          && visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        (visibleTreasuryProposals.length > 0) && m('h4.proposals-subheader', [
-          'Treasury proposals',
-        ]),
-        visibleTreasuryProposals
-          && visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        visibleCosmosProposals && m('h4.proposals-subheader', [
-          'Cosmos proposals',
-          m('a.proposals-action', {
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
-          }, 'New'),
-        ]),
-        visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
-        //
-        visibleMolochProposals && m('h4.proposals-subheader', 'DAO proposals'),
-        visibleMolochProposals && visibleMolochProposals.map((proposal) => m(ProposalRow, { proposal })),
-      ],
-      sidebar: [
+      rightSidebar: [
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),
           m('.stats-tile-figure-minor', [
@@ -223,7 +173,53 @@ const ProposalsPage: m.Component<{}> = {
           ]),
         ]),
       ],
-    });
+    }, [
+      !visibleReferenda
+        && !visibleCouncilProposals
+        && !visibleDemocracyProposals
+        && !visibleCosmosProposals
+        && !visibleMolochProposals
+        && m('.no-proposals', 'No referenda, motions, or proposals'),
+      //
+      (visibleDispatchQueue.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
+      visibleDispatchQueue && visibleDispatchQueue.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      //
+      (visibleReferenda.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
+      visibleReferenda && visibleReferenda.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      (visibleCouncilProposals.length > 0) && m('h4.proposals-subheader', 'Council motions'),
+      visibleCouncilProposals && visibleCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      (visibleDemocracyProposals.length > 0) && m('h4.proposals-subheader', [
+        'Democracy Proposed Referenda',
+      ]),
+      visibleDemocracyProposals
+        && visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      (visibleSignalingProposals.length > 0) && m('h4.proposals-subheader', [
+        'Signaling proposals',
+      ]),
+      visibleSignalingProposals
+        && visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      (visibleTreasuryProposals.length > 0) && m('h4.proposals-subheader', [
+        'Treasury proposals',
+      ]),
+      visibleTreasuryProposals
+        && visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      visibleCosmosProposals && m('h4.proposals-subheader', [
+        'Cosmos proposals',
+        m('a.proposals-action', {
+          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
+        }, 'New'),
+      ]),
+      visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
+      //
+      visibleMolochProposals && m('h4.proposals-subheader', 'DAO proposals'),
+      visibleMolochProposals && visibleMolochProposals.map((proposal) => m(ProposalRow, { proposal })),
+    ]);
   }
 };
 

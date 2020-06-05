@@ -46,14 +46,6 @@ const DiscussionRow: m.Component<IAttrs> = {
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
-        m('.discussion-pre', [
-          m(User, {
-            user: [proposal.author, proposal.authorChain],
-            avatarOnly: true,
-            avatarSize: 35,
-            tooltip: true,
-          }),
-        ]),
         m('.discussion-content', {
           class: proposal.title === '--' ? 'no-title' : ''
         }, [
@@ -75,7 +67,6 @@ const DiscussionRow: m.Component<IAttrs> = {
                 user: [proposal.author, proposal.authorChain],
                 linkify: true,
                 tooltip: true,
-                hideAvatar: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
