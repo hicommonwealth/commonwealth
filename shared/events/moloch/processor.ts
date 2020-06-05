@@ -5,9 +5,9 @@ import { IEventProcessor, CWEvent } from '../interfaces';
 import parseEventType from './filters/type_parser';
 import enrichEvent from './filters/enricher';
 
-import { factory, formatFilename } from '../../logging';
 import { IMolochEventData, MolochRawEvent } from './types';
-import { MolochApi } from '.';
+import { MolochApi, molochApiVersion } from '.';
+import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventProcessor<MolochApi, MolochRawEvent> {
@@ -19,6 +19,9 @@ export default class extends IEventProcessor<MolochApi, MolochRawEvent> {
    * @returns an array of processed events
    */
   public async process(event: MolochRawEvent): Promise<CWEvent<IMolochEventData>[]> {
-    return [];
+    const kind = parseEventType(molochApiVersion(this._api), event.event);
+    if (!kind) return null;
+    const cwEvent = await enrichEvent(this._api, event.blockNumber, kind, event);
+    return [ cwEvent ];
   }
 }

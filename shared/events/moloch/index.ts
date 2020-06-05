@@ -17,6 +17,13 @@ import { Moloch2Factory } from '../../../eth/types/Moloch2Factory';
 const log = factory.getLogger(formatFilename(__filename));
 
 export type MolochApi = Moloch1 | Moloch2;
+export function molochApiVersion(api: MolochApi): 1 | 2 {
+  const result = api instanceof Moloch1
+    ? 1 : api instanceof Moloch2
+      ? 2 : null;
+  if (result === null) throw new Error('unknown moloch API');
+  return result;
+}
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
