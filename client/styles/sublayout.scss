@@ -1,0 +1,13 @@
+.Sublayout {
+    display: flex;
+
+    > .left-sidebar {
+        width: 200px;
+    }
+    > .right-sidebar {
+        width: 200px;
+    }
+    > .sublayout-content {
+        flex: 1;
+    }
+}

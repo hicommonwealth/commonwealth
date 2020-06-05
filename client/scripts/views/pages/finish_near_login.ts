@@ -8,8 +8,8 @@ import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from '
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase } from 'models';
+import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -62,43 +62,37 @@ const FinishNearLogin: m.Component<{}, IState> = {
       return m(PageNotFound);
     }
     if (vnode.state.validationError) {
-      return m(ListingPage, {
+      return m(Sublayout, {
         class: 'FinishNearLogin',
-        title: 'Near Login',
-        subtitle: 'Error!',
-        sidebar: [],
-        content: [
-          m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
-          m('button.formular-button-primary', {
-            onclick: async (e) => {
-              e.preventDefault();
-              redirectToNextPage();
-            }
-          }, 'Return Home'),
-        ]
-      });
+      }, [
+        m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
+        m('button.formular-button-primary', {
+          onclick: async (e) => {
+            e.preventDefault();
+            redirectToNextPage();
+          }
+        }, 'Return Home'),
+      ]);
     } else if (vnode.state.validationCompleted) {
-      return m(ListingPage, {
+      return m(Sublayout, {
         class: 'FinishNearLogin',
-        sidebar: [],
-        content: [
-          m('div', {
-            oncreate: (e) => {
-              if (vnode.state.validatedAccount.profile.name !== undefined) {
-                redirectToNextPage();
-              } else {
-                app.modals.create({
-                  modal: LinkNewAddressModal,
-                  data: { alreadyInitializedAccount: vnode.state.validatedAccount },
-                  exitCallback: () => {
-                    redirectToNextPage();
-                  }
-                });
-              }
+      }, [
+        m('div', {
+          oncreate: (e) => {
+            if (vnode.state.validatedAccount.profile.name !== undefined) {
+              redirectToNextPage();
+            } else {
+              app.modals.create({
+                modal: LinkNewAddressModal,
+                data: { alreadyInitializedAccount: vnode.state.validatedAccount },
+                exitCallback: () => {
+                  redirectToNextPage();
+                }
+              });
             }
-          }),
-        ]
-      });
+          }
+        }),
+      ]);
     } else if (!vnode.state.validating) {
     // chain loaded and on near -- finish login
     // TODO: share one wallet account across all actual accounts and swap out

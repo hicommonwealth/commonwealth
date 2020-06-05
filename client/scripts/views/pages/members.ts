@@ -6,11 +6,14 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
+import Sublayout from 'views/sublayout';
 import ChainOrCommunityRoles from 'views/pages/discussions/roles';
 
 const MembersPage = {
   view: (vnode) => {
-    return m('.MembersPage', [
+    return m(Sublayout, {
+      class: 'MembersPage',
+    }, [
       m(ChainOrCommunityRoles),
     ]);
   },

@@ -4,9 +4,7 @@ $discussion-row-color: #999;
 
 .DiscussionRow {
     display: block;
-    margin: 20px 0 40px;
-
-    padding-bottom: 30px;
+    padding: 28px 32px;
     border-bottom: 1px solid #ececec;
 
     a.discussion-tag {
@@ -24,13 +22,6 @@ $discussion-row-color: #999;
         display: flex;
     }
 
-    .discussion-pre {
-        margin-top: 3px;
-        margin-right: 25px;
-        .User.avatar-only {
-            display: block; // ensure tooltip appears above avatar circle
-        }
-    }
     .discussion-content {
         position: relative;
         flex: 1;
@@ -104,6 +95,7 @@ $discussion-row-color: #999;
     .discussion-commenters {
         display: flex;
         margin: 24px 0 0;
+        font-size: 14px;
         .commenters-avatars {
             .User {
                 margin-right: -8px;

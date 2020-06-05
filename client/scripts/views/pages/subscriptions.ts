@@ -9,9 +9,9 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import ListingPage from './_listing_page';
-import Tabs from '../components/widgets/tabs';
-import { DropdownFormField } from '../components/forms';
+import Tabs from 'views/components/widgets/tabs';
+import { DropdownFormField } from 'views/components/forms';
+import Sublayout from 'views/sublayout';
 
 const NotificationButtons: m.Component = {
   oninit: (vnode) => {
@@ -430,7 +430,9 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
 
 const SubscriptionsPage: m.Component = {
   view: () => {
-    return m('.SubscriptionsPage', [
+    return m(Sublayout, {
+      class: 'SubscriptionsPage',
+    }, [
       m('.forum-container', [
         m(Tabs, [{
           name: 'Active Subscriptions',

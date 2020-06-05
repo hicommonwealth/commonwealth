@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import app from 'state';
 import { OffchainThread } from 'models';
 
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
 import ProfileHeader from './profile_header';
@@ -221,7 +222,9 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
-    return m('.ProfilePage', [
+    return m(Sublayout, {
+      class: 'ProfilePage',
+    }, [
       m('.forum-container-alt', [
         m(ProfileHeader, { account }),
         m('.row.row-narrow.forum-row', [

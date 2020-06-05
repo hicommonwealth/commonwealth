@@ -1,5 +1,6 @@
 @import 'client/styles/shared';
 
+$sidebar-width: 240px;
 $sidebar-padding: 16px;
 $active-color: #ececec;
 
@@ -55,19 +56,18 @@ $active-color: #ececec;
 
 .Sidebar {
     position: fixed;
-    top: 0;
-    bottom: 0;
+    top: $header-height + 20px;
+    bottom: 20px;
     width: $sidebar-width;
-    border-left: 7px solid $theme-accent-dark;
-    border-right: 1px solid #ececec;
-    z-index: 9;
+    background: #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.07);
+
     .SidebarMenu {
         height: 100%;
     }
     .SidebarMenu .cui-list {
         height: 100%;
         overflow-x: hidden;
-        background: #f8f8f8;
     }
     .SidebarMenu .cui-list.list-bottom {
         position: absolute;
@@ -134,42 +134,8 @@ $active-color: #ececec;
     .cui-list .cui-list-item-content-right .cui-button + .cui-button {
         margin-left: 4px;
     }
-    // top
-    .cui-list .title-selector {
-        position: relative;
-        min-height: $header-height;
-        margin-bottom: 20px;
-        user-select: none;
-        border-bottom: 1px solid #e7e7e7;
-        cursor: pointer;
-        .cui-button {
-            width: 100%;
-            height: 100%;
-            padding: 0 15px;
-            color: #222;
-            background: #f8f8f8 !important;
-        }
-        .cui-button-label {
-            width: 100%;
-
-            .CommunityLabel {
-                margin: 17px 0 13px;
-            }
-            svg.SwitchIcon {
-                position: absolute;
-                right: 6px;
-                top: 21px;
-                // svg attributes
-                fill: none;
-                polyline {
-                    stroke: #aaa;
-                }
-            }
-        }
-    }
     .cui-list .action-selector {
         padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
-        // background: #fff !important;
         cursor: default !important;
         user-select: none;
         border-bottom: 1px solid #eee;
@@ -189,7 +155,6 @@ $active-color: #ececec;
         border-top: 1px solid #eee;
         z-index: 1;
         // style the logic selector as additional menu space, not a selectable
-        background: #f8f8f8 !important;
         cursor: initial !important;
         user-select: none;
 
@@ -252,11 +217,14 @@ $active-color: #ececec;
     .cui-list-item {
         min-width: 260px;
         padding: 10px 15px;
-        &.cui-selected {
-            color: #444;
-            opacity: 0.7;
-            .ChainIcon, .CommunityIcon {
-                opacity: 0.7;
+        &.cui-selected, &.cui-selected:hover {
+            background: lighten(#3960f4, 7%);
+            color: #fff;
+            .community-id {
+                color: #fff;
+            }
+            .cui-icon svg {
+                color: #fff !important;
             }
         }
         &.starred .community-star-toggle .cui-icon svg {

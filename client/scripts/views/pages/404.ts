@@ -3,6 +3,7 @@ import 'pages/404.scss';
 import { default as m } from 'mithril';
 import { default as mixpanel } from 'mixpanel-browser';
 import { EmptyState, Icon, Icons } from 'construct-ui';
+import Sublayout from 'views/sublayout';
 
 const PageNotFound: m.Component<{ message?: string }> = {
   oncreate: (vnode) => {
@@ -10,7 +11,9 @@ const PageNotFound: m.Component<{ message?: string }> = {
   },
   view: (vnode) => {
     const { message } = vnode.attrs;
-    return m('.forum-container', [
+    return m(Sublayout, {
+      class: 'PageNotFound',
+    }, [
       m(EmptyState, {
         class: 'PageNotFound',
         icon: Icons.X_OCTAGON,

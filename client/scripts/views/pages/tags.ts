@@ -7,11 +7,14 @@ import $ from 'jquery';
 import { Card } from 'construct-ui';
 
 import app from 'state';
+import Sublayout from 'views/sublayout';
 import TagSelector from 'views/components/sidebar/tag_selector';
 
 const TagsPage = {
   view: (vnode) => {
-    return m('.TagsPage', [
+    return m(Sublayout, {
+      class: 'TagsPage',
+    }, [
       m(TagSelector, { activeTag: null, showFullListing: true, hideEditButton: false }),
     ]);
   },
