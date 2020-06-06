@@ -33,8 +33,10 @@ const LoginSelector = {
       ]),
     ]);
 
-    return m('.LoginSelector', [
-      m('.login-selector-left', app.vm.activeAccount
+    return m('.LoginSelector', {
+      class: (app.chain || app.community) ? '' : 'no-community',
+    }, [
+      (app.chain || app.community) && m('.login-selector-left', app.vm.activeAccount
         // if address selected
         ? [
           m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
@@ -98,7 +100,7 @@ const LoginSelector = {
                 iconLeft: Icons.EDIT,
                 label: 'Edit Profile'
               }),
-            m(MenuItem, {
+            app.chain && m(MenuItem, {
               onclick: async () => app.modals.create({
                 modal: EditIdentityModal,
                 data: { account: app.vm.activeAccount },

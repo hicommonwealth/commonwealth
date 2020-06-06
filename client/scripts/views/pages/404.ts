@@ -13,6 +13,7 @@ const PageNotFound: m.Component<{ message?: string }> = {
     const { message } = vnode.attrs;
     return m(Sublayout, {
       class: 'PageNotFound',
+      leftSidebar: null,
     }, [
       m(EmptyState, {
         class: 'PageNotFound',

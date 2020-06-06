@@ -4,13 +4,18 @@
     margin-left: $header-spacing;
     display: flex;
     padding-left: 4px;
-
     .login-selector-left {
         flex: 1;
         display: flex;
     }
     .login-selector-right {
         padding-left: $header-spacing;
+    }
+    &.no-community {
+        padding-left: 0;
+        .login-selector-right {
+            padding-left: 0;
+        }
     }
 
     button.cui-button {

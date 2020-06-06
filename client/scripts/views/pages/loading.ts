@@ -8,6 +8,7 @@ const LoadingPage: m.Component<{ message?: string }> = {
   view: (vnode) => {
     return m(Sublayout, {
       class: 'LoadingPage',
+      leftSidebar: null,
     }, [
       m(Spinner, {
         fill: true,

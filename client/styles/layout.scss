@@ -34,8 +34,8 @@ html {
     }
 }
 .layout-container {
-    margin-top: $header-height + $vertical-padding;
-    margin-bottom: $vertical-padding;
+    padding-top: $header-height + $vertical-padding;
+    padding-bottom: $vertical-padding;
 }
 
 //
