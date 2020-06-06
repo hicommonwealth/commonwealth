@@ -15,49 +15,28 @@ import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import CommunitySelector from './community_selector';
-
-const ToggleViewButton = {
-  view: (vnode) => {
-    return m(ButtonGroup, {
-      class: 'ToggleViewButton',
-    }, [
-      m(Button, {
-        iconLeft: Icons.ALIGN_LEFT,
-        onclick: (e) => {
-          // TODO
-        }
-      }),
-      m(Button, {
-        iconLeft: Icons.ALIGN_JUSTIFY,
-        onclick: (e) => {
-          // TODO
-        }
-      }),
-    ]);
-  }
-};
+import LoginSelector from './login_selector';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
-    // user menu
-
-    return m('.Header', {
-      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'}`
-    }, [
-      m('.placeholder', [
-        m(CommunitySelector),
+    return m('.Header', [
+      m('.header-content', [
+        m('.placeholder', [
+          m(CommunitySelector),
+        ]),
+        // new proposal
+        m(NewProposalButton, { fluid: false }),
+        // notifications menu
+        app.isLoggedIn() && m(NotificationsDropdownMenu),
+        // invites menu
+        app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
+          size: 'sm',
+          iconLeft: Icons.MAIL,
+          onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+        }),
+        // login selector
+        m(LoginSelector),
       ]),
-      // toggle view
-      m(ToggleViewButton),
-      // new proposal
-      m(NewProposalButton, { fluid: false }),
-      // notifications menu
-      app.isLoggedIn() && m(NotificationsDropdownMenu),
-      // invites menu
-      app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
-        iconLeft: Icons.MAIL,
-        onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-      }),
     ]);
   }
 };

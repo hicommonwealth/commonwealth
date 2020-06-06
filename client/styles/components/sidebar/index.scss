@@ -1,6 +1,5 @@
 @import 'client/styles/shared';
 
-$sidebar-width: 240px;
 $sidebar-padding: 16px;
 $active-color: #ececec;
 
@@ -56,11 +55,12 @@ $active-color: #ececec;
 
 .Sidebar {
     position: fixed;
-    top: $header-height + 20px;
-    bottom: 20px;
+    top: $header-height + $vertical-padding;
+    bottom: $vertical-padding;
     width: $sidebar-width;
     background: #fff;
     box-shadow: 0 0 4px rgba(0,0,0,0.07);
+    padding-top: 10px;
 
     .SidebarMenu {
         height: 100%;
@@ -107,6 +107,7 @@ $active-color: #ececec;
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.15px;
+        border: none;
     }
     .cui-list > .cui-list-item {
         font-size: 14.5px;
@@ -145,90 +146,4 @@ $active-color: #ececec;
         }
     }
     // bottom
-    .cui-list .login-selector {
-        position: absolute;
-        display: flex;
-        // position at bottom
-        bottom: 0;
-        width: $sidebar-width;
-        padding: 17px $sidebar-padding 18px;
-        border-top: 1px solid #eee;
-        z-index: 1;
-        // style the logic selector as additional menu space, not a selectable
-        cursor: initial !important;
-        user-select: none;
-
-        .login-selector-left {
-            flex: 1;
-            display: flex;
-        }
-        .login-selector-right {
-            padding-left: 8px;
-        }
-
-        button.cui-button {
-            position: relative;
-        }
-        .User.avatar-only {
-            overflow: visible;
-            padding-right: 13px;
-            position: relative;
-            top: -1px;
-        }
-        .login-selector-user {
-            line-height: 1.1;
-            .user-info {
-                position: relative;
-                .User {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    max-width: 110px;
-                    font-size: 14px;
-                }
-                .user-address {
-                    font-size: 12px;
-                    font-weight: 400;
-                    color: #777;
-                    margin: 0;
-                }
-            }
-        }
-    }
-    &.no-active-community .cui-list .title-selector {
-        border-bottom: none;
-    }
-    &.no-active-community .cui-list .login-selector {
-        border-top: none;
-    }
-}
-
-.CommunitySelectList {
-    .cui-popover-content {
-        padding: 6px 0 6px;
-    }
-    .select-list-back-home {
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-    .cui-list {
-        max-height: 90vh;
-    }
-    .cui-list-item {
-        min-width: 260px;
-        padding: 10px 15px;
-        &.cui-selected, &.cui-selected:hover {
-            background: lighten(#3960f4, 7%);
-            color: #fff;
-            .community-id {
-                color: #fff;
-            }
-            .cui-icon svg {
-                color: #fff !important;
-            }
-        }
-        &.starred .community-star-toggle .cui-icon svg {
-            fill: currentColor;
-        }
-    }
 }

@@ -3,11 +3,11 @@
     user-select: none;
     cursor: pointer;
     max-width: 240px;
-    margin-left: -14px;
+    margin: -8px 0;
     .cui-button {
         width: 100%;
         height: 100%;
-        padding: 0 15px;
+        padding: 8px 15px;
         color: #222;
     }
     .cui-button-label {
@@ -26,6 +26,36 @@
             polyline {
                 stroke: #aaa;
             }
+        }
+    }
+}
+
+.CommunitySelectList {
+    .cui-popover-content {
+        padding: 6px 0 6px;
+    }
+    .select-list-back-home {
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+    .cui-list {
+        max-height: 90vh;
+    }
+    .cui-list-item {
+        min-width: 260px;
+        padding: 10px 15px;
+        &.cui-selected, &.cui-selected:hover {
+            background: lighten(#3960f4, 7%);
+            color: #fff;
+            .community-id {
+                color: #fff;
+            }
+            .cui-icon svg {
+                color: #fff !important;
+            }
+        }
+        &.starred .community-star-toggle .cui-icon svg {
+            fill: currentColor;
         }
     }
 }

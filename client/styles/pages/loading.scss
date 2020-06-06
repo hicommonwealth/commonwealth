@@ -1,7 +1,4 @@
 @import 'client/styles/shared';
 
 .LoadingPage {
-    position: absolute;
-    height: calc(100% - #{$header-height});
-    width: 100%;
 }

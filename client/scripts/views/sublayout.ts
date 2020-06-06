@@ -7,12 +7,10 @@ const Sublayout: m.Component<{ class: string, rightSidebar? }> = {
   view: (vnode) => {
     const { rightSidebar } = vnode.attrs;
 
-    return m('.Sublayout', {
-      class: vnode.attrs.class
-    }, [
+    return m('.Sublayout', { class: vnode.attrs.class }, [
       m('.left-sidebar', m(Sidebar)),
       m('.sublayout-content', vnode.children),
-      rightSidebar && m('.right-sidebar', rightSidebar),
+      m('.right-sidebar', rightSidebar),
     ]);
   }
 };
