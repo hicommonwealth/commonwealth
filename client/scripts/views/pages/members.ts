@@ -14,7 +14,9 @@ const MembersPage = {
     return m(Sublayout, {
       class: 'MembersPage',
     }, [
-      m(ChainOrCommunityRoles),
+      m('.forum-container', [
+        m(ChainOrCommunityRoles),
+      ]),
     ]);
   },
 };

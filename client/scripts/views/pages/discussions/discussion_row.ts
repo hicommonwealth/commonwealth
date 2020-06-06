@@ -3,15 +3,15 @@ import 'pages/discussions/discussion_row.scss';
 import { default as m } from 'mithril';
 import { default as _ } from 'lodash';
 import { default as moment } from 'moment-twitter';
+import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
-import { Icon, Icons, Tag, } from 'construct-ui';
 
-import User from 'views/components/widgets/user';
 import { OffchainThread, OffchainThreadKind, OffchainTag } from 'models';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
+import User from 'views/components/widgets/user';
 
 import ThreadCaratMenu from './thread_carat_menu';
 
@@ -50,10 +50,11 @@ const DiscussionRow: m.Component<IAttrs> = {
           class: proposal.title === '--' ? 'no-title' : ''
         }, [
           m('.discussion-title', [
-            link('a',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`, [
-                proposal.title
-              ]),
+            link(
+              'a',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+              proposal.title,
+            ),
             app.comments.nComments(proposal) > 0
               && link(
                 'a.discussion-replies',
@@ -104,9 +105,11 @@ const DiscussionRow: m.Component<IAttrs> = {
               m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
                 return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
               })),
-              m('.commenters-label', [
+              link(
+                'a.commenters-label',
+                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
                 pluralize(app.comments.nComments(proposal), 'reply'),
-              ]),
+              ),
             ]),
           propType === OffchainThreadKind.Link
             && proposal.url

@@ -15,7 +15,9 @@ const TagsPage = {
     return m(Sublayout, {
       class: 'TagsPage',
     }, [
-      m(TagSelector, { activeTag: null, showFullListing: true, hideEditButton: false }),
+      m('.forum-container', [
+        m(TagSelector, { activeTag: null, showFullListing: true, hideEditButton: false }),
+      ]),
     ]);
   },
 };

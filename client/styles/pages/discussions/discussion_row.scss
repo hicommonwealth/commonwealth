@@ -26,35 +26,34 @@ $discussion-row-color: #999;
         position: relative;
         flex: 1;
         .discussion-title {
-            margin-bottom: 1px;
+            margin-bottom: 4px;
             .discussion-edit-tags {
                 position: absolute;
                 right: -7px;
             }
-        }
-        .discussion-title a {
-            color: #111;
-            font-size: 16px;
-            text-decoration: none;
-            font-weight: 600;
-            &:hover {
-                text-decoration: underline;
+            a {
+                color: #111;
+                font-size: 19px;
+                text-decoration: none;
+                font-weight: 600;
+                line-height: 1.3;
+                &:hover {
+                    text-decoration: underline;
+                }
             }
-        }
-        .discussion-title a.discussion-replies {
-            text-decoration: none;
-            margin-left: 8px;
-            color: #888;
-            user-select: none;
-            white-space: nowrap;
-            .cui-icon {
-                position: relative;
-                top: -1px;
+            a.discussion-replies {
+                text-decoration: none;
+                margin-left: 8px;
                 color: #888;
-                margin-left: 3px;
+                user-select: none;
+                white-space: nowrap;
+                .cui-icon {
+                    position: relative;
+                    top: -1px;
+                    color: #888;
+                    margin-left: 3px;
+                }
             }
-        }
-        .discussion-meta {
         }
     }
 
@@ -96,6 +95,12 @@ $discussion-row-color: #999;
         display: flex;
         margin: 24px 0 0;
         font-size: 14px;
+        a {
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
         .commenters-avatars {
             .User {
                 margin-right: -8px;

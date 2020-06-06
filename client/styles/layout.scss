@@ -37,6 +37,12 @@ html {
     padding-top: $header-height + $vertical-padding;
     padding-bottom: $vertical-padding;
 }
+.forum-container {
+    background: #fff;
+    padding: 20px 32px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.07);
+    margin-bottom: 16px;
+}
 
 //
 // typographical styles
