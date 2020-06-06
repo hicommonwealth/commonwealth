@@ -18,7 +18,7 @@ const PresentationComponent = (state, chain: Substrate) => {
         m('th.val-total', 'Other Stake'),
         m('th.val-commission', 'Commission'),
         m('th.val-points', 'Points'),
-        // m('th.val-age', 'Validator Age'),
+        m('th.val-last-hash', 'last #'),
         m('th.val-action', ''),
       ]),
       Object.keys(validators).filter((validator) => (
