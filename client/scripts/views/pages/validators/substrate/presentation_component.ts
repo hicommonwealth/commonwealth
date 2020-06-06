@@ -40,6 +40,9 @@ const PresentationComponent = (state, chain: Substrate) => {
           const commissionPer = validators[validator].commissionPer;
           const hasNominated: boolean = app.vm.activeAccount && nominators
             && !!nominators.find(({ stash }) => stash === app.vm.activeAccount.address);
+          const blockCount = validators[validator].blockCount;
+          const hasMessage = validators[validator]?.hasMessage;
+          const isOnline = validators[validator]?.isOnline;
           // add validator to collection if hasNominated already
           if (hasNominated) {
             state.nominations.push(validator);
@@ -55,6 +58,9 @@ const PresentationComponent = (state, chain: Substrate) => {
             hasNominated,
             commissionPer,
             eraPoints,
+            blockCount,
+            hasMessage,
+            isOnline,
             onChangeHandler: (result) => {
               if (state.nominations.indexOf(result) === -1) {
                 state.nominations.push(result);
