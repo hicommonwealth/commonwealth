@@ -105,7 +105,10 @@ class SubstrateStaking implements StorageModule {
             controller: controllers[i].toString(),
             isElected: true,
             toBeElected: false,
-            eraPoints: eraPoints[key]
+            eraPoints: eraPoints[key],
+            blockCount: imOnline[key]?.blockCount,
+            hasMessage: imOnline[key]?.hasMessage,
+            isOnline: imOnline[key]?.isOnline
           };
         }
         // add set of next elected
