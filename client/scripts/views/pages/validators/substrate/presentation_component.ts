@@ -87,6 +87,9 @@ const PresentationComponent = (state, chain: Substrate) => {
           const controller = validators[validator].controller;
           const eraPoints = validators[validator].eraPoints;
           const toBeElected = validators[validator].toBeElected;
+          const blockCount = validators[validator].blockCount;
+          const hasMessage = validators[validator]?.hasMessage;
+          const isOnline = validators[validator]?.isOnline;
           return m(ValidatorRow, {
             stash: validator,
             controller,
@@ -97,7 +100,10 @@ const PresentationComponent = (state, chain: Substrate) => {
             commissionPer,
             waiting: true,
             eraPoints,
-            toBeElected
+            toBeElected,
+            blockCount,
+            hasMessage,
+            isOnline
           });
         }),
     ])

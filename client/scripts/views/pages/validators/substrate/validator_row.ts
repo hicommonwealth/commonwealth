@@ -3,7 +3,7 @@ import app from 'state';
 import BN from 'bn.js';
 import { ChainBase } from 'models';
 import { pluralize } from 'helpers';
-import { Observable } from 'rxjs';
+import { Icons, Icon } from 'construct-ui';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
@@ -135,17 +135,20 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         && m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' ')
       ),
       (vnode.attrs.waiting
-        && m('td.val-points', vnode.attrs.toBeElected
-          ? 'PolkadotJS'
+        && m('td.val-to-be-elected', vnode.attrs.toBeElected
+          ? m(Icon, { name: Icons.ARROW_RIGHT_CIRCLE, size: 'sm' })
           : '')
       ),
-      // m('td.val-action', [
-      //   m('button.view-validator.formular-button-primary', {
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //     }
-      //   }, 'View'),
-      // ]),
+      (vnode.attrs.waiting
+        && m('td.val-is-online', vnode.attrs.isOnline
+          ? m(Icon, { name: Icons.WIFI, size: 'sm' })
+          : '')
+      ),
+      (vnode.attrs.waiting
+        && m('td.val-message', vnode.attrs.hasMessage
+          ? m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'sm' })
+          : '')
+      )
     ]);
   }
 });

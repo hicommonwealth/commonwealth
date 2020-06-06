@@ -5,6 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import _ from 'lodash';
+import { u32 } from '@polkadot/types';
 import app, { ApiStatus } from 'state';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -35,6 +36,9 @@ export interface IValidatorAttrs {
   waiting?: boolean;
   eraPoints?: string;
   toBeElected?: boolean;
+  blockCount?: u32;
+  hasMessage?: boolean;
+  isOnline?: boolean;
 }
 
 export interface IValidatorPageState {
