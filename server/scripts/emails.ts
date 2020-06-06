@@ -56,19 +56,21 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 
 export const createRegularNotificationEmailObject = async (user, notifications) => {
   console.dir('create regular notification email object');
-  let text = '<h1>Unread Notifications: </h1>';
-  notifications.forEach((n) => {
+  const notification1Subscription = await notifications[0].getSubscription();
+  const emailObjArray = [];
+  Promise.all(notifications.forEach(async (n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
-      chain_id, community_id, author_address, author_chain } = n.notification_data;
+      chain_id, community_id, author_address, author_chain } = JSON.parse(n.notification_data);
     const decodedTitle = decodeURIComponent(root_title).trim();
-    const { category_id } = n.Subscription;
+    const nSubscription = await n.getSubscription();
+    const { category_id } = nSubscription;
     const content = (category_id === NotificationCategories.NewComment) ? `New comment on '${decodedTitle}'`
       : (category_id === NotificationCategories.NewMention) ? `New mention on '${decodedTitle}'`
         : (category_id === NotificationCategories.NewReaction) ? `New reaction on '${decodedTitle}'`
           : (category_id === NotificationCategories.NewThread) ? `New Thread in '${decodedTitle}'`
             : (category_id === NotificationCategories.ThreadEdit) ? `'${decodedTitle}' edited`
               : 'New notification on Commonwealth';
-    console.dir(n);
+    // const content = 'hi';
     const pseudoProposal = {
       id: root_id,
       title: root_title,
@@ -77,19 +79,20 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
     };
     const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
     const path = (getProposalUrl as any)(...args);
-    text += `<li><a href=${path}>${content}</a></li>`;
-  });
+    const obj = { path, content, decodedTitle, category_id };
+    emailObjArray.push(obj);
+    console.dir(emailObjArray.length);
+  }));
   console.dir('post-notifications');
+  console.dir(emailObjArray);
 
   const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
   const msg = {
     to: null,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
-    text,
-    html: text,
+    data: emailObjArray,
   };
-  console.dir(msg);
   return msg;
 };
 
@@ -103,7 +106,7 @@ export const sendRegularNotificationEmail = async (models, user) => {
     },
   });
   const subscriptionIds = subscriptions.map((s) => s.id);
-  console.dir(subscriptionIds);
+  console.dir(`subscriptionsIds: ${subscriptionIds.length}`);
   const notifications = await models.Notification.findAll({
     where: {
       subscription_id: {
@@ -112,18 +115,19 @@ export const sendRegularNotificationEmail = async (models, user) => {
       is_read: false,
     }
   });
-  console.dir('notifications acquired');
-  console.dir(notifications);
+  console.dir(`notifications acquired: ${notifications.length}`);
   const msg = await createRegularNotificationEmailObject(user, notifications);
+  console.dir(`msg: ${msg}`);
 
-  if (NOTLIVE) {
-    log.info('not live!');
-    log.info(msg.text);
-  } else {
-    log.info('live!?!?!?');
-    msg.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
-    await sgMail.send(msg);
-  }
+  // if (NOTLIVE) {
+  //   log.info('not live!');
+  //   log.info(msg.text);
+  // } else {
+  //   log.info('live!?!?!?');
+  //   msg.to = (process.env.NODE_ENV === 'development') ? 'test@commonwealth.im' : user.email;
+  //   await sgMail.send(msg);
+  // }
+  console.dir('end of send Regular Notification Email');
 };
 
 export const sendBatchedNotificationEmails = async (models, interval: string) => {
@@ -134,7 +138,10 @@ export const sendBatchedNotificationEmails = async (models, interval: string) =>
       emailNotificationInterval: interval,
     }
   });
+  console.dir(users);
   await users.forEach(async (user) => {
+    console.dir(user.id);
     sendRegularNotificationEmail(models, user);
   });
+  console.dir('whole thing done');
 };
