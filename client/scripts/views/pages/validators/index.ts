@@ -6,6 +6,7 @@ import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
 import _ from 'lodash';
 import app, { ApiStatus } from 'state';
+import { HeaderExtended } from '@polkadot/api-derive';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import { formatAddressShort } from 'helpers';
@@ -39,6 +40,7 @@ export interface IValidatorAttrs {
 export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
+    lastHeader: HeaderExtended
   };
   nominations: any[];
   originalNominations: any[];
@@ -99,6 +101,9 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     stakingLedger: (app.chain.base === ChainBase.Substrate && app.vm.activeAccount)
       ? (app.vm.activeAccount as SubstrateAccount).stakingLedger
       : null,
+    lastHeader: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.lastHeader
+      : null
   }),
   view: (vnode) => {
     let vComponents = [];

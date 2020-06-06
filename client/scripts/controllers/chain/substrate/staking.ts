@@ -7,12 +7,16 @@ import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
 import { formatNumber } from '@polkadot/util';
 import { Observable, combineLatest, of } from 'rxjs';
+import { HeaderExtended } from '@polkadot/api-derive';
 import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints } from '@polkadot/types/interfaces';
 import { InterfaceTypes } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingElected, DeriveSessionProgress } from '@polkadot/api-derive/types';
+import { DeriveStakingValidators, DeriveStakingQuery,
+  DeriveSessionProgress, DeriveAccountInfo } from '@polkadot/api-derive/types';
 import { IValidators } from './account';
 import SubstrateChain from './shared';
+
+const MAX_HEADERS = 50;
 
 class SubstrateStaking implements StorageModule {
   private _initialized: boolean = false;
@@ -22,7 +26,9 @@ class SubstrateStaking implements StorageModule {
   // STORAGE
   private _store = new StakingStore();
   public get store() { return this._store; }
-
+  // change to public and create a new tab on staking ui
+  private lastHeaders: HeaderExtended[] = [];
+  public byAuthor: Record<string, string> = {};
   private _Chain: SubstrateChain;
 
   private _app: IApp;
@@ -127,11 +133,36 @@ class SubstrateStaking implements StorageModule {
       }),
     );
   }
-  public info(address: string): Observable<any> {
+  public info(address: string): Observable<DeriveAccountInfo> {
     return this._Chain.query((api: ApiRx) => api.derive.accounts.info(address));
   }
-  public query(address: string): Observable<any> {
+  public query(address: string): Observable<DeriveStakingQuery> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
+  }
+  public get lastHeader(): Observable<HeaderExtended> {
+    return this._Chain.query(
+      (api: ApiRx) => api.derive.chain.subscribeNewHeads()
+    ).pipe(map((lastHeader: HeaderExtended) => {
+      if (lastHeader?.number) {
+        const blockNumber = lastHeader.number.unwrap();
+        const thisBlockAuthor = lastHeader.author?.toString();
+        const thisBlockNumber = formatNumber(blockNumber);
+
+        if (thisBlockAuthor) {
+          this.byAuthor[thisBlockAuthor] = thisBlockNumber;
+        }
+
+        this.lastHeaders = this.lastHeaders
+          .filter((old, index): boolean => index < MAX_HEADERS && old.number.unwrap().lt(blockNumber))
+          .reduce((next, header): HeaderExtended[] => {
+            next.push(header);
+
+            return next;
+          }, [lastHeader])
+          .sort((a, b) => b.number.unwrap().cmp(a.number.unwrap()));
+      }
+      return lastHeader;
+    }));
   }
   public deinit() {
     this._initialized = false;
