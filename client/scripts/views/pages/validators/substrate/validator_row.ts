@@ -3,7 +3,6 @@ import app from 'state';
 import BN from 'bn.js';
 import { ChainBase } from 'models';
 import { pluralize } from 'helpers';
-import { Observable } from 'rxjs';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';

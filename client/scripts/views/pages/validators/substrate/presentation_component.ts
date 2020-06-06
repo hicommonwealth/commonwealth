@@ -1,12 +1,20 @@
 import m from 'mithril';
 import app from 'state';
 import Substrate from 'controllers/chain/substrate/main';
+import { ChainBase } from 'models';
+import { formatNumber } from '@polkadot/util';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
+import RecentBlock from './recent_block';
 
 const PresentationComponent = (state, chain: Substrate) => {
   const validators = state.dynamic.validators;
   if (!validators) return;
+
+  const lastHeaders = (app.chain.base === ChainBase.Substrate)
+    ? (app.chain as Substrate).staking.lastHeaders
+    : [];
+
   return m(Tabs, [{
     name: 'Current Validators',
     content: m('table.validators-table', [
@@ -100,6 +108,24 @@ const PresentationComponent = (state, chain: Substrate) => {
             toBeElected
           });
         }),
+    ])
+  }, {
+    name: 'Recent Blocks',
+    content: m('table.validators-table', [
+      m('tr.validators-heading', [
+        m('th.val-block-number', 'Block #'),
+        m('th.val-block-hash', 'Hash'),
+        m('th.val-block-author', 'Author')
+      ]),
+      lastHeaders.map((lastHeader) => {
+        if (!lastHeader)
+          return null;
+        return m(RecentBlock, {
+          number: formatNumber(lastHeader.number),
+          hash: lastHeader.hash.toHex(),
+          author: lastHeader.author
+        });
+      })
     ])
   }]);
 };

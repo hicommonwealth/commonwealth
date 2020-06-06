@@ -2,16 +2,13 @@ import m from 'mithril';
 import { formatNumber } from '@polkadot/util';
 import { BlockNumber } from '@polkadot/types/interfaces';
 
-interface IValidatorState {
-  isNominating: boolean;
-}
 interface IValidatorAttrs {
   title: string;
   total: BlockNumber;
   value: BlockNumber;
 }
 
-const ActionForm: m.Component<IValidatorAttrs, IValidatorState> = {
+const CardSummary: m.Component<IValidatorAttrs, {}> = {
   view: (vnode) => {
     const { total, value, title } = vnode.attrs;
     const percentage: number = (value.muln(10000).div(total).toNumber() / 100);
@@ -27,4 +24,4 @@ const ActionForm: m.Component<IValidatorAttrs, IValidatorState> = {
   },
 };
 
-export default ActionForm;
+export default CardSummary;
