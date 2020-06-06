@@ -10,10 +10,9 @@ import {
   AccountData, Balance, BalanceLock, BalanceLockTo212, EraIndex,
   AccountId, Exposure, Conviction, StakingLedger, Registration
 } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
+import { Vec, u32 } from '@polkadot/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
-
 import { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
 import { Account, IAccountsModule, ChainClass } from 'models';
@@ -44,9 +43,11 @@ export interface IValidatorValue {
   isElected: boolean,
   toBeElected?: boolean,
   commissionPer?: number,
-  eraPoints?: string
+  eraPoints?: string,
+  blockCount?: u32,
+  hasMessage?: boolean,
+  isOnline?: boolean,
 }
-
 export interface IValidators {
   [address: string]: IValidatorValue;
 }
