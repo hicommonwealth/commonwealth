@@ -26,8 +26,7 @@ class SubstrateStaking implements StorageModule {
   // STORAGE
   private _store = new StakingStore();
   public get store() { return this._store; }
-  // change to public and create a new tab on staking ui
-  private lastHeaders: HeaderExtended[] = [];
+  public lastHeaders: HeaderExtended[] = [];
   public byAuthor: Record<string, string> = {};
   private _Chain: SubstrateChain;
 
