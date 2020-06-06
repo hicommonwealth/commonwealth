@@ -47,6 +47,7 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
       m(User, {
         user: author,
         tooltip: true,
+        linkify: true,
       }),
     ]);
   }

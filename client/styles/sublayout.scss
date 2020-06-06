@@ -1,0 +1,19 @@
+@import 'client/styles/shared';
+
+.Sublayout {
+    display: flex;
+    max-width: $sublayout-max-width;
+    margin: 0 auto;
+
+    > .left-sidebar {
+        width: $sidebar-width;
+        margin-right: $gutter-width;
+    }
+    > .right-sidebar {
+        width: $sidebar-width;
+        margin-left: $gutter-width;
+    }
+    > .sublayout-content {
+        flex: 1;
+    }
+}

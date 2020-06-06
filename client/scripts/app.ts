@@ -260,8 +260,8 @@ m.route.set = (...args) => {
   setTimeout(() => {
     const html = document.getElementsByTagName('html')[0];
     if (html) html.scrollTo(0, 0);
-    const mithrilApp = document.getElementsByClassName('mithril-app')[0];
-    if (mithrilApp) mithrilApp.scrollTo(0, 0);
+    const body = document.getElementsByTagName('body')[0];
+    if (body) body.scrollTo(0, 0);
   }, 0);
 };
 
@@ -303,7 +303,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, hideNavigation?: boolean) => ({
+  const importRoute = (module, scoped: string | boolean, wideLayout?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -317,7 +317,7 @@ $(() => {
           // false => scope is null
           : null;
       const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, hideNavigation }, [ vnode ]);
+      return m(Layout, { scope, activeTag, wideLayout }, [ vnode ]);
     },
   });
 
@@ -330,18 +330,18 @@ $(() => {
 
     // Landing pages
     '/':                         importRoute(import('views/pages/home'), false, true),
-    '/about':                    importRoute(import('views/pages/landing/about'), false, true),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false, true),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false, true),
+    '/about':                    importRoute(import('views/pages/landing/about'), false),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false, true),
+    '/login':                    importRoute(import('views/pages/login'), false),
     '/settings':                 importRoute(import('views/pages/settings'), false),
     '/notifications':            importRoute(import('views/pages/notifications'), false),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false, true),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false, true),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),

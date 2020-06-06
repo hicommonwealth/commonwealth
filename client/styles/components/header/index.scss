@@ -1,0 +1,64 @@
+@import 'client/styles/shared';
+
+.Header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0 30px;
+    background: #fff;
+    border-top: 6px solid $theme-base-color;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 0 4px rgba(0,0,0,0.07);
+    z-index: 1;
+    .header-content {
+        margin: 0 auto;
+        max-width: $sublayout-max-width;
+        display: flex;
+        align-items: center;
+        height: $header-height;
+        .placeholder,
+        .header-breadcrumb {
+            flex: 1;
+        }
+        > .cui-button {
+            margin-left: $header-spacing;
+        }
+        > .cui-button-group {
+            margin-left: $header-spacing;
+        }
+        .cui-button-label {
+            font-size: 14px;
+        }
+    }
+}
+
+// notifications menu (outside header, displayed in a cui-portal)
+.notification-menu {
+    .notification-list {
+        height: 480px;
+        background: #fff;
+        width: 340px;
+    }
+    .cui-menu {
+        max-width: 342px;
+        margin: 0;
+        padding: 0;
+        border-color: #d8dee0;
+        background: none;
+        overflow: hidden;
+    }
+    .cui-popover-arrow {
+        background: white;
+    }
+    .cui-list-item {
+        padding: 11px;
+    }
+    .no-notifications {
+        list-style: none;
+        text-align: center;
+        padding-top: 230px;
+        color: #546e7d;
+        font-weight: 600;
+    }
+}

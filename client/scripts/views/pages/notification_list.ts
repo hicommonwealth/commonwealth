@@ -5,6 +5,7 @@ import { default as m } from 'mithril';
 import app from 'state';
 import { NotificationSubscription, Notification, OffchainComment } from 'models';
 import User from 'views/components/widgets/user';
+import Sublayout from 'views/sublayout';
 import { NotificationCategories } from 'types';
 
 interface ISubscriptionRow {
@@ -175,7 +176,9 @@ const Notifications = {
 
 const NotificationsPage = {
   view: (vnode) => {
-    return m('.NotificationsPage', [
+    return m(Sublayout, {
+      class: 'NotificationsPage',
+    }, [
       m(Notifications)
     ]);
   }

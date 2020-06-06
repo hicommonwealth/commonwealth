@@ -224,7 +224,7 @@ describe('Webhook Tests', () => {
         jwt: jwtToken
       });
       res = await modelUtils.createThread({
-        chain,
+        chainId: chain,
         address: loggedInAddr,
         jwt: jwtToken,
         title: decodeURIComponent(markdownThread.title),
@@ -239,7 +239,7 @@ describe('Webhook Tests', () => {
         root_id: `discussion_${res.result.id}`,
       });
       res = await modelUtils.createThread({
-        chain,
+        chainId: chain,
         address: loggedInAddr,
         jwt: jwtToken,
         title: decodeURIComponent(richTextThread.title),

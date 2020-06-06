@@ -7,13 +7,18 @@ import mixpanel from 'mixpanel-browser';
 import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { OffchainTag } from 'models';
+import { OffchainTag, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { re_weburl } from 'lib/url-validation';
 
 import { notifyInfo } from 'controllers/app/notifications';
+import Sublayout from 'views/sublayout';
+import PreviewModal from 'views/modals/preview_modal';
+import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
+import { updateLastVisited } from 'controllers/app/login';
+import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
+import PageLoading from 'views/pages/loading';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
-import AutoCompleteTagForm from '../components/autocomplete_tag_form';
-import PageLoading from './loading';
 
 interface IState {
   form: IThreadForm,
@@ -266,7 +271,9 @@ const NewThreadPage: m.Component = {
       xl: 8,
     };
 
-    return m('.NewThreadPage', [
+    return m(Sublayout, {
+      class: 'NewThreadPage',
+    }, [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
         m(Grid, [

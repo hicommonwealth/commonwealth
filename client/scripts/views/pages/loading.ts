@@ -2,10 +2,14 @@ import 'pages/loading.scss';
 
 import m from 'mithril';
 import { Spinner } from 'construct-ui';
+import Sublayout from 'views/sublayout';
 
 const LoadingPage: m.Component<{ message?: string }> = {
   view: (vnode) => {
-    return m('.LoadingPage', [
+    return m(Sublayout, {
+      class: 'LoadingPage',
+      leftSidebar: null,
+    }, [
       m(Spinner, {
         fill: true,
         message: vnode.attrs.message,

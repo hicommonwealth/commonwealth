@@ -5,11 +5,10 @@
     justify-content: space-between;
     .discussions-main {
         flex: 1;
-        max-width: 720px;
-    }
-    .discussions-sidebar {
-        width: 300px;
-        padding-left: 30px;
+        max-width: 800px;
+        margin: 0px auto;
+        background: #fff;
+        box-shadow: 0 0 6px rgba(0,0,0,0.07);
     }
 
     h4 {

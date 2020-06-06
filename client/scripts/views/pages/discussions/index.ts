@@ -11,6 +11,7 @@ import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'constr
 import app from 'state';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
@@ -237,7 +238,9 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
 
-    return m('.DiscussionsPage', [
+    return m(Sublayout, {
+      class: 'DiscussionsPage',
+    }, [
       m('.discussions-main', [
         (app.chain || app.community) && [
           vnode.attrs.activeTag
@@ -245,17 +248,17 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
             : getHomepageListing(),
         ],
       ]),
-      m('.discussions-sidebar', [
-        m('h4', [
-          'About ',
-          selectedNode ? selectedNode.chain.name
-            : selectedCommunity ? selectedCommunity.meta.name : ''
-        ]),
-        m('p', [
-          selectedNode ? selectedNode.chain.description
-            : selectedCommunity ? selectedCommunity.meta.description : ''
-        ]),
-      ]),
+      // m('.discussions-sidebar', [
+      //   m('h4', [
+      //     'About ',
+      //     selectedNode ? selectedNode.chain.name
+      //       : selectedCommunity ? selectedCommunity.meta.name : ''
+      //   ]),
+      //   m('p', [
+      //     selectedNode ? selectedNode.chain.description
+      //       : selectedCommunity ? selectedCommunity.meta.description : ''
+      //   ]),
+      // ]),
     ]);
   },
 };
