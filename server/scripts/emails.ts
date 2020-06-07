@@ -87,9 +87,12 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
   const msg = {
     to: 'zak@commonwealth.im', // TODO user.email
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    subject: subjectLine,
-    templateId: 'd-7ccab17c309f45dab93b4290b3d396d1',
-    dynamic_template_data: emailObjArray,
+    templateId: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
+    dynamic_template_data: {
+      notifications: emailObjArray,
+      subject: 'hello dumbo',
+      user: 'zak',
+    },
   };
   await sgMail.send(msg);
   return msg;
