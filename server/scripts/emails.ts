@@ -57,7 +57,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 export const createRegularNotificationEmailObject = async (user, notifications) => {
   console.dir('create regular notification email object');
   // const emailObjArray = [];
-  const emailObjArray = Promise.all(notifications.map(async (n) => {
+  const emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
       chain_id, community_id, author_address, author_chain } = JSON.parse(n.notification_data);
     const decodedTitle = decodeURIComponent(root_title).trim();
@@ -78,15 +78,13 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
     const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
     const path = (getProposalUrl as any)(...args);
     return { path, content, decodedTitle, category_id, subscription: nSubscription };
-    // emailObjArray.push({ path, content, decodedTitle, category_id, subscription: nSubscription });
-    // console.dir(emailObjArray.length);
   }));
   console.dir('post-notifications');
   console.dir(emailObjArray);
 
   const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
   const msg = {
-    to: null,
+    to: null, // TODO
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
     data: emailObjArray,
@@ -115,9 +113,7 @@ export const sendRegularNotificationEmail = async (models, user) => {
   });
   console.dir(`notifications acquired: ${notifications.length}`);
   const msg = await createRegularNotificationEmailObject(user, notifications);
-  console.dir('msg');
-  console.dir(msg);
-
+  console.dir('sending msg');
   // if (NOTLIVE) {
   //   log.info('not live!');
   //   log.info(msg.text);
@@ -127,6 +123,7 @@ export const sendRegularNotificationEmail = async (models, user) => {
   //   await sgMail.send(msg);
   // }
   console.dir('end of send Regular Notification Email');
+  return msg;
 };
 
 export const sendBatchedNotificationEmails = async (models, interval: string) => {
@@ -138,8 +135,8 @@ export const sendBatchedNotificationEmails = async (models, interval: string) =>
     }
   });
   console.dir(`users: ${users.length}`);
-  await users.forEach(async (user) => {
-    sendRegularNotificationEmail(models, user);
+  const emails = await users.map(async (user) => {
+    return sendRegularNotificationEmail(models, user);
   });
-  console.dir('whole thing done');
+  console.dir(`emails send: ${emails.length}`);
 };
