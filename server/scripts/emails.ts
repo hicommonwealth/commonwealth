@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import sgMail from '@sendgrid/mail';
+// import sgMail from '@sendgrid/mail';
 import { SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
@@ -8,6 +8,7 @@ const { Op } = Sequelize;
 const log = factory.getLogger(formatFilename(__filename));
 
 import { IPostNotificationData, NotificationCategories } from '../../shared/types';
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 // immediate notification email
@@ -46,6 +47,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
     to: null,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
+    templateId: 'd-7ccab17c309f45dab93b4290b3d396d1',
     text: `${subjectLine}. <a href='${path}'>Click here</a>`,
     html: `${subjectLine}. <a href='${path}'>Click here</a>`,
   };
@@ -56,8 +58,8 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
 
 export const createRegularNotificationEmailObject = async (user, notifications) => {
   console.dir('create regular notification email object');
-  // const emailObjArray = [];
-  const emailObjArray = await Promise.all(notifications.map(async (n) => {
+  let emailObjArray = [];
+  emailObjArray = await Promise.all(notifications.map(async (n) => {
     const { created_at, root_id, root_title, root_type, comment_id, comment_text,
       chain_id, community_id, author_address, author_chain } = JSON.parse(n.notification_data);
     const decodedTitle = decodeURIComponent(root_title).trim();
@@ -80,15 +82,16 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
     return { path, content, decodedTitle, category_id, subscription: nSubscription };
   }));
   console.dir('post-notifications');
-  console.dir(emailObjArray);
 
   const subjectLine = `${notifications.length} unread notifications on Commonwealth!`;
   const msg = {
-    to: null, // TODO
+    to: 'zak@commonwealth.im', // TODO user.email
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
-    data: emailObjArray,
+    templateId: 'd-7ccab17c309f45dab93b4290b3d396d1',
+    dynamic_template_data: emailObjArray,
   };
+  await sgMail.send(msg);
   return msg;
 };
 
@@ -135,8 +138,9 @@ export const sendBatchedNotificationEmails = async (models, interval: string) =>
     }
   });
   console.dir(`users: ${users.length}`);
-  const emails = await users.map(async (user) => {
-    return sendRegularNotificationEmail(models, user);
-  });
-  console.dir(`emails send: ${emails.length}`);
+  const emails = await Promise.all(users.map(async (user) => {
+    await sendRegularNotificationEmail(models, user).then((msg) => { return msg; });
+  }));
+
+  console.dir(emails);
 };
