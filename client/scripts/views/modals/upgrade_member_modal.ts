@@ -18,6 +18,7 @@ const UpgradeMemberModal = {
     });
     if (!app.activeCommunityId()) return; // TODO: Check necessary?
     vnode.state.loadingStarted = true;
+    // TODO: Change to GET /members
     $.get(`${app.serverUrl()}/bulkMembers`, {
       community: app.activeCommunityId(),
     }).then((response) => {

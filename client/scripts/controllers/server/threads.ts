@@ -70,7 +70,9 @@ class ThreadsController {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
+
     try {
+      // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chainId,
@@ -113,6 +115,7 @@ class ThreadsController {
     const versionHistory = JSON.stringify(recentEdit);
 
     try {
+      // TODO: Change to PUT /thread
       const response = await $.post(`${app.serverUrl()}/editThread`, {
         'thread_id': proposal.id,
         'kind': proposal.kind,
@@ -139,6 +142,7 @@ class ThreadsController {
   public async delete(proposal) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {
         'jwt': app.login.jwt,
         'thread_id': proposal.id,
@@ -154,6 +158,7 @@ class ThreadsController {
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
+    // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,

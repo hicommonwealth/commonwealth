@@ -385,6 +385,8 @@ const instantiateEditor = (
   const uploadImg = async (file) => {
     return new Promise((resolve, reject) => {
       document.getElementsByClassName('ql-container')[0].appendChild(createSpinner());
+      // TODO: Change to POST /uploadSignature
+      // TODO: Reuse code since this is used in other places
       $.post(`${app.serverUrl()}/getUploadSignature`, {
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png

@@ -17,27 +17,16 @@ const modelFromServer = (tag) => {
 
 class TagsController {
   private _store: TagsStore = new TagsStore();
-
   private _initialized: boolean = false;
-
   public get store() { return this._store; }
-
   public get initialized() { return this._initialized; }
-
-  public getByIdentifier(id) {
-    return this._store.getById(id);
-  }
-
-  public getByCommunity(communityId) {
-    return this._store.getByCommunity(communityId);
-  }
-
-  public addToStore(tag: OffchainTag) {
-    return this._store.add(modelFromServer(tag));
-  }
+  public getByIdentifier(id) { return this._store.getById(id); }
+  public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
+  public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
 
   public async edit(tag: OffchainTag, featured_order?) {
     try {
+      // TODO: Change to PUT /tag
       const response = await $.post(`${app.serverUrl()}/editTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -90,6 +79,7 @@ class TagsController {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
         : { 'community': app.activeCommunityId() };
+      // TODO: Change to POST /tag
       const response = await $.post(`${app.serverUrl()}/createTag`, {
         ...chainOrCommObj,
         'name': name,
@@ -111,6 +101,7 @@ class TagsController {
 
   public async remove(tag) {
     try {
+      // TODO: Change to DELETE /tag
       const response = await $.post(`${app.serverUrl()}/deleteTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -128,6 +119,7 @@ class TagsController {
 
   public async refreshAll(chainId, communityId, reset = false) {
     try {
+      // TODO: Change to GET /tags
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
         chain: chainId || app.activeChainId(),
         community: communityId || app.activeCommunityId(),

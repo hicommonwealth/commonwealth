@@ -122,11 +122,13 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
 
     const loadCommunity = async () => {
       try {
+        // TODO: Change to GET /members
         const bulkMembers = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         vnode.state.roleData = bulkMembers.result;
 
         if (isAdmin(vnode, app.vm.activeAccount)) {
+          // TODO: Change to GET /webhooks
           const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
             { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
           if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');

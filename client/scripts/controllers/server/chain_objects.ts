@@ -24,6 +24,8 @@ export default class ChainObjectController<T> {
     if (objectId !== undefined) {
       queryArgs.object_id = objectId;
     }
+    // TODO: Change to GET /chainObjects
+    // TODO: Remove these controllers if we aren't using them
     const resp = await $.get(`${app.serverUrl()}/viewChainObjects`, queryArgs);
     if (resp.status !== 'Success') {
       throw new Error('failed to fetch chain objects');
