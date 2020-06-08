@@ -263,24 +263,12 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
-    const span = {
-      xs: 12,
-      sm: 12,
-      md: 11,
-      lg: 10,
-      xl: 8,
-    };
-
     return m(Sublayout, {
       class: 'NewThreadPage',
     }, [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
-        m(Grid, [
-          m(Col, { span }, [
-            m(NewThreadForm),
-          ])
-        ])
+        m(NewThreadForm),
       ]),
     ]);
   },
