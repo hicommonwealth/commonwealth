@@ -16,11 +16,11 @@
     "traceResolution": true
   },
   "include": [
-    "client",
-    "client/scripts",
-    "shared/adapters",
-    ".",
-    "eth/types"
+    "../client",
+    "../client/scripts",
+    "../shared/adapters",
+    "../",
+    "../eth/types"
   ],
   "exclude": [
     "../node_modules",

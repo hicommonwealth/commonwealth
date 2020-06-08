@@ -108,7 +108,7 @@ export default class extends IEventHandler {
     const entity = eventToEntity(event.data.kind);
     if (!entity) {
       log.trace(`no archival action needed for event of kind ${event.data.kind.toString()}`);
-      return;
+      return dbEvent;
     }
     const [ entityKind, updateType ] = entity;
     const fieldName = entityToFieldName(entityKind);
