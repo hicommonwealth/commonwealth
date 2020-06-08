@@ -12,6 +12,7 @@ import { WalletAccount } from 'nearlib';
 
 import { NotificationCategories } from 'types';
 import app, { LoginState } from 'state';
+import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
@@ -602,10 +603,10 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
             : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('.mithril-app').scrollTop();
+          const scrollTop = $('html, body').scrollTop();
           const replyTop = $reply.offset().top;
           if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-            $('.mithril-app').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
+            $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
 
           // highlight the reply form
           const animationDelayTime = 2000;
@@ -621,23 +622,27 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     };
 
     const { replyParent } = vnode.state;
-    return m('.ViewProposalPage', [
-      m(ProposalHeader, {
-        proposal,
-        commentCount,
-        viewCount,
-        getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
-      }),
-      m(ProposalComments, {
-        proposal,
-        comments,
-        createdCommentCallback,
-        replyParent,
-        getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
-      }),
-      m(ProposalSidebar, { proposal }),
+    return m(Sublayout, {
+      class: 'ViewProposalPage',
+      rightSidebar: m(ProposalSidebar, { proposal }),
+    }, [
+      m('.forum-container', [
+        m(ProposalHeader, {
+          proposal,
+          commentCount,
+          viewCount,
+          getSetGlobalEditingStatus,
+          getSetGlobalReplyStatus
+        }),
+        m(ProposalComments, {
+          proposal,
+          comments,
+          createdCommentCallback,
+          replyParent,
+          getSetGlobalEditingStatus,
+          getSetGlobalReplyStatus
+        }),
+      ]),
     ]);
   }
 };

@@ -4,6 +4,8 @@ import 'pages/subscriptions.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import _ from 'lodash';
+
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
@@ -12,10 +14,9 @@ import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
-import _ from 'lodash';
-import ListingPage from './_listing_page';
-import Tabs from '../components/widgets/tabs';
-import { DropdownFormField } from '../components/forms';
+import Sublayout from 'views/sublayout';
+import Tabs from 'views/components/widgets/tabs';
+import { DropdownFormField } from 'views/components/forms';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmailStatus: boolean, }> = {
   oninit: (vnode) => {
@@ -708,7 +709,9 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
     const communityIds = communities.map((c) => c.id);
 
     if (!app.loginStatusLoaded()) return;
-    return m('.SubscriptionsPage', [
+    return m(Sublayout, {
+      class: 'SubscriptionsPage',
+    }, [
       m(SubscriptionsPageSideBar, {
         selectedFilter,
         communities,

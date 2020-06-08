@@ -8,6 +8,7 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import { switchMap } from 'rxjs/operators';
 
 import app from 'state';
+import Sublayout from 'views/sublayout';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';
 import { formatCoin } from 'adapters/currency';
@@ -574,7 +575,9 @@ const AdminPage: m.Component<{}> = {
       return m(PageLoading);
     }
 
-    return m('.AdminPage', [
+    return m(Sublayout, {
+      class: 'AdminPage',
+    }, [
       m('.forum-container', [
         m(Tabs, [{
           name: 'Admin',

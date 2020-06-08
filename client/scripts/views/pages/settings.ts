@@ -6,6 +6,7 @@ import app from 'state';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { notifyInfo } from 'controllers/app/notifications';
+import Sublayout from 'views/sublayout';
 import AccountsWell from 'views/components/settings/accounts_well';
 import SettingsWell from 'views/components/settings/settings_well';
 import SendEDGWell from 'views/components/settings/send_edg_well';
@@ -19,7 +20,9 @@ const SettingsPage: m.Component<{}> = {
       m.route.set('/', {}, { replace: true });
       return;
     }
-    return m('.SettingsPage', [
+    return m(Sublayout, {
+      class: 'SettingsPage',
+    }, [
       !app.loginStatusLoaded()
         ? m('.forum-container', 'Loading...')
         : m('.forum-container', [

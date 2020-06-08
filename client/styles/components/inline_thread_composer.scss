@@ -27,7 +27,7 @@
     input[name='link-title'] {
         margin-bottom: 20px;
         margin-left: $left-margin;
-        width: calc(100% - $left-margin);
+        width: calc(100% - #{$left-margin});
     }
     input[name='thread-composer'], input[name='link-title'], .QuillEditor .ql-bubble .ql-editor {
         border: 1px solid #e4e4e4;

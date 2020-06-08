@@ -20,6 +20,7 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
       hoverCloseDelay: 0,
       trigger: m(Button, {
         iconLeft: Icons.BELL,
+        size: 'sm',
       }),
       position: 'bottom-end',
       closeOnContentClick: true,

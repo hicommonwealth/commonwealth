@@ -6,30 +6,31 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import {
   List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  SelectList, Button, Tag, Menu, MenuHeading, Popover
+  SelectList, Button, ButtonGroup, Tag, Menu, MenuHeading, Popover
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link, SwitchIcon } from 'helpers';
+import { featherIcon, link } from 'helpers';
+import { isRoleOfCommunity } from 'helpers/roles';
+import { getProposalUrl } from 'shared/utils';
+import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { ProposalType } from 'identifiers';
+import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
+import { OffchainCommunitiesStore } from 'stores';
+
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
-import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
-import { OffchainCommunitiesStore } from 'stores';
 
 import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import User from 'views/components/widgets/user';
 import TagSelector from 'views/components/sidebar/tag_selector';
-import ChainStatusIndicator from 'views/components/chain_status_indicator';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import CreateCommunityModal from 'views/modals/create_community_modal';
-import SelectAddressModal from 'views/modals/select_address_modal';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
 
@@ -37,76 +38,6 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
-
-import { getProposalUrl } from 'shared/utils';
-import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
-import { isRoleOfCommunity } from 'helpers/roles';
-
-import { initAppState } from 'app';
-import { notifySuccess } from 'controllers/app/notifications';
-import LoginModal from 'views/modals/login_modal';
-import EditProfileModal from 'views/modals/edit_profile_modal';
-import FeedbackModal from 'views/modals/feedback_modal';
-import EditIdentityModal from 'views/modals/edit_identity_modal';
-import AdminPanel from 'views/components/admin_panel';
-
-const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo, showStatus?: boolean }> = {
-  view: (vnode) => {
-    const { chain, community, showStatus } = vnode.attrs;
-
-    if (chain) return m('.CommunityLabel', [
-      m('.community-label-left', [
-        m(ChainIcon, { chain }),
-      ]),
-      m('.community-label-right', [
-        m('.community-name-row', [
-          m('span.community-name', chain.name),
-          showStatus === true && m(ChainStatusIndicator, { hideLabel: true }),
-        ]),
-        m('.community-id', `/${chain.id}`),
-      ]),
-    ]);
-
-    if (community) return m('.CommunityLabel', [
-      m('.community-label-left', [
-        m(CommunityIcon, { community }),
-      ]),
-      m('.community-label-right', [
-        m('.community-name-row', [
-          m('span.community-name', community.name),
-          showStatus === true && [
-            community.privacyEnabled && m('span.icon-lock'),
-            !community.privacyEnabled && m('span.icon-globe'),
-          ],
-        ]),
-        m('.community-id', `/${community.id}`),
-      ]),
-    ]);
-
-    return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Select a community'),
-    ]);
-  }
-};
-
-const CurrentCommunityLabel: m.Component<{}> = {
-  view: (vnode) => {
-    const nodes = app.config.nodes.getAll();
-    const activeNode = app.chain?.meta;
-    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
-                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
-    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
-
-    if (selectedNode) {
-      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true });
-    } else if (selectedCommunity) {
-      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true });
-    } else {
-      return m(CommunityLabel, { showStatus: true });
-    }
-  }
-};
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
@@ -161,36 +92,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     if (onNotificationsPage(m.route.get())) return;
 
-    const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-      .concat(app.config.chains.getAll())
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .sort((a, b) => {
-        // sort starred communities at top
-        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
-        if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
-        return 0;
-      })
-      .sort((a, b) => {
-        // sort current community at top
-        if (a instanceof ChainInfo && app.activeChainId() === a.id) return -1;
-        if (a instanceof CommunityInfo && app.activeCommunityId() === a.id) return -1;
-        return 0;
-      })
-      .filter((item) => {
-        // only show chains with nodes
-        return (item instanceof ChainInfo)
-          ? app.config.nodes.getByChain(item.id)?.length
-          : true;
-      });
-
-    const currentIndex = selectableCommunities.findIndex((item) => {
-      return item instanceof ChainInfo
-        ? app.activeChainId() === item.id
-        : item instanceof CommunityInfo
-          ? app.activeCommunityId() === item.id
-          : null;
-    });
-
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
@@ -200,67 +101,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           interactive: true,
           size: 'lg',
         }, [
-          // header
-          m('.title-selector', [
-            m(SelectList, {
-              closeOnSelect: true,
-              class: 'CommunitySelectList',
-              items: (selectableCommunities as any).concat('home'),
-              defaultActiveIndex: -1,
-              itemRender: (item) => {
-                return item instanceof ChainInfo
-                  ? m(ListItem, {
-                    class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-                    label: m(CommunityLabel, { chain: item }),
-                    selected: app.activeChainId() === item.id,
-                    contentRight: app.isLoggedIn() && isMember(item.id, null) && m('.community-star-toggle', {
-                      onclick: (e) => {
-                        app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-                      }
-                    }, [
-                      m(Icon, { name: Icons.STAR }),
-                    ]),
-                  })
-                  : item instanceof CommunityInfo
-                    ? m(ListItem, {
-                      class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                      label: m(CommunityLabel, { community: item }),
-                      selected: app.activeCommunityId() === item.id,
-                      contentRight: app.isLoggedIn() && isMember(null, item.id) && m('.community-star-toggle', {
-                        onclick: (e) => {
-                          app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-                        },
-                      }, [
-                        m(Icon, { name: Icons.STAR }),
-                      ]),
-                    })
-                    : m(ListItem, {
-                      class: 'select-list-back-home',
-                      label: 'Back to home',
-                    });
-              },
-              onSelect: (item: any) => {
-                m.route.set(item.id ? `/${item.id}` : '/');
-              },
-              filterable: false,
-              checkmark: false,
-              popoverAttrs: {
-                hasArrow: false
-              },
-              trigger: m(Button, {
-                align: 'left',
-                basic: true,
-                compact: true,
-                label: [
-                  m(CurrentCommunityLabel),
-                  m(SwitchIcon),
-                ],
-                style: 'min-width: 200px',
-              }),
-            }),
-            //   app.isLoggedIn() && (app.community || app.chain)
-            //     && m(SubscriptionButton),
-          ]),
           // community homepage
           (app.community || app.chain)
             && m(ListItem, {
@@ -354,142 +194,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
             && m(AdminPanel),
-          // login selector
-          !app.isLoggedIn()
-          // if logged out
-            ? m(ListItem, {
-              class: 'login-selector',
-              label: m('.login-selector-user', [
-                m(Button, {
-                  intent: 'primary',
-                  iconLeft: Icons.USER,
-                  size: 'sm',
-                  fluid: true,
-                  label: 'Log in',
-                  onclick: () => app.modals.create({ modal: LoginModal }),
-                }),
-              ]),
-            })
-          // if logged in
-            : m(ListItem, {
-              class: 'login-selector',
-              label: [
-                m('.login-selector-left', app.vm.activeAccount
-                  // if address selected
-                  ? [
-                    m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-                    m('.login-selector-user', [
-                      m('.user-info', [
-                        m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-                        m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                          ? `@${app.vm.activeAccount.address}`
-                          : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-                      ])
-                    ]),
-                  ]
-                  // if no address is selected
-                  : app.login.activeAddresses.length === 0 ? m(Button, {
-                    intent: 'none',
-                    iconLeft: Icons.USER_PLUS,
-                    size: 'sm',
-                    fluid: true,
-                    label: 'Link new address',
-                    onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-                  })
-                  // if addresses are available, but none is selected
-                    : m(Button, {
-                      label: 'Select an address',
-                      fluid: true,
-                      size: 'sm',
-                      onclick: () => app.modals.create({ modal: SelectAddressModal }),
-                    })),
-                m('.login-selector-right', [
-                  // logged in
-                  app.isLoggedIn() && m(PopoverMenu, {
-                    closeOnContentClick: true,
-                    transitionDuration: 0,
-                    hoverCloseDelay: 0,
-                    position: 'bottom-end',
-                    trigger: m(Button, {
-                      class: app.vm.activeAccount ? 'address-menu' : 'address-menu cui-button-icon',
-                      intent: 'none',
-                      size: 'sm',
-                      fluid: true,
-                      label: m(Icon, { name: Icons.SETTINGS }),
-                    }),
-                    content: [
-                      m(MenuItem, {
-                        label: 'Go to profile',
-                        iconLeft: Icons.USER,
-                        onclick: (e) => {
-                          m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-                        },
-                        disabled: !(
-                          app.vm.activeAccount
-                            && app.vm.activeAccount.chain
-                            && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`)
-                      }),
-                      app.vm.activeAccount
-                        && m(MenuItem, {
-                          onclick: () => app.modals.create({
-                            modal: EditProfileModal,
-                            data: app.vm.activeAccount
-                          }),
-                          iconLeft: Icons.EDIT,
-                          label: 'Edit Profile'
-                        }),
-                      m(MenuItem, {
-                        onclick: async () => app.modals.create({
-                          modal: EditIdentityModal,
-                          data: { account: app.vm.activeAccount },
-                        }),
-                        iconLeft: Icons.LINK,
-                        label: 'Set on-chain ID'
-                      }),
-                      m(MenuDivider),
-                      (app.chain || app.community) && m(MenuItem, {
-                        onclick: async () => app.modals.create({
-                          modal: SelectAddressModal,
-                        }),
-                        iconLeft: Icons.USER,
-                        label: 'Switch address'
-                      }),
-                      m(MenuItem, {
-                        onclick: () => m.route.set('/settings'),
-                        iconLeft: Icons.SETTINGS,
-                        label: 'Settings'
-                      }),
-                      app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
-                        onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
-                        iconLeft: Icons.USER,
-                        label: 'Admin'
-                      }),
-                      m(MenuItem, {
-                        onclick: () => app.modals.create({ modal: FeedbackModal }),
-                        iconLeft: Icons.SEND,
-                        label: 'Send feedback',
-                      }),
-                      m(MenuItem, {
-                        onclick: () => {
-                          $.get(`${app.serverUrl()}/logout`).then(async () => {
-                            await initAppState();
-                            notifySuccess('Logged out');
-                            m.route.set('/');
-                            m.redraw();
-                          }).catch((err) => {
-                            // eslint-disable-next-line no-restricted-globals
-                            location.reload();
-                          });
-                          mixpanel.reset();
-                        },
-                        iconLeft: Icons.X_SQUARE,
-                        label: 'Logout'
-                      }),
-                    ]
-                  }),
-                ])
-              ]
-            }),
         ]),
         // // chat (all communities)
         // (app.community || app.chain) &&

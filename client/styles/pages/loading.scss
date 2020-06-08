@@ -1,8 +1,4 @@
 @import 'client/styles/shared';
 
 .LoadingPage {
-    position: absolute;
-    padding-left: $sidebar-width + $layout-padding;
-    height: calc(100% - #{$header-height + $layout-padding + $layout-padding-top});
-    width: calc(100% - #{$sidebar-width + ($layout-padding * 2)});
 }

@@ -5,6 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
 import { ProposalType, proposalSlugToFriendlyName } from 'identifiers';
+import Sublayout from 'views/sublayout';
 import NewProposalForm from './new_proposal_form';
 
 const NewProposalPage = {
@@ -13,7 +14,9 @@ const NewProposalPage = {
   view: (vnode) => {
     vnode.state.typeEnum = vnode.attrs.type;
     vnode.state.titlePre = 'Create';
-    return m('.NewProposalPage', [
+    return m(Sublayout, {
+      class: 'NewProposalPage',
+    }, [
       m('.forum-container', [
         m('h2.page-title', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
         m(NewProposalForm, {
