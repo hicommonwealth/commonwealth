@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 import Quill from 'quill';
-import moment from 'moment-twitter';
+import moment from 'moment';
 import { OffchainThread, OffchainComment } from 'models';
 import { CompactModalExitButton } from '../modal';
 import QuillFormattedText from '../components/quill_formatted_text';
