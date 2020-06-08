@@ -62,7 +62,7 @@ function setupPassport(models) {
       // check associations and log in the correct user
       const user = await githubAccount.getUser();
       if (req.user === null && user === null) {
-        const newUser = await models.User.create({ email: null });
+        const newUser = await models.User.create({ email: profile.email });
         await githubAccount.setUser(newUser);
         return cb(null, newUser);
       } else if (req.user && req.user !== user) {
