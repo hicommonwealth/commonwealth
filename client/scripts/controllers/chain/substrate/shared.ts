@@ -44,13 +44,12 @@ import {
   ChainEventType,
 } from 'models';
 
-import { CWEvent } from 'events/interfaces';
+import { CWEvent, eventToEntity, entityToFieldName } from 'events/interfaces';
 import EdgewareStorageFetcher from 'events/edgeware/storageFetcher';
 import EdgewareEventSubscriber from 'events/edgeware/subscriber';
 import EdgewareEventProcessor from 'events/edgeware/processor';
 import {
-  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-  eventToEntity, entityToFieldName, ISubstrateEventData
+  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents, ISubstrateEventData
 } from 'events/edgeware/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -294,8 +293,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   // handle a single incoming chain event emitted from client connection with node
   private _handleCWEvent(chain: string, cwEvent: CWEvent<ISubstrateEventData>): void {
     // immediately return if no entity involved, event unrelated to proposals/etc
-    const entityKind = eventToEntity(cwEvent.data.kind);
-    if (!entityKind) return;
+    const eventEntity = eventToEntity(cwEvent.data.kind);
+    if (!eventEntity) return;
+    const [ entityKind ] = eventEntity;
 
     // create event type
     const eventType = new ChainEventType(

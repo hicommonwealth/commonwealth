@@ -3,16 +3,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 
-import { resetDatabase } from '../../../../server-test';
-import models from '../../../../server/database';
-import { CWEvent } from '../../../../shared/events/interfaces';
-import StorageHandler from '../../../../server/eventHandlers/storage';
-import EntityArchivalHandler from '../../../../server/eventHandlers/edgeware/entityArchival';
-import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../../shared/events/edgeware/types';
-import { NotificationCategories, WebsocketMessageType } from '../../../../shared/types';
+import { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
+import { CWEvent } from '../../../shared/events/interfaces';
+import StorageHandler from '../../../server/eventHandlers/storage';
+import EntityArchivalHandler from '../../../server/eventHandlers/entityArchival';
+import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../shared/events/edgeware/types';
+import { WebsocketMessageType } from '../../../shared/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;

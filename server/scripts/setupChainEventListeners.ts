@@ -1,11 +1,9 @@
 import WebSocket from 'ws';
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
-import EdgewareMigrationHandler from '../eventHandlers/edgeware/migration';
-import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchival';
+import MigrationHandler from '../eventHandlers/migration';
+import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import MolochMigrationHandler from '../eventHandlers/moloch/migration';
-import MolochEntityArchivalHandler from '../eventHandlers/moloch/entityArchival';
 import subscribeMolochEvents from '../../shared/events/moloch/index';
 import { IDisconnectedRange, IEventHandler, EventSupportingChains } from '../../shared/events/interfaces';
 import { EdgewareEventChains } from '../../shared/events/edgeware/types';
@@ -43,12 +41,8 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
   await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
-      let migrationHandler;
-      let entityArchivalHandler;
       let subscribeFn;
       if (EdgewareEventChains.includes(node.chain)) {
-        migrationHandler = new EdgewareMigrationHandler(models, node.chain);
-        entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
         const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
         const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
         const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
@@ -62,8 +56,6 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           migrate,
         );
       } else if (MolochEventChains.includes(node.chain)) {
-        migrationHandler = new MolochMigrationHandler(models, node.chain);
-        entityArchivalHandler = new MolochEntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
         subscribeFn = (evtHandlers) => subscribeMolochEvents(
           node.chain,
           node.url,
@@ -76,6 +68,11 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       }
       const storageHandler = new EventStorageHandler(models, node.chain);
       const notificationHandler = new EventNotificationHandler(models, wss);
+      const migrationHandler = new MigrationHandler(models, node.chain);
+      const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+
+      // handlers are run in order, so if migrating, we run migration -> entityArchival,
+      // but normally it's storage -> notification -> entityArchival
       if (migrate) {
         handlers.push(migrationHandler, entityArchivalHandler);
       } else {

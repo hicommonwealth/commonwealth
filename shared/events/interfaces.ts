@@ -10,6 +10,11 @@ export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
 export type IChainEventData = ISubstrateEventData | IMolochEventData;
 export type IChainEventKind = SubstrateEventKind | MolochEventKind;
 export const EventSupportingChains = [...EdgewareEventChains, ...MolochEventChains];
+export enum EntityEventKind {
+  Create = 0,
+  Update,
+  Complete,
+}
 
 export interface CWEvent<IEventData = IChainEventData> {
   blockNumber: number;
@@ -96,3 +101,112 @@ export interface IEventTitle {
 export type TitlerFilter = (
   kind: IChainEventKind,
 ) => IEventTitle;
+
+export function entityToFieldName(entity: IChainEntityKind): string | null {
+  switch (entity) {
+    case SubstrateEntityKind.DemocracyProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.DemocracyReferendum: {
+      return 'referendumIndex';
+    }
+    case SubstrateEntityKind.DemocracyPreimage: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.TreasuryProposal: {
+      return 'proposalIndex';
+    }
+    case SubstrateEntityKind.CollectiveProposal: {
+      return 'proposalHash';
+    }
+    case SubstrateEntityKind.SignalingProposal: {
+      return 'proposalHash';
+    }
+    case MolochEntityKind.Proposal: {
+      return 'proposalIndex';
+    }
+    default: {
+      // should be exhaustive
+      const dummy: never = entity;
+      return null;
+    }
+  }
+}
+
+export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, EntityEventKind ] {
+  switch (event) {
+    case SubstrateEventKind.DemocracyProposed: {
+      return [ SubstrateEntityKind.DemocracyProposal, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.DemocracyTabled: {
+      return [ SubstrateEntityKind.DemocracyProposal, EntityEventKind.Complete ];
+    }
+
+    case SubstrateEventKind.DemocracyStarted: {
+      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.DemocracyPassed: {
+      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Update ];
+    }
+    case SubstrateEventKind.DemocracyNotPassed:
+    case SubstrateEventKind.DemocracyCancelled:
+    case SubstrateEventKind.DemocracyExecuted: {
+      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Complete ];
+    }
+
+    case SubstrateEventKind.PreimageNoted: {
+      return [ SubstrateEntityKind.DemocracyPreimage, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.PreimageUsed:
+    case SubstrateEventKind.PreimageInvalid:
+    case SubstrateEventKind.PreimageReaped: {
+      return [ SubstrateEntityKind.DemocracyPreimage, EntityEventKind.Complete ];
+    }
+
+    case SubstrateEventKind.TreasuryProposed: {
+      return [ SubstrateEntityKind.TreasuryProposal, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.TreasuryRejected:
+    case SubstrateEventKind.TreasuryAwarded: {
+      return [ SubstrateEntityKind.TreasuryProposal, EntityEventKind.Complete ];
+    }
+
+    case SubstrateEventKind.CollectiveProposed: {
+      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.CollectiveVoted:
+    case SubstrateEventKind.CollectiveApproved: {
+      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Update ];
+    }
+    case SubstrateEventKind.CollectiveDisapproved:
+    case SubstrateEventKind.CollectiveExecuted: {
+      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Complete ];
+    }
+
+    // Signaling Events
+    case SubstrateEventKind.SignalingNewProposal: {
+      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Create ];
+    }
+    case SubstrateEventKind.SignalingCommitStarted:
+    case SubstrateEventKind.SignalingVotingStarted: {
+      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Update ];
+    }
+    case SubstrateEventKind.SignalingVotingCompleted: {
+      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Complete ];
+    }
+
+    // Moloch Events
+    case MolochEventKind.SubmitProposal: {
+      return [ MolochEntityKind.Proposal, EntityEventKind.Create ];
+    }
+    case MolochEventKind.SubmitVote: {
+      return [ MolochEntityKind.Proposal, EntityEventKind.Update ];
+    }
+    case MolochEventKind.ProcessProposal: {
+      return [ MolochEntityKind.Proposal, EntityEventKind.Complete ];
+    }
+    default: {
+      return null;
+    }
+  }
+}

@@ -27,7 +27,7 @@ Adding a new Edgeware event requires the following steps:
 5. If the event relates to an existing _entity_ (see ["Adding a new entity"](#Adding-a-new-entity) below), then perform the following steps to include the new event in the entity's processing:
   * Ensure your interface from step 3 contains the same identifying item as the rest of the events relating to that entity.
   * In [entityArchival.ts](../../server/eventHandlers/edgeware/entityArchival.ts), add the appropriate `createEntityFn` or `updateEntityFn` case for the new event.
-  * If a migration of historical event data should be performed for the new event (typically not necessary), then you must add the event to the "auxiliary" union types at the bottom of [types.ts](edgeware/types.ts), and also to the `eventToEntity` function beneath it. Additionally, you must add API queries that enable you to synthesize the event in [migration.ts](edgeware/migration.ts).
+  * If a migration of historical event data should be performed for the new event (typically not necessary), then you must add the event to the "auxiliary" union types at the bottom of [types.ts](edgeware/types.ts), and also to the `eventToEntity` function in [interfaces.ts](interfaces.ts). Additionally, you must add API queries that enable you to synthesize the event in [migration.ts](edgeware/migration.ts).
 6. Test out your change by triggering the event on a local testnet, and by writing a test case for the enricher, in [enricher.spec.ts](../../test/unit/events/edgeware/enricher.spec.ts).
 
 ## Adding a new entity

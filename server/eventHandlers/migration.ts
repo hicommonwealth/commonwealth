@@ -1,10 +1,11 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
-import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
-import { eventToEntity, entityToFieldName, ISubstrateEventData } from '../../../shared/events/edgeware/types';
+import {
+  IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData
+} from '../../shared/events/interfaces';
 
-import { factory, formatFilename } from '../../../shared/logging';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -19,7 +20,7 @@ export default class extends IEventHandler {
    * Handles an event during the migration process, by creating or updating existing
    * events depending whether we've seen them before.
    */
-  public async handle(event: CWEvent<ISubstrateEventData>) {
+  public async handle(event: CWEvent<IChainEventData>) {
     // case by entity type to determine what value to look for
     const createOrUpdateModel = async (fieldName, fieldValue) => {
       const dbEventType = await this._models.ChainEventType.findOne({ where: {
@@ -52,8 +53,9 @@ export default class extends IEventHandler {
       }
     };
 
-    const entityKind = eventToEntity(event.data.kind);
-    if (entityKind === null) return null;
+    const entity = eventToEntity(event.data.kind);
+    if (!entity) return null;
+    const [ entityKind ] = entity;
     const fieldName = entityToFieldName(entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];

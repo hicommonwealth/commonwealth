@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["../*", "../shared/*", "../client/scripts/*", "../eth/types/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": true
+  },
+  "include": [
+    "client",
+    "client/scripts",
+    "shared/adapters",
+    ".",
+    "eth/types"
+  ],
+  "exclude": [
+    "../node_modules",
+    "../client/scripts/controllers/chain/ethereum/contracts/*"
+  ]
+}

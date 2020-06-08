@@ -4,12 +4,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { resetDatabase } from '../../../../server-test';
-import models from '../../../../server/database';
-import { CWEvent } from '../../../../shared/events/interfaces';
-import { SubstrateEventKind, ISubstrateEventData } from '../../../../shared/events/edgeware/types';
-import StorageHandler from '../../../../server/eventHandlers/storage';
-import MigrationHandler from '../../../../server/eventHandlers/edgeware/migration';
+import { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
+import { CWEvent } from '../../../shared/events/interfaces';
+import { SubstrateEventKind, ISubstrateEventData } from '../../../shared/events/edgeware/types';
+import StorageHandler from '../../../server/eventHandlers/storage';
+import MigrationHandler from '../../../server/eventHandlers/migration';
 
 chai.use(chaiHttp);
 const { assert } = chai;
