@@ -103,7 +103,7 @@ function setupPassport(models) {
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
     } else {
-      const newUser = await models.User.create({ email: null });
+      const newUser = await models.User.create({ email: profile.email });
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
