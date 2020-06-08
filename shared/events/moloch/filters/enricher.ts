@@ -1,6 +1,5 @@
 import { CWEvent } from '../../interfaces';
-import { MolochEventKind, MolochRawEvent, IMolochEventData } from '../types';
-import { MolochApi } from '../index';
+import { MolochEventKind, MolochRawEvent, IMolochEventData, MolochApi } from '../types';
 import { Moloch1 } from '../../../../eth/types/Moloch1';
 
 // these functions unwrap the uint type received from chain,

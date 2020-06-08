@@ -4,8 +4,7 @@
 import { Listener } from 'ethers/providers';
 
 import { IEventSubscriber } from '../interfaces';
-import { MolochApi } from '.';
-import { MolochRawEvent } from './types';
+import { MolochRawEvent, MolochApi } from './types';
 
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));

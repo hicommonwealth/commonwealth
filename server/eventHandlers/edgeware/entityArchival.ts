@@ -4,7 +4,7 @@
 import WebSocket from 'ws';
 import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../shared/events/edgeware/types';
-import { NotificationCategories, WebsocketMessageType, IWebsocketsPayload } from '../../../shared/types';
+import { wssSendEntity } from '../util';
 
 import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -16,25 +16,6 @@ export default class extends IEventHandler {
     private readonly _wss?: WebSocket.Server,
   ) {
     super();
-  }
-
-  public async wssSend(dbEntity, dbEvent) {
-    if (!this._wss) return;
-    const dbEventType = await dbEvent.getChainEventType();
-    const payload: IWebsocketsPayload<any> = {
-      event: WebsocketMessageType.ChainEntity,
-      data: {
-        object_id: dbEntity.id,
-        chainEntity: dbEntity.toJSON(),
-        chainEvent: dbEvent.toJSON(),
-        chainEventType: dbEventType.toJSON(),
-      }
-    };
-    try {
-      this._wss.emit(WebsocketMessageType.ChainEntity, payload);
-    } catch (e) {
-      log.warn(`Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`);
-    }
   }
 
   /**
@@ -65,7 +46,7 @@ export default class extends IEventHandler {
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
-      await this.wssSend(dbEntity, dbEvent);
+      await wssSendEntity(this._wss, dbEntity, dbEvent);
 
       // TODO: create thread?
       return dbEvent;
@@ -92,7 +73,7 @@ export default class extends IEventHandler {
         dbEntity.completed = true;
         await dbEntity.save();
       }
-      await this.wssSend(dbEntity, dbEvent);
+      await wssSendEntity(this._wss, dbEntity, dbEvent);
 
       return dbEvent;
     };
