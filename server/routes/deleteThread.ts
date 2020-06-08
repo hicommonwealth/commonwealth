@@ -3,18 +3,18 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 enum DeleteThreadErrors {
-  NotLoggedIn = 'Not logged in',
-  NoThreadId = 'Must provide thread_id',
+  NoUser = 'Not logged in',
+  NoThread = 'Must provide thread_id',
   NoPermission = 'Not owned by this user'
 }
 
 const deleteThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
   if (!req.user) {
-    return next(new Error(DeleteThreadErrors.NotLoggedIn));
+    return next(new Error(DeleteThreadErrors.NoUser));
   }
   if (!thread_id) {
-    return next(new Error(DeleteThreadErrors.NoThreadId));
+    return next(new Error(DeleteThreadErrors.NoThread));
   }
 
   try {

@@ -1,15 +1,24 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
 
+enum UpdateTagsErrors {
+  NoUser = 'Not logged in',
+  NoThread = 'Must provide thread_id',
+  NoAddr = 'Must provide address',
+  NoTag = 'Must provide tag_name',
+  InvalidAddr = 'Invalid address',
+  NoPermission = `You do not have permission to edit post's tags`
+}
+
 const updateTags = async (models, req, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.thread_id) return next(new Error('Must provide thread_id'));
-  if (!req.body.address) return next(new Error('Must provide address'));
-  if (!req.body.tag_name) return next(new Error('Must provide tag_name'));
+  if (!req.user) return next(new Error(UpdateTagsErrors.NoUser));
+  if (!req.body.thread_id) return next(new Error(UpdateTagsErrors.NoThread));
+  if (!req.body.address) return next(new Error(UpdateTagsErrors.NoAddr));
+  if (!req.body.tag_name) return next(new Error(UpdateTagsErrors.NoTag));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find((a) => a.verified && a.address === req.body.address);
-  if (!userAddress) return next(new Error('Invalid address'));
+  if (!userAddress) return next(new Error(UpdateTagsErrors.InvalidAddr));
 
   const thread = await models.OffchainThread.findOne({
     where: {
@@ -31,7 +40,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
   const isAdminOrMod = roles.length > 0;
   const isAuthor = (thread.author_id === userAddress.id);
   if (!isAdminOrMod && !isAuthor) {
-    return next(new Error(`You do not have permission to edit this post's tags`));
+    return next(new Error(UpdateTagsErrors.NoPermission));
   }
 
   // remove deleted tags
