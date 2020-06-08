@@ -1,0 +1,11 @@
+@import 'client/styles/shared';
+
+.GithubWell {
+    @include well;
+    h4 {
+        margin-top: 20px;
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+}

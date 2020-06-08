@@ -1,39 +1,50 @@
 import 'components/settings/settings_well.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 
 import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { selectNode } from 'app';
-import { NodeInfo } from 'models';
+import { SocialAccount } from 'models';
+import { Button } from 'construct-ui';
 
 interface IState {
-  initialized: boolean;
-  showMoreSettings: boolean;
+  githubAccount: SocialAccount;
 }
 
 const GithubWell: m.Component<{}, IState> = {
+  oninit: (vnode) => {
+    vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
+  },
   view: (vnode) => {
-    const nodes = (app.chain && app.chain.meta ? [] : [{
-      name: 'node',
-      label: 'Select a node',
-      value: undefined,
-      selected: true,
-    }]).concat(app.config.nodes.getAll().map((n) => ({
-      name: 'node',
-      label: `${n.chain.id} - ${n.url}`,
-      value: n.id,
-      selected: app.chain && app.chain.meta && n.url === app.chain.meta.url && n.chain === app.chain.meta.chain,
-    })));
-
+    const { githubAccount } = vnode.state;
     return m('.GithubWell', [
       m('form', [
-        m('h4', 'Email'),
-        m('input[type="email"]', {
-          value: app.login.socialAccounts || 'None'
+        m('h4', 'Github'),
+        m('input[type="text"]', {
+          value: githubAccount.username || 'None',
         }),
+        m(Button, {
+          label: githubAccount ? 'Unlink Account' : 'Link Account',
+          href: githubAccount ? '#' : `${app.serverUrl()}/auth/github`,
+          onclick: () => {
+            if (githubAccount) {
+              $.post(`${app.serverUrl()}/deleteGithubAccount`, { jwt: app.login.jwt }).then((response) => {
+                if (response.status === 'Success') vnode.state.githubAccount = null;
+              }).catch((err: any) => {
+                console.dir(err);
+                m.redraw();
+              });
+            } else {
+              localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
+                timestamp: (+new Date()).toString(),
+                path: m.route.get()
+              }));
+            }
+          },
+        })
       ]),
     ]);
   }

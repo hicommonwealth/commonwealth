@@ -58,6 +58,7 @@ import upgradeMember from './routes/upgradeMember';
 import createInviteLink from './routes/createInviteLink';
 import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
+import deleteGithubAccount from './routes/deleteGithubAccount';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -182,6 +183,10 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // offchain profiles
   router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
+
+  // social accounts
+  router.post('/deleteGithubAccount', passport.authenticate('jwt', { session: false }), deleteGithubAccount.bind(this, models));
+
 
   // offchain viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
