@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
+import $ from 'jquery';
+import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification } from 'models';

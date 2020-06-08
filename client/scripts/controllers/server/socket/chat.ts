@@ -1,5 +1,5 @@
 /*
-import { default as moment } from 'moment-twitter';
+import moment from 'moment-twitter';
 import { Account } from 'models';
 import app from 'state';
 import WebsocketController, { IWebsocketsPayload } from '.';

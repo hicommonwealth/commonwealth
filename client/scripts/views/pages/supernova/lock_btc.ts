@@ -1,8 +1,8 @@
 import 'pages/supernova/lock_btc.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import $ from 'jquery';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import { TextInputFormField } from '../../components/forms';
 import CodeBlock from '../../components/widgets/code_block';

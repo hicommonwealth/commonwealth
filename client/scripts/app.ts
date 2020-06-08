@@ -4,8 +4,8 @@ import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -14,8 +14,8 @@ import { Layout, LoadingLayout } from 'views/layout';
 import { ChainInfo, CommunityInfo, NodeInfo,
   OffchainTag, ChainClass, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { default as moment } from 'moment-twitter';
-import { default as mixpanel } from 'mixpanel-browser';
+import moment from 'moment-twitter';
+import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';

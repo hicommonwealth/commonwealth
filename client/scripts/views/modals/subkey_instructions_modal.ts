@@ -1,6 +1,6 @@
 import 'modals/subkey_instructions_modal.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import CodeBlock from 'views/components/widgets/code_block';
 
 const SubkeyInstructionsModal: m.Component<{}> = {

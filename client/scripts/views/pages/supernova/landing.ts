@@ -1,9 +1,9 @@
 import 'pages/supernova/landing.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
-import { default as moment } from 'moment-twitter';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
+import moment from 'moment-twitter';
 import Countdown from 'views/components/countdown';
 
 import app from 'state';
