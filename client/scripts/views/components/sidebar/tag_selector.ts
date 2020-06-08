@@ -248,10 +248,10 @@ const NewTagButton: m.Component = {
 };
 
 const TagSelector: m.Component<{
-  activeTag: string, showFullListing: boolean, hideEditButton?: boolean
+  activeTag: string, hideEditButton?: boolean
 }, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
-    const { activeTag, showFullListing, hideEditButton } = vnode.attrs;
+    const { activeTag, hideEditButton } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
 
@@ -278,7 +278,7 @@ const TagSelector: m.Component<{
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
-      featuredTagListing.length > 0 && showFullListing && m('h4', 'Pinned to sidebar'),
+      featuredTagListing.length > 0 && m('h4', 'Pinned'),
       featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
@@ -294,9 +294,8 @@ const TagSelector: m.Component<{
           }
         }
       }, featuredTagListing),
-      showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
-      showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
-      showFullListing && isCommunityAdmin() && m(NewTagButton),
+      otherTagListing.length > 0 && m(List, { class: 'other-tag-list' }, otherTagListing),
+      isCommunityAdmin() && m(NewTagButton),
     ]);
   },
 };

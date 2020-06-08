@@ -16,7 +16,7 @@ const TagsPage = {
       class: 'TagsPage',
     }, [
       m('.forum-container', [
-        m(TagSelector, { activeTag: null, showFullListing: true, hideEditButton: false }),
+        m(TagSelector, { activeTag: null, hideEditButton: false }),
       ]),
     ]);
   },

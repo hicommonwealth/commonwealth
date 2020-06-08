@@ -111,7 +111,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             }),
           // discussions (all communities)
           (app.community || app.chain)
-            && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
+            && m(TagSelector, { activeTag, hideEditButton: true }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
             && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
@@ -119,7 +119,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
               active: onProposalPage(m.route.get()),
               label: 'Proposals',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
@@ -132,7 +131,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
@@ -181,7 +179,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: onMembersPage(m.route.get()),
               label: 'Members',
               onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: 'octagon' }),
             }),
           (app.community || app.chain)
             && m(ListItem, {
@@ -189,7 +186,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               active: m.route.get() === `/${app.activeId()}/tags/`,
               label: 'Tags',
               onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-              contentLeft: m(Icon, { name: 'octagon' }),
             }),
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
