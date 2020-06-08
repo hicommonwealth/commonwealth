@@ -1,5 +1,4 @@
 module.exports = (sequelize, DataTypes) => {
-
   const OffchainThread = sequelize.define('OffchainThread', {
     author_id: { type: DataTypes.INTEGER, allowNull: false },
     title: { type: DataTypes.TEXT, allowNull: false },

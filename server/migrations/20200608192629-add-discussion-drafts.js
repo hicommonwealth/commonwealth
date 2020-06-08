@@ -11,8 +11,11 @@ module.exports = {
       chain: { type: DataTypes.STRING, allowNull: true },
       community: { type: DataTypes.STRING, allowNull: true },
       attachment: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'OffchainAttachment', key: 'id' } },
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false },
+    }, {
+      underscored: true,
+      indexes: [
+        { fields: ['author_id'] },
+      ],
     });
   },
 
