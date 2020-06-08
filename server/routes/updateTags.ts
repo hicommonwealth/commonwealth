@@ -47,7 +47,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
   let newTag;
   if (req.body.tag_id) {
     thread.tag_id = req.body.tag_id;
-    thread.save();
+    await thread.save();
     newTag = await models.OffchainTag.findOne({
       where: { id: req.body.tag_id }
     });
@@ -60,7 +60,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
       },
     });
     thread.tag_id = newTag.id;
-    thread.save();
+    await thread.save();
   }
   return res.json({ status: 'Success', result: newTag });
 };
