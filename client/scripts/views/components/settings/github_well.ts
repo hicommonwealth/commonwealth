@@ -1,4 +1,4 @@
-import 'components/settings/settings_well.scss';
+import 'components/settings/github_well.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -8,7 +8,7 @@ import { DropdownFormField, RadioSelectorFormField } from 'views/components/form
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { SocialAccount } from 'models';
-import { Button } from 'construct-ui';
+import { Button, Input, Icons, Icon } from 'construct-ui';
 
 interface IState {
   githubAccount: SocialAccount;
@@ -23,16 +23,20 @@ const GithubWell: m.Component<{}, IState> = {
     return m('.GithubWell', [
       m('form', [
         m('h4', 'Github'),
-        m('input[type="text"]', {
-          value: githubAccount.username || 'None',
+        githubAccount && m(Input, {
+          value: githubAccount?.username || '',
+          contentLeft: m(Icon, { name: Icons.GITHUB }),
+          disabled: true,
         }),
         m(Button, {
           label: githubAccount ? 'Unlink Account' : 'Link Account',
-          href: githubAccount ? '#' : `${app.serverUrl()}/auth/github`,
+          href: githubAccount ? '' : `${app.serverUrl()}/auth/github`,
+          intent: githubAccount ? 'negative' : 'none',
           onclick: () => {
             if (githubAccount) {
-              $.post(`${app.serverUrl()}/deleteGithubAccount`, { jwt: app.login.jwt }).then((response) => {
-                if (response.status === 'Success') vnode.state.githubAccount = null;
+              $.post(`${app.serverUrl()}/deleteGithubAccount`, { jwt: app.login.jwt }).then((res) => {
+                if (res.status === 'Success') vnode.state.githubAccount = null;
+                m.redraw();
               }).catch((err: any) => {
                 console.dir(err);
                 m.redraw();
@@ -42,6 +46,7 @@ const GithubWell: m.Component<{}, IState> = {
                 timestamp: (+new Date()).toString(),
                 path: m.route.get()
               }));
+              m.redraw();
             }
           },
         })
