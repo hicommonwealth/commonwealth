@@ -1,6 +1,6 @@
 import 'components/autocomplete_tag_form.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { symbols } from '../../helpers';
 import { AutoCompleteForm } from './autocomplete_input';
 

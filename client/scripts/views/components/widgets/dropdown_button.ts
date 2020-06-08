@@ -1,7 +1,7 @@
 import 'components/widgets/dropdown_button.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 
 import { featherIcon } from 'helpers';
 

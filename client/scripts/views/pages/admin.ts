@@ -1,8 +1,8 @@
 import 'pages/admin.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import $ from 'jquery';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
 import { switchMap } from 'rxjs/operators';

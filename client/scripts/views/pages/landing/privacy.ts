@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
 
 const PrivacyPolicy = `

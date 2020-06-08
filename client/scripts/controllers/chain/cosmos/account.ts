@@ -1,4 +1,4 @@
-import { default as _ } from 'lodash';
+import _ from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 

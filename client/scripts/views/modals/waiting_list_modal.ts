@@ -1,8 +1,8 @@
 import 'modals/waiting_list_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
 const sampleAddresses = {

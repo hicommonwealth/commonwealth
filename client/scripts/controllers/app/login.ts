@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 
 import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';

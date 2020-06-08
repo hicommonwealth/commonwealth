@@ -1,8 +1,8 @@
 /* eslint-disable no-useless-escape */
 import 'components/markdown_formatted_text.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 // Three-pass Markdown formatter.
 //

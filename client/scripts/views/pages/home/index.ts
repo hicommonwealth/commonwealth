@@ -1,6 +1,6 @@
 import 'pages/home/index.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import MarketingModules from './marketing_modules';
 import CommunityCards from './community_cards';
 import Header from './header';
