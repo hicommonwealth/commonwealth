@@ -1,8 +1,8 @@
 import 'components/inline_thread_composer.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import _ from 'lodash';
+import $ from 'jquery';
 import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';

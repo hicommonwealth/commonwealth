@@ -1,8 +1,8 @@
 import 'pages/discussions/discussion_row.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import m from 'mithril';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 import { Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';

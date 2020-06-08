@@ -1,5 +1,5 @@
-import { default as m } from 'mithril';
-import { default as moment } from 'moment-twitter';
+import m from 'mithril';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { Account } from 'models';

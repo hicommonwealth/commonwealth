@@ -1,8 +1,8 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
+import m from 'mithril';
+import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
 import { Tooltip } from 'construct-ui';
 

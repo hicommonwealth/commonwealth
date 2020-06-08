@@ -1,8 +1,8 @@
 import 'pages/supernova/lookup.scss';
 
 import app from 'state';
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 import { pluralize } from 'helpers';
 import { isHex, formatNumber } from 'views/stats/stats_helpers';

@@ -1,6 +1,6 @@
 import 'pages/notifications.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import app from 'state';
 import { NotificationSubscription, Notification, OffchainComment } from 'models';

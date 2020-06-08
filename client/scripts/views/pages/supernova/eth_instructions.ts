@@ -1,5 +1,5 @@
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 import CodeBlock from '../../components/widgets/code_block';
 import SocialShare from './social_share';

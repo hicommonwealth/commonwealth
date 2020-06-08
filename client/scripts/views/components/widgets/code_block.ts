@@ -1,7 +1,7 @@
 import 'components/widgets/code_block.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 
 interface IAttrs {
   clickToSelect: boolean;

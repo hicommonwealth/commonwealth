@@ -1,9 +1,9 @@
 import 'components/hedgehog_login_form.scss';
 
 import axios from 'axios';
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as app } from 'state';
+import $ from 'jquery';
+import m from 'mithril';
+import app from 'state';
 import { createUserWithAddress } from 'controllers/app/login';
 import { EthereumAccount } from 'client/scripts/controllers/chain/ethereum/account';
 

@@ -1,7 +1,7 @@
 import 'modals/council_voting_modal.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 import app from 'state';
 

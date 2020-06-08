@@ -1,7 +1,7 @@
 import 'components/forms.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 
 interface ITextFormFieldAttrs {

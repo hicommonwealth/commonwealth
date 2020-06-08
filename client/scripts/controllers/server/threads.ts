@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
-import { ProposalStore } from 'stores';
+import _ from 'lodash';
+import moment from 'moment-twitter';
+import { ProposalStore, TagsStore } from 'stores';
 import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
-import { default as $ } from 'jquery';
+import $ from 'jquery';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 

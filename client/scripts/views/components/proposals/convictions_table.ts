@@ -1,6 +1,6 @@
 import 'components/proposals/convictions_table.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';

@@ -1,7 +1,7 @@
 import 'components/widgets/account_balance.scss';
 
 import { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import { Coin, formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
