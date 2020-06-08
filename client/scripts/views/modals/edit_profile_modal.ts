@@ -1,7 +1,7 @@
 import 'modals/edit_profile_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 import {
   PROFILE_BIO_MAX_CHARS,

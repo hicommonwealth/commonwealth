@@ -1,6 +1,6 @@
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import $ from 'jquery';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';

@@ -1,8 +1,8 @@
 import 'pages/council.scss';
 
-import { default as _ } from 'lodash';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import _ from 'lodash';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';

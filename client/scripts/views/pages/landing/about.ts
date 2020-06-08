@@ -1,7 +1,7 @@
 import 'pages/landing/about.scss';
 
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import LandingPage from 'views/pages/landing/landing';
 import { renderMultilineText } from 'helpers';
 

@@ -1,8 +1,8 @@
 import 'components/widgets/character_limited_text_input.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import _ from 'lodash';
+import $ from 'jquery';
 
 const debouncedRedraw = _.debounce(() => { m.redraw(); }, 100, { leading: true, trailing: true });
 

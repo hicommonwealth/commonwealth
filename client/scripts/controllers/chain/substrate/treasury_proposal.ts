@@ -9,7 +9,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { ISubstrateTreasuryProposed, SubstrateEventKind } from 'events/edgeware/types';
-import { default as SubstrateChain } from './shared';
+import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
 

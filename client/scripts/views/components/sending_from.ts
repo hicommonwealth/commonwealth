@@ -1,6 +1,6 @@
 import 'components/sending_from.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import User from 'views/components/widgets/user';
 import { Coin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';

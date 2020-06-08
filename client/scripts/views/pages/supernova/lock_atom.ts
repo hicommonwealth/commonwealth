@@ -1,8 +1,8 @@
 import 'pages/supernova/lock_atom.scss';
 
 import app from 'state';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';

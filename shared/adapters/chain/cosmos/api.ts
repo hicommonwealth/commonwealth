@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
 import * as $ from 'jquery';
-import { default as _ } from 'lodash';
+import _ from 'lodash';
 import { takeWhile } from 'rxjs/operators';
 
 export interface ITxEvent {

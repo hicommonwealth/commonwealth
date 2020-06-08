@@ -1,6 +1,8 @@
 import 'components/autocomplete_tag_form.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
+import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
+import { OffchainTag } from 'client/scripts/models';
 import { symbols } from '../../helpers';
 import { AutoCompleteForm } from './autocomplete_input';
 

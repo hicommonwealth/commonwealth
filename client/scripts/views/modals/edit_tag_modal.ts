@@ -1,7 +1,7 @@
 import 'modals/edit_tag_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as app } from 'state';
+import m from 'mithril';
+import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 

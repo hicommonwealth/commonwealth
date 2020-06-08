@@ -1,4 +1,4 @@
-import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
+import SubstrateChain from 'controllers/chain/substrate/shared';
 
 class EdgewareChain extends SubstrateChain {
 

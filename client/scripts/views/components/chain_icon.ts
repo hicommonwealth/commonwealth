@@ -1,6 +1,6 @@
 import 'components/chain_icon.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { ChainInfo, CommunityInfo } from 'models';
 
 export const ChainIcon: m.Component<{ chain: ChainInfo }> = {

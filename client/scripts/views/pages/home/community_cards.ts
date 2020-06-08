@@ -1,6 +1,6 @@
 import 'pages/home/community_cards.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { link } from 'helpers';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import MembershipButton, { isMember } from 'views/components/membership_button';

@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import 'components/quill_formatted_text.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 import { stringUpperFirst } from '@polkadot/util';
 import { loadScript } from '../../helpers';
 
