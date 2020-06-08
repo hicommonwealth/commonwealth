@@ -8,7 +8,8 @@ import { Card } from 'construct-ui';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import TagSelector from 'views/components/sidebar/tag_selector';
+import { isCommunityAdmin } from 'views/pages/discussions/roles';
+import TagSelector, { NewTagButton } from 'views/components/sidebar/tag_selector';
 
 const TagsPage = {
   view: (vnode) => {
@@ -17,6 +18,8 @@ const TagsPage = {
     }, [
       m('.forum-container', [
         m(TagSelector, { activeTag: null, hideEditButton: false }),
+        m('br'),
+        isCommunityAdmin() && m(NewTagButton),
       ]),
     ]);
   },

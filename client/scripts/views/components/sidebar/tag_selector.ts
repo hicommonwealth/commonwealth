@@ -230,7 +230,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
   return ({ featuredTagListing, otherTagListing });
 };
 
-const NewTagButton: m.Component = {
+export const NewTagButton: m.Component = {
   view: (vnode) => {
     return m(Button, {
       class: '',
@@ -278,7 +278,6 @@ const TagSelector: m.Component<{
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
-      featuredTagListing.length > 0 && m('h4', 'Pinned'),
       featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
@@ -295,7 +294,6 @@ const TagSelector: m.Component<{
         }
       }, featuredTagListing),
       otherTagListing.length > 0 && m(List, { class: 'other-tag-list' }, otherTagListing),
-      isCommunityAdmin() && m(NewTagButton),
     ]);
   },
 };
