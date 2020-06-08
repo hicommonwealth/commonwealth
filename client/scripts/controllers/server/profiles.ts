@@ -41,6 +41,7 @@ class ProfilesController {
 
   public async updateProfileForAccount(account, data) {
     return new Promise((resolve, reject) => {
+      // TODO: Change to PUT /profile
       $.post(`${app.serverUrl()}/updateProfile`, {
         chain: account.chain.id,
         address: account.address,
@@ -73,6 +74,7 @@ class ProfilesController {
     const ps = await Promise.all(chunkedProfiles.map(async (chunk): Promise<Profile[]> => {
       const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
       try {
+        // TODO: Change to GET /profiles
         const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
           'addresses[]': chunk.map((profile) => profile.address),
           'chains[]': chunk.map((profile) => profile.chain),

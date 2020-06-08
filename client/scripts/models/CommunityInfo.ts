@@ -43,6 +43,7 @@ class CommunityInfo {
     privacyEnabled: boolean,
     invitesEnabled: boolean
   ) {
+    // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
@@ -70,6 +71,7 @@ class CommunityInfo {
 
   public async updateFeaturedTags(tags: string[]) {
     try {
+      // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
         'featured_tags[]': tags,
