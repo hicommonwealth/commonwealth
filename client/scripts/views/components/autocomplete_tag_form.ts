@@ -64,7 +64,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       view: (vnode_) => {
         return m('a.no-matching-tags', {
           href: '#',
-          onclick: () => addTag(),
+          onclick: addTag,
         }, 'No matches found. Add tag?');
       }
     };

@@ -80,8 +80,8 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   let comment;
   try {
     comment = await models.OffchainComment.create(commentContent);
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    return next(err);
   }
 
   let parentComment;

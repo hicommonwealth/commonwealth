@@ -2,13 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+enum DeleteThreadErrors {
+  NotLoggedIn = 'Not logged in',
+  NoThreadId = 'Must provide thread_id',
+  NoPermission = 'Not owned by this user'
+}
+
 const deleteThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new Error(DeleteThreadErrors.NotLoggedIn));
   }
   if (!thread_id) {
-    return next(new Error('Must provide thread_id'));
+    return next(new Error(DeleteThreadErrors.NoThreadId));
   }
 
   try {
@@ -18,7 +24,7 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       include: [ models.Chain, models.OffchainCommunity ]
     });
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
-      return next(new Error('Not owned by this user'));
+      return next(new Error(DeleteThreadErrors.NoPermission));
     }
 
     const tag = await models.OffchainTag.findOne({
