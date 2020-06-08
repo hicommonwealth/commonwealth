@@ -10,6 +10,7 @@ import Sublayout from 'views/sublayout';
 import AccountsWell from 'views/components/settings/accounts_well';
 import SettingsWell from 'views/components/settings/settings_well';
 import SendEDGWell from 'views/components/settings/send_edg_well';
+import GithubWell from 'views/components/settings/github_well';
 
 const SettingsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -28,6 +29,7 @@ const SettingsPage: m.Component<{}> = {
         : m('.forum-container', [
           m('h2.page-title', 'Settings'),
           m(SettingsWell),
+          m(GithubWell),
           m(AccountsWell),
           !app.community && app.vm.activeAccount && app.vm.activeAccount instanceof SubstrateAccount
             && m(SendEDGWell, { sender: app.vm.activeAccount }),
