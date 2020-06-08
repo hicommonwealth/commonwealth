@@ -14,17 +14,6 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { title, body, tag } = req.body;
 
-  const mentions = typeof req.body['mentions[]'] === 'string'
-    ? [req.body['mentions[]']]
-    : typeof req.body['mentions[]'] === 'undefined'
-      ? []
-      : req.body['mentions[]'];
-  const tags = typeof req.body['tags[]'] === 'string'
-    ? [req.body['tags[]']]
-    : typeof req.body['tags[]'] === 'undefined'
-      ? []
-      : req.body['tags[]'];
-
   if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
     return next(new Error(Errors.NoBodyOrAttachments));
   }

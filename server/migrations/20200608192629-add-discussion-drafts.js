@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('UserDrafts', {
+    return queryInterface.createTable('DiscussionDraft', {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       author_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Addresses', key: 'id' } },
       title: { type: DataTypes.TEXT, allowNull: true },
@@ -17,6 +17,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('UserDrafts');
+    return queryInterface.dropTable('DiscussionDraft');
   }
 };
