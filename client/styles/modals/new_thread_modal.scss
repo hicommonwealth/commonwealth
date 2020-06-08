@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .NewThreadModal {
     max-width: 640px;
     min-height: 410px;
@@ -5,5 +7,12 @@
 
     .ql-editor {
         min-height: 160px;
+    }
+}
+
+.NewThreadForm {
+    .error-message {
+        @include error-text;
+        margin: 10px 0 20px;
     }
 }

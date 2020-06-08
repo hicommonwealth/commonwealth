@@ -71,8 +71,12 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     return m(SelectList, {
       class: 'AutocompleteTagForm',
+      checkmark: false,
       emptyContent: m(EmptyContent),
-      inputAttrs: { class: 'autocomplete-tag-input' },
+      inputAttrs: {
+        class: 'autocomplete-tag-input',
+        placeholder: 'Select a tag...',
+      },
       itemPredicate,
       itemRender,
       items: sortTags(tags),
@@ -85,9 +89,9 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         label: vnode.state.selectedTag
           ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
           : '',
-        sublabel: 'Category',
+        sublabel: vnode.state.selectedTag ? '' : 'Select a tag (required)',
         tabindex
-      })
+      }),
     });
   },
 };
