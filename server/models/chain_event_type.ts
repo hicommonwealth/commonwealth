@@ -1,9 +1,35 @@
-module.exports = (sequelize, DataTypes) => {
-  const ChainEventType = sequelize.define('ChainEventType', {
+import * as Sequelize from 'sequelize';
+
+import { ChainEventAttributes } from './chain_event';
+import { ChainAttributes } from './chain';
+
+export interface ChainEventTypeAttributes {
+  id: string;
+  chain: string;
+  event_name: string;
+
+  ChainEvents?: ChainEventAttributes[];
+  Chain?: ChainAttributes;
+}
+
+export interface ChainEventTypeInstance
+extends Sequelize.Instance<ChainEventTypeAttributes>, ChainEventTypeAttributes {
+
+}
+
+export interface ChainEventTypeModel extends Sequelize.Model<ChainEventTypeInstance, ChainEventTypeAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): ChainEventTypeModel => {
+  const ChainEventType = sequelize.define<ChainEventTypeInstance, ChainEventTypeAttributes>('ChainEventType', {
     // id = chain-event_name (event_name is value of string enum)
-    id: { type: DataTypes.STRING, primaryKey: true },
-    chain: { type: DataTypes.STRING, allowNull: false },
-    event_name: { type: DataTypes.STRING, allowNull: false },
+    id: { type: dataTypes.STRING, primaryKey: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
+    event_name: { type: dataTypes.STRING, allowNull: false },
   }, {
     timestamps: false,
     underscored: true,

@@ -1,7 +1,7 @@
 import 'pages/settings.scss';
 
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

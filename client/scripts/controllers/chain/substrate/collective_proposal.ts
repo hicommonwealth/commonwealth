@@ -10,7 +10,7 @@ import {
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/edgeware/types';
-import { default as SubstrateChain } from './shared';
+import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 
@@ -88,7 +88,6 @@ export class SubstrateCollectiveProposal
   }
 
   public update(e: ChainEvent) {
-    console.log(e);
     if (this.completed) {
       return;
     }

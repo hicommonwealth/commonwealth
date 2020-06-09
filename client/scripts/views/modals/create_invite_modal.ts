@@ -63,8 +63,10 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
 
           let postType: string;
           if (selection === 'address') {
+            // TODO: Change to POST /member
             postType = '/addMember';
           } else if (selection === 'email') {
+            // TODO: Change to POST /invite
             postType = '/createInvite';
           } else {
             return;

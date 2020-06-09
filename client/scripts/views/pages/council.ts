@@ -1,8 +1,8 @@
 import 'pages/council.scss';
 
-import { default as _ } from 'lodash';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import _ from 'lodash';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
@@ -27,13 +27,12 @@ import ViewVotersModal from 'views/modals/view_voters_modal';
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
   title: string;
-  reelection: boolean;
 }
 
 const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
-    const { account, reelection, title } = vnode.attrs;
+    const { account, title } = vnode.attrs;
     const election = (app.chain as Substrate).phragmenElections;
 
     const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
@@ -91,10 +90,6 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
           m('.proposal-row-metadata', election.isMember(account)
             ? election.backing(account).format(true)
             : votes.length),
-        ]),
-        reelection && m('.item', [
-          m('.proposal-row-subheading', 'Candidate for re-election'),
-          m('.proposal-row-metadata', 'Yes' )
         ]),
       ]),
       m('.proposal-row-xs-clear'),
@@ -249,30 +244,30 @@ const CouncilPage: m.Component<{}> = {
         ]),
       ],
     }, [
-        // councillors
-        m('h4.proposals-subheader', 'Councillors'),
-        councillors.length === 0
-          ? m('.no-proposals', 'No members')
-          : m('.councillors', [
-            councillors.map(
-              (account) => m(CollectiveMember, { account, title: 'Councillor', reelection: true })
-            ),
-            m('.clear'),
-          ]),
-        // candidates
-        m('h4.proposals-subheader', [
-          'Candidates',
-          m(CollectiveVotingButton, { candidates }),
-          m(CandidacyButton, { activeAccountIsCandidate, candidates }),
+      // councillors
+      m('h4.proposals-subheader', 'Councillors'),
+      councillors.length === 0
+        ? m('.no-proposals', 'No members')
+        : m('.councillors', [
+          councillors.map(
+            (account) => m(CollectiveMember, { account, title: 'Councillor' })
+          ),
+          m('.clear'),
         ]),
-        candidates.length === 0
-          ? m('.no-proposals', 'No candidates')
-          : m('.council-candidates', [
-            candidates
-              .filter(([ account ]) => !councillors.includes(account))
-              .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate', reelection: false })),
-            m('.clear'),
-          ]),
+      // candidates
+      m('h4.proposals-subheader', [
+        'Candidates',
+        m(CollectiveVotingButton, { candidates }),
+        m(CandidacyButton, { activeAccountIsCandidate, candidates }),
+      ]),
+      candidates.length === 0
+        ? m('.no-proposals', 'No candidates')
+        : m('.council-candidates', [
+          candidates
+            .filter(([ account ]) => !councillors.includes(account))
+            .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
+          m('.clear'),
+        ]),
     ]);
   },
 };

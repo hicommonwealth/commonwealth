@@ -1,8 +1,8 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 
 import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
@@ -21,6 +21,7 @@ import {
 import moment from 'moment';
 
 function createAccount(account: Account<any>) {
+  // TODO: Change to POST /address
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
@@ -204,6 +205,7 @@ export async function createUserWithAddress(address: string, keytype?: string): 
 
 export function unlinkLogin(account) {
   const unlinkingCurrentlyActiveAccount = app.vm.activeAccount === account;
+  // TODO: Change to DELETE /address
   return $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
     chain: account.chain,

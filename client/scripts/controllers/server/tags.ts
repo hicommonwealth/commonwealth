@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { TagsStore } from 'stores';
-import { IUniqueId, OffchainThread, OffchainTag } from 'models';
+import { OffchainTag } from 'models';
 import app from 'state';
 
 const modelFromServer = (tag) => {
@@ -17,27 +17,16 @@ const modelFromServer = (tag) => {
 
 class TagsController {
   private _store: TagsStore = new TagsStore();
-
   private _initialized: boolean = false;
-
   public get store() { return this._store; }
-
   public get initialized() { return this._initialized; }
+  public getByIdentifier(id) { return this._store.getById(id); }
+  public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
+  public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
 
-  public getByIdentifier(id) {
-    return this._store.getById(id);
-  }
-
-  public getByCommunity(communityId) {
-    return this._store.getByCommunity(communityId);
-  }
-
-  public addToStore(tag: OffchainTag) {
-    return this._store.add(modelFromServer(tag));
-  }
-
-  public async edit(tag: OffchainTag, featured_order?) {
+  public async edit(tag: OffchainTag, featured_order?: boolean) {
     try {
+      // TODO: Change to PUT /tag
       const response = await $.post(`${app.serverUrl()}/editTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -67,6 +56,7 @@ class TagsController {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
         : { 'community': app.activeCommunityId() };
+      // TODO: Change to POST /tag
       const response = await $.post(`${app.serverUrl()}/createTag`, {
         ...chainOrCommObj,
         'name': name,
@@ -88,6 +78,7 @@ class TagsController {
 
   public async remove(tag) {
     try {
+      // TODO: Change to DELETE /tag
       const response = await $.post(`${app.serverUrl()}/deleteTag`, {
         'id': tag.id,
         'community': tag.communityId,
@@ -105,6 +96,7 @@ class TagsController {
 
   public async refreshAll(chainId, communityId, reset = false) {
     try {
+      // TODO: Change to GET /tags
       const response = await $.get(`${app.serverUrl()}/bulkTags`, {
         chain: chainId || app.activeChainId(),
         community: communityId || app.activeCommunityId(),
@@ -126,8 +118,14 @@ class TagsController {
     }
   }
 
-  public removeFromStore(tag: OffchainTag) {
-    return this._store.remove(tag);
+  public getTagListing = (tag, activeTag) => {
+    // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
+    // addition to the TagStore, since said store will be more up-to-date
+    const existing = this.getByIdentifier(tag.id);
+    if (!existing) this.addToStore(tag);
+    const { id, name, description } = existing || tag;
+    const selected = name === activeTag;
+    return { id, name, description, selected };
   }
 }
 

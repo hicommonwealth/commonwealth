@@ -1,4 +1,4 @@
-import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
+import EthereumChain from 'controllers/chain/ethereum/chain';
 import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';

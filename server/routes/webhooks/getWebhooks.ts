@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const getWebhooks = async (models, req: Request, res: Response, next: NextFunction) => {

@@ -4,7 +4,7 @@ import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import { ProposalModule, ChainEntity, } from 'models';
-import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
+import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateEntityKind } from 'events/edgeware/types';

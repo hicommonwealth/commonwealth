@@ -1,7 +1,7 @@
 import 'components/membership_button.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { Button, Icon, Icons, MenuItem, MenuDivider, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
@@ -34,6 +34,7 @@ const MembershipButton: m.Component<{
     if (!app.login.roles) return;
 
     const createRoleWithAddress = (a, e) => {
+      // TODO: Change to POST /role
       $.post('/api/createRole', {
         jwt: app.login.jwt,
         address_id: a.id,
@@ -50,7 +51,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Joined ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);
@@ -66,7 +67,7 @@ const MembershipButton: m.Component<{
         m.redraw();
         return;
       }
-
+      // TODO: Change to DELETE /role
       $.post('/api/deleteRole', {
         jwt: app.login.jwt,
         address_id: a.id,
@@ -86,7 +87,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Left ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);

@@ -1,6 +1,6 @@
 import 'components/chain_status_indicator.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import app, { ApiStatus } from 'state';
 
 interface IAttrs {

@@ -42,7 +42,6 @@ describe('Update Community/Chain Tests', () => {
       invitesEnabled: 'false',
       id: 'tester',
       name: 'tester community',
-      creator_id: result.user_id,
       creator_address: loggedInAddr,
       creator_chain: chain,
       description: 'Tester community community',

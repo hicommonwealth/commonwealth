@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const status = async (models, req: Request, res: Response, next: NextFunction) => {

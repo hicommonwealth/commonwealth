@@ -40,6 +40,7 @@ class ChainInfo {
   }
 
   public async updateChainData(name: string, description: string,) {
+    // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
       'name': name,
@@ -63,6 +64,7 @@ class ChainInfo {
 
   public async updateFeaturedTags(tags: string[]) {
     try {
+      // TODO: Change to PUT /chain
       await $.post(`${app.serverUrl()}/updateChain`, {
         'id': app.activeChainId(),
         'featured_tags[]': tags,

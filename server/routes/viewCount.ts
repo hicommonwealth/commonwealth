@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const viewCount = async (models, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {

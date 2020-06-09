@@ -1,6 +1,6 @@
 import 'pages/supernova/key_gen.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import CodeBlock from '../../components/widgets/code_block';
 import SupernovaPreheader from './supernova_preheader';

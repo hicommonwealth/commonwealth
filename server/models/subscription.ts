@@ -4,6 +4,9 @@ import Sequelize from 'sequelize';
 import sgMail from '@sendgrid/mail';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SENDGRID_API_KEY } from '../config';
+import { UserAttributes } from './user';
+import { NotificationCategoryAttributes } from './notification_category';
+import { NotificationAttributes } from './notification';
 import {
   WebsocketMessageType, IWebsocketsPayload,
   IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData
@@ -15,27 +18,51 @@ const log = factory.getLogger(formatFilename(__filename));
 const { Op } = Sequelize;
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-module.exports = (sequelize, DataTypes) => {
-  const Subscription = sequelize.define('Subscription', {
-    subscriber_id: { type: DataTypes.INTEGER, allowNull: false },
-    category_id: { type: DataTypes.STRING, allowNull: false },
-    object_id: { type: DataTypes.STRING, allowNull: false },
-    is_active: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false },
-    immediate_email: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
-  }, {
-    underscored: true,
-    paranoid: true,
-    indexes: [
-      { fields: ['subscriber_id'] },
-      { fields: ['category_id', 'object_id', 'is_active'] },
-    ],
-  });
+export interface SubscriptionAttributes {
+  id?: number;
+  subscriber_id: number;
+  category_id: string;
+  object_id: string;
+  is_active?: boolean;
+  immediate_email?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+  User?: UserAttributes;
+  NotificationCategory?: NotificationCategoryAttributes;
+  Notifications?: NotificationAttributes[];
+}
 
-  Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.Notification);
-  };
+export interface SubscriptionInstance
+extends Sequelize.Instance<SubscriptionAttributes>, SubscriptionAttributes {
+
+}
+
+export interface SubscriptionModel
+extends Sequelize.Model<SubscriptionInstance, SubscriptionAttributes> {
+  emitNotifications?: any;
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): SubscriptionModel => {
+  const Subscription: SubscriptionModel = sequelize.define<SubscriptionInstance, SubscriptionAttributes>(
+    'Subscription', {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
+      category_id: { type: dataTypes.STRING, allowNull: false },
+      object_id: { type: dataTypes.STRING, allowNull: false },
+      is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
+      immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+    }, {
+      underscored: true,
+      paranoid: true,
+      indexes: [
+        { fields: ['subscriber_id'] },
+        { fields: ['category_id', 'object_id', 'is_active'] },
+      ],
+    }
+  );
 
   Subscription.emitNotifications = async (
     models,
@@ -151,6 +178,12 @@ module.exports = (sequelize, DataTypes) => {
       wss.emit(WebsocketMessageType.Notification, payload, userNotificationMap);
     }
     return notifications;
+  };
+
+  Subscription.associate = (models) => {
+    models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
+    models.Subscription.hasMany(models.Notification);
   };
 
   return Subscription;

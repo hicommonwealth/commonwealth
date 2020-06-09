@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
+import $ from 'jquery';
+import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent } from 'models';
@@ -51,6 +51,7 @@ class ChainEntityController {
     if (!loadIncompleteEntities) {
       options.completed = true;
     }
+    // TODO: Change to GET /entities
     return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);

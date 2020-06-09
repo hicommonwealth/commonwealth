@@ -1,4 +1,4 @@
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';

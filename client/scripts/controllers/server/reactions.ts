@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-restricted-syntax */
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import $ from 'jquery';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
@@ -45,6 +45,7 @@ class ReactionsController {
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
+      // TODO: Change to POST /reaction
       const response = await $.post(`${app.serverUrl()}/createReaction`, options);
       const { result } = response;
       this._store.add(modelFromServer(result));
@@ -57,14 +58,12 @@ class ReactionsController {
   }
 
   public async refresh(post: any, chainId: string, communityId: string) {
-    const options = {
-      chain: chainId,
-      community: communityId,
-    };
+    const options = { chain: chainId, community: communityId };
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).identifier;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
+      // TODO: Remove any verbs from these route names '/reactions'
       const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
@@ -91,6 +90,7 @@ class ReactionsController {
   public async delete(reaction) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /reaction
       $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.login.jwt,
         reaction_id: reaction.id,
@@ -107,6 +107,7 @@ class ReactionsController {
 
   public async refreshAll(chainId: string, communityId: string, reset = false) {
     try {
+      // TODO: Change to GET /reactions
       const response = await $.get(`${app.serverUrl()}/bulkReactions`, {
         chain: chainId,
         community: communityId,

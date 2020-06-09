@@ -273,7 +273,6 @@ describe('Thread Tests', () => {
         invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
-        creator_id: userId,
         creator_address: userAddress,
         creator_chain: chain,
         description: 'test enabled community',
@@ -623,6 +622,57 @@ describe('Thread Tests', () => {
         });
       expect(res.body.error).to.not.be.null;
       expect(res.status).to.be.equal(500);
+    });
+
+    it('should fail to edit a thread without passing a thread id', async () => {
+      const thread_kind = thread.kind;
+      const body = thread.body;
+      const recentEdit : any = { timestamp: moment(), body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .post('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': null,
+          'kind': thread_kind,
+          'body': encodeURIComponent(body),
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
+    });
+
+    it('should fail to edit a thread without passing a body', async () => {
+      const thread_id = thread.id;
+      const thread_kind = thread.kind;
+      const body = thread.body;
+      const recentEdit : any = { timestamp: moment(), body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .post('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id,
+          'kind': thread_kind,
+          'body': null,
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
     });
 
     it('should fail to edit a thread without passing a thread id', async () => {

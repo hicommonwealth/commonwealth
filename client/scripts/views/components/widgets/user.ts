@@ -1,8 +1,8 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
+import m from 'mithril';
+import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
 import { Tooltip } from 'construct-ui';
 
@@ -14,6 +14,9 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { Registration } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
+import Substrate from 'client/scripts/controllers/chain/substrate/main';
+import { from } from 'rxjs';
+import SubstrateIdentity from 'client/scripts/controllers/chain/substrate/identity';
 
 interface IAttrs {
   user: Account<any> | [string, string];
@@ -35,21 +38,23 @@ export interface ISubstrateIdentityAttrs {
 
 export interface ISubstrateIdentityState {
   dynamic: {
-    identity: Registration | null;
+    identity: SubstrateIdentity | null;
   },
 }
 
-const SubstrateIdentity = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
+const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
   getObservables: (attrs) => ({
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) ? attrs.account.identity : null,
+    identity: (attrs.account instanceof SubstrateAccount)
+      ? (app.chain as Substrate).identities.get(attrs.account)
+      : null,
   }),
   view: (vnode) => {
     const { profile, linkify, account, hideIdentityIcon } = vnode.attrs;
 
     // return polkadot identity if possible
     const displayNameHex = vnode.state.dynamic.identity?.info?.display;
-    const judgements = vnode.state.dynamic.identity?.judgements?.toArray() || [];
+    const judgements = vnode.state.dynamic.identity?.judgements || [];
     if (displayNameHex && judgements) {
       // Polkadot identity judgements. See:
       // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
@@ -125,9 +130,9 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && account.identity)
+        (account instanceof SubstrateAccount && app.chain.loaded)
           // substrate name
-          ? m(SubstrateIdentity, { account, linkify, profile, hideIdentityIcon }) : [
+          ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link(`a.user-display-name${
@@ -150,8 +155,8 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && account.identity)
-          ? m(SubstrateIdentity, { account, linkify: true, profile, hideIdentityIcon })
+        (account instanceof SubstrateAccount && app.chain.loaded)
+          ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',

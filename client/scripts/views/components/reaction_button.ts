@@ -1,7 +1,7 @@
 import 'components/reaction_button.scss';
 
-import { default as m, VnodeDOM } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { Tooltip } from 'construct-ui';
 
 import app from 'state';

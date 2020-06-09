@@ -308,7 +308,6 @@ describe('Roles Test', () => {
         invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
-        creator_id: adminUserId,
         creator_address: loggedInAddr,
         creator_chain: chain,
         description: 'test enabled community',

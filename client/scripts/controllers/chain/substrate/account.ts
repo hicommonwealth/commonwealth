@@ -21,9 +21,7 @@ import { AccountsStore } from 'stores';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
-import { constants } from 'ethers';
 import SubstrateChain from './shared';
-import { SubstrateIdentity } from './identity';
 
 function addressFromSeed(seed: string, chain: SubstrateChain): string {
   return `${(chain.keyring()).addFromUri(`\/\/${seed}`).address}`;
@@ -309,18 +307,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         .map(([ stash ]) => this._Accounts.get(stash))
       ),
     );
-  }
-
-  public get identity(): Observable<Registration> {
-    if (!this._Chain?.apiInitialized) return;
-    return this._Chain.query((api: ApiRx) => api.query.identity.identityOf(this.address))
-      .pipe(map((id) => {
-        if (id.isSome) {
-          return id.unwrap();
-        } else {
-          return null;
-        }
-      }));
   }
 
   private _Chain: SubstrateChain;

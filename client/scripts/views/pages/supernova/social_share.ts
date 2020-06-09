@@ -1,6 +1,6 @@
 import 'pages/supernova/social_share.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 const SocialShare: m.Component = {
   view: (vnode) => {
