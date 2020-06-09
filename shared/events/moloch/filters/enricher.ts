@@ -21,6 +21,7 @@ function hexToNumber({ _hex: n }) {
  * into the interface, and returns a fully-formed event, ready for database storage.
  */
 export default async function (
+  version: 1 | 2,
   api: MolochApi,
   blockNumber: number,
   kind: MolochEventKind,
@@ -60,6 +61,7 @@ export default async function (
           proposalIndex: hexToNumber(proposalIndex),
           delegateKey,
           member: memberAddress,
+          // TODO: will the vote be in hex?
           vote: hexToNumber(uintVote),
         }
       };
