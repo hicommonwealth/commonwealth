@@ -1,8 +1,34 @@
-module.exports = (sequelize, DataTypes) => {
-  const ChainNode = sequelize.define('ChainNode', {
-    chain: { type: DataTypes.STRING, allowNull: false },
-    url: { type: DataTypes.STRING, allowNull: false },
-    address: { type: DataTypes.STRING, allowNull: true },
+import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { ChainInstance, ChainAttributes } from './chain';
+
+export interface ChainNodeAttributes {
+  id?: number;
+  chain: string;
+  url: string;
+  address: string;
+
+  // associations
+  Chain?: ChainAttributes;
+}
+
+export interface ChainNodeInstance extends Sequelize.Instance<ChainNodeAttributes>, ChainNodeAttributes {
+  // TODO: add mixins as needed
+  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+}
+
+export interface ChainNodeModel extends Sequelize.Model<ChainNodeInstance, ChainNodeAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes
+): ChainNodeModel => {
+  const ChainNode = sequelize.define<ChainNodeInstance, ChainNodeAttributes>('ChainNode', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
+    url: { type: dataTypes.STRING, allowNull: false },
+    address: { type: dataTypes.STRING, allowNull: true },
   }, {
     timestamps: false,
     underscored: true,

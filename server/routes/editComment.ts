@@ -4,17 +4,14 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const editComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
-  if (!req.user) {
-    return next(new Error('Not logged in'));
-  }
   if (!req.body.id) {
     return next(new Error('Must provide id'));
   }

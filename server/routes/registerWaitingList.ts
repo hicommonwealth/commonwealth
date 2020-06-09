@@ -1,7 +1,6 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
-
 import { factory, formatFilename } from '../../shared/logging';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

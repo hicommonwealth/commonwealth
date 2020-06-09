@@ -5,6 +5,9 @@ import app from 'state';
 import * as clipboard from 'clipboard-polyfill';
 import { Registration, IdentityInfo } from '@polkadot/types/interfaces';
 import { Account, ChainBase } from 'models';
+import { of } from 'rxjs';
+import Substrate from 'controllers/chain/substrate/main';
+import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { formatAddressShort, link } from '../../../helpers';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
@@ -35,7 +38,7 @@ export interface IProfileHeaderAttrs {
 
 export interface IProfileHeaderState {
   dynamic: {
-    identity: Registration | null;
+    identity: SubstrateIdentity | null;
   },
   copied: boolean;
 }
@@ -45,7 +48,9 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
     // if attrs.account loads later than the component, we need our group key to force an update
     // to the observed values
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) ? attrs.account.identity : null,
+    identity: (attrs.account instanceof SubstrateAccount)
+      ? (app.chain as Substrate).identities.get(attrs.account)
+      : null,
   }),
   view: (vnode) => {
     const account: Account<any> = vnode.attrs.account;

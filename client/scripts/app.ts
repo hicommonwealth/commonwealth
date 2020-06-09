@@ -76,7 +76,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.login.selectedNode = NodeInfo.fromJSON(data.user.selectedNode);
       }
       resolve();
-    }).catch((err) => {
+    }).catch((err: any) => {
+      app.loadingError = err.responseJSON.error;
       reject(err);
     });
   });
@@ -497,6 +498,8 @@ $(() => {
         );
       }
     }
+    m.redraw();
+  }).catch((err) => {
     m.redraw();
   });
 });
