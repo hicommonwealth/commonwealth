@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import app from 'state';
+import { RoleInfo } from 'models';
 import { ChainNetwork } from './types';
 import OffchainTag from './OffchainTag';
 
@@ -13,8 +14,9 @@ class ChainInfo {
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
+  public readonly adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?) {
+  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?, adminsAndMods?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -24,6 +26,7 @@ class ChainInfo {
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
     this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
+    this.adminsAndMods = adminsAndMods || [];
   }
   public static fromJSON(json) {
     return new ChainInfo(

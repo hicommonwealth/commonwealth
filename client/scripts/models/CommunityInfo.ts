@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import app from 'state';
+import { RoleInfo } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTag from './OffchainTag';
 
@@ -12,8 +13,9 @@ class CommunityInfo {
   public privacyEnabled: boolean;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
+  public readonly adminsAndMods: RoleInfo[];
 
-  constructor(id, name, description, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags) {
+  constructor(id, name, description, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -22,6 +24,7 @@ class CommunityInfo {
     this.privacyEnabled = privacyEnabled;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
+    this.adminsAndMods = adminsAndMods || [];
   }
 
   public static fromJSON(json) {
@@ -33,7 +36,8 @@ class CommunityInfo {
       json.invitesEnabled,
       json.privacyEnabled,
       json.featuredTags,
-      json.tags
+      json.tags,
+      json.adminsAndMods,
     );
   }
 

@@ -3,8 +3,8 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link } from 'helpers';
-import { Tooltip } from 'construct-ui';
+import { formatAddressShort, link, getRoleInCommunity, formatAsTitleCase } from 'helpers';
+import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
 import { Account, Profile } from 'models';
@@ -27,6 +27,7 @@ interface IAttrs {
   linkify?: boolean;
   onclick?: any;
   tooltip?: boolean;
+  showRole?: boolean;
 }
 
 export interface ISubstrateIdentityAttrs {
@@ -89,13 +90,14 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
 
 const User : m.Component<IAttrs> = {
   view: (vnode) => {
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
 
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
+    let role;
 
     if (vnode.attrs.user instanceof Array) {
       const chainId = vnode.attrs.user[1];
@@ -111,6 +113,11 @@ const User : m.Component<IAttrs> = {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
     }
+    const roleTag = role ? m(Tag, {
+      label: role.permission,
+      rounded: true,
+      size: 'sm',
+    }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -141,6 +148,7 @@ const User : m.Component<IAttrs> = {
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
+        showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -163,6 +171,7 @@ const User : m.Component<IAttrs> = {
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
+      roleTag,
     ]);
 
     return tooltip
