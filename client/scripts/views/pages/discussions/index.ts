@@ -22,8 +22,6 @@ import { updateLastVisited } from '../../../controllers/app/login';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 
-// TODO: refactor all of the below into a controller.
-
 interface IDiscussionPageAttrs {
   activeTag?: string;
 }
@@ -35,6 +33,43 @@ interface IDiscussionPageState {
   hasOlderPosts?: boolean;
   defaultLookback: number;
 }
+
+const TagSidebar: m.Component<{ tag: string }> = {
+  view: (vnode) => {
+    const { tag } = vnode.attrs;
+
+    return m('.TagSidebar', [
+      tag
+    ]);
+  }
+};
+
+const CommunitySidebar: m.Component<{}> = {
+  view: (vnode) => {
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => {
+      return activeNode
+        && n.url === activeNode.url
+        && n.chain
+        && activeNode.chain
+        && n.chain.id === activeNode.chain.id;
+    });
+    const selectedNode = selectedNodes && selectedNodes[0];
+    const selectedCommunity = app.community;
+
+    const communityName = selectedNode
+      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    const communityDescription = selectedNode
+      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
+
+    return m('.CommunitySidebar', [
+      m('h4', `About ${communityName}`),
+      m('p', communityDescription),
+      m('br'),
+      m('h4', 'Admins & Mods')
+    ]);
+  }
+};
 
 const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
   oncreate: (vnode) => {
@@ -240,6 +275,9 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
+      rightSidebar: (app.chain || app.community) && [
+        vnode.attrs.activeTag ? m(TagSidebar, { tag: vnode.attrs.activeTag }) : m(CommunitySidebar)
+      ],
     }, [
       m('.discussions-main', [
         (app.chain || app.community) && [
