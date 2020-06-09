@@ -469,14 +469,12 @@ describe('Thread Tests', () => {
           'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.read_only).to.be.equal(readOnly);
-      expect(res.body.result.private).to.be.equal(privacy);
+      expect(res.body.result.read_only).to.be.equal(false);
     });
 
     it('should turn off both read_only and privacy', async () => {
