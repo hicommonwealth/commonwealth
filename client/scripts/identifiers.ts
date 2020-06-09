@@ -1,8 +1,5 @@
-import { Observable, merge } from 'rxjs';
-import { share, map, filter } from 'rxjs/operators';
-
-import { StorageModule, AnyProposal, ChainBase, ChainClass } from 'models';
-import { IStoreUpdate, UpdateType, ProposalStore } from 'stores';
+import { StorageModule, ChainBase, ChainClass } from 'models';
+import { ProposalStore } from 'stores';
 
 import app from './state';
 import Substrate from './controllers/chain/substrate/main';
@@ -60,30 +57,6 @@ export const proposalSlugToStore = (slug: string): ProposalStore<any> => {
   return proposalSlugToClass().get(slug).store;
 };
 
-export const proposalSlugsFromChain = (chain) => {
-  const results = ['discussion'];
-  if (chain.base === ChainBase.Substrate) {
-    results.push('referendum');
-    results.push('democracyproposal');
-    results.push('democracypreimage');
-    results.push('democracyimminent');
-    results.push('councilmotion');
-    results.push('treasuryproposal');
-    results.push('phragmenelection');
-  } else if (chain.base === ChainBase.CosmosSDK) {
-    results.push('cosmosproposal');
-  } else if (chain.class === ChainClass.Moloch) {
-    results.push('molochproposal');
-  }
-  if (chain.class === ChainClass.Kusama) {
-    results.push('technicalcommitteemotion');
-  }
-  if (chain.class === ChainClass.Edgeware) {
-    results.push('signalingproposal');
-  }
-  return results;
-};
-
 export const proposalSlugToFriendlyName = new Map<string, string>([
   ['referendum', 'Democracy Referendum'],
   ['democracyproposal', 'Democracy Proposal'],
@@ -97,23 +70,6 @@ export const proposalSlugToFriendlyName = new Map<string, string>([
   ['cosmosproposal', 'Cosmos Proposal'],
   ['molochproposal', 'Moloch Proposal']
 ]);
-
-// / This observable provides access to the stream of created Proposals
-// / once they've been successfully added to their various stores.
-// / This does NOT guarantee that their subscriptions have resolved yet,
-// / but it does guarantee that the object is fully created.
-// / The string returned is the proposal's slug, allowing a listener to tell apart proposal types.
-// / TODO: maybe we should have this as a property of the proposal itself?
-export const getProposalObservable = (): Observable<[AnyProposal, string]> => {
-  const storeObservables = proposalSlugsFromChain(app.chain).map((s: string): Observable<[AnyProposal, string]> => {
-    const store = proposalSlugToStore(s);
-    return store.getObservable().pipe(
-      filter((update: IStoreUpdate<any>) => update.updateType === UpdateType.Add),
-      map((update: IStoreUpdate<any>) => [update.item, s]),
-    );
-  });
-  return merge(...storeObservables).pipe(share());
-};
 
 export const idToProposal = (slug, id) => {
   const store = proposalSlugToStore(slug);

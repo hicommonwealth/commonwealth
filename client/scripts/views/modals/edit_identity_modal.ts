@@ -15,9 +15,10 @@ import { SubstrateAccount } from '../../controllers/chain/substrate/account';
 import AvatarUpload from '../components/avatar_upload';
 import Substrate from '../../controllers/chain/substrate/main';
 import { IdentityInfoProps } from '../../controllers/chain/substrate/identities';
+import SubstrateIdentity from '../../controllers/chain/substrate/identity';
 
 interface IAttrs {
-  currentIdentity?: IdentityInfo;
+  currentIdentity?: SubstrateIdentity;
   account: SubstrateAccount;
 }
 
@@ -28,7 +29,7 @@ interface IState {
 
 const EditIdentityModal: m.Component<IAttrs, IState> = {
   oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    if (vnode.attrs.currentIdentity) {
+    if (vnode.attrs.currentIdentity?.info) {
       const {
         additional,
         display,
@@ -39,7 +40,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         // pgpFingerprint,
         image,
         twitter
-      } = vnode.attrs.currentIdentity;
+      } = vnode.attrs.currentIdentity.info;
 
       // do not display SHA values, only raw strings
       const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
