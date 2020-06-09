@@ -2,6 +2,7 @@ import 'layout.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import { EmptyState, Icons } from 'construct-ui';
 
 import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
 import app from 'state';
@@ -35,7 +36,24 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, wideLayout
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
-    if (!app.loginStatusLoaded()) {
+    if (app.loadingError) {
+      return m('.Layout.mithril-app', [
+        m(Header),
+        m('.layout-container', [
+          m(EmptyState, {
+            fill: true,
+            icon: Icons.X,
+            content: [
+              m('p', `Application error: ${app.loadingError}`),
+              m('p', 'Please try again at another time'),
+            ],
+            style: 'color: #546e7b;'
+          }),
+        ]),
+        m(AppModals),
+        m(AppToasts),
+      ]);
+    } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
       return m(LoadingLayout, { activeTag, wideLayout });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {

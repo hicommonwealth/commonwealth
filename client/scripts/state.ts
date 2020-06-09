@@ -102,6 +102,7 @@ export interface IApp {
   isLoggedIn(): boolean;
   isProduction(): boolean;
   serverUrl(): string;
+  loadingError: string;
 }
 
 const app: IApp = {
@@ -162,7 +163,8 @@ const app: IApp = {
   vm: {
     activeAccount: null,
   },
-  serverUrl: () => '/api'
+  serverUrl: () => '/api',
+  loadingError: null,
 };
 
 export default app;
