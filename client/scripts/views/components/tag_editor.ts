@@ -17,7 +17,7 @@ interface ITagEditorState {
   isOpen: boolean;
 }
 
-const TagWindow: m.Component<{ onChangeHandler: Function }> = {
+const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function }> = {
   view: (vnode) => {
     const { onChangeHandler } = vnode.attrs;
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
@@ -25,8 +25,9 @@ const TagWindow: m.Component<{ onChangeHandler: Function }> = {
       return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
     return m(AutoCompleteTagForm, {
-      tags: app.tags.getByCommunity(app.activeId()),
       featuredTags,
+      activeTag: vnode.attrs.thread.tag,
+      tags: app.tags.getByCommunity(app.activeId()),
       updateFormData: onChangeHandler,
     });
   }
@@ -58,6 +59,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
         content: m(TagWindow, {
+          thread: vnode.attrs.thread,
           onChangeHandler: (tagName, tagId?) => {
             vnode.state.tagName = tagName;
             vnode.state.tagId = tagId;

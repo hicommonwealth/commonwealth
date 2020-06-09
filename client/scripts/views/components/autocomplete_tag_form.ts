@@ -9,6 +9,7 @@ interface IAutoCompleteTagFormAttrs {
   defaultActiveIndex?: number;
   tags: OffchainTag[];
   featuredTags: OffchainTag[];
+  activeTag?: OffchainTag;
   tabindex?: number;
   updateFormData: Function;
   updateParentErrors?: Function;
@@ -21,7 +22,8 @@ interface IAutoCompleteTagFormState {
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
+    const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
+    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
 
     const itemRender = (tag) => {
       return m(ListItem, {
