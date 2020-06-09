@@ -1,4 +1,5 @@
-import { default as crypto } from 'crypto';
+import crypto from 'crypto';
+import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';

@@ -1,6 +1,6 @@
 import 'components/proposals_loading_row.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 const ProposalsLoadingRow: m.Component = {
   view: (vnode: m.VnodeDOM) => {

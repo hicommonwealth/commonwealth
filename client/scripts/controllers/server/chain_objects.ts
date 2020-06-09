@@ -1,4 +1,4 @@
-import { default as $ } from 'jquery';
+import $ from 'jquery';
 import app from 'state';
 import { ChainObject } from 'models';
 

@@ -1,8 +1,8 @@
 import 'components/avatar_upload.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as Dropzone } from 'dropzone';
+import $ from 'jquery';
+import m from 'mithril';
+import Dropzone from 'dropzone';
 import { featherIcon } from 'helpers';
 import app from 'state';
 

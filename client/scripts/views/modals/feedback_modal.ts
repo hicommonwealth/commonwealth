@@ -1,7 +1,7 @@
 import 'modals/feedback_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { Button, Form, FormGroup, TextArea } from 'construct-ui';
 import app from 'state';
 

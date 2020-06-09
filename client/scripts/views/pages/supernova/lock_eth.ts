@@ -1,8 +1,8 @@
 import 'pages/supernova/lock_eth.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 
 import { formatAsTitleCase } from 'helpers';
 import app from 'state';

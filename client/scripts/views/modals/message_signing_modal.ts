@@ -1,7 +1,7 @@
 import 'modals/message_signing_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 
 import CodeBlock from 'views/components/widgets/code_block';

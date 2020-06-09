@@ -1,8 +1,8 @@
 import 'pages/new_signaling.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 import {
   Grid, Col, Classes, ButtonGroup, Callout, Form, FormGroup,
   FormLabel, Button, Icon, Icons, Radio, RadioGroup, Tag, Input, TextArea
