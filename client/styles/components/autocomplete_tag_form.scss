@@ -1,14 +1,14 @@
 @import 'client/styles/shared';
 
 .AutocompleteTagForm {
-  .featured-tag + .other-tag {
-    border-top: 1px solid blue;
-  }
-  .no-matching-tags {
-    color: blue;
-    text-decoration: none;
-  }
-  .cui-list.cui-interactive {
-    max-height: 200px !important;
-  }
+    .featured-tag + .other-tag {
+        border-top: 1px solid $theme-focus-border;
+    }
+    .no-matching-tags {
+        color: $theme-focus-border;
+        text-decoration: none;
+    }
+    .cui-list.cui-interactive {
+        max-height: 200px !important;
+    }
 }
