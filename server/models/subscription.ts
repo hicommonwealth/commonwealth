@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import WebSocket from 'ws';
 import Sequelize from 'sequelize';
-import sgMail from '@sendgrid/mail';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SENDGRID_API_KEY } from '../config';
 import {
@@ -10,6 +9,8 @@ import {
 } from '../../shared/types';
 import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
+const sgMail = require('@sendgrid/mail');
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;

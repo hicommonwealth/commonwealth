@@ -1,10 +1,8 @@
 import Sequelize from 'sequelize';
-// import sgMail from '@sendgrid/mail';
 import { SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { getProposalUrl } from '../../shared/utils';
 const { Op } = Sequelize;
-// import models from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 import { IPostNotificationData, NotificationCategories } from '../../shared/types';
