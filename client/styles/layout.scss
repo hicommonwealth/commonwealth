@@ -4,7 +4,9 @@
     box-sizing: border-box;
 }
 html, body {
+    height: 100%;
     box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -12,12 +14,39 @@ html {
     line-height: 1.4;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #fff;
+    background: #fafafa;
+    &.modal-open {
+        overflow-y: hidden;
+    }
 }
 .mithril-app {
     height: 100%;
     width: 100%;
 }
+.container {
+    position: relative;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    @include xs-max {
+        padding: 0 1rem;
+    }
+}
+.layout-container {
+    padding-top: $header-height + $vertical-padding;
+    padding-bottom: $vertical-padding;
+}
+.forum-container {
+    background: #fff;
+    padding: 20px 32px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.07);
+    margin-bottom: 16px;
+}
+
+//
+// typographical styles
+//
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
@@ -63,6 +92,10 @@ pre {
     color: #fff;
     background: #444;
 }
+
+//
+// basic components
+//
 
 input[type="submit"],
 input[type="button"],
@@ -206,58 +239,10 @@ td, th {
     border-bottom: 1px solid #e5e5e5;
 }
 
-body.modal-open {
-    overflow-y: hidden;
-}
-.app-loading  {
-    min-height: calc(100vh - 80px);
-    padding-top: calc(50vh - 240px);
-    text-align: center;
-    p {
-        font-size: 14px;
-        margin: 30px;
-        color: #333;
-    }
-    .icon-spinner2 {
-        margin-top: 160px;
-    }
-    svg.feather-icon {
-        margin-top: 150px;
-    }
-}
-
-.container {
-    position: relative;
-    max-width: 1180px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 20px;
-    @include xs-max {
-        padding: 0 1rem;
-    }
-}
-
-.layout-content {
-    padding: 15px 40px;
-    padding-top: $header-height + 15px;
-    padding-left: $sidebar-width + 40px;
-    // &.logged-out {
-    //     padding-left: $sidebar-width;
-    // }
-    &.navigation-hidden {
-        padding-left: $switcher-width + 40px;
-        padding-top: 15px;
-    }
-    // &.navigation-hidden.logged-out {
-    //     padding-left: 40px;
-    // }
-}
-
-@media (max-width: 680px) {
-    .hidden-on-mobile {
-        display: none;
-    }
-}
+//
+// construct-ui overrides
+// TODO: move to construct.scss
+//
 
 // Small changes to input styles
 .cui-input input,
@@ -313,4 +298,50 @@ body.modal-open {
 // align text in menus to the left by default
 .cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
     text-align: left;
+}
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
+}
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
+
+// menu styles
+.cui-menu {
+    border: solid 1px #eee;
+    > .cui-menu-divider {
+        border-bottom: solid 1px #eee;
+    }
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
 }

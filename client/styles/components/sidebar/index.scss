@@ -1,22 +1,79 @@
 @import 'client/styles/shared';
 
 $sidebar-padding: 16px;
-$active-color: #e9e9f5;
+$active-color: #ececec;
+
+.CommunityLabel {
+    text-align: left;
+    flex: 1;
+    display: flex;
+    font-weight: 400;
+
+    &.CommunityLabelPlaceholder {
+        padding: 8px 0;
+        .community-name {
+            color: #aaa;
+        }
+    }
+
+    .community-label-left {
+        padding-right: 12px;
+    }
+    .community-label-right {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .community-name-row,
+    .community-id {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    .community-name-row {
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    .community-id {
+        font-size: 13px;
+        color: #777;
+    }
+    .icon-globe, .icon-lock {
+        margin-left: 2px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .ChainStatusIndicator {
+        display: inline-block;
+        margin-left: 8px;
+        margin-right: -2px;
+        position: relative;
+        top: -1px;
+    }
+}
 
 .Sidebar {
     position: fixed;
-    top: 0;
-    bottom: 0;
-    left: $switcher-width;
-    width: $sidebar-width - $switcher-width;
-    z-index: 9;
-    border-right: 1px solid #e8e8e8;
+    top: $header-height + $vertical-padding;
+    bottom: $vertical-padding;
+    width: $sidebar-width;
+    background: #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.07);
+    padding-top: 10px;
+
     .SidebarMenu {
         height: 100%;
     }
     .SidebarMenu .cui-list {
         height: 100%;
-        background: #f4f4f9;
+        overflow-x: hidden;
+    }
+    .SidebarMenu .cui-list.list-bottom {
+        position: absolute;
+        bottom: 0;
+        height: initial;
+        padding-bottom: 20px;
     }
 
     // list styles
@@ -24,21 +81,22 @@ $active-color: #e9e9f5;
         max-height: 100%;
         user-select: none;
         > h4 {
-            color: #546e7b;
+            color: #555;
             opacity: 0.6;
         }
         > .cui-list-item {
-            color: #546e7b;
-            &:hover, &.cui-active, &.cui-selected {
+            color: #111;
+            &:hover {
                 background: $active-color;
             }
-            &.cui-selected .cui-icon svg {
-                color: #5c6bc1 !important;
+            &.cui-active {
+                background: $theme-base-color;
+                color: #fff;
+                .cui-icon svg {
+                    color: #fff !important;
+                }
             }
         }
-    }
-    .TagSelector {
-        margin-bottom: 10px;
     }
 
     // individual menu items
@@ -49,20 +107,22 @@ $active-color: #e9e9f5;
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.15px;
+        border: none;
     }
     .cui-list > .cui-list-item {
-        font-size: 15px;
-        border: none;
+        font-size: 14.5px;
         font-weight: 500;
-        padding: 4px $sidebar-padding;
-        .cui-icon svg {
-            height: 14px;
-            width: 14px;
-            min-height: 14px;
-            min-width: 14px;
+        border: none;
+        padding: 5px $sidebar-padding;
+        > .cui-list-item-content-left > .cui-icon svg {
+            height: 15px;
+            width: 15px;
+            min-height: 15px;
+            min-width: 15px;
             position: relative;
             top: -1px;
             margin-right: -2px;
+            color: #222;
         }
     }
     .cui-list-item .cui-tag {
@@ -75,71 +135,15 @@ $active-color: #e9e9f5;
     .cui-list .cui-list-item-content-right .cui-button + .cui-button {
         margin-left: 4px;
     }
-    // top
-    .cui-list .title-selector {
-        display: flex;
-        padding: 1px $sidebar-padding 0;
-        margin-bottom: 12px;
+    .cui-list .action-selector {
+        padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
+        cursor: default !important;
         user-select: none;
         border-bottom: 1px solid #eee;
-        background: #fff !important;
-        color: #222 !important;
-        min-height: $header-height;
-        align-items: center;
-
-        border-bottom: 1px solid #e7e7e7;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-        .title-selector-left {
-            flex: 1;
-            display: flex;
-        }
-        .community-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            font-weight: 700;
-            line-height: 1.25;
-        }
-        .icon-lock {
-            margin-left: 2px;
-        }
-        .ChainStatusIndicator {
-            display: inline-block;
-            margin-left: 8px;
-            margin-right: -2px;
-            position: relative;
-            top: -1px;
-        }
-        .SubscriptionButton {
-            float: right;
+        margin-bottom: 10px;
+        &:hover {
+            background: initial;
         }
     }
-}
-
-// notifications menu (outside Sidebar, displayed in a cui-portal)
-.notification-menu {
-    .notification-list {
-        height: 640px;
-        background: #fff;
-        width: 340px;
-    }
-    .cui-menu {
-        max-width: 342px;
-        margin: 0;
-        padding: 0;
-        border-color: #d8dee0;
-        background: none;
-        overflow: hidden;
-    }
-    .cui-popover-arrow {
-        background: white;
-    }
-    .cui-list-item {
-        padding: 11px;
-    }
-}
-
-// TODO: use non-generic CSS here
-.cui-portal .cui-overlay-backdrop {
-    background: rgba(47, 49, 54, 0.65);
+    // bottom
 }

@@ -1,7 +1,7 @@
 import 'components/widgets/profile_block.scss';
 
-import { default as m } from 'mithril';
-import { default as app } from 'state';
+import m from 'mithril';
+import app from 'state';
 import User from 'views/components/widgets/user';
 import { Account, ChainBase } from 'models';
 import { formatCoin, Coin } from 'adapters/currency';

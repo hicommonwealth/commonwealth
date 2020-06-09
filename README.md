@@ -2,7 +2,7 @@
 
 Discussions and governance for blockchain networks.
 
-[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth-oss/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth-oss/tree/master)
+[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master)
 
 ## Quickstart
 

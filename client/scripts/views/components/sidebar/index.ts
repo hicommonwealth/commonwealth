@@ -6,25 +6,30 @@ import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import {
   List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  Button, Tag, Menu, MenuHeading, Popover } from 'construct-ui';
+  SelectList, Button, ButtonGroup, Tag, Menu, MenuHeading, Popover
+} from 'construct-ui';
 
-import { ApiStatus, default as app } from 'state';
+import app, { ApiStatus } from 'state';
 import { featherIcon, link } from 'helpers';
+import { isRoleOfCommunity } from 'helpers/roles';
+import { getProposalUrl } from 'shared/utils';
+import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { ProposalType } from 'identifiers';
+import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
+import { OffchainCommunitiesStore } from 'stores';
+
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
-import { ChainClass, ChainBase, Notification } from 'models';
-import { OffchainCommunitiesStore } from 'stores';
 
 import { isMember } from 'views/components/membership_button';
-import ChainIcon from 'views/components/chain_icon';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
 import TagSelector from 'views/components/sidebar/tag_selector';
-import ChainStatusIndicator from 'views/components/chain_status_indicator';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
@@ -34,21 +39,10 @@ import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
-import { getProposalUrl } from 'shared/utils';
-import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
-import { isRoleOfCommunity } from 'helpers/roles';
-import AdminPanel from '../admin_panel';
-
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
-    const nodes = app.config.nodes.getAll();
     const activeAccount = app.vm.activeAccount;
-    const activeNode = app.chain?.meta;
-    const selectedNodes = nodes.filter((n) => activeNode && n.url === activeNode.url
-                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
-    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
 
     // chain menu
     const chains = {};
@@ -84,6 +78,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -95,6 +90,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    if (onNotificationsPage(m.route.get())) return;
 
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
@@ -105,62 +101,28 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           interactive: true,
           size: 'lg',
         }, [
-          // header
-          m('.title-selector', [
-            m('.title-selector-left', [
-              (app.community || app.chain) ? [
-                m('.community-name', selectedNode
-                  ? selectedNode.chain.name
-                  : selectedCommunity ? selectedCommunity.meta.name : ''),
-                !selectedNode && selectedCommunity && selectedCommunity.meta.privacyEnabled && m('span.icon-lock'),
-                !selectedNode && selectedCommunity && !selectedCommunity.meta.privacyEnabled && m('span.icon-globe'),
-                selectedNode && m(ChainStatusIndicator, { hideLabel: true }),
-              ] : m('.community-name', 'Commonwealth'),
-            ]),
-            m('.title-selector-right', [
-              app.isLoggedIn() && (app.community || app.chain)
-                && m(SubscriptionButton),
-            ]),
-          ]),
+          // community homepage
+          (app.community || app.chain)
+            && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.HOME }),
+              active: onDiscussionsPage(m.route.get()),
+              label: 'Home',
+              onclick: (e) => m.route.set(`/${app.activeId()}`),
+            }),
           // discussions (all communities)
           (app.community || app.chain)
-            && m('h4', 'Off-chain'),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onDiscussionsPage(m.route.get()),
-              label: 'Discussions',
-              onclick: (e) => m.route.set(`/${app.activeId()}/`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
-            }),
-          (app.community || app.chain)
             && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onMembersPage(m.route.get()),
-              label: 'Members',
-              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
-            }),
-          // admin panel (all communities)
-          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()) &&
-          (app.community || app.chain) &&
-          m(AdminPanel),
-          // // chat (all communities)
-          // (app.community || app.chain) &&
-          //   m(ListItem, {
-          //     active: onChatPage(m.route.get()),
-          //     label: 'Chat',
-          //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-          //   }),
           // proposals (substrate and cosmos only)
           (app.community || app.chain)
-            && m('h4', 'On-chain voting'),
+            && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
+                || showMolochMenuOptions)
+            && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
               active: onProposalPage(m.route.get()),
               label: 'Proposals',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [
                 allSubstrateGovernanceProposals > 0
                   && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
@@ -170,36 +132,42 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
+              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
               contentRight: [], // TODO
             }),
           showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal }),
-            label: 'New proposal'
+            onclick: (e) => {
+              m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
+            },
+            label: 'New proposal',
+            contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
             }),
-            label: 'Update delegate key'
+            label: 'Update delegate key',
+            contentLeft: m(Icon, { name: Icons.KEY }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
             }),
-            label: 'Rage quit'
+            label: 'Rage quit',
+            contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: TokenApprovalModal,
             }),
-            label: 'Approve tokens'
+            label: 'Approve tokens',
+            contentLeft: m(Icon, { name: Icons.POWER }),
           }),
           (app.community || app.chain)
-            && m('h4', 'Staking'),
+          && m('h4', 'Staking'),
           // validators (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
             m(ListItem, {
@@ -208,8 +176,32 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
               contentLeft: m(Icon, { name: Icons.BOX }),
             }),
-          // TODO: add a "reserve tokens" option here, to apply to DAO?
+          (app.community || app.chain)
+            && m(ListItem, {
+              active: onMembersPage(m.route.get()),
+              label: 'Members',
+              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+              contentLeft: m(Icon, { name: 'hexagon' }),
+            }),
+          (app.community || app.chain)
+            && m(ListItem, {
+              class: 'TagRow',
+              active: m.route.get() === `/${app.activeId()}/tags/`,
+              label: 'Tags',
+              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+              contentLeft: m(Icon, { name: 'hexagon' }),
+            }),
+          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+            && (app.community || app.chain)
+            && m(AdminPanel),
         ]),
+        // // chat (all communities)
+        // (app.community || app.chain) &&
+        //   m(ListItem, {
+        //     active: onChatPage(m.route.get()),
+        //     label: 'Chat',
+        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+        //   }),
       ]),
     ]);
   },

@@ -5,6 +5,9 @@ import app from 'state';
 import * as clipboard from 'clipboard-polyfill';
 import { Registration, IdentityInfo } from '@polkadot/types/interfaces';
 import { Account, ChainBase } from 'models';
+import { of } from 'rxjs';
+import Substrate from 'controllers/chain/substrate/main';
+import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { formatAddressShort, link } from '../../../helpers';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
@@ -16,17 +19,18 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account: Account<any>, currentIdentity?: IdentityInfo) => {
+const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity | null) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
-    class: app.chain.loaded ? '' : 'disabled',
+    // wait for info to load before making it clickable, if identity exists
+    class: !currentIdentity || !currentIdentity.exists || currentIdentity.info ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
         data: { account: account as SubstrateAccount, currentIdentity },
       });
     },
-  }, currentIdentity ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
+  }, currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
 };
 
 export interface IProfileHeaderAttrs {
@@ -35,7 +39,7 @@ export interface IProfileHeaderAttrs {
 
 export interface IProfileHeaderState {
   dynamic: {
-    identity: Registration | null;
+    identity: SubstrateIdentity | null;
   },
   copied: boolean;
 }
@@ -45,7 +49,9 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
     // if attrs.account loads later than the component, we need our group key to force an update
     // to the observed values
     groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount) ? attrs.account.identity : null,
+    identity: (attrs.account instanceof SubstrateAccount)
+      ? (app.chain as Substrate).identities.get(attrs.account)
+      : null,
   }),
   view: (vnode) => {
     const account: Account<any> = vnode.attrs.account;
@@ -87,7 +93,7 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
         // Add in identity actions here
         m('.bio-actions', [
           (app.vm.activeAccount && account.address === app.vm.activeAccount.address) ? [
-            editIdentityAction(account, vnode.state.dynamic.identity?.info),
+            editIdentityAction(account, vnode.state.dynamic.identity),
             m('button.formular-button-primary', {
               onclick: () => {
                 app.modals.create({

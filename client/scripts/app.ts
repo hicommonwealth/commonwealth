@@ -2,12 +2,10 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
+import 'construct.scss';
 
-import 'construct-ui/src/utils/focus-manager/index.scss';
-import 'construct-ui/src/components/index.scss';
-
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -16,8 +14,8 @@ import { Layout, LoadingLayout } from 'views/layout';
 import { ChainInfo, CommunityInfo, NodeInfo,
   OffchainTag, ChainClass, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { default as moment } from 'moment-twitter';
-import { default as mixpanel } from 'mixpanel-browser';
+import moment from 'moment-twitter';
+import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
@@ -55,6 +53,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       app.login.roles = data.roles || [];
+
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
@@ -63,6 +62,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
 
       // add roles data for user
       if (data.roles) {
@@ -76,7 +76,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.login.selectedNode = NodeInfo.fromJSON(data.user.selectedNode);
       }
       resolve();
-    }).catch((err) => {
+    }).catch((err: any) => {
+      app.loadingError = err.responseJSON.error;
       reject(err);
     });
   });
@@ -199,7 +200,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
     // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
+    updateActiveAddresses(n.chain, true);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
@@ -260,8 +261,8 @@ m.route.set = (...args) => {
   setTimeout(() => {
     const html = document.getElementsByTagName('html')[0];
     if (html) html.scrollTo(0, 0);
-    const mithrilApp = document.getElementsByClassName('mithril-app')[0];
-    if (mithrilApp) mithrilApp.scrollTo(0, 0);
+    const body = document.getElementsByTagName('body')[0];
+    if (body) body.scrollTo(0, 0);
   }, 0);
 };
 
@@ -303,7 +304,7 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, hideNavigation?: boolean) => ({
+  const importRoute = (module, scoped: string | boolean, wideLayout?: boolean) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
@@ -317,7 +318,7 @@ $(() => {
           // false => scope is null
           : null;
       const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, hideNavigation }, [ vnode ]);
+      return m(Layout, { scope, activeTag, wideLayout }, [ vnode ]);
     },
   });
 
@@ -337,7 +338,7 @@ $(() => {
     // Login page
     '/login':                    importRoute(import('views/pages/login'), false),
     '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
+    '/notifications':            importRoute(import('views/pages/notifications'), false),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
@@ -346,7 +347,7 @@ $(() => {
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
+    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), true),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), true),
     '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
@@ -362,7 +363,7 @@ $(() => {
     '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
     '/:scope/admin':             importRoute(import('views/pages/admin'), true),
     '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/link_new_address':  importRoute(import('views/pages/link_new_address'), true),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), true),
 
     '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
     '/:scope/account':           redirectRoute((attrs) => {
@@ -480,7 +481,6 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              console.log(payload.data.subscription_id, app.login.notifications.subscriptions);
               const subscription = app.login.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );
@@ -498,6 +498,8 @@ $(() => {
         );
       }
     }
+    m.redraw();
+  }).catch((err) => {
     m.redraw();
   });
 });

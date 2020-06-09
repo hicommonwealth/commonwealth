@@ -24,10 +24,10 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
       const CommunityButton = m(Button, {
         class: 'NewProposalButton',
         label: 'New post',
-        iconLeft: Icons.PLUS,
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
+        size: 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
       return activeAccount
@@ -44,6 +44,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         intent: 'primary',
         label: 'New post',
         fluid,
+        size: 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
       m(PopoverMenu, {
@@ -54,6 +55,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
           disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
+          size: 'sm',
         }),
         position: 'bottom-end',
         closeOnContentClick: true,

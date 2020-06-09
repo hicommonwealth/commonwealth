@@ -1,6 +1,6 @@
 import 'modals/preview_modal.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { CompactModalExitButton } from 'views/modal';

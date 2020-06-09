@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
+import $ from 'jquery';
+import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent } from 'models';
@@ -37,7 +37,7 @@ class ChainEntityController {
   }
 
   public update(entity: ChainEntity, event: ChainEvent) {
-    const existingEntity = this.store.getById(entity.id);
+    const existingEntity = this.store.get(entity);
     if (!existingEntity) {
       this._store.add(entity);
     } else {
@@ -46,8 +46,13 @@ class ChainEntityController {
     entity.addEvent(event);
   }
 
-  public refresh(chain) {
-    return get('/bulkEntities', { chain }, (result) => {
+  public refresh(chain: string, loadIncompleteEntities: boolean = false) {
+    const options: any = { chain };
+    if (!loadIncompleteEntities) {
+      options.completed = true;
+    }
+    // TODO: Change to GET /entities
+    return get('/bulkEntities', options, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);

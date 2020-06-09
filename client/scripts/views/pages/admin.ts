@@ -1,13 +1,14 @@
 import 'pages/admin.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import $ from 'jquery';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { SubmittableResult, ApiRx } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
 import { switchMap } from 'rxjs/operators';
 
 import app from 'state';
+import Sublayout from 'views/sublayout';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import { ChainInfo, NodeInfo } from 'models';
 import { formatCoin } from 'adapters/currency';
@@ -48,6 +49,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
               vnode.attrs.success = null;
               vnode.attrs.error = null;
               if (!confirm('Are you sure?')) return;
+              // TODO: Change to DELETE /chainNoode
               $.post(`${app.serverUrl()}/deleteChainNode`, {
                 id: chain.id,
                 node_url: node.url,
@@ -79,6 +81,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           vnode.attrs.success = null;
           vnode.attrs.error = null;
           const url = prompt('Enter the node url:');
+          // TODO: Change to POST /chainNode
           $.post(`${app.serverUrl()}/addChainNode`, {
             id: chain.id,
             name: chain.name,
@@ -396,8 +399,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
           onclick: (e) => {
             e.preventDefault();
             vnode.state.inprogress = true;
-            console.log(vnode.state.selected_profile);
-            console.log(vnode.state.role);
+            // TODO: Change to PUT /adminStatus
             $.post(`${app.serverUrl()}/updateAdminStatus`, {
               admin: app.vm.activeAccount.address,
               address: vnode.state.selected_profile, // the address to be changed
@@ -457,6 +459,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
             e.preventDefault();
             const time = $(vnode.dom).find('[name="time"] option:selected').val();
             const uses = $(vnode.dom).find('[name="uses"] option:selected').val();
+            // TODO: Change to POST /inviteLink
             $.post(`${app.serverUrl()}/createInviteLink`, {
               community_id: app.activeCommunityId(),
               time,
@@ -508,6 +511,7 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
     vnode.state.links = [];
   },
   oncreate: (vnode) => {
+    // TODO: Change to GET /inviteLinks
     $.get(`${app.serverUrl()}/getInviteLinks`, {
       address: app.vm.activeAccount.address,
       community_id: app.activeCommunityId(),
@@ -574,7 +578,9 @@ const AdminPage: m.Component<{}> = {
       return m(PageLoading);
     }
 
-    return m('.AdminPage', [
+    return m(Sublayout, {
+      class: 'AdminPage',
+    }, [
       m('.forum-container', [
         m(Tabs, [{
           name: 'Admin',

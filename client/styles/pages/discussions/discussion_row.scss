@@ -4,8 +4,8 @@ $discussion-row-color: #999;
 
 .DiscussionRow {
     display: block;
-    display: block;
-    margin: 20px 0 40px;
+    padding: 28px 32px;
+    border-bottom: 1px solid #ececec;
 
     a.discussion-tag {
         display: inline-block;
@@ -22,37 +22,37 @@ $discussion-row-color: #999;
         display: flex;
     }
 
-    // TODO: these sections are hidden for now
-    .discussion-pre {
-        margin-top: 4px;
-        @include xs-max {
-            display: none;
-        }
-        .User.avatar-only {
-            // ensure tooltip appears above avatar circle
-            display: block;
-        }
-    }
-    .discussion-pre-mobile {
-        display: none;
-        .User {
-            position: relative;
-            top: 2px;
-        }
-        @include xs-max {
-            display: block;
-        }
-    }
-    .discussion-pre, .discussion-pre-mobile {
-        display: none;
-    }
     .discussion-content {
         position: relative;
         flex: 1;
         .discussion-title {
+            margin-bottom: 4px;
             .discussion-edit-tags {
                 position: absolute;
                 right: -7px;
+            }
+            a {
+                color: #111;
+                font-size: 19px;
+                text-decoration: none;
+                font-weight: 600;
+                line-height: 1.3;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+            a.discussion-replies {
+                text-decoration: none;
+                margin-left: 8px;
+                color: #888;
+                user-select: none;
+                white-space: nowrap;
+                .cui-icon {
+                    position: relative;
+                    top: -1px;
+                    color: #888;
+                    margin-left: 3px;
+                }
             }
         }
     }
@@ -91,6 +91,27 @@ $discussion-row-color: #999;
             }
         }
     }
+    .discussion-commenters {
+        display: flex;
+        margin: 24px 0 0;
+        font-size: 14px;
+        a {
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .commenters-avatars {
+            .User {
+                margin-right: -8px;
+                margin-top: -1px;
+            }
+        }
+        .commenters-label {
+            margin-left: 20px;
+            color: #999;
+        }
+    }
     a.discussion-link {
         display: inline-block;
         color: $primary-green;
@@ -102,49 +123,23 @@ $discussion-row-color: #999;
             text-decoration: underline;
         }
     }
-    .discussion-title a {
-        color: #111;
-        font-size: 15px;
-        text-decoration: none;
-        font-weight: 600;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-    .discussion-title a.discussion-replies {
-        text-decoration: none;
-        margin-left: 8px;
-        color: #888;
-        user-select: none;
-        white-space: nowrap;
-        .cui-icon {
-            position: relative;
-            top: -1px;
-            color: #888;
-            margin-left: 3px;
-        }
-    }
     .discussion-excerpt {
-        color: #999;
+        margin-top: 18px;
+        font-size: 14.5px;
+        .QuillFormattedText,
+        .MarkdownFormattedText {
+            line-height: 1.5;
+        }
+        // show max 3 lines
         overflow: hidden;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
-        font-size: 14px;
-        margin: 6px 0 8px;
-    }
-    .discussion-body-preview {
-        font-size: 14px;
-        color: $discussion-row-color;
     }
 
     .no-title {
         padding-top: 0;
         margin-top: -6px;
-    }
-    .no-title .discussion-excerpt {
-        color: #111;
-        font-size: 16px;
     }
     .no-title .discussion-title {
         display: none;

@@ -1,5 +1,5 @@
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 import CodeBlock from '../../components/widgets/code_block';
 import SocialShare from './social_share';
@@ -19,7 +19,7 @@ const ETHInstructions: m.Component<IAttrs> = {
     return m('.ETHInstructions', {
       key: vnode.attrs.method,
       oncreate: (vvnode) => {
-        $('.mithril-app').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
+        $('html, body').animate({ scrollTop: $(vvnode.dom).position().top }, 500);
       }
     }, [
       (vnode.attrs.method === 'myCrypto') ? [

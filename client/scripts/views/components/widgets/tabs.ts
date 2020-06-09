@@ -1,7 +1,7 @@
 import 'components/widgets/tabs.scss';
 
-import { default as _ } from 'lodash';
-import { default as m } from 'mithril';
+import _ from 'lodash';
+import m from 'mithril';
 
 const Tabs = {
   view: (vnode) => {

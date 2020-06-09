@@ -3,7 +3,7 @@ import 'components/quill_editor.scss';
 import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
 import Quill from 'quill';
-import { Tag } from 'construct-ui';
+import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
@@ -42,6 +42,10 @@ const instantiateEditor = (
   const Keyboard = Quill.import('modules/keyboard');
   const Clipboard = Quill.import('modules/clipboard');
   let quill;
+
+  // Set up markdown mode helper
+  // TODO: Avoid using jquery to inspect
+  const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
   // Remove existing editor, if there is one
   $editor.empty();
@@ -122,18 +126,27 @@ const instantiateEditor = (
       const left = window.pageXOffset;
 
       if (e.defaultPrevented || !(this as any).quill.isEnabled()) return;
+      const plainText = e.clipboardData.getData('text/plain').replace(/\n/g, '\n\n').replace(/\n\n+/g, '\n\n');
       const range = (this as any).quill.getSelection();
       let delta = new Delta().retain(range.index);
       (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop
                                           || document.body.scrollTop || 0).toString()}px`;
       (this as any).container.focus();
       setTimeout(() => {
-        (this as any).quill.selection.update(Quill.sources.SILENT);
+        const editor = (this as any).quill;
+        editor.selection.update(Quill.sources.SILENT);
         delta = delta.concat((this as any).convert()).delete(range.length);
-        (this as any).quill.updateContents(delta, Quill.sources.USER);
-        (this as any).quill.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-        const bounds = (this as any).quill.getBounds(delta.length() - range.length, Quill.sources.SILENT);
-        (this as any).quill.scrollingContainer.scrollTop = bounds.top;
+
+        // transform pasted text
+        if (isMarkdownMode()) {
+          delta = new Delta().retain(range.index).delete(range.length).insert(plainText);
+        }
+
+        // update editor with pasted content and selection
+        editor.updateContents(delta, Quill.sources.USER);
+        editor.setSelection(delta.length() - range.length, Quill.sources.SILENT);
+        const bounds = editor.getBounds(delta.length() - range.length, Quill.sources.SILENT);
+        editor.scrollingContainer.scrollTop = bounds.top;
 
         // scroll window to previous position after paste
         window.scrollTo({ top, left });
@@ -232,7 +245,6 @@ const instantiateEditor = (
   Quill.register('formats/video', VideoBlot, true);
 
   // Setup custom keyboard bindings, override Quill default bindings where necessary
-  const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
   const bindings = {
     // Don't insert hard tabs
     'tab': {
@@ -374,6 +386,8 @@ const instantiateEditor = (
   const uploadImg = async (file) => {
     return new Promise((resolve, reject) => {
       document.getElementsByClassName('ql-container')[0].appendChild(createSpinner());
+      // TODO: Change to POST /uploadSignature
+      // TODO: Reuse code since this is used in other places
       $.post(`${app.serverUrl()}/getUploadSignature`, {
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png
@@ -843,71 +857,77 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       m('.quill-editor'),
       theme !== 'bubble' && m('.type-selector', [
         vnode.state.markdownMode
-          ? m(Tag, {
-            label: 'Markdown',
-            size: 'sm',
-            onclick: (e) => {
-              if (!vnode.state.markdownMode) return;
-              const cachedContents = vnode.state.editor.getContents();
-              // switch editor to rich text
-              vnode.state.markdownMode = false;
-              const $editor = $(vnode.dom).find('.quill-editor');
-              vnode.state.editor = instantiateEditor(
-                $editor, theme, true, imageUploader, placeholder, editorNamespace,
-                vnode.state, onkeyboardSubmit
-              );
-              vnode.state.editor.setContents(cachedContents);
-              vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
-              if (tabindex) setTabIndex(tabindex);
-              vnode.state.editor.focus();
-
-              // try to save setting
-              if (app.isLoggedIn()) {
-                SettingsController.disableRichText(false);
-              }
-            },
-          })
-          : m(Tag, {
-            label: 'Rich text',
-            size: 'sm',
-            onclick: async (e) => {
-              if (vnode.state.markdownMode) return;
-
-              // confirm before removing formatting and switching to markdown mode
-              // first, we check if removeFormat() actually does anything; then we ask the user to confirm
-              let confirmed = false;
-              let cachedContents = vnode.state.editor.getContents();
-              vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
-              if (vnode.state.editor.getContents().ops.length === cachedContents.ops.length) {
-                confirmed = true;
-              } else {
+          ? m(Tooltip, {
+            trigger: m(Tag, {
+              label: 'Markdown',
+              size: 'sm',
+              onclick: (e) => {
+                if (!vnode.state.markdownMode) return;
+                const cachedContents = vnode.state.editor.getContents();
+                // switch editor to rich text
+                vnode.state.markdownMode = false;
+                const $editor = $(vnode.dom).find('.quill-editor');
+                vnode.state.editor = instantiateEditor(
+                  $editor, theme, true, imageUploader, placeholder, editorNamespace,
+                  vnode.state, onkeyboardSubmit
+                );
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
-              }
-              if (!confirmed) {
-                confirmed = await confirmationModalWithText('All formatting and images will be lost. Continue?')();
-              }
-              if (!confirmed) return;
+                if (tabindex) setTabIndex(tabindex);
+                vnode.state.editor.focus();
 
-              // remove formatting, switch editor to markdown
-              vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
-              cachedContents = vnode.state.editor.getContents();
-              vnode.state.markdownMode = true;
-              const $editor = $(vnode.dom).find('.quill-editor');
-              vnode.state.editor = instantiateEditor(
-                $editor, theme, true, imageUploader, placeholder, editorNamespace,
-                vnode.state, onkeyboardSubmit
-              );
-              vnode.state.editor.setContents(cachedContents);
-              vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
-              if (tabindex) setTabIndex(tabindex);
-              vnode.state.editor.focus();
+                // try to save setting
+                if (app.isLoggedIn()) {
+                  SettingsController.disableRichText(false);
+                }
+              },
+            }),
+            content: 'Click for rich text',
+          })
+          : m(Tooltip, {
+            trigger: m(Tag, {
+              label: 'Rich text',
+              size: 'sm',
+              onclick: async (e) => {
+                if (vnode.state.markdownMode) return;
 
-              // try to save setting
-              if (app.isLoggedIn()) {
-                SettingsController.disableRichText(true);
-              }
-            },
+                // confirm before removing formatting and switching to markdown mode
+                // first, we check if removeFormat() actually does anything; then we ask the user to confirm
+                let confirmed = false;
+                let cachedContents = vnode.state.editor.getContents();
+                vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
+                if (vnode.state.editor.getContents().ops.length === cachedContents.ops.length) {
+                  confirmed = true;
+                } else {
+                  vnode.state.editor.setContents(cachedContents);
+                  vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
+                }
+                if (!confirmed) {
+                  confirmed = await confirmationModalWithText('All formatting and images will be lost. Continue?')();
+                }
+                if (!confirmed) return;
+
+                // remove formatting, switch editor to markdown
+                vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
+                cachedContents = vnode.state.editor.getContents();
+                vnode.state.markdownMode = true;
+                const $editor = $(vnode.dom).find('.quill-editor');
+                vnode.state.editor = instantiateEditor(
+                  $editor, theme, true, imageUploader, placeholder, editorNamespace,
+                  vnode.state, onkeyboardSubmit
+                );
+                vnode.state.editor.setContents(cachedContents);
+                vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
+                if (tabindex) setTabIndex(tabindex);
+                vnode.state.editor.focus();
+
+                // try to save setting
+                if (app.isLoggedIn()) {
+                  SettingsController.disableRichText(true);
+                }
+              },
+            }),
+            content: 'Click for Markdown',
           }),
       ]),
     ]);

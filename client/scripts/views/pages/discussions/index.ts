@@ -11,6 +11,7 @@ import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'constr
 import app from 'state';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
@@ -20,8 +21,6 @@ import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
-
-// TODO: refactor all of the below into a controller.
 
 interface IDiscussionPageAttrs {
   activeTag?: string;
@@ -34,6 +33,43 @@ interface IDiscussionPageState {
   hasOlderPosts?: boolean;
   defaultLookback: number;
 }
+
+const TagSidebar: m.Component<{ tag: string }> = {
+  view: (vnode) => {
+    const { tag } = vnode.attrs;
+
+    return m('.TagSidebar', [
+      tag
+    ]);
+  }
+};
+
+const CommunitySidebar: m.Component<{}> = {
+  view: (vnode) => {
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => {
+      return activeNode
+        && n.url === activeNode.url
+        && n.chain
+        && activeNode.chain
+        && n.chain.id === activeNode.chain.id;
+    });
+    const selectedNode = selectedNodes && selectedNodes[0];
+    const selectedCommunity = app.community;
+
+    const communityName = selectedNode
+      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    const communityDescription = selectedNode
+      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
+
+    return m('.CommunitySidebar', [
+      m('h4', `About ${communityName}`),
+      m('p', communityDescription),
+      m('br'),
+      m('h4', 'Admins & Mods')
+    ]);
+  }
+};
 
 const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
   oncreate: (vnode) => {
@@ -56,7 +92,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
   },
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
-    // add chain compatability (node info?)
+    // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
     const allLastVisited = (typeof app.login.lastVisited === 'string')
@@ -82,10 +118,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const getSingleTagListing = (tag) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-listing.tag-listing', [
-          m('h4.tag-name', [
-            tag,
-            getBackHomeButton(),
-          ]),
           m(ProposalsLoadingRow),
         ]);
       }
@@ -134,10 +166,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       if (!tagObj) return;
 
       return m('.discussions-listing.tag-listing', [
-        m('h4.tag-name', [
-          tag,
-          getBackHomeButton(),
-        ]),
         tagObj.description
         && m('h4', [
           tagObj.description,
@@ -239,12 +267,36 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
-    return m('.DiscussionsPage', [
-      (app.chain || app.community) && [
-        vnode.attrs.activeTag
-          ? getSingleTagListing(vnode.attrs.activeTag)
-          : getHomepageListing(),
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
+    const selectedCommunity = app.community;
+
+    return m(Sublayout, {
+      class: 'DiscussionsPage',
+      rightSidebar: (app.chain || app.community) && [
+        vnode.attrs.activeTag ? m(TagSidebar, { tag: vnode.attrs.activeTag }) : m(CommunitySidebar)
       ],
+    }, [
+      m('.discussions-main', [
+        (app.chain || app.community) && [
+          vnode.attrs.activeTag
+            ? getSingleTagListing(vnode.attrs.activeTag)
+            : getHomepageListing(),
+        ],
+      ]),
+      // m('.discussions-sidebar', [
+      //   m('h4', [
+      //     'About ',
+      //     selectedNode ? selectedNode.chain.name
+      //       : selectedCommunity ? selectedCommunity.meta.name : ''
+      //   ]),
+      //   m('p', [
+      //     selectedNode ? selectedNode.chain.description
+      //       : selectedCommunity ? selectedCommunity.meta.description : ''
+      //   ]),
+      // ]),
     ]);
   },
 };

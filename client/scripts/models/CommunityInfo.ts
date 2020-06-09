@@ -43,6 +43,7 @@ class CommunityInfo {
     privacyEnabled: boolean,
     invitesEnabled: boolean
   ) {
+    // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
@@ -58,8 +59,19 @@ class CommunityInfo {
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
 
+  public addFeaturedTag(tag: string) {
+    this.featuredTags.push(tag);
+  }
+
+  public removeFeaturedTag(tag: string) {
+    if (this.featuredTags.includes(tag)) {
+      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+    }
+  }
+
   public async updateFeaturedTags(tags: string[]) {
     try {
+      // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
         'featured_tags[]': tags,

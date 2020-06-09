@@ -10,6 +10,7 @@ import {
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
+  StarredCommunity,
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -21,8 +22,8 @@ import ReactionsController from './controllers/server/reactions';
 import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
-import SelectedAddressesController from './controllers/server/selected_addresses';
 import ChainEntityController from './controllers/server/chain_entities';
+import CommunitiesController from './controllers/server/communities';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -50,6 +51,7 @@ export interface IApp {
   reactions: ReactionsController;
   tags: TagsController;
   chainEntities: ChainEntityController;
+  communities: CommunitiesController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -60,21 +62,29 @@ export interface IApp {
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
+  // populated on login
   login: {
     email?: string;
     jwt?: string;
+    // all address infos for all chains/communities loaded
     addresses: AddressInfo[];
+    // contains all role data for every active + non-active address
+    // TODO: Turn this into a map, app.login.roles[community] or turn into stores/controllers
     roles: RoleInfo[];
+    // active addresses for a specific community or chain
+    // TODO: Rename to some accounts based name
     activeAddresses: Array<Account<any>>;
+    // TODO: Identify a use-case, implement a use case
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
     isSiteAdmin: boolean;
     disableRichText: boolean;
     notifications: NotificationsController;
     lastVisited: object;
-    selectedAddresses: SelectedAddressesController;
+    starredCommunities: StarredCommunity[];
     unseenPosts: object;
   };
+  // stored on server-side
   config: {
     communities: OffchainCommunitiesStore;
     chains: ChainStore;
@@ -84,6 +94,7 @@ export interface IApp {
     defaultChain: string;
     invites: any[];
   };
+  // TODO: pull this into login
   vm: {
     activeAccount: Account<any>;
   };
@@ -91,6 +102,7 @@ export interface IApp {
   isLoggedIn(): boolean;
   isProduction(): boolean;
   serverUrl(): string;
+  loadingError: string;
 }
 
 const app: IApp = {
@@ -107,6 +119,7 @@ const app: IApp = {
   reactions: new ReactionsController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
+  communities: new CommunitiesController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -125,8 +138,8 @@ const app: IApp = {
     isSiteAdmin: false,
     disableRichText: null,
     lastVisited: {},
-    selectedAddresses: new SelectedAddressesController(),
     unseenPosts: {},
+    starredCommunities: [],
     notifications: new NotificationsController(),
   },
   config: {
@@ -150,7 +163,8 @@ const app: IApp = {
   vm: {
     activeAccount: null,
   },
-  serverUrl: () => '/api'
+  serverUrl: () => '/api',
+  loadingError: null,
 };
 
 export default app;

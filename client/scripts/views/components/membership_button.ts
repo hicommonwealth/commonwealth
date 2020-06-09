@@ -1,7 +1,7 @@
 import 'components/membership_button.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { Button, Icon, Icons, MenuItem, MenuDivider, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
@@ -11,10 +11,11 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
-export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any>) => {
+export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any> | undefined) => {
+  if (!app.isLoggedIn()) return false;
   if (!app.login.roles) return false;
 
-  const addressinfo = (address instanceof Account)
+  const addressinfo: AddressInfo | undefined = (address instanceof Account)
     ? app.login.addresses.find((a) => address.address === a.address && address.chain.id === a.chain)
     : address;
   const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
@@ -33,6 +34,7 @@ const MembershipButton: m.Component<{
     if (!app.login.roles) return;
 
     const createRoleWithAddress = (a, e) => {
+      // TODO: Change to POST /role
       $.post('/api/createRole', {
         jwt: app.login.jwt,
         address_id: a.id,
@@ -49,7 +51,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Joined ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);
@@ -65,7 +67,7 @@ const MembershipButton: m.Component<{
         m.redraw();
         return;
       }
-
+      // TODO: Change to DELETE /role
       $.post('/api/deleteRole', {
         jwt: app.login.jwt,
         address_id: a.id,
@@ -85,7 +87,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Left ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);

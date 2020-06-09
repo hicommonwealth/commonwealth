@@ -1,19 +1,23 @@
 import 'pages/validators.scss';
 
 import m from 'mithril';
+import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
+
+import app, { ApiStatus } from 'state';
+import { formatAddressShort } from 'helpers';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
-import _ from 'lodash';
-import app, { ApiStatus } from 'state';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
-import { formatAddressShort } from 'helpers';
 import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
 import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
+import Tabs from 'views/components/widgets/tabs';
+import { createTXModal } from 'views/modals/tx_signing_modal';
+import Sublayout from 'views/sublayout';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
@@ -154,7 +158,9 @@ const ValidatorPage : m.Component = {
       }
     }
 
-    return m('.ValidatorPage', [
+    return m(Sublayout, {
+      class: 'ValidatorPage',
+    }, [
       m(Validators),
       m('.clear'),
     ]);

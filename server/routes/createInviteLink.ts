@@ -1,20 +1,29 @@
-
 import crypto from 'crypto';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NotLoggedIn: 'Not logged in',
+  NoCommunityId: 'Error finding community',
+  NoTimeLimit: 'Must provide a time limit',
+  InvalidCommunity: 'Invalid community',
+  NotAdminMod: 'Must be an admin/mod to create Invite Link',
+  InvalidUses: 'Must provide a valid number of uses',
+};
+
 const createInviteLink = async (models, req, res, next) => {
-  if (!req.user) return next(new Error('Not logged in'));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { community_id, time } = req.body;
-  if (!community_id) return next(new Error('Error finding community'));
-  if (!time) return next(new Error('Must provide a time limit'));
+  if (!community_id) return next(new Error(Errors.NoCommunityId));
+  if (!time) return next(new Error(Errors.NoTimeLimit));
 
   const community = await models.OffchainCommunity.findOne({
     where: {
       id: community_id,
     },
   });
-  if (!community) return next(new Error('Invalid community'));
+  if (!community) return next(new Error(Errors.InvalidCommunity));
 
   if (!community.invitesEnabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
@@ -24,7 +33,7 @@ const createInviteLink = async (models, req, res, next) => {
         permission: ['admin', 'moderator'],
       },
     });
-    if (!requesterIsAdminOrMod) return next(new Error('Must be an admin/mod to create Invite Link'));
+    if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdminMod));
   }
 
   let { uses } = req.body;
@@ -34,7 +43,7 @@ const createInviteLink = async (models, req, res, next) => {
     uses = +uses;
   }
   if (isNaN(uses)) {
-    return next(new Error('Must provide a valid number of uses'));
+    return next(new Error(Errors.InvalidUses));
   }
 
   // check to see if unlimited time + unlimited usage already exists

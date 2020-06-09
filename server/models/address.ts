@@ -1,7 +1,7 @@
 (global as any).window = {};
 
+import * as Sequelize from 'sequelize';
 import crypto from 'crypto';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { stringToU8a, hexToU8a, u8aToString } from '@polkadot/util';
@@ -16,47 +16,108 @@ import nacl from 'tweetnacl';
 import { KeyringOptions } from '@polkadot/keyring/types';
 import { keyToSignMsg } from '../../shared/adapters/chain/cosmos/keys';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../util/logging';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { ChainAttributes, ChainInstance } from './chain';
+import { UserAttributes } from './user';
+import { OffchainProfileAttributes } from './offchain_profile';
+import { RoleAttributes } from './role';
+import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 // tslint:disable-next-line
 const ethUtil = require('ethereumjs-util');
 
-module.exports = (sequelize, DataTypes) => {
-  const Address = sequelize.define('Address', {
-    address:                    { type: DataTypes.STRING, allowNull: false },
-    chain:                      { type: DataTypes.STRING, allowNull: false },
-    verification_token:         { type: DataTypes.STRING, allowNull: false },
-    verification_token_expires: { type: DataTypes.DATE, allowNull: true },
-    verified:                   { type: DataTypes.DATE, allowNull: true },
-    keytype:                    { type: DataTypes.STRING, allowNull: true },
-    name:                       { type: DataTypes.STRING, allowNull: true }
+export interface AddressAttributes {
+  id?: number;
+  address: string;
+  chain: string;
+  verification_token: string;
+  verification_token_expires?: Date;
+  verified?: Date;
+  keytype?: string;
+  name?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  user_id?: number;
+
+  // associations
+  Chain?: ChainAttributes;
+  User?: UserAttributes;
+  OffchainProfile?: OffchainProfileAttributes;
+  Roles?: RoleAttributes[];
+}
+
+export interface AddressInstance extends Sequelize.Instance<AddressAttributes>, AddressAttributes {
+  // no mixins used yet
+}
+
+export interface AddressModel extends Sequelize.Model<AddressInstance, AddressAttributes> {
+  // static methods
+  createWithToken?: (
+    user_id: number,
+    chain: string,
+    address: string,
+    keytype?: string
+  ) => Promise<AddressInstance>;
+
+  updateWithToken?: (
+    address: AddressInstance,
+    user_id?: number,
+    keytype?: string
+  ) => Promise<AddressInstance>;
+
+  verifySignature?: (
+    models: Sequelize.Models,
+    chain: ChainInstance,
+    addressModel: AddressInstance,
+    user_id: number,
+    signatureString: string,
+    signatureParams: string,
+  ) => Promise<boolean>;
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): AddressModel => {
+  const Address: AddressModel = sequelize.define<AddressInstance, AddressAttributes>('Address', {
+    id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    address:                    { type: dataTypes.STRING, allowNull: false },
+    chain:                      { type: dataTypes.STRING, allowNull: false },
+    verification_token:         { type: dataTypes.STRING, allowNull: false },
+    verification_token_expires: { type: dataTypes.DATE, allowNull: true },
+    verified:                   { type: dataTypes.DATE, allowNull: true },
+    keytype:                    { type: dataTypes.STRING, allowNull: true },
+    name:                       { type: dataTypes.STRING, allowNull: true },
+    created_at:                 { type: dataTypes.DATE, allowNull: false },
+    updated_at:                 { type: dataTypes.DATE, allowNull: false },
+    user_id:                    { type: dataTypes.INTEGER, allowNull: true },
   }, {
     underscored: true,
     indexes: [
       { fields: ['address', 'chain'], unique: true },
       { fields: ['user_id'] },
       { fields: ['name'] }
-    ],
+    ]
   });
 
-  Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
-    models.Address.hasOne(models.OffchainProfile);
-    models.Address.hasMany(models.Role, { foreignKey: 'address_id', targetKey: 'id' });
-  };
-
-  // Create an unverified 'stub' address, with a verification token
-  // tslint:disable:variable-name
-  Address.createWithToken = (user_id, chain, address, keytype?) => {
+  Address.createWithToken = (
+    user_id: number,
+    chain: string,
+    address: string,
+    keytype?: string
+  ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     return Address.create({ user_id, chain, address, verification_token, verification_token_expires, keytype });
   };
 
   // Update an existing address' verification token
-  Address.updateWithToken = (address, user_id?, keytype?) => {
+  Address.updateWithToken = (
+    address: AddressInstance,
+    user_id?: number,
+    keytype?: string,
+  ): Promise<AddressInstance> => {
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
     if (user_id) {
@@ -72,13 +133,13 @@ module.exports = (sequelize, DataTypes) => {
   // passed from the frontend to show exactly what was signed.
   // Supports Substrate, Ethereum, Cosmos, and NEAR.
   Address.verifySignature = async (
-    models,
-    chain,
-    addressModel,
-    user_id,
+    models: Sequelize.Models,
+    chain: ChainInstance,
+    addressModel: AddressInstance,
+    user_id: number,
     signatureString: string,
     signatureParams: string,
-  ) => {
+  ): Promise<boolean> => {
     if (!chain) {
       log.error('no chain provided to verifySignature');
       return false;
@@ -117,8 +178,8 @@ module.exports = (sequelize, DataTypes) => {
         const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
         isValid = signerKeyring.verify(signedPayload, hexToU8a(signatureString));
       } else {
-        const signedMessage = stringToU8a(addressModel.verification_token + '\n');
-        isValid = signerKeyring.verify(signedMessage, hexToU8a('0x' + signatureString));
+        const signedMessage = stringToU8a(`${addressModel.verification_token}\n`);
+        isValid = signerKeyring.verify(signedMessage, hexToU8a(`0x${signatureString}`));
       }
     } else if (chain.network === 'cosmos') {
       const signatureData = JSON.parse(signatureString);
@@ -132,7 +193,7 @@ module.exports = (sequelize, DataTypes) => {
       // the account they registered with
       const generatedAddress = getCosmosAddress(pk);
       if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
+        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
         isValid = secp256k1.verify(signHash, signature, pk);
       } else {
         isValid = false;
@@ -154,18 +215,18 @@ module.exports = (sequelize, DataTypes) => {
       );
       const addressBuffer = ethUtil.publicToAddress(publicKey);
       const address = ethUtil.bufferToHex(addressBuffer);
-      isValid = (addressModel.address.toLowerCase() === address.toLowerCase()) ? true : false ;
+      isValid = (addressModel.address.toLowerCase() === address.toLowerCase());
     } else if (chain.network === 'near') {
       // both in base64 encoding
       const { signature: sigObj, publicKey } = JSON.parse(signatureString);
       isValid = nacl.sign.detached.verify(
-        Buffer.from(addressModel.verification_token + '\n'),
+        Buffer.from(`${addressModel.verification_token}\n`),
         Buffer.from(sigObj, 'base64'),
         Buffer.from(publicKey, 'base64'),
       );
     } else {
       // invalid network
-      log.error('invalid network: ' + chain.network);
+      log.error(`invalid network: ${chain.network}`);
       isValid = false;
     }
 
@@ -192,6 +253,13 @@ module.exports = (sequelize, DataTypes) => {
       await addressModel.save();
     }
     return isValid;
+  };
+
+  Address.associate = (models) => {
+    models.Address.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.Address.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Address.hasOne(models.OffchainProfile);
+    models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
   };
 
   return Address;

@@ -1,6 +1,6 @@
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import $ from 'jquery';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
@@ -12,7 +12,12 @@ import { notifyError } from 'controllers/app/notifications';
 
 export enum CommentParent {
   Proposal = 'proposal',
-  Comment = 'comment'
+  Comment = 'comment',
+}
+
+export enum CommentRefreshOption {
+  ResetAndLoadOffchainComments = 'ResetAndLoadOffchainComments',
+  LoadProposalComments = 'LoadProposalComments',
 }
 
 const modelFromServer = (comment) => {
@@ -59,6 +64,14 @@ class CommentsController {
     return this._store.nComments(proposal);
   }
 
+  public uniqueCommenters<T extends IUniqueId>(proposal: T) {
+    // Returns an array of [chain, address] arrays
+    // TODO: Use a better comparator to determine uniqueness
+    const comments = this._store.getByProposal(proposal);
+    return _.uniq(comments.map((c) => `${c.authorChain}#${c.author}`))
+      .map((slug) => slug.split(/#/));
+  }
+
   public lastCommented<T extends IUniqueId>(proposal: T) {
     const comments = this._store.getByProposal(proposal);
     if (comments.length === 0) return null;
@@ -79,6 +92,7 @@ class CommentsController {
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
+      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chain,
@@ -112,6 +126,7 @@ class CommentsController {
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     try {
+      // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         'address': app.vm.activeAccount.address,
         'author_chain': app.vm.activeAccount.chain.id,
@@ -140,6 +155,7 @@ class CommentsController {
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
+        // TODO: Change to GET /comments
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
           community: communityId,
@@ -170,6 +186,7 @@ class CommentsController {
   public async delete(comment) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.login.jwt,
         comment_id: comment.id,
@@ -185,32 +202,24 @@ class CommentsController {
     });
   }
 
-  public async refreshAll(
-    chainId: string,
-    communityId: string,
-    reset = false,
-    offchainThreadsOnly = false,
-    proposalsOnly = false
-  ) {
+  public async refreshAll(chainId: string, communityId: string, reset: CommentRefreshOption) {
     try {
       const args: any = {
         chain: chainId,
         community: communityId,
       };
-      if (offchainThreadsOnly && proposalsOnly) {
-        throw new Error('cannot select mutually exclusive offchain threads and proposals only options');
-      }
-      if (offchainThreadsOnly) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         args.offchain_threads_only = 1;
       }
-      if (proposalsOnly) {
+      if (reset === CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
+      // TODO: Change to GET /comments
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);
       }
-      if (reset) {
+      if (reset === CommentRefreshOption.ResetAndLoadOffchainComments) {
         this._store.clear();
       }
       await Promise.all(response.result.map(async (comment) => {

@@ -10,7 +10,7 @@ import {
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/edgeware/types';
-import { default as SubstrateChain } from './shared';
+import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 
@@ -88,30 +88,30 @@ export class SubstrateCollectiveProposal
   }
 
   public update(e: ChainEvent) {
-    console.log(e);
     if (this.completed) {
       return;
     }
     switch (e.data.kind) {
       case SubstrateEventKind.CollectiveProposed: {
+        // proposer always submits an implicit yes vote
+        if (e.data.proposer) {
+          const voter = this._Accounts.fromAddress(e.data.proposer);
+          this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, true));
+        }
+        break;
+      }
+      case SubstrateEventKind.CollectiveVoted: {
+        const voter = this._Accounts.fromAddress(e.data.voter);
+        this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, e.data.vote));
         break;
       }
       case SubstrateEventKind.CollectiveDisapproved: {
-        console.log('disapproved', e);
         this._approved.next(false);
-        this._updateVotes(
-          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
-          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
-        );
         this.complete();
         break;
       }
       case SubstrateEventKind.CollectiveApproved: {
         this._approved.next(true);
-        this._updateVotes(
-          e.data.ayes.map((who) => this._Accounts.fromAddress(who)),
-          e.data.nays.map((who) => this._Accounts.fromAddress(who)),
-        );
         break;
       }
       case SubstrateEventKind.CollectiveExecuted: {

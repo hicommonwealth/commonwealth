@@ -5,9 +5,17 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
+import { factory, formatFilename } from '../../shared/logging';
 
-import { factory, formatFilename } from '../util/logging';
 const log = factory.getLogger(formatFilename(__filename));
+
+export const Errors = {
+  MissingRootId: 'Must provide root_id',
+  InvalidParent: 'Invalid parent',
+  MissingTextOrAttachment: 'Must provide text or attachment',
+  ThreadNotFound: 'Cannot comment; thread not found',
+  CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
+};
 
 const createComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -31,21 +39,21 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
         chain: chain.id,
       }
     });
-    if (!parentCommentIsVisibleToUser) return next(new Error('Invalid parent'));
+    if (!parentCommentIsVisibleToUser) return next(new Error(Errors.InvalidParent));
   }
 
   if (!root_id) {
-    return next(new Error('Must provide root_id'));
+    return next(new Error(Errors.MissingRootId));
   }
   if ((!text || !text.trim())
       && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-    return next(new Error('Must provide text or attachment'));
+    return next(new Error(Errors.MissingTextOrAttachment));
   }
   try {
     const quillDoc = JSON.parse(decodeURIComponent(text));
     if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === ''
         && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-      return next(new Error('Must provide text or attachment'));
+      return next(new Error(Errors.MissingTextOrAttachment));
     }
   } catch (e) {
     // check always passes if the comment text isn't a Quill document
@@ -126,11 +134,11 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
 
   if (!proposal) {
     await finalComment.destroy();
-    return next(new Error('Cannot comment; thread not found'));
+    return next(new Error(Errors.ThreadNotFound));
   }
   if (proposal.read_only) {
     await finalComment.destroy();
-    return next(new Error('Cannot comment when thread is read_only'));
+    return next(new Error(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
@@ -153,22 +161,20 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
 
   // grab mentions to notify tagged users
   let mentionedAddresses;
-  if (mentions && mentions.length) {
-    try {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        mention = mention.split(',');
-        const user = await models.Address.findOne({
-          where: {
-            chain: mention[0],
-            address: mention[1],
-          },
-          include: [ models.User, models.Role ]
-        });
-        return user;
-      }));
-    } catch (err) {
-      log.error(err);
-    }
+  if (mentions && mentions.length > 0) {
+    mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
+      mention = mention.split(',');
+      const user = await models.Address.findOne({
+        where: {
+          chain: mention[0],
+          address: mention[1],
+        },
+        include: [ models.User, models.Role ]
+      });
+      return user;
+    }));
+
+    mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
   }
 
   // dispatch notifications to root thread
@@ -232,7 +238,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   // notify mentioned users if they have permission to view the originating forum
-  if (mentionedAddresses?.length) {
+  if (mentionedAddresses?.length > 0) {
     await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 

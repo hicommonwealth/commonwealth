@@ -1,8 +1,8 @@
 import 'pages/new_signaling.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 import {
   Grid, Col, Classes, ButtonGroup, Callout, Form, FormGroup,
   FormLabel, Button, Icon, Icons, Radio, RadioGroup, Tag, Input, TextArea
@@ -15,6 +15,7 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { notifyInfo } from 'controllers/app/notifications';
 
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { TextInputFormField, TextareaFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
@@ -100,7 +101,9 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       md: 7,
     };
 
-    return m('.NewSignalingPage', [
+    return m(Sublayout, {
+      class: 'NewSignalingPage',
+    }, [
       m('.forum-container', [
         m('h2.page-title', 'New Signaling Proposal'),
         m(Grid, [

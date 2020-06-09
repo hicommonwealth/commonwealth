@@ -10,16 +10,17 @@ import {
 
 import app from 'state';
 import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { re_weburl } from 'lib/url-validation';
 
 import { notifyInfo } from 'controllers/app/notifications';
+import Sublayout from 'views/sublayout';
 import PreviewModal from 'views/modals/preview_modal';
 import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import { newThread, getLinkTitle, detectURL, newLink } from 'views/pages/threads';
-import { re_weburl } from '../../lib/url-validation';
-import { updateLastVisited } from '../../controllers/app/login';
-import AutoCompleteTagForm from '../components/autocomplete_tag_form';
-import PageLoading from './loading';
+import { updateLastVisited } from 'controllers/app/login';
+import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
+import PageLoading from 'views/pages/loading';
 
 interface IState {
   form,
@@ -77,7 +78,11 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
-    return m('.NewThreadForm', [
+    return m('.NewThreadForm', {
+      oncreate: (vvnode) => {
+        $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
+      },
+    }, [
       vnode.state.newType === 'Link' && m(Form, [
         typeSelector,
         m(FormGroup, [
@@ -92,6 +97,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Input, {
+            class: 'new-thread-title',
             placeholder: 'Title',
             onchange: (e) => {
               const { value } = e.target as any;
@@ -233,7 +239,9 @@ const NewThreadPage: m.Component = {
       xl: 8,
     };
 
-    return m('.NewThreadPage', [
+    return m(Sublayout, {
+      class: 'NewThreadPage',
+    }, [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
         m(Grid, [

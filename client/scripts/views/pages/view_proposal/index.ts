@@ -12,6 +12,7 @@ import { WalletAccount } from 'nearlib';
 
 import { NotificationCategories } from 'types';
 import app, { LoginState } from 'state';
+import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
@@ -319,7 +320,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
 interface IProposalCommentsState {
   commentError: any;
   dom;
-  jumpedToHighlightedComment: boolean;
+  highlightedComment: boolean;
 }
 
 interface IProposalCommentsAttrs {
@@ -343,8 +344,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
-    if (vnode.state.dom && comments?.length > 0 && !vnode.state.jumpedToHighlightedComment) {
-      vnode.state.jumpedToHighlightedComment = true;
+    if (vnode.state.dom && comments?.length > 0 && !vnode.state.highlightedComment) {
+      vnode.state.highlightedComment = true;
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
         : null;
@@ -440,7 +441,7 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -602,7 +603,7 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
             : $('.ProposalComments > .CreateComment');
 
           // if the reply is at least partly offscreen, scroll it entirely into view
-          const scrollTop = $('body').scrollTop();
+          const scrollTop = $('html, body').scrollTop();
           const replyTop = $reply.offset().top;
           if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
             $('html, body').animate({ scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40 }, 500);
@@ -621,23 +622,27 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
     };
 
     const { replyParent } = vnode.state;
-    return m('.ViewProposalPage', [
-      m(ProposalHeader, {
-        proposal,
-        commentCount,
-        viewCount,
-        getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
-      }),
-      m(ProposalComments, {
-        proposal,
-        comments,
-        createdCommentCallback,
-        replyParent,
-        getSetGlobalEditingStatus,
-        getSetGlobalReplyStatus
-      }),
-      m(ProposalSidebar, { proposal }),
+    return m(Sublayout, {
+      class: 'ViewProposalPage',
+      rightSidebar: m(ProposalSidebar, { proposal }),
+    }, [
+      m('.forum-container', [
+        m(ProposalHeader, {
+          proposal,
+          commentCount,
+          viewCount,
+          getSetGlobalEditingStatus,
+          getSetGlobalReplyStatus
+        }),
+        m(ProposalComments, {
+          proposal,
+          comments,
+          createdCommentCallback,
+          replyParent,
+          getSetGlobalEditingStatus,
+          getSetGlobalReplyStatus
+        }),
+      ]),
     ]);
   }
 };

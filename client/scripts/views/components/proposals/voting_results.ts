@@ -1,6 +1,6 @@
 import 'components/proposals/voting_results.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { VoteOutcome } from 'edgeware-node-types/dist';
 import { u8aToString } from '@polkadot/util';
 

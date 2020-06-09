@@ -1,6 +1,7 @@
 import { SERVER_URL } from '../config';
 import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../util/logging';
+import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const redirectWithLoginSuccess = (res, email, path?, newAcct = false) => {

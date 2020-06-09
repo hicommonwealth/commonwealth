@@ -1,4 +1,3 @@
-import { Event, Extrinsic } from '@polkadot/types/interfaces';
 import { SubstrateEventKind } from '../types';
 
 /**
@@ -62,6 +61,7 @@ export default function (
     case 'technicalCollective':
       switch (method) {
         case 'Proposed': return SubstrateEventKind.CollectiveProposed;
+        case 'Voted': return SubstrateEventKind.CollectiveVoted;
         case 'Approved': return SubstrateEventKind.CollectiveApproved;
         case 'Disapproved': return SubstrateEventKind.CollectiveDisapproved;
         case 'Executed': return SubstrateEventKind.CollectiveExecuted;

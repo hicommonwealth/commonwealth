@@ -1,4 +1,4 @@
-import { default as m } from 'mithril';
+import m from 'mithril';
 import app from 'state';
 
 import { isRoleOfCommunity } from 'helpers/roles';
@@ -43,6 +43,7 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs> = {
       && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
           || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
           || proposal.author === app.vm.activeAccount.address);
+    if (!app.isLoggedIn()) return;
 
     return m(PopoverMenu, {
       transitionDuration: 0,

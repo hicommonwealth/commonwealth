@@ -15,7 +15,7 @@ import { CosmosApi } from 'adapters/chain/cosmos/api';
 import { Unsubscribable, BehaviorSubject } from 'rxjs';
 import { filter, takeWhile } from 'rxjs/operators';
 import { ProposalStore } from 'stores';
-import { default as moment } from 'moment-twitter';
+import moment from 'moment-twitter';
 import { CosmosAccount, CosmosAccounts } from './account';
 import CosmosChain from './chain';
 import CosmosGovernance, { marshalTally } from './governance';
@@ -341,8 +341,6 @@ export class CosmosProposal extends Proposal<
     this._totalDeposit = state.totalDeposit;
     if (state.completed) {
       super.complete(store);
-    } else {
-      store.update(this);
     }
   }
 }

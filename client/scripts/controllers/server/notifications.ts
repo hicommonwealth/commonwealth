@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
+import $ from 'jquery';
+import _ from 'lodash';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification } from 'models';
@@ -30,6 +30,7 @@ class NotificationsController {
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
+      // TODO: Change to POST /subscription
       return post('/createSubscription', {
         'category': category, 'object_id': objectId, 'is_active': true
       }, (result) => {
@@ -40,6 +41,7 @@ class NotificationsController {
   }
 
   public enableSubscriptions(subscriptions: NotificationSubscription[]) {
+    // TODO: Change to PUT /subscriptions
     return post('/enableSubscriptions', {
       'subscription_ids[]': subscriptions.map((n) => n.id),
     }, (result) => {
@@ -50,6 +52,7 @@ class NotificationsController {
   }
 
   public disableSubscriptions(subscriptions: NotificationSubscription[]) {
+    // TODO: Change to PUT /subscriptions
     return post('/disableSubscriptions', {
       'subscription_ids[]': subscriptions.map((n) => n.id),
     }, (result) => {
@@ -59,7 +62,30 @@ class NotificationsController {
     });
   }
 
+  public enableImmediateEmails(subscriptions: NotificationSubscription[]) {
+    // TODO: Change to PUT /immediateEmails
+    return post('/enableImmediateEmails', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      for (const s of subscriptions) {
+        s.enableImmediateEmail();
+      }
+    });
+  }
+
+  public disableImmediateEmails(subscriptions: NotificationSubscription[]) {
+    // TODO: Change to PUT /immediateEmails
+    return post('/disableImmediateEmails', {
+      'subscription_ids[]': subscriptions.map((n) => n.id),
+    }, (result) => {
+      for (const s of subscriptions) {
+        s.disableImmediateEmail();
+      }
+    });
+  }
+
   public deleteSubscription(subscription: NotificationSubscription) {
+    // TODO: Change to DELETE /subscription
     return post('/deleteSubscription', {
       'subscription_id': subscription.id,
     }, (result) => {
@@ -72,6 +98,7 @@ class NotificationsController {
   }
 
   public markAsRead(notifications: Notification[]) {
+    // TODO: Change to PUT /notificationsRead
     return post('/markNotificationsRead', {
       'notification_ids[]': notifications.map((n) => n.id),
     }, (result) => {
@@ -82,6 +109,7 @@ class NotificationsController {
   }
 
   public clearAllRead() {
+    // TODO: Change to DELETE /notificationsRead (combine with mark route)
     return post('/clearReadNotifications', { }, (result) => {
       const toClear = this._store.getAll().filter((n) => n.isRead);
       for (const n of toClear) {
@@ -91,13 +119,16 @@ class NotificationsController {
   }
 
   public update(n: Notification) {
-    this._store.add(n);
+    if (!this._store.getById(n.id)) {
+      this._store.add(n);
+    }
   }
 
   public refresh() {
     if (!app.login || !app.login.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
+    // TODO: Change to GET /notifications
     return post('/viewNotifications', { }, (result) => {
       this._store.clear();
       this._subscriptions = [];

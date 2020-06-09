@@ -1,5 +1,8 @@
-$fonts: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$fonts: IBM Plex Sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: 'iA Writer Duospace', monospace;
+
+$theme-base-color: #5b7bf6;
+$theme-accent-dark: darken(#5b7bf6, 7%);
 
 $offwhite-extralight: #fcfbfa;
 $offwhite-light: #f9f8f6;
@@ -18,311 +21,315 @@ $form-active-color: #08c;
 $lighttextgrey: #999;
 $electricblue: #229bd6;
 
-$header-height: 68px;
-$sidebar-width: 280px;
-$switcher-width: 68px;
+$header-height: 64px;
+$sidebar-width: 240px;
+$sublayout-max-width: 1340px;
+
+$vertical-padding: 30px; // padding between header and content
+$gutter-width: 24px; // padding between columns
+$header-spacing: 14px; // padding between header items
 
 @mixin popout {
-  animation: popout 0.05s ease;
-  -webkit-animation: popout 0.05s ease;
+    animation: popout 0.05s ease;
+    -webkit-animation: popout 0.05s ease;
 }
 @keyframes popout {
-  from { transform: scale(0.975); }
-  80% { transform: scale(1); }
-  to { transform: scale(1); }
+    from { transform: scale(0.975); }
+    80% { transform: scale(1); }
+    to { transform: scale(1); }
 }
 @-webkit-keyframes popout {
-  from { -webkit-transform: scale(0.975); }
-  80% { -webkit-transform: scale(1); }
-  to { -webkit-transform: scale(1); }
+    from { -webkit-transform: scale(0.975); }
+    80% { -webkit-transform: scale(1); }
+    to { -webkit-transform: scale(1); }
 }
 
 @mixin hoverFloat {
-  transition: transform 50ms ease-in-out;
-  &:hover {
-    transform: translate(0, -1px);
-  }
+    transition: transform 50ms ease-in-out;
+    &:hover {
+        transform: translate(0, -1px);
+    }
 }
 
 @mixin error-text {
-  font-weight: 700;
-  color: $error-red;
+    font-weight: 700;
+    color: $error-red;
 }
 @mixin success-text {
-  font-weight: 700;
-  color: $success-green;
+    font-weight: 700;
+    color: $success-green;
 }
 @mixin profile-notice($background, $text-color) {
-  display: inline-block;
-  margin-bottom: 10px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: $background;
-  color: $text-color;
-  // text
-  font-size: 14px;
-  font-weight: 500;
-  text-align: left;
-  a {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: $background;
     color: $text-color;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  @include xs-max {
-    padding: 8px 12px;
-  }
+    // text
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    a {
+        color: $text-color;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    @include xs-max {
+        padding: 8px 12px;
+    }
 }
 @mixin category-icon {
-  display: inline-block;
-  background: #ccc;
-  width: 10px;
-  height: 10px;
-  margin-top: 2px;
-  margin-right: 8px;
-  border-radius: 2px;
+    display: inline-block;
+    background: #ccc;
+    width: 10px;
+    height: 10px;
+    margin-top: 2px;
+    margin-right: 8px;
+    border-radius: 2px;
 }
 @mixin attachments {
-  p {
-    font-weight: 700;
-    color: #999;
-  }
-  a.attachment-item {
-    display: inline-block;
-    max-width: 100px;
-    max-height: 100px;
-    background: #f1efef;
-    margin-right: 10px;
-    text-align: center;
-    text-decoration: none;
-    &:hover {
-      background: darken(#f1efef, 1%);
+    p {
+        font-weight: 700;
+        color: #999;
     }
-    img {
-      width: 50%;
-      margin: 10px 0 4px;
+    a.attachment-item {
+        display: inline-block;
+        max-width: 100px;
+        max-height: 100px;
+        background: #f1efef;
+        margin-right: 10px;
+        text-align: center;
+        text-decoration: none;
+        &:hover {
+            background: darken(#f1efef, 1%);
+        }
+        img {
+            width: 50%;
+            margin: 10px 0 4px;
+        }
     }
-  }
 }
 
 @mixin clearfix {
-  *zoom: 1;
-  &:before,
-  &:after {
-    display: table;
-    content: "";
-    line-height: 0;
-  }
-  &:after {
-    clear: both;
-  }
+    *zoom: 1;
+    &:before,
+    &:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+    &:after {
+        clear: both;
+    }
 }
 
 @mixin xxs-max {
-  @media only screen and (max-width: 42em) { @content; }
+    @media only screen and (max-width: 42em) { @content; }
 }
 @mixin xs-max {
-  @media only screen and (max-width: 48em) { @content; }
+    @media only screen and (max-width: 48em) { @content; }
 }
 @mixin sm-max {
-  @media only screen and (max-width: 62em) { @content; }
+    @media only screen and (max-width: 62em) { @content; }
 }
 @mixin md-max {
-  @media only screen and (max-width: 75em) { @content; }
+    @media only screen and (max-width: 75em) { @content; }
 }
 @mixin sm-min {
-  @media only screen and (min-width: 48em) { @content; }
+    @media only screen and (min-width: 48em) { @content; }
 }
 @mixin md-min {
-  @media only screen and (min-width: 62em) { @content; }
+    @media only screen and (min-width: 62em) { @content; }
 }
 @mixin lg-min {
-  @media only screen and (min-width: 75em) { @content; }
+    @media only screen and (min-width: 75em) { @content; }
 }
 
 @mixin well {
-  padding: 24px 30px 28px;
-  background: #f9f8f6;
-  border-radius: 4px;
-  margin: 20px 0;
-  h4 {
-    margin-top: 0;
-    margin-bottom: 6px;
-  }
-  @include xs-max {
-    padding: 20px 22px 22px;
-  }
+    padding: 24px 30px 28px;
+    background: #f9f8f6;
+    border-radius: 4px;
+    margin: 20px 0;
+    h4 {
+        margin-top: 0;
+        margin-bottom: 6px;
+    }
+    @include xs-max {
+        padding: 20px 22px 22px;
+    }
 }
 
 @mixin formfield-base {
-  display: block;
-  width: 100%;
-  border: 1px solid $form-border-color;
-  border-radius: $form-border-radius;
-  outline: none;
-  box-shadow: none;
-  &:focus {
-    border-color: $form-active-color;
-  }
+    display: block;
+    width: 100%;
+    border: 1px solid $form-border-color;
+    border-radius: $form-border-radius;
+    outline: none;
+    box-shadow: none;
+    &:focus {
+        border-color: $form-active-color;
+    }
 }
 
 @mixin formfield-text {
-  @include formfield-base;
-  padding: 10px 10px;
-  &::placeholder {
-      color: #aaa;
-  }
-  &:focus::placeholder {
-      color: #999;
-  }
+    @include formfield-base;
+    padding: 10px 10px;
+    &::placeholder {
+        color: #aaa;
+    }
+    &:focus::placeholder {
+        color: #999;
+    }
 }
 
 @mixin dark-menu-styles {
-  color: #fff;
-  z-index: 9999;
-  background: #343434;
-  border-radius: 0 0 2px 2px;
-  ul {
-    padding: 4px 0;
-    margin: 0;
-  }
-  ul a {
-    text-decoration: none;
     color: #fff;
-  }
-  ul li {
-    margin: 0;
-    padding: 6px 16px;
-    list-style: none;
-    cursor: pointer;
-  }
-  ul li:last-child {
-    border-bottom: none;
-  }
-  ul li:hover {
-    background: #454545;
-    color: #fff;
-  }
-  ul a li:hover {
-    color: #fff;
-  }
-  ul li.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  ul li.divider {
-    height: 1px;
-    padding: 0;
-    margin: 6px 0;
-    border-bottom: 1px solid #474747;
-  }
+    z-index: 9999;
+    background: #343434;
+    border-radius: 0 0 2px 2px;
+    ul {
+        padding: 4px 0;
+        margin: 0;
+    }
+    ul a {
+        text-decoration: none;
+        color: #fff;
+    }
+    ul li {
+        margin: 0;
+        padding: 6px 16px;
+        list-style: none;
+        cursor: pointer;
+    }
+    ul li:last-child {
+        border-bottom: none;
+    }
+    ul li:hover {
+        background: #454545;
+        color: #fff;
+    }
+    ul a li:hover {
+        color: #fff;
+    }
+    ul li.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+    ul li.divider {
+        height: 1px;
+        padding: 0;
+        margin: 6px 0;
+        border-bottom: 1px solid #474747;
+    }
 }
 
 @mixin menu-styles {
-  color: #111;
-  z-index: 9999;
-  background: #fff;
-  border-radius: 4px;
-  border: 1px solid #eee;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.04);
-  ul {
-    padding: 2px 0;
-    margin: 0;
-  }
-  ul a {
-    text-decoration: none;
-    color: $offwhite-dark;
-  }
-  ul li {
-    margin: 0;
-    padding: 6px 16px;
-    list-style: none;
-    cursor: pointer;
-  }
-  ul li:last-child {
-    border-bottom: none;
-  }
-  ul li:hover {
-    background: #08c;
-    color: $offwhite-extralight;
-  }
-  ul a li:hover {
-    color: $offwhite-extralight;;
-  }
-  ul li.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  ul li.divider {
-    height: 1px;
-    padding: 0;
-    margin: 2px 0;
-    border-bottom: 1px solid #ececec;
-  }
-  ul li .alert-badge {
-    float: right;
-    margin-top: 2px;
-    padding: 3px 3px 2px;
-    border-radius: 2px;
-    color: $offwhite-extralight;;
-    background: $badge-lightred;
-    font-size: 12px;
-    line-height: 1;
-  }
+    color: #111;
+    z-index: 9999;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.04);
+    ul {
+        padding: 2px 0;
+        margin: 0;
+    }
+    ul a {
+        text-decoration: none;
+        color: $offwhite-dark;
+    }
+    ul li {
+        margin: 0;
+        padding: 6px 16px;
+        list-style: none;
+        cursor: pointer;
+    }
+    ul li:last-child {
+        border-bottom: none;
+    }
+    ul li:hover {
+        background: #08c;
+        color: $offwhite-extralight;
+    }
+    ul a li:hover {
+        color: $offwhite-extralight;;
+    }
+    ul li.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+    ul li.divider {
+        height: 1px;
+        padding: 0;
+        margin: 2px 0;
+        border-bottom: 1px solid #ececec;
+    }
+    ul li .alert-badge {
+        float: right;
+        margin-top: 2px;
+        padding: 3px 3px 2px;
+        border-radius: 2px;
+        color: $offwhite-extralight;;
+        background: $badge-lightred;
+        font-size: 12px;
+        line-height: 1;
+    }
 }
 
 @mixin clean-button {
-  background-color: white !important;
-  border: 1px solid $electricblue !important;
-  background-image: none !important;
-  color: $electricblue;
-  border-radius: $form-border-radius;
-  padding: 8px 20px;
+    background-color: white !important;
+    border: 1px solid $electricblue !important;
+    background-image: none !important;
+    color: $electricblue;
+    border-radius: $form-border-radius;
+    padding: 8px 20px;
 }
 
 @mixin clean-button-2 {
-  background-color: $electricblue !important;
-  background-image: none !important;
-  border: 0px solid transparent !important;
-  color: white !important;
-  font-weight: 700;
-  border-radius: $form-border-radius;
-  padding: 8px 20px;
+    background-color: $electricblue !important;
+    background-image: none !important;
+    border: 0px solid transparent !important;
+    color: white !important;
+    font-weight: 700;
+    border-radius: $form-border-radius;
+    padding: 8px 20px;
 }
 
 @mixin clean-button-2 {
-  background-color: $electricblue !important;
-  background-image: none !important;
-  border: 0px solid transparent !important;
-  color: white !important;
-  font-weight: 700;
-  border-radius: 4px;
-  padding: 8px 20px;
+    background-color: $electricblue !important;
+    background-image: none !important;
+    border: 0px solid transparent !important;
+    color: white !important;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 8px 20px;
 }
 
 @mixin dragula {
-  .gu-mirror {
-    cursor: pointer;
-    position: fixed !important;
-    margin: 0 !important;
-    z-index: 9999 !important;
-    opacity: 0.8;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-    filter: alpha(opacity=80);
-  }
-  .gu-hide {
-    display: none !important;
-  }
-  .gu-unselectable {
-    cursor: default;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-  }
-  .gu-transit {
-    cursor: pointer;
-    opacity: 0.5;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-    filter: alpha(opacity=20);
-  }
+    .gu-mirror {
+        cursor: pointer;
+        position: fixed !important;
+        margin: 0 !important;
+        z-index: 9999 !important;
+        opacity: 0.8;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+        filter: alpha(opacity=80);
+    }
+    .gu-hide {
+        display: none !important;
+    }
+    .gu-unselectable {
+        cursor: default;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+    }
+    .gu-transit {
+        cursor: pointer;
+        opacity: 0.5;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+        filter: alpha(opacity=20);
+    }
 }

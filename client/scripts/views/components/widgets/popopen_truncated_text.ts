@@ -1,5 +1,5 @@
 import 'components/widgets/popopen_truncated_text.scss';
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 interface IAttrs {
   text: string;

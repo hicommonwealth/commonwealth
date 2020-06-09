@@ -1,11 +1,11 @@
 import 'modals/create_community_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import _ from 'lodash';
+import mixpanel from 'mixpanel-browser';
 
-import { default as app } from 'state';
+import app from 'state';
 import { inputModalWithText } from 'views/modals/input_modal';
 
 // import User from 'views/components/widgets/user';
@@ -107,6 +107,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
 
             vnode.state.disabled = true;
             vnode.state.success = false;
+            // TODO: Change to POST /community
             $.post(`${app.serverUrl()}/createCommunity`, {
               creator_address: vnode.state.selectedAddress,
               creator_chain: vnode.state.selectedChain,

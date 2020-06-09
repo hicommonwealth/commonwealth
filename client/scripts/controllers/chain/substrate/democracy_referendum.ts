@@ -15,7 +15,7 @@ import {
 import { SubstrateEventKind, ISubstrateDemocracyStarted } from 'events/edgeware/types';
 import { BehaviorSubject, Unsubscribable, of } from 'rxjs';
 import { Coin } from 'adapters/currency';
-import { default as SubstrateChain } from './shared';
+import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
 

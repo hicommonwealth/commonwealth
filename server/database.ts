@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from './util/logging';
+import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sequelize = new Sequelize(DATABASE_URI, {
@@ -15,14 +15,20 @@ const sequelize = new Sequelize(DATABASE_URI, {
     requestTimeout: 10000
   },
 });
-const db = { sequelize, Sequelize };
 
-// import all files in models folder
-fs.readdirSync(__dirname + '/models')
+// TODO: separate Sequelize and SequelizeStatic into new object & type this as Sequelize.Models
+const db = {
+  sequelize,
+  Sequelize,
+};
+
+fs.readdirSync(`${__dirname}/models`)
   .filter((file) => file.indexOf('.') !== 0 && file !== 'index.js')
   .forEach((file) => {
     const model = sequelize.import(path.join(__dirname, 'models', file));
-    db[model.name] = model;
+    if (!db[model.name]) {
+      db[model.name] = model;
+    }
   });
 
 // setup associations

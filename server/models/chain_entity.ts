@@ -1,13 +1,46 @@
-module.exports = (sequelize, DataTypes) => {
-  const ChainEntity = sequelize.define('ChainEntity', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: DataTypes.STRING, allowNull: false },
-    type: { type: DataTypes.STRING, allowNull: false },
-    type_id: { type: DataTypes.STRING, allowNull: false },
-    thread_id: { type: DataTypes.INTEGER, allowNull: true },
+import * as Sequelize from 'sequelize';
 
-    created_at: { type: DataTypes.DATE, allowNull: false },
-    updated_at: { type: DataTypes.DATE, allowNull: false },
+import { ChainAttributes } from './chain';
+import { OffchainThreadAttributes } from './offchain_thread';
+import { ChainEventAttributes } from './chain_event';
+
+export interface ChainEntityAttributes {
+  id?: number;
+  chain: string;
+  type: string;
+  type_id: string;
+  thread_id?: number;
+  completed?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+
+  Chain?: ChainAttributes;
+  OffchainThread?: OffchainThreadAttributes;
+  ChainEvents?: ChainEventAttributes[];
+}
+
+export interface ChainEntityInstance
+extends Sequelize.Instance<ChainEntityAttributes>, ChainEntityAttributes {
+
+}
+
+export interface ChainEntityModel extends Sequelize.Model<ChainEntityInstance, ChainEntityAttributes> {
+
+}
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): ChainEntityModel => {
+  const ChainEntity = sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
+    id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
+    type: { type: dataTypes.STRING, allowNull: false },
+    type_id: { type: dataTypes.STRING, allowNull: false },
+    thread_id: { type: dataTypes.INTEGER, allowNull: true },
+    completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     timestamps: true,
     underscored: true,

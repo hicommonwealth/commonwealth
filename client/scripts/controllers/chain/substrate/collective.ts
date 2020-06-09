@@ -6,7 +6,7 @@ import { SubstrateEntityKind } from 'events/edgeware/types';
 import { ProposalModule, ChainEntity } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
-import { default as SubstrateChain } from './shared';
+import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 
