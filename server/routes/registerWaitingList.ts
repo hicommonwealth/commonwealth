@@ -2,9 +2,9 @@ import sgMail from '@sendgrid/mail';
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const registerWaitingList = async (models, req: Request, res: Response, next: NextFunction) => {

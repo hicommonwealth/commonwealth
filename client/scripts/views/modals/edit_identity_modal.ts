@@ -4,7 +4,6 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { createType } from '@polkadot/types/create';
 import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
 import { u8aToString } from '@polkadot/util';
@@ -15,7 +14,7 @@ import { createTXModal } from './tx_signing_modal';
 import { SubstrateAccount } from '../../controllers/chain/substrate/account';
 import AvatarUpload from '../components/avatar_upload';
 import Substrate from '../../controllers/chain/substrate/main';
-import { IdentityInfoProps } from '../../controllers/chain/substrate/identity';
+import { IdentityInfoProps } from '../../controllers/chain/substrate/identities';
 
 interface IAttrs {
   currentIdentity?: IdentityInfo;

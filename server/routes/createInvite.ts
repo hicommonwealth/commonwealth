@@ -3,6 +3,7 @@ import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 
 export const Errors = {
   NoEmailAndAddress: 'Can only invite either an address or email, not both',
@@ -15,7 +16,6 @@ export const Errors = {
 };
 
 sgMail.setApiKey(SENDGRID_API_KEY);
-import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {

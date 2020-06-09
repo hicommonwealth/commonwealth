@@ -1,10 +1,43 @@
-module.exports = (sequelize, DataTypes) => {
-  const StarredCommunity = sequelize.define('StarredCommunity', {
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
-    chain: { type: DataTypes.STRING, allowNull: true },
-    community: { type: DataTypes.STRING, allowNull: true },
-    created_at: { type: DataTypes.DATE, allowNull: false },
-    updated_at: { type: DataTypes.DATE, allowNull: false },
+import * as Sequelize from 'sequelize';
+
+import { UserAttributes } from './user';
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+
+export interface StarredCommunityAttributes {
+  id?: number;
+  user_id: number;
+  chain?: string;
+  community?: string;
+  created_at?: Date;
+  updated_at?: Date;
+
+  // associations
+  User?: UserAttributes | UserAttributes['id'];
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+}
+
+export interface StarredCommunityInstance extends Sequelize.Instance<StarredCommunityAttributes>,
+StarredCommunityAttributes {
+  // no mixins used
+}
+
+export interface StarredCommunityModel extends Sequelize.Model<StarredCommunityInstance, StarredCommunityAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): StarredCommunityModel => {
+  const StarredCommunity = sequelize.define<StarredCommunityInstance, StarredCommunityAttributes>('StarredCommunity', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    user_id: { type: dataTypes.INTEGER, allowNull: false },
+    chain: { type: dataTypes.STRING, allowNull: true },
+    community: { type: dataTypes.STRING, allowNull: true },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     underscored: true,
     indexes: [

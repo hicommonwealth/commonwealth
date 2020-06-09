@@ -1,4 +1,5 @@
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const getInviteLinks = async (models, req, res, next) => {

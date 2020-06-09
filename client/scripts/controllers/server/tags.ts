@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { TagsStore } from 'stores';
-import { IUniqueId, OffchainThread, OffchainTag } from 'models';
+import { OffchainTag } from 'models';
 import app from 'state';
 
 const modelFromServer = (tag) => {
@@ -24,7 +24,7 @@ class TagsController {
   public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
   public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
 
-  public async edit(tag: OffchainTag, featured_order?) {
+  public async edit(tag: OffchainTag, featured_order?: boolean) {
     try {
       // TODO: Change to PUT /tag
       const response = await $.post(`${app.serverUrl()}/editTag`, {
@@ -141,8 +141,14 @@ class TagsController {
     }
   }
 
-  public removeFromStore(tag: OffchainTag) {
-    return this._store.remove(tag);
+  public getTagListing = (tag, activeTag) => {
+    // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
+    // addition to the TagStore, since said store will be more up-to-date
+    const existing = this.getByIdentifier(tag.id);
+    if (!existing) this.addToStore(tag);
+    const { id, name, description } = existing || tag;
+    const selected = name === activeTag;
+    return { id, name, description, selected };
   }
 }
 

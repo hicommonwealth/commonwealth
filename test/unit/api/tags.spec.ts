@@ -1,8 +1,12 @@
+/* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
+import sleep from 'sleep-promise';
+import moment from 'moment';
+import { Errors as TagErrors } from 'server/routes/editTag';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -11,6 +15,12 @@ const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
+
+let adminJWT;
+let adminAddress;
+let userJWT;
+let userAddress;
+let tag;
 
 describe('Tag Tests', () => {
   const community = 'staking';
@@ -23,6 +33,23 @@ describe('Tag Tests', () => {
 
   before('reset database', async () => {
     await resetDatabase();
+    let res = await modelUtils.createAndVerifyAddress({ chain });
+    adminAddress = res.address;
+    adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    const isAdmin = await modelUtils.assignRole({
+      address_id: res.address_id,
+      chainOrCommObj: { offchain_community_id: community },
+      role: 'admin',
+    });
+    expect(adminAddress).to.not.be.null;
+    expect(adminJWT).to.not.be.null;
+    expect(isAdmin).to.not.be.null;
+
+    res = await modelUtils.createAndVerifyAddress({ chain });
+    userAddress = res.address;
+    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    expect(userAddress).to.not.be.null;
+    expect(userJWT).to.not.be.null;
   });
 
   describe('Bulk Tags', () => {
@@ -52,7 +79,11 @@ describe('Tag Tests', () => {
         tagId,
         kind,
       });
+      expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
+      expect(res2.result.Address).to.not.be.null;
+      expect(res2.result.Address.address).to.equal(userAddress);
+      tag = res2.result.tags[0];
     });
 
     it('Should pass /bulkTags', async () => {
@@ -71,8 +102,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Update Tags', () => {
-    let adminJWT;
-    let adminAddress;
     let thread;
 
     before(async () => {
@@ -98,8 +127,6 @@ describe('Tag Tests', () => {
         tagId,
         kind,
       });
-      thread = res2.result;
-      expect(thread).to.not.be.null;
     });
 
     it('Should fail to update thread without a tag name', async () => {
