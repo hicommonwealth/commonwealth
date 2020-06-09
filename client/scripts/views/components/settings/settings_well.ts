@@ -52,7 +52,6 @@ const SettingsWell: m.Component<{}, IState> = {
                 'jwt': app.login.jwt,
               });
               app.login.email = response.result.email;
-              vnode.state.updateEmailStatus = true;
             } catch (err) {
               console.log('Failed to update email');
               throw new Error((err.responseJSON && err.responseJSON.error)
