@@ -39,6 +39,8 @@ const DropzoneTextarea: m.Component<IAttrs, IState> = {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
+        // TODO: Change to POST /uploadSignature
+        // TODO: Reuse code since this is called in other places
         $.post(`${app.serverUrl()}/getUploadSignature`, {
           name: file.name, // tokyo.png
           mimetype: file.type, // image/png

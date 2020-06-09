@@ -62,13 +62,20 @@ export interface IApp {
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
+  // populated on login
   login: {
     email?: string;
     emailInterval?: string;
     jwt?: string;
+    // all address infos for all chains/communities loaded
     addresses: AddressInfo[];
+    // contains all role data for every active + non-active address
+    // TODO: Turn this into a map, app.login.roles[community] or turn into stores/controllers
     roles: RoleInfo[];
+    // active addresses for a specific community or chain
+    // TODO: Rename to some accounts based name
     activeAddresses: Array<Account<any>>;
+    // TODO: Identify a use-case, implement a use case
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
     isSiteAdmin: boolean;
@@ -78,6 +85,7 @@ export interface IApp {
     starredCommunities: StarredCommunity[];
     unseenPosts: object;
   };
+  // stored on server-side
   config: {
     communities: OffchainCommunitiesStore;
     chains: ChainStore;
@@ -87,6 +95,7 @@ export interface IApp {
     defaultChain: string;
     invites: any[];
   };
+  // TODO: pull this into login
   vm: {
     activeAccount: Account<any>;
   };

@@ -36,7 +36,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       vnode.state.disabled = true;
       vnode.state.success = false;
       vnode.state.failure = false;
-
+      // TODO: Change to POST /webhook
       $.post(`${app.serverUrl()}/createWebhook`, {
         ...chainOrCommObj,
         webhookUrl,
@@ -80,7 +80,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
               vnode.state.disabled = true;
               vnode.state.success = false;
               vnode.state.failure = false;
-
+              // TODO: Change to DELETE /webhook
               $.post(`${app.serverUrl()}/deleteWebhook`, {
                 ...chainOrCommObj,
                 webhookUrl: webhook.url,
