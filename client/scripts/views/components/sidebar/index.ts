@@ -98,6 +98,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     }, [
       // discussions
       m(List, { interactive: true }, [
+        m('h4', 'Discussions'),
         (app.community || app.chain)
           && m(ListItem, {
             contentLeft: m(Icon, { name: Icons.HOME }),
@@ -112,6 +113,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
       (app.community || app.chain)
         && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
+          m('h4', 'Voting & Staking'),
           // proposals (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
@@ -171,6 +173,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         ]),
       // manage
       (app.community || app.chain) && m(List, { interactive: true }, [
+        m('h4', 'Manage Community'),
         m(ListItem, {
           active: onMembersPage(m.route.get()),
           label: 'Members',

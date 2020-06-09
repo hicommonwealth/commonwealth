@@ -68,7 +68,7 @@ $active-color: #ececec;
             color: #555;
             opacity: 0.6;
             margin: 0;
-            padding: 24px 0 6px $sidebar-padding;
+            padding: 6px $sidebar-padding;
             font-weight: 600;
             font-size: 12px;
             text-transform: uppercase;
@@ -102,6 +102,11 @@ $active-color: #ececec;
                 .cui-icon svg {
                     color: #fff !important;
                 }
+            }
+            .cui-tag {
+                margin: -3px 0;
+                position: relative;
+                top: -2px;
             }
         }
     }
