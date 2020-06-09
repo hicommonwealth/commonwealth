@@ -24,24 +24,34 @@ const validURL = (str) => {
   return !!pattern.test(str);
 };
 
-const getFilteredContent = (content) => {
+const getFilteredContent = (content, address) => {
   return [
-    (content.user) ? `Address: ${content.user}` : null,
+    address ? `Name: ${address.name}` : null,
+    content.user ? `Address: ${content.user}` : null,
     (!content.community && content.chain) ? `Chain: ${content.chain}` : null,
-    (content.community) ? `Community: ${content.community}` : null,
-    (content.notificationCategory) ? `Type: ${content.notificationCategory}` : null,
-    (content.title) ? `Title: ${decodeURIComponent(content.title)}` : null,
-    (content.bodyUrl) ? `External Link: ${content.bodyUrl}` : null,
-    (content.url) ? `Link: ${content.url}` : null,
+    content.community ? `Community: ${content.community}` : null,
+    content.notificationCategory ? `Type: ${content.notificationCategory}` : null,
+    content.title ? `Title: ${decodeURIComponent(content.title)}` : null,
+    content.bodyUrl ? `External Link: ${content.bodyUrl}` : null,
+    content.url ? `Link: ${content.url}` : null,
   ].filter((elt) => !!elt);
 };
 
 const send = async (models, content: WebhookContent) => {
   if (SUPPRESSED_NOTIFICATION_TYPES.indexOf(content.notificationCategory) !== -1) return;
 
+  let address;
+  try {
+    console.trace();
+    address = await models.Address.findOne({ where: { address: content.user, chain: content.chain } });
+    console.log(content, address);
+  } catch (e) {
+    // pass nothing if no matching address is found
+  }
+
   // create data for sending
   const data = JSON.stringify({
-    text: `\`\`\`${getFilteredContent(content).join('\n')}\`\`\``
+    text: `\`\`\`${getFilteredContent(content, address).join('\n')}\`\`\``
   });
   // if a community is passed with the content, we know that it is from an offchain community
   const chainOrCommObj = (content.community)
