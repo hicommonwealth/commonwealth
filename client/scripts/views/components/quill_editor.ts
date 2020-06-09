@@ -243,7 +243,6 @@ const instantiateEditor = (
   Quill.register('modules/clipboard', CustomClipboard, true);
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
-
   // Setup custom keyboard bindings, override Quill default bindings where necessary
   const bindings = {
     // Don't insert hard tabs
@@ -799,11 +798,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const theme = vnode.attrs.theme || 'snow';
     const { imageUploader, placeholder, tabindex, editorNamespace, onkeyboardSubmit } = vnode.attrs;
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
-    const setTabIndex = (idx) => {
-      if (vnode.state.editor.editor && vnode.state.editor.editor.scroll && vnode.state.editor.editor.scroll.domNode) {
-        (document.getElementsByClassName('ql-editor')[0] as HTMLElement).tabIndex = idx;
-      }
-    };
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
@@ -842,7 +836,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           $editor, theme, true, imageUploader, placeholder, editorNamespace,
           vnode.state, onkeyboardSubmit
         );
-        if (tabindex) setTabIndex(tabindex);
+        // once editor is instantiated, it can be updated with a tabindex
+        $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
@@ -850,7 +845,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           const res = vnode.state.editor.setContents(contentsDoc);
           vnode.state.markdownMode = false;
         }
-        if (tabindex) setTabIndex(tabindex);
         oncreateBind(vnode.state);
       },
     }, [
@@ -867,13 +861,15 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 // switch editor to rich text
                 vnode.state.markdownMode = false;
                 const $editor = $(vnode.dom).find('.quill-editor');
+                vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
+                // once editor is instantiated, it can be updated with a tabindex
+                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
-                if (tabindex) setTabIndex(tabindex);
                 vnode.state.editor.focus();
 
                 // try to save setting
@@ -916,9 +912,11 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
+                // once editor is instantiated, it can be updated with a tabindex
+                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
-                if (tabindex) setTabIndex(tabindex);
                 vnode.state.editor.focus();
 
                 // try to save setting

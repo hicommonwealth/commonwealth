@@ -4,12 +4,10 @@ import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import {
-  RadioGroup, Form, FormGroup, Input, Button, ButtonGroup, Icon, Icons, PopoverMenu, MenuItem, Grid, Col
-} from 'construct-ui';
+import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
+import { OffchainTag, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from 'lib/url-validation';
 
 import { notifyInfo } from 'controllers/app/notifications';
@@ -17,13 +15,13 @@ import Sublayout from 'views/sublayout';
 import PreviewModal from 'views/modals/preview_modal';
 import User from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
-import { newThread, getLinkTitle, detectURL, newLink } from 'views/pages/threads';
 import { updateLastVisited } from 'controllers/app/login';
 import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
 import PageLoading from 'views/pages/loading';
+import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 
 interface IState {
-  form,
+  form: IThreadForm,
   error,
   quillEditorState,
   hasComment,
@@ -32,10 +30,19 @@ interface IState {
   uploadsInProgress,
 }
 
+interface IThreadForm {
+  tagName?: string;
+  tagId?: number;
+  url?: string;
+  title?: string;
+}
+
 export const NewThreadForm: m.Component<{}, IState> = {
-  view: (vnode) => {
+  view: (vnode: VnodeDOM<{}, IState>) => {
     const author = app.vm.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
     // init
     if (vnode.state.form === undefined) vnode.state.form = {};
@@ -93,6 +100,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
               vnode.state.form.url = value;
               if (detectURL(value)) getUrlForLinkPost();
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -105,6 +113,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
               if (vnode.state.error.title) delete vnode.state.error.title;
               vnode.state.form.title = value;
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -115,16 +124,20 @@ export const NewThreadForm: m.Component<{}, IState> = {
             },
             placeholder: 'Comment (optional)',
             editorNamespace: 'new-link',
+            tabindex: 3,
           }) : m('a.add-comment', {
             href: '#',
             onclick: (e) => { vnode.state.hasComment = true; },
+            tabindex: 2,
           }, 'Add comment'),
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
+            tags: app.tags.getByCommunity(app.activeId()),
+            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+            updateFormData: (tagName: string, tagId?: number) => {
+              vnode.state.form.tagName = tagName;
+              vnode.state.form.tagId = tagId;
             },
             updateParentErrors: (err: string) => {
               if (err) vnode.state.error = err;
@@ -136,14 +149,22 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
+            class: !author ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
+            name: 'submission',
             onclick: () => {
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
               if (!Object.values(vnode.state.error).length) {
-                Object.assign(vnode.state.error, newLink(vnode.state.form, vnode.state.quillEditorState, author));
+                newLink(vnode.state.form, vnode.state.quillEditorState, author);
+              }
+              if (!vnode.state.error) {
+                $(vnode.dom).trigger('modalcomplete');
+                setTimeout(() => {
+                  $(vnode.dom).trigger('modalexit');
+                }, 0);
               }
             },
           }),
@@ -167,6 +188,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
             onchange: (e) => {
               vnode.state.form.title = (e as any).target.value;
             },
+            tabindex: 1,
           }),
         ]),
         m(FormGroup, [
@@ -175,15 +197,17 @@ export const NewThreadForm: m.Component<{}, IState> = {
             oncreateBind: (state) => {
               vnode.state.quillEditorState = state;
             },
+            editorNamespace: 'new-discussion',
             tabindex: 2,
-            editorNamespace: 'new-link',
           }),
         ]),
         m(FormGroup, [
           m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
+            tags: app.tags.getByCommunity(app.activeId()),
+            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+            updateFormData: (tagName: string, tagId?: number) => {
+              vnode.state.form.tagName = tagName;
+              vnode.state.form.tagId = tagId;
             },
             updateParentErrors: (err: string) => {
               if (err) vnode.state.error = err;
@@ -195,12 +219,20 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            disabled: !author || vnode.state.uploadsInProgress > 0,
+            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              if (!vnode.state.error) {
+                $(vnode.dom).trigger('modalcomplete');
+                setTimeout(() => {
+                  $(vnode.dom).trigger('modalexit');
+                }, 0);
+              }
             },
             label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
+            name: 'submission',
+            tabindex: 4
           }),
         ]),
         error
@@ -231,24 +263,12 @@ const NewThreadPage: m.Component = {
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 
-    const span = {
-      xs: 12,
-      sm: 12,
-      md: 11,
-      lg: 10,
-      xl: 8,
-    };
-
     return m(Sublayout, {
       class: 'NewThreadPage',
     }, [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
-        m(Grid, [
-          m(Col, { span }, [
-            m(NewThreadForm),
-          ])
-        ])
+        m(NewThreadForm),
       ]),
     ]);
   },

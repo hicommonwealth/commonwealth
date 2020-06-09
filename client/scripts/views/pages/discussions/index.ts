@@ -130,13 +130,13 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.tags && thread.tags.filter((t) => t.name === tag).length > 0)
+        .filter((thread) => thread.tag && thread.tag.name === tag)
         .sort(orderDiscussionsbyLastComment);
 
       if (sortedThreads.length === 0) {
         return m('.discussions-listing.tag-listing.no-tags-found', [
           m('h4.tag-name', [
-            `No threads contain the tag '${tag}.'`,
+            `No threads listed under '${tag}.'`,
           ]),
           getBackHomeButton(),
         ]);

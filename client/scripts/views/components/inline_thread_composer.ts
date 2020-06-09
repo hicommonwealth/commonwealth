@@ -7,10 +7,10 @@ import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, OffchainTag } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
-import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
+import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from './autocomplete_tag_form';
 import { isCommunityAdmin } from '../pages/discussions/roles';
 
@@ -25,9 +25,16 @@ interface ILinkPostState {
   autoTitleOverride: boolean;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
   titleSelected: boolean;
+}
+
+interface IThreadForm {
+  tagName?: string;
+  tagId?: number;
+  url?: string;
+  title?: string;
 }
 
 const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
@@ -38,7 +45,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     if (!form) vnode.state.form = { title, url };
     else if (!autoTitleOverride) vnode.state.form = Object.assign(form, { title, url });
     else Object.assign(vnode.state.form, { url });
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
     if (title === '404: Not Found' || title === '500: Server Error') {
       vnode.state.error.url = title;
@@ -46,14 +53,6 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     } else {
       delete vnode.state.error.url;
     }
-
-    const invalidForm = (
-      !author
-      || Object.values(vnode.state.error).length
-      || !vnode.state.form.title
-      || !vnode.state.form.url
-      || !vnode.state.form.tags
-    );
 
     const createLink = (e?) => {
       if (e) e.preventDefault();
@@ -96,8 +95,12 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         onkeyboardSubmit: createLink,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntity.meta.tags || [],
-        updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
+        tags: app.tags.getByCommunity(app.activeId()),
+        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
+        },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
           else delete vnode.state.error;
@@ -108,6 +111,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
+            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
             type: 'submit',
             intent: 'primary',
             onclick: createLink,
@@ -146,7 +150,7 @@ interface ITextPostState {
   uploadsInProgress: number;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
 }
 
@@ -158,7 +162,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
     const { closed } = vnode.state;
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (!vnode.state.error) vnode.state.error = {};
     if (closed) return null;
     vnode.state.form = vnode.state.form ? Object.assign(vnode.state.form, { title }) : { title };
@@ -185,9 +189,11 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         onkeyboardSubmit: createThread,
       }),
       m(AutoCompleteTagForm, {
-        results: activeEntity.meta.tags || [],
-        updateFormData: (tags: string[]) => {
-          vnode.state.form.tags = tags;
+        tags: app.tags.getByCommunity(app.activeId()),
+        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
         },
         updateParentErrors: (err: string) => {
           if (err) vnode.state.error = err;
@@ -199,6 +205,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
       m('.bottom-panel', [
         m('.actions', [
           m(Button, {
+            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
             type: 'submit',
             intent: 'primary',
             onclick: createThread,
@@ -206,6 +213,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
             label: 'Create thread'
           }),
           m(Button, {
+            class: !author ? 'disabled' : '',
             type: 'cancel',
             onclick: closeComposer,
             basic: true,

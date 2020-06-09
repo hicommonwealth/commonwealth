@@ -87,8 +87,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       hideEditButton
     } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
-    const selected = m.route.get() === `/${app.activeId()}/discussions/${name}`;
-
+    const selected = m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`;
     return m(ListItem, {
       class: 'TagRow',
       key: id,
@@ -146,36 +145,35 @@ export const getTagListing = (params: IGetTagListingParams) => {
   const featuredTags = {};
 
   app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link).forEach((thread) => {
-    const { tags } = thread;
-    tags.forEach((tag) => {
-      // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
-      // addition to the TagStore, since said store will be more up-to-date
-      const existing = app.tags.getByIdentifier(tag.id);
-      if (!existing) app.tags.addToStore(tag);
-      const { id, name, description } = existing || tag;
+    const { tag } = thread;
+    if (!tag) return null;
+    // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
+    // addition to the TagStore, since said store will be more up-to-date
+    const existing = app.tags.getByIdentifier(tag.id);
+    if (!existing) app.tags.addToStore(tag);
+    const { id, name, description } = existing || tag;
 
-      if (featuredTagIds.includes(`${id}`)) {
-        if (featuredTags[name]) featuredTags[name].count += 1;
-        else {
-          featuredTags[name] = {
-            count: 1,
-            description,
-            featured_order: featuredTagIds.indexOf(`${id}`),
-            id,
-            name,
-          };
-        }
-      } else if (otherTags[name]) {
-        otherTags[name].count += 1;
-      } else {
-        otherTags[name] = {
+    if (featuredTagIds.includes(`${id}`)) {
+      if (featuredTags[name]) featuredTags[name].count += 1;
+      else {
+        featuredTags[name] = {
           count: 1,
           description,
+          featured_order: featuredTagIds.indexOf(`${id}`),
           id,
           name,
         };
       }
-    });
+    } else if (otherTags[name]) {
+      otherTags[name].count += 1;
+    } else {
+      otherTags[name] = {
+        count: 1,
+        description,
+        id,
+        name,
+      };
+    }
   });
 
   const threadlessTags = app.tags.getByCommunity(app.activeId()).forEach((tag) => {
@@ -231,7 +229,7 @@ export const getTagListing = (params: IGetTagListingParams) => {
   return ({ featuredTagListing, otherTagListing });
 };
 
-const NewTagButton: m.Component = {
+export const NewTagButton: m.Component = {
   view: (vnode) => {
     return m(Button, {
       class: '',
@@ -249,10 +247,10 @@ const NewTagButton: m.Component = {
 };
 
 const TagSelector: m.Component<{
-  activeTag: string, showFullListing: boolean, hideEditButton?: boolean
+  activeTag: string, hideEditButton?: boolean
 }, { refreshed, featuredTagIds }> = {
   view: (vnode) => {
-    const { activeTag, showFullListing, hideEditButton } = vnode.attrs;
+    const { activeTag, hideEditButton } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return;
 
@@ -279,7 +277,6 @@ const TagSelector: m.Component<{
     const { featuredTagListing, otherTagListing } = getTagListing(params);
 
     return m('.TagSelector', [
-      featuredTagListing.length > 0 && showFullListing && m('h4', 'Pinned to sidebar'),
       featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
@@ -295,9 +292,7 @@ const TagSelector: m.Component<{
           }
         }
       }, featuredTagListing),
-      showFullListing && m('h4', featuredTagListing.length > 0 ? 'Other tags' : 'Tags'),
-      showFullListing && !!otherTagListing.length && m(List, { class: 'other-tag-list' }, otherTagListing),
-      showFullListing && isCommunityAdmin() && m(NewTagButton),
+      otherTagListing.length > 0 && m(List, { class: 'other-tag-list' }, otherTagListing),
     ]);
   },
 };
