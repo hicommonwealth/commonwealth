@@ -9,7 +9,6 @@ export interface StarredCommunityAttributes {
   user_id: number;
   chain?: string;
   community?: string;
-  active?: boolean;
   created_at?: Date;
   updated_at?: Date;
 
@@ -19,7 +18,8 @@ export interface StarredCommunityAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
 }
 
-export interface StarredCommunityInstance extends Sequelize.Instance<StarredCommunityAttributes>, StarredCommunityAttributes {
+export interface StarredCommunityInstance extends Sequelize.Instance<StarredCommunityAttributes>,
+StarredCommunityAttributes {
   // no mixins used
 }
 
@@ -36,7 +36,6 @@ export default (
     user_id: { type: dataTypes.INTEGER, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
-    active: { type: dataTypes.BOOLEAN, defaultValue: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {

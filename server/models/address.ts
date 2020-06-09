@@ -31,7 +31,6 @@ export interface AddressAttributes {
   id?: number;
   address: string;
   chain: string;
-  selected?: boolean;
   verification_token: string;
   verification_token_expires?: Date;
   verified?: Date;
@@ -85,7 +84,6 @@ export default (
     id:                         { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address:                    { type: dataTypes.STRING, allowNull: false },
     chain:                      { type: dataTypes.STRING, allowNull: false },
-    selected:                   { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     verification_token:         { type: dataTypes.STRING, allowNull: false },
     verification_token_expires: { type: dataTypes.DATE, allowNull: true },
     verified:                   { type: dataTypes.DATE, allowNull: true },
