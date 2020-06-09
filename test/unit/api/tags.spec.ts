@@ -53,8 +53,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Bulk Tags', () => {
-    let adminJWT;
-    let adminAddress;
 
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
@@ -82,8 +80,8 @@ describe('Tag Tests', () => {
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
       expect(res2.result.Address).to.not.be.null;
-      expect(res2.result.Address.address).to.equal(userAddress);
-      tag = res2.result.tags[0];
+      expect(res2.result.Address.address).to.equal(adminAddress);
+      tag = res2.result.tag;
     });
 
     it('Should pass /bulkTags', async () => {
@@ -127,6 +125,7 @@ describe('Tag Tests', () => {
         tagId,
         kind,
       });
+      thread = res2.result;
     });
 
     it('Should fail to update thread without a tag name', async () => {
