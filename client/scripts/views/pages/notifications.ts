@@ -32,7 +32,7 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
         m(Input, {
           contentLeft: m(Icon, { name: Icons.MAIL }),
           defaultValue: vnode.state.email || null,
-          onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
+          onkeyup: (e) => { e.preventDefault(); vnode.state.email = (e.target as any).value; },
         }),
         m(Button, {
           label: 'Update Email',
