@@ -167,16 +167,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
           (app.community || app.chain)
-          && m('h4', 'Staking'),
-          // validators (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-            m(ListItem, {
-              active: onValidatorsPage(m.route.get()),
-              label: 'Validators',
-              onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-              contentLeft: m(Icon, { name: Icons.BOX }),
-            }),
-          (app.community || app.chain)
             && m(ListItem, {
               active: onMembersPage(m.route.get()),
               label: 'Members',
@@ -194,6 +184,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
             && m(AdminPanel),
+          (app.community || app.chain)
+            && m('h4', 'Staking'),
+          // validators (substrate and cosmos only)
+          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
+            m(ListItem, {
+              active: onValidatorsPage(m.route.get()),
+              label: 'Validators',
+              onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
+              contentLeft: m(Icon, { name: Icons.BOX }),
+            }),
         ]),
         // // chat (all communities)
         // (app.community || app.chain) &&
