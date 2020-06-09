@@ -62,7 +62,7 @@ function setupPassport(models) {
       // check associations and log in the correct user
       const user = await githubAccount.getUser();
       if (req.user === null && user === null) {
-        const newUser = await models.User.create({ email: profile.email });
+        const newUser = await models.User.create({ email: null });
         await githubAccount.setUser(newUser);
         return cb(null, newUser);
       } else if (req.user && req.user !== user) {
@@ -103,7 +103,7 @@ function setupPassport(models) {
       await newGithubAccount.setUser(req.user);
       return cb(null, req.user);
     } else {
-      const newUser = await models.User.create({ email: profile.email });
+      const newUser = await models.User.create({ email: null });
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
