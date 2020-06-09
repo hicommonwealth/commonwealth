@@ -34,12 +34,18 @@ const GithubWell: m.Component<{}, IState> = {
           intent: githubAccount ? 'negative' : 'none',
           onclick: () => {
             if (githubAccount) {
-              $.post(`${app.serverUrl()}/deleteGithubAccount`, { jwt: app.login.jwt }).then((res) => {
-                if (res.status === 'Success') vnode.state.githubAccount = null;
-                m.redraw();
-              }).catch((err: any) => {
-                console.dir(err);
-                m.redraw();
+              $.ajax({
+                url: `${app.serverUrl()}/githubAccount`,
+                data: { jwt: app.login.jwt },
+                type: 'DELETE',
+                success: (result) => {
+                  vnode.state.githubAccount = null;
+                  m.redraw();
+                },
+                error: (err) => {
+                  console.dir(err);
+                  m.redraw();
+                },
               });
             } else {
               localStorage.setItem('githubPostAuthRedirect', JSON.stringify({

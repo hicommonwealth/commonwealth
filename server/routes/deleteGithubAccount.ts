@@ -7,7 +7,6 @@ export const Errors = {
 };
 
 const deleteGithubAccount = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const socialAccounts = await req.user.getSocialAccounts();
   const githubAccount = socialAccounts.find((sa) => sa.provider === 'github');
   await githubAccount.destroy();

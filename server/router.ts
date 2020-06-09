@@ -185,7 +185,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
   // social accounts
-  router.post('/deleteGithubAccount', passport.authenticate('jwt', { session: false }), deleteGithubAccount.bind(this, models));
+  router.delete('/githubAccount', passport.authenticate('jwt', { session: false }), deleteGithubAccount.bind(this, models));
 
 
   // offchain viewCount
