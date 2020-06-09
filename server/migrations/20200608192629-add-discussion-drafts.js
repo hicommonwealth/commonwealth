@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, DataTypes) => {
-    return queryInterface.createTable('DiscussionDraft', {
+    return queryInterface.createTable('DiscussionDrafts', {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       author_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Addresses', key: 'id' } },
       title: { type: DataTypes.TEXT, allowNull: true },
@@ -10,7 +10,7 @@ module.exports = {
       tag: { type: DataTypes.STRING, allowNull: true },
       chain: { type: DataTypes.STRING, allowNull: true },
       community: { type: DataTypes.STRING, allowNull: true },
-      attachment: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'OffchainAttachment', key: 'id' } },
+      attachment: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'OffchainAttachments', key: 'id' } },
     }, {
       underscored: true,
       indexes: [
@@ -20,6 +20,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('DiscussionDraft');
+    return queryInterface.dropTable('DiscussionDrafts');
   }
 };
