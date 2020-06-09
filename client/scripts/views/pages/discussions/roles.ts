@@ -15,10 +15,11 @@ import ManageCommunityModal from '../../modals/manage_community_modal';
 
 export const isCommunityAdmin = () => {
   const role = app.login.roles.find((r) => {
-    return (r.chain_id && r.chain_id === app.activeChainId())
-      || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId());
+    return ((r.chain_id && r.chain_id === app.activeChainId())
+            || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId()))
+    && r.permission === RolePermission.admin;
   });
-  return role?.permission === RolePermission.admin;
+  return role !== undefined;
 };
 
 export const sortAdminsAndModsFirst = (a, b) => {
