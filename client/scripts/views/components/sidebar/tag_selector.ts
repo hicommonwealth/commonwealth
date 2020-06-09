@@ -87,8 +87,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       hideEditButton
     } = vnode.attrs;
     if (featured && typeof Number(featured_order) !== 'number') return null;
-    const selected = m.route.get() === `/${app.activeId()}/discussions/${name}`;
-
+    const selected = m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`;
     return m(ListItem, {
       class: 'TagRow',
       key: id,
