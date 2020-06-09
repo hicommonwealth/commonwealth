@@ -179,6 +179,9 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
       ]);
     };
 
+    const notificationData = typeof notification.data === 'string'
+      ? JSON.parse(notification.data)
+      : notification.data;
     const {
       author,
       createdAt,
@@ -186,7 +189,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
       notificationBody,
       path,
       pageJump
-    } = getBatchNotificationFields(category, JSON.parse(notification.data), notifications.length);
+    } = getBatchNotificationFields(category, JSON.parse(notificationData), notifications.length);
 
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
@@ -218,15 +221,6 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         ]),
       ]);
     } else {
-      const {
-        author,
-        createdAt,
-        notificationHeader,
-        notificationBody,
-        path,
-        pageJump
-      } = getBatchNotificationFields(category, JSON.parse(notification.data), notifications.length);
-
       return getHeaderNotificationRow(
         author,
         createdAt,

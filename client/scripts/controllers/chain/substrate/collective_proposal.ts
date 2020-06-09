@@ -88,7 +88,6 @@ export class SubstrateCollectiveProposal
   }
 
   public update(e: ChainEvent) {
-    console.log(e);
     if (this.completed) {
       return;
     }

@@ -51,7 +51,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Joined ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);
@@ -87,7 +87,7 @@ const MembershipButton: m.Component<{
           ? app.config.chains.getById(chain)?.name
           : app.config.communities.getById(community)?.name;
         notifySuccess(`Left ${name}`);
-      }).catch((err) => {
+      }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
         notifyError(err.responseJSON.error);

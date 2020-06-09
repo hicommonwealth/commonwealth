@@ -1,6 +1,7 @@
 import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
