@@ -96,27 +96,23 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
     }, [
-      m('.SidebarMenu', [
-        m(List, {
-          interactive: true,
-          size: 'lg',
-        }, [
-          // community homepage
-          (app.community || app.chain)
-            && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.HOME }),
-              active: onDiscussionsPage(m.route.get()),
-              label: 'Home',
-              onclick: (e) => m.route.set(`/${app.activeId()}`),
-            }),
-          // discussions (all communities)
-          (app.community || app.chain)
-            && m(TagSelector, { activeTag, hideEditButton: true }),
+      // discussions
+      m(List, { interactive: true }, [
+        (app.community || app.chain)
+          && m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.HOME }),
+            active: onDiscussionsPage(m.route.get()),
+            label: 'Home',
+            onclick: (e) => m.route.set(`/${app.activeId()}`),
+          }),
+        (app.community || app.chain)
+          && m(TagSelector, { activeTag, hideEditButton: true }),
+      ]),
+      // proposals
+      (app.community || app.chain)
+        && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+        && m(List, { interactive: true }, [
           // proposals (substrate and cosmos only)
-          (app.community || app.chain)
-            && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
-                || showMolochMenuOptions)
-            && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
               active: onProposalPage(m.route.get()),
@@ -172,33 +168,30 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
-          (app.community || app.chain)
-            && m('h4', 'More'),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onMembersPage(m.route.get()),
-              label: 'Members',
-              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-            }),
-          (app.community || app.chain)
-            && m(ListItem, {
-              class: 'TagRow',
-              active: m.route.get() === `/${app.activeId()}/tags/`,
-              label: 'Tags',
-              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-            }),
-          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-            && (app.community || app.chain)
-            && m(AdminPanel),
         ]),
-        // // chat (all communities)
-        // (app.community || app.chain) &&
-        //   m(ListItem, {
-        //     active: onChatPage(m.route.get()),
-        //     label: 'Chat',
-        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-        //   }),
+      // manage
+      (app.community || app.chain) && m(List, { interactive: true }, [
+        m(ListItem, {
+          active: onMembersPage(m.route.get()),
+          label: 'Members',
+          onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+        }),
+        m(ListItem, {
+          class: 'TagRow',
+          active: m.route.get() === `/${app.activeId()}/tags/`,
+          label: 'Tags',
+          onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+        }),
+        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          && m(AdminPanel),
       ]),
+      // // chat (all communities)
+      // (app.community || app.chain) &&
+      //   m(ListItem, {
+      //     active: onChatPage(m.route.get()),
+      //     label: 'Chat',
+      //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+      //   }),
     ]);
   },
 };
