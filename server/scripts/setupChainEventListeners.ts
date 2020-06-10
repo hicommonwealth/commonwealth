@@ -31,7 +31,7 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
+const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');
@@ -39,6 +39,8 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
     .filter((node) => EventSupportingChains.includes(node.chain))
     // filter out duplicate nods per-chain, only use one node
     .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
+    // if migrating, only use chain specified, unless "all"
+    .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
       if (migrate) {
@@ -52,11 +54,11 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
       let url: string = node.url;
-      if (url.indexOf('edgewa.re') !== -1) {
+      if (node.chain === 'edgeware') {
         // must be ws
         const urlNoProtocol = url.replace(/ws?s:\/\//, '');
         url = `ws://${urlNoProtocol}`;
-      } else if (url.indexOf('kusama') !== -1) {
+      } else if (node.chain === 'kusama') {
         // requires wss and no port
         const urlPath = url.replace(/^ws?s:\/\//, '').replace(/:[0-9]*$/, '');
         url = `wss://${urlPath}`;
@@ -67,7 +69,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         handlers,
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
-        migrate,
+        !!migrate,
       );
 
       // hook for clean exit
