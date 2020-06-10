@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import app from 'state';
-import { RoleInfo } from 'models';
+import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork } from './types';
 import OffchainTag from './OffchainTag';
 
@@ -41,6 +41,18 @@ class ChainInfo {
       json.ChainObjectVersion,
       json.adminsAndMods,
     );
+  }
+
+  public async getAdminsAndMods(id: string) {
+    try {
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      const roles = res.result.filter((r) => {
+        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+      });
+      this.setAdmins(roles);
+    } catch {
+      console.log('Failed to fetch admins/mods');
+    }
   }
 
   public setAdmins(roles) {

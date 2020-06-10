@@ -13,6 +13,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import { isAdminOrMod } from 'helpers/roles';
 
 interface IAttrs {
   user: Account<any> | [string, string];
@@ -98,15 +99,11 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = app.activeChainId()
-        ? app.chain.meta.chain.adminsAndMods.find((r) => r.address === address)
-        : app.community.meta.adminsAndMods.find((r) => r.address === address);
+      role = isAdminOrMod(address);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = app.activeChainId()
-        ? app.chain.meta.chain.adminsAndMods.find((r) => r.address === account.address)
-        : app.community.meta.adminsAndMods.find((r) => r.address === account.address);
+      role = isAdminOrMod(account.address);
     }
     const roleTag = role ? m(Tag, {
       class: 'roleTag',
