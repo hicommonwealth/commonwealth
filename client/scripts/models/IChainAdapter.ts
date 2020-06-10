@@ -61,6 +61,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);
     await this.app.tags.refreshAll(this.id, null, true);
+    await this.meta.chain.getAdminsAndMods(this.id);
 
     // if we're loading entities from chain, only pull completed
     await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);

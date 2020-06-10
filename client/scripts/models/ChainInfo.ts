@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import app from 'state';
+import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork } from './types';
 import OffchainTag from './OffchainTag';
 
@@ -13,8 +14,9 @@ class ChainInfo {
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
+  public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?) {
+  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?, adminsAndMods?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -24,6 +26,7 @@ class ChainInfo {
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
     this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
+    this.adminsAndMods = adminsAndMods || [];
   }
   public static fromJSON(json) {
     return new ChainInfo(
@@ -35,8 +38,36 @@ class ChainInfo {
       json.description,
       json.featured_tags,
       json.tags,
-      json.ChainObjectVersion
+      json.ChainObjectVersion,
+      json.adminsAndMods,
     );
+  }
+
+  public async getAdminsAndMods(id: string) {
+    try {
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      const roles = res.result.filter((r) => {
+        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+      });
+      this.setAdmins(roles);
+    } catch {
+      console.log('Failed to fetch admins/mods');
+    }
+  }
+
+  public setAdmins(roles) {
+    this.adminsAndMods = [];
+    roles.forEach((r) => {
+      this.adminsAndMods.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public async updateChainData(name: string, description: string,) {
