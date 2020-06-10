@@ -13,7 +13,7 @@ class CommunityInfo {
   public privacyEnabled: boolean;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
-  public readonly adminsAndMods: RoleInfo[];
+  public adminsAndMods: RoleInfo[];
 
   constructor(id, name, description, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
     this.id = id;
@@ -39,6 +39,21 @@ class CommunityInfo {
       json.tags,
       json.adminsAndMods,
     );
+  }
+
+  public setAdmins(roles) {
+    this.adminsAndMods = [];
+    roles.forEach((r) => {
+      this.adminsAndMods.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public async updateCommunityData(

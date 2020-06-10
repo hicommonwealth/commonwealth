@@ -1,4 +1,5 @@
 import { CommunityInfo, ICommunityAdapter } from 'models';
+import $ from 'jquery';
 
 import { Coin } from 'adapters/currency';
 import { CommentRefreshOption } from 'controllers/server/comments';
@@ -20,6 +21,11 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     await this.app.comments.refreshAll(null, this.id, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(null, this.id, true);
     await this.app.tags.refreshAll(null, this.id, true);
+    await $.get(`${this.app.serverUrl()}/bulkMembers`, { community: this.id, })
+      .then((res) => {
+        const roles = res.result.filter((r) => { return r.permission === 'admin' || r.permission === 'moderator'; });
+        this.app.community.meta.setAdmins(roles);
+      }).catch(() => console.log('Failed to fetch admins/mods'));
     this._serverLoaded = true;
     this._loaded = true;
   }

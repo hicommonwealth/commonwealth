@@ -2,6 +2,7 @@ import moment from 'moment-twitter';
 import { ApiStatus, IApp } from 'state';
 import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
+import $ from 'jquery';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
@@ -59,6 +60,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);
     await this.app.tags.refreshAll(this.id, null, true);
+
+    await $.get(`${this.app.serverUrl()}/bulkMembers`, { chain: this.id, })
+      .then((res) => {
+        const roles = res.result.filter((r) => { return r.permission === 'admin' || r.permission === 'moderator'; });
+        this.app.chain.meta.chain.setAdmins(roles);
+      }).catch(() => console.log('Failed to fetch admins/mods'));
 
     // if we're loading entities from chain, only pull completed
     await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);

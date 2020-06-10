@@ -14,7 +14,7 @@ class ChainInfo {
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
-  public readonly adminsAndMods: RoleInfo[];
+  public adminsAndMods: RoleInfo[];
 
   constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?, adminsAndMods?) {
     this.id = id;
@@ -38,8 +38,24 @@ class ChainInfo {
       json.description,
       json.featured_tags,
       json.tags,
-      json.ChainObjectVersion
+      json.ChainObjectVersion,
+      json.adminsAndMods,
     );
+  }
+
+  public setAdmins(roles) {
+    this.adminsAndMods = [];
+    roles.forEach((r) => {
+      this.adminsAndMods.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
   }
 
   public async updateChainData(name: string, description: string,) {

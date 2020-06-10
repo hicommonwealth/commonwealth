@@ -109,11 +109,18 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
+      role = app.activeChainId()
+        ? app.chain.meta.chain.adminsAndMods.find((r) => r.address === address)
+        : app.community.meta.adminsAndMods.find((r) => r.address === address);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
+      role = app.activeChainId()
+        ? app.chain.meta.chain.adminsAndMods.find((r) => r.address === account.address)
+        : app.community.meta.adminsAndMods.find((r) => r.address === account.address);
     }
     const roleTag = role ? m(Tag, {
+      class: 'roleTag',
       label: role.permission,
       rounded: true,
       size: 'sm',
