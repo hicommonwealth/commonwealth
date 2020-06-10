@@ -11,6 +11,7 @@ import { Option, Vec } from '@polkadot/types';
 import { BalanceOf, AccountId, Hash, BlockNumber } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
+import { isFunction } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { CWEvent } from '../interfaces';
 import {
@@ -40,7 +41,15 @@ async function fetchDemocracyProposals(api: ApiPromise, blockNumber: number): Pr
   const proposedEvents = _.zip(publicProps, deposits)
     .map(([ [ idx, hash, proposer ], depositOpt ]): ISubstrateDemocracyProposed => {
       if (!depositOpt.isSome) return null;
-      const [ deposit ] = depositOpt.unwrap();
+
+      // handle kusama vs edgeware depositOpt order
+      const depositors = depositOpt.unwrap();
+      let deposit: BalanceOf;
+      if (isFunction((depositors[1] as BalanceOf).mul)) {
+        deposit = depositors[1];
+      } else {
+        deposit = depositors[0];
+      }
       return {
         kind: SubstrateEventKind.DemocracyProposed,
         proposalIndex: +idx,

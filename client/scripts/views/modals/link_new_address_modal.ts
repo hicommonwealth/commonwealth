@@ -168,6 +168,7 @@ const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, 
             specVersion: api.runtimeVersion.specVersion,
             tip: newTx.tip.toNumber(),
             nonce: undefined,
+            transactionVersion: 0,
           };
           const signedPayload = new ExtrinsicPayload((app.chain.chain as SubstrateChain).registry,
                                                      signedPayloadParams);
