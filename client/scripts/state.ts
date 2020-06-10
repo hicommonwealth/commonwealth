@@ -82,6 +82,7 @@ export interface IApp {
     notifications: NotificationsController;
     lastVisited: object;
     starredCommunities: StarredCommunity[];
+    discussionDrafts: DiscussionDraft[];
     unseenPosts: object;
   };
   // stored on server-side

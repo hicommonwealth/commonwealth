@@ -272,7 +272,8 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
-
+    const a = app;
+    debugger
     return m(Sublayout, {
       class: 'DiscussionsPage',
       rightSidebar: (app.chain || app.community) && [

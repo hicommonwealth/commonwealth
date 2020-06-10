@@ -63,6 +63,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
       app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
+      app.login.discussionDrafts = data.user ? data.user.discussionDrafts : [];
 
       // add roles data for user
       if (data.roles) {
