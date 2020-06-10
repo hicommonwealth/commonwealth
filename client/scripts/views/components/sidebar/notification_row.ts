@@ -68,8 +68,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
       : m('span', [ actorName, ' mentioned you in ', m('span.commented-obj', decoded_title || community_name) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ' reacted to your post ', m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ' reacted to your post in ', m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ' reacted 👍 to your post ', m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ' reacted 👍 to your post in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -189,7 +189,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
       notificationBody,
       path,
       pageJump
-    } = getBatchNotificationFields(category, JSON.parse(notificationData), notifications.length);
+    } = getBatchNotificationFields(category, notificationData, notifications.length);
 
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {

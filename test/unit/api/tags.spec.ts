@@ -16,17 +16,22 @@ chai.use(chaiHttp);
 const { expect } = chai;
 const markdownThread = require('../../util/fixtures/markdownThread');
 
+let adminJWT;
+let adminAddress;
+let userJWT;
+let userAddress;
+let tag;
+
 describe('Tag Tests', () => {
   const community = 'staking';
   const chain = 'ethereum';
+  const title = 'test title';
+  const body = 'test body';
+  const tagName = 'test tag';
+  const tagId = undefined;
+  const kind = 'forum';
 
-  let adminJWT;
-  let adminAddress;
-  let userJWT;
-  let userAddress;
-  let tag;
-
-  before(async () => {
+  before('reset database', async () => {
     await resetDatabase();
     let res = await modelUtils.createAndVerifyAddress({ chain });
     adminAddress = res.address;
@@ -47,100 +52,110 @@ describe('Tag Tests', () => {
     expect(userJWT).to.not.be.null;
   });
 
-  describe('/editTag', () => {
-    const updatedName = 'test name';
-    const updatedDescription = 'test description';
-    const featured_order = true;
-
-    beforeEach(async () => {
-      const kind = 'forum';
-      const threadRes = await modelUtils.createThread({
-        chain,
-        address: userAddress,
-        jwt: userJWT,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        privacy: true,
-        readOnly: true,
-        tags: ['tag', 'tag2', 'tag3'],
+  describe('Bulk Tags', () => {
+    before(async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      adminAddress = res.address;
+      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+      expect(adminAddress).to.not.be.null;
+      expect(adminJWT).to.not.be.null;
+      expect(isAdmin).to.not.be.null;
+      const res2 = await modelUtils.createThread({
+        chainId: chain,
+        communityId: undefined,
+        address: adminAddress,
+        jwt: adminJWT,
+        title,
+        body,
+        tagName,
+        tagId,
         kind,
       });
-      expect(threadRes.status).to.be.equal('Success');
-      expect(threadRes.result).to.not.be.null;
-      expect(threadRes.result.Address).to.not.be.null;
-      expect(threadRes.result.Address.address).to.equal(userAddress);
-      tag = threadRes.result.tags[0];
+      expect(res2.status).to.be.equal('Success');
+      expect(res2.result).to.not.be.null;
+      expect(res2.result.Address).to.not.be.null;
+      expect(res2.result.Address.address).to.equal(adminAddress);
+      tag = res2.result.tag;
     });
 
-    it('should successfully edit tag names & descriptions', async () => {
-      const res = await modelUtils.editTag({
-        id: tag.id,
-        name: updatedName,
-        description: updatedDescription,
+    it('Should pass /bulkTags', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkTags')
+        .set('Accept', 'application/json')
+        .query({
+          chain,
+          jwt: adminJWT,
+        });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.length).to.be.equal(1);
+    });
+  });
+
+  describe('Update Tags', () => {
+    let thread;
+
+    before(async () => {
+      const res = await modelUtils.createAndVerifyAddress({ chain });
+      adminAddress = res.address;
+      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      const isAdmin = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+      expect(adminAddress).to.not.be.null;
+      expect(adminJWT).to.not.be.null;
+      expect(isAdmin).to.not.be.null;
+      const res2 = await modelUtils.createThread({
+        chainId: chain,
+        communityId: community,
         address: adminAddress,
         jwt: adminJWT,
-        community,
+        title,
+        body,
+        tagName,
+        tagId,
+        kind,
       });
-      expect(res.status).to.equal('Success');
-      expect(res.result).to.not.be.null;
-      expect(res.result.name).to.equal(updatedName);
-      expect(res.result.description).to.equal(updatedDescription);
+      thread = res2.result;
     });
 
-    it('should successfully feature existing tags', async () => {
-      const res = await modelUtils.editTag({
-        id: tag.id,
-        community,
-        address: adminAddress,
-        jwt: adminJWT,
-        featured_order,
-      });
-
-      expect(res.status).to.equal('Success');
-      expect(res.result).to.not.be.null;
-      // todo: check against a community's featured_tag prop
+    it('Should fail to update thread without a tag name', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateTags')
+        .set('Accept', 'application/json')
+        .send({
+          'jwt': adminJWT,
+          'thread_id': thread.id,
+          'address': adminAddress,
+          'tag_name': undefined,
+        });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.not.be.equal('Success');
+      expect(res.body.result).to.not.be.null;
     });
 
-    it('should fail to edit a tag without an id', async () => {
-      const res = await modelUtils.editTag({
-        id: undefined,
-        name: updatedName,
-        description: updatedDescription,
-        address: adminAddress,
-        jwt: adminJWT,
-        community,
-      });
-      expect(res).to.not.be.null;
-      expect(res.error).to.not.be.null;
-      expect(res.error).to.be.equal(TagErrors.NoTagId);
-    });
-
-    it('should fail to edit a non-existing tag', async () => {
-      const res = await modelUtils.editTag({
-        id: 99999,
-        name: updatedName,
-        description: updatedDescription,
-        address: adminAddress,
-        jwt: adminJWT,
-        community,
-      });
-      expect(res).to.not.be.null;
-      expect(res.error).to.not.be.null;
-      expect(res.error).to.be.equal(TagErrors.TagNotFound);
-    });
-
-    it('should fail when a non-admin attempts to edit', async () => {
-      const res = await modelUtils.editTag({
-        id: tag.id,
-        name: updatedName,
-        description: updatedDescription,
-        address: userAddress,
-        jwt: userJWT,
-        community,
-      });
-      expect(res).to.not.be.null;
-      expect(res.error).to.not.be.null;
-      expect(res.error).to.be.equal(TagErrors.NotAdmin);
+    it('Should successfully add tag to thread', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateTags')
+        .set('Accept', 'application/json')
+        .send({
+          'jwt': adminJWT,
+          'thread_id': thread.id,
+          'address': adminAddress,
+          'tag_name': tagName,
+        });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result).to.not.be.null;
+      expect(res.body.result.name).to.be.equal(tagName);
     });
   });
 });

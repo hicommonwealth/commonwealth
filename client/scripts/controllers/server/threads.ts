@@ -18,7 +18,7 @@ const modelFromServer = (thread) => {
     attachments,
     thread.id,
     moment(thread.created_at),
-    thread.tags,
+    thread.tag,
     thread.kind,
     thread.version_history,
     thread.community,
@@ -52,14 +52,15 @@ class ThreadsController {
     return result;
   }
 
-  public create(
+  public async create(
     address: string,
     kind: string,
     chainId: string,
     communityId: string,
     title: string,
+    tagName: string,
+    tagId: number,
     body?: string,
-    tags?: string[],
     url?: string,
     attachments?: string[],
     mentions?: string[],
@@ -69,32 +70,35 @@ class ThreadsController {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
-    // TODO: Change to POST /thread
-    return $.post(`${app.serverUrl()}/createThread`, {
-      'author_chain': app.vm.activeAccount.chain.id,
-      'chain': chainId,
-      'community': communityId,
-      'address': address,
-      'title': encodeURIComponent(title),
-      'body': encodeURIComponent(body),
-      'kind': kind,
-      'versionHistory': versionHistory,
-      'attachments[]': attachments,
-      'mentions[]': mentions,
-      'tags[]': tags,
-      'url': url,
-      'privacy': privacy,
-      'readOnly': readOnly,
-      'jwt': app.login.jwt,
-    }).then((response) => {
+
+    try {
+      // TODO: Change to POST /thread
+      const response = await $.post(`${app.serverUrl()}/createThread`, {
+        'author_chain': app.vm.activeAccount.chain.id,
+        'chain': chainId,
+        'community': communityId,
+        'address': address,
+        'title': encodeURIComponent(title),
+        'body': encodeURIComponent(body),
+        'kind': kind,
+        'versionHistory': versionHistory,
+        'attachments[]': attachments,
+        'mentions[]': mentions,
+        'tag_name': tagName,
+        'tag_id': tagId,
+        'url': url,
+        'privacy': privacy,
+        'readOnly': readOnly,
+        'jwt': app.login.jwt,
+      });
       const result = modelFromServer(response.result);
       this._store.add(result);
       return result;
-    }, (err) => {
+    } catch (err) {
       console.log('Failed to create thread');
       throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
         : 'Failed to create thread');
-    });
+    }
   }
 
   public async edit(
@@ -140,8 +144,8 @@ class ThreadsController {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.login.jwt,
-        thread_id: proposal.id,
+        'jwt': app.login.jwt,
+        'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
         resolve(result);

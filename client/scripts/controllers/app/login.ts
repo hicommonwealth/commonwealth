@@ -151,6 +151,7 @@ export function updateActiveUser(data) {
     app.vm.activeAccount = null;
   } else {
     app.login.email = data.email;
+    app.login.emailInterval = data.emailInterval;
     app.login.jwt = data.jwt;
 
     app.login.addresses = data.addresses

@@ -1,121 +1,100 @@
 import 'components/autocomplete_tag_form.scss';
 
 import m from 'mithril';
+import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
+import { OffchainTag } from 'client/scripts/models';
 import { symbols } from '../../helpers';
-import { AutoCompleteForm } from './autocomplete_input';
-
 
 interface IAutoCompleteTagFormAttrs {
-  results: any;
-  updateFormData?: CallableFunction;
-  updateParentErrors: CallableFunction;
+  defaultActiveIndex?: number;
+  tags: OffchainTag[];
+  featuredTags: OffchainTag[];
+  activeTag?: OffchainTag;
   tabindex?: number;
+  updateFormData: Function;
+  updateParentErrors?: Function;
 }
 
 interface IAutoCompleteTagFormState {
   error: string;
-  noMatches: boolean;
-  tags: string[];
+  selectedTag: OffchainTag | string;
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
-    if (!vnode.state.tags) vnode.state.tags = [];
+    const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
+    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
 
-    const TagItem = (tag: string, onclick: CallableFunction, handlerType: string) => m('span.TagItem', {
-      key: tag,
-      class: handlerType === 'addTag' ? 'addable' : 'removable',
-      href: '#',
-      onclick,
-    }, [
-      m('a.tag', handlerType === 'addTag' ? tag : `#${tag}`),
-    ]);
+    const itemRender = (tag) => {
+      return m(ListItem, {
+        class: featuredTags.includes(tag) ? 'featured-tag' : 'other-tag',
+        // contentLeft: m('.tagItem', `# ${tag.name}`),
+        label: `# ${tag.name}`,
+        selected: (vnode.state.selectedTag as OffchainTag)?.name === tag.name,
+      });
+    };
 
-    const TagList = () => vnode.state.tags.map((tag) => {
-      const removeTag = (e) => {
-        e.preventDefault();
-        vnode.state.tags = vnode.state.tags.filter((t) => t !== tag);
-        vnode.attrs.updateParentErrors();
-      };
-      return TagItem(tag, removeTag, 'removeTag');
+    const itemPredicate = (query: string, item: OffchainTag) => {
+      return item.name.toLowerCase().includes(query.toLowerCase());
+    };
+
+    const onSelect = (item: OffchainTag) => {
+      vnode.state.selectedTag = item;
+      updateFormData(item.name, item.id);
+    };
+
+    const manuallyClosePopover = () => {
+      const button = document.getElementsByClassName('tag-selection-drop-menu')[0];
+      if (button) (button as HTMLButtonElement).click();
+    };
+
+    const addTag = () => {
+      const input = (document.getElementsByClassName('autocomplete-tag-input')[0].firstChild as HTMLInputElement);
+      const newTag = input.value;
+      tags.push({ name: newTag, id: undefined, description: '' });
+      setTimeout(() => { vnode.state.selectedTag = newTag; }, 1);
+      updateFormData(newTag);
+      manuallyClosePopover();
+    };
+
+    const sortTags = (tags_: OffchainTag[]) => {
+      return tags_.filter((tag) => featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1)
+        .concat(tags_.filter((tag) => !featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1));
+    };
+
+    const EmptyContent: m.Component<{}, {}> = {
+      view: (vnode_) => {
+        return m('a.no-matching-tags', {
+          href: '#',
+          onclick: addTag,
+        }, 'No matches found. Add tag?');
+      }
+    };
+
+    return m(SelectList, {
+      class: 'AutocompleteTagForm',
+      checkmark: false,
+      emptyContent: m(EmptyContent),
+      inputAttrs: {
+        class: 'autocomplete-tag-input',
+        placeholder: 'Select a tag...',
+      },
+      itemPredicate,
+      itemRender,
+      items: sortTags(tags),
+      onSelect,
+      trigger: m(Button, {
+        align: 'left',
+        class: 'tag-selection-drop-menu',
+        compact: true,
+        iconRight: Icons.CHEVRON_DOWN,
+        label: vnode.state.selectedTag
+          ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
+          : '',
+        sublabel: vnode.state.selectedTag ? '' : 'Select a tag (required)',
+        tabindex
+      }),
     });
-
-    const clearAutoComplete = (inputEle) => {
-      inputEle.value = '';
-      vnode.state.noMatches = false;
-      (document.getElementsByClassName('results')[0] as HTMLInputElement)
-        .classList.remove('show');
-      (document.getElementsByClassName('autocomplete-wrap')[0] as HTMLInputElement)
-        .classList.remove('displaying-results');
-      m.redraw();
-      inputEle.focus();
-    };
-
-    const addTag = (tag: string) => {
-      if (!tag.length) return;
-      const { tags } = vnode.state;
-      const { updateFormData } = vnode.attrs;
-      const formInput = (document.getElementsByClassName('autocomplete-entry')[0] as HTMLInputElement);
-      if (tags.length === 1) {
-        clearAutoComplete(formInput);
-        vnode.attrs.updateParentErrors('You can only select a single tag');
-        return;
-      }
-      for (const t of tags) {
-        if (t.toLowerCase() === tag.toLowerCase()) {
-          clearAutoComplete(formInput);
-          return;
-        }
-      }
-      vnode.attrs.updateParentErrors();
-      vnode.state.tags.push(tag);
-      updateFormData(vnode.state.tags);
-      clearAutoComplete(formInput);
-    };
-
-    const addTagWrap = (e) => {
-      e.preventDefault();
-      const formInput = (document.getElementsByClassName('autocomplete-entry')[0] as HTMLInputElement);
-      const tag = vnode.state.noMatches ? formInput.value : e.target.innerText;
-      addTag(tag);
-    };
-
-    const rowComponentFunc = (res) => TagItem(res.name, addTagWrap, 'addTag');
-
-    const onChangeHandler = (result) => {
-      if (!result.length) return false;
-      delete vnode.state.error;
-      if (result.length === 1) {
-        const formInput = (document.getElementsByClassName('autocomplete-entry')[0] as HTMLInputElement);
-        formInput.addEventListener('keyup', (e) => {
-          if (e.keyCode === 13) addTag(formInput.value);
-        });
-      }
-      const results = vnode.attrs.results
-        .filter((t) => (t.name.toLowerCase().indexOf(result.toLowerCase()) !== -1))
-        .sort((a, b) => a.name - b.name);
-      vnode.state.noMatches = !results.length;
-      const truncatedResults = vnode.state.noMatches
-        ? [{ name: `New tag '${result}'...` }]
-        : results.slice(0, Math.min(10, results.length));
-      return truncatedResults;
-    };
-
-    return m('.AutoCompleteTagForm', [
-      m('.top-wrap', [
-        m('.left-panel', [
-          m(AutoCompleteForm, {
-            placeholder: 'Select a category',
-            results: vnode.attrs.results || [],
-            applyDefaultHandler: true,
-            onChangeHandler,
-            rowComponentFunc,
-            tabindex: vnode.attrs.tabindex,
-          }),
-        ]),
-        m('.right-panel', TagList()),
-      ]),
-    ]);
   },
 };
 

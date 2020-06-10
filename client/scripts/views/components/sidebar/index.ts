@@ -96,30 +96,27 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
     }, [
-      m('.SidebarMenu', [
-        m(List, {
-          interactive: true,
-          size: 'lg',
-        }, [
-          // community homepage
-          (app.community || app.chain)
-            && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.HOME }),
-              active: onDiscussionsPage(m.route.get()),
-              label: 'Home',
-              onclick: (e) => m.route.set(`/${app.activeId()}`),
-            }),
-          // discussions (all communities)
-          (app.community || app.chain)
-            && m(TagSelector, { activeTag, showFullListing: false, hideEditButton: true }),
+      // discussions
+      m(List, { interactive: true }, [
+        m('h4', 'Discussions'),
+        (app.community || app.chain)
+          && m(ListItem, {
+            contentLeft: m(Icon, { name: Icons.HOME }),
+            active: onDiscussionsPage(m.route.get()),
+            label: 'Home',
+            onclick: (e) => m.route.set(`/${app.activeId()}`),
+          }),
+        (app.community || app.chain)
+          && m(TagSelector, { activeTag, hideEditButton: true }),
+      ]),
+      // proposals
+      (app.community || app.chain)
+        && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+        && m(List, { interactive: true }, [
+          m('h4', 'Voting & Staking'),
           // proposals (substrate and cosmos only)
-          (app.community || app.chain)
-            && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate
-                || showMolochMenuOptions)
-            && m('br'),
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.GIT_PULL_REQUEST }),
               active: onProposalPage(m.route.get()),
               label: 'Proposals',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
@@ -132,7 +129,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
-              contentLeft: m(Icon, { name: Icons.GRID }),
               active: onCouncilPage(m.route.get()),
               label: 'Council',
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
@@ -195,14 +191,13 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               contentLeft: m(Icon, { name: Icons.BOX }),
             }),
         ]),
-        // // chat (all communities)
-        // (app.community || app.chain) &&
-        //   m(ListItem, {
-        //     active: onChatPage(m.route.get()),
-        //     label: 'Chat',
-        //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-        //   }),
-      ]),
+      // // chat (all communities)
+      // (app.community || app.chain) &&
+      //   m(ListItem, {
+      //     active: onChatPage(m.route.get()),
+      //     label: 'Chat',
+      //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+      //   }),
     ]);
   },
 };

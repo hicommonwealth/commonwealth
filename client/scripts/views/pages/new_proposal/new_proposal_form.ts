@@ -19,7 +19,6 @@ import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import SendingFrom from 'views/components/sending_from';
 import Substrate from 'controllers/chain/substrate/main';
 import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
 import Cosmos from 'controllers/chain/cosmos/main';
@@ -124,9 +123,11 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
+          vnode.state.form.tagName,
+          vnode.state.form.tagId,
           vnode.state.form.title,
           vnode.state.form.description,
-          vnode.state.form.categoryId
+          vnode.state.form.categoryId,
         ).then(done)
           .then(() => { m.redraw(); })
           .catch((err) => { console.error(err); });
@@ -305,6 +306,8 @@ const NewProposalForm = {
       });
     }
 
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+
     return m('.NewProposalForm', [
       m(Grid, [
         m(Col, { span }, [
@@ -329,9 +332,11 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTags
             && m(AutoCompleteTagForm, {
-              results: activeEntity.meta.tags || [],
-              updateFormData: (tags: string[]) => {
-                vnode.state.form.tags = tags;
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.form.tagName = tagName;
+                vnode.state.form.tagId = tagId;
               },
               updateParentErrors: (err: string) => {
                 if (err) vnode.state.error = err;

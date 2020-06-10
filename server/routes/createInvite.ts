@@ -1,9 +1,11 @@
 import crypto from 'crypto';
-import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {
   NoEmailAndAddress: 'Can only invite either an address or email, not both',
@@ -14,9 +16,6 @@ export const Errors = {
   InvalidEmail: 'Invalid email',
   FailedToSendEmail: 'Could not send invite email',
 };
-
-sgMail.setApiKey(SENDGRID_API_KEY);
-const log = factory.getLogger(formatFilename(__filename));
 
 const createInvite = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -35,15 +34,15 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
     : { offchain_community_id: community.id };
 
   // check that invitesEnabled === true, or the user is an admin or mod
-  if (!community.invitesEnabled) {
-    const address = await models.Address.findOne({
-      where: {
-        address: req.body.address,
-        user_id: req.user.id,
-      },
-    });
+  const address = await models.Address.findOne({
+    where: {
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
+  if (!address) return next(new Error(Errors.AddressNotFound));
 
-    if (!address) return next(new Error(Errors.AddressNotFound));
+  if (!community.invitesEnabled) {
     const requesterIsAdminOrMod = await models.Role.findAll({
       where: {
         ...chainOrCommObj,
@@ -114,11 +113,13 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    subject: `Invitation to ${invite.community_id}`,
-    text: `You have been invited to the ${invite.community_name} community. ` +
-      `${joinOrLogIn} to accept or see more information: ${signupLink}`,
-    html: `You have been invited to the <strong>${invite.community_name}</strong> community. ` +
-      `${joinOrLogIn} to accept or see more information: ${signupLink}`,
+    templateId: 'd-000c08160c07459798b46c927b638b9a',
+    dynamic_template_data: {
+      community_name: invite.community_id,
+      inviter: address.name,
+      joinOrLogIn,
+      invite_link: signupLink,
+    },
     mail_settings: {
       sandbox_mode: {
         enable: (process.env.NODE_ENV === 'development'),
@@ -127,7 +128,7 @@ const createInvite = async (models, req: Request, res: Response, next: NextFunct
   };
 
   try {
-    const message = await sgMail.send(msg);
+    await sgMail.send(msg);
     return res.json({ status: 'Success', result: invite.toJSON() });
   } catch (e) {
     return res.status(500).json({ error: Errors.FailedToSendEmail, message: e.message });

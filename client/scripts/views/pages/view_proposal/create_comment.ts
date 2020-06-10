@@ -21,6 +21,7 @@ interface ICreateCommentAttrs {
   getSetGlobalReplyStatus: CallableFunction;
   parentComment?: OffchainComment<any>;
   rootProposal: AnyProposal | OffchainThread;
+  tabindex?: number;
 }
 
 interface ICreateCommentState {
@@ -127,6 +128,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         },
         editorNamespace: `${document.location.pathname}-commenting`,
         onkeyboardSubmit: submitComment,
+        tabindex: vnode.attrs.tabindex,
       }),
       m('.form-bottom', [
         m(Button, {
