@@ -4,7 +4,7 @@ import {
   AddressInfo,
   RoleInfo,
   SocialAccount,
-  OffchainTag,
+  DiscussionDraft,
   ContractCategory,
   Account,
   IChainAdapter,
@@ -141,6 +141,7 @@ const app: IApp = {
     lastVisited: {},
     unseenPosts: {},
     starredCommunities: [],
+    discussionDrafts: [],
     notifications: new NotificationsController(),
   },
   config: {

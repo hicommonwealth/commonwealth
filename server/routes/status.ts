@@ -73,6 +73,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       address_id: { [Op.in]: myAddressIds },
     },
   });
+  const discussionDrafts = await models.DiscussionDraft.findAll({
+    where: {
+      author_Id: user.id
+    }
+  });
   const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
   const privateCommunities = await models.OffchainCommunity.findAll({
     where: {
@@ -166,6 +171,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
       starredCommunities,
+      discussionDrafts,
       unseenPosts
     }
   });
