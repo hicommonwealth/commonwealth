@@ -58,10 +58,6 @@ class SubstrateTreasury extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
-  protected _entityConstructor(entity: ChainEntity) {
-    return new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, entity);
-  }
-
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -81,7 +77,8 @@ class SubstrateTreasury extends ProposalModule<
         });
         */
         const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
-        const proposals = entities.map((e) => this._entityConstructor(e));
+        const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
+        const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
         this._initialized = true;
         resolve();

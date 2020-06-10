@@ -28,10 +28,6 @@ class SubstrateCollective extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
-  protected _entityConstructor(entity: ChainEntity): SubstrateCollectiveProposal {
-    return new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, entity);
-  }
-
   // TODO: we may want to track membership here as well as in elections
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName: string): Promise<void> {
     this._Chain = ChainInfo;
@@ -39,7 +35,8 @@ class SubstrateCollective extends ProposalModule<
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
       const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
-      const proposals = entities.map((e) => this._entityConstructor(e));
+      const constructorFunc = (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e);
+      const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         const memberP = new Promise((memberResolve) => {

@@ -33,9 +33,6 @@ class SubstrateDemocracy extends ProposalModule<
     return this.store.getAll().find((referendum) => referendum.hash === hash);
   }
 
-  protected _entityConstructor(entity: ChainEntity): SubstrateDemocracyReferendum {
-    return new SubstrateDemocracyReferendum(this._Chain, this._Accounts, this, entity);
-  }
   // Loads all proposals and referendums currently present in the democracy module
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, useRedesignLogic: boolean): Promise<void> {
     this._Chain = ChainInfo;
@@ -43,7 +40,8 @@ class SubstrateDemocracy extends ProposalModule<
     this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
       const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
-      const proposals = entities.map((e) => this._entityConstructor(e));
+      const constructorFunc = (e) => new SubstrateDemocracyReferendum(this._Chain, this._Accounts, this, e);
+      const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // save parameters

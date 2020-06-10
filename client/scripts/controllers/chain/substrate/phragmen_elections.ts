@@ -60,9 +60,6 @@ class SubstratePhragmenElections extends ProposalModule<
     super.deinit();
   }
 
-  protected _entityConstructor(entity: ChainEntity): SubstratePhragmenElection {
-    throw new Error('not implemented');
-  }
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, moduleName?: string): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
