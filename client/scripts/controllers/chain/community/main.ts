@@ -1,4 +1,4 @@
-import { CommunityInfo, ICommunityAdapter } from 'models';
+import { CommunityInfo, ICommunityAdapter, RolePermission } from 'models';
 import $ from 'jquery';
 
 import { Coin } from 'adapters/currency';
@@ -23,7 +23,7 @@ class Community extends ICommunityAdapter<Coin, OffchainAccount> {
     await this.app.tags.refreshAll(null, this.id, true);
     await $.get(`${this.app.serverUrl()}/bulkMembers`, { community: this.id, })
       .then((res) => {
-        const roles = res.result.filter((r) => { return r.permission === 'admin' || r.permission === 'moderator'; });
+        const roles = res.result.filter((r) => { return r.permission === RolePermission.admin || r.permission === RolePermission.moderator; });
         this.app.community.meta.setAdmins(roles);
       }).catch(() => console.log('Failed to fetch admins/mods'));
     this._serverLoaded = true;

@@ -8,7 +8,7 @@ import { clearLocalStorage } from 'stores/PersistentStore';
 import { CommentRefreshOption } from 'controllers/server/comments';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
-import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
+import { Account, NodeInfo, ChainEntity, ChainEvent, RolePermission } from '.';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -65,7 +65,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
 
     await $.get(`${this.app.serverUrl()}/bulkMembers`, { chain: this.id, })
       .then((res) => {
-        const roles = res.result.filter((r) => { return r.permission === 'admin' || r.permission === 'moderator'; });
+        const roles = res.result.filter((r) => { return r.permission === RolePermission.admin || r.permission === RolePermission.moderator; });
         this.app.chain.meta.chain.setAdmins(roles);
       }).catch(() => console.log('Failed to fetch admins/mods'));
 
