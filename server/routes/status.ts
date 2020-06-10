@@ -75,7 +75,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const discussionDrafts = await models.DiscussionDraft.findAll({
     where: {
-      author_Id: user.id
+      author_id: user.id
     }
   });
   const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
@@ -94,13 +94,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
-    where: { user_id: req.user.id }
+    where: { user_id: user.id }
   });
 
   // get invites for user
   const invites = await models.InviteCode.findAll({
     where: {
-      invited_email: req.user.email,
+      invited_email: user.email,
       used: false,
     },
   });

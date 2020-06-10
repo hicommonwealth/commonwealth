@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     community: { type: DataTypes.STRING, allowNull: true },
     attachment: { type: DataTypes.INTEGER, allowNull: true }
   }, {
+    timestamps: true,
     underscored: true,
     indexes: [
       { fields: ['author_id'] },
