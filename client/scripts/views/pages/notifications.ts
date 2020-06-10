@@ -12,13 +12,78 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
 
-const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
+const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmailStatus: boolean, }> = {
+  oninit: (vnode) => {
+    vnode.state.updateEmailStatus = false;
+    vnode.state.interval = app.login.emailInterval;
+    vnode.state.email = app.login.email;
+  },
+  view: (vnode) => {
+    return m('.EmailPanel', [
+      m('h2', 'Email Settings:'),
+      m('.EmailUpdate', [
+        m('h4', 'Email:'),
+        m(Input, {
+          contentLeft: m(Icon, { name: Icons.MAIL }),
+          defaultValue: vnode.state.email || null,
+          onkeyup: (e) => { e.preventDefault(); vnode.state.email = (e.target as any).value; },
+        }),
+        m(Button, {
+          label: 'Update Email',
+          iconRight: vnode.state.updateEmailStatus ? Icons.CHECK_CIRCLE : null,
+          onclick: async () => {
+            try {
+              if (vnode.state.email === app.login.email) return;
+              const response = await $.post(`${app.serverUrl()}/updateEmail`, {
+                'email': vnode.state.email,
+                'jwt': app.login.jwt,
+              });
+              app.login.email = response.result.email;
+              vnode.state.updateEmailStatus = true;
+            } catch (err) {
+              console.log('Failed to update email');
+              throw new Error((err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to update email');
+            }
+          }
+        }),
+      ]),
+      m('.EmailInterval', [
+        m('h4', 'Receive notification emails:'),
+        m(Select, {
+          defaultValue: vnode.state.interval,
+          options: ['daily', 'weekly', 'monthly', 'never'],
+          onchange: async (e) => {
+            vnode.state.interval = (e.target as any).value;
+            try {
+              if (vnode.state.interval === app.login.emailInterval) return;
+              const response = await $.post(`${app.serverUrl()}/updateUserEmailInterval`, {
+                'interval': vnode.state.interval,
+                'jwt': app.login.jwt,
+              });
+              app.login.emailInterval = response.result.emailNotificationInterval;
+            } catch (err) {
+              vnode.state.interval = app.login.emailInterval;
+              console.log('Failed to update email notification interval');
+              throw new Error((err.responseJSON && err.responseJSON.error)
+                ? err.responseJSON.error
+                : 'Failed to update email notification interval');
+            }
+          },
+        })
+      ]),
+    ]);
+  },
+};
+
+const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   view: (vnode) => {
     let notifications: any[];
     if (app.loginStatusLoaded) {
@@ -26,23 +91,55 @@ const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[]
     }
     const { subscriptions } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
-    return m('.UserSubscriptions', [
+    return m('.UserNotifications', [
       m('h2', 'Notifications:'),
-      m(Button, {
-        label: 'Mark all as read',
-        onclick: (e) => {
-          e.preventDefault();
-          if (notifications.length < 1) return;
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
-        }
-      }),
-      m(Button, {
-        label: 'Clear all read',
-        onclick: (e) => {
-          e.preventDefault();
-          app.login.notifications.clearAllRead().then(() => m.redraw());
-        }
-      }),
+      m('.MarkAllButtons', [
+        m('h4', 'For all current notifications:'),
+        m(Button, {
+          label: 'Mark all as read',
+          onclick: (e) => {
+            e.preventDefault();
+            if (notifications.length < 1) return;
+            app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          }
+        }),
+        m(Button, {
+          label: 'Clear all read',
+          onclick: (e) => {
+            e.preventDefault();
+            app.login.notifications.clearAllRead().then(() => m.redraw());
+          }
+        }),
+      ]),
+      mentionsSubscription
+        && m('.MentionsButton', [
+          m('h4', 'Mentions:'),
+          m(Button, {
+            label: mentionsSubscription.isActive ? 'On' : 'Off',
+            intent: mentionsSubscription.isActive ? 'positive' : 'none',
+            onclick: async (e) => {
+              e.preventDefault();
+              if (mentionsSubscription.isActive) {
+                await app.login.notifications.disableSubscriptions([mentionsSubscription]);
+              } else {
+                await app.login.notifications.enableSubscriptions([mentionsSubscription]);
+              }
+              m.redraw();
+            }
+          }),
+        ]),
+    ]);
+  },
+};
+
+const UserSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }> = {
+  oninit: (vnode) => {
+  },
+  view: (vnode) => {
+    return m('.UserSubscriptions', [
+      m('h1', 'User Settings'),
+      m(EmailPanel),
+      m(UserNotifications, { subscriptions: vnode.attrs.subscriptions, })
     ]);
   }
 };
@@ -60,7 +157,7 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === communityOrChain.id);
 
-    return [
+    return m('.ChainOrCommunitySubscriptionButton.NewThreadRow', [
       m('h4', 'New Threads:'),
       m(Button, {
         label: communitySubscription ? 'Notifications on' : 'Notifications off',
@@ -75,7 +172,7 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
             subscriptions.subscribe(NotificationCategories.NewThread, communityOrChain.id).then(() => m.redraw());
           }
         },
-      })];
+      })]);
   }
 };
 
@@ -245,23 +342,11 @@ interface IActiveSubscriptionsState {
   subscriptions: NotificationSubscription[];
 }
 
-const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
+const ActiveSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }, IActiveSubscriptionsState> = {
   oninit: (vnode) => {
-    vnode.state.subscriptions = [];
-  },
-  oncreate: async (vnode) => {
-    if (!app.isLoggedIn) m.route.set('/');
-    // TODO: Change to GET /subscriptions
-    $.get(`${app.serverUrl()}/viewSubscriptions`, {
-      jwt: app.login.jwt,
-    }).then((result) => {
-      result.result.forEach((sub) => {
-        vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
-      });
-      m.redraw();
-    }, (error) => {
-      m.route.set('/');
-    });
+    vnode.state.subscriptions = vnode.attrs.subscriptions.filter(
+      (s) => s.category !== NotificationCategories.NewMention
+    );
   },
   view: (vnode) => {
     const subscriptions = vnode.state.subscriptions;
@@ -603,7 +688,20 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         .filter((c) => chainIds.includes(c.id))
     );
     vnode.state.selectedFilter = 'default';
-    vnode.state.subscriptions = app.login.notifications.subscriptions;
+    vnode.state.subscriptions = [];
+  },
+  oncreate: async (vnode) => {
+    if (!app.isLoggedIn) m.route.set('/');
+    $.get(`${app.serverUrl()}/viewSubscriptions`, {
+      jwt: app.login.jwt,
+    }).then((result) => {
+      result.result.forEach((sub) => {
+        vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
+      });
+      m.redraw();
+    }, (error) => {
+      m.route.set('/');
+    });
   },
   view: (vnode) => {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
@@ -627,7 +725,7 @@ const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
         (selectedFilter === 'default')
           && m(UserSubscriptions, { subscriptions }),
         (selectedFilter === 'active')
-          && m(ActiveSubscriptions),
+          && m(ActiveSubscriptions, { subscriptions }),
         (chainIds.includes(selectedFilter))
           && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
         (communityIds.includes(selectedFilter))

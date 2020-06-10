@@ -1,7 +1,6 @@
-import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
-
+const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
 const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -59,17 +58,14 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
       try {
         const user = await models.User.findOne({ where: { id: oldId } });
         if (!user.email) throw new Error('No email to alert'); // users who register thru github don't have emails!
-        const mainText = `Another user signed a message using ${req.body.address} `
-          + `(${req.body.chain}) claiming the address as their own.`;
-        const secondLine = 'If this was you, you don\'t need to do anything.';
-        const thirdLine = 'If this was someone else, you should stop using the address immediately, '
-          + 'and take steps to protect any funds, identities, or voting power linked to it.';
         const msg = {
           to: user.email,
           from: 'Commonwealth <no-reply@commonwealth.im>',
-          subject: 'Your address was moved',
-          text: `${mainText}\n\n${secondLine}\n\n${thirdLine}`,
-          html: `${mainText}<br/><br/>${secondLine}<br/><br/>${thirdLine}`,
+          templateId: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
+          dynamic_template_data: {
+            address: req.body.address,
+            chain: req.body.chain,
+          },
         };
         await sgMail.send(msg);
         log.info('sent address move email!');

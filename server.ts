@@ -30,6 +30,7 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -158,6 +159,7 @@ setupPassport(models);
 setupAPI(app, models, fetcher, viewCountCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
+sendBatchedNotificationEmails(models, 'monthly');
 
 if (SHOULD_RESET_DB) {
   resetServer(models, closeMiddleware);
