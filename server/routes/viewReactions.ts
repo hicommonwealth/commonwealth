@@ -18,11 +18,16 @@ const viewReactions = async (models, req: Request, res: Response, next: NextFunc
   if (req.query.thread_id) options['thread_id'] = req.query.thread_id;
   else if (req.query.community_id) options['comment_id'] = req.query.comment_id;
 
-  const reactions = await models.OffchainReaction.findAll({
-    where: options,
-    include: [ models.Address ],
-    order: [['created_at', 'DESC']],
-  });
+  let reactions;
+  try {
+    reactions = await models.OffchainReaction.findAll({
+      where: options,
+      include: [ models.Address ],
+      order: [['created_at', 'DESC']],
+    });
+  } catch (err) {
+    return next(new Error(err));
+  }
 
   return res.json({ status: 'Success', result: reactions.map((c) => c.toJSON()) });
 };

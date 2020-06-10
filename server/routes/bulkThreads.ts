@@ -15,17 +15,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     const publicThreads = await models.OffchainThread.findAll({
       where: publicThreadsQuery,
-      include: [
-        models.Address,
-        {
-          model: models.OffchainTag,
-          as: 'tags',
-          through: {
-            model: models.TaggedThread,
-            as: 'taggedThreads',
-          },
-        },
-      ],
+      include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
       order: [['created_at', 'DESC']],
     });
 
@@ -38,17 +28,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const allThreads = await models.OffchainThread.findAll({
     where: allThreadsQuery,
-    include: [
-      models.Address,
-      {
-        model: models.OffchainTag,
-        as: 'tags',
-        through: {
-          model: models.TaggedThread,
-          as: 'taggedThreads',
-        },
-      },
-    ],
+    include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
     order: [['created_at', 'DESC']],
   });
 

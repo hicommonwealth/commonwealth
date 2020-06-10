@@ -345,3 +345,8 @@ td, th {
 .cui-icon.filled-icon svg {
     fill: currentColor;
 }
+
+// select list styles
+.cui-popover.cui-select-list .cui-popover-content {
+    padding: 10px;
+}

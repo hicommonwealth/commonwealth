@@ -45,12 +45,15 @@ describe('Subscriptions Tests', () => {
     });
     it('should make new-comment subscription on thread', async () => {
       let res = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: community,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't',
         body: 't',
         kind: 'forum',
+        tagName: 't',
+        tagId: undefined
       });
 
       const object_id = res.result.id;
@@ -323,13 +326,15 @@ describe('Subscriptions Tests', () => {
       const newAddress = result.address;
       const newJWT = jwt.sign({ id: result.user_id, email: result.email }, JWT_SECRET);
       thread = await modelUtils.createThread({
-        chain,
-        community,
+        chainId: chain,
+        communityId: community,
         jwt: newJWT,
         address: newAddress,
         title: 'hi',
         body: 'hi you!',
         kind: 'forum',
+        tagName: 't',
+        tagId: undefined
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;

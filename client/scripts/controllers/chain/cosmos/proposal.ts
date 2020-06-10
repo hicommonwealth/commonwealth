@@ -341,8 +341,6 @@ export class CosmosProposal extends Proposal<
     this._totalDeposit = state.totalDeposit;
     if (state.completed) {
       super.complete(store);
-    } else {
-      store.update(this);
     }
   }
 }
