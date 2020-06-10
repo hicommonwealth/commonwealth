@@ -220,6 +220,22 @@ export const NewThreadForm: m.Component<{}, IState> = {
         m(FormGroup, [
           m(Button, {
             class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+            intent: 'none',
+            onclick: () => {
+              vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              if (!vnode.state.error) {
+                $(vnode.dom).trigger('modalcomplete');
+                setTimeout(() => {
+                  $(vnode.dom).trigger('modalexit');
+                }, 0);
+              }
+            },
+            label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
+            name: 'saving',
+            tabindex: 4
+          }),
+          m(Button, {
+            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);

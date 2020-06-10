@@ -22,6 +22,7 @@ import ReactionsController from './controllers/server/reactions';
 import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
+import DraftsController from './controllers/server/drafts';
 import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
 
@@ -48,6 +49,7 @@ export interface IApp {
   profiles: ProfilesController;
   comments: CommentsController;
   threads: ThreadsController;
+  drafts: DraftsController;
   reactions: ReactionsController;
   tags: TagsController;
   chainEntities: ChainEntityController;
@@ -117,6 +119,7 @@ const app: IApp = {
   profiles: new ProfilesController(),
   comments: new CommentsController(),
   threads: new ThreadsController(),
+  drafts: new DraftsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),

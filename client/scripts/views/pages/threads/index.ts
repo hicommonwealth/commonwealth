@@ -42,6 +42,62 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   }
 };
 
+export const saveDraft = (
+  form,
+  quillEditorState,
+  author
+) => {
+  const chainId = app.activeCommunityId() ? null : app.activeChainId();
+  const communityId = app.activeCommunityId();
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const { title, tagName, bodyText } = form;
+  const attachments = [];
+  (async () => {
+    let result;
+    try {
+      result = await app.drafts.create(
+        author.address,
+        chainId,
+        communityId,
+        title,
+        tagName,
+        bodyText,
+        attachments
+      );
+    } catch (e) {
+      console.error(e);
+      return ({ thread_creation: e });
+    }
+    
+        const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+        updateLastVisited(app.activeCommunityId()
+          ? (activeEntity.meta as CommunityInfo)
+          : (activeEntity.meta as NodeInfo).chain, true);
+        await app.login.notifications.refresh();
+        m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+    
+        try {
+          const tagNames = Array.isArray(activeEntity?.meta?.tags)
+            ? activeEntity.meta.tags.map((t) => t.name)
+            : [];
+          if (!tagNames.includes(result.tag.name)) {
+            activeEntity.meta.tags.push(result.tag);
+          }
+        } catch (e) {
+          console.log(`Error adding new tag to ${activeEntity}.`);
+        }
+    
+        mixpanel.track('Create Thread', {
+          'Step No': 2,
+          Step: 'Filled in Proposal and Discussion',
+          'Thread Type': kind,
+        });
+      })();
+}
+
 export const newThread = (
   form,
   quillEditorState,
