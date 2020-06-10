@@ -67,7 +67,7 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
   let nodeUrl = node.url;
   const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
   nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
-  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1;
+  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1 && nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1;
   const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
   if (nodeUrl.indexOf(':9944') !== -1) {
     nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
