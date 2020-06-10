@@ -78,6 +78,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       author_id: user.id
     }
   });
+
   const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
   const privateCommunities = await models.OffchainCommunity.findAll({
     where: {

@@ -29,13 +29,13 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
 
   const draftContent = community ? {
     community: community.id,
-    author_id: author.id,
+    author_id: req.user.id,
     title,
     body,
     tag
   } : {
     chain: chain.id,
-    author_id: author.id,
+    author_id: req.user.id,
     title,
     body,
     tag
@@ -62,7 +62,7 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
 
   let finalDraft;
   try {
-    finalDraft = await models.UserDraft.findOne({
+    finalDraft = await models.DiscussionDraft.findOne({
       where: { id: draft.id },
       include: [
         models.Address,

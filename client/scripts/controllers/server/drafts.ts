@@ -53,7 +53,7 @@ class DraftsController {
         'title': encodeURIComponent(title),
         'body': encodeURIComponent(body),
         'attachments[]': attachments,
-        'tag_name': tagName,
+        'tag': tagName,
         'jwt': app.login.jwt,
       });
       const result = modelFromServer(response.result);
