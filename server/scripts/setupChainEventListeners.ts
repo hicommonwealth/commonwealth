@@ -31,11 +31,16 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
+const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');
-  await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
+  await Promise.all(nodes
+    .filter((node) => EventSupportingChains.includes(node.chain))
+    // filter out duplicate nods per-chain, only use one node
+    .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
+    // if migrating, only use chain specified, unless "all"
+    .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
       if (migrate) {
@@ -48,17 +53,23 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
-      const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
-      const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
-      const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-      const url = protocol + node.url;
+      let url: string = node.url;
+      if (node.chain === 'edgeware') {
+        // must be ws
+        const urlNoProtocol = url.replace(/ws?s:\/\//, '');
+        url = `ws://${urlNoProtocol}`;
+      } else if (node.chain === 'kusama') {
+        // requires wss and no port
+        const urlPath = url.replace(/^ws?s:\/\//, '').replace(/:[0-9]*$/, '');
+        url = `wss://${urlPath}`;
+      }
       const subscriber = await subscribeEdgewareEvents(
         node.chain,
         url,
         handlers,
         skipCatchup,
         () => discoverReconnectRange(models, node.chain),
-        migrate,
+        !!migrate,
       );
 
       // hook for clean exit

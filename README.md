@@ -40,8 +40,8 @@ set up any environment variables
 To download and restore the production database, and run migrations:
 
 ```
-heroku pg:backups:capture
-heroku pg:backups:download
+heroku pg:backups:capture -a commonwealthapp
+heroku pg:backups:download -a commonwealthapp
 npx sequelize db:drop   # Reset the database
 npx sequelize db:create # Create a new empty database
 pg_restore --verbose --clean --no-acl --no-owner --if-exists -h localhost -U commonwealth -d commonwealth latest.dump

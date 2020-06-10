@@ -3,6 +3,10 @@ import { takeWhile } from 'rxjs/operators';
 import { Unsubscribable } from 'rxjs';
 import BN from 'bn.js';
 import { ApiRx } from '@polkadot/api';
+import { Vec } from '@polkadot/types';
+import { ITuple } from '@polkadot/types/types';
+import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
+import { isFunction } from '@polkadot/util';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
@@ -159,7 +163,13 @@ class SubstrateDemocracyProposal extends Proposal<
     return this._Chain.query((api) => api.query.democracy.depositOf(this.data.index))
       .pipe(takeWhile((v) => v.isSome))
       .subscribe((depositOpt) => {
-        const [ deposit, depositors ] = depositOpt.unwrap();
+        const depositorsTuple: ITuple<[ BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId> ]> = depositOpt.unwrap();
+        let depositors: Vec<AccountId>;
+        if (isFunction((depositorsTuple[1] as BalanceOf).mul)) {
+          depositors = depositorsTuple[0] as Vec<AccountId>;
+        } else {
+          depositors = depositorsTuple[1] as Vec<AccountId>;
+        }
         // eslint-disable-next-line no-restricted-syntax
         for (const depositor of depositors) {
           const acct = this._Accounts.fromAddress(depositor.toString());
