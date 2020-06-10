@@ -19,37 +19,19 @@ import { isRoleOfCommunity } from 'helpers/roles';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
-import OffchainAccounts from 'controllers/chain/community/account';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import {
   OffchainThread,
   OffchainThreadKind,
   OffchainComment,
-  Proposal,
   AnyProposal,
   Account,
-  Profile,
-  ChainBase,
-  OffchainTag
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import Tabs from 'views/components/widgets/tabs';
-import QuillEditor from 'views/components/quill_editor';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import ProfileBlock from 'views/components/widgets/profile_block';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import PreviewModal from 'views/modals/preview_modal';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
-import { formatCoin } from 'adapters/currency';
-import VersionHistoryModal from 'views/modals/version_history_modal';
 
 import {
   ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete,
@@ -107,7 +89,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         m('.proposal-header-meta', [
           m(ProposalHeaderTags, { proposal }),
           proposal instanceof OffchainThread
-            && (proposal.tags?.length > 0
+            && (proposal.tag
                 || (app.vm.activeAccount?.address === (proposal as OffchainThread).author)
                 || isRoleOfCommunity(
                   app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()

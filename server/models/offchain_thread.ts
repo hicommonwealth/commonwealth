@@ -13,6 +13,7 @@ export interface OffchainThreadAttributes {
   body?: string;
   kind: string;
   url?: string;
+  tag_id: number;
   pinned?: boolean;
   chain?: string;
   community?: string;
@@ -28,7 +29,6 @@ export interface OffchainThreadAttributes {
   OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?: OffchainAttachmentAttributes[] | OffchainAttachmentAttributes['id'][];
-  tags?: OffchainTagAttributes[] | OffchainTagAttributes['id'][];
 }
 
 export interface OffchainThreadInstance extends Sequelize.Instance<OffchainThreadAttributes>, OffchainThreadAttributes {
@@ -50,6 +50,7 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
+    tag_id: { type: dataTypes.INTEGER, allowNull: false },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
@@ -76,11 +77,9 @@ export default (
       constraints: false,
       scope: { attachable: 'thread' },
     });
-    models.OffchainThread.belongsToMany(models.OffchainTag, {
-      through: models.TaggedThread,
-      as: 'tags',
-      foreignKey: 'thread_id',
-      otherKey: 'tag_id',
+    models.OffchainThread.belongsTo(models.OffchainTag, {
+      as: 'tag',
+      foreignKey: 'tag_id',
     });
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',

@@ -34,6 +34,8 @@ describe('Webhook Tests', () => {
   let notAdminJWT;
   const chain = 'ethereum';
   const community = 'staking';
+  const tagName = 'test';
+  const tagId = 0;
 
   before('reset database', async () => {
     await resetDatabase();
@@ -224,7 +226,10 @@ describe('Webhook Tests', () => {
         jwt: jwtToken
       });
       res = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: null,
+        tagName,
+        tagId,
         address: loggedInAddr,
         jwt: jwtToken,
         title: decodeURIComponent(markdownThread.title),
@@ -239,7 +244,10 @@ describe('Webhook Tests', () => {
         root_id: `discussion_${res.result.id}`,
       });
       res = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: null,
+        tagName,
+        tagId,
         address: loggedInAddr,
         jwt: jwtToken,
         title: decodeURIComponent(richTextThread.title),

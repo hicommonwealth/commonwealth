@@ -7,6 +7,18 @@ import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
 
+enum NewThreadErrors {
+  NoBody = 'Thread body cannot be blank',
+  NoTag = 'Thread must have a tag',
+  NoTitle = 'Title cannot be blank',
+  NoUrl = 'URL cannot be blank',
+}
+
+export const formDataIncomplete = (state) : string => {
+  if (!state.form.title) return NewThreadErrors.NoTitle;
+  if (!state.form.tag) return NewThreadErrors.NoTag;
+};
+
 export const parseMentionsForServer = (text, isMarkdown) => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
@@ -39,16 +51,16 @@ export const newThread = (
   readOnly?: boolean
 ) => {
   if (!form.title) {
-    return ({ title: 'Title cannot be blank' });
+    return ({ title: NewThreadErrors.NoTitle });
   }
-  if (form.tags?.length > 3) {
-    return ({ tags: 'Threads may only have up to three tags' });
+  if (!form.tagName) {
+    return ({ tag: NewThreadErrors.NoTag });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
-    return ({ url: 'URL cannot be blank' });
+    return ({ url: NewThreadErrors.NoUrl });
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
-    return ({ editor: 'Thread cannot be blank' });
+    return ({ editor: NewThreadErrors.NoBody });
   }
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
@@ -63,7 +75,7 @@ export const newThread = (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tags, title, url } = form;
+  const { tagName, tagId, title, url } = form;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();
@@ -85,8 +97,9 @@ export const newThread = (
         chainId,
         communityId,
         title,
+        tagName,
+        tagId,
         bodyText,
-        tags,
         url,
         attachments,
         mentions,
@@ -109,13 +122,11 @@ export const newThread = (
       const tagNames = Array.isArray(activeEntity?.meta?.tags)
         ? activeEntity.meta.tags.map((t) => t.name)
         : [];
-      result.tags.forEach((tag) => {
-        if (!tagNames.includes(tag.name)) {
-          activeEntity.meta.tags.push(tag);
-        }
-      });
+      if (!tagNames.includes(result.tag.name)) {
+        activeEntity.meta.tags.push(result.tag);
+      }
     } catch (e) {
-      console.log(`Error adding new ${activeEntity} tags.`);
+      console.log(`Error adding new tag to ${activeEntity}.`);
     }
 
     mixpanel.track('Create Thread', {

@@ -54,96 +54,60 @@ $active-color: #ececec;
 }
 
 .Sidebar {
-    position: fixed;
-    top: $header-height + $vertical-padding;
-    bottom: $vertical-padding;
-    width: $sidebar-width;
-    background: #fff;
-    box-shadow: 0 0 4px rgba(0,0,0,0.07);
-    padding-top: 10px;
-
-    .SidebarMenu {
-        height: 100%;
-    }
-    .SidebarMenu .cui-list {
-        height: 100%;
-        overflow-x: hidden;
-    }
-    .SidebarMenu .cui-list.list-bottom {
-        position: absolute;
-        bottom: 0;
-        height: initial;
-        padding-bottom: 20px;
-    }
-
-    // list styles
     .cui-list {
+        // reset list styles
+        overflow-x: hidden;
         max-height: 100%;
         user-select: none;
+        // set up visual styles
+        background: #fff;
+        box-shadow: 0 0 4px rgba(0,0,0,0.07);
+        padding: 10px 0;
+        margin-bottom: 20px;
         > h4 {
             color: #555;
             opacity: 0.6;
+            margin: 0;
+            padding: 6px $sidebar-padding;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15px;
+            border: none;
         }
-        > .cui-list-item {
+        > .cui-list-item,
+        .TagSelector > .cui-list > .cui-list-item {
             color: #111;
+            font-size: 15px;
+            border: none;
+            padding: 4px $sidebar-padding;
+            > .cui-list-item-content-left > .cui-icon svg {
+                height: 15px;
+                width: 15px;
+                min-height: 15px;
+                min-width: 15px;
+                position: relative;
+                top: -1px;
+                margin-right: -2px;
+                color: #222;
+            }
             &:hover {
                 background: $active-color;
             }
+            &.cui-selected,
             &.cui-active {
+                font-weight: 400;
                 background: $theme-base-color;
                 color: #fff;
                 .cui-icon svg {
                     color: #fff !important;
                 }
             }
+            .cui-tag {
+                margin: -3px 0;
+                position: relative;
+                top: -2px;
+            }
         }
     }
-
-    // individual menu items
-    .cui-list > h4 {
-        margin: 0;
-        padding: 24px 0 6px $sidebar-padding;
-        font-weight: 600;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.15px;
-        border: none;
-    }
-    .cui-list > .cui-list-item {
-        font-size: 14.5px;
-        font-weight: 500;
-        border: none;
-        padding: 5px $sidebar-padding;
-        > .cui-list-item-content-left > .cui-icon svg {
-            height: 15px;
-            width: 15px;
-            min-height: 15px;
-            min-width: 15px;
-            position: relative;
-            top: -1px;
-            margin-right: -2px;
-            color: #222;
-        }
-    }
-    .cui-list-item .cui-tag {
-        margin: -6px 2px;
-        font-size: 13.5px;
-        border: none;
-    }
-
-    // buttons
-    .cui-list .cui-list-item-content-right .cui-button + .cui-button {
-        margin-left: 4px;
-    }
-    .cui-list .action-selector {
-        padding: 15px ($sidebar-padding + 1) 15px $sidebar-padding;
-        cursor: default !important;
-        user-select: none;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 10px;
-        &:hover {
-            background: initial;
-        }
-    }
-    // bottom
 }
