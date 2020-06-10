@@ -53,7 +53,7 @@ export const saveDraft = (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const { title, tagName, bodyText } = form;
+  const { title, tagName } = form;
   const attachments = [];
   (async () => {
     let result;
@@ -71,32 +71,13 @@ export const saveDraft = (
       console.error(e);
       return ({ thread_creation: e });
     }
-    
-        const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-        updateLastVisited(app.activeCommunityId()
-          ? (activeEntity.meta as CommunityInfo)
-          : (activeEntity.meta as NodeInfo).chain, true);
-        await app.login.notifications.refresh();
-        m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
-    
-        try {
-          const tagNames = Array.isArray(activeEntity?.meta?.tags)
-            ? activeEntity.meta.tags.map((t) => t.name)
-            : [];
-          if (!tagNames.includes(result.tag.name)) {
-            activeEntity.meta.tags.push(result.tag);
-          }
-        } catch (e) {
-          console.log(`Error adding new tag to ${activeEntity}.`);
-        }
-    
-        mixpanel.track('Create Thread', {
-          'Step No': 2,
-          Step: 'Filled in Proposal and Discussion',
-          'Thread Type': kind,
-        });
-      })();
-}
+
+    mixpanel.track('Save discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
+  })();
+};
 
 export const newThread = (
   form,

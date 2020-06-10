@@ -18,7 +18,7 @@ import QuillEditor from 'views/components/quill_editor';
 import { updateLastVisited } from 'controllers/app/login';
 import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
 import PageLoading from 'views/pages/loading';
-import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
+import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
 
 interface IState {
   form: IThreadForm,
@@ -222,8 +222,9 @@ export const NewThreadForm: m.Component<{}, IState> = {
             class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'none',
             onclick: () => {
-              vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
-              if (!vnode.state.error) {
+              const { form, quillEditorState } = vnode.state;
+              try {
+                saveDraft(form, quillEditorState, author);
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');
@@ -238,7 +239,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
             class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
-              vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              const { form, quillEditorState } = vnode.state;
+              vnode.state.error = newThread(form, quillEditorState, author);
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
