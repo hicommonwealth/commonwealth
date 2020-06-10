@@ -45,8 +45,8 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     templateId: 'd-2b00abbf123e4b5981784d17151e86be',
-    dynamicTemplateData: {
-      loginLink,
+    dynamic_template_data: {
+      loginLink: loginLink,
     },
   };
   sgMail.send(msg).then((result) => {

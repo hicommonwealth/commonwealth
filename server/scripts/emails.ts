@@ -42,7 +42,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
   const msg = {
-    to: null,
+    to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
     templateId: 'd-7ccab17c309f45dab93b4290b3d396d1',
