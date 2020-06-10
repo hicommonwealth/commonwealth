@@ -119,7 +119,9 @@ class NotificationsController {
   }
 
   public update(n: Notification) {
-    this._store.add(n);
+    if (!this._store.getById(n.id)) {
+      this._store.add(n);
+    }
   }
 
   public refresh() {

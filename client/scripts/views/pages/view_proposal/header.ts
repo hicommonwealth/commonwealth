@@ -163,18 +163,19 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
 
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
-        proposal.tags?.map((tag) => m(Tag, {
+        m(Tag, {
           rounded: true,
           intent: 'none',
           size: 'xs',
-          onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
-          label: `#${tag.name}`
-        }))
+          onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
+          label: `#${proposal.tag?.name}`
+        })
       ]),
-      canEdit && proposal.tags?.length > 0 && m(ProposalHeaderSpacer),
+      canEdit && proposal.tag && m(ProposalHeaderSpacer),
       canEdit && m(TagEditor, {
+        popoverMenu: true,
         thread: proposal,
-        onChangeHandler: (tags: OffchainTag[]) => { proposal.tags = tags; m.redraw(); },
+        onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
       }),
     ]);
   }

@@ -74,14 +74,12 @@ const DiscussionRow: m.Component<IAttrs> = {
             ]),
             m('.discussion-meta-right', [
               m('.discussion-tags', [
-                proposal.tags.sort((a, b) => tagSortByName(a, b)).map((tag) => {
-                  return m(Tag, {
-                    rounded: true,
-                    intent: 'none',
-                    label: tag.name,
-                    size: 'xs',
-                    onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${tag.name}`),
-                  });
+                proposal.tag && m(Tag, {
+                  rounded: true,
+                  intent: 'none',
+                  label: proposal.tag.name,
+                  size: 'xs',
+                  onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
                 }),
                 m(ThreadCaratMenu, { proposal }),
               ]),

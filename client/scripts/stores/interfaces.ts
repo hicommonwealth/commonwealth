@@ -4,9 +4,9 @@ export enum UpdateType {
   Update,
 }
 
-export interface IStoreUpdate<T> {
-  item: T;
-  updateType: UpdateType;
+export interface ISerializable<T> {
+  serialize: () => T;
+  deserialize: (data: T) => void;
 }
 
 export interface IHasId {

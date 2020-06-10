@@ -47,6 +47,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     const thread = await models.OffchainThread.findOne({
       where: { id: thread_id },
     });
+    if (!thread) return next(new Error('No thread with that id found'));
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error(Errors.IncorrectOwner));
     }
@@ -61,7 +62,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     attachFiles();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tags' } ],
+      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
     });
 
     // dispatch notifications to subscribers of the given chain/community
@@ -85,7 +86,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     );
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(e);
+    return next(new Error(e));
   }
 
   // Todo: dispatch notifications conditional on a new mention

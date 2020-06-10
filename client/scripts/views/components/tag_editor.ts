@@ -3,49 +3,43 @@ import $ from 'jquery';
 import { OffchainThread, OffchainTag } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
 import app from 'state';
+import AutoCompleteTagForm from './autocomplete_tag_form';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
-  onChangeHandler: Function;
   popoverMenu?: boolean;
+  onChangeHandler: Function;
 }
 
-const TagWindow: m.Component<{tags: string[], onChangeHandler: Function}> = {
+interface ITagEditorState {
+  tagName: string;
+  tagId: number;
+  isOpen: boolean;
+}
+
+const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function }> = {
   view: (vnode) => {
-    const { onChangeHandler, tags } = vnode.attrs;
-    return m(TagInput, {
-      oncreate: (vvnode) => {
-        $(vvnode.dom).find('input').focus();
-      },
-      contentLeft: m(Icon, { name: Icons.TAG }),
-      tags: tags && (tags.length !== 0)
-        && vnode.attrs.tags.map((tag) => {
-          return m(Tag, {
-            label: `#${tag}`,
-            onRemove: () => {
-              onChangeHandler(tags.filter((t) => t !== tag));
-            },
-          });
-        }),
-      intent: 'none',
-      size: 'lg',
-      onAdd: (value: string) => {
-        if (!tags.includes(value)) {
-          tags.push(value);
-          onChangeHandler(tags);
-        }
-      },
+    const { onChangeHandler } = vnode.attrs;
+    const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const featuredTags = activeMeta.featuredTags.map((t) => {
+      return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
+    });
+    return m(AutoCompleteTagForm, {
+      featuredTags,
+      activeTag: vnode.attrs.thread.tag,
+      tags: app.tags.getByCommunity(app.activeId()),
+      updateFormData: onChangeHandler,
     });
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}> = {
-  oninit: (vnode) => {
-    vnode.state.isOpen = false;
-    vnode.state.tags = [];
-  },
+const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
   oncreate: (vnode) => {
-    vnode.attrs.thread.tags.map((tag) => vnode.state.tags.push(tag.name));
+    vnode.state.tagName = vnode.attrs.thread.tag.name;
+    vnode.state.tagId = vnode.attrs.thread.tag.id;
+  },
+  oninit: (vnode) => {
+    if (vnode.state.isOpen === undefined) vnode.state.isOpen = false;
   },
   view: (vnode) => {
     return m('TagEditor', [
@@ -65,8 +59,11 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
         content: m(TagWindow, {
-          tags: vnode.state.tags,
-          onChangeHandler: (tags: string[]) => { vnode.state.tags = tags; },
+          thread: vnode.attrs.thread,
+          onChangeHandler: (tagName, tagId?) => {
+            vnode.state.tagName = tagName;
+            vnode.state.tagId = tagId;
+          }
         }),
         hasBackdrop: true,
         isOpen: vnode.state.isOpen,
@@ -82,24 +79,18 @@ const TagEditor: m.Component<ITagEditorAttrs, {isOpen: boolean, tags: string[]}>
           m(Button, {
             label: 'Submit',
             intent: 'primary',
-            onclick: () => {
-              // TODO: Change to PUT /tags
-              $.post(`${app.serverUrl()}/updateTags`, {
-                'jwt': app.login.jwt,
-                'thread_id': vnode.attrs.thread.id,
-                'tags[]': vnode.state.tags,
-                'address': app.vm.activeAccount.address,
-              }).then((r) => {
-                const tags: OffchainTag[] = r.result;
-                vnode.attrs.onChangeHandler(tags);
-              });
+            onclick: async () => {
+              const { tagName, tagId } = vnode.state;
+              const { thread } = vnode.attrs;
+              const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
+              vnode.attrs.onChangeHandler(tag);
               vnode.state.isOpen = false;
             },
           }),
         ])
-      }),
+      })
     ]);
-  },
+  }
 };
 
 export default TagEditor;
