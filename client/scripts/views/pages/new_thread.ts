@@ -229,9 +229,11 @@ export const NewThreadForm: m.Component<{}, IState> = {
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');
                 }, 0);
+              } catch (e) {
+                console.error(e);
               }
             },
-            label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
+            label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Save as draft',
             name: 'saving',
             tabindex: 4
           }),

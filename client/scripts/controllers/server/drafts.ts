@@ -46,7 +46,7 @@ class DraftsController {
     const timestamp = moment();
 
     try {
-      const response = await $.post(`${app.serverUrl()}/createDiscussionDraft`, {
+      const response = await $.post(`${app.serverUrl()}/createDraft`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chainId,
         'community': communityId,
@@ -79,7 +79,7 @@ class DraftsController {
     const newTag = tagName || draft.tag;
     // Todo: handle attachments
     try {
-      const response = await $.post(`${app.serverUrl()}/editDiscussionDraft`, {
+      const response = await $.post(`${app.serverUrl()}/editDraft`, {
         'draft_id': draft.id,
         'body': encodeURIComponent(newBody),
         'title': encodeURIComponent(newTitle),
@@ -103,7 +103,7 @@ class DraftsController {
   public async delete(draft) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(`${app.serverUrl()}/deleteDiscussionDraft`, {
+      $.post(`${app.serverUrl()}/deleteDraft`, {
         'jwt': app.login.jwt,
         'draft_id': draft.id,
       }).then((result) => {

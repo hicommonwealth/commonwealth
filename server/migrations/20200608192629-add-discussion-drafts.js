@@ -12,7 +12,7 @@ module.exports = {
       community: { type: DataTypes.STRING, allowNull: true },
       attachment: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'OffchainAttachments', key: 'id' } },
       created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_dat: { type: DataTypes.DATE, allowNull: false }
+      updated_at: { type: DataTypes.DATE, allowNull: false }
     }, {
       underscored: true,
       indexes: [
