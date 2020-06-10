@@ -41,7 +41,7 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
     tag
   };
 
-  const draft = await models.OffchainThread.create(draftContent);
+  const draft = await models.DiscussionDraft.create(draftContent);
 
   // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
   if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {

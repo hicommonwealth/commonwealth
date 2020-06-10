@@ -102,7 +102,6 @@ import bulkEntities from './routes/bulkEntities';
 
 function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   const router = express.Router();
-
   router.get('/status', status.bind(this, models));
 
   // TODO: Change to POST /gist
@@ -148,10 +147,8 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
   // offchain discussion drafts
-  // TODO: Change to POST /drafts
-  router.post('/createDraft', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
-  // TODO: Change to GET /drafts
-  router.get('/getDrafts', getDrafts.bind(this, models));
+  router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
+  router.get('/drafts', getDrafts.bind(this, models));
 
   // offchain comments
   // TODO: Change to POST /comment

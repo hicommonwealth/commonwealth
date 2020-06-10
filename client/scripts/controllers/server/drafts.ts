@@ -44,9 +44,8 @@ class DraftsController {
     attachments?: string[],
   ) {
     const timestamp = moment();
-
     try {
-      const response = await $.post(`${app.serverUrl()}/createDraft`, {
+      const response = await $.post(`${app.serverUrl()}/drafts`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chainId,
         'community': communityId,
