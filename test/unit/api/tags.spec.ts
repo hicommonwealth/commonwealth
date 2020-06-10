@@ -62,7 +62,7 @@ describe('Tag Tests', () => {
         body: decodeURIComponent(markdownThread.body),
         privacy: true,
         readOnly: true,
-        tags: ['tag', 'tag2', 'tag3'],
+        tags: ['tag', ],
         kind,
       });
       expect(threadRes.status).to.be.equal('Success');
