@@ -4,7 +4,7 @@ import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip } from 'construct-ui';
+import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List } from 'construct-ui';
 
 import app from 'state';
 import { OffchainTag, OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
@@ -90,180 +90,185 @@ export const NewThreadForm: m.Component<{}, IState> = {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
-      vnode.state.newType === 'Link' && m(Form, [
-        typeSelector,
-        m(FormGroup, [
-          m(Input, {
-            placeholder: 'https://',
-            onchange: (e) => {
-              const { value } = e.target as any;
-              vnode.state.form.url = value;
-              if (detectURL(value)) getUrlForLinkPost();
-            },
-            tabindex: 1,
-          }),
+      m('.new-thread-form-body', [
+        vnode.state.newType === 'Link' && m(Form, [
+          typeSelector,
+          m(FormGroup, [
+            m(Input, {
+              placeholder: 'https://',
+              onchange: (e) => {
+                const { value } = e.target as any;
+                vnode.state.form.url = value;
+                if (detectURL(value)) getUrlForLinkPost();
+              },
+              tabindex: 1,
+            }),
+          ]),
+          m(FormGroup, [
+            m(Input, {
+              class: 'new-thread-title',
+              placeholder: 'Title',
+              onchange: (e) => {
+                const { value } = e.target as any;
+                vnode.state.autoTitleOverride = true;
+                if (vnode.state.error.title) delete vnode.state.error.title;
+                vnode.state.form.title = value;
+              },
+              tabindex: 1,
+            }),
+          ]),
+          m(FormGroup, [
+            vnode.state.hasComment ? m(QuillEditor, {
+              contentsDoc: '', // Prevent the editor from being filled in with previous content
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              placeholder: 'Comment (optional)',
+              editorNamespace: 'new-link',
+              tabindex: 3,
+            }) : m('a.add-comment', {
+              href: '#',
+              onclick: (e) => { vnode.state.hasComment = true; },
+              tabindex: 2,
+            }, 'Add comment'),
+          ]),
+          m(FormGroup, [
+            m(AutoCompleteTagForm, {
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.form.tagName = tagName;
+                vnode.state.form.tagId = tagId;
+              },
+              updateParentErrors: (err: string) => {
+                if (err) vnode.state.error = err;
+                else delete vnode.state.error;
+                m.redraw();
+              },
+              tabindex: 4,
+            }),
+          ]),
+          m(FormGroup, [
+            m(Button, {
+              class: !author ? 'disabled' : '',
+              intent: 'primary',
+              label: 'Create link',
+              name: 'submission',
+              onclick: () => {
+                if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
+                  vnode.state.error.url = 'Must provide a valid URL.';
+                }
+                if (!Object.values(vnode.state.error).length) {
+                  newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                }
+                if (!vnode.state.error) {
+                  $(vnode.dom).trigger('modalcomplete');
+                  setTimeout(() => {
+                    $(vnode.dom).trigger('modalexit');
+                  }, 0);
+                }
+              },
+            }),
+          ]),
+          error
+            && (typeof error === 'string' || Object.keys(error).length)
+            ? m('.error-message', [
+              (typeof error === 'string')
+                ? m('span', error)
+                : Object.values(error).map((val) => m('span', `${val} `)),
+            ])
+            : m('.error-placeholder'),
         ]),
-        m(FormGroup, [
-          m(Input, {
-            class: 'new-thread-title',
-            placeholder: 'Title',
-            onchange: (e) => {
-              const { value } = e.target as any;
-              vnode.state.autoTitleOverride = true;
-              if (vnode.state.error.title) delete vnode.state.error.title;
-              vnode.state.form.title = value;
-            },
-            tabindex: 1,
-          }),
+        //
+        vnode.state.newType === 'Discussion' && m(Form, [
+          typeSelector,
+          m(FormGroup, [
+            m(Input, {
+              name: 'title',
+              placeholder: 'Title',
+              onchange: (e) => {
+                vnode.state.form.title = (e as any).target.value;
+              },
+              tabindex: 1,
+            }),
+          ]),
+          m(FormGroup, [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: 'new-discussion',
+              tabindex: 2,
+            }),
+          ]),
+          m(FormGroup, [
+            m(AutoCompleteTagForm, {
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.form.tagName = tagName;
+                vnode.state.form.tagId = tagId;
+              },
+              updateParentErrors: (err: string) => {
+                if (err) vnode.state.error = err;
+                else delete vnode.state.error;
+                m.redraw();
+              },
+              tabindex: 3,
+            }),
+          ]),
+          m(FormGroup, [
+            m(Button, {
+              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              intent: 'none',
+              onclick: () => {
+                const { form, quillEditorState } = vnode.state;
+                try {
+                  saveDraft(form, quillEditorState, author);
+                  $(vnode.dom).trigger('modalcomplete');
+                  setTimeout(() => {
+                    $(vnode.dom).trigger('modalexit');
+                  }, 0);
+                } catch (e) {
+                  console.error(e);
+                }
+              },
+              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Save as draft',
+              name: 'saving',
+              tabindex: 4
+            }),
+            m(Button, {
+              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              intent: 'primary',
+              onclick: () => {
+                const { form, quillEditorState } = vnode.state;
+                vnode.state.error = newThread(form, quillEditorState, author);
+                if (!vnode.state.error) {
+                  $(vnode.dom).trigger('modalcomplete');
+                  setTimeout(() => {
+                    $(vnode.dom).trigger('modalexit');
+                  }, 0);
+                }
+              },
+              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
+              name: 'submission',
+              tabindex: 4
+            }),
+          ]),
+          error
+            && (typeof error === 'string' || Object.keys(error).length)
+            ? m('.error-message', [
+              (typeof error === 'string')
+                ? m('span', error)
+                : Object.values(error).map((val) => m('span', `${val} `)),
+            ])
+            : m('.error-placeholder'),
         ]),
-        m(FormGroup, [
-          vnode.state.hasComment ? m(QuillEditor, {
-            contentsDoc: '', // Prevent the editor from being filled in with previous content
-            oncreateBind: (state) => {
-              vnode.state.quillEditorState = state;
-            },
-            placeholder: 'Comment (optional)',
-            editorNamespace: 'new-link',
-            tabindex: 3,
-          }) : m('a.add-comment', {
-            href: '#',
-            onclick: (e) => { vnode.state.hasComment = true; },
-            tabindex: 2,
-          }, 'Add comment'),
-        ]),
-        m(FormGroup, [
-          m(AutoCompleteTagForm, {
-            tags: app.tags.getByCommunity(app.activeId()),
-            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tagName: string, tagId?: number) => {
-              vnode.state.form.tagName = tagName;
-              vnode.state.form.tagId = tagId;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 4,
-          }),
-        ]),
-        m(FormGroup, [
-          m(Button, {
-            class: !author ? 'disabled' : '',
-            intent: 'primary',
-            label: 'Create link',
-            name: 'submission',
-            onclick: () => {
-              if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
-                vnode.state.error.url = 'Must provide a valid URL.';
-              }
-              if (!Object.values(vnode.state.error).length) {
-                newLink(vnode.state.form, vnode.state.quillEditorState, author);
-              }
-              if (!vnode.state.error) {
-                $(vnode.dom).trigger('modalcomplete');
-                setTimeout(() => {
-                  $(vnode.dom).trigger('modalexit');
-                }, 0);
-              }
-            },
-          }),
-        ]),
-        error
-          && (typeof error === 'string' || Object.keys(error).length)
-          ? m('.error-message', [
-            (typeof error === 'string')
-              ? m('span', error)
-              : Object.values(error).map((val) => m('span', `${val} `)),
-          ])
-          : m('.error-placeholder'),
       ]),
-      //
-      vnode.state.newType === 'Discussion' && m(Form, [
-        typeSelector,
-        m(FormGroup, [
-          m(Input, {
-            name: 'title',
-            placeholder: 'Title',
-            onchange: (e) => {
-              vnode.state.form.title = (e as any).target.value;
-            },
-            tabindex: 1,
-          }),
-        ]),
-        m(FormGroup, [
-          m(QuillEditor, {
-            contentsDoc: '',
-            oncreateBind: (state) => {
-              vnode.state.quillEditorState = state;
-            },
-            editorNamespace: 'new-discussion',
-            tabindex: 2,
-          }),
-        ]),
-        m(FormGroup, [
-          m(AutoCompleteTagForm, {
-            tags: app.tags.getByCommunity(app.activeId()),
-            featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-            updateFormData: (tagName: string, tagId?: number) => {
-              vnode.state.form.tagName = tagName;
-              vnode.state.form.tagId = tagId;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
-          }),
-        ]),
-        m(FormGroup, [
-          m(Button, {
-            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-            intent: 'none',
-            onclick: () => {
-              const { form, quillEditorState } = vnode.state;
-              try {
-                saveDraft(form, quillEditorState, author);
-                $(vnode.dom).trigger('modalcomplete');
-                setTimeout(() => {
-                  $(vnode.dom).trigger('modalexit');
-                }, 0);
-              } catch (e) {
-                console.error(e);
-              }
-            },
-            label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Save as draft',
-            name: 'saving',
-            tabindex: 4
-          }),
-          m(Button, {
-            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-            intent: 'primary',
-            onclick: () => {
-              const { form, quillEditorState } = vnode.state;
-              vnode.state.error = newThread(form, quillEditorState, author);
-              if (!vnode.state.error) {
-                $(vnode.dom).trigger('modalcomplete');
-                setTimeout(() => {
-                  $(vnode.dom).trigger('modalexit');
-                }, 0);
-              }
-            },
-            label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
-            name: 'submission',
-            tabindex: 4
-          }),
-        ]),
-        error
-          && (typeof error === 'string' || Object.keys(error).length)
-          ? m('.error-message', [
-            (typeof error === 'string')
-              ? m('span', error)
-              : Object.values(error).map((val) => m('span', `${val} `)),
-          ])
-          : m('.error-placeholder'),
-      ]),
+      m('.new-thread-form-sidebar', [
+        m(List, ['test', 'test2'])
+      ])
     ]);
   }
 };
