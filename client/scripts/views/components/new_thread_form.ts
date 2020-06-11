@@ -1,4 +1,4 @@
-import 'pages/new_thread_form.scss';
+import 'components/new_thread_form.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
