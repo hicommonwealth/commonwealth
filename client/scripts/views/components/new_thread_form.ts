@@ -16,12 +16,13 @@ import MarkdownFormattedText from './markdown_formatted_text';
 interface IState {
   form: IThreadForm,
   activeTag: OffchainTag | string,
+  fromDraft?: number,
   error,
   quillEditorState,
-  hasComment,
+  hasComment: boolean,
   autoTitleOverride,
-  newType,
-  uploadsInProgress,
+  newType: string,
+  uploadsInProgress: number,
 }
 
 interface IThreadForm {
@@ -238,10 +239,13 @@ export const NewThreadForm: m.Component<{}, IState> = {
             m(Button, {
               class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
               intent: 'primary',
-              onclick: () => {
+              onclick: async () => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.error = newThread(form, quillEditorState, author);
                 if (!vnode.state.error) {
+                  if (vnode.state.fromDraft) {
+                    await app.drafts.delete(vnode.state.fromDraft);
+                  }
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
                     $(vnode.dom).trigger('modalexit');
@@ -290,6 +294,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
                   const doc = JSON.parse(body);
                   vnode.state.quillEditorState.editor.setContents(doc);
                 } catch (e) {
+                  // TODO: figure out Markdown strategy
                   // const doc = body;
                 }
               }
@@ -297,7 +302,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
               (titleInput as HTMLInputElement).value = draft.title;
               vnode.state.form.title = draft.title;
               vnode.state.activeTag = draft.tag;
-              // vnode.state.form.tagName = draft.tag;
+              vnode.state.fromDraft = draft.id;
               m.redraw();
             }
           });

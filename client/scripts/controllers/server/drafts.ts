@@ -97,12 +97,12 @@ class DraftsController {
     }
   }
 
-  public async delete(draft) {
+  public async delete(draftId: number) {
     const _this = this;
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/deleteDraft`, {
         'jwt': app.login.jwt,
-        'draft_id': draft.id,
+        'id': draftId,
       }).then((result) => {
         // _this.store.remove(draft);
         resolve(result);
