@@ -11,7 +11,8 @@
         box-shadow: 0 0 6px rgba(0,0,0,0.07);
     }
 
-    h4 {
+    // sidebar
+    .CommunitySidebar h4 {
         font-size: 14px;
         color: #a0a0a0;
         font-weight: 600;
@@ -21,15 +22,6 @@
     }
 
     // content
-    a.back-home {
-        color: #888;
-        font-weight: 400;
-        margin-left: 14px;
-        text-decoration: none;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
     .LastSeenDivider {
         display: flex;
         padding: 12px 0 10px;
@@ -48,17 +40,5 @@
             border-bottom: 1px solid lighten(#ea7a60, 11%);
             width: -webkit-fill-available;
         }
-    }
-
-    a.extra-items {
-        display: block;
-        margin: 12px 0;
-        padding: 5px 0;
-        border: 1px solid #eee;
-        text-align: center;
-        text-decoration: none;
-        color: #444;
-    }
-    .discussion-group-wrap {
     }
 }

@@ -121,11 +121,9 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       return tsB - tsA;
     };
 
-    const getBackHomeButton = () => link('a.back-home', `/${app.activeId()}/`, m.trust('&lsaquo; Back home'));
-
     const getSingleTagListing = (tag) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
-        return m('.discussions-listing.tag-listing', [
+        return m('.discussions-main', [
           m(ProposalsLoadingRow),
         ]);
       }
@@ -141,47 +139,32 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         .filter((thread) => thread.tag && thread.tag.name === tag)
         .sort(orderDiscussionsbyLastComment);
 
-      if (sortedThreads.length === 0) {
-        return m('.discussions-listing.tag-listing.no-tags-found', [
-          m('h4.tag-name', [
-            `No threads listed under '${tag}.'`,
-          ]),
-          getBackHomeButton(),
-        ]);
+      if (sortedThreads.length > 0) {
+        const firstThread = sortedThreads[0];
+        const lastThread = sortedThreads[sortedThreads.length - 1];
+        const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
+        const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
+
+        if (noThreadsSeen() || allThreadsSeen()) {
+          list.push(m('.discussion-group-wrap', sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
+        } else {
+          sortedThreads.forEach((proposal) => {
+            const row = m(DiscussionRow, { proposal });
+            if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
+              list = [m('.discussion-group-wrap', list), divider, m('.discussion-group-wrap', [row])];
+              visitMarkerPlaced = true;
+            } else {
+              // eslint-disable-next-line no-unused-expressions
+              visitMarkerPlaced ? list[2].children.push(row) : list.push(row);
+            }
+          });
+        }
+        if (list.length > 0) {
+          return m('.discussions-main', list);
+        }
       }
 
-      const firstThread = sortedThreads[0];
-      const lastThread = sortedThreads[sortedThreads.length - 1];
-      const allThreadsSeen = () => getLastUpdate(firstThread) < lastVisited;
-      const noThreadsSeen = () => getLastUpdate(lastThread) > lastVisited;
-
-      if (noThreadsSeen() || allThreadsSeen()) {
-        list.push(m('.discussion-group-wrap', sortedThreads.map((proposal) => m(DiscussionRow, { proposal }))));
-      } else {
-        sortedThreads.forEach((proposal) => {
-          const row = m(DiscussionRow, { proposal });
-          if (!visitMarkerPlaced && getLastUpdate(proposal) < lastVisited) {
-            list = [m('.discussion-group-wrap', list), divider, m('.discussion-group-wrap', [row])];
-            visitMarkerPlaced = true;
-          } else {
-            // eslint-disable-next-line no-unused-expressions
-            visitMarkerPlaced ? list[2].children.push(row) : list.push(row);
-          }
-        });
-      }
-      const tags = app.tags.getByCommunity(app.activeId());
-      const tagObj = tags.find((t) => t.name === tag);
-      if (!tagObj) return;
-
-      return m('.discussions-listing.tag-listing', [
-        tagObj.description
-        && m('h4', [
-          tagObj.description,
-        ]),
-        list.length === 0
-          ? m('.no-threads', 'No threads')
-          : m('.tag-forum', list),
-      ]);
+      return m('.discussions-main', 'No threads');
     };
 
     const getHomepageListing = () => {
@@ -260,7 +243,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         });
         return arr;
       };
-      return m('.discussions-listing', [
+      return m('.discussions-main', [
         // m(InlineThreadComposer),
         allProposals.length === 0
         && [
@@ -287,24 +270,11 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         vnode.attrs.activeTag ? m(TagSidebar, { tag: vnode.attrs.activeTag }) : m(CommunitySidebar)
       ],
     }, [
-      m('.discussions-main', [
-        (app.chain || app.community) && [
-          vnode.attrs.activeTag
-            ? getSingleTagListing(vnode.attrs.activeTag)
-            : getHomepageListing(),
-        ],
-      ]),
-      // m('.discussions-sidebar', [
-      //   m('h4', [
-      //     'About ',
-      //     selectedNode ? selectedNode.chain.name
-      //       : selectedCommunity ? selectedCommunity.meta.name : ''
-      //   ]),
-      //   m('p', [
-      //     selectedNode ? selectedNode.chain.description
-      //       : selectedCommunity ? selectedCommunity.meta.description : ''
-      //   ]),
-      // ]),
+      (app.chain || app.community) && [
+        vnode.attrs.activeTag
+          ? getSingleTagListing(vnode.attrs.activeTag)
+          : getHomepageListing(),
+      ]
     ]);
   },
 };
