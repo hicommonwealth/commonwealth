@@ -24,6 +24,7 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
+import { getSelectableCommunities } from 'views/components/header/community_selector';
 import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
@@ -95,23 +96,36 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, [
+    }, (!app.community && !app.chain) ? [
+      // no community
+      m(List, { interactive: true }, [
+        m('h4', 'Commonwealth'),
+        app.isLoggedIn() && getSelectableCommunities().map((c: CommunityInfo | ChainInfo) => {
+          return m(ListItem, {
+            label: c.name,
+            onclick: (e) => m.route.set(`/${c.id}`),
+          });
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
+          label: 'Back to home',
+          onclick: (e) => m.route.set('/'),
+        }),
+      ]),
+    ] : [
       // discussions
       m(List, { interactive: true }, [
         m('h4', 'Discussions'),
-        (app.community || app.chain)
-          && m(ListItem, {
-            contentLeft: m(Icon, { name: Icons.HOME }),
-            active: onDiscussionsPage(m.route.get()),
-            label: 'Home',
-            onclick: (e) => m.route.set(`/${app.activeId()}`),
-          }),
-        (app.community || app.chain)
-          && m(TagSelector, { activeTag, hideEditButton: true }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.HOME }),
+          active: onDiscussionsPage(m.route.get()),
+          label: 'Home',
+          onclick: (e) => m.route.set(`/${app.activeId()}`),
+        }),
+        m(TagSelector, { activeTag, hideEditButton: true }),
       ]),
       // proposals
-      (app.community || app.chain)
-        && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
           m('h4', 'Voting & Staking'),
           // proposals (substrate and cosmos only)
@@ -172,7 +186,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           }),
         ]),
       // manage
-      (app.community || app.chain) && m(List, { interactive: true }, [
+      m(List, { interactive: true }, [
         m('h4', 'Manage Community'),
         m(ListItem, {
           active: onMembersPage(m.route.get()),
@@ -189,12 +203,11 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           && m(AdminPanel),
       ]),
       // // chat (all communities)
-      // (app.community || app.chain) &&
-      //   m(ListItem, {
-      //     active: onChatPage(m.route.get()),
-      //     label: 'Chat',
-      //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      //   }),
+      // m(ListItem, {
+      //   active: onChatPage(m.route.get()),
+      //   label: 'Chat',
+      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+      // }),
     ]);
   },
 };
