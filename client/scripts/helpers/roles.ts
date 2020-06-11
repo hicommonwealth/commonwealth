@@ -27,8 +27,9 @@ export function isRoleOfCommunity(
 }
 
 export function isAdminOrMod(address: string) {
+  if (!app.activeId()) return;
   const role = app.activeChainId()
     ? app.chain.meta.chain.adminsAndMods.find((r) => r.address === address)
     : app.community.meta.adminsAndMods.find((r) => r.address === address);
   return role;
-};
+}

@@ -71,6 +71,7 @@ class SubstrateIdentities implements StorageModule {
       this._registrarSubscription.unsubscribe();
     }
     this._initialized = false;
+    if (!this.store) return; // TODO: why is the store sometimes missing? (#363)
     this.store.clear();
   }
 
