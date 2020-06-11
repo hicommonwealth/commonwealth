@@ -130,7 +130,7 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && app.chain.loaded)
+        (account instanceof SubstrateAccount && app.chain?.loaded)
           // substrate name
           ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
@@ -156,7 +156,7 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && app.chain.loaded)
+        (account instanceof SubstrateAccount && app.chain?.loaded)
           ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
