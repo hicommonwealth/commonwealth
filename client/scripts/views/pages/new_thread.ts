@@ -30,7 +30,7 @@ const NewThreadPage: m.Component = {
     }, [
       m('.forum-container', [
         m('h2.page-title', 'New Post'),
-        m(NewThreadForm),
+        m(NewThreadForm, { header: false }),
       ]),
     ]);
   },

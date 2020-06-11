@@ -55,6 +55,7 @@ class DraftsController {
         'jwt': app.login.jwt,
       });
       const result = modelFromServer(response.result);
+      // TODO: Hook up store so that /status need not be called to update
       // this._store.add(result);
       return result;
     } catch (err) {
@@ -103,7 +104,7 @@ class DraftsController {
   public async delete(draftId: number) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.ajax(`${app.serverUrl()}/draft`, {
+      $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
           'jwt': app.login.jwt,

@@ -32,8 +32,8 @@ interface IThreadForm {
   title?: string;
 }
 
-export const NewThreadForm: m.Component<{}, IState> = {
-  view: (vnode: VnodeDOM<{}, IState>) => {
+export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
+  view: (vnode: VnodeDOM<{ header: boolean }, IState>) => {
     const author = app.vm.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
@@ -80,12 +80,15 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
+    console.log(app.login.discussionDrafts)
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
+        vnode.attrs.header && m('h3', 'New Post'),
         vnode.state.newType === 'Link' && m(Form, [
           typeSelector,
           m(FormGroup, [
@@ -265,7 +268,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
             : m('.error-placeholder'),
         ]),
       ]),
-      m('.new-thread-form-sidebar', [
+      !!app.login.discussionDrafts.length && m('.new-thread-form-sidebar', [
         m('h3', 'Saved drafts'),
         m(List, { interactive: true }, app.login.discussionDrafts.map((draft) => {
           const { body } = draft;
