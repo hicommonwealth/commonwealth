@@ -45,9 +45,14 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
     to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
-    templateId: 'd-7ccab17c309f45dab93b4290b3d396d1',
-    text: `${subjectLine}. <a href='${path}'>Click here</a>`,
-    html: `${subjectLine}. <a href='${path}'>Click here</a>`,
+    templateId: 'd-3f30558a95664528a2427b40292fec51',
+    dynamic_template_data: {
+      notification: {
+        subject: subjectLine,
+        title: decodedTitle,
+        path,
+      }
+    },
   };
   return msg;
 };
