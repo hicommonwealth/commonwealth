@@ -3,11 +3,9 @@ import 'modals/link_new_address_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { isU8a, isHex, hexToU8a, u8aToHex } from '@polkadot/util';
+import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { ExtrinsicPayloadValue } from '@polkadot/types/types/extrinsic';
-import SignerPayload from '@polkadot/types/extrinsic/SignerPayload';
-import ExtrinsicPayload from '@polkadot/types/extrinsic/v4/ExtrinsicPayload';
+import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
 import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
@@ -133,59 +131,32 @@ const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, 
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
-        // Since web wallets don't support signBytes() yet, sign a
-        // system.remark() transaction instead. This is a little complicated:
-        // - create a signer payload, give it to the signer
-        // - create an extrinsic payload based on the signer payload
-        // - verify the signature that comes back from the web wallet matches the extrinsic payload
         const signerAccount = await createUserWithAddress(AddressSwapper({
           address: account.address,
           currentPrefix: (app.chain as Substrate).chain.ss58Format,
         })) as SubstrateAccount;
-        const signerKeyring = (app.chain as Substrate).chain.keyring().addFromAddress(signerAccount.address);
         const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
         vnode.state.linking = true;
         m.redraw();
-        (app.chain as Substrate).chain.api.subscribe(async (api) => {
-          const newTx = api.tx.system.remark(signerAccount.validationToken);
-          const outgoingPayload = new SignerPayload((app.chain.chain as SubstrateChain).registry, {
-            address: signerAccount.address,
-            blockHash: api.genesisHash,
-            era: newTx.era,
-            genesisHash: api.genesisHash,
-            method: newTx.method.toHex(),
-            specVersion: api.runtimeVersion.specVersion,
-            tip: newTx.tip.toHex(),
-            blockNumber: 0,
-            runtimeVersion: api.runtimeVersion,
-            version: api.extrinsicVersion,
-          }).toPayload();
-          const signedPayloadParams: ExtrinsicPayloadValue = {
-            blockHash: api.genesisHash,
-            era: newTx.era,
-            genesisHash: api.genesisHash,
-            method: newTx.method.toHex(),
-            specVersion: api.runtimeVersion.specVersion,
-            tip: newTx.tip.toNumber(),
-            nonce: undefined,
-            transactionVersion: 0,
-          };
-          const signedPayload = new ExtrinsicPayload((app.chain.chain as SubstrateChain).registry,
-                                                     signedPayloadParams);
-          // drop the first byte of the signature, which just represents the crypto version used
-          const webWalletSignature = hexToU8a((await signer.signPayload(outgoingPayload)).signature).slice(1);
-          const verified = signerKeyring.verify(signedPayload.toU8a(true), webWalletSignature);
-          if (!verified) {
-            vnode.state.linking = false;
-            return errorCallback('Verification failed.');
-          }
-          signerAccount.validate(u8aToHex(webWalletSignature), JSON.stringify(signedPayloadParams)).then(() => {
-            vnode.state.linking = false;
-            accountVerifiedCallback(signerAccount, vnode.attrs.parentVnode);
-          }, (err) => {
-            vnode.state.linking = false;
-            errorCallback('Verification failed.');
-          });
+
+        const token = signerAccount.validationToken;
+        const payload: SignerPayloadRaw = {
+          address: signerAccount.address,
+          data: stringToHex(token),
+          type: 'bytes',
+        };
+        const signature = (await signer.signRaw(payload)).signature;
+        const verified = await signerAccount.isValidSignature(token, signature);
+        if (!verified) {
+          vnode.state.linking = false;
+          return errorCallback('Verification failed.');
+        }
+        signerAccount.validate(signature).then(() => {
+          vnode.state.linking = false;
+          accountVerifiedCallback(signerAccount, vnode.attrs.parentVnode);
+        }, (err) => {
+          vnode.state.linking = false;
+          errorCallback('Verification failed.');
         });
       }
     }, vnode.state.linking ? [

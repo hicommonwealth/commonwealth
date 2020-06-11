@@ -351,8 +351,11 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public async isValidSignature(message: string, signature: string): Promise<boolean> {
+    const signatureU8a = signature.slice(0, 2) === '0x'
+      ? hexToU8a(signature)
+      : hexToU8a(`0x${signature}`);
     const keyring = this._Chain.keyring(this.isEd25519).addFromAddress(this.address);
-    return keyring.verify(stringToU8a(message), hexToU8a(`0x${signature}`));
+    return keyring.verify(stringToU8a(message), signatureU8a);
   }
 
   // keys
