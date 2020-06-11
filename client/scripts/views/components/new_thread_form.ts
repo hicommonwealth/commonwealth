@@ -259,6 +259,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
       ]),
       m('.new-thread-form-sidebar', [
+        m('h3', 'Saved drafts'),
         m(List, { interactive: true }, app.login.discussionDrafts.map((draft) => {
           console.log(draft)
           const body = draft.body;
@@ -275,9 +276,9 @@ export const NewThreadForm: m.Component<{}, IState> = {
           return m(ListItem, {
             contentLeft: [
               m('.discussion-draft-title', draft.title || 'Untitled'),
-              m('.discussion-draft-body', draft.body
-                ? ''
-                : body)
+              m('.discussion-draft-body', draft.body.length
+                ? bodyComponent
+                : '')
             ]
           });
         }))

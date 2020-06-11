@@ -17,8 +17,8 @@ const modelFromServer = (draft) => {
     draft.id,
     draft.community,
     draft.chain,
-    decodeURIComponent(draft.title),
-    decodeURIComponent(draft.body),
+    draft.title,
+    draft.body,
     draft.tag,
     attachments,
   );
@@ -42,15 +42,14 @@ class DraftsController {
     tagName?: string,
     attachments?: string[],
   ) {
-    const timestamp = moment();
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chainId,
         'community': communityId,
         'address': address,
-        'title': encodeURIComponent(title),
-        'body': encodeURIComponent(body),
+        'title': title,
+        'body': body,
         'attachments[]': attachments,
         'tag': tagName,
         'jwt': app.login.jwt,
@@ -79,8 +78,8 @@ class DraftsController {
     try {
       const response = await $.post(`${app.serverUrl()}/editDraft`, {
         'draft_id': draft.id,
-        'body': encodeURIComponent(newBody),
-        'title': encodeURIComponent(newTitle),
+        'body': newBody,
+        'title': newTitle,
         'tag': newTag,
         'attachments[]': attachments,
         'jwt': app.login.jwt
