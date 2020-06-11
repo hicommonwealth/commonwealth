@@ -30,7 +30,6 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import TagSelector from 'views/components/sidebar/tag_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
@@ -39,6 +38,45 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+const TagListItems: m.Component<{}> = {
+  view: (vnode) => {
+    const featuredTags = {};
+    const otherTags = {};
+    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+
+    const getTagRow = (name, id) => m(ListItem, {
+      key: id,
+      contentLeft: m(Icon, { name: Icons.HASH }),
+      label: name,
+      selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    });
+
+    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
+      const { id, name } = tag;
+      if (featuredTagIds.includes(`${tag.id}`)) {
+        featuredTags[tag.name] = { id, name, featured_order: featuredTagIds.indexOf(`${id}`) };
+      } else {
+        otherTags[tag.name] = { id, name };
+      }
+    });
+    const otherTagListing = Object.keys(otherTags)
+      .sort((a, b) => otherTags[b].name.localeCompare(otherTags[a].name))
+      .map((name, idx) => getTagRow(name, otherTags[name].id));
+    const featuredTagListing = Object.keys(featuredTags)
+      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
+      .map((name, idx) => getTagRow(name, featuredTags[name].id));
+
+    return [
+      featuredTagListing,
+      otherTagListing,
+    ];
+  }
+};
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
@@ -122,7 +160,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           label: 'Home',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
         }),
-        m(TagSelector, { activeTag, hideEditButton: true }),
+        m(TagListItems),
       ]),
       // proposals
       (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
