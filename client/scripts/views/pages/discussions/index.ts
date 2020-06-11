@@ -13,6 +13,7 @@ import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import User from 'views/components/widgets/user';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
@@ -66,7 +67,14 @@ const CommunitySidebar: m.Component<{}> = {
       m('h4', `About ${communityName}`),
       m('p', communityDescription),
       m('br'),
-      m('h4', 'Admins & Mods')
+      m('h4', 'Admins & Mods'),
+      (app.chain || app.community) && [
+        (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
+          return m('.community-admin', [
+            m(User, { user: [r.address, r.address_chain], showRole: true })
+          ]);
+        }),
+      ],
     ]);
   }
 };

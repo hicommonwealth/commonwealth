@@ -62,6 +62,7 @@ class ChainInfo {
         r.id,
         r.address_id,
         r.Address.address,
+        r.Address.chain,
         r.chain_id,
         r.offchain_community_id,
         r.permission,
