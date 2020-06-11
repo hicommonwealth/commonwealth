@@ -80,8 +80,6 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
-    console.log(vnode.state.form);
-
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();

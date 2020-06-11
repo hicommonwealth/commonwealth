@@ -69,8 +69,6 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       }
     };
 
-    console.log(activeTag);
-    console.log(vnode.state.selectedTag);
     if (activeTag instanceof OffchainTag) {
       (vnode.state.selectedTag as any) = activeTag;
     } else if (typeof activeTag === 'string') {

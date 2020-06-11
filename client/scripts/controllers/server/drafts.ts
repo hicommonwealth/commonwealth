@@ -76,13 +76,16 @@ class DraftsController {
     const newTag = tagName || draft.tag;
     // Todo: handle attachments
     try {
-      const response = await $.post(`${app.serverUrl()}/editDraft`, {
-        'draft_id': draft.id,
-        'body': newBody,
-        'title': newTitle,
-        'tag': newTag,
-        'attachments[]': attachments,
-        'jwt': app.login.jwt
+      const response = await $.ajax(`${app.serverUrl()}/editDraft`, {
+        type: 'PATCH',
+        data: {
+          'draft_id': draft.id,
+          'body': newBody,
+          'title': newTitle,
+          'tag': newTag,
+          'attachments[]': attachments,
+          'jwt': app.login.jwt
+        }
       });
       const result = modelFromServer(response.result);
       // if (this._store.getByIdentifier(result.id)) {
@@ -100,9 +103,12 @@ class DraftsController {
   public async delete(draftId: number) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(`${app.serverUrl()}/deleteDraft`, {
-        'jwt': app.login.jwt,
-        'draft_id': draftId,
+      $.ajax(`${app.serverUrl()}/draft`, {
+        type: 'DELETE',
+        data: {
+          'jwt': app.login.jwt,
+          'draft_id': draftId,
+        }
       }).then((result) => {
         // _this.store.remove(draft);
         resolve(result);
