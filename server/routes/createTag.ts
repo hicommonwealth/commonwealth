@@ -10,7 +10,7 @@ const createTag = async (models, req, res: Response, next: NextFunction) => {
   if (!req.body.name) return next(new Error('Tag name required'));
 
   const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
-  const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+  const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
   const userMembership = await models.Role.findOne({
     where: {
       address_id: { [Op.in]: userAddressIds },

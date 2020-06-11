@@ -40,7 +40,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       where: { id: req.body.id },
     });
 
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     const arr = comment.version_history;

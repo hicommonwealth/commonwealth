@@ -35,7 +35,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
       return next(new Error('Token has expired, please re-register'));
     }
     // check for validity
-    const isAddressTransfer = existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
+    const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
     const oldId = existingAddress.user_id;
     try {
       const valid = req.body.signature

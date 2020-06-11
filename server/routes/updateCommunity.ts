@@ -21,7 +21,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   });
   if (!community) return next(new Error(Errors.CommunityNotFound));
   else {
-    const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

@@ -17,7 +17,7 @@ const deleteReaction = async (models, req: Request, res: Response, next: NextFun
       where: { id: req.body.reaction_id, },
       include: [ models.Address ],
     });
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(reaction.address_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(reaction.address_id) === -1) {
       return next(new Error('Not owned by this user'));
     }
     // actually delete
