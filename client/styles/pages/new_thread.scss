@@ -13,16 +13,6 @@
     padding: 16px 16px !important;
   }
 
-  .NewThreadForm {
-    display: flex;
-    .new-thread-form-body {
-      flex: 9;
-    }
-    .new-thread-form-sidebar {
-      flex: 3;
-    }
-  }
-
   // duplicated from NewSignalingPage - to be generalized across all 'New X' forms
   .new-thread-left, .new-link-left {
     .User {
