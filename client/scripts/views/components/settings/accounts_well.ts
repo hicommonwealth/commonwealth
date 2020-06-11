@@ -3,6 +3,7 @@ import 'components/settings/accounts_well.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 import { formatCoin, Coin } from 'adapters/currency';
 import { orderAccountsByAddress, link } from 'helpers';
@@ -58,7 +59,9 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
         ]) : [],
       ]),
       m('.action-col', [
-        m('button.formular-button-negative', {
+        m(Button, {
+          intent: 'negative',
+          size: 'sm',
           class: vnode.state.removing ? ' disabled' : '',
           onclick: async () => {
             const confirmed = await confirmationModalWithText('Are you sure you want to remove this account?')();
@@ -70,7 +73,9 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
               });
             }
           },
-        }, vnode.state.removing ? 'Removing...' : 'Remove'),
+          disabled: vnode.state.removing,
+          label: vnode.state.removing ? 'Removing...' : 'Remove'
+        }),
       ]),
     ]);
   },
@@ -89,9 +94,12 @@ const AccountsWell: m.Component<{}> = {
       ])),
       app.login.addresses.length === 0
         && m('.no-accounts', 'No addresses'),
-      m('button.formular-button-primary.add-account', {
+      m(Button, {
+        intent: 'primary',
+        class: 'add-account',
         onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-      }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+        label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
+      }),
     ]);
   },
 };

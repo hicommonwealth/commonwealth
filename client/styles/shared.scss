@@ -147,20 +147,6 @@ $header-spacing: 14px; // padding between header items
     @media only screen and (min-width: 75em) { @content; }
 }
 
-@mixin well {
-    padding: 24px 30px 28px;
-    background: #f9f8f6;
-    border-radius: 4px;
-    margin: 20px 0;
-    h4 {
-        margin-top: 0;
-        margin-bottom: 6px;
-    }
-    @include xs-max {
-        padding: 20px 22px 22px;
-    }
-}
-
 @mixin formfield-base {
     display: block;
     width: 100%;
