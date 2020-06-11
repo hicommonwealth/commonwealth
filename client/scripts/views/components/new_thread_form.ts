@@ -9,11 +9,13 @@ import app from 'state';
 import QuillEditor from 'views/components/quill_editor';
 import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
+import { OffchainTag } from 'client/scripts/models';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
 interface IState {
   form: IThreadForm,
+  activeTag: OffchainTag | string,
   error,
   quillEditorState,
   hasComment,
@@ -126,6 +128,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           ]),
           m(FormGroup, [
             m(AutoCompleteTagForm, {
+              activeTag: vnode.state.activeTag || null,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
@@ -280,16 +283,18 @@ export const NewThreadForm: m.Component<{}, IState> = {
                 : '')
             ],
             onclick: () => {
-              let doc;
               if (body) {
                 try {
-                  doc = JSON.parse(body);
+                  const doc = JSON.parse(body);
+                  vnode.state.quillEditorState.editor.setContents(doc);
                 } catch (e) {
-                  doc = body;
+                  // const doc = body;
                 }
               }
-              vnode.state.quillEditorState.editor.insertText(0, doc);
+              const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+              (titleInput as HTMLInputElement).value = draft.title;
               vnode.state.form.title = draft.title;
+              vnode.state.activeTag = draft.tag;
               vnode.state.form.tagName = draft.tag;
             }
           });

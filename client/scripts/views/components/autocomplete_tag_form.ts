@@ -2,14 +2,13 @@ import 'components/autocomplete_tag_form.scss';
 
 import m from 'mithril';
 import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
-import { OffchainTag } from 'client/scripts/models';
+import { OffchainTag } from '../../models';
 import { symbols } from '../../helpers';
 
 interface IAutoCompleteTagFormAttrs {
-  defaultActiveIndex?: number;
   tags: OffchainTag[];
   featuredTags: OffchainTag[];
-  activeTag?: OffchainTag;
+  activeTag?: OffchainTag | string;
   tabindex?: number;
   updateFormData: Function;
   updateParentErrors?: Function;
@@ -23,7 +22,6 @@ interface IAutoCompleteTagFormState {
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
   view: (vnode) => {
     const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
-    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
 
     const itemRender = (tag) => {
       return m(ListItem, {
@@ -48,13 +46,13 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       if (button) (button as HTMLButtonElement).click();
     };
 
-    const addTag = () => {
-      const input = (document.getElementsByClassName('autocomplete-tag-input')[0].firstChild as HTMLInputElement);
-      const newTag = input.value;
+    const addTag = (tag?) => {
+      const newTag = tag || (document.getElementsByClassName('autocomplete-tag-input')[0]
+        .firstChild as HTMLInputElement).value;
       tags.push({ name: newTag, id: undefined, description: '' });
       setTimeout(() => { vnode.state.selectedTag = newTag; }, 1);
       updateFormData(newTag);
-      manuallyClosePopover();
+      if (!tag) manuallyClosePopover();
     };
 
     const sortTags = (tags_: OffchainTag[]) => {
@@ -70,6 +68,12 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         }, 'No matches found. Add tag?');
       }
     };
+
+    if (activeTag instanceof OffchainTag) {
+      (vnode.state.selectedTag as any) = activeTag;
+    } else {
+      addTag(activeTag);
+    }
 
     return m(SelectList, {
       class: 'AutocompleteTagForm',
