@@ -36,6 +36,8 @@ html {
 .layout-container {
     padding-top: $header-height + $vertical-padding;
     padding-bottom: $vertical-padding;
+    margin-left: $horizontal-padding;
+    margin-right: $horizontal-padding;
 }
 .forum-container {
     background: #fff;
@@ -349,4 +351,12 @@ td, th {
 // select list styles
 .cui-popover.cui-select-list .cui-popover-content {
     padding: 10px;
+}
+
+// empty state override
+.cui-empty-state.cui-empty-state-fill {
+    z-index: initial;
+}
+.cui-spinner.cui-spinner-fill {
+    z-index: initial;
 }
