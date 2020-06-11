@@ -261,8 +261,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
       m('.new-thread-form-sidebar', [
         m('h3', 'Saved drafts'),
         m(List, { interactive: true }, app.login.discussionDrafts.map((draft) => {
-          console.log(draft)
-          const body = draft.body;
+          const { body } = draft;
           let bodyComponent;
           if (body) {
             try {
@@ -279,7 +278,20 @@ export const NewThreadForm: m.Component<{}, IState> = {
               m('.discussion-draft-body', draft.body.length
                 ? bodyComponent
                 : '')
-            ]
+            ],
+            onclick: () => {
+              let doc;
+              if (body) {
+                try {
+                  doc = JSON.parse(body);
+                } catch (e) {
+                  doc = body;
+                }
+              }
+              vnode.state.quillEditorState.editor.insertText(0, doc);
+              vnode.state.form.title = draft.title;
+              vnode.state.form.tagName = draft.tag;
+            }
           });
         }))
       ])
