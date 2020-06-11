@@ -79,6 +79,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
+    console.log(vnode.state.form);
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
@@ -128,7 +130,6 @@ export const NewThreadForm: m.Component<{}, IState> = {
           ]),
           m(FormGroup, [
             m(AutoCompleteTagForm, {
-              activeTag: vnode.state.activeTag || null,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
@@ -199,6 +200,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           ]),
           m(FormGroup, [
             m(AutoCompleteTagForm, {
+              activeTag: vnode.state.activeTag || undefined,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
@@ -295,7 +297,8 @@ export const NewThreadForm: m.Component<{}, IState> = {
               (titleInput as HTMLInputElement).value = draft.title;
               vnode.state.form.title = draft.title;
               vnode.state.activeTag = draft.tag;
-              vnode.state.form.tagName = draft.tag;
+              // vnode.state.form.tagName = draft.tag;
+              m.redraw();
             }
           });
         }))

@@ -50,7 +50,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       const newTag = tag || (document.getElementsByClassName('autocomplete-tag-input')[0]
         .firstChild as HTMLInputElement).value;
       tags.push({ name: newTag, id: undefined, description: '' });
-      setTimeout(() => { vnode.state.selectedTag = newTag; }, 1);
+      setTimeout(() => { vnode.state.selectedTag = newTag; m.redraw(); }, 1);
       updateFormData(newTag);
       if (!tag) manuallyClosePopover();
     };
@@ -69,9 +69,11 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       }
     };
 
+    console.log(activeTag);
+    console.log(vnode.state.selectedTag);
     if (activeTag instanceof OffchainTag) {
       (vnode.state.selectedTag as any) = activeTag;
-    } else {
+    } else if (typeof activeTag === 'string') {
       addTag(activeTag);
     }
 
