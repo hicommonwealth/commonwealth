@@ -35,6 +35,7 @@ const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function
 
 const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
   oncreate: (vnode) => {
+    if (!vnode.attrs.thread.tag) return;
     vnode.state.tagName = vnode.attrs.thread.tag.name;
     vnode.state.tagId = vnode.attrs.thread.tag.id;
   },
