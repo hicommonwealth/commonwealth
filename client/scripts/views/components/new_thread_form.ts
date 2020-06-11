@@ -80,8 +80,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
       ]),
     ]);
 
-    console.log(app.login.discussionDrafts)
-
+    // TODO: Community-scope tags in /status & store
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
