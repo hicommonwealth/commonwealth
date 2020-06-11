@@ -1,13 +1,15 @@
 import 'pages/validators.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 
 import app, { ApiStatus } from 'state';
 import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
+import _ from 'lodash';
+import { u32 } from '@polkadot/types';
+import { HeaderExtended } from '@polkadot/api-derive';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
 import { ICosmosValidator } from 'controllers/chain/cosmos/account';
 import User from 'views/components/widgets/user';
@@ -38,11 +40,15 @@ export interface IValidatorAttrs {
   waiting?: boolean;
   eraPoints?: string;
   toBeElected?: boolean;
+  blockCount?: u32;
+  hasMessage?: boolean;
+  isOnline?: boolean;
 }
 
 export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
+    lastHeader: HeaderExtended
   };
   nominations: any[];
   originalNominations: any[];
@@ -103,6 +109,9 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
       ? (app.user.activeAccount as SubstrateAccount).stakingLedger
       : null,
+    lastHeader: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.lastHeader
+      : null
   }),
   view: (vnode) => {
     let vComponents = [];

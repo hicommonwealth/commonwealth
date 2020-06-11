@@ -2,21 +2,22 @@ import m from 'mithril';
 import app from 'state';
 import BN from 'bn.js';
 import { ChainBase } from 'models';
+import { Icons, Icon } from 'construct-ui';
 import { pluralize } from 'helpers/index';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
 import Substrate from 'controllers/chain/substrate/main';
-import { DeriveStakingQuery } from '@polkadot/api-derive/types';
 import { makeDynamicComponent } from 'models/mithril';
+import { DeriveStakingQuery, DeriveAccountInfo } from '@polkadot/api-derive/types';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
-
 const PERBILL_PERCENT = 10_000_000;
 
 interface IValidatorState {
   dynamic: {
-    info: any;
-    query: any;
+    info: DeriveAccountInfo;
+    query: DeriveStakingQuery;
+    byAuthor: Record<string, string>;
   },
   isNominating: boolean;
 }
@@ -63,10 +64,15 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
     // info: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.info(attrs.stash) : null,
-    query: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.query(attrs.stash) : null
+    query: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.query(attrs.stash)
+      : null
   }),
   view: (vnode) => {
     const { query } = vnode.state.dynamic;
+    const byAuthor = (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.byAuthor
+      : {};
     const stakingInfo = query ? expandInfo(query) : null;
     const nominators = stakingInfo
       ? stakingInfo.nominators.map(([who, value]): any => ({ stash: who, balance: app.chain.chain.coins(value) }))
@@ -121,23 +127,24 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       (!vnode.attrs.waiting
         && m('td.val-own', formatCoin(vnode.attrs.nominated, true))
       ),
-      m('td.val-commission', stakingInfo?.commission || '-'),
+      m('td.val-commission', stakingInfo?.commission || ' '),
       (!vnode.attrs.waiting
-        && m('td.val-points', vnode.attrs.eraPoints || '-')
+        && m('td.val-points', vnode.attrs.eraPoints || ' ')
       ),
-      (vnode.attrs.waiting
-        && m('td.val-points', vnode.attrs.toBeElected
-          ? 'PolkadotJS'
-          : '')
+      (!vnode.attrs.waiting
+        && m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' ')
       ),
-      // m('td.val-action', [
-      //   m('button.nominate-validator.formular-button-primary', {
-      //     class: app.user.activeAccount ? '' : 'disabled',
-      //     onclick: (e) => {
-      //       e.preventDefault();
-      //     }
-      //   }, 'View'),
-      // ]),
+      m('td.val-im-online',
+        m('span.im-online-icons', [
+          vnode.attrs.toBeElected
+        && m(Icon, { name: Icons.ARROW_LEFT_CIRCLE, size: 'sm' }),
+          vnode.attrs.isOnline
+        && m(Icon, { name: Icons.WIFI, size: 'sm' }),
+          vnode.attrs.hasMessage
+        && m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'sm' }),
+          vnode.attrs.blockCount
+          && m('label.block-count', vnode.attrs.blockCount)
+        ]))
     ]);
   }
 });

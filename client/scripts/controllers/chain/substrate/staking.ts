@@ -7,12 +7,16 @@ import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
 import { formatNumber } from '@polkadot/util';
 import { Observable, combineLatest, of } from 'rxjs';
+import { HeaderExtended } from '@polkadot/api-derive';
 import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints } from '@polkadot/types/interfaces';
 import { InterfaceTypes } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingElected, DeriveSessionProgress } from '@polkadot/api-derive/types';
+import { DeriveStakingValidators, DeriveStakingQuery,
+  DeriveSessionProgress, DeriveAccountInfo, DeriveHeartbeatAuthor } from '@polkadot/api-derive/types';
 import { IValidators } from './account';
 import SubstrateChain from './shared';
+
+const MAX_HEADERS = 50;
 
 class SubstrateStaking implements StorageModule {
   private _initialized: boolean = false;
@@ -22,7 +26,8 @@ class SubstrateStaking implements StorageModule {
   // STORAGE
   private _store = new StakingStore();
   public get store() { return this._store; }
-
+  public lastHeaders: HeaderExtended[] = [];
+  public byAuthor: Record<string, string> = {};
   private _Chain: SubstrateChain;
 
   private _app: IApp;
@@ -47,13 +52,14 @@ class SubstrateStaking implements StorageModule {
         api.derive.staking.validators(),
         api.query.staking.currentEra(),
         api.derive.staking.stashes(),
-        api.derive.staking.currentPoints()
+        api.derive.staking.currentPoints(),
+        api.derive.imOnline.receivedHeartbeats()
       )),
 
       // fetch balances alongside validators
       flatMap((
-        [api, { nextElected, validators: currentSet }, era, allStashes, queryPoints]:
-        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[], EraRewardPoints]
+        [api, { nextElected, validators: currentSet }, era, allStashes, queryPoints, imOnline]:
+        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[], EraRewardPoints, Record<string, DeriveHeartbeatAuthor>]
       ) => {
         const eraPoints: Record<string, string> = {};
         const entries = [...queryPoints.individual.entries()]
@@ -78,16 +84,17 @@ class SubstrateStaking implements StorageModule {
           api.query.staking.bonded.multi(toBeElected.map((elt) => elt.toString())),
           stakersCall.multi(toBeElected.map((elt) => stakersCallArgs(elt.toString()))),
           of(waiting),
-          of(eraPoints)
+          of(eraPoints),
+          of(imOnline)
         );
       }),
       auditTime(100),
       map(([
         currentSet, toBeElected, controllers, exposures,
-        nextUpControllers, nextUpExposures, waiting, eraPoints
+        nextUpControllers, nextUpExposures, waiting, eraPoints, imOnline
       ] : [
         AccountId[], AccountId[], Vec<AccountId>, Exposure[],
-        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>
+        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>, Record<string, DeriveHeartbeatAuthor>
       ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
@@ -97,7 +104,10 @@ class SubstrateStaking implements StorageModule {
             controller: controllers[i].toString(),
             isElected: true,
             toBeElected: false,
-            eraPoints: eraPoints[key]
+            eraPoints: eraPoints[key],
+            blockCount: imOnline[key]?.blockCount,
+            hasMessage: imOnline[key]?.hasMessage,
+            isOnline: imOnline[key]?.isOnline
           };
         }
         // add set of next elected
@@ -108,7 +118,10 @@ class SubstrateStaking implements StorageModule {
             controller: nextUpControllers[i].toString(),
             isElected: false,
             toBeElected: true,
-            eraPoints: eraPoints[key]
+            eraPoints: eraPoints[key],
+            blockCount: imOnline[key]?.blockCount,
+            hasMessage: imOnline[key]?.hasMessage,
+            isOnline: imOnline[key]?.isOnline
           };
         }
         // add set of waiting validators
@@ -119,7 +132,10 @@ class SubstrateStaking implements StorageModule {
             controller: null,
             isElected: false,
             toBeElected: false,
-            eraPoints: eraPoints[key]
+            eraPoints: eraPoints[key],
+            blockCount: imOnline[key]?.blockCount,
+            hasMessage: imOnline[key]?.hasMessage,
+            isOnline: imOnline[key]?.isOnline
           };
         }
 
@@ -127,11 +143,36 @@ class SubstrateStaking implements StorageModule {
       }),
     );
   }
-  public info(address: string): Observable<any> {
+  public info(address: string): Observable<DeriveAccountInfo> {
     return this._Chain.query((api: ApiRx) => api.derive.accounts.info(address));
   }
-  public query(address: string): Observable<any> {
+  public query(address: string): Observable<DeriveStakingQuery> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
+  }
+  public get lastHeader(): Observable<HeaderExtended> {
+    return this._Chain.query(
+      (api: ApiRx) => api.derive.chain.subscribeNewHeads()
+    ).pipe(map((lastHeader: HeaderExtended) => {
+      if (lastHeader?.number) {
+        const blockNumber = lastHeader.number.unwrap();
+        const thisBlockAuthor = lastHeader.author?.toString();
+        const thisBlockNumber = formatNumber(blockNumber);
+
+        if (thisBlockAuthor) {
+          this.byAuthor[thisBlockAuthor] = thisBlockNumber;
+        }
+
+        this.lastHeaders = this.lastHeaders
+          .filter((old, index): boolean => index < MAX_HEADERS && old.number.unwrap().lt(blockNumber))
+          .reduce((next, header): HeaderExtended[] => {
+            next.push(header);
+
+            return next;
+          }, [lastHeader])
+          .sort((a, b) => b.number.unwrap().cmp(a.number.unwrap()));
+      }
+      return lastHeader;
+    }));
   }
   public deinit() {
     this._initialized = false;
