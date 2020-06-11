@@ -102,7 +102,7 @@ class DraftsController {
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/deleteDraft`, {
         'jwt': app.login.jwt,
-        'id': draftId,
+        'draft_id': draftId,
       }).then((result) => {
         // _this.store.remove(draft);
         resolve(result);
