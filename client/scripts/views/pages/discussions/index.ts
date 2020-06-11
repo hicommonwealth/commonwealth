@@ -6,7 +6,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem } from 'construct-ui';
+import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState } from 'construct-ui';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -35,18 +35,11 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const TagSidebar: m.Component<{ tag: string }> = {
+const CommunitySidebar: m.Component<{ activeTag?: string }> = {
   view: (vnode) => {
-    const { tag } = vnode.attrs;
+    const { activeTag } = vnode.attrs;
+    if (!app.chain && !app.community) return;
 
-    return m('.TagSidebar', [
-      tag
-    ]);
-  }
-};
-
-const CommunitySidebar: m.Component<{}> = {
-  view: (vnode) => {
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => {
       return activeNode
@@ -64,17 +57,20 @@ const CommunitySidebar: m.Component<{}> = {
       ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     return m('.CommunitySidebar', [
+      activeTag && [
+        m('h4', `About #${activeTag}`),
+        m('p', app.tags.store.getByName(activeTag, app.chain ? app.chain.meta.id : app.community.meta.id).description),
+        m('br'),
+      ],
       m('h4', `About ${communityName}`),
       m('p', communityDescription),
       m('br'),
       m('h4', 'Admins & Mods'),
-      (app.chain || app.community) && [
-        (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
-          return m('.community-admin', [
-            m(User, { user: [r.address, r.address_chain], showRole: true })
-          ]);
-        }),
-      ],
+      (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
+        return m('.community-admin', [
+          m(User, { user: [r.address, r.address_chain], showRole: true })
+        ]);
+      }),
     ]);
   }
 };
@@ -164,7 +160,12 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         }
       }
 
-      return m('.discussions-main', 'No threads');
+      return m('.discussions-main.empty-list', [
+        m(EmptyState, {
+          icon: Icons.LAYERS,
+          content: m('p', { style: 'color: #546e7b;' }, 'No threads found'),
+        })
+      ]);
     };
 
     const getHomepageListing = () => {
@@ -247,7 +248,6 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         // m(InlineThreadComposer),
         allProposals.length === 0
         && [
-          // m('h4', 'This week'),
           m('.no-threads', 'No threads'),
         ],
         allProposals.length !== 0
@@ -255,6 +255,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       ]);
     };
 
+    const { activeTag } = vnode.attrs;
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
@@ -267,12 +268,12 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     return m(Sublayout, {
       class: 'DiscussionsPage',
       rightSidebar: (app.chain || app.community) && [
-        vnode.attrs.activeTag ? m(TagSidebar, { tag: vnode.attrs.activeTag }) : m(CommunitySidebar)
+        activeTag ? m(CommunitySidebar, { activeTag }) : m(CommunitySidebar)
       ],
     }, [
       (app.chain || app.community) && [
-        vnode.attrs.activeTag
-          ? getSingleTagListing(vnode.attrs.activeTag)
+        activeTag
+          ? getSingleTagListing(activeTag)
           : getHomepageListing(),
       ]
     ]);
