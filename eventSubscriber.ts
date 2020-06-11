@@ -1,4 +1,4 @@
-import subscribeMolochEvents from './shared/events/moloch/index';
+import subscribeMolochEvents, { createMolochApi } from './shared/events/moloch/index';
 import { IEventHandler, CWEvent } from './shared/events/interfaces';
 
 const chain = process.env.NODE_CHAIN || 'moloch-local';
@@ -15,4 +15,6 @@ class StandaloneMolochEventHandler extends IEventHandler {
 
 const skipCatchup = false;
 
-subscribeMolochEvents(chain, network, 1, contractAddress, [ new StandaloneMolochEventHandler() ]);
+createMolochApi(network, 1, contractAddress).then((api) => {
+  subscribeMolochEvents(chain, api, 1, [ new StandaloneMolochEventHandler() ]);
+});

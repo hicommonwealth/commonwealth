@@ -22,7 +22,7 @@ export default class extends IEventSubscriber<MolochApi, MolochRawEvent> {
    */
   public subscribe(cb: (event: MolochRawEvent) => any) {
     this._listener = (event: MolochRawEvent) => {
-      log.info(`Received ${this._name} event: ${JSON.stringify(event, null, 2)}.`);
+      log.trace(`Received ${this._name} event: ${JSON.stringify(event, null, 2)}.`);
       cb(event);
     };
     this._api.addListener('*', this._listener);

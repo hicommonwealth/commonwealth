@@ -18,7 +18,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
+export function createEdgewareApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
   const registry = new TypeRegistry();
   if (isEdgeware) {
     const edgewareTypes = Object.values(edgewareDefinitions)
@@ -71,7 +71,7 @@ export default async function (
   });
   if (unsubscribe) unsubscribe();
 
-  const api = await createApi(provider, chain.startsWith('edgeware')).isReady;
+  const api = await createEdgewareApi(provider, chain.startsWith('edgeware')).isReady;
 
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<ISubstrateEventData>) => {

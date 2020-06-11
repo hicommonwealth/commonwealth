@@ -4,7 +4,7 @@ import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import subscribeMolochEvents from '../../shared/events/moloch/index';
+import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
 import { IDisconnectedRange, IEventHandler, EventSupportingChains } from '../../shared/events/interfaces';
 import { EdgewareEventChains } from '../../shared/events/edgeware/types';
 import { MolochEventChains } from '../../shared/events/moloch/types';
@@ -56,11 +56,11 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           migrate,
         );
       } else if (MolochEventChains.includes(node.chain)) {
+        const api = await createMolochApi(node.url, 1, '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7');
         subscribeFn = (evtHandlers) => subscribeMolochEvents(
           node.chain,
-          node.url,
+          api,
           1,
-          '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
           evtHandlers,
           // skipCatchup,
           // () => discoverReconnectRange(models, node.chain),

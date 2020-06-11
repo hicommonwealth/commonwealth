@@ -20,7 +20,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(
+export function createMolochApi(
   ethNetworkUrl: string,
   contractVersion: 1 | 2,
   contractAddress: string
@@ -46,16 +46,12 @@ export function createApi(
  */
 export default async function (
   chain: string, // contract name
-  ethNetworkUrl: string,
+  api: MolochApi,
   contractVersion: 1 | 2,
-  contractAddress: string,
   handlers: IEventHandler<IMolochEventData>[],
   skipCatchup: boolean = true,
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
 ): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
-  console.log(contractAddress);
-  const api = await createApi(ethNetworkUrl, contractVersion, contractAddress);
-
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IMolochEventData>) => {
     let prevResult = null;
@@ -111,7 +107,7 @@ export default async function (
   }
 
   try {
-    log.info(`Subscribing to Moloch contract ${chain} on ${ethNetworkUrl}...`);
+    log.info(`Subscribing to Moloch contract ${chain}...`);
     subscriber.subscribe(processEventFn);
   } catch (e) {
     log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
