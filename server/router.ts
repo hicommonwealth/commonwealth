@@ -70,6 +70,8 @@ import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
 import createDraft from './routes/createDraft';
+import deleteDraft from './routes/deleteDraft';
+import editDraft from './routes/editDraft';
 import getDrafts from './routes/getDrafts';
 import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
@@ -149,6 +151,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
   router.get('/drafts', getDrafts.bind(this, models));
+  router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models))
 
   // offchain comments
   // TODO: Change to POST /comment
