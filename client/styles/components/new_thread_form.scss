@@ -2,6 +2,9 @@
   display: flex;
   .new-thread-form-body {
     flex: 9;
+    button[name="saving"] {
+      margin-right: 15px;
+    }
   }
   .new-thread-form-sidebar {
     flex: 3;

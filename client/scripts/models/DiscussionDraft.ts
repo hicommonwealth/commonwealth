@@ -24,7 +24,6 @@ class DiscussionDraft implements IUniqueId {
   constructor(
     author: string,
     id: number,
-    createdAt: moment.Moment,
     community: string,
     chain: string,
     title?: string,
@@ -38,7 +37,6 @@ class DiscussionDraft implements IUniqueId {
     this.attachments = attachments;
     this.id = id;
     this.identifier = `${id}`;
-    this.createdAt = createdAt;
     this.tag = tag;
     this.community = community;
     this.chain = chain;

@@ -15,7 +15,6 @@ const modelFromServer = (draft) => {
   return new DiscussionDraft(
     draft.Address.address,
     draft.id,
-    moment(draft.created_at),
     draft.community,
     draft.chain,
     decodeURIComponent(draft.title),

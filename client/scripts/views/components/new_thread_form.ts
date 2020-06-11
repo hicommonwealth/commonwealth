@@ -3,12 +3,14 @@ import 'components/new_thread_form.scss';
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List } from 'construct-ui';
+import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem } from 'construct-ui';
 
 import app from 'state';
 import QuillEditor from 'views/components/quill_editor';
 import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
+import QuillFormattedText from './quill_formatted_text';
+import MarkdownFormattedText from './markdown_formatted_text';
 
 interface IState {
   form: IThreadForm,
@@ -257,7 +259,28 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
       ]),
       m('.new-thread-form-sidebar', [
-        m(List, ['test', 'test2'])
+        m(List, { interactive: true }, app.login.discussionDrafts.map((draft) => {
+          console.log(draft)
+          const body = draft.body;
+          let bodyComponent;
+          if (body) {
+            try {
+              const doc = JSON.parse(body);
+              doc.ops = doc.ops.slice(0, 3);
+              bodyComponent = m(QuillFormattedText, { doc, hideFormatting: true });
+            } catch (e) {
+              bodyComponent = m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+            }
+          }
+          return m(ListItem, {
+            contentLeft: [
+              m('.discussion-draft-title', draft.title || 'Untitled'),
+              m('.discussion-draft-body', draft.body
+                ? ''
+                : body)
+            ]
+          });
+        }))
       ])
     ]);
   }

@@ -63,8 +63,8 @@ export const saveDraft = (
         chainId,
         communityId,
         title,
-        tagName,
         bodyText,
+        tagName,
         attachments
       );
     } catch (e) {
