@@ -24,12 +24,12 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
+import { getSelectableCommunities } from 'views/components/header/community_selector';
 import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import TagSelector from 'views/components/sidebar/tag_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
@@ -38,6 +38,45 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+const TagListItems: m.Component<{}> = {
+  view: (vnode) => {
+    const featuredTags = {};
+    const otherTags = {};
+    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+
+    const getTagRow = (name, id) => m(ListItem, {
+      key: id,
+      contentLeft: m(Icon, { name: Icons.HASH }),
+      label: name,
+      selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    });
+
+    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
+      const { id, name } = tag;
+      if (featuredTagIds.includes(`${tag.id}`)) {
+        featuredTags[tag.name] = { id, name, featured_order: featuredTagIds.indexOf(`${id}`) };
+      } else {
+        otherTags[tag.name] = { id, name };
+      }
+    });
+    const otherTagListing = Object.keys(otherTags)
+      .sort((a, b) => otherTags[b].name.localeCompare(otherTags[a].name))
+      .map((name, idx) => getTagRow(name, otherTags[name].id));
+    const featuredTagListing = Object.keys(featuredTags)
+      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
+      .map((name, idx) => getTagRow(name, featuredTags[name].id));
+
+    return [
+      featuredTagListing,
+      otherTagListing,
+    ];
+  }
+};
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
@@ -95,23 +134,36 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, [
+    }, (!app.community && !app.chain) ? [
+      // no community
+      m(List, { interactive: true }, [
+        m('h4', 'Commonwealth'),
+        app.isLoggedIn() && getSelectableCommunities().map((c: CommunityInfo | ChainInfo) => {
+          return m(ListItem, {
+            label: c.name,
+            onclick: (e) => m.route.set(`/${c.id}`),
+          });
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
+          label: 'Back to home',
+          onclick: (e) => m.route.set('/'),
+        }),
+      ]),
+    ] : [
       // discussions
       m(List, { interactive: true }, [
         m('h4', 'Discussions'),
-        (app.community || app.chain)
-          && m(ListItem, {
-            contentLeft: m(Icon, { name: Icons.HOME }),
-            active: onDiscussionsPage(m.route.get()),
-            label: 'Home',
-            onclick: (e) => m.route.set(`/${app.activeId()}`),
-          }),
-        (app.community || app.chain)
-          && m(TagSelector, { activeTag, hideEditButton: true }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.HOME }),
+          active: onDiscussionsPage(m.route.get()),
+          label: 'Home',
+          onclick: (e) => m.route.set(`/${app.activeId()}`),
+        }),
+        m(TagListItems),
       ]),
       // proposals
-      (app.community || app.chain)
-        && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
           m('h4', 'Voting & Staking'),
           // proposals (substrate and cosmos only)
@@ -162,21 +214,6 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
-          (app.community || app.chain)
-            && m(ListItem, {
-              active: onMembersPage(m.route.get()),
-              label: 'Members',
-              onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-              contentLeft: m(Icon, { name: 'hexagon' }),
-            }),
-          (app.community || app.chain)
-            && m(ListItem, {
-              class: 'TagRow',
-              active: m.route.get() === `/${app.activeId()}/tags/`,
-              label: 'Tags',
-              onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-              contentLeft: m(Icon, { name: 'hexagon' }),
-            }),
           isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
             && (app.community || app.chain)
             && m(AdminPanel),
@@ -191,13 +228,29 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
               contentLeft: m(Icon, { name: Icons.BOX }),
             }),
         ]),
+      // manage
+      m(List, { interactive: true }, [
+        m('h4', 'Manage Community'),
+        m(ListItem, {
+          active: onMembersPage(m.route.get()),
+          label: 'Members',
+          onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+        }),
+        m(ListItem, {
+          class: 'TagRow',
+          active: m.route.get() === `/${app.activeId()}/tags/`,
+          label: 'Tags',
+          onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+        }),
+        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          && m(AdminPanel),
+      ]),
       // // chat (all communities)
-      // (app.community || app.chain) &&
-      //   m(ListItem, {
-      //     active: onChatPage(m.route.get()),
-      //     label: 'Chat',
-      //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      //   }),
+      // m(ListItem, {
+      //   active: onChatPage(m.route.get()),
+      //   label: 'Chat',
+      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+      // }),
     ]);
   },
 };

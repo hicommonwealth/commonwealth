@@ -2,6 +2,7 @@ import IdStore from './IdStore';
 import { OffchainTag } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
+// TODO: Differentiate between tags associated with a chain, and tags associated with a community
 class TagsStore extends IdStore<OffchainTag> {
   private _storeCommunity: { [identifier: string]: Array<OffchainTag> } = {};
 
@@ -38,6 +39,10 @@ class TagsStore extends IdStore<OffchainTag> {
 
   public getByCommunity(communityId): Array<OffchainTag> {
     return this._storeCommunity[communityId] || [];
+  }
+
+  public getByName(name, communityId): OffchainTag {
+    return this.getByCommunity(communityId).find((t) => t.name === name);
   }
 }
 

@@ -1,8 +1,7 @@
 @import 'client/styles/shared';
 
 .GithubWell {
-    @include well;
-    input { 
+    input {
         margin-right: 12px;
     }
 }

@@ -68,6 +68,7 @@ const DiscussionRow: m.Component<IAttrs> = {
                 user: [proposal.author, proposal.authorChain],
                 linkify: true,
                 tooltip: true,
+                showRole: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
             ]),
