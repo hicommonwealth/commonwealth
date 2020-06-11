@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
-import lookupAddressIsOwnedByUser from 'server/util/lookupAddressIsOwnedByUser';
+import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from '../../shared/logging';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
@@ -20,6 +20,25 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   }
 
   const { id, title, body, tag } = req.body;
+
+  const attachFiles = async () => {
+    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+      await models.OffchainAttachment.create({
+        attachable: 'draft',
+        attachment_id: id,
+        url: req.body['attachments[]'],
+        description: 'image',
+      });
+    } else if (req.body['attachments[]']) {
+      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
+        attachable: 'draft',
+        attachment_id: id,
+        url,
+        description: 'image',
+      })));
+    }
+  };
+
   try {
     const userOwnedAddresses = await req.user.getAddresses();
     const draft = await models.DiscussionDraft.findOne({
@@ -33,6 +52,8 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     if (title) draft.title = title;
     if (tag) draft.tag = tag;
     await tag.save();
+    attachFiles();
+
     return res.json({ status: 'Success', result: tag.toJSON() });
   } catch (e) {
     return next(e);

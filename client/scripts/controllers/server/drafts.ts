@@ -79,7 +79,7 @@ class DraftsController {
       const response = await $.ajax(`${app.serverUrl()}/editDraft`, {
         type: 'PATCH',
         data: {
-          'draft_id': draft.id,
+          'id': draft.id,
           'body': newBody,
           'title': newTitle,
           'tag': newTag,
@@ -107,7 +107,7 @@ class DraftsController {
         type: 'DELETE',
         data: {
           'jwt': app.login.jwt,
-          'draft_id': draftId,
+          'id': draftId,
         }
       }).then((result) => {
         // _this.store.remove(draft);
