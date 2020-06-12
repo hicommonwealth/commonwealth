@@ -12,6 +12,7 @@ import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pa
 import { OffchainTag } from 'client/scripts/models';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import { confirmationModalWithText } from '../modals/confirm_modal';
 
 interface IState {
   form: IThreadForm,
@@ -289,7 +290,15 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 ? bodyComponent
                 : '')
             ],
-            onclick: () => {
+            onclick: async () => {
+              let confirmed = true;
+              const threadText = vnode.state.quillEditorState.markdownMode
+                ? vnode.state.quillEditorState.editor.getText()
+                : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
+              if (threadText) {
+                confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+              }
+              if (!confirmed) return;
               if (body) {
                 try {
                   const doc = JSON.parse(body);

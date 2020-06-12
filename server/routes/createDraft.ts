@@ -17,15 +17,6 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
   if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
     return next(new Error(Errors.NoBodyOrAttachments));
   }
-  try {
-    const quillDoc = JSON.parse(decodeURIComponent(body));
-    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === ''
-      && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-      return next(new Error(Errors.NoBodyOrAttachments));
-    }
-  } catch (e) {
-    // check always passes if the body isn't a Quill document
-  }
 
   const draftContent = community ? {
     community: community.id,
