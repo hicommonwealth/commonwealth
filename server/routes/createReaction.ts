@@ -10,11 +10,11 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-enum CreateReactionErrors {
-  NoPostId = 'Must provide a comment or thread id',
-  NoReaction = 'Must provide a reaction string',
-  NoProposalMatch = 'No matching proposal found.'
-}
+export const Errors = {
+  NoPostId: 'Must provide a comment or thread id',
+  NoReaction: 'Must provide a reaction string',
+  NoProposalMatch: 'No matching proposal found.'
+};
 
 const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
@@ -22,10 +22,10 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   const { reaction, comment_id, thread_id } = req.body;
 
   if (!thread_id && !comment_id) {
-    return next(new Error(CreateReactionErrors.NoPostId));
+    return next(new Error(Errors.NoPostId));
   }
   if (!reaction) {
-    return next(new Error(CreateReactionErrors.NoReaction));
+    return next(new Error(Errors.NoReaction));
   }
 
   const options = {
@@ -78,7 +78,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       root_type = 'discussion';
     }
   } catch (err) {
-    return next(new Error(CreateReactionErrors.NoProposalMatch));
+    return next(new Error(Errors.NoProposalMatch));
   }
 
   // dispatch notifications

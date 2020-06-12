@@ -9,6 +9,7 @@ import moment from 'moment';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
+import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -843,7 +844,7 @@ describe('Thread Tests', () => {
         .send({ chain });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Must provide object_id');
+      expect(res.body.error).to.equal(ViewCountErrors.NoObjectId);
     });
 
     it('should not track views without chain or community', async () => {
@@ -853,7 +854,7 @@ describe('Thread Tests', () => {
         .send({ object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Must provide chain or community');
+      expect(res.body.error).to.equal(ViewCountErrors.NoChainOrComm);
     });
 
     it('should not track views with invalid chain or community', async () => {
@@ -863,7 +864,7 @@ describe('Thread Tests', () => {
         .send({ chain: 'adkgjkjgda', object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Invalid community or chain');
+      expect(res.body.error).to.equal(ViewCountErrors.InvalidChainOrComm);
     });
 
     it('should not track views with invalid object_id', async () => {
@@ -873,7 +874,7 @@ describe('Thread Tests', () => {
         .send({ chain, object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Invalid offchain thread');
+      expect(res.body.error).to.equal(ViewCountErrors.InvalidThread);
     });
   });
 });

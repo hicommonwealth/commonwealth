@@ -4,6 +4,11 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  IncorrectLogin: 'Username or password is incorrect',
+  NoKey: 'Missing field: lookupKey',
+};
+
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (req.query && req.query.lookupKey) {
     const existingAuth = await models.HedgehogAuthentication.findOne({
@@ -17,6 +22,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       res.status(r.statusCode).send(r.object);
     }
 
-    return next(new Error('Username or password is incorrect'));
-  } else return next(new Error('Missing field: lookupKey'));
+    return next(new Error(Errors.IncorrectLogin));
+  } else return next(new Error(Errors.NoKey));
 };

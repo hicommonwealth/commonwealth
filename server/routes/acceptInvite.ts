@@ -39,7 +39,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const userAddresses = await req.user.getAddresses();
   const isUser = userAddresses
-    .filter((addr) => addr.verified)
+    .filter((addr) => !!addr.verified)
     .filter((add) => add.address === addressObj.address);
 
   if (isUser.length === 0) {
