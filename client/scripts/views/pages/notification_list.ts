@@ -77,7 +77,7 @@ const NotificationRow: m.Component<INotificationRow> = {
         // category === NotificationCategories.NewCommunity ? 'New community' :
         category === NotificationCategories.NewThread ? `New thread #${thread}`
           : category === NotificationCategories.NewComment ? [
-            m(User, { user: [comment.author, comment.authorChain], hideAvatar: true }),
+            (comment && m(User, { user: [comment.author, comment.authorChain], hideAvatar: true })),
             ' commented'
           ] : 'Unknown notification'
       ]),
