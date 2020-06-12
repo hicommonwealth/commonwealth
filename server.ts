@@ -138,7 +138,7 @@ const templateFile = (() => {
   try {
     return fs.readFileSync('./build/index.html');
   } catch (e) {
-    console.error(`Failed to read template file: ${JSON.stringify(e)}`);
+    console.error(`Failed to read template file: ${e.message}`);
   }
 })();
 
@@ -212,12 +212,12 @@ if (SHOULD_RESET_DB) {
       }
     }, (err) => {
       if (RUN_ENTITY_MIGRATION) {
-        console.error(`Entity migration failed: ${JSON.stringify(err)}`);
+        console.error(`Entity migration failed: ${err.message}`);
         models.sequelize.close()
           .then(() => (closeMiddleware()))
           .then(() => process.exit(1));
       } else {
-        console.error(`Chain event listener setup failed: ${JSON.stringify(err)}`);
+        console.error(`Chain event listener setup failed: ${err.message}`);
       }
     });
   if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);

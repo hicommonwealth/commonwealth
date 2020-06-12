@@ -62,7 +62,7 @@ export default async function (
         /* eslint-disable-next-line no-await-in-loop */
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        log.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
+        log.error(`Event handle failure: ${err.message}`);
         break;
       }
     }
@@ -96,8 +96,12 @@ export default async function (
     }
 
     const fetcher = new StorageFetcher(api, contractVersion);
-    const cwEvents = await fetcher.fetch(offlineRange);
-    await Promise.all(cwEvents.map((e) => handleEventFn(e)));
+    try {
+      const cwEvents = await fetcher.fetch(offlineRange);
+      await Promise.all(cwEvents.map((e) => handleEventFn(e)));
+    } catch (e) {
+      log.error(`Unable to fetch events from storage: ${e.message}`);
+    }
   };
 
   if (!skipCatchup) {
@@ -110,7 +114,7 @@ export default async function (
     log.info(`Subscribing to Moloch contract ${chain}...`);
     subscriber.subscribe(processEventFn);
   } catch (e) {
-    log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
+    log.error(`Subscription error: ${e.message}`);
   }
 
   return subscriber;

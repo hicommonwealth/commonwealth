@@ -33,6 +33,7 @@ export default class extends IStorageFetcher<MolochApi> {
           applicant: proposal.applicant,
           tokenTribute: proposal.tokenTribute.toString(),
           sharesRequested: proposal.sharesRequested.toString(),
+          details: proposal.details,
           startTime,
         }
       };
@@ -71,12 +72,20 @@ export default class extends IStorageFetcher<MolochApi> {
     return events;
   }
 
+  /**
+   * Fetches all CW events relating to ChainEntities from chain (or in this case contract),
+   *   by quering available chain/contract storage and reconstructing events.
+   *
+   * NOTE: throws on error! Make sure to wrap in try/catch!
+   *
+   * @param range Determines the range of blocks to query events within.
+   */
   public async fetch(range?: IDisconnectedRange): Promise<CWEvent<IMolochEventData>[]> {
     // we need to fetch a few constants to convert voting periods into blocks
-    this._periodDuration = (await this._api.periodDuration()).toNumber();
-    this._summoningTime = (await this._api.summoningTime()).toNumber();
+    this._periodDuration = +(await this._api.periodDuration());
+    this._summoningTime = +(await this._api.summoningTime());
 
-    this._startBlock = range.startBlock || 0;
+    this._startBlock = range ? range.startBlock : 0;
     let rangeStartTime = 0;
     let rangeEndTime = 0;
     if (range) {
@@ -92,17 +101,17 @@ export default class extends IStorageFetcher<MolochApi> {
 
     // we work backwards through the proposal queue ...
     // TODO: how do we handle votes?
-    const queueLength = (await this._api.getProposalQueueLength()).toNumber();
+    const queueLength = +(await this._api.getProposalQueueLength());
     const results: CWEvent<IMolochEventData>[] = [];
     /* eslint-disable no-await-in-loop, for-direction */
     for (let i = queueLength - 1; i >= 0; --i) {
       const proposalIndex = this._version === 1
         ? i
-        : (await (this._api as Moloch2).proposalQueue(i)).toNumber();
+        : +(await (this._api as Moloch2).proposalQueue(i));
       const proposal: Moloch1Proposal | Moloch2Proposal = this._version === 1
         ? await this._api.proposalQueue(proposalIndex)
         : await this._api.proposals(proposalIndex);
-      const startingPeriod = proposal.startingPeriod.toNumber();
+      const startingPeriod = +proposal.startingPeriod;
       const proposalStartingTime = (startingPeriod * this._periodDuration) + this._summoningTime;
       if (proposalStartingTime >= rangeStartTime && proposalStartingTime <= rangeEndTime) {
         results.push(...this._eventsFromProposal(proposalIndex, proposal, proposalStartingTime));

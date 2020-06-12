@@ -83,7 +83,7 @@ export default async function (
         /* eslint-disable-next-line no-await-in-loop */
         prevResult = await handler.handle(event, prevResult);
       } catch (err) {
-        log.error(`Event handle failure: ${JSON.stringify(err, null, 4)}`);
+        log.error(`Event handle failure: ${err.message}`);
         break;
       }
     }
@@ -168,7 +168,7 @@ export default async function (
     // handle reconnects with poller
     api.on('connected', pollMissedBlocksFn);
   } catch (e) {
-    log.error(`Subscription error: ${JSON.stringify(e, null, 2)}`);
+    log.error(`Subscription error: ${e.message}`);
   }
 
   return subscriber;

@@ -39,7 +39,9 @@ export default async function (
         sharesRequested,
       } = rawData.args as any;
       // TODO: pull these out into class, perhaps
-      const startPeriod = +(await (api as Moloch1).proposalQueue(proposalIndex)).startingPeriod;
+      const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
+      const startingPeriod = +proposal.startingPeriod;
+      const details = proposal.details;
       const periodDuration = +(await api.periodDuration());
       const summoningTime = +(await api.summoningTime());
       return {
@@ -53,7 +55,8 @@ export default async function (
           applicant,
           tokenTribute: hexToString(tokenTribute),
           sharesRequested: hexToString(sharesRequested),
-          startTime: summoningTime + (startPeriod * periodDuration),
+          details,
+          startTime: summoningTime + (startingPeriod * periodDuration),
         }
       };
     }

@@ -142,6 +142,7 @@ describe('Moloch Event Integration Tests', () => {
             applicant,
             tokenTribute: '5',
             sharesRequested: '5',
+            details: 'hello',
             startTime: +summonTime + 2,
           });
           resolve();
@@ -368,6 +369,7 @@ describe('Moloch Event Integration Tests', () => {
         applicant: applicant1,
         tokenTribute: '5',
         sharesRequested: '5',
+        details: 'hello',
         startTime: proposalStartTimes[0],
       },
       {
@@ -389,6 +391,7 @@ describe('Moloch Event Integration Tests', () => {
         applicant: applicant2,
         tokenTribute: '0',
         sharesRequested: '5',
+        details: 'hello',
         startTime: proposalStartTimes[1],
       },
       {
@@ -405,6 +408,7 @@ describe('Moloch Event Integration Tests', () => {
         applicant: applicant2,
         tokenTribute: '5',
         sharesRequested: '5',
+        details: 'hello',
         startTime: proposalStartTimes[2],
       },
     ]);

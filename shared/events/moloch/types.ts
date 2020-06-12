@@ -51,6 +51,7 @@ export interface IMolochSubmitProposal extends IMolochEvent {
   applicant: Address;
   tokenTribute: Balance;
   sharesRequested: Balance;
+  details: string;
   startTime: number;
 }
 
