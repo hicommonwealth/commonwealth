@@ -114,15 +114,13 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
   // then, render each group
   return hideFormatting
     ? groups.map((group) => {
-      return m('span', group.parents.map((parent) => {
+      return m('p.hidden-formatting', group.parents.map((parent) => {
         return parent.children.map((child) => {
           if (child.insert?.image) return;
           if (child.insert?.mention) return m('span', child.insert.mention.value);
-          if (child.insert?.twitter || child.insert?.video) {
-            const embedType = Object.keys(child.insert)[0];
-            return m('span', `[${stringUpperFirst(embedType)} embed]`);
-          }
-          return m('span', `${child.insert} `);
+          if (child.insert?.twitter) return; // return m('span', '[tweet]');
+          if (child.insert?.video) return; // return m('span', '[video]');
+          return m('span', `${child.insert}`);
         });
       }));
     })
@@ -196,9 +194,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
-            }, `${child.insert} `);
+            }, `${child.insert}`);
           } else {
-            result = m('span', `${child.insert} `);
+            result = m('span', `${child.insert}`);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if ((k !== 'color' && k !== 'background') && v !== true) return;
@@ -233,10 +231,12 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     });
 };
 
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapsed? }, { suppressFadeout }> = {
+const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }, { suppressFadeout }> = {
   view: (vnode) => {
+    const { doc, hideFormatting, collapse } = vnode.attrs;
+
     return m('.QuillFormattedText', {
-      class: (vnode.attrs.collapsed ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
+      class: (collapse ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
       oncreate: (vnode2) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
@@ -244,7 +244,7 @@ const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapsed? }, { s
         vnode.state.suppressFadeout = height < 120;
         setTimeout(() => m.redraw());
       }
-    }, renderQuillDelta(vnode.attrs.doc, vnode.attrs.hideFormatting));
+    }, renderQuillDelta(doc, hideFormatting));
   }
 };
 

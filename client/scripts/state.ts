@@ -67,6 +67,7 @@ export interface IApp {
   // populated on login
   login: {
     email?: string;
+    emailInterval?: string;
     jwt?: string;
     // all address infos for all chains/communities loaded
     addresses: AddressInfo[];

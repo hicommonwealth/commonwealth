@@ -3,8 +3,8 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link } from 'helpers';
-import { Tooltip } from 'construct-ui';
+import { formatAddressShort, link, getRoleInCommunity, formatAsTitleCase } from 'helpers';
+import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
 import { Account, Profile } from 'models';
@@ -13,6 +13,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import { isAdminOrMod } from 'helpers/roles';
 
 interface IAttrs {
   user: Account<any> | [string, string];
@@ -23,6 +24,7 @@ interface IAttrs {
   linkify?: boolean;
   onclick?: any;
   tooltip?: boolean;
+  showRole?: boolean;
 }
 
 export interface ISubstrateIdentityAttrs {
@@ -78,13 +80,14 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
 
 const User : m.Component<IAttrs> = {
   view: (vnode) => {
-    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
 
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
+    let role;
 
     if (vnode.attrs.user instanceof Array) {
       const chainId = vnode.attrs.user[1];
@@ -96,10 +99,18 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
+      role = isAdminOrMod(address);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
+      role = isAdminOrMod(account.address);
     }
+    const roleTag = role ? m(Tag, {
+      class: 'roleTag',
+      label: role.permission,
+      rounded: true,
+      size: 'sm',
+    }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -119,7 +130,7 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && app.chain.loaded)
+        (account instanceof SubstrateAccount && app.chain?.loaded)
           // substrate name
           ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
@@ -130,6 +141,7 @@ const User : m.Component<IAttrs> = {
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
+        showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -144,7 +156,7 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && app.chain.loaded)
+        (account instanceof SubstrateAccount && app.chain?.loaded)
           ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
@@ -152,6 +164,7 @@ const User : m.Component<IAttrs> = {
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
+      roleTag,
     ]);
 
     return tooltip

@@ -1,9 +1,8 @@
 import moment from 'moment';
-import sgMail from '@sendgrid/mail';
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-
+const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,14 +40,14 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   // create and email the token
   const path = req.body.path;
   const tokenObj = await models.LoginToken.createForEmail(email, path);
-  const loginLink = SERVER_URL + `/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
+  const loginLink = `${SERVER_URL}/api/finishLogin?token=${tokenObj.token}&email=${encodeURIComponent(email)}`;
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    subject: 'Your Commonwealth login link',
-    text: `Use this link to log in: ${loginLink}`,
-    html: `<a href="${loginLink}">Click here to log in.</a><br/><br/>
-Or copy and paste this link into your browser: ${loginLink}`,
+    templateId: 'd-2b00abbf123e4b5981784d17151e86be',
+    dynamic_template_data: {
+      loginLink: loginLink,
+    },
   };
   sgMail.send(msg).then((result) => {
     res.json({ status: 'Success' });

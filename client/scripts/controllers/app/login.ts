@@ -38,7 +38,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
     const role = getRoleInCommunity(account, chain, community);
 
     if (!role) {
-      if (!suppressNotification) {
+      if (!suppressNotification && app.vm.activeAccount !== account) {
         notifySuccess('Switched account');
       }
       app.vm.activeAccount = account;
@@ -61,7 +61,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
         getAllRolesInCommunity(chain, community).forEach((r) => { r.is_user_default = false; });
         role.is_user_default = true;
 
-        if (!suppressNotification) {
+        if (!suppressNotification && app.vm.activeAccount !== account) {
           notifySuccess('Switched account');
         }
         app.vm.activeAccount = account;
@@ -151,6 +151,7 @@ export function updateActiveUser(data) {
     app.vm.activeAccount = null;
   } else {
     app.login.email = data.email;
+    app.login.emailInterval = data.emailInterval;
     app.login.jwt = data.jwt;
 
     app.login.addresses = data.addresses

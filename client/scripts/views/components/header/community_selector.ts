@@ -11,6 +11,24 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import { isMember } from 'views/components/membership_button';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
 
+export const getSelectableCommunities = () => {
+  return (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
+    .concat(app.config.chains.getAll())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => {
+      // sort starred communities at top
+      if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
+      if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
+      return 0;
+    })
+    .filter((item) => {
+      // only show chains with nodes
+      return (item instanceof ChainInfo)
+        ? app.config.nodes.getByChain(item.id)?.length
+        : true;
+    });
+};
+
 const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo, showStatus?: boolean }> = {
   view: (vnode) => {
     const { chain, community, showStatus } = vnode.attrs;
@@ -71,21 +89,7 @@ const CurrentCommunityLabel: m.Component<{}> = {
 
 const CommunitySelector = {
   view: (vnode) => {
-    const selectableCommunities = (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-      .concat(app.config.chains.getAll())
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .sort((a, b) => {
-        // sort starred communities at top
-        if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
-        if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
-        return 0;
-      })
-      .filter((item) => {
-        // only show chains with nodes
-        return (item instanceof ChainInfo)
-          ? app.config.nodes.getByChain(item.id)?.length
-          : true;
-      });
+    const selectableCommunities = getSelectableCommunities();
     const currentIndex = selectableCommunities.findIndex((item) => {
       if (item instanceof ChainInfo) return app.activeChainId() === item.id;
       if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;

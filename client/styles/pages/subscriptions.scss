@@ -35,13 +35,12 @@
     }
   }
 
-  .ChainSubscriptionRow, .CommunitySubscriptionRow {
+  .NewThreadRow {
     display: flex;
     flex-direction: row;
-
-    .ChainOrCommunitySubscriptionButton {
-      height: 34px;
-      margin: auto 20px;
+    align-items: center;
+    h4 {
+      margin-right: 12px;
     }
   }
 
@@ -55,4 +54,41 @@
   .DropdownFormField {
     width: 50%;
   }
+
+  .EmailPanel {
+    .EmailUpdate {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      h4, div, button {
+        padding-right: 12px;
+      }
+      .cui-input {
+        min-width: max-content;
+        width: 240px;
+      }
+    }
+    .EmailInterval {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      h4 {
+        padding-right: 12px;
+      }
+    }
+  }
+
+  .UserNotifications {
+    .MarkAllButtons, .MentionsButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      button {
+        margin-left: 12px;
+      }
+    }
+
+  }
+  
 }

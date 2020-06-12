@@ -34,7 +34,7 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
 }
 
 export function extractDomain(url) {
-  const re = new RegExp('^(?:https?:)?(?://)?(?:[^@]+@)?(?:www.)?([^:/]+)');
+  const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
 }
 

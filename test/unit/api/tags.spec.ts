@@ -53,7 +53,6 @@ describe('Tag Tests', () => {
   });
 
   describe('Bulk Tags', () => {
-
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;

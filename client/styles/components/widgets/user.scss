@@ -51,6 +51,10 @@
 .User {
     display: inline-block;
     white-space: nowrap;
+    a {
+        text-decoration: none;
+        color: initial;
+    }
     .user-avatar {
         @include bareAvatar();
     }
@@ -68,6 +72,11 @@
     }
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
+    }
+    .roleTag {
+        margin-left: 6px;
+        margin-right: 0;
+        padding: 0 6px;
     }
 }
 

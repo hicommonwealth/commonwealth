@@ -102,33 +102,33 @@ const AdminPanel: m.Component<{}, { isOpen: boolean }> = {
     vnode.state.isOpen = false;
   },
   view: (vnode) => {
-    return [m(ListItem, {
-      href: '#',
-      class: 'AdminPanel',
-      onclick: (e) => {
-        e.preventDefault();
-        vnode.state.isOpen = true;
-      },
-      label: 'Manage Community',
-      contentLeft: m(Icon, { name: Icons.SETTINGS, }),
-    }),
-    m(Dialog, {
-      autofocus: true,
-      basic: false,
-      closeOnEscapeKey: true,
-      closeOnOutsideClick: true,
-      class: 'AdminPanelDialog',
-      content: m(AdminPanelContents, {
-        onChangeHandler: (v) => { vnode.state.isOpen = v; },
+    return [
+      m(ListItem, {
+        class: 'AdminPanel',
+        onclick: (e) => {
+          e.preventDefault();
+          vnode.state.isOpen = true;
+        },
+        label: 'Configuration',
       }),
-      hasBackdrop: true,
-      isOpen: vnode.state.isOpen,
-      inline: false,
-      onClose: () => { vnode.state.isOpen = false; },
-      title: 'Manage Community',
-      transitionDuration: 200,
-      footer: null,
-    })];
+      m(Dialog, {
+        autofocus: true,
+        basic: false,
+        closeOnEscapeKey: true,
+        closeOnOutsideClick: true,
+        class: 'AdminPanelDialog',
+        content: m(AdminPanelContents, {
+          onChangeHandler: (v) => { vnode.state.isOpen = v; },
+        }),
+        hasBackdrop: true,
+        isOpen: vnode.state.isOpen,
+        inline: false,
+        onClose: () => { vnode.state.isOpen = false; },
+        title: 'Manage Community',
+        transitionDuration: 200,
+        footer: null,
+      })
+    ];
   },
 };
 

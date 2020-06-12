@@ -10,7 +10,7 @@ import {
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link } from 'helpers';
+import { featherIcon, link, pluralize } from 'helpers';
 import { isRoleOfCommunity } from 'helpers/roles';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
@@ -24,12 +24,12 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
+import { getSelectableCommunities } from 'views/components/header/community_selector';
 import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
 import Login from 'views/components/login';
-import TagSelector from 'views/components/sidebar/tag_selector';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import SubscriptionButton from 'views/components/sidebar/subscription_button';
@@ -38,6 +38,54 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
+
+const TagListings: m.Component<{}, { showMore: boolean }> = {
+  view: (vnode) => {
+    const featuredTags = {};
+    const otherTags = {};
+    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+
+    const getTagRow = (name, id) => m(ListItem, {
+      key: id,
+      contentLeft: m(Icon, { name: Icons.HASH }),
+      label: name.toLowerCase(),
+      selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    });
+
+    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
+      const { id, name } = tag;
+      if (featuredTagIds.includes(`${tag.id}`)) {
+        featuredTags[tag.name] = { id, name, featured_order: featuredTagIds.indexOf(`${id}`) };
+      } else {
+        otherTags[tag.name] = { id, name };
+      }
+    });
+    const otherTagListing = Object.keys(otherTags)
+      .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
+      .map((name, idx) => getTagRow(name, otherTags[name].id));
+    const featuredTagListing = Object.keys(featuredTags)
+      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
+      .map((name, idx) => getTagRow(name, featuredTags[name].id));
+
+    return [
+      m(List, featuredTagListing),
+      otherTagListing.length > 0 && [
+        vnode.state.showMore && m(List, { class: 'more-tags-list' }, otherTagListing),
+        m(ListItem, {
+          class: 'more-tags-toggle',
+          label: vnode.state.showMore ? 'Show less' : pluralize(otherTagListing.length, 'more tag'),
+          onclick: () => {
+            vnode.state.showMore = !vnode.state.showMore;
+          },
+        }),
+      ],
+    ];
+  }
+};
 
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
@@ -95,25 +143,38 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, [
+    }, (!app.community && !app.chain) ? [
+      // no community
+      m(List, { interactive: true }, [
+        m('h4', 'Commonwealth'),
+        app.isLoggedIn() && getSelectableCommunities().map((c: CommunityInfo | ChainInfo) => {
+          return m(ListItem, {
+            label: c.name,
+            onclick: (e) => m.route.set(`/${c.id}`),
+          });
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
+          label: 'Back to home',
+          onclick: (e) => m.route.set('/'),
+        }),
+      ]),
+    ] : [
       // discussions
       m(List, { interactive: true }, [
-        m('h4', 'Discussions'),
-        (app.community || app.chain)
-          && m(ListItem, {
-            contentLeft: m(Icon, { name: Icons.HOME }),
-            active: onDiscussionsPage(m.route.get()),
-            label: 'Home',
-            onclick: (e) => m.route.set(`/${app.activeId()}`),
-          }),
-        (app.community || app.chain)
-          && m(TagSelector, { activeTag, hideEditButton: true }),
+        m('h4', 'Discuss'),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.HOME }),
+          active: onDiscussionsPage(m.route.get()),
+          label: 'Home',
+          onclick: (e) => m.route.set(`/${app.activeId()}`),
+        }),
+        m(TagListings),
       ]),
       // proposals
-      (app.community || app.chain)
-        && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
-          m('h4', 'Voting & Staking'),
+          m('h4', 'Vote & Stake'),
           // proposals (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
@@ -172,8 +233,8 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           }),
         ]),
       // manage
-      (app.community || app.chain) && m(List, { interactive: true }, [
-        m('h4', 'Manage Community'),
+      m(List, { interactive: true }, [
+        m('h4', 'Manage'),
         m(ListItem, {
           active: onMembersPage(m.route.get()),
           label: 'Members',
@@ -189,12 +250,11 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           && m(AdminPanel),
       ]),
       // // chat (all communities)
-      // (app.community || app.chain) &&
-      //   m(ListItem, {
-      //     active: onChatPage(m.route.get()),
-      //     label: 'Chat',
-      //     onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      //   }),
+      // m(ListItem, {
+      //   active: onChatPage(m.route.get()),
+      //   label: 'Chat',
+      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
+      // }),
     ]);
   },
 };

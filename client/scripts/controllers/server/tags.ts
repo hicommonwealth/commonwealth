@@ -22,6 +22,7 @@ class TagsController {
   public get initialized() { return this._initialized; }
   public getByIdentifier(id) { return this._store.getById(id); }
   public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
+  public getByName(name, communityId) { return this._store.getByName(name, communityId); }
   public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
 
   public async edit(tag: OffchainTag, featured_order?: boolean) {
