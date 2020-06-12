@@ -292,11 +292,23 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
             ],
             onclick: async () => {
               let confirmed = true;
-              const threadText = vnode.state.quillEditorState.markdownMode
-                ? vnode.state.quillEditorState.editor.getText()
-                : JSON.stringify(vnode.state.quillEditorState.editor.getContents());
-              if (threadText) {
-                confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+              if (vnode.state.fromDraft) {
+                const formBodyText = vnode.state.quillEditorState.markdownMode
+                  ? vnode.state.quillEditorState.editor.getText()
+                  : vnode.state.quillEditorState.editor.getContents().ops;
+                const draftText = JSON.parse(app.login.discussionDrafts
+                  .filter((d) => d.id === vnode.state.fromDraft)[0].body);
+                debugger
+                if (formBodyText !== draftTExt) {
+                  confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+                }
+              } else {
+                const formBodyText = vnode.state.quillEditorState.markdownMode
+                  ? vnode.state.quillEditorState.editor.getText()
+                  : vnode.state.quillEditorState.editor.getContents().ops;
+                if (!(formBodyText.length === 1 && formBodyText[0].insert === '\n')) {
+                  confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+                }
               }
               if (!confirmed) return;
               if (body) {
