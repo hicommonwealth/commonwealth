@@ -45,7 +45,8 @@ export const parseMentionsForServer = (text, isMarkdown) => {
 export const saveDraft = (
   form,
   quillEditorState,
-  author
+  author,
+  existingDraft?
 ) => {
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
@@ -55,28 +56,47 @@ export const saveDraft = (
       : JSON.stringify(quillEditorState.editor.getContents());
   const { title, tagName } = form;
   const attachments = [];
-  (async () => {
-    let result;
-    try {
-      result = await app.drafts.create(
-        author.address,
-        chainId,
-        communityId,
-        title,
-        bodyText,
-        tagName,
-        attachments
-      );
-    } catch (e) {
-      console.error(e);
-      return ({ thread_creation: e });
-    }
-
-    mixpanel.track('Save discussion draft', {
-      'Step No': 2,
-      Step: 'Filled in Proposal and Discussion',
-    });
-  })();
+  if (existingDraft) {
+    (async () => {
+      let result;
+      try {
+        result = await app.drafts.edit(
+          existingDraft,
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+      }
+      mixpanel.track('Update discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
+  } else {
+    (async () => {
+      let result;
+      try {
+        result = await app.drafts.create(
+          author.address,
+          chainId,
+          communityId,
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+      }
+      mixpanel.track('Save discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
+  }
 };
 
 export const newThread = (

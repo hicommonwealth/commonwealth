@@ -223,7 +223,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
               onclick: () => {
                 const { form, quillEditorState } = vnode.state;
                 try {
-                  saveDraft(form, quillEditorState, author);
+                  saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
                     $(vnode.dom).trigger('modalexit');
