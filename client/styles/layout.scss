@@ -15,6 +15,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     background: #fafafa;
+    overflow-y: scroll;
     &.modal-open {
         overflow-y: hidden;
     }
