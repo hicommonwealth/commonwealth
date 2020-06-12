@@ -3,7 +3,7 @@ import Processor from '../../../../shared/events/moloch/processor';
 import { MolochApi, MolochRawEvent, MolochEventKind } from '../../../../shared/events/moloch/types';
 const { assert } = chai;
 
-const toHex = (n: number | string) => ({ _hex: n.toString() });
+const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
 describe('Moloch Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {

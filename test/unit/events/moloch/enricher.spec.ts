@@ -13,7 +13,7 @@ const constructEvent = (data: object, section = '', typeDef: string[] = []): Mol
 const blockNumber = 10000;
 const api: MolochApi = {} as MolochApi;
 
-const toHex = (n: number | string) => ({ _hex: n.toString() });
+const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
 describe('Moloch Event Enricher Filter Tests', () => {
   it('should enrich submit proposal event', async () => {
@@ -48,7 +48,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
       proposalIndex: toHex(1),
       delegateKey: 'delegate',
       memberAddress: 'member',
-      uintVote: toHex(1),
+      uintVote: 1,
     });
     const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {

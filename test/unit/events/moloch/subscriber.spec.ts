@@ -6,7 +6,7 @@ import { MolochApi, MolochRawEvent } from '../../../../shared/events/moloch/type
 
 const { assert } = chai;
 
-const toHex = (n: number | string) => ({ _hex: n.toString() });
+const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
 describe('Moloch Event Subscriber Tests', () => {
   it('should callback with event data', (done) => {
