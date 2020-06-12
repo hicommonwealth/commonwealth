@@ -156,7 +156,7 @@ export default async function (
   };
 
   if (!skipCatchup) {
-    pollMissedBlocksFn();
+    await pollMissedBlocksFn();
   } else {
     log.info('Skipping event catchup on startup!');
   }

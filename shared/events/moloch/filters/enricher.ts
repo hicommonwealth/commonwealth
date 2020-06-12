@@ -38,6 +38,10 @@ export default async function (
         tokenTribute,
         sharesRequested,
       } = rawData.args as any;
+      // TODO: pull these out into class, perhaps
+      const startPeriod = +(await (api as Moloch1).proposalQueue(proposalIndex)).startingPeriod;
+      const periodDuration = +(await api.periodDuration());
+      const summoningTime = +(await api.summoningTime());
       return {
         blockNumber,
         excludeAddresses: [ memberAddress ],
@@ -49,6 +53,7 @@ export default async function (
           applicant,
           tokenTribute: hexToString(tokenTribute),
           sharesRequested: hexToString(sharesRequested),
+          startTime: summoningTime + (startPeriod * periodDuration),
         }
       };
     }

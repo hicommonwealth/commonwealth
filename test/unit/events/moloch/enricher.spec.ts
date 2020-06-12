@@ -11,7 +11,11 @@ const constructEvent = (data: object, section = '', typeDef: string[] = []): Mol
 };
 
 const blockNumber = 10000;
-const api: MolochApi = {} as MolochApi;
+const api: MolochApi = {
+  proposalQueue: async (n) => ({ startingPeriod: '1' }),
+  periodDuration: async () => '2',
+  summoningTime: async () => '0',
+} as unknown as MolochApi;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
@@ -38,6 +42,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
         applicant: 'applicant',
         tokenTribute: '5',
         sharesRequested: '6',
+        startTime: 2,
       }
     });
   });

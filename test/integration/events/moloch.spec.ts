@@ -16,6 +16,7 @@ function getProvider(): providers.Web3Provider {
   const web3Provider = require('ganache-cli').provider({
     allowUnlimitedContractSize: true,
     gasLimit: 1000000000,
+    time: new Date(1000),
     // logger: console,
   });
   return new providers.Web3Provider(web3Provider);
@@ -35,7 +36,7 @@ async function deployMoloch1(signer, summoner, tokenAddress): Promise<Moloch1> {
     2, // _periodDuration: 2 second
     2, // _votingPeriodLength: 4 seconds
     2, // _gracePeriodLength: 4 seconds
-    1, // _abortWindow: 2 seconds
+    2, // _abortWindow: 2 seconds
     5, // _proposalDeposit
     100, // _diluationBound
     5, // _processingReward
@@ -52,6 +53,7 @@ class MolochEventHandler extends IEventHandler {
 
   public async handle(event: CWEvent<IMolochEventData>): Promise<any> {
     this.emitter.emit(event.data.kind.toString(), event);
+    this.emitter.emit('*', event);
   }
 }
 
@@ -63,7 +65,7 @@ interface ISetupData {
   handler: MolochEventHandler;
 }
 
-async function setupSubscription(): Promise<ISetupData> {
+async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const provider = getProvider();
   const addresses: string[] = await provider.listAccounts();
   const [ member ] = addresses;
@@ -72,7 +74,9 @@ async function setupSubscription(): Promise<ISetupData> {
   const api: MolochApi = await deployMoloch1(signer, member, token.address);
   const emitter = new EventEmitter();
   const handler = new MolochEventHandler(emitter);
-  await subscribeMolochEvents('test', api, 1, [ handler ], true);
+  if (subscribe) {
+    await subscribeMolochEvents('test', api, 1, [ handler ], true);
+  }
   return { api, token, addresses, provider, handler };
 }
 
@@ -124,6 +128,7 @@ describe('Moloch Event Integration Tests', () => {
   it('should create moloch1 proposal', async () => {
     const { addresses, handler, api, token, provider } = await setupSubscription();
     const [ member, applicant ] = addresses;
+    const summonTime = await api.summoningTime();
     await submitProposal(provider, api, token, member, applicant);
     await new Promise((resolve) => {
       handler.emitter.on(
@@ -137,6 +142,7 @@ describe('Moloch Event Integration Tests', () => {
             applicant,
             tokenTribute: '5',
             sharesRequested: '5',
+            startTime: +summonTime + 2,
           });
           resolve();
         }
@@ -151,7 +157,7 @@ describe('Moloch Event Integration Tests', () => {
 
     // wait 2 seconds to enter voting period
     provider.send('evm_increaseTime', [2]);
-    await api.submitVote(0, 1);
+    await api.submitVote(0, 2);
     await new Promise((resolve) => {
       handler.emitter.on(
         MolochEventKind.SubmitVote.toString(),
@@ -161,7 +167,7 @@ describe('Moloch Event Integration Tests', () => {
             proposalIndex: 0,
             member,
             delegateKey: member,
-            vote: 1,
+            vote: 2,
           });
           resolve();
         }
@@ -306,5 +312,101 @@ describe('Moloch Event Integration Tests', () => {
         }
       );
     });
+  });
+
+  it('should migrate past proposal started/processed/aborted events', async () => {
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant1, applicant2 ] = addresses;
+    const summonTime = +(await api.summoningTime());
+    const periodDuration = +(await api.periodDuration());
+
+    // proposal 0: processed
+    await submitProposal(provider, api, token, member, applicant1);
+    provider.send('evm_increaseTime', [2]);
+    await api.submitVote(0, 1);
+    provider.send('evm_increaseTime', [10]);
+    await api.processProposal(0);
+
+    // proposal 1: aborted
+    await submitProposal(provider, api, token, member, applicant2);
+    provider.send('evm_increaseTime', [2]);
+    const app2Signer = provider.getSigner(applicant2);
+    const app2Moloch = Moloch1Factory.connect(api.address, app2Signer);
+    await app2Moloch.deployed();
+    await app2Moloch.abort(1);
+
+    // proposal 2: started by prior applicant, voted on, not completed
+    await token.transfer(applicant1, 20);  // from summoner: you're gonna need it!
+    const app1Signer = provider.getSigner(applicant1);
+    const app1Token = TokenFactory.connect(token.address, app1Signer);
+    await app1Token.deployed();
+    const app1Moloch = Moloch1Factory.connect(api.address, app1Signer);
+    await app1Moloch.deployed();
+    await submitProposal(provider, app1Moloch, app1Token, applicant1, applicant2);
+    provider.send('evm_increaseTime', [2]);
+    await app1Moloch.submitVote(2, 2);
+    await api.submitVote(2, 1);
+
+    // perform migration
+    const events: CWEvent<IMolochEventData>[] = [];
+    handler.emitter.on('*', (evt: CWEvent<IMolochEventData>) => events.push(evt));
+    const discoverReconnectRange = async () => ({ startBlock: 0 });
+    const subscription = await subscribeMolochEvents('test', api, 1, [ handler ], false, discoverReconnectRange);
+    subscription.unsubscribe();
+
+    // validate events
+    const proposalStartTimes = [
+      (await (api as Moloch1).proposalQueue(0)).startingPeriod,
+      (await (api as Moloch1).proposalQueue(1)).startingPeriod,
+      (await (api as Moloch1).proposalQueue(2)).startingPeriod,
+    ].map((period) => (+period * periodDuration) + summonTime);
+    assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 0), [
+      {
+        kind: MolochEventKind.SubmitProposal,
+        proposalIndex: 0,
+        member,
+        applicant: applicant1,
+        tokenTribute: '5',
+        sharesRequested: '5',
+        startTime: proposalStartTimes[0],
+      },
+      {
+        kind: MolochEventKind.ProcessProposal,
+        proposalIndex: 0,
+        member,
+        applicant: applicant1,
+        tokenTribute: '5',
+        sharesRequested: '5',
+        didPass: true,
+      },
+    ]);
+
+    assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 1), [
+      {
+        kind: MolochEventKind.SubmitProposal,
+        proposalIndex: 1,
+        member,
+        applicant: applicant2,
+        tokenTribute: '0',
+        sharesRequested: '5',
+        startTime: proposalStartTimes[1],
+      },
+      {
+        kind: MolochEventKind.Abort,
+        proposalIndex: 1,
+        applicant: applicant2,
+      }
+    ]);
+    assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 2), [
+      {
+        kind: MolochEventKind.SubmitProposal,
+        proposalIndex: 2,
+        member: applicant1,
+        applicant: applicant2,
+        tokenTribute: '5',
+        sharesRequested: '5',
+        startTime: proposalStartTimes[2],
+      },
+    ]);
   });
 });

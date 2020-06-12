@@ -3,37 +3,44 @@ import { IMolochEventData, MolochEventKind, MolochApi, Moloch1Proposal, Moloch2P
 import { Moloch1 } from '../../../eth/types/Moloch1';
 import { Moloch2 } from '../../../eth/types/Moloch2';
 
-function isMoloch1Proposal(m: Moloch1Proposal | Moloch2Proposal): m is Moloch1Proposal {
-  return 'sponsor' in m;
-}
-
 export default class extends IStorageFetcher<MolochApi> {
-  private _currentPeriod: number;      // current contract period
-  private _periodDuration: number;     // 1 period in blocks
-  private _votingPeriodLength: number; // voting time in periods
-  private _gracePeriodLength: number;  // grace time post-voting in periods
-  private _summoningTime: number;      // starting block of contract
+  constructor(protected _api: MolochApi, private _version: 1 | 2) {
+    super(_api);
+  }
 
-  private _eventsFromProposal(index: number, proposal: Moloch1Proposal | Moloch2Proposal): CWEvent<IMolochEventData>[] {
+  private _periodDuration: number;     // 1 period in seconds
+  private _summoningTime: number;      // starting time of contract
+  private _startBlock: number;
+
+  private _isMoloch1Proposal(m: Moloch1Proposal | Moloch2Proposal): m is Moloch1Proposal {
+    return this._version === 1;
+  }
+
+  private _eventsFromProposal(
+    index: number,
+    proposal: Moloch1Proposal | Moloch2Proposal,
+    startTime: number
+  ): CWEvent<IMolochEventData>[] {
     const events: CWEvent<IMolochEventData>[] = [ ];
-    if (isMoloch1Proposal(proposal)) {
-      const startingBlock = (proposal.startingPeriod.toNumber() * this._periodDuration) + this._summoningTime;
+    if (this._isMoloch1Proposal(proposal)) {
       const proposedEvent: CWEvent<IMolochEventData> = {
-        blockNumber: startingBlock,
+        // fake it
+        blockNumber: this._startBlock,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: index,
           member: proposal.proposer,
           applicant: proposal.applicant,
-          tokenTribute: proposal.tokenTribute.toHexString(),
-          sharesRequested: proposal.sharesRequested.toHexString(),
+          tokenTribute: proposal.tokenTribute.toString(),
+          sharesRequested: proposal.sharesRequested.toString(),
+          startTime,
         }
       };
       events.push(proposedEvent);
       if (proposal.aborted) {
         const abortedEvent: CWEvent<IMolochEventData> = {
-          // we cannot know exactly when it was aborted, but we can invent a time
-          blockNumber: startingBlock + 1,
+          // fake it
+          blockNumber: this._startBlock + 1,
           data: {
             kind: MolochEventKind.Abort,
             proposalIndex: index,
@@ -42,18 +49,16 @@ export default class extends IStorageFetcher<MolochApi> {
         };
         events.push(abortedEvent);
       } else if (proposal.processed) {
-        const processedBlock = startingBlock
-          + ((this._votingPeriodLength + this._gracePeriodLength)
-            * this._periodDuration);
         const processedEvent: CWEvent<IMolochEventData> = {
-          blockNumber: processedBlock,
+          // fake it
+          blockNumber: this._startBlock + 1,
           data: {
             kind: MolochEventKind.ProcessProposal,
             proposalIndex: index,
             applicant: proposal.applicant,
             member: proposal.proposer,
-            tokenTribute: proposal.tokenTribute.toHexString(),
-            sharesRequested: proposal.sharesRequested.toHexString(),
+            tokenTribute: proposal.tokenTribute.toString(),
+            sharesRequested: proposal.sharesRequested.toString(),
             didPass: proposal.didPass,
           }
         };
@@ -68,28 +73,39 @@ export default class extends IStorageFetcher<MolochApi> {
 
   public async fetch(range?: IDisconnectedRange): Promise<CWEvent<IMolochEventData>[]> {
     // we need to fetch a few constants to convert voting periods into blocks
-    this._currentPeriod = (await this._api.getCurrentPeriod()).toNumber();
     this._periodDuration = (await this._api.periodDuration()).toNumber();
-    this._votingPeriodLength = (await this._api.votingPeriodLength()).toNumber();
-    this._gracePeriodLength = (await this._api.gracePeriodLength()).toNumber();
     this._summoningTime = (await this._api.summoningTime()).toNumber();
+
+    this._startBlock = range.startBlock || 0;
+    let rangeStartTime = 0;
+    let rangeEndTime = 0;
+    if (range) {
+      rangeStartTime = (await this._api.provider.getBlock(range.startBlock)).timestamp;
+      if (!range.endBlock) {
+        range.endBlock = await this._api.provider.getBlockNumber();
+      }
+      rangeEndTime = (await this._api.provider.getBlock(range.endBlock)).timestamp;
+    } else {
+      const currentBlock = await this._api.provider.getBlockNumber();
+      rangeEndTime = (await this._api.provider.getBlock(currentBlock)).timestamp;
+    }
 
     // we work backwards through the proposal queue ...
     // TODO: how do we handle votes?
     const queueLength = (await this._api.getProposalQueueLength()).toNumber();
     const results: CWEvent<IMolochEventData>[] = [];
     /* eslint-disable no-await-in-loop, for-direction */
-    for (let i = queueLength - 1; i >= 0; ++i) {
-      const proposalIndex = this._api instanceof Moloch1
+    for (let i = queueLength - 1; i >= 0; --i) {
+      const proposalIndex = this._version === 1
         ? i
-        : (await this._api.proposalQueue(i)).toNumber();
-      const proposal: Moloch1Proposal | Moloch2Proposal = this._api instanceof Moloch1
+        : (await (this._api as Moloch2).proposalQueue(i)).toNumber();
+      const proposal: Moloch1Proposal | Moloch2Proposal = this._version === 1
         ? await this._api.proposalQueue(proposalIndex)
         : await this._api.proposals(proposalIndex);
       const startingPeriod = proposal.startingPeriod.toNumber();
-      const startingBlock = (startingPeriod * this._periodDuration) + this._summoningTime;
-      if (startingBlock >= range.startBlock && startingBlock < range.endBlock) {
-        results.push(...this._eventsFromProposal(proposalIndex, proposal));
+      const proposalStartingTime = (startingPeriod * this._periodDuration) + this._summoningTime;
+      if (proposalStartingTime >= rangeStartTime && proposalStartingTime <= rangeEndTime) {
+        results.push(...this._eventsFromProposal(proposalIndex, proposal, proposalStartingTime));
       }
     }
     return results;

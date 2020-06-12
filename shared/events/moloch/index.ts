@@ -95,13 +95,13 @@ export default async function (
       return;
     }
 
-    const fetcher = new StorageFetcher(api);
+    const fetcher = new StorageFetcher(api, contractVersion);
     const cwEvents = await fetcher.fetch(offlineRange);
     await Promise.all(cwEvents.map((e) => handleEventFn(e)));
   };
 
   if (!skipCatchup) {
-    pollMissedEventsFn();
+    await pollMissedEventsFn();
   } else {
     log.info('Skipping event catchup on startup!');
   }

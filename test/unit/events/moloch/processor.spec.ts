@@ -9,29 +9,28 @@ describe('Moloch Event Processor Tests', () => {
   it('should process a raw event into a CWEvent', async () => {
     const processor = new Processor(1, {} as MolochApi);
     const event = {
-      event: 'SubmitProposal',
+      event: 'ProcessProposal',
       blockNumber: 10,
       args: {
         proposalIndex: toHex(1),
-        delegateKey: 'delegate',
         memberAddress: 'member',
         applicant: 'applicant',
         tokenTribute: toHex(5),
         sharesRequested: toHex(6),
+        didPass: true,
       }
     } as unknown as MolochRawEvent;
     const result = await processor.process(event);
     assert.deepEqual(result, [{
       blockNumber: 10,
-      excludeAddresses: [ 'member' ],
       data: {
-        kind: MolochEventKind.SubmitProposal,
+        kind: MolochEventKind.ProcessProposal,
         proposalIndex: 1,
-        delegateKey: 'delegate',
         member: 'member',
         applicant: 'applicant',
         tokenTribute: '5',
         sharesRequested: '6',
+        didPass: true,
       }
     }]);
   });
@@ -56,6 +55,28 @@ describe('Moloch Event Processor Tests', () => {
       blockNumber: 10,
       args: {
         proposalIndex: toHex(1),
+      }
+    } as unknown as MolochRawEvent;
+    const result = await processor.process(event);
+    assert.isEmpty(result);
+  });
+
+  it('should gracefully fail to process an event with invalid api call', async () => {
+    const processor = new Processor(1, {
+      provider: {
+        getBlock: (n) => { throw new Error('fail!'); }
+      }
+    } as unknown as MolochApi);
+    const event = {
+      event: 'SubmitProposal',
+      blockNumber: 10,
+      args: {
+        proposalIndex: toHex(1),
+        memberAddress: 'member',
+        delegateKey: 'member',
+        applicant: 'applicant',
+        tokenTribute: toHex(5),
+        sharesRequested: toHex(6),
       }
     } as unknown as MolochRawEvent;
     const result = await processor.process(event);

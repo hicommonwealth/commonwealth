@@ -31,7 +31,7 @@ export default class extends IEventProcessor<MolochApi, MolochRawEvent> {
       const cwEvent = await enrichEvent(this._version, this._api, event.blockNumber, kind, event);
       return [ cwEvent ];
     } catch (e) {
-      log.error(`Failed to enrich event: ${JSON.stringify(e)}`);
+      log.error(`Failed to enrich event: ${e.message}`);
       return [];
     }
   }
