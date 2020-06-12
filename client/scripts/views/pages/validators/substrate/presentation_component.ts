@@ -60,6 +60,7 @@ const PresentationComponent = (state, chain: Substrate) => {
 
   return m('div',
     m(Tabs, [{
+      callback: model.reset,
       name: 'Current Validators',
       content: m('table.validators-table', [
         m('tr.validators-heading', [
