@@ -85,20 +85,19 @@ $discussion-row-color: #999;
         display: flex;
         margin: 24px 0 0;
         a {
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+            color: #aaa;
         }
         .commenters-avatars {
             .User {
                 margin-right: -8px;
-                margin-top: -1px;
             }
         }
         .commenters-label {
             margin-left: 20px;
-            color: #999;
+        }
+        .commenters-label,
+        .no-commenters-label {
+            color: #aaa;
         }
     }
     a.discussion-link {
@@ -106,7 +105,7 @@ $discussion-row-color: #999;
         color: $primary-green;
         text-decoration: none;
         font-weight: 600;
-        margin-bottom: 9px;
+        margin: 10px 0;
         &:hover {
             text-decoration: underline;
         }

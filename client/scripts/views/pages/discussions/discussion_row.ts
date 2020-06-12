@@ -76,6 +76,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             }),
             m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
           ]),
+          // content
           propType === OffchainThreadKind.Forum
             && (proposal as OffchainThread).body
             && m('.discussion-excerpt', [
@@ -102,6 +103,13 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 }
               }, 'See more'),
             ]),
+          propType === OffchainThreadKind.Link
+            && proposal.url
+            && externalLink('a.discussion-link', proposal.url, [
+              extractDomain(proposal.url),
+              m.trust(' &rarr;'),
+            ]),
+          // comments
           m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
             m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
               return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
@@ -118,12 +126,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               'No replies',
             ),
           ]),
-          propType === OffchainThreadKind.Link
-            && proposal.url
-            && externalLink('a.discussion-link', proposal.url, [
-              extractDomain(proposal.url),
-              m.trust(' &rarr;'),
-            ]),
         ]),
       ]),
     ]);

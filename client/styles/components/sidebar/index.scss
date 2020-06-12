@@ -71,7 +71,7 @@ $active-color: #ececec;
             margin: 0;
             padding: 6px $sidebar-padding;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.15px;
             border: none;
@@ -82,17 +82,15 @@ $active-color: #ececec;
             border: none;
             padding: 4px $sidebar-padding;
             > .cui-list-item-content-left > .cui-icon svg {
-                height: 15px;
-                width: 15px;
-                min-height: 15px;
-                min-width: 15px;
-                position: relative;
-                top: -1px;
+                height: 14px;
+                width: 14px;
+                min-height: 14px;
+                min-width: 14px;
                 margin-right: -2px;
-                color: #222;
+                color: #444;
             }
             &:hover {
-                background: $active-color;
+                background: lighten($active-color, 3%);
             }
             &.cui-selected,
             &.cui-active {
