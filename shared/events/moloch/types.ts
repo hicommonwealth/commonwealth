@@ -8,14 +8,6 @@ export type Moloch2Proposal = UnPromisify<ReturnType<Moloch2['functions']['propo
 
 export type MolochApi = Moloch1 | Moloch2;
 
-export function molochApiVersion(api: MolochApi): 1 | 2 {
-  const result = api instanceof Moloch1
-    ? 1 : api instanceof Moloch2
-      ? 2 : null;
-  if (result === null) throw new Error('unknown moloch API');
-  return result;
-}
-
 export const MolochEventChains = [ 'moloch', 'moloch-local' ];
 
 export type MolochRawEvent = Event;
