@@ -15,19 +15,14 @@ import User from 'views/components/widgets/user';
 
 import ThreadCaratMenu from './thread_carat_menu';
 
-
-interface IAttrs {
-  proposal: OffchainThread;
-}
-
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
   return timestamp.fromNow();
 };
 
-const DiscussionRow: m.Component<IAttrs> = {
-  view: (vnode: m.VnodeDOM<IAttrs>) => {
+const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boolean }> = {
+  view: (vnode) => {
     const proposal: OffchainThread = vnode.attrs.proposal;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
@@ -88,12 +83,24 @@ const DiscussionRow: m.Component<IAttrs> = {
                 const body = (proposal as OffchainThread).body;
                 try {
                   const doc = JSON.parse(body);
-                  doc.ops = doc.ops.slice(0, 5);
-                  return m(QuillFormattedText, { doc, hideFormatting: true });
+                  return m(QuillFormattedText, {
+                    doc,
+                    collapse: !vnode.state.expanded,
+                  });
                 } catch (e) {
-                  return m(MarkdownFormattedText, { doc: body.slice(0, 400), hideFormatting: true });
+                  return m(MarkdownFormattedText, {
+                    doc: body,
+                    collapse: !vnode.state.expanded,
+                  });
                 }
               })(),
+              !vnode.state.expanded && m('a', {
+                href: '#',
+                onclick: (e) => {
+                  e.preventDefault();
+                  vnode.state.expanded = true;
+                }
+              }, 'See more'),
             ]),
           m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
             m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {

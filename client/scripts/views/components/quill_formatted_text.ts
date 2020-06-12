@@ -120,7 +120,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           if (child.insert?.mention) return m('span', child.insert.mention.value);
           if (child.insert?.twitter) return; // return m('span', '[tweet]');
           if (child.insert?.video) return; // return m('span', '[video]');
-          return m('span', `${child.insert} `);
+          return m('span', `${child.insert}`);
         });
       }));
     })
@@ -194,7 +194,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
               target: '_blank',
               noreferrer: 'noreferrer',
               noopener: 'noopener',
-            }, `${child.insert} `);
+            }, `${child.insert}`);
           } else {
             result = m('span', `${child.insert} `);
           }
@@ -231,12 +231,12 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     });
 };
 
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapseAndHideFormatting? }, { suppressFadeout }> = {
+const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }, { suppressFadeout }> = {
   view: (vnode) => {
-    const { doc, hideFormatting, collapseAndHideFormatting } = vnode.attrs;
+    const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
-      class: (collapseAndHideFormatting ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
+      class: (collapse ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
       oncreate: (vnode2) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
@@ -244,7 +244,7 @@ const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapseAndHideFo
         vnode.state.suppressFadeout = height < 120;
         setTimeout(() => m.redraw());
       }
-    }, renderQuillDelta(doc, hideFormatting || collapseAndHideFormatting));
+    }, renderQuillDelta(doc, hideFormatting));
   }
 };
 
