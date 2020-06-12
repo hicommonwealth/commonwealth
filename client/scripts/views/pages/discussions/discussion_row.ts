@@ -49,6 +49,16 @@ const DiscussionRow: m.Component<IAttrs> = {
         m('.discussion-content', {
           class: proposal.title === '--' ? 'no-title' : ''
         }, [
+          m('.discussion-tags', [
+            proposal.tag && m(Tag, {
+              rounded: true,
+              intent: 'none',
+              label: proposal.tag.name,
+              size: 'xs',
+              onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
+            }),
+            m(ThreadCaratMenu, { proposal }),
+          ]),
           m('.discussion-title', [
             link(
               'a',
@@ -63,27 +73,13 @@ const DiscussionRow: m.Component<IAttrs> = {
               ),
           ]),
           m('.discussion-meta', [
-            m('.discussion-meta-left', [
-              m(User, {
-                user: [proposal.author, proposal.authorChain],
-                linkify: true,
-                tooltip: true,
-                showRole: true,
-              }),
-              m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
-            ]),
-            m('.discussion-meta-right', [
-              m('.discussion-tags', [
-                proposal.tag && m(Tag, {
-                  rounded: true,
-                  intent: 'none',
-                  label: proposal.tag.name,
-                  size: 'xs',
-                  onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-                }),
-                m(ThreadCaratMenu, { proposal }),
-              ]),
-            ]),
+            m(User, {
+              user: [proposal.author, proposal.authorChain],
+              linkify: true,
+              tooltip: true,
+              showRole: true,
+            }),
+            m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
           ]),
           propType === OffchainThreadKind.Forum
             && (proposal as OffchainThread).body
@@ -99,17 +95,22 @@ const DiscussionRow: m.Component<IAttrs> = {
                 }
               })(),
             ]),
-          app.comments.nComments(proposal) > 0
-            && m('.discussion-commenters', [
-              m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
-                return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
-              })),
-              link(
-                'a.commenters-label',
-                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                pluralize(app.comments.nComments(proposal), 'reply'),
-              ),
-            ]),
+          m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
+            m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
+              return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
+            })),
+            link(
+              'a.commenters-label',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+              pluralize(app.comments.nComments(proposal), 'reply'),
+            ),
+          ] : [
+            link(
+              'a.no-commenters-label',
+              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
+              'No replies',
+            ),
+          ]),
           propType === OffchainThreadKind.Link
             && proposal.url
             && externalLink('a.discussion-link', proposal.url, [

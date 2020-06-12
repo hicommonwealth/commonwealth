@@ -25,12 +25,11 @@ $discussion-row-color: #999;
     .discussion-content {
         position: relative;
         flex: 1;
+        .discussion-tags {
+            margin-bottom: 6px;
+        }
         .discussion-title {
             margin-bottom: 4px;
-            .discussion-edit-tags {
-                position: absolute;
-                right: -7px;
-            }
             a {
                 color: #111;
                 font-size: 19px;
@@ -59,28 +58,20 @@ $discussion-row-color: #999;
 
     // content left
     .discussion-meta {
-        display: flex;
         color: $discussion-row-color;
         font-size: 14px;
-        .discussion-meta-left {
-            flex: 1;
-            text-align: left;
-            .User a {
-                display: inline-block;
-                text-decoration: none;
-                color: $discussion-row-color;
-                &:hover {
-                    color: darken($discussion-row-color, 8%);
-                    text-decoration: underline;
-                }
-            }
-            .discussion-last-updated {
-                display: inline;
-                margin-left: 12px;
+        .User a {
+            display: inline-block;
+            text-decoration: none;
+            color: $discussion-row-color;
+            &:hover {
+                color: darken($discussion-row-color, 8%);
+                text-decoration: underline;
             }
         }
-        .discussion-meta-right {
-            text-align: right;
+        .discussion-last-updated {
+            display: inline;
+            margin-left: 12px;
         }
         a.discussion-created, a.discussion-replies {
             text-decoration: none;
