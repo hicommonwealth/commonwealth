@@ -9,7 +9,7 @@ import ValidatorRow from './validator_row';
 import RecentBlock from './recent_block';
 
 const model = {
-  perPage: 10,
+  perPage: 20,
   currentPage: 1,
   currentTab: 'current',
   show: true,
