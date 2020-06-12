@@ -127,8 +127,8 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
       : m('span', [ actorName, ` and ${length} others mentioned you in `, m('span.commented-obj', decoded_title || community_name) ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
-      ? m('span', [ actorName, ` and ${length} others reacted to your post `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others reacted to your post in `, m('span.commented-obj', decoded_title || community_name) ]);
+      ? m('span', [ actorName, ` and ${length} others reacted 👍 to your post `, m('span.commented-obj', decoded_title) ])
+      : m('span', [ actorName, ` and ${length} others reacted 👍 to your post in `, m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
