@@ -47,7 +47,7 @@ html {
 }
 
 //
-// typographical styles
+// typography
 //
 
 h1, h2, h3, h4, h5, h6 {
@@ -57,10 +57,14 @@ strong {
     font-weight: 700;
 }
 a {
-    color: #111;
+    color: $theme-accent-dark;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 a:visited {
-    color: #777;
+    color: lighten($theme-accent-dark, 4%);
 }
 ul,
 ol {

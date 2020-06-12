@@ -196,7 +196,7 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
               noopener: 'noopener',
             }, `${child.insert}`);
           } else {
-            result = m('span', `${child.insert} `);
+            result = m('span', `${child.insert}`);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if ((k !== 'color' && k !== 'background') && v !== true) return;
