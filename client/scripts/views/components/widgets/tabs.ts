@@ -24,7 +24,13 @@ const Tabs = {
             class: (vnode.state.selectedIndex === index ? 'active' : '')
               + (vnode.children[index].disabled ? ' disabled' : ''),
             href: '#',
-            onclick: ((i, e) => { e.preventDefault(); vnode.state.selectedIndex = i; }).bind(this, index)
+            onclick: ((i, e) => {
+              e.preventDefault();
+              vnode.state.selectedIndex = i;
+              if (typeof vnode.children[vnode.state.selectedIndex].callback === 'function') {
+                vnode.children[vnode.state.selectedIndex].callback(i);
+              }
+            }).bind(this, index)
           }, name);
         }),
         m('.clear'),
