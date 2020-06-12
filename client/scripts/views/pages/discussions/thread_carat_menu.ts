@@ -106,7 +106,7 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { isOpen: boolean }> =
       m(PopoverMenu, {
         transitionDuration: 0,
         closeOnOutsideClick: true,
-        menuAttrs: { size: 'sm' },
+        menuAttrs: {},
         content: [
           canEditThread && m(TagEditorButton, {
             popoverMenu: true,
