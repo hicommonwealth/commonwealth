@@ -69,7 +69,6 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
               : 'Amount'),
           ]),
           vnode.attrs.nominators.map((n) => {
-            console.log('nominators', n);
             return m('tr', [
               m('td', m(User, {
                 user: app.chain.accounts.get(n.stash),
