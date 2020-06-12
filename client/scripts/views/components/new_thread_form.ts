@@ -291,27 +291,25 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 : '')
             ],
             onclick: async () => {
+              const { fromDraft, quillEditorState } = vnode.state; 
+              const quill = quillEditorState.editor;
               let confirmed = true;
-              if (vnode.state.fromDraft) {
-                const formBodyDelta = vnode.state.quillEditorState.editor.getContents().ops[0];
-                const discardedDraftDelta = JSON.parse(app.login.discussionDrafts
-                  .filter((d) => d.id === vnode.state.fromDraft)[0].body).ops;
+              if (fromDraft) {
+                // Todo: Add markdown mode
+                const formBodyDelta = JSON.stringify(quill.getContents().ops[0]);
+                const discardedDraftDelta = JSON.stringify(JSON.parse(app.login.discussionDrafts
+                  .filter((d) => d.id === fromDraft)[0].body).ops[0]);
                 if (formBodyDelta !== discardedDraftDelta) {
                   confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
                 }
-              } else {
-                const formBodyText = vnode.state.quillEditorState.markdownMode
-                  ? vnode.state.quillEditorState.editor.getText()
-                  : vnode.state.quillEditorState.editor.getContents().ops;
-                if (!(formBodyText.length === 1 && formBodyText[0].insert === '\n')) {
-                  confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
-                }
+              } else if (quill.getLength()) {
+                confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
               }
               if (!confirmed) return;
               if (body) {
                 try {
                   const doc = JSON.parse(body);
-                  vnode.state.quillEditorState.editor.setContents(doc);
+                  quill.setContents(doc);
                 } catch (e) {
                   // TODO: figure out Markdown strategy
                   // const doc = body;
