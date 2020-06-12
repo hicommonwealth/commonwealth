@@ -282,6 +282,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
             }
           }
           return m(ListItem, {
+            allowOnContentClick: true,
             contentLeft: [
               m('.discussion-draft-title', draft.title || 'Untitled'),
               m('.discussion-draft-body', draft.body.length
@@ -304,7 +305,8 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
               vnode.state.activeTag = draft.tag;
               vnode.state.fromDraft = draft.id;
               m.redraw();
-            }
+            },
+            selected: vnode.state.fromDraft === draft.id
           });
         }))
       ])

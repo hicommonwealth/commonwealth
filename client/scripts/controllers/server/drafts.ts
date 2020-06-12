@@ -66,24 +66,21 @@ class DraftsController {
   }
 
   public async edit(
-    draft: DiscussionDraft,
+    draftId: number,
     title?: string,
     body?: string,
     tagName?: string,
     attachments?: string[],
   ) {
-    const newBody = body || draft.body;
-    const newTitle = title || draft.title;
-    const newTag = tagName || draft.tag;
     // Todo: handle attachments
     try {
       const response = await $.ajax(`${app.serverUrl()}/editDraft`, {
         type: 'PATCH',
         data: {
-          'id': draft.id,
-          'body': newBody,
-          'title': newTitle,
-          'tag': newTag,
+          'id': draftId,
+          'body': body,
+          'title': title,
+          'tag': tagName,
           'attachments[]': attachments,
           'jwt': app.login.jwt
         }
