@@ -60,11 +60,9 @@ const CommunitySidebar: m.Component<{ activeTag?: string }> = {
       activeTag && [
         m('h4', `About #${activeTag}`),
         m('p', app.tags.store.getByName(activeTag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-        m('br'),
       ],
       m('h4', `About ${communityName}`),
       m('p', communityDescription),
-      m('br'),
       m('h4', 'Admins & Mods'),
       (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
         return m('.community-admin', [
