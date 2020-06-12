@@ -45,8 +45,6 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
   }),
   view: (vnode) => {
     const { query } = vnode.state.dynamic;
-    if (!query)
-      return null;
     const nominations = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.nominations
       : {};
@@ -57,18 +55,16 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
     return m('tr.ValidatorRow', [
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-nominations', [
-        nominatorsList.length > 0 && [
-          m('a.val-nominators', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              app.modals.create({
-                modal: ViewNominatorsModal,
-                data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash, waiting: true }
-              });
-            }
-          }, pluralize(nominatorsList.length, 'Nomination')),
-        ]
+        m('a.val-nominators', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: ViewNominatorsModal,
+              data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash, waiting: true }
+            });
+          }
+        }, pluralize(nominatorsList.length, 'Nomination')),
       ]),
       m('td.val-commission', stakingInfo?.commission || ' '),
       m(ImOnline, {
