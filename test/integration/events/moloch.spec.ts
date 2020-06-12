@@ -180,6 +180,11 @@ describe('Moloch Event Integration Tests', () => {
 
     // wait another 10 seconds to finish voting/grace periods
     provider.send('evm_increaseTime', [10]);
+
+    const proposalPreprocess = await (api as Moloch1).proposalQueue(0);
+    assert.equal(proposalPreprocess.processed, false);
+    assert.equal(proposalPreprocess.didPass, false);
+
     await api.processProposal(0);
     await new Promise((resolve) => {
       handler.emitter.on(
@@ -198,11 +203,89 @@ describe('Moloch Event Integration Tests', () => {
         }
       );
     });
+
+    // verify contract storage
+    const proposal = await (api as Moloch1).proposalQueue(0);
+    assert.equal(proposal.processed, true);
+    assert.equal(proposal.didPass, true);
+    assert.equal(+proposal.yesVotes, 1);
+    assert.equal(+proposal.noVotes, 0);
+
     const applicantMember = await api.members(applicant);
     assert.equal(applicantMember.exists, true);
     assert.equal(+applicantMember.shares, 5);
     assert.equal(+applicantMember.highestIndexYesVote, 0);
     assert.equal(applicantMember.delegateKey, applicant);
+  });
+
+  it('should abort moloch1 proposal', async () => {
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant ] = addresses;
+    await submitProposal(provider, api, token, member, applicant);
+
+    // wait 2 seconds to enter abort window
+    provider.send('evm_increaseTime', [2]);
+
+    // get applicant provider to abort with
+    const appSigner = provider.getSigner(applicant);
+    const appMoloch = Moloch1Factory.connect(api.address, appSigner);
+    await appMoloch.deployed();
+    await appMoloch.abort(0);
+
+    await new Promise((resolve) => {
+      handler.emitter.on(
+        MolochEventKind.Abort.toString(),
+        (evt: CWEvent<IMolochEventData>) => {
+          assert.deepEqual(evt.data, {
+            kind: MolochEventKind.Abort,
+            proposalIndex: 0,
+            applicant,
+          });
+          resolve();
+        }
+      );
+    });
+
+    // verify contract storage
+    const proposal = await (api as Moloch1).proposalQueue(0);
+    assert.equal(proposal.aborted, true);
+  });
+
+  it('should ragequit moloch1 member', async () => {
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant ] = addresses;
+    await submitProposal(provider, api, token, member, applicant);
+
+    // wait 2 seconds to enter voting period
+    provider.send('evm_increaseTime', [2]);
+    await api.submitVote(0, 1);
+
+    // wait another 10 seconds to finish voting/grace periods
+    provider.send('evm_increaseTime', [10]);
+    await api.processProposal(0);
+
+    // now that member is processed, have them ragequit
+    const appSigner = provider.getSigner(applicant);
+    const appMoloch = Moloch1Factory.connect(api.address, appSigner);
+    await appMoloch.deployed();
+    await appMoloch.ragequit(5);
+    await new Promise((resolve) => {
+      handler.emitter.on(
+        MolochEventKind.Ragequit.toString(),
+        (evt: CWEvent<IMolochEventData>) => {
+          assert.deepEqual(evt.data, {
+            kind: MolochEventKind.Ragequit,
+            member: applicant,
+            sharesToBurn: '5',
+          });
+          resolve();
+        }
+      );
+    });
+
+    const applicantMemberData = await api.members(applicant);
+    assert.equal(applicantMemberData.exists, true);
+    assert.equal(+applicantMemberData.shares, 0);
   });
 
   it('should update moloch1 delegate key', async () => {

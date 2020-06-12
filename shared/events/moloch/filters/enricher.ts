@@ -70,7 +70,6 @@ export default async function (
       const { proposalIndex, applicant, memberAddress, tokenTribute, sharesRequested, didPass } = rawData.args as any;
       return {
         blockNumber,
-        // TODO: do we exclude any addresses here?
         data: {
           kind,
           proposalIndex: hexToNumber(proposalIndex),
@@ -78,7 +77,7 @@ export default async function (
           member: memberAddress,
           tokenTribute: hexToString(tokenTribute),
           sharesRequested: hexToString(sharesRequested),
-          didPass, // TODO: do we need to unmarshal this boolean?
+          didPass,
         }
       };
     }
