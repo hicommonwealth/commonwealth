@@ -2,14 +2,14 @@ import m from 'mithril';
 import { Icons, Icon } from 'construct-ui';
 import { u32 } from '@polkadot/types';
 
-interface IValidatorAttrs {
+interface ImOnlineAttrs {
   toBeElected: Boolean;
   hasMessage: Boolean;
   isOnline: Boolean;
   blockCount: u32;
 }
 
-const CardSummary: m.Component<IValidatorAttrs, {}> = {
+const ImOnline: m.Component<ImOnlineAttrs, {}> = {
   view: (vnode) => {
     return m('td.val-im-online',
       m('span.im-online-icons', [
@@ -25,4 +25,4 @@ const CardSummary: m.Component<IValidatorAttrs, {}> = {
   },
 };
 
-export default CardSummary;
+export default ImOnline;
