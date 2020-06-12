@@ -16,8 +16,7 @@ function getProvider(): providers.Web3Provider {
   const web3Provider = require('ganache-cli').provider({
     allowUnlimitedContractSize: true,
     gasLimit: 1000000000,
-    debug: true,
-    vmErrorsOnRPCResponse: false,
+    // logger: console,
   });
   return new providers.Web3Provider(web3Provider);
 }
@@ -33,12 +32,12 @@ async function deployMoloch1(signer, summoner, tokenAddress): Promise<Moloch1> {
   const moloch1 = await factory.deploy(
     summoner,
     tokenAddress,
-    17280, // _periodDuration
-    35, // _votingPeriodLength
-    35, // _gracePeriodLength
-    12, // _abortWindow
+    2, // _periodDuration: 2 second
+    2, // _votingPeriodLength: 4 seconds
+    2, // _gracePeriodLength: 4 seconds
+    1, // _abortWindow: 2 seconds
     5, // _proposalDeposit
-    3, // _diluationBound
+    100, // _diluationBound
     5, // _processingReward
   );
   return moloch1;
@@ -46,27 +45,69 @@ async function deployMoloch1(signer, summoner, tokenAddress): Promise<Moloch1> {
 
 class MolochEventHandler extends IEventHandler {
   constructor(
-    private readonly _emitter: EventEmitter,
+    public readonly emitter: EventEmitter,
   ) {
     super();
   }
 
   public async handle(event: CWEvent<IMolochEventData>): Promise<any> {
-    this._emitter.emit(event.data.kind.toString(), event);
+    this.emitter.emit(event.data.kind.toString(), event);
   }
+}
+
+interface ISetupData {
+  api: MolochApi;
+  token: Token;
+  addresses: string[];
+  provider: providers.Web3Provider;
+  handler: MolochEventHandler;
+}
+
+async function setupSubscription(): Promise<ISetupData> {
+  const provider = getProvider();
+  const addresses: string[] = await provider.listAccounts();
+  const [ member ] = addresses;
+  const signer = provider.getSigner(member);
+  const token = await deployToken(signer);
+  const api: MolochApi = await deployMoloch1(signer, member, token.address);
+  const emitter = new EventEmitter();
+  const handler = new MolochEventHandler(emitter);
+  await subscribeMolochEvents('test', api, 1, [ handler ], true);
+  return { api, token, addresses, provider, handler };
+}
+
+async function submitProposal(
+  provider: providers.Web3Provider,
+  api: MolochApi,
+  token: Token,
+  member: string,
+  applicant: string
+): Promise<void> {
+  await token.transfer(applicant, 10);
+  await token.approve(api.address, 5);
+
+  const appSigner = provider.getSigner(applicant);
+  const appToken = TokenFactory.connect(token.address, appSigner);
+  await appToken.deployed();
+  await appToken.approve(api.address, 5);
+
+  const summonerBalance = await token.balanceOf(member);
+  const applicantBalance = await token.balanceOf(applicant);
+  const summonerAllowance = await token.allowance(member, api.address);
+  const applicantAllowance = await token.allowance(applicant, api.address);
+  assert.isAtLeast(+summonerBalance, 5);
+  assert.isAtLeast(+applicantBalance, 5);
+  assert.isAtLeast(+summonerAllowance, 5);
+  assert.isAtLeast(+applicantAllowance, 5);
+
+  await (api as Moloch1).submitProposal(applicant, 5, 5, 'hello');
 }
 
 describe('Moloch Event Integration Tests', () => {
   it('should summon moloch1', async () => {
-    const provider = getProvider();
-    const addresses = await provider.listAccounts();
-    const signer = provider.getSigner(addresses[0]);
-    const api: MolochApi = await deployMoloch1(signer, addresses[0], addresses[0]);
-    const emitter = new EventEmitter();
-    const handlers = [ new MolochEventHandler(emitter) ];
-    await subscribeMolochEvents('test', api, 1, handlers, true);
+    const { addresses, handler } = await setupSubscription();
     await new Promise((resolve) => {
-      emitter.on(
+      handler.emitter.on(
         MolochEventKind.SummonComplete.toString(),
         (evt: CWEvent<IMolochEventData>) => {
           assert.deepEqual(evt.data, {
@@ -81,43 +122,19 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should create moloch1 proposal', async () => {
-    const provider = getProvider();
-    const addresses: string[] = await provider.listAccounts();
-    const signer = provider.getSigner(addresses[0]);
-    const token = await deployToken(signer);
-    const api: MolochApi = await deployMoloch1(signer, addresses[0], token.address);
-    const emitter = new EventEmitter();
-    const handlers = [ new MolochEventHandler(emitter) ];
-    await subscribeMolochEvents('test', api, 1, handlers, true);
-
-    await token.transfer(addresses[1], 10);
-    await token.approve(api.address, 5);
-
-    const appSigner = provider.getSigner(addresses[1]);
-    const appToken = TokenFactory.connect(token.address, appSigner);
-    await appToken.deployed();
-    await appToken.approve(api.address, 5);
-
-    const summonerBalance = await token.balanceOf(addresses[0]);
-    const applicantBalance = await token.balanceOf(addresses[1]);
-    const summonerAllowance = await token.allowance(addresses[0], api.address);
-    const applicantAllowance = await token.allowance(addresses[1], api.address);
-    assert.isAtLeast(+summonerBalance, 5);
-    assert.isAtLeast(+applicantBalance, 5);
-    assert.isAtLeast(+summonerAllowance, 5);
-    assert.isAtLeast(+applicantAllowance, 5);
-
-    await (api as Moloch1).submitProposal(addresses[1], 5, 5, 'hello');
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant ] = addresses;
+    await submitProposal(provider, api, token, member, applicant);
     await new Promise((resolve) => {
-      emitter.on(
+      handler.emitter.on(
         MolochEventKind.SubmitProposal.toString(),
         (evt: CWEvent<IMolochEventData>) => {
           assert.deepEqual(evt.data, {
             kind: MolochEventKind.SubmitProposal,
             proposalIndex: 0,
-            member: addresses[0],
-            delegateKey: addresses[0],
-            applicant: addresses[1],
+            member,
+            delegateKey: member,
+            applicant,
             tokenTribute: '0x05',
             sharesRequested: '0x05',
           });
@@ -127,23 +144,44 @@ describe('Moloch Event Integration Tests', () => {
     });
   });
 
+  it('should create moloch1 vote', async () => {
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant ] = addresses;
+    await submitProposal(provider, api, token, member, applicant);
+
+    // wait 2 seconds to enter voting period
+    provider.send('evm_increaseTime', [2]);
+    await api.submitVote(0, 1);
+    await new Promise((resolve) => {
+      handler.emitter.on(
+        MolochEventKind.SubmitVote.toString(),
+        (evt: CWEvent<IMolochEventData>) => {
+          assert.deepEqual(evt.data, {
+            kind: MolochEventKind.SubmitVote,
+            proposalIndex: 0,
+            member,
+            delegateKey: member,
+            vote: 1,
+          });
+          resolve();
+        }
+      );
+    });
+  });
+
   it('should update moloch1 delegate key', async () => {
-    const provider = getProvider();
-    const addresses = await provider.listAccounts();
-    const signer = provider.getSigner(addresses[0]);
-    const api: MolochApi = await deployMoloch1(signer, addresses[0], addresses[0]);
-    const emitter = new EventEmitter();
-    const handlers = [ new MolochEventHandler(emitter) ];
-    await subscribeMolochEvents('test', api, 1, handlers, true);
+    const { addresses, handler, api } = await setupSubscription();
+    const [ member, newDelegateKey ] = addresses;
+
     await api.updateDelegateKey(addresses[1]);
     await new Promise((resolve) => {
-      emitter.on(
+      handler.emitter.on(
         MolochEventKind.UpdateDelegateKey.toString(),
         (evt: CWEvent<IMolochEventData>) => {
           assert.deepEqual(evt.data, {
             kind: MolochEventKind.UpdateDelegateKey,
-            member: addresses[0],
-            newDelegateKey: addresses[1],
+            member,
+            newDelegateKey,
           });
           resolve();
         }

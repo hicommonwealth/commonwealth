@@ -61,8 +61,7 @@ export default async function (
           proposalIndex: hexToNumber(proposalIndex),
           delegateKey,
           member: memberAddress,
-          // TODO: will the vote be in hex?
-          vote: hexToNumber(uintVote),
+          vote: uintVote,
         }
       };
     }
