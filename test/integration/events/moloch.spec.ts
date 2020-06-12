@@ -113,7 +113,7 @@ describe('Moloch Event Integration Tests', () => {
           assert.deepEqual(evt.data, {
             kind: MolochEventKind.SummonComplete,
             summoner: addresses[0],
-            shares: '0x01',
+            shares: '1',
           });
           resolve();
         }
@@ -135,8 +135,8 @@ describe('Moloch Event Integration Tests', () => {
             member,
             delegateKey: member,
             applicant,
-            tokenTribute: '0x05',
-            sharesRequested: '0x05',
+            tokenTribute: '5',
+            sharesRequested: '5',
           });
           resolve();
         }
@@ -167,6 +167,42 @@ describe('Moloch Event Integration Tests', () => {
         }
       );
     });
+  });
+
+  it('should process moloch1 proposal', async () => {
+    const { addresses, handler, api, token, provider } = await setupSubscription();
+    const [ member, applicant ] = addresses;
+    await submitProposal(provider, api, token, member, applicant);
+
+    // wait 2 seconds to enter voting period
+    provider.send('evm_increaseTime', [2]);
+    await api.submitVote(0, 1);
+
+    // wait another 10 seconds to finish voting/grace periods
+    provider.send('evm_increaseTime', [10]);
+    await api.processProposal(0);
+    await new Promise((resolve) => {
+      handler.emitter.on(
+        MolochEventKind.ProcessProposal.toString(),
+        (evt: CWEvent<IMolochEventData>) => {
+          assert.deepEqual(evt.data, {
+            kind: MolochEventKind.ProcessProposal,
+            proposalIndex: 0,
+            member,
+            applicant,
+            tokenTribute: '5',
+            sharesRequested: '5',
+            didPass: true,
+          });
+          resolve();
+        }
+      );
+    });
+    const applicantMember = await api.members(applicant);
+    assert.equal(applicantMember.exists, true);
+    assert.equal(+applicantMember.shares, 5);
+    assert.equal(+applicantMember.highestIndexYesVote, 0);
+    assert.equal(applicantMember.delegateKey, applicant);
   });
 
   it('should update moloch1 delegate key', async () => {

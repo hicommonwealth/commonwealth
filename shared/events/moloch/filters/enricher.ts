@@ -1,15 +1,16 @@
+import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
 import { CWEvent } from '../../interfaces';
 import { MolochEventKind, MolochRawEvent, IMolochEventData, MolochApi } from '../types';
 import { Moloch1 } from '../../../../eth/types/Moloch1';
 
 // these functions unwrap the uint type received from chain,
 // which is an object like { _hex: <value> }, into a string/number
-function hexToString({ _hex: n }): string {
-  return n;
+function hexToString({ _hex: n }: { _hex: string }): string {
+  return hexToNumberString(n);
 }
 
-function hexToNumber({ _hex: n }) {
-  return parseInt(n, 16);
+function hexToNumber({ _hex: n }: { _hex: string }): number {
+  return web3HexToNumber(n);
 }
 
 /**
