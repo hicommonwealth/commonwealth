@@ -54,7 +54,7 @@ $active-color: #ececec;
 }
 
 .Sidebar {
-    .cui-list {
+    > .cui-list {
         // reset list styles
         overflow-x: hidden;
         max-height: 100%;
@@ -75,8 +75,7 @@ $active-color: #ececec;
             letter-spacing: 0.15px;
             border: none;
         }
-        > .cui-list-item,
-        .TagSelector > .cui-list > .cui-list-item {
+        .cui-list-item {
             color: #111;
             font-size: 15px;
             border: none;
@@ -108,6 +107,22 @@ $active-color: #ececec;
                 position: relative;
                 top: -2px;
             }
+        }
+        .cui-list.more-tags-list {
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding: 10px 0;
+            max-height: 230px;
+            margin-bottom: -10px;
+        }
+        .cui-list-item.more-tags-toggle {
+            display: block;
+            color: #888;
+            border-top: 1px solid #eee;
+            width: 100%;
+            padding: 10px 15px;
+            margin-top: 10px;
+            margin-bottom: -10px;
         }
     }
 }
