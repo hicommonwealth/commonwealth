@@ -107,8 +107,16 @@
                 color: #fff !important;
             }
         }
+        .community-star-toggle .cui-icon svg {
+            stroke: lighten(#546e7b, 40%);
+        }
+        $star-color: #ecbc00;
+        .community-star-toggle .cui-icon:hover svg {
+            stroke: $star-color;
+        }
         &.starred .community-star-toggle .cui-icon svg {
-            fill: currentColor;
+            stroke: $star-color;
+            fill: $star-color;
         }
     }
 }
