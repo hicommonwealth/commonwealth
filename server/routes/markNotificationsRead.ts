@@ -8,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NotLoggedIn: 'Not lgoged in',
   NoNotificationIds: 'Must specify notification ids',
-  NotifWrongOwner: 'Notification not woned by user',
+  WrongOwner: 'Notification not woned by user',
 };
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +32,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
-    return next(new Error(Errors.NotifWrongOwner));
+    return next(new Error(Errors.WrongOwner));
   }
 
   // TODO: transactionalize this

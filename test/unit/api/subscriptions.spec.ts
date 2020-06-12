@@ -10,6 +10,7 @@ import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import Errors from '../../../server/routes/subscription/errors';
+import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -165,12 +166,14 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
       res = await chai.request(app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: newJWT, 'subscription_ids[]': [subscription.id] });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NotUsersSubscription);
     });
 
     it('should fail to enable and disable subscription when no subscriptions are passed to route', async () => {
@@ -180,12 +183,14 @@ describe('Subscriptions Tests', () => {
         .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
       res = await chai.request(app)
         .post('/api/disableSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
   });
 
@@ -296,6 +301,7 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
       expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoSubscriptionId);
     });
 
     it('should fail to find a bad subscription id', async () => {
@@ -405,6 +411,7 @@ describe('Subscriptions Tests', () => {
           .send({ jwt: jwtToken });
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.not.be.null;
+        expect(res.body.error).to.be.equal(MarkNotifErrors.NoNotificationIds);
       });
       it('should fail when not the owner of the notification', async () => {
         expect(notifications).to.not.be.null;
@@ -417,6 +424,7 @@ describe('Subscriptions Tests', () => {
           .send({ jwt: newJwt, 'notification_ids[]': notification_ids });
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.not.be.null;
+        expect(res.body.error).to.be.equal(MarkNotifErrors.WrongOwner);
       });
     });
 
