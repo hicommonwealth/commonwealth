@@ -293,13 +293,10 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
             onclick: async () => {
               let confirmed = true;
               if (vnode.state.fromDraft) {
-                const formBodyText = vnode.state.quillEditorState.markdownMode
-                  ? vnode.state.quillEditorState.editor.getText()
-                  : vnode.state.quillEditorState.editor.getContents().ops;
-                const draftText = JSON.parse(app.login.discussionDrafts
-                  .filter((d) => d.id === vnode.state.fromDraft)[0].body);
-                debugger
-                if (formBodyText !== draftTExt) {
+                const formBodyDelta = vnode.state.quillEditorState.editor.getContents().ops[0];
+                const discardedDraftDelta = JSON.parse(app.login.discussionDrafts
+                  .filter((d) => d.id === vnode.state.fromDraft)[0].body).ops;
+                if (formBodyDelta !== discardedDraftDelta) {
                   confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
                 }
               } else {
