@@ -25,9 +25,9 @@ const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: A
           m('.comment-text', (() => {
             try {
               const doc = JSON.parse(comment.text);
-              return m(QuillFormattedText, { doc, collapsed: true });
+              return m(QuillFormattedText, { doc, collapseAndHideFormatting: true });
             } catch (e) {
-              return m(MarkdownFormattedText, { doc: comment.text, collapsed: true });
+              return m(MarkdownFormattedText, { doc: comment.text, collapseAndHideFormatting: true });
             }
           })()),
         ])),

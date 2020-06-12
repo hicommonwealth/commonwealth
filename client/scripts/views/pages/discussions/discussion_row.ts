@@ -88,10 +88,10 @@ const DiscussionRow: m.Component<IAttrs> = {
                 const body = (proposal as OffchainThread).body;
                 try {
                   const doc = JSON.parse(body);
-                  doc.ops = doc.ops.slice(0, 3);
+                  doc.ops = doc.ops.slice(0, 5);
                   return m(QuillFormattedText, { doc, hideFormatting: true });
                 } catch (e) {
-                  return m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+                  return m(MarkdownFormattedText, { doc: body.slice(0, 400), hideFormatting: true });
                 }
               })(),
             ]),

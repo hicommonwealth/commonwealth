@@ -6,4 +6,5 @@
     line-height: 1.45;
     @include formatted-text();
     @include collapsible();
+    @include hidden-formatting();
 }

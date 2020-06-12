@@ -219,9 +219,22 @@
     }
 }
 
+@mixin hidden-formatting {
+    p.hidden-formatting {
+        margin: 6px 0;
+        &:first-child {
+            margin-top: 0;
+        }
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
 .QuillFormattedText {
     position: relative;
     line-height: 1.45;
     @include formatted-text();
     @include collapsible();
+    @include hidden-formatting();
 }

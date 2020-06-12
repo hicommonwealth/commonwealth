@@ -201,21 +201,13 @@ function applyBlockFormatters(parentText, hideFormatting) {
   });
 }
 
-interface IAttrs {
-  doc: string;
-  hideFormatting?: boolean;
-  collapsed?: boolean;
-}
-
-interface IState {
-  suppressFadeout: boolean;
-}
-
-const MarkdownFormattedText : m.Component<IAttrs, IState> = {
+const MarkdownFormattedText : m.Component<{
+  doc: string,  hideFormatting?: boolean, collapseAndHideFormatting?: boolean
+}, { suppressFadeout: boolean }> = {
   view: (vnode) => {
-    const doc = `${vnode.attrs.doc}`;
-    const hideFormatting = vnode.attrs.hideFormatting;
+    const { doc, hideFormatting, collapseAndHideFormatting } = vnode.attrs;
     if (!doc) return;
+
     const results = [];
     const codeBlockRegex = /```((?:.|\n)*?)```/gm;
     let lastMatchEndingIndex = 0;
@@ -235,7 +227,7 @@ const MarkdownFormattedText : m.Component<IAttrs, IState> = {
     }
     results.push(applyBlockFormatters(doc.slice(lastMatchEndingIndex), hideFormatting));
     return m('.MarkdownFormattedText', {
-      class: (vnode.attrs.collapsed ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
+      class: (collapseAndHideFormatting ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
       oncreate: (vnode2) => {
         const height = $(vnode2.dom).height();
         vnode.state.suppressFadeout = height < 120;
