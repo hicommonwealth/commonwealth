@@ -33,6 +33,40 @@ interface IThreadForm {
   title?: string;
 }
 
+export const populateDraft = async (state, draft) => {
+  const { fromDraft, quillEditorState } = state;
+  const { body, title, tag, id } = draft;
+  const quill = quillEditorState.editor;
+  let confirmed = true;
+  if (fromDraft) {
+    // TODO: Add markdown check for formBodyDelta
+    // TODO: Better naming to distinguish text from Deltas (throughout form?)
+    const formBodyDelta = JSON.stringify(quill.getContents().ops[0]);
+    const discardedDraftDelta = JSON.stringify(JSON.parse(app.login.discussionDrafts
+      .filter((d) => d.id === fromDraft)[0].body).ops[0]);
+    if (formBodyDelta !== discardedDraftDelta) {
+      confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+    }
+  } else if (quill.getLength() > 1) {
+    confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
+  }
+  if (!confirmed) return;
+  if (body) {
+    try {
+      const doc = JSON.parse(body);
+      quill.setContents(doc);
+    } catch (e) {
+      // TODO: figure out Markdown strategy
+    }
+  }
+  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+  (titleInput as HTMLInputElement).value = draft.title;
+  state.form.title = draft.title;
+  state.activeTag = draft.tag;
+  state.fromDraft = draft.id;
+  m.redraw();
+};
+
 export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
   view: (vnode: VnodeDOM<{ header: boolean }, IState>) => {
     const author = app.vm.activeAccount;
@@ -290,38 +324,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 ? bodyComponent
                 : '')
             ],
-            onclick: async () => {
-              const { fromDraft, quillEditorState } = vnode.state; 
-              const quill = quillEditorState.editor;
-              let confirmed = true;
-              if (fromDraft) {
-                // Todo: Add markdown mode
-                const formBodyDelta = JSON.stringify(quill.getContents().ops[0]);
-                const discardedDraftDelta = JSON.stringify(JSON.parse(app.login.discussionDrafts
-                  .filter((d) => d.id === fromDraft)[0].body).ops[0]);
-                if (formBodyDelta !== discardedDraftDelta) {
-                  confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
-                }
-              } else if (quill.getLength()) {
-                confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
-              }
-              if (!confirmed) return;
-              if (body) {
-                try {
-                  const doc = JSON.parse(body);
-                  quill.setContents(doc);
-                } catch (e) {
-                  // TODO: figure out Markdown strategy
-                  // const doc = body;
-                }
-              }
-              const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
-              (titleInput as HTMLInputElement).value = draft.title;
-              vnode.state.form.title = draft.title;
-              vnode.state.activeTag = draft.tag;
-              vnode.state.fromDraft = draft.id;
-              m.redraw();
-            },
+            onclick: () => populateDraft(vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
           });
         }))
