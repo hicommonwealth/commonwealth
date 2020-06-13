@@ -12,7 +12,8 @@ import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints, Nominations } from '@polkadot/types/interfaces';
 import { InterfaceTypes, Codec } from '@polkadot/types/types';
 import { DeriveStakingValidators, DeriveStakingQuery,
-  DeriveSessionProgress, DeriveAccountInfo, DeriveHeartbeatAuthor } from '@polkadot/api-derive/types';
+  DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
+  DeriveHeartbeatAuthor } from '@polkadot/api-derive/types';
 import { IValidators } from './account';
 import SubstrateChain from './shared';
 
@@ -21,6 +22,18 @@ const MAX_HEADERS = 50;
 interface iInfo {
   stash: string;
   balance: number;
+}
+
+export interface IAccountInfo extends DeriveAccountRegistration{
+  name: string;
+  isBad: boolean;
+  isErroneous: boolean;
+  isExistent: boolean;
+  isGood: boolean;
+  isKnownGood: boolean;
+  isLowQuality: boolean;
+  isReasonable: boolean;
+  waitCount: number;
 }
 
 function extractNominators(nominations: [StorageKey, Option<Nominations>][]): Record<string, iInfo[]> {
@@ -79,6 +92,38 @@ class SubstrateStaking implements StorageModule {
   }
   public get sessionInfo(): Observable<DeriveSessionProgress> {
     return this._Chain.query((api: ApiRx) => api.derive.session.progress());
+  }
+  public info(address: string): Observable<IAccountInfo> {
+    return this._Chain.query(
+      (api: ApiRx) => api.derive.accounts.info(address)
+    ).pipe(map((accountInfo: DeriveAccountInfo) => {
+      let info: IAccountInfo;
+      const { accountIndex: anAccountIndex, identity, nickname } = accountInfo || {};
+      const name = identity?.display
+        ? identity?.display
+        : nickname;
+      if (identity) {
+        const judgements = identity.judgements.filter(([, judgement]) => !judgement.isFeePaid);
+        const isKnownGood = judgements.some(([, judgement]) => judgement.isKnownGood);
+        const isReasonable = judgements.some(([, judgement]) => judgement.isReasonable);
+        const isErroneous = judgements.some(([, judgement]) => judgement.isErroneous);
+        const isLowQuality = judgements.some(([, judgement]) => judgement.isLowQuality);
+        info = {
+          name,
+          ...identity,
+          isBad: isErroneous || isLowQuality,
+          isErroneous,
+          isExistent: !!identity.display,
+          isGood: isKnownGood || isReasonable,
+          isKnownGood,
+          isLowQuality,
+          isReasonable,
+          waitCount: identity.judgements.length - judgements.length
+        };
+      }
+      info.name = name || '';
+      return info;
+    }));
   }
   public get validators(): Observable<IValidators> {
     return this._Chain.api.pipe(
@@ -177,9 +222,6 @@ class SubstrateStaking implements StorageModule {
         return result;
       }),
     );
-  }
-  public info(address: string): Observable<DeriveAccountInfo> {
-    return this._Chain.query((api: ApiRx) => api.derive.accounts.info(address));
   }
   public query(address: string): Observable<DeriveStakingQuery> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));

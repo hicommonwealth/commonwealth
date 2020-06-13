@@ -1,21 +1,24 @@
 import m from 'mithril';
 import app from 'state';
 import BN from 'bn.js';
+import { Tooltip } from 'construct-ui';
 import { ChainBase } from 'models';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
-import { DeriveStakingQuery, DeriveAccountInfo } from '@polkadot/api-derive/types';
+import { IAccountInfo } from 'controllers/chain/substrate/staking';
+import { DeriveStakingQuery } from '@polkadot/api-derive/types';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
 import ImOnline from './im_online';
+import Identity from './identity';
 
 const PERBILL_PERCENT = 10_000_000;
 
 export interface IValidatorState {
   dynamic: {
-    info: DeriveAccountInfo;
+    info: IAccountInfo;
     query: DeriveStakingQuery;
     byAuthor: Record<string, string>;
   },
@@ -66,10 +69,13 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     // info: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.info(attrs.stash) : null,
     query: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.query(attrs.stash)
+      : null,
+    info: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.info(attrs.stash)
       : null
   }),
   view: (vnode) => {
-    const { query } = vnode.state.dynamic;
+    const { query, info } = vnode.state.dynamic;
     const byAuthor = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.byAuthor
       : {};
@@ -79,7 +85,9 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     const nominatorsList = vnode.attrs.nominators;
     return m('tr.ValidatorRow', [
       m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
-      m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
+      m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+      })),
       m('td.val-total', [
         formatCoin(app.chain.chain.coins(stakingInfo?.stakeTotal), true), ' ',
         nominatorsList.length > 0 && [ '(',

@@ -1,5 +1,6 @@
 import m from 'mithril';
 import app from 'state';
+import { Tooltip } from 'construct-ui';
 import { ChainBase } from 'models';
 import { pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
@@ -8,6 +9,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
 import { expandInfo, IValidatorState } from './validator_row';
 import ImOnline from './im_online';
+import Identity from './identity';
 
 const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
   oninit: (vnode) => {
@@ -18,10 +20,14 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
     groupKey: app.chain.class.toString(),
     query: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.query(attrs.stash)
+      : null,
+    info: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.info(attrs.stash)
       : null
   }),
   view: (vnode) => {
-    const { query } = vnode.state.dynamic;
+    const { query, info } = vnode.state.dynamic;
+
     const nominations = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.nominations
       : {};
@@ -29,8 +35,11 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
       ? expandInfo(query)
       : null;
     const nominatorsList = nominations[vnode.attrs.stash] || [];
+
     return m('tr.ValidatorRow', [
-      m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
+      m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+      })),
       m('td.val-nominations', [
         m('a.val-nominations', {
           href: '#',
