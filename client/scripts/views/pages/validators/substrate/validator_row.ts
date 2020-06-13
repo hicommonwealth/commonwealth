@@ -13,7 +13,7 @@ import ImOnline from './im_online';
 
 const PERBILL_PERCENT = 10_000_000;
 
-interface IValidatorState {
+export interface IValidatorState {
   dynamic: {
     info: DeriveAccountInfo;
     query: DeriveStakingQuery;
@@ -22,7 +22,7 @@ interface IValidatorState {
   isNominating: boolean;
 }
 
-interface StakingState {
+export interface StakingState {
   commission?: string;
   nominators: [string, Balance][];
   stakeTotal?: BN;
