@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-
       const userChainAssociations = await queryInterface.sequelize.query(`
 SELECT DISTINCT user_id, chain FROM (
   SELECT DISTINCT u.id as user_id, o.chain FROM "OffchainThreads" o
@@ -17,7 +16,8 @@ UNION ALL
   WHERE o2.community IS NULL AND o2.deleted_at IS NULL AND a2.verified IS NOT NULL
 ) t`);
 
-      const userPublicCommunityAssociations = await queryInterface.sequelize.query(`
+      const userPublicCommunityAssociations = await queryInterface.sequelize
+        .query(`
 SELECT DISTINCT user_id, community FROM (
   SELECT DISTINCT u.id as user_id, o.community FROM "OffchainThreads" o
   JOIN "Addresses" a ON a.id = o.author_id
@@ -32,7 +32,8 @@ UNION ALL
   WHERE c2."privacyEnabled" = false AND o2.deleted_at IS NULL AND a2.verified IS NOT NULL
 ) t`);
 
-      const userPrivateCommunityAssociations = await queryInterface.sequelize.query(`
+      const userPrivateCommunityAssociations = await queryInterface.sequelize
+        .query(`
 SELECT DISTINCT user_id, community FROM (
   SELECT DISTINCT u.id as user_id, o.community FROM "OffchainThreads" o
   JOIN "Addresses" a ON a.id = o.author_id
@@ -52,22 +53,45 @@ UNION ALL
 ) t`);
 
       const update = (associations) => {
-        return associations.map((obj) => Object.assign(obj, {
-          active: true,
-          created_at: new Date(),
-          updated_at: new Date(),
-        }));
-      }
+        return associations.map((obj) =>
+          Object.assign(obj, {
+            active: true,
+            created_at: new Date(),
+            updated_at: new Date(),
+          })
+        );
+      };
+      const a1 = update(userChainAssociations[0]);
+      const a2 = update(userPublicCommunityAssociations[0]);
+      const a3 = update(userPrivateCommunityAssociations[0]);
 
       return Promise.all([
-        queryInterface.bulkInsert('Memberships', update(userChainAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Memberships', update(userPublicCommunityAssociations[0]), { transaction: t }),
-        queryInterface.bulkInsert('Memberships', update(userPrivateCommunityAssociations[0]), { transaction: t }),
+        !a1.length
+          ? Promise.resolve()
+          : queryInterface.bulkInsert(
+              "Memberships",
+              update(userChainAssociations[0]),
+              { transaction: t }
+            ),
+        !a2.length
+          ? Promise.resolve()
+          : queryInterface.bulkInsert(
+              "Memberships",
+              update(userPublicCommunityAssociations[0]),
+              { transaction: t }
+            ),
+        !a3.length
+          ? Promise.resolve()
+          : queryInterface.bulkInsert(
+              "Memberships",
+              update(userPrivateCommunityAssociations[0]),
+              { transaction: t }
+            ),
       ]);
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('Memberships');
-  }
+    return queryInterface.bulkDelete("Memberships");
+  },
 };
