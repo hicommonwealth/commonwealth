@@ -92,14 +92,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             eraPoints,
             blockCount,
             hasMessage,
-            isOnline,
-            onChangeHandler: (result) => {
-              if (state.nominations.indexOf(result) === -1) {
-                state.nominations.push(result);
-              } else {
-                state.nominations = state.nominations.filter((n) => n !== result);
-              }
-            }
+            isOnline
           });
         }),
       ])
