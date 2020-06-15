@@ -438,7 +438,7 @@ describe('Thread Tests', () => {
       const readOnly = true;
       const privacy = false;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -462,7 +462,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -484,7 +484,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = false;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -509,7 +509,7 @@ describe('Thread Tests', () => {
       let readOnly = false;
       const privacy = false;
       let res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -529,7 +529,7 @@ describe('Thread Tests', () => {
       // turning on read_only
       readOnly = true;
       res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -554,7 +554,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       let privacy = false;
       let res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -574,7 +574,7 @@ describe('Thread Tests', () => {
       // failing to turn on privacy, thread.private stays false.
       privacy = true;
       res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
@@ -600,7 +600,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread_id,
@@ -623,7 +623,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': null,
@@ -648,7 +648,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread_id,
@@ -673,7 +673,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': null,
@@ -699,7 +699,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread_id,
