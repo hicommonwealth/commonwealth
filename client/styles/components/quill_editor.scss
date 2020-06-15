@@ -77,31 +77,24 @@
     }
 
     // 2. checklist styling
-    // .ql-editor ul[data-checked=true], .ql-editor ul[data-checked=false] {
-    //     pointer-events: none;
-    // }
-    // .ql-editor ul[data-checked=true] > li::before, .ql-editor ul[data-checked=false] > li::before {
-    //     cursor: pointer;
-    //     pointer-events: all;
-    //     font-family: "fontello";
-    // }
-    // .ql-editor ul[data-checked="true"] li {
-    //     text-decoration: line-through;
-    // }
-    // .ql-editor ul[data-checked=true] > li::before {
-    //     content: '\f14a';
-    //     color: #777;
-    //     position: relative;
-    //     top: 1px;
-    //     font-family: $fonts;
-    // }
-    // .ql-editor ul[data-checked=false] > li::before {
-    //     content: '\f096';
-    //     color: #b0bec5;
-    //     position: relative;
-    //     top: 1px;
-    //     font-family: $fonts;
-    // }
+    .ql-editor li[data-list=checked] .ql-ui::before,
+    .ql-editor li[data-list=unchecked] .ql-ui::before {
+        position: relative;
+        top: 1px;
+        font-family: 'fontello';
+    }
+    .ql-editor li[data-list=checked] {
+        text-decoration: line-through;
+    }
+    .ql-editor li[data-list=checked] .ql-ui::before {
+        content: '\f14a';
+        color: #444;
+        font-size: 93%;
+    }
+    .ql-editor li[data-list=unchecked] .ql-ui::before {
+        content: '\f096';
+        color: #b0bec5;
+    }
 
     // 3. ql-snow form input styles, ql-bubble styles
     .ql-container.ql-snow {
