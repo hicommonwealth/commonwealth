@@ -3,6 +3,17 @@
 @import 'client/styles/lib/quill.bubble';
 @import 'client/styles/lib/quill.snow';
 
+//
+// 1. editor typography modifications
+// 2. checklist styling
+// 3. ql-snow form input styles, ql-bubble styles
+// 4. toolbar
+// 5. toolbar (markdown mode)
+// 6. image upload spinner
+// 7. preview button
+// 8. mentions container
+//
+
 .QuillEditor {
     position: relative;
     ::selection {
@@ -10,12 +21,23 @@
         color: #333;
     }
 
+    // 1. editor typography modifications
     .ql-editor {
         font-size: 16px;
         line-height: 1.45;
         padding: 20px 18px;
     }
-
+    .ql-editor pre {
+        font-family: $monospace-fonts;
+        margin-bottom: 8px;
+        margin-top: 8px;
+        &:first-child {
+            margin-top: 2px;
+        }
+        &:last-child {
+            margin-bottom: 2px;
+        }
+    }
     .ql-editor ol,
     .ql-editor ul {
         padding-left: 1em;
@@ -54,7 +76,7 @@
         counter-increment: list-num;
     }
 
-    // Checklist styling
+    // 2. checklist styling
     // .ql-editor ul[data-checked=true], .ql-editor ul[data-checked=false] {
     //     pointer-events: none;
     // }
@@ -81,12 +103,44 @@
     //     font-family: $fonts;
     // }
 
-    .ql-snow.ql-toolbar,
-    .ql-snow .ql-toolbar {
+    // 3. ql-snow form input styles, ql-bubble styles
+    .ql-container.ql-snow {
+        border: 1px solid $form-border-color;
+        border-radius: 0 0 3px 3px;
+        // construct-ui input styles
+        color: #37474f;
+        box-shadow: 0px 1px 0px #eef1f2;
+    }
+    .ql-bubble .ql-editor {
+        padding: 1px 8px 8px 1px;
+    }
+    .ql-bubble .ql-editor blockquote {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+
+    // 4. toolbar
+    .ql-toolbar.ql-snow {
+        border: 1px solid $form-border-color;
+        border-radius: $form-border-radius $form-border-radius 0 0;
+        box-sizing: border-box;
+        padding: 5px 8px;
         white-space: nowrap;
         overflow-x: auto;
-        min-height: 40px;
+        min-height: 39px;
     }
+    .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
+        border-color: $form-border-color
+    }
+    .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+        border-color: $form-border-color
+    }
+    .ql-tooltip {
+        z-index: 9999;
+    }
+
+    // 5. toolbar markdown mode
     &.markdown-mode {
         .ql-snow.ql-toolbar button.ql-image {
             display: none;
@@ -100,23 +154,6 @@
             display: inline-block;
         }
     }
-    .ql-tooltip {
-        z-index: 9999;
-    }
-
-    // Image upload spinner
-    .spinner-wrap.img-spinner {
-        margin: 10px;
-        width: 100%;
-        text-align: center;
-        color: #999;
-        font-size: 14px;
-        .icon-spinner2.animate-spin {
-            margin: 0 4px;
-        }
-    }
-
-    // Rich Text or Markdown selector
     .type-selector {
         position: absolute;
         display: flex;
@@ -130,7 +167,19 @@
         }
     }
 
-    // Preview button
+    // 6. image upload spinner
+    .spinner-wrap.img-spinner {
+        margin: 10px;
+        width: 100%;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+        .icon-spinner2.animate-spin {
+            margin: 0 4px;
+        }
+    }
+
+    // 7. preview button
     .ql-formats > .ql-preview {
         width: initial !important;
     }
@@ -176,4 +225,74 @@
         /* Uncomment for 3D effect */
         /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
     }
+}
+
+// 8. mentions container
+.ql-mention-list-container {
+    background: white;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    z-index: 2;
+    .ql-mention-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        li {
+            padding: 5px 10px;
+            border-bottom: 1px solid #eee;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            div {
+                display: flex;
+                align-items: center;
+                width: 100%;
+            }
+            &:first-child {
+                border-radius: 4px 4px 0 0;
+            }
+            &:last-child {
+                border-radius: 0 0 4px 4px;
+            }
+        }
+        > .selected {
+            background: lighten(#08c, 48%);
+            cursor: pointer;
+        }
+        .ql-mention-text-wrap {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .ql-mention-name {
+            display: block;
+            min-width: 50px;
+            margin-right: 12px;
+        }
+        .ql-mention-addr {
+            color: #999;
+        }
+        .ql-mention-avatar {
+            height: 20px;
+            width: 20px;
+            min-height: 20px;
+            min-width: 20px;
+            margin-right: 8px;
+            border-radius: 9999px;
+            &.missing {
+                background-color: #eee;
+            }
+        }
+    }
+}
+
+// 9. progress bar
+.progress-bar {
+    height: 3px;
+    width: 80%;
+    background-color: red;
 }
