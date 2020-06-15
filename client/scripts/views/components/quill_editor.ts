@@ -2,12 +2,12 @@ import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
-import Quill from 'quill';
+import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
-import 'quill-mention';
+import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -59,6 +59,9 @@ const instantiateEditor = (
 
   // Register markdown shortcuts
   Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
+
+  // Register mentions module
+  Quill.register({ 'modules/mention': QuillMention });
 
   const insertEmbeds = (text) => {
     const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
@@ -247,12 +250,12 @@ const instantiateEditor = (
   const bindings = {
     // Don't insert hard tabs
     'tab': {
-      key: Keyboard.keys.TAB,
+      key: 'Tab',
       handler: () => true,
     },
     // Check for embeds on return
     'new line': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       shortKey: false,
       shiftKey: null,
       handler: (range, context) => {
@@ -266,7 +269,7 @@ const instantiateEditor = (
     },
     // Submit on cmd-Enter/ctrl-Enter
     'submit': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       shortKey: true,
       handler: () => {
         if (onkeyboardSubmit) {
@@ -279,7 +282,7 @@ const instantiateEditor = (
     },
     // Close headers, code blocks, and blockquotes when backspacing the start of a line
     'header backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['header'],
       offset: 0,
@@ -288,7 +291,7 @@ const instantiateEditor = (
       }
     },
     'blockquote backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['blockquote'],
       offset: 0,
@@ -297,7 +300,7 @@ const instantiateEditor = (
       }
     },
     'code backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['code-block'],
       offset: 0,
@@ -586,7 +589,7 @@ const instantiateEditor = (
     formats: hasFormats ? [
       'bold', 'italic', 'strike', 'code',
       'link', 'image', 'blockquote', 'code-block',
-      'header', 'list', 'twitter', 'video',
+      'header', 'list', 'twitter', 'video', 'mention',
     ] : [],
     theme,
   });
