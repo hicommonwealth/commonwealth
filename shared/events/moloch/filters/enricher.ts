@@ -62,6 +62,7 @@ export default async function (
     }
     case MolochEventKind.SubmitVote: {
       const { proposalIndex, delegateKey, memberAddress, uintVote } = rawData.args as any;
+      const member = await (api as Moloch1).members(memberAddress);
       return {
         blockNumber,
         excludeAddresses: [ memberAddress ],
@@ -71,11 +72,14 @@ export default async function (
           delegateKey,
           member: memberAddress,
           vote: uintVote,
+          shares: member.shares.toString(),
+          highestIndexYesVote: member.highestIndexYesVote.toString(),
         }
       };
     }
     case MolochEventKind.ProcessProposal: {
       const { proposalIndex, applicant, memberAddress, tokenTribute, sharesRequested, didPass } = rawData.args as any;
+      const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       return {
         blockNumber,
         data: {
@@ -86,6 +90,8 @@ export default async function (
           tokenTribute: hexToString(tokenTribute),
           sharesRequested: hexToString(sharesRequested),
           didPass,
+          yesVotes: proposal.yesVotes.toString(),
+          noVotes: proposal.noVotes.toString(),
         }
       };
     }

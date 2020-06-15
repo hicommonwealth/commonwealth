@@ -1,10 +1,14 @@
 import BN from 'bn.js';
 
-import { ProposalModule, ITXModalData } from 'models';
+import { ProposalModule, ITXModalData, ChainEntity } from 'models';
 
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import ChainObjectController from 'controllers/server/chain_objects';
 import { BigNumber } from 'ethers/utils';
+
+import MolochStorageFetcher from 'events/moloch/storageFetcher';
+import MolochEventSubscriber from 'events/moloch/subscriber';
+import MolochEventProcessor from 'events/moloch/processor';
+import { MolochEntityKind } from 'events/moloch/types';
 
 import MolochProposal from './proposal';
 import MolochMembers from './members';
@@ -29,8 +33,7 @@ export default class MolochGovernance extends ProposalModule<
 
   private _api: MolochAPI;
   private _Members: MolochMembers;
-  private _useChainProposalData: boolean;
-  private _fetcher: ChainObjectController<IMolochProposalResponse>;
+  private _useClientChainEntities: boolean;
 
   // GETTERS
   public get proposalCount() { return this._proposalCount; }
@@ -48,22 +51,20 @@ export default class MolochGovernance extends ProposalModule<
   }
 
   public get api() { return this._api; }
-  public get useChainProposalData() { return this._useChainProposalData; }
-  public get fetcher() { return this._fetcher; }
+  public get useClientChainEntities() { return this._useClientChainEntities; }
 
   // INIT / DEINIT
-  protected _entityConstructor(entity): MolochProposal {
-    throw new Error('not implemented');
+  protected _entityConstructor(entity: ChainEntity): MolochProposal {
+    return new MolochProposal(this._Members, this, entity);
   }
 
   public async init(
     api: MolochAPI,
-    MolochMembers: MolochMembers,
-    chainObjectId: string,
-    useChainProposalData = false,
+    Members: MolochMembers,
+    useClientChainEntities = true,
   ) {
-    this._Members = MolochMembers;
-    this._useChainProposalData = useChainProposalData;
+    this._Members = Members;
+    this._useClientChainEntities = useClientChainEntities;
     this._api = api;
     this._guildBank = await this._api.Contract.guildBank();
 
@@ -77,24 +78,24 @@ export default class MolochGovernance extends ProposalModule<
     this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
 
     // fetch all proposals
-    let proposalObjects: IMolochProposalResponse[];
-    if (this._useChainProposalData) {
-      console.log('Fetching moloch proposals from chain.');
-      proposalObjects = [];
-      const queueLength = await api.Contract.getProposalQueueLength();
-      for (let n = 0; n < queueLength.toNumber(); ++n) {
-        const rawProposal = await api.Contract.proposalQueue(n);
-        const iProp = this.convertChainProposal(n, rawProposal);
-        proposalObjects.push(iProp);
-      }
-    } else {
+    if (!this._useClientChainEntities) {
       console.log('Fetching moloch proposals from backend.');
-      this._fetcher = new ChainObjectController<IMolochProposalResponse>(chainObjectId);
-      const chainObjects = await this._fetcher.fetch();
-      proposalObjects = chainObjects.map(({ objectData }) => objectData);
+      await this.app.chainEntities.refresh(this.app.chain.id, true);
+    } else {
+      console.log('Fetching moloch proposals from chain.');
+      const fetcher = new MolochStorageFetcher(api.Contract, 1);
+      const subscriber = new MolochEventSubscriber(api.Contract, this.app.chain.id);
+      const processor = new MolochEventProcessor(api.Contract, 1);
+      await this.app.chainEntities.subscribeEntities(
+        this.app.chain,
+        fetcher,
+        subscriber,
+        processor,
+      );
     }
-    proposalObjects.map((p) => new MolochProposal(this._Members, this, p));
-    this._proposalCount = new BN(proposalObjects.length);
+    const entities = this.app.chainEntities.store.getByType(MolochEntityKind.Proposal);
+    entities.map((p) => this._entityConstructor(p));
+    this._proposalCount = new BN(entities.length);
     this._initialized = true;
   }
 
@@ -131,7 +132,7 @@ export default class MolochGovernance extends ProposalModule<
     tokenTribute: BN,
     sharesRequested: BN,
     details: string,
-  ): Promise<MolochProposal> {
+  ) {
     if (!(await this._Members.isSenderDelegate())) {
       throw new Error('sender must be valid delegate');
     }
@@ -169,84 +170,5 @@ export default class MolochGovernance extends ProposalModule<
     if (txReceipt.status !== 1) {
       throw new Error('failed to submit proposal');
     }
-
-    // if successful, refresh list of proposals to include new one
-    if (this._useChainProposalData) {
-      const queueLength = (await this.api.Contract.getProposalQueueLength()).toNumber();
-      const currentCount = this._proposalCount.toNumber();
-      let result: MolochProposal;
-      for (let n = currentCount; n < queueLength; ++n) {
-        const rawProposal = await this.api.Contract.proposalQueue(n);
-        const iProp = this.convertChainProposal(n, rawProposal);
-        const p = new MolochProposal(this._Members, this, iProp);
-        if (p.data.applicantAddress === applicantAddress.toLowerCase()) {
-          result = p;
-        }
-      }
-      this._proposalCount = new BN(queueLength);
-      return result;
-    } else {
-      const newObjects = await this._fetcher.forceUpdate('ADD');
-      newObjects.map((p) => {
-        if (this.store.getByIdentifier(p.objectData.id)) return;
-        return new MolochProposal(this._Members, this, p.objectData);
-      });
-      this._proposalCount = new BN(this.store.getAll().length);
-      return this.store.getAll().find((p) => p.applicantAddress === applicantAddress.toLowerCase());
-    }
-  }
-
-  // converts a proposal object from the Contract into the equivalent
-  // chain object type
-  public convertChainProposal(
-    n: number,
-    p: {
-      proposer: string;
-      applicant: string;
-      sharesRequested: BigNumber;
-      startingPeriod: BigNumber;
-      yesVotes: BigNumber;
-      noVotes: BigNumber;
-      processed: boolean;
-      didPass: boolean;
-      aborted: boolean;
-      tokenTribute: BigNumber;
-      details: string;
-      maxTotalSharesAtYesVote: BigNumber;
-      0: string;
-      1: string;
-      2: BigNumber;
-      3: BigNumber;
-      4: BigNumber;
-      5: BigNumber;
-      6: boolean;
-      7: boolean;
-      8: boolean;
-      9: BigNumber;
-      10: string;
-      11: BigNumber;
-    }
-  ): IMolochProposalResponse {
-    const startingPeriod = new BN(p.startingPeriod.toString());
-    // convert into object data
-    return {
-      id: `${n}`,
-      identifier: `${n}`,
-      details: p.details,
-      timestamp: startingPeriod.mul(this.periodDuration).add(this.summoningTime).toString(),
-      startingPeriod: p.startingPeriod.toString(),
-      delegateKey: p.proposer,
-      applicantAddress: p.applicant,
-      tokenTribute: p.tokenTribute.toString(),
-      sharesRequested: p.sharesRequested.toString(),
-      processed: p.processed,
-      status: p.aborted ? 'ABORTED' :
-        p.didPass ? 'PASSED' :
-        p.processed ? 'FAILED' :
-        startingPeriod.ltn(this.currentPeriod) ? 'IN_QUEUE' : 'VOTING_PERIOD',
-      votes: [],
-      yesVotes: p.yesVotes.toString(),
-      noVotes: p.noVotes.toString(),
-    };
   }
 }

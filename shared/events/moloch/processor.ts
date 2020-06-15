@@ -12,7 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export default class extends IEventProcessor<MolochApi, MolochRawEvent> {
   private _version: 1 | 2;
 
-  constructor(contractVersion: 1 | 2, api: MolochApi) {
+  constructor(api: MolochApi, contractVersion: 1 | 2) {
     super(api);
     this._version = contractVersion;
   }

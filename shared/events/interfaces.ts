@@ -205,6 +205,9 @@ export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, Entit
     case MolochEventKind.ProcessProposal: {
       return [ MolochEntityKind.Proposal, EntityEventKind.Complete ];
     }
+    case MolochEventKind.Abort: {
+      return [ MolochEntityKind.Proposal, EntityEventKind.Complete ];
+    }
     default: {
       return null;
     }

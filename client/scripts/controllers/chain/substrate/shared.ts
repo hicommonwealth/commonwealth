@@ -11,7 +11,6 @@ import {
   Moment,
   Balance,
   EventRecord,
-  Event,
   BlockNumber,
   Index,
   Hash,
@@ -26,25 +25,20 @@ import {
 import { Vec, Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { formatCoin, Coin } from 'adapters/currency';
+import { formatCoin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
-  Proposal,
   NodeInfo,
-  StorageModule,
   ITXModalData,
   ITransactionResult,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainBase,
   ChainClass,
   ChainEntity,
   ChainEvent,
-  ChainEventType,
 } from 'models';
 
-import { CWEvent, eventToEntity, entityToFieldName } from 'events/interfaces';
 import EdgewareStorageFetcher from 'events/edgeware/storageFetcher';
 import EdgewareEventSubscriber from 'events/edgeware/subscriber';
 import EdgewareEventProcessor from 'events/edgeware/processor';
@@ -124,6 +118,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       }
     }
     default:
+      console.error('Received invalid substrate chain entity!');
       break;
   }
   // force titles to update?
@@ -290,54 +285,17 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return !!this._api;
   }
 
-  // handle a single incoming chain event emitted from client connection with node
-  private _handleCWEvent(chain: string, cwEvent: CWEvent<ISubstrateEventData>): void {
-    // immediately return if no entity involved, event unrelated to proposals/etc
-    const eventEntity = eventToEntity(cwEvent.data.kind);
-    if (!eventEntity) return;
-    const [ entityKind ] = eventEntity;
-
-    // create event type
-    const eventType = new ChainEventType(
-      `${chain}-${cwEvent.data.kind.toString()}`,
-      chain,
-      cwEvent.data.kind.toString()
-    );
-
-    // create event
-    const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-
-    // create entity
-    const fieldName = entityToFieldName(entityKind);
-    if (!fieldName) return;
-    const fieldValue = event.data[fieldName];
-    const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
-    this._app.chainEntities.update(entity, event);
-    this._app.chain.handleEntityUpdate(entity, event);
-  }
-
   // load existing events and subscribe to future via client node connection
-  public async initChainEntities(chain: string) {
-    // get existing events
+  public initChainEntities(): Promise<void> {
     const fetcher = new EdgewareStorageFetcher(this._apiPromise);
-    const existingEvents = await fetcher.fetch();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cwEvent of existingEvents) {
-      this._handleCWEvent(chain, cwEvent);
-    }
-
-    // kick off subscription to future events
     const subscriber = new EdgewareEventSubscriber(this._apiPromise);
     const processor = new EdgewareEventProcessor(this._apiPromise);
-    // TODO: handle unsubscribing
-    console.log('Subscribing to chain events.');
-    subscriber.subscribe(async (block) => {
-      const incomingEvents = await processor.process(block);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cwEvent of incomingEvents) {
-        this._handleCWEvent(chain, cwEvent);
-      }
-    });
+    return this._app.chainEntities.subscribeEntities(
+      this._app.chain,
+      fetcher,
+      subscriber,
+      processor,
+    );
   }
 
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {

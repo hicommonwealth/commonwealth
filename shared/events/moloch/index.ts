@@ -70,7 +70,7 @@ export default async function (
 
   // helper function that sends a block through the event processor and
   // into the event handlers
-  const processor = new Processor(contractVersion, api);
+  const processor = new Processor(api, contractVersion);
   const processEventFn = async (event: MolochRawEvent) => {
     // retrieve events from block
     const cwEvents: CWEvent<IMolochEventData>[] = await processor.process(event);

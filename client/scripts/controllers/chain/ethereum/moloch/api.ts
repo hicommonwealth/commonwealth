@@ -1,18 +1,18 @@
 import { Web3Provider, AsyncSendable, JsonRpcSigner } from 'ethers/providers';
 import { ethers } from 'ethers';
 
-import { ERC20 } from 'ERC20';
-import { ERC20Factory } from 'ERC20Factory';
+import { Erc20 } from 'eth/types/Erc20';
+import { Erc20Factory } from 'eth/types/Erc20Factory';
 
-import { Moloch1 } from 'MolochV1/Moloch1';
-import { Moloch1Factory } from 'MolochV1/Moloch1Factory';
-import { GuildBank1 } from 'MolochV1/GuildBank1';
-import { GuildBank1Factory } from 'MolochV1/GuildBank1Factory';
+import { Moloch1 } from 'eth/types/Moloch1';
+import { Moloch1Factory } from 'eth/types/Moloch1Factory';
+import { GuildBank1 } from 'eth/types/GuildBank1';
+import { GuildBank1Factory } from 'eth/types/GuildBank1Factory';
 
-import { Moloch2 } from 'MolochV2/Moloch2';
-import { Moloch2Factory } from 'MolochV2/Moloch2Factory';
-import { GuildBank2 } from 'MolochV2/GuildBank2';
-import { GuildBank2Factory } from 'MolochV2/GuildBank2Factory';
+import { Moloch2 } from 'eth/types/Moloch2';
+import { Moloch2Factory } from 'eth/types/Moloch2Factory';
+import { GuildBank2 } from 'eth/types/GuildBank2';
+import { GuildBank2Factory } from 'eth/types/GuildBank2Factory';
 
 export default class MolochAPI {
   public readonly gasLimit: number = 3000000;
@@ -22,7 +22,7 @@ export default class MolochAPI {
   private _Contract: Moloch1;
   private _Provider: Web3Provider;
   private _Signer: JsonRpcSigner;
-  private _tokenContract: ERC20;
+  private _tokenContract: Erc20;
 
   public get contractAddress() { return this._contractAddress; }
   public get userAddress() { return this._userAddress; }
@@ -47,6 +47,6 @@ export default class MolochAPI {
   public async init() {
     // perform fetch of approved ERC20 token and set up contract for approval
     const tokenAddress = await this._Contract.approvedToken();
-    this._tokenContract = ERC20Factory.connect(tokenAddress, this._Signer);
+    this._tokenContract = Erc20Factory.connect(tokenAddress, this._Signer);
   }
 }

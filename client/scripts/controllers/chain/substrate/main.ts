@@ -64,9 +64,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     ]);
     await this._postModuleLoad(!useClientChainEntities);
     if (useClientChainEntities) {
-      await this.chain.initChainEntities(this.meta.chain.id);
+      await this.chain.initChainEntities();
     }
-    await this.chain.initEventLoop();
+    this.chain.initEventLoop();
 
     this._loaded = true;
   }

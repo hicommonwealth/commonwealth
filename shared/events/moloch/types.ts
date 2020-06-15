@@ -50,9 +50,11 @@ export interface IMolochSubmitProposal extends IMolochEvent {
 export interface IMolochSubmitVote extends IMolochEvent {
   kind: MolochEventKind.SubmitVote;
   proposalIndex: number;
-  delegateKey?: Address;
+  delegateKey: Address;
   member: Address;
   vote: number;
+  shares: string;
+  highestIndexYesVote: string;
 }
 
 export interface IMolochProcessProposal extends IMolochEvent {
@@ -63,6 +65,8 @@ export interface IMolochProcessProposal extends IMolochEvent {
   tokenTribute: Balance;
   sharesRequested: Balance;
   didPass: boolean;
+  yesVotes: string;
+  noVotes: string;
 }
 
 export interface IMolochRagequit extends IMolochEvent {

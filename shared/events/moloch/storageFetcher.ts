@@ -61,6 +61,8 @@ export default class extends IStorageFetcher<MolochApi> {
             tokenTribute: proposal.tokenTribute.toString(),
             sharesRequested: proposal.sharesRequested.toString(),
             didPass: proposal.didPass,
+            yesVotes: proposal.yesVotes.toString(),
+            noVotes: proposal.noVotes.toString(),
           }
         };
         events.push(processedEvent);
