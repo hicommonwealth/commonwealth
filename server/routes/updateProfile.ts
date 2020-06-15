@@ -9,16 +9,27 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  MissingParams: 'Must specify chain, address, and data',
+  NotBlob: 'Data must be a valid JSON blob',
+  InvalidProfile: 'Invalid profile, or profile owned by someone else',
+  NoName: 'Must provide a name',
+  NameTooShort: `Your name must be at least ${PROFILE_NAME_MIN_CHARS} characters.`,
+  NameTooLong: `Your name can't be over ${PROFILE_NAME_MAX_CHARS} characters.`,
+  HeadlineTooLong: `Your headline can't be over ${PROFILE_HEADLINE_MAX_CHARS} characters.`,
+  BioTooLong: `Your bio can't be over ${PROFILE_BIO_MAX_CHARS} characters.`,
+};
+
 const updateProfile = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
-    return next(new Error('Must specify chain, address, and data'));
+    return next(new Error(Errors.MissingParams));
   }
 
   let unpackedData;
   try {
     unpackedData = JSON.parse(req.body.data);
   } catch (e) {
-    return next(new Error('Data must be a valid JSON blob'));
+    return next(new Error(Errors.NotBlob));
   }
 
   const address = await models.Address.find({
@@ -28,26 +39,26 @@ const updateProfile = async (models, req: Request, res: Response, next: NextFunc
     }
   });
   if (!address || !address.id) {
-    return next(new Error('Invalid profile, or profile owned by someone else'));
+    return next(new Error(Errors.InvalidProfile));
   }
   if (address.user_id !== req.user.id) {
-    return next(new Error('Invalid profile, or profile owned by someone else'));
+    return next(new Error(Errors.InvalidProfile));
   }
 
   // enforce required fields
   if (!unpackedData.name) {
-    return next(new Error('A name is required.'));
+    return next(new Error(Errors.NoName));
   } else if (unpackedData.name.length < PROFILE_NAME_MIN_CHARS) {
-    return next(new Error(`Your name must be at least ${PROFILE_NAME_MIN_CHARS} characters.`));
+    return next(new Error(Errors.NameTooShort));
   }
 
   // enforce max chars
   if (unpackedData.name && unpackedData.name.length > PROFILE_NAME_MAX_CHARS) {
-    return next(new Error(`Your name can't be over ${PROFILE_NAME_MAX_CHARS} characters.`));
+    return next(new Error(Errors.NameTooLong));
   } else if (unpackedData.headline && unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS) {
-    return next(new Error(`Your headline can't be over ${PROFILE_HEADLINE_MAX_CHARS} characters.`));
+    return next(new Error(Errors.HeadlineTooLong));
   } else if (unpackedData.bio && unpackedData.bio.length > PROFILE_BIO_MAX_CHARS) {
-    return next(new Error(`Your bio can't be over ${PROFILE_BIO_MAX_CHARS} characters.`));
+    return next(new Error(Errors.BioTooLong));
   }
 
   // try to find existing profile

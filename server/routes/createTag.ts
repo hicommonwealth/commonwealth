@@ -1,16 +1,23 @@
 import { Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
+export const Errors = {
+  InvalidChainOrCommuntiy: 'Invalid chain or community',
+  NotLoggedIn: 'Not logged in',
+  TagRequired: 'Tag name required',
+  MustBeAdmin: 'Must be an admin',
+};
+
 const createTag = async (models, req, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!chain && !community) return next(new Error('Invalid chain or community'));
-  if (chain && community) return next(new Error('Invalid chain or community'));
-  if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.name) return next(new Error('Tag name required'));
+  if (!chain && !community) return next(new Error(Errors.InvalidChainOrCommuntiy));
+  if (chain && community) return next(new Error(Errors.InvalidChainOrCommuntiy));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.body.name) return next(new Error(Errors.TagRequired));
 
   const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
-  const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+  const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
   const userMembership = await models.Role.findOne({
     where: {
       address_id: { [Op.in]: userAddressIds },
@@ -18,7 +25,7 @@ const createTag = async (models, req, res: Response, next: NextFunction) => {
     },
   });
   if (userMembership.permission !== 'admin') {
-    return next(new Error('Must be an admin'));
+    return next(new Error(Errors.MustBeAdmin));
   }
 
   const chainOrCommObj2 = community ? { community_id: community.id } : { chain_id: chain.id };

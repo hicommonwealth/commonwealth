@@ -17,7 +17,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
   if (!req.body.tag_name) return next(new Error(UpdateTagsErrors.NoTag));
 
   const userAddresses = await req.user.getAddresses();
-  const userAddress = userAddresses.find((a) => a.verified && a.address === req.body.address);
+  const userAddress = userAddresses.find((a) => !!a.verified && a.address === req.body.address);
   if (!userAddress) return next(new Error(UpdateTagsErrors.InvalidAddr));
 
   const thread = await models.OffchainThread.findOne({

@@ -25,7 +25,7 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
   const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses.map((a) => a.id);
+  const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,

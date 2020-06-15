@@ -3,6 +3,16 @@ import { factory, formatFilename } from '../../shared/logging';
 const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NoAddress: 'Must provide address',
+  NoChain: 'Must provide chain',
+  NoSignature: 'Must provide signature',
+  AddressNF: 'Address not found',
+  ExpiredToken: 'Token has expired, please re-register',
+  InvalidSignature: 'Invalid signature, please re-register',
+  NoEmail: 'No email to alert',
+};
+
 const verifyAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // Verify that a linked address is actually owned by its supposed user.
   //
@@ -11,13 +21,13 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
   // bytes but can sign a no-op tx like Substrate's system.remark().
 
   if (!req.body.address) {
-    return next(new Error('Must provide address'));
+    return next(new Error(Errors.NoAddress));
   }
   if (!req.body.chain) {
-    return next(new Error('Must provide chain'));
+    return next(new Error(Errors.NoChain));
   }
   if (!req.body.signature && !(req.body.txSignature && req.body.txParams)) {
-    return next(new Error('Must provide signature'));
+    return next(new Error(Errors.NoSignature));
   }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
@@ -27,15 +37,15 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     where: { chain: req.body.chain, address: req.body.address }
   });
   if (!existingAddress) {
-    return next(new Error('Address not found'));
+    return next(new Error(Errors.AddressNF));
   } else {
     // first, check whether the token has expired
     const expiration = existingAddress.verification_token_expires;
     if (expiration && +expiration <= +(new Date())) {
-      return next(new Error('Token has expired, please re-register'));
+      return next(new Error(Errors.ExpiredToken));
     }
     // check for validity
-    const isAddressTransfer = existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
+    const isAddressTransfer = !!existingAddress.verified && req.user && existingAddress.user_id !== req.user.id;
     const oldId = existingAddress.user_id;
     try {
       const valid = req.body.signature
@@ -46,7 +56,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
           models, chain, existingAddress, (req.user ? req.user.id : null), req.body.txSignature, req.body.txParams
         );
       if (!valid) {
-        return next(new Error('Invalid signature, please re-register'));
+        return next(new Error(Errors.InvalidSignature));
       }
     } catch (e) {
       return next(e);
@@ -57,7 +67,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
     if (isAddressTransfer) {
       try {
         const user = await models.User.findOne({ where: { id: oldId } });
-        if (!user.email) throw new Error('No email to alert'); // users who register thru github don't have emails!
+        if (!user.email) throw new Error(Errors.NoEmail); // users who register thru github don't have emails by default!
         const msg = {
           to: user.email,
           from: 'Commonwealth <no-reply@commonwealth.im>',

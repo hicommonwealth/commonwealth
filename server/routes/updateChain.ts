@@ -20,7 +20,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
   if (!chain) return next(new Error(Errors.NoChainFound));
   else {
-    const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: { [Op.in]: userAddressIds },

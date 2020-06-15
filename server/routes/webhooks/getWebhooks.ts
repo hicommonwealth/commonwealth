@@ -16,7 +16,7 @@ const getWebhooks = async (models, req: Request, res: Response, next: NextFuncti
   const adminRoles = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: addresses.map((addr) => addr.id),
+      address_id: addresses.filter((addr) => !!addr.verified).map((addr) => addr.id),
       permission: ['admin']
     },
   });

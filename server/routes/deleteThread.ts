@@ -24,7 +24,7 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       where: { id: req.body.thread_id, },
       include: [ models.Chain, models.OffchainCommunity ]
     });
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 

@@ -4,12 +4,19 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NoObjectId: 'Must provide object_id',
+  NoChainOrComm: 'Must provide chain or community',
+  InvalidChainOrComm: 'Invalid chain or community',
+  InvalidThread: 'Invalid offchain thread',
+};
+
 const viewCount = async (models, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.object_id) {
-    return next(new Error('Must provide object_id'));
+    return next(new Error(Errors.NoObjectId));
   }
   if (!req.body.chain && !req.body.community) {
-    return next(new Error('Must provide chain or community'));
+    return next(new Error(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
@@ -19,7 +26,7 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
   });
 
   if (!chain && !community) {
-    return next(new Error('Invalid community or chain'));
+    return next(new Error(Errors.InvalidChainOrComm));
   }
 
   // verify thread exists before querying
@@ -33,7 +40,7 @@ const viewCount = async (models, cache: ViewCountCache, req: Request, res: Respo
     }
   });
   if (!obj) {
-    return next(new Error('Invalid offchain thread'));
+    return next(new Error(Errors.InvalidThread));
   }
 
   // query view counts, creating as needed
