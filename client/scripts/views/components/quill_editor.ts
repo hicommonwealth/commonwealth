@@ -40,7 +40,7 @@ const instantiateEditor = (
 ) => {
   const Delta = Quill.import('delta');
   const Keyboard = Quill.import('modules/keyboard');
-  const Clipboard = Quill.import('modules/clipboard');
+  const Clipboard = Quill.import('modules/clipboard') as any;
   let quill;
 
   // Set up markdown mode helper
@@ -123,37 +123,19 @@ const instantiateEditor = (
 
   // Register a patch to prevent pasting into long documents causing the editor to jump
   class CustomClipboard extends Clipboard {
-    onPaste(e) {
-      // get current page offset before paste
-      const top = window.pageYOffset;
-      const left = window.pageXOffset;
-
-      if (e.defaultPrevented || !(this as any).quill.isEnabled()) return;
-      const plainText = e.clipboardData.getData('text/plain').replace(/\n/g, '\n\n').replace(/\n\n+/g, '\n\n');
-      const range = (this as any).quill.getSelection();
-      let delta = new Delta().retain(range.index);
-      (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop
-                                          || document.body.scrollTop || 0).toString()}px`;
-      (this as any).container.focus();
-      setTimeout(() => {
-        const editor = (this as any).quill;
-        editor.selection.update(Quill.sources.SILENT);
-        delta = delta.concat((this as any).convert()).delete(range.length);
-
-        // transform pasted text
-        if (isMarkdownMode()) {
-          delta = new Delta().retain(range.index).delete(range.length).insert(plainText);
-        }
-
-        // update editor with pasted content and selection
-        editor.updateContents(delta, Quill.sources.USER);
-        editor.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-        const bounds = editor.getBounds(delta.length() - range.length, Quill.sources.SILENT);
-        editor.scrollingContainer.scrollTop = bounds.top;
-
-        // scroll window to previous position after paste
-        window.scrollTo({ top, left });
-      }, 1);
+    onCapturePaste(e) {
+      if (e.defaultPrevented || !this.quill.isEnabled()) return;
+      e.preventDefault();
+      const range = this.quill.getSelection(true);
+      if (range == null) return;
+      const html = e.clipboardData.getData('text/html');
+      const text = e.clipboardData.getData('text/plain');
+      const files = Array.from(e.clipboardData.files || []);
+      if (!html && files.length > 0) {
+        this.quill.uploader.upload(range, files);
+      } else {
+        this.onPaste(range, isMarkdownMode() ? { html: text, text } : { html, text });
+      }
     }
   }
 
