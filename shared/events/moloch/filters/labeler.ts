@@ -19,32 +19,39 @@ const labelMolochEvent: LabelerFilter = (
   switch (data.kind) {
     case MolochEventKind.SubmitProposal: return {
       heading: 'Proposal Submitted',
-      label: '',
+      label: `Member ${fmtAddr(data.member)} submitted proposal with index ${data.proposalIndex}.`,
+      linkUrl: chainId ? `/${chainId}/proposal/molochproposal/${data.proposalIndex}` : null,
     };
     case MolochEventKind.SubmitVote: return {
       heading: 'Vote Submitted',
-      label: '',
+      label: `A vote was received on proposal ${data.proposalIndex}.`,
+      linkUrl: chainId ? `/${chainId}/proposal/molochproposal/${data.proposalIndex}` : null,
     };
     case MolochEventKind.ProcessProposal: return {
       heading: 'Proposal Processed',
-      label: '',
+      label: `Proposal ${data.proposalIndex} was processed.`,
+      linkUrl: chainId ? `/${chainId}/proposal/molochproposal/${data.proposalIndex}` : null,
     };
     case MolochEventKind.Ragequit: return {
       heading: 'Member Ragequit',
-      label: '',
+      label: `Member ${fmtAddr(data.member)} ragequit and burned ${data.sharesToBurn} shares.`,
+      linkUrl: chainId ? `/${chainId}/account/${data.member}` : null,
     };
     case MolochEventKind.Abort: return {
       heading: 'Proposal Aborted',
-      label: '',
+      label: `Proposal ${data.proposalIndex} was aborted by applicant ${fmtAddr(data.applicant)}.`,
+      linkUrl: chainId ? `/${chainId}/proposal/molochproposal/${data.proposalIndex}` : null,
     };
     case MolochEventKind.UpdateDelegateKey: return {
       heading: 'Delegate Key Updated',
-      label: '',
+      label: `Member ${fmtAddr(data.member)} updated their delegate to ${fmtAddr(data.newDelegateKey)}.`,
+      linkUrl: chainId ? `/${chainId}/account/${data.member}` : null,
     };
     // this event should never appear
     case MolochEventKind.SummonComplete: return {
       heading: 'Summon Complete',
       label: `Moloch is summoned, by user ${fmtAddr(data.summoner)} with ${data.shares}!`,
+      linkUrl: chainId ? `/${chainId}/account/${data.summoner}` : null,
     };
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
