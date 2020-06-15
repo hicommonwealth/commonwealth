@@ -2,12 +2,10 @@ import IdStore from './IdStore';
 import { DiscussionDraft } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
-// TODO: Differentiate between tags associated with a chain, and tags associated with a community
-class TagStore extends IdStore<DiscussionDraft> {
+class DraftStore extends IdStore<DiscussionDraft> {
   private _storeCommunity: { [identifier: string]: Array<DiscussionDraft> } = {};
 
   public add(draft: DiscussionDraft) {
-    // TODO: Remove this once we start enforcing an ordering in stores
     super.add(draft);
     this.getAll().sort(byAscendingCreationDate);
     const parentEntity = draft.community ? draft.community : draft.chain;
@@ -40,10 +38,6 @@ class TagStore extends IdStore<DiscussionDraft> {
   public getByCommunity(communityId): Array<DiscussionDraft> {
     return this._storeCommunity[communityId] || [];
   }
-
-  public getByName(name, communityId): DiscussionDraft {
-    return this.getByCommunity(communityId).find((t) => t.name === name);
-  }
 }
 
-export default TagStore;
+export default DraftStore;

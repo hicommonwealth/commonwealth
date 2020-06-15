@@ -7,6 +7,7 @@ import { DiscussionDraft, OffchainAttachment, OffchainTag, CommunityInfo } from 
 import $ from 'jquery';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
+import DraftStore from 'client/scripts/stores/DraftStore';
 
 const modelFromServer = (draft) => {
   const attachments = draft.OffchainAttachments
@@ -25,7 +26,7 @@ const modelFromServer = (draft) => {
 };
 
 class DraftsController {
-  private _store = new D();
+  private _store = new DraftStore();
 
   public get store() { return this._store; }
 
