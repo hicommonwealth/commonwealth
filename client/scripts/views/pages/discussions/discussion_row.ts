@@ -112,7 +112,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           // comments
           m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
             m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
-              return m(User, { user: [address, chain], avatarOnly: true, avatarSize: 20 });
+              return m(User, { user: [address, chain], avatarOnly: true, tooltip: true, avatarSize: 20 });
             })),
             link(
               'a.commenters-label',
