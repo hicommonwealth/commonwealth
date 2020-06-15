@@ -261,7 +261,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
-          app.threads.edit(proposal, null, null, true).then(() => m.redraw());
+          app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
       }),
