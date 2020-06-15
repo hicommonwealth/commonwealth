@@ -3,7 +3,7 @@ import { OffchainTag } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 // TODO: Differentiate between tags associated with a chain, and tags associated with a community
-class TagsStore extends IdStore<OffchainTag> {
+class TagStore extends IdStore<OffchainTag> {
   private _storeCommunity: { [identifier: string]: Array<OffchainTag> } = {};
 
   public add(tag: OffchainTag) {
@@ -46,4 +46,4 @@ class TagsStore extends IdStore<OffchainTag> {
   }
 }
 
-export default TagsStore;
+export default TagStore;

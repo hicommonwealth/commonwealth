@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { TagsStore } from 'stores';
+import { TagStore } from 'stores';
 import { OffchainTag } from 'models';
 import app from 'state';
 
@@ -16,7 +16,7 @@ const modelFromServer = (tag) => {
 };
 
 class TagsController {
-  private _store: TagsStore = new TagsStore();
+  private _store: TagStore = new TagStore();
   private _initialized: boolean = false;
   public get store() { return this._store; }
   public get initialized() { return this._initialized; }

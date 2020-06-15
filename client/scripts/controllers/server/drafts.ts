@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { ProposalStore, TagsStore } from 'stores';
+import { ProposalStore, TagStore } from 'stores';
 import { DiscussionDraft, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
 import $ from 'jquery';
@@ -25,9 +25,9 @@ const modelFromServer = (draft) => {
 };
 
 class DraftsController {
-  // private _store = new ProposalStore<OffchainThread>();
+  private _store = new D();
 
-  // public get store() { return this._store; }
+  public get store() { return this._store; }
 
   private _initialized = false;
 

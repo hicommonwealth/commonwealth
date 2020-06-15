@@ -7,7 +7,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
-import { ReactionsStore } from 'stores';
+import { ReactionStore } from 'stores';
 import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -25,7 +25,7 @@ const modelFromServer = (reaction) => {
 };
 
 class ReactionsController {
-  private _store: ReactionsStore = new ReactionsStore();
+  private _store: ReactionStore = new ReactionStore();
   public get store() { return this._store; }
 
   public getByPost(post: OffchainThread | OffchainComment<any>) {
