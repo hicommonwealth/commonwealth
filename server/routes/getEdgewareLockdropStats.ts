@@ -371,7 +371,7 @@ export const getCountsByBlock = async (web3, contracts) => {
   allEvents.sort((a, b) => a.blockNumber - b.blockNumber);
 
   if (allEvents.length === 0) {
-    throw new Error(Error.NoLockingEvent);
+    throw new Error(Errors.NoLockingEvent);
   }
 
   // set number of blocks to quantize our x-axis to
