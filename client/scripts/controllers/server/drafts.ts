@@ -126,21 +126,21 @@ class DraftsController {
       throw new Error('must be logged in to refresh drafts');
     }
     const response = await $.get(`${app.serverUrl()}/drafts`, {
-      'address': app.vm.activeAccount.address,
-      'author_chain': app.vm.activeAccount.chain.id,
-      'jwt': app.login.jwt
     });
     try {
+      debugger
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
       if (reset) {
         this._store.clear();
       }
-      for (const draft of response.result) {
+      for (let draft of response.result) {
+        debugger
         if (!draft.Address) {
           console.error('OffchainThread missing address');
         }
+        draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);
         if (existing) {
           this._store.remove(existing);

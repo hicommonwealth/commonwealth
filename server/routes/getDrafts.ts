@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getDiscussionDrafts = async (models, req: Request, res: Response, next: NextFunction) => {
-  const author = await lookupAddressIsOwnedByUser(models, req, next);
+  const [addresses] = user.getAddresses();
+  const myAddressIds = Array.from(addresses.map((address) => address.id));
 
   const drafts = await models.DiscussionDraft.findAll({
     where: {
-      author_id: author.id,
+      author_id: {
+        [Op.in]: myAddressIds,
+      }
     },
     include: [
       models.Address,
