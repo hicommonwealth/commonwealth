@@ -7,7 +7,7 @@ import { HeaderBatchNotificationRow } from 'views/components/sidebar/notificatio
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 
-const NotificationsDrowdownMenu: m.Component<{},{}> = {
+const NotificationsDropdownMenu: m.Component = {
   view: (vnode) => {
     const notifications = app.login.notifications
       ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
@@ -43,4 +43,4 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
   },
 };
 
-export default NotificationsDrowdownMenu;
+export default NotificationsDropdownMenu;
