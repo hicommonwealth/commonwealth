@@ -22,13 +22,6 @@ module.exports = (sequelize, DataTypes) => {
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain', targetKey: 'id' });
     models.Chain.belongsToMany(models.User, { through: models.WaitlistRegistration });
-
-    // currently we have a 1-to-1 mapping from chain <--> chain_object_version
-    // in the future, we may want this to be a many-to-1, in case a chain has
-    // many versions of chain objects. however, for now, the client only supports 1.
-    models.Chain.hasOne(models.ChainObjectVersion, {
-      foreignKey: 'chain',
-    });
   };
 
   return Chain;

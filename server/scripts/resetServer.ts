@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
 import { SubstrateEventKinds, EdgewareEventChains } from '../../shared/events/edgeware/types';
 import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
@@ -234,13 +233,6 @@ const resetServer = (models, closeMiddleware) => {
       active: true,
       type: 'dao',
     });
-
-    // add queries for daos
-    const molochQueries = (await import('../queries/moloch')).default;
-    await addChainObjectQueries(molochQueries, app, models);
-
-    const metacartelQueries = (await import('../queries/metacartel')).default;
-    await addChainObjectQueries(metacartelQueries, app, models);
 
     const molochLocal = await models.Chain.create({
       id: 'moloch-local',
