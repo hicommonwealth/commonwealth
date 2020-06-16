@@ -341,10 +341,10 @@ $(() => {
     '/privacy':                  importRoute(import('views/pages/landing/privacy'), { scoped: false }),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false),
-    '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/notifications':            importRoute(import('views/pages/notifications'), false),
-    '/notification-settings':    importRoute(import('views/pages/notification-settings'), false),
+    '/login':                    importRoute(import('views/pages/login'), { scoped: false }),
+    '/settings':                 importRoute(import('views/pages/settings'), { scoped: false }),
+    '/notifications':            importRoute(import('views/pages/notifications'), { scoped: false }),
+    '/notification-settings':    importRoute(import('views/pages/notification-settings'), { scoped: false }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), { scoped: false }),
@@ -354,23 +354,23 @@ $(() => {
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute(import('views/pages/discussions'), true),
-    '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
-    '/:scope/tags':              importRoute(import('views/pages/tags'), true),
-    '/:scope/members':           importRoute(import('views/pages/members'), true),
+    '/:scope':                   importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/tags':              importRoute(import('views/pages/tags'), { scoped: true }),
+    '/:scope/members':           importRoute(import('views/pages/members'), { scoped: true }),
     // '/:scope/chat':              importRoute(import('views/pages/chat'), true),
-    '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
-    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), true),
-    '/:scope/council':           importRoute(import('views/pages/council'), true),
-    '/:scope/login':             importRoute(import('views/pages/login'), true),
-    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),
-    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
-    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
-    '/:scope/admin':             importRoute(import('views/pages/admin'), true),
-    '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/web3login':         importRoute(import('views/pages/web3login'), true),
+    '/:scope/proposals':         importRoute(import('views/pages/proposals'), { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), { scoped: true }),
+    '/:scope/council':           importRoute(import('views/pages/council'), { scoped: true }),
+    '/:scope/login':             importRoute(import('views/pages/login'), { scoped: true }),
+    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), { scoped: true }),
+    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), { scoped: true }),
+    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), { scoped: true }),
+    '/:scope/admin':             importRoute(import('views/pages/admin'), { scoped: true }),
+    '/:scope/settings':          importRoute(import('views/pages/settings'), { scoped: true }),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), { scoped: true }),
 
-    '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
+    '/:scope/account/:address':  importRoute(import('views/pages/profile'), { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
         ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
