@@ -152,6 +152,7 @@ export function updateActiveUser(data) {
   } else {
     app.login.email = data.email;
     app.login.emailInterval = data.emailInterval;
+    app.login.emailVerified = data.emailVerified;
     app.login.jwt = data.jwt;
 
     app.login.addresses = data.addresses
