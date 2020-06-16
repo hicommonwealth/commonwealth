@@ -173,7 +173,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
       ]),
       canEdit && proposal.tag && m(ProposalHeaderSpacer),
       canEdit && m(TagEditor, {
-        popoverMenu: true,
         thread: proposal,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
       }),
