@@ -43,7 +43,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
     if (vnode.state.isOpen === undefined) vnode.state.isOpen = false;
   },
   view: (vnode) => {
-    return m('TagEditor', [
+    return m('.TagEditor', [
       vnode.attrs.popoverMenu
         ? m(MenuItem, {
           iconLeft: Icons.TAG,
