@@ -4,13 +4,18 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getDiscussionDrafts = async (models, req: Request, res: Response, next: NextFunction) => {
-  const [addresses] = user.getAddresses();
-  const myAddressIds = Array.from(addresses.map((address) => address.id));
+  const addresses = await models.Address.findAll({
+    where: {
+      user_id: req.user.id,
+    }
+  });
+  console.log(addresses);
+  const addressIds = Array.from(addresses.map((address) => address.id));
 
   const drafts = await models.DiscussionDraft.findAll({
     where: {
       author_id: {
-        [Op.in]: myAddressIds,
+        [Op.in]: addressIds,
       }
     },
     include: [

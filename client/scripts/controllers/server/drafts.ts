@@ -128,7 +128,6 @@ class DraftsController {
     const response = await $.get(`${app.serverUrl()}/drafts`, {
     });
     try {
-      debugger
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -136,7 +135,6 @@ class DraftsController {
         this._store.clear();
       }
       for (let draft of response.result) {
-        debugger
         if (!draft.Address) {
           console.error('OffchainThread missing address');
         }
@@ -146,7 +144,7 @@ class DraftsController {
           this._store.remove(existing);
         }
         try {
-          this._store.add(modelFromServer(draft));
+          this._store.add(draft);
         } catch (e) {
           console.error(e.message);
         }
