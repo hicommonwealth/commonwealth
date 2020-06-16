@@ -62,8 +62,8 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           api,
           1,
           evtHandlers,
-          // skipCatchup,
-          // () => discoverReconnectRange(models, node.chain),
+          skipCatchup,
+          () => discoverReconnectRange(models, node.chain),
         );
       }
       const storageHandler = new EventStorageHandler(models, node.chain);

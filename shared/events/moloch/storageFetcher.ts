@@ -3,6 +3,9 @@ import { IMolochEventData, MolochEventKind, MolochApi, Moloch1Proposal, Moloch2P
 import { Moloch1 } from '../../../eth/types/Moloch1';
 import { Moloch2 } from '../../../eth/types/Moloch2';
 
+import { factory, formatFilename } from '../../logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export default class extends IStorageFetcher<MolochApi> {
   constructor(protected _api: MolochApi, private _version: 1 | 2) {
     super(_api);
@@ -113,10 +116,14 @@ export default class extends IStorageFetcher<MolochApi> {
       const proposal: Moloch1Proposal | Moloch2Proposal = this._version === 1
         ? await this._api.proposalQueue(proposalIndex)
         : await this._api.proposals(proposalIndex);
+      log.debug(`Fetched Moloch proposal ${proposalIndex} from storage.`);
       const startingPeriod = +proposal.startingPeriod;
       const proposalStartingTime = (startingPeriod * this._periodDuration) + this._summoningTime;
       if (proposalStartingTime >= rangeStartTime && proposalStartingTime <= rangeEndTime) {
         results.push(...this._eventsFromProposal(proposalIndex, proposal, proposalStartingTime));
+      } else if (proposalStartingTime < rangeStartTime) {
+        log.debug('Moloch proposal start time before range start time, ending fetch.');
+        break;
       }
     }
     return results;

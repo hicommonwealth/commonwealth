@@ -238,7 +238,7 @@ const resetServer = (models, closeMiddleware) => {
       id: 'moloch-local',
       network: 'moloch',
       symbol: 'Moloch',
-      name: 'Moloch',
+      name: 'Moloch Local',
       icon_url: '/static/img/protocols/molochdao.png',
       active: true,
       type: 'dao',
