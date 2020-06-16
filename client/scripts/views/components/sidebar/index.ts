@@ -154,6 +154,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           });
         }),
         m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          label: 'Notification Settings',
+          onclick: (e) => m.route.set('/notification-settings'),
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.USER, }),
+          label: 'User Settings',
+          onclick: (e) => m.route.set('/settings'),
+        }),
+        m(ListItem, {
           contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
           label: 'Back to home',
           onclick: (e) => m.route.set('/'),

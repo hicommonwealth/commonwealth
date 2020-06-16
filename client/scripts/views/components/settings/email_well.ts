@@ -20,7 +20,6 @@ const EmailWell: m.Component<{}, IState> = {
   oninit: (vnode) => {
     vnode.state.email = app.login.email;
     vnode.state.emailVerified = app.login.emailVerified;
-    console.dir(`Email Verified: ${app.login.emailVerified}`);
   },
   view: (vnode) => {
     return m('.EmailWell', [
