@@ -49,7 +49,6 @@ export interface IApp {
   profiles: ProfilesController;
   comments: CommentsController;
   threads: ThreadsController;
-  drafts: DraftsController;
   reactions: ReactionsController;
   tags: TagsController;
   chainEntities: ChainEntityController;
@@ -85,7 +84,7 @@ export interface IApp {
     notifications: NotificationsController;
     lastVisited: object;
     starredCommunities: StarredCommunity[];
-    discussionDrafts: DiscussionDraft[];
+    discussionDrafts: DraftsController;
     unseenPosts: object;
   };
   // stored on server-side
@@ -120,7 +119,6 @@ const app: IApp = {
   profiles: new ProfilesController(),
   comments: new CommentsController(),
   threads: new ThreadsController(),
-  drafts: new DraftsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
@@ -145,7 +143,7 @@ const app: IApp = {
     lastVisited: {},
     unseenPosts: {},
     starredCommunities: [],
-    discussionDrafts: [],
+    discussionDrafts: new DraftsController(),
     notifications: new NotificationsController(),
   },
   config: {

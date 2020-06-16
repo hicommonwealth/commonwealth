@@ -42,7 +42,7 @@ export const populateDraft = async (state, draft) => {
     // TODO: Add markdown check for formBodyDelta
     // TODO: Better naming to distinguish text from Deltas (throughout form?)
     const formBodyDelta = JSON.stringify(quill.getContents().ops[0]);
-    const discardedDraftDelta = JSON.stringify(JSON.parse(app.login.discussionDrafts
+    const discardedDraftDelta = JSON.stringify(JSON.parse(app.login.discussionDrafts.store.getByCommunity(app.activeId())
       .filter((d) => d.id === fromDraft)[0].body).ops[0]);
     if (formBodyDelta !== discardedDraftDelta) {
       confirmed = await confirmationModalWithText('Load draft? Current discussion will not be saved.')();
@@ -114,6 +114,8 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
         }),
       ]),
     ]);
+
+    const discussionDrafts = app.login.discussionDrafts.store().getByCommunity(app.activeId());
 
     // TODO: Community-scope tags in /status & store
     return m('.NewThreadForm', {
@@ -279,7 +281,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 vnode.state.error = newThread(form, quillEditorState, author);
                 if (!vnode.state.error) {
                   if (vnode.state.fromDraft) {
-                    await app.drafts.delete(vnode.state.fromDraft);
+                    await app.login.discussionDrafts.delete(vnode.state.fromDraft);
                   }
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
@@ -302,9 +304,10 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
             : m('.error-placeholder'),
         ]),
       ]),
-      !!app.login.discussionDrafts.length && m('.new-thread-form-sidebar', [
+      !!discussionDrafts.length
+      && m('.new-thread-form-sidebar', [
         m('h3', 'Saved drafts'),
-        m(List, { interactive: true }, app.login.discussionDrafts.map((draft) => {
+        m(List, { interactive: true }, discussionDrafts.map((draft) => {
           const { body } = draft;
           let bodyComponent;
           if (body) {

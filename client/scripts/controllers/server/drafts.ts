@@ -7,7 +7,7 @@ import { DiscussionDraft, OffchainAttachment, OffchainTag, CommunityInfo } from 
 import $ from 'jquery';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import DraftStore from 'client/scripts/stores/DraftStore';
+import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
   const attachments = draft.OffchainAttachments
@@ -119,7 +119,39 @@ class DraftsController {
     });
   }
 
-  // Todo: handle refresh/refreshAll if necessary
+  public refreshAll(reset = false) {
+    if (!app.login || !app.login.jwt) {
+      throw new Error('must be logged in to refresh drafts');
+    }
+    return $.get(`${app.serverUrl()}/drafts`).then((response) => {
+      if (response.status !== 'Success') {
+        throw new Error(`Unsuccessful refresh status: ${response.status}`);
+      }
+      if (reset) {
+        this._store.clear();
+      }
+      for (const draft of response.result) {
+        if (!draft.Address) {
+          console.error('OffchainThread missing address');
+        }
+        const existing = this._store.getById(draft.id);
+        if (existing) {
+          this._store.remove(existing);
+        }
+        try {
+          this._store.add(modelFromServer(draft));
+        } catch (e) {
+          console.error(e.message);
+        }
+      }
+      this._initialized = true;
+    }, (err) => {
+      console.log('failed to load discussion drafts');
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Error loading discussion drafts');
+    });
+  }
 
   public deinit() {
     this._initialized = false;

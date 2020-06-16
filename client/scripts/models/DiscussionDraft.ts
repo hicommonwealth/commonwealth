@@ -4,7 +4,7 @@ import OffchainAttachment from './OffchainAttachment';
 
 class DiscussionDraft implements IUniqueId {
   public readonly id: number;
-  public readonly identifier: string;Zz
+  public readonly identifier: string;
   public readonly author: string;
   public readonly authorChain: string;
   public readonly title: string;

@@ -151,7 +151,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
-  router.get('/drafts', getDrafts.bind(this, models));
+  router.get('/drafts', passport.authenticate('jwt', { session: false }), getDrafts.bind(this, models));
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
 

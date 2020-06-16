@@ -452,6 +452,10 @@ $(() => {
         app.login.notifications.refresh().then(() => m.redraw());
         jwt = app.login.jwt;
       }
+      // grab discussion drafts
+      if (app.loginState === LoginState.LoggedIn) {
+        app.login.discussionDrafts.refreshAll().then(() => m.redraw());
+      }
 
       let wsUrl = app.serverUrl();
       if (app.serverUrl().indexOf('https')) {

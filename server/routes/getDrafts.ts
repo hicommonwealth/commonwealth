@@ -9,7 +9,8 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
   const drafts = await models.DiscussionDraft.findAll({
     where: {
       author_id: author.id,
-    }
+    },
+    include: [ models.Address ],
   });
 
   return res.json({ status: 'Success', result: drafts });
