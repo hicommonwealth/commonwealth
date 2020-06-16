@@ -17,6 +17,7 @@ import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/Poss
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
+import EmailWell from 'views/components/settings/email_well';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmailStatus: boolean, }> = {
   oninit: (vnode) => {
@@ -26,35 +27,36 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
   },
   view: (vnode) => {
     return m('.EmailPanel', [
-      m('h2', 'Email Settings:'),
-      m('.EmailUpdate', [
-        m('h4', 'Email:'),
-        m(Input, {
-          contentLeft: m(Icon, { name: Icons.MAIL }),
-          defaultValue: vnode.state.email || null,
-          onkeyup: (e) => { e.preventDefault(); vnode.state.email = (e.target as any).value; },
-        }),
-        m(Button, {
-          label: 'Update Email',
-          iconRight: vnode.state.updateEmailStatus ? Icons.CHECK_CIRCLE : null,
-          onclick: async () => {
-            try {
-              if (vnode.state.email === app.login.email) return;
-              const response = await $.post(`${app.serverUrl()}/updateEmail`, {
-                'email': vnode.state.email,
-                'jwt': app.login.jwt,
-              });
-              app.login.email = response.result.email;
-              vnode.state.updateEmailStatus = true;
-            } catch (err) {
-              console.log('Failed to update email');
-              throw new Error((err.responseJSON && err.responseJSON.error)
-                ? err.responseJSON.error
-                : 'Failed to update email');
-            }
-          }
-        }),
-      ]),
+      m(EmailWell),
+      // m('h2', 'Email Settings:'),
+      // m('.EmailUpdate', [
+      //   m('h4', 'Email:'),
+      //   m(Input, {
+      //     contentLeft: m(Icon, { name: Icons.MAIL }),
+      //     defaultValue: vnode.state.email || null,
+      //     onkeyup: (e) => { e.preventDefault(); vnode.state.email = (e.target as any).value; },
+      //   }),
+      //   m(Button, {
+      //     label: 'Update Email',
+      //     iconRight: vnode.state.updateEmailStatus ? Icons.CHECK_CIRCLE : null,
+      //     onclick: async () => {
+      //       try {
+      //         if (vnode.state.email === app.login.email) return;
+      //         const response = await $.post(`${app.serverUrl()}/updateEmail`, {
+      //           'email': vnode.state.email,
+      //           'jwt': app.login.jwt,
+      //         });
+      //         app.login.email = response.result.email;
+      //         vnode.state.updateEmailStatus = true;
+      //       } catch (err) {
+      //         console.log('Failed to update email');
+      //         throw new Error((err.responseJSON && err.responseJSON.error)
+      //           ? err.responseJSON.error
+      //           : 'Failed to update email');
+      //       }
+      //     }
+      //   }),
+      // ]),
       m('.EmailInterval', [
         m('h4', 'Receive notification emails:'),
         m(Select, {
