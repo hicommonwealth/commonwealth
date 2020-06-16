@@ -56,8 +56,7 @@ class DraftsController {
         'jwt': app.login.jwt,
       });
       const result = modelFromServer(response.result);
-      // TODO: Hook up store so that /status need not be called to update
-      // this._store.add(result);
+      this._store.add(result);
       return result;
     } catch (err) {
       console.log('Failed to create draft');
@@ -87,10 +86,10 @@ class DraftsController {
         }
       });
       const result = modelFromServer(response.result);
-      // if (this._store.getByIdentifier(result.id)) {
-      //   this._store.remove(this._store.getByIdentifier(result.id));
-      // }
-      // this._store.add(result);
+      if (this._store.getById(result.id)) {
+        this._store.remove(this._store.getById(result.id));
+      }
+      this._store.add(result);
       return result;
     } catch (err) {
       console.log('Failed to edit draft');
@@ -123,7 +122,11 @@ class DraftsController {
     if (!app.login || !app.login.jwt) {
       throw new Error('must be logged in to refresh drafts');
     }
-    return $.get(`${app.serverUrl()}/drafts`).then((response) => {
+    return $.get(`${app.serverUrl()}/drafts`, {
+      'address': app.vm.activeAccount.address,
+      'author_chain': app.vm.activeAccount.chain.id,
+      'jwt': app.login.jwt
+    }).then((response) => {
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }

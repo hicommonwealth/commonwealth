@@ -115,7 +115,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
       ]),
     ]);
 
-    const discussionDrafts = app.login.discussionDrafts.store?.getByCommunity(app.activeId()) || [];
+    const discussionDrafts = app.login.discussionDrafts.store.getByCommunity(app.activeId());
 
     // TODO: Community-scope tags in /status & store
     return m('.NewThreadForm', {
