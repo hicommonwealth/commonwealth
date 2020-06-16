@@ -45,10 +45,10 @@ class DraftsController {
   ) {
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
+        'address': app.vm.activeAccount.address,
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chainId,
         'community': communityId,
-        'address': address,
         'title': title,
         'body': body,
         'attachments[]': attachments,
@@ -74,9 +74,13 @@ class DraftsController {
   ) {
     // Todo: handle attachments
     try {
-      const response = await $.ajax(`${app.serverUrl()}/editDraft`, {
+      const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
         data: {
+          'address': app.vm.activeAccount.address,
+          'author_chain': app.vm.activeAccount.chain.id,
+          'community': app.activeCommunityId(),
+          'chain': app.activeChainId(),
           'id': draftId,
           'body': body,
           'title': title,
@@ -99,11 +103,14 @@ class DraftsController {
   }
 
   public async delete(draftId: number) {
-    const _this = this;
     return new Promise((resolve, reject) => {
       $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
+          'address': app.vm.activeAccount.address,
+          'author_chain': app.vm.activeAccount.chain.id,
+          'community': app.activeCommunityId(),
+          'chain': app.activeChainId(),
           'jwt': app.login.jwt,
           'id': draftId,
         }

@@ -42,7 +42,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   try {
     const userOwnedAddresses = await req.user.getAddresses();
     const draft = await models.DiscussionDraft.findOne({
-      where: { id },
+      where: { id, author_id: author.id },
     });
     if (!draft) return next(new Error(Errors.NotFound));
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.author_id) === -1) {
