@@ -61,4 +61,14 @@
         color: #546e7d;
         font-weight: 600;
     }
+    .NotificationButtons {
+        .cui-button {
+            margin: 0;
+            border-radius: 0;
+            border-top: 1px #d8dee0 solid;
+        }
+        .cui-button:nth-child(1) {
+            border-right: 1px #d8dee0 solid; 
+        }
+    }
 }
