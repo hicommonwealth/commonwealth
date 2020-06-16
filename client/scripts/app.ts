@@ -452,8 +452,6 @@ $(() => {
         jwt = app.login.jwt;
       }
       // grab discussion drafts
-      const a = app;
-      debugger
       if (app.loginState === LoginState.LoggedIn) {
         console.log(app.login.discussionDrafts);
         app.login.discussionDrafts.refreshAll().then(() => m.redraw());

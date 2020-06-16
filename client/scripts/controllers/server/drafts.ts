@@ -1,8 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import moment from 'moment-twitter';
-import { ProposalStore, TagStore } from 'stores';
-import { DiscussionDraft, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
+import { DiscussionDraft, OffchainAttachment } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
@@ -89,6 +87,7 @@ class DraftsController {
           'jwt': app.login.jwt
         }
       });
+      debugger
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));

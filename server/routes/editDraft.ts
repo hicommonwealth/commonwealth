@@ -46,6 +46,10 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
         id,
         author_id: author.id
       },
+      include: [
+        models.Address,
+        models.OffchainAttachment
+      ]
     });
     if (!draft) return next(new Error(Errors.NotFound));
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.author_id) === -1) {

@@ -10,7 +10,10 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
     where: {
       author_id: author.id,
     },
-    include: [ models.Address ],
+    include: [
+      models.Address,
+      models.OffchainAttachment
+    ],
   });
 
   return res.json({ status: 'Success', result: drafts });
