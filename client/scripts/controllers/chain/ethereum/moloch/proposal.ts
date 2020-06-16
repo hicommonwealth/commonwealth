@@ -263,7 +263,7 @@ export default class MolochProposal extends Proposal<
           id: e.data.member,
           delegateKey: e.data.delegateKey,
           shares: e.data.shares,
-          highestIndexYesVote: e.data.highestIndexYesVote,
+          highestIndexYesVote: `${e.data.highestIndexYesVote}`,
         };
         const member = this._Members.getFromJSON(memberJson);
         const choice = e.data.vote === 1 ? MolochVote.YES : e.data.vote === 2 ? MolochVote.NO : MolochVote.NULL;

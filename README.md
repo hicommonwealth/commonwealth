@@ -190,7 +190,7 @@ npm install -g ganache-cli@latest
 - The "moloch-local" chain is always configured to fetch data from the chain directly.
   - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
   - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
-  - Initialize the app using the `NO_ARCHIVE=true yarn start` flag to avoid fetching chain data on the backend.
+  - Initialize the app with `yarn start`.
 
 Cosmos Hub (Gaia):
 

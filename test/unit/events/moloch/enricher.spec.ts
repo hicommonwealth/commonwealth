@@ -12,9 +12,10 @@ const constructEvent = (data: object, section = '', typeDef: string[] = []): Mol
 
 const blockNumber = 10000;
 const api: MolochApi = {
-  proposalQueue: async (n) => ({ startingPeriod: '1', details: 'hello' }),
+  proposalQueue: async (n) => ({ startingPeriod: '1', details: 'hello', yesVotes: '5', noVotes: '4' }),
   periodDuration: async () => '2',
   summoningTime: async () => '0',
+  members: async (addr) => ({ delegateKey: addr, shares: '10', exists: true, highestIndexYesVote: 1 }),
 } as unknown as MolochApi;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
@@ -66,6 +67,8 @@ describe('Moloch Event Enricher Filter Tests', () => {
         delegateKey: 'delegate',
         member: 'member',
         vote: 1,
+        shares: '10',
+        highestIndexYesVote: 1,
       }
     });
   });
@@ -79,6 +82,8 @@ describe('Moloch Event Enricher Filter Tests', () => {
       tokenTribute: toHex(5),
       sharesRequested: toHex(6),
       didPass: true,
+      yesVotes: toHex(5),
+      noVotes: toHex(4),
     });
     const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
@@ -91,6 +96,8 @@ describe('Moloch Event Enricher Filter Tests', () => {
         tokenTribute: '5',
         sharesRequested: '6',
         didPass: true,
+        yesVotes: '5',
+        noVotes: '4',
       }
     });
   });

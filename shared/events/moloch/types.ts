@@ -54,7 +54,7 @@ export interface IMolochSubmitVote extends IMolochEvent {
   member: Address;
   vote: number;
   shares: string;
-  highestIndexYesVote: string;
+  highestIndexYesVote: number;
 }
 
 export interface IMolochProcessProposal extends IMolochEvent {

@@ -73,7 +73,7 @@ export default async function (
           member: memberAddress,
           vote: uintVote,
           shares: member.shares.toString(),
-          highestIndexYesVote: member.highestIndexYesVote.toString(),
+          highestIndexYesVote: +member.highestIndexYesVote,
         }
       };
     }

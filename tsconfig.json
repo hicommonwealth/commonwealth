@@ -23,7 +23,6 @@
     "./shared/adapters",
     "./test",
     "./eth/types",
-    "./eth/test"
   ],
   "exclude": [
     "./node_modules",

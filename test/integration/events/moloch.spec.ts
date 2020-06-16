@@ -169,6 +169,8 @@ describe('Moloch Event Integration Tests', () => {
             member,
             delegateKey: member,
             vote: 2,
+            shares: '1',
+            highestIndexYesVote: 0,
           });
           resolve();
         }
@@ -205,6 +207,8 @@ describe('Moloch Event Integration Tests', () => {
             tokenTribute: '5',
             sharesRequested: '5',
             didPass: true,
+            yesVotes: '1',
+            noVotes: '0',
           });
           resolve();
         }
@@ -380,6 +384,8 @@ describe('Moloch Event Integration Tests', () => {
         tokenTribute: '5',
         sharesRequested: '5',
         didPass: true,
+        yesVotes: '1',
+        noVotes: '0',
       },
     ]);
 

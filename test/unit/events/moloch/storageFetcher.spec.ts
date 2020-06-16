@@ -144,6 +144,8 @@ describe('Moloch Storage Fetcher Tests', () => {
           tokenTribute: '4',
           sharesRequested: '2',
           didPass: true,
+          yesVotes: '2',
+          noVotes: '3',
         }
       },
     ]);
@@ -223,6 +225,8 @@ describe('Moloch Storage Fetcher Tests', () => {
           tokenTribute: '4',
           sharesRequested: '2',
           didPass: false,
+          yesVotes: '2',
+          noVotes: '3',
         }
       },
     ]);
@@ -268,6 +272,8 @@ describe('Moloch Storage Fetcher Tests', () => {
           tokenTribute: '4',
           sharesRequested: '2',
           didPass: false,
+          yesVotes: '2',
+          noVotes: '3',
         }
       },
     ]);

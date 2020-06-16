@@ -1,18 +1,18 @@
 import { Web3Provider, AsyncSendable, JsonRpcSigner } from 'ethers/providers';
 import { ethers } from 'ethers';
 
-import { Erc20 } from 'eth/types/Erc20';
-import { Erc20Factory } from 'eth/types/Erc20Factory';
+import { Erc20 } from 'Erc20';
+import { Erc20Factory } from 'Erc20Factory';
 
-import { Moloch1 } from 'eth/types/Moloch1';
-import { Moloch1Factory } from 'eth/types/Moloch1Factory';
-import { GuildBank1 } from 'eth/types/GuildBank1';
-import { GuildBank1Factory } from 'eth/types/GuildBank1Factory';
+import { Moloch1 } from 'Moloch1';
+import { Moloch1Factory } from 'Moloch1Factory';
+import { GuildBank1 } from 'GuildBank1';
+import { GuildBank1Factory } from 'GuildBank1Factory';
 
-import { Moloch2 } from 'eth/types/Moloch2';
-import { Moloch2Factory } from 'eth/types/Moloch2Factory';
-import { GuildBank2 } from 'eth/types/GuildBank2';
-import { GuildBank2Factory } from 'eth/types/GuildBank2Factory';
+import { Moloch2 } from 'Moloch2';
+import { Moloch2Factory } from 'Moloch2Factory';
+import { GuildBank2 } from 'GuildBank2';
+import { GuildBank2Factory } from 'GuildBank2Factory';
 
 export default class MolochAPI {
   public readonly gasLimit: number = 3000000;
