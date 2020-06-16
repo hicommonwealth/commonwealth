@@ -70,11 +70,7 @@ const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen: boolea
   }
 };
 
-interface IThreadCaratMenuAttrs {
-  proposal: OffchainThread;
-}
-
-const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { tagEditorIsOpen: boolean }> = {
+const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;

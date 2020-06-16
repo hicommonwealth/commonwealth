@@ -110,12 +110,8 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
               modal: EditTagModal,
               data: {
                 description,
-                featured,
-                featured_order,
                 id,
                 name,
-                addFeaturedTag,
-                removeFeaturedTag
               }
             });
           },

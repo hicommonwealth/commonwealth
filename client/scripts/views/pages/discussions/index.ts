@@ -22,6 +22,7 @@ import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
+import TagCaratMenu from './tag_carat_menu';
 
 interface IDiscussionPageAttrs {
   activeTag?: string;
@@ -57,6 +58,7 @@ const CommunitySidebar: m.Component<{ activeTag?: string }> = {
       ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     return m('.CommunitySidebar', [
+      m(TagCaratMenu, { tag: activeTag }),
       activeTag && [
         m('h4', `About #${activeTag}`),
         m('p', app.tags.store.getByName(activeTag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
