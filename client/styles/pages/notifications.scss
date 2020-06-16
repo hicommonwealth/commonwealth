@@ -3,37 +3,12 @@
         padding-top: 0;
         margin-top: 0;
     }
-}
-
-.NotificationRow {
-    display: flex;
-    border-bottom: 1px solid #ddd;
-    padding: 12px 15px;
-    &.unread {
-        background: #f2f3f4;
+    .NotificationButtons {
+        margin-bottom: 24px;
     }
-
-    .notification-icon {
-        width: 45px;
-    }
-    .notification-icon-inner {
-        width: 30px;
-        height: 30px;
-        background: #ddd;
-        border-radius: 9999px;
-    }
-    .notification-content {
-        flex: 1;
-    }
-    .notification-crated {
-        text-align: right;
-    }
-    .notification-read {
-        width: 80px;
-        text-align: right;
-        cursor: pointer;
-        &:hover {
-            text-decoration: underline;
+    .NotificationsList {
+        li:nth-child(1) {
+            border-top: 1px solid #ddd;
         }
     }
 }
