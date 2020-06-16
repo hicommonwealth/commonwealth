@@ -63,7 +63,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
       app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
-      app.login.discussionDrafts = data.user ? data.user.discussionDrafts : [];
 
       // add roles data for user
       if (data.roles) {
@@ -453,7 +452,10 @@ $(() => {
         jwt = app.login.jwt;
       }
       // grab discussion drafts
+      const a = app;
+      debugger
       if (app.loginState === LoginState.LoggedIn) {
+        console.log(app.login.discussionDrafts);
         app.login.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
