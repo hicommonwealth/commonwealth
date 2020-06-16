@@ -1,7 +1,8 @@
-import { MolochShares } from 'adapters/chain/ethereum/types';
+import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
-import EthereumAccounts, { EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
@@ -11,7 +12,7 @@ import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
 
-export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount> {
+export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Moloch;
   public chain: EthereumChain;
@@ -53,7 +54,7 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider, activeAddress);
+    const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
 
     if (this.webWallet) {

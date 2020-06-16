@@ -13,7 +13,7 @@ import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
 import { ProposalType } from 'identifiers';
 import { featherIcon, slugify } from 'helpers';
-import { NotificationCategories } from 'types';
+import { NotificationCategories, IPostNotificationData, ICommunityNotificationData } from 'types';
 
 import { formatCoin } from 'adapters/currency';
 import labelEdgewareEvent from 'events/edgeware/filters/labeler';
@@ -21,11 +21,13 @@ import labelEdgewareEvent from 'events/edgeware/filters/labeler';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Edgeware from 'controllers/chain/edgeware/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import EthereumAccount from 'controllers/chain/ethereum/account';
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { NearAccount } from 'controllers/chain/near/account';
-import { ChainClass, ChainBase, Notification, NotificationCategory } from 'models';
+import { ChainClass, ChainBase, Notification } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 
 import { jumpHighlightComment } from 'views/pages/view_proposal';
@@ -49,7 +51,6 @@ import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 import { getProposalUrl } from '../../../../shared/utils';
-import { IPostNotificationData, ICommunityNotificationData } from '../../../../shared/types';
 
 
 interface INavigationMenuAttrs {
@@ -465,10 +466,14 @@ const ActionMenu : m.Component<IMenuAttrs> = {
               data: { account: activeAcct }
             })
           }, 'Rage quit'),
-          (activeAcct instanceof MolochMember) && m('li', {
+          (activeAcct instanceof EthereumAccount && (app.chain instanceof Moloch)) && m('li', {
             onclick: (e) => app.modals.create({
               modal: TokenApprovalModal,
-              data: { account: activeAcct },
+              data: {
+                account: activeAcct,
+                contractAddress: (app.chain as Moloch).governance.api.contractAddress,
+                tokenAddress: (app.chain as Moloch).governance.api.tokenContract.address,
+              },
             })
           }, 'Approve tokens'),
           // TODO: add a "reserve tokens" option here, in case you want to apply to DAO?

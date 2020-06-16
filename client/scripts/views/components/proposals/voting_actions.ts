@@ -29,7 +29,7 @@ import MolochProposal, {
   MolochVote,
   MolochProposalState
 } from 'controllers/chain/ethereum/moloch/proposal';
-import { EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 
 const CannotVote: m.Component<{ text?, action? }> = {

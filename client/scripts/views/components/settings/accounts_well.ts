@@ -15,7 +15,6 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 interface IAttrs {
   account: AddressInfo;

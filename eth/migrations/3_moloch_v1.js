@@ -27,12 +27,4 @@ module.exports = async function (deployer, network, accounts) {
 
   await deployer.deploy(GuildBankV1, summoner);
   // deployer.deploy(Helper);
-
-  // approve token for summoner and first applicant
-  await token.approve(moloch.address, 500, { from: summoner });
-  await Promise.all(applicants.map(async (a) => {
-    const addr = a.toLowerCase();
-    await token.transfer(addr, 20, { from: summoner });
-    await token.approve(moloch.address, 20, { from: addr });
-  }));
 };

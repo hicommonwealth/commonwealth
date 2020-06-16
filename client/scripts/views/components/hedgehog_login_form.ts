@@ -5,7 +5,7 @@ import { default as $ } from 'jquery';
 import { default as m } from 'mithril';
 import { default as app } from 'state';
 import { createUserWithAddress } from 'controllers/app/login';
-import { EthereumAccount } from 'client/scripts/controllers/chain/ethereum/account';
+import EthereumAccount from 'client/scripts/controllers/chain/ethereum/account';
 
 const messages = {
   // signedIn: {

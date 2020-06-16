@@ -1,9 +1,9 @@
 import BN from 'bn.js';
 import moment from 'moment';
 
-import { MolochShares } from 'adapters/chain/ethereum/types';
+import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { MolochEventKind, IMolochSubmitProposal, IMolochProcessProposal, IMolochSubmitVote } from 'events/moloch/types';
+import { MolochEventKind, IMolochSubmitProposal, IMolochProcessProposal } from 'events/moloch/types';
 
 import {
   Proposal,
@@ -37,7 +37,7 @@ export enum MolochProposalState {
   Processed
 }
 
-export class MolochProposalVote implements IVote<MolochShares> {
+export class MolochProposalVote implements IVote<EthereumCoin> {
   public readonly account: MolochMember;
   public readonly choice: MolochVote;
 
@@ -100,7 +100,7 @@ const backportEntityToAdapter = (
 
 export default class MolochProposal extends Proposal<
   MolochAPI,
-  MolochShares,
+  EthereumCoin,
   IMolochProposalResponse,
   MolochProposalVote
 > {

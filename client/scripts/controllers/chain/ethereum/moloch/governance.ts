@@ -107,25 +107,6 @@ export default class MolochGovernance extends ProposalModule<
     throw new Error('Method not implemented.');
   }
 
-  public async approveShares(amountToApprove: BN) {
-    // if (this._Members.api.userAddress !== this.address) {
-    //   throw new Error('can only have metamask verified user approve tokens');
-    // }
-
-    const approvalTx = await this.api.tokenContract.approve(
-      this._api.contractAddress,
-      amountToApprove.toString(),
-      { gasLimit: this._Members.api.gasLimit }
-    );
-    const approvalTxReceipt = await approvalTx.wait();
-    if (approvalTxReceipt.status !== 1) {
-      throw new Error('failed to approve amount');
-    }
-
-    // trigger update to refresh holdings
-    return approvalTxReceipt;
-  }
-
   // web wallet only create proposal transaction
   public async createPropWebTx(
     applicantAddress: string,

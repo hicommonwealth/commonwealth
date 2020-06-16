@@ -3,7 +3,6 @@ import 'modals/ragequit_modal.scss';
 import { default as m } from 'mithril';
 import { default as $ } from 'jquery';
 import { TextInputFormField } from 'views/components/forms';
-import { MolochShares } from 'adapters/chain/ethereum/types';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';

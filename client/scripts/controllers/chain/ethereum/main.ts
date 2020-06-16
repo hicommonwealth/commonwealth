@@ -1,5 +1,6 @@
-import { default as EthereumChain } from 'controllers/chain/ethereum/chain';
-import { default as EthereumAccounts, EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumChain from 'controllers/chain/ethereum/chain';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import EthereumAccount from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
@@ -60,7 +61,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   }
 
   public async getEthersProvider() {
-    const provider = new (await import('ethers')).providers.Web3Provider(this.chain.api.currentProvider);
+    const provider = new (await import('ethers')).providers.Web3Provider(this.chain.api.currentProvider as any);
     return provider;
   }
 }

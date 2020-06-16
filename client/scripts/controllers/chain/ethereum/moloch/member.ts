@@ -6,7 +6,8 @@ import { switchMap, first } from 'rxjs/operators';
 import { MolochShares } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
 
-import EthereumAccounts, { EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 
 import MolochMembers from './members';
@@ -24,7 +25,9 @@ export default class MolochMember extends EthereumAccount {
 
   public get balance(): Observable<MolochShares> {
     return from(this.initialized).pipe(
-      switchMap(() => this.isMember ? this._shares.asObservable() : of(new MolochShares(0)))
+      switchMap(() => this.isMember
+        ? this._shares.asObservable()
+        : of(new MolochShares(this._Members.api.contractAddress, 0)))
     );
   }
 
@@ -33,7 +36,14 @@ export default class MolochMember extends EthereumAccount {
   public get shares() { return this._shares.value; }
   public get highestIndexYesVote() { return this._highestIndexYesVote; }
 
-  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, Members: MolochMembers, address: string, data?: IMolochMember) {
+  constructor(
+    app: IApp,
+    ChainInfo: EthereumChain,
+    Accounts: EthereumAccounts,
+    Members: MolochMembers,
+    address: string,
+    data?: IMolochMember
+  ) {
     super(app, ChainInfo, Accounts, address);
     this._Members = Members;
     if (data) {
@@ -42,13 +52,12 @@ export default class MolochMember extends EthereumAccount {
       }
       this._isMember = true;
       this._delegateKey = data.delegateKey.toLowerCase();
-      this._shares.next(new MolochShares(new BN(data.shares)));
+      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(data.shares)));
       this._highestIndexYesVote = data.highestIndexYesVote ? new BN(data.highestIndexYesVote) : null;
       this._initialized = Promise.resolve(true);
     } else {
-      this._initialized = new Promise(async (resolve, reject) => {
-        await this.refresh();
-        resolve(true);
+      this._initialized = new Promise((resolve, reject) => {
+        this.refresh().then(() => resolve(true));
       });
     }
     Members.store.add(this);
@@ -61,7 +70,7 @@ export default class MolochMember extends EthereumAccount {
     } else {
       this._isMember = true;
       this._delegateKey = m.delegateKey.toLowerCase();
-      this._shares.next(new MolochShares(new BN(m.shares.toString())));
+      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(m.shares.toString())));
       this._highestIndexYesVote = m.highestIndexYesVote ? new BN(m.highestIndexYesVote.toString()) : null;
     }
   }
@@ -70,11 +79,11 @@ export default class MolochMember extends EthereumAccount {
     if (this._Members.api.userAddress !== this.address) {
       throw new Error('can only updateDelegateKey metamask verified user');
     }
-  
+
     if (!(await this._Members.isSenderMember())) {
       throw new Error('caller must be member');
     }
-  
+
     if (parseInt(delegateKey, 16) === 0) {
       throw new Error('delegate key cannot be 0');
     }
@@ -105,25 +114,6 @@ export default class MolochMember extends EthereumAccount {
     return txReceipt;
   }
 
-  public async approveShares(amountToApprove: BN) {
-    // if (this._Members.api.userAddress !== this.address) {
-    //   throw new Error('can only have metamask verified user approve tokens');
-    // }
-
-    const approvalTx = await this._Members.api.tokenContract.approve(
-      this._Members.api.contractAddress,
-      amountToApprove.toString(),
-      { gasLimit: this._Members.api.gasLimit }
-    );
-      const approvalTxReceipt = await approvalTx.wait();
-      if (approvalTxReceipt.status !== 1) {
-        throw new Error('failed to approve amount');
-    }
-
-    // trigger update to refresh holdings
-    await this.refresh();
-    return approvalTxReceipt;
-  }
 
   public async ragequitTx(sharesToBurn: BN) {
     if (this._Members.api.userAddress !== this.address) {
