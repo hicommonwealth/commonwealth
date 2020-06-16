@@ -109,41 +109,47 @@ function applyBlockFormatters(parentText, hideFormatting) {
 
     const blockFormatters = [{
       pattern: /^# /,
-      formatMany: (text) => m('h1', text),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'h1', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^## /,
-      formatMany: (text) => m('h2', text),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'h2', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^### /,
-      formatMany: (text) => m('h3', text),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'h3', text),
       formatOne: (text, match) => hideFormatting
         ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^> /,
-      formatMany: (text) => m('blockquote', text),
-      formatOne: (text, match) => m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'blockquote', text),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('div', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^(- |\* |• |· )/,
-      formatMany: (text) => m('ul', text),
-      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', text),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^ {1,2}(- |\* |• |· )/,
-      formatMany: (text) => m('ul', m('ul', text)),
-      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', text)),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^ {3,4}(- |\* |• |· )/,
-      formatMany: (text) => m('ul', m('ul', m('ul', text))),
-      formatOne: (text, match) => m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'ul', m('ul', m('ul', text))),
+      formatOne: (text, match) => hideFormatting
+        ? [] : m('li', applyInlineFormatters(text.replace(match, ''), hideFormatting)),
     }, {
       pattern: /^\[([ x])\] /,
-      formatMany: (text) => m('ul.checklist', text),
-      formatOne: (text, match) => m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
-        m('span', applyInlineFormatters(text.replace(match, ''), hideFormatting))
-      ]),
+      formatMany: (text) => m(hideFormatting ? 'div' : 'ul.checklist', text),
+      formatOne: (text, match) => hideFormatting
+        ? []
+        : m(`li${match.includes('x') ? '.checked' : '.unchecked'}`, [
+          m('span', applyInlineFormatters(text.replace(match, ''), hideFormatting))
+        ]),
     }];
 
     // Lines which don't match any of the above groups are assigned an
@@ -172,19 +178,19 @@ function applyBlockFormatters(parentText, hideFormatting) {
       if (thisLineFormat === lastLineFormat) {
         // if we are in the same group, keep appending to it
         lastGroup.push(
-          (blockFormatters[thisLineFormat] && !hideFormatting)
+          (blockFormatters[thisLineFormat])
             ? blockFormatters[thisLineFormat].formatOne(line, match[0]) : `${line} `
         );
       } else {
         // otherwise, push the previous group onto `results` and start anew
         results.push(
-          (blockFormatters[lastLineFormat] && !hideFormatting)
+          (blockFormatters[lastLineFormat])
             ? blockFormatters[lastLineFormat].formatMany(lastGroup)
             : defaultGroup(lastGroup)
         );
         lastLineFormat = thisLineFormat;
         lastGroup = [
-          (blockFormatters[thisLineFormat] && !hideFormatting)
+          (blockFormatters[thisLineFormat])
             ? blockFormatters[thisLineFormat].formatOne(line, match[0])
             : `${line} `
         ];
@@ -193,7 +199,7 @@ function applyBlockFormatters(parentText, hideFormatting) {
     // push the last group onto `results`
     if (lastGroup.length > 0) {
       results.push(
-        (blockFormatters[lastLineFormat] && !hideFormatting)
+        (blockFormatters[lastLineFormat])
           ? blockFormatters[lastLineFormat].formatMany(lastGroup)
           : defaultGroup(lastGroup)
       );

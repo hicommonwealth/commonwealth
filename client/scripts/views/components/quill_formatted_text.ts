@@ -5,7 +5,8 @@ import $ from 'jquery';
 import m from 'mithril';
 import clamp from 'clamp-js';
 import { stringUpperFirst } from '@polkadot/util';
-import { loadScript } from '../../helpers';
+import { Icon, Icons } from 'construct-ui';
+import { loadScript } from 'helpers';
 
 interface IQuillJSON {
   ops: IQuillOps[];
@@ -117,10 +118,17 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     ? groups.map((group) => {
       return m('p.hidden-formatting', group.parents.map((parent) => {
         return parent.children.map((child) => {
-          if (child.insert?.image) return;
-          if (child.insert?.mention) return m('span', child.insert.mention.value);
-          if (child.insert?.twitter) return; // return m('span', '[tweet]');
-          if (child.insert?.video) return; // return m('span', '[video]');
+          if (child.insert?.mention)
+            return m('span.mention', child.insert.mention.denotationChar + child.insert.mention.value);
+          if (child.insert?.image) return m(Icon, { name: Icons.IMAGE });
+          if (child.insert?.twitter) return m(Icon, { name: Icons.IMAGE });
+          if (child.insert?.video) return m(Icon, { name: Icons.IMAGE });
+          if (child.attributes?.link) return m('a', {
+            href: child.attributes.link,
+            target: '_blank',
+            noreferrer: 'noreferrer',
+            noopener: 'noopener',
+          }, `${child.insert}`);
           return m('span', `${child.insert}`);
         });
       }));
@@ -187,7 +195,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           let result;
           if (child.insert?.mention) {
             result = m('span.mention', {
-              onclick: (e) => alert(child.insert.mention.id)
+              onclick: (e) => {
+                //alert(child.insert.mention.id)
+              }
             }, child.insert.mention.denotationChar + child.insert.mention.value);
           } else if (child.attributes?.link) {
             result = m('a', {

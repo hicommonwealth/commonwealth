@@ -176,6 +176,9 @@
         &:last-child {
             margin-bottom: 0;
         }
+        .hidden-formatting-listitem + .hidden-formatting-listitem {
+            margin-top: 6px;
+        }
     }
 }
 
