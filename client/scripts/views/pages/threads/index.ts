@@ -80,9 +80,6 @@ export const saveDraft = (
       let result;
       try {
         result = await app.login.discussionDrafts.create(
-          author.address,
-          chainId,
-          communityId,
           title,
           bodyText,
           tagName,

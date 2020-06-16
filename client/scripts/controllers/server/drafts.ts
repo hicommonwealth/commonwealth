@@ -33,20 +33,17 @@ class DraftsController {
   public get initialized() { return this._initialized; }
 
   public async create(
-    address: string,
-    chainId: string,
-    communityId: string,
-    title?: string,
-    body?: string,
-    tagName?: string,
+    title: string,
+    body: string,
+    tagName: string,
     attachments?: string[],
   ) {
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
         'address': app.vm.activeAccount.address,
         'author_chain': app.vm.activeAccount.chain.id,
-        'chain': chainId,
-        'community': communityId,
+        'chain': app.activeChainId(),
+        'community': app.activeCommunityId(),
         'title': title,
         'body': body,
         'attachments[]': attachments,
@@ -65,9 +62,9 @@ class DraftsController {
 
   public async edit(
     draftId: number,
-    title?: string,
-    body?: string,
-    tagName?: string,
+    title: string,
+    body: string,
+    tagName: string,
     attachments?: string[],
   ) {
     // Todo: handle attachments
@@ -124,15 +121,16 @@ class DraftsController {
     });
   }
 
-  public refreshAll(reset = false) {
+  public async refreshAll(reset = false) {
     if (!app.login || !app.login.jwt) {
       throw new Error('must be logged in to refresh drafts');
     }
-    return $.get(`${app.serverUrl()}/drafts`, {
+    const response = await $.get(`${app.serverUrl()}/drafts`, {
       'address': app.vm.activeAccount.address,
       'author_chain': app.vm.activeAccount.chain.id,
       'jwt': app.login.jwt
-    }).then((response) => {
+    });
+    try {
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -154,12 +152,12 @@ class DraftsController {
         }
       }
       this._initialized = true;
-    }, (err) => {
+    } catch (err) {
       console.log('failed to load discussion drafts');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Error loading discussion drafts');
-    });
+    }
   }
 
   public deinit() {
