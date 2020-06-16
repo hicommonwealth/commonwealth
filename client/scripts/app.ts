@@ -304,11 +304,17 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, wideLayout?: boolean) => ({
+  interface RouteAttrs {
+    scoped: string | boolean;
+    wideLayout?: boolean;
+  }
+
+  const importRoute = (module, attrs: RouteAttrs) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
     render: (vnode) => {
+      const { scoped, wideLayout } = attrs;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -317,8 +323,7 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, wideLayout }, [ vnode ]);
+      return m(Layout, { scope, wideLayout }, [ vnode ]);
     },
   });
 
@@ -330,10 +335,10 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), false, true),
-    '/about':                    importRoute(import('views/pages/landing/about'), false),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/':                         importRoute(import('views/pages/home'), { scoped: false, wideLayout: true }),
+    '/about':                    importRoute(import('views/pages/landing/about'), { scoped: false }),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), { scoped: false }),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), { scoped: false }),
 
     // Login page
     '/login':                    importRoute(import('views/pages/login'), false),
@@ -342,8 +347,8 @@ $(() => {
     '/notification-settings':    importRoute(import('views/pages/notification-settings'), false),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), { scoped: false }),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), { scoped: false }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -372,12 +377,12 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute(import('views/pages/questions'), true),
-    // '/:scope/requests':          importRoute(import('views/pages/requests'), true),
-    // '/:scope/validators':        importRoute(import('views/pages/validators'), true),
+    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
+    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
+    // '/:scope/validators':        importRoute(import('views/pages/validators'), { scoped: true }),
 
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),
+    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), { scoped: true }),
   });
 
   // initialize construct-ui focus manager
