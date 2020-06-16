@@ -26,7 +26,7 @@ import { SubstratePreHeader, SubstratePresentationComponent } from './substrate'
 
 export interface IValidatorAttrs {
   stash: string;
-  total: Coin;
+  total?: Coin;
   nominators?: any;
   error?: any;
   sending?: boolean;
@@ -35,7 +35,6 @@ export interface IValidatorAttrs {
   nominated?: Coin;
   controller?: string;
   hasNominated?: boolean;
-  commissionPer?: number;
   onChangeHandler?: any;
   waiting?: boolean;
   eraPoints?: string;
@@ -56,7 +55,7 @@ export interface IValidatorPageState {
   results: any[];
 }
 
-export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr }> = {
+export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
@@ -66,7 +65,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr }> = 
         m('table', [
           m('tr', [
             m('th', 'Nominator'),
-            m('th', 'Amount'),
+            m('th', vnode.attrs.waiting
+              ? 'Priority'
+              : 'Amount'),
           ]),
           vnode.attrs.nominators.map((n) => {
             return m('tr', [
@@ -77,7 +78,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr }> = 
                   this.trigger('modalexit');
                 }
               })),
-              m('td', formatCoin(n.balance, true)),
+              m('td', vnode.attrs.waiting
+                ? n.balance
+                : formatCoin(n.balance, true)),
             ]);
           }),
         ])
@@ -111,6 +114,9 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       : null,
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
+      : null,
+    nominatedBy: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.nominatedBy
       : null
   }),
   view: (vnode) => {
