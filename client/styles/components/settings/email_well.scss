@@ -1,0 +1,11 @@
+.EmailWell {
+  h4 {
+    margin-top: 20px;
+    &:first-child {
+        margin-top: 0;
+    }
+  }
+  input {
+    margin-right: 12px;
+  }
+}

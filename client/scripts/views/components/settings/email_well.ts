@@ -1,5 +1,5 @@
 
-import 'components/settings/github_well.scss';
+import 'components/settings/email_well.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -20,7 +20,7 @@ const EmailWell: m.Component<{}, IState> = {
     vnode.state.email = app.login.email;
   },
   view: (vnode) => {
-    return m('EmailWell', [
+    return m('.EmailWell', [
       m('h4', 'Email'),
       m(Input, {
         contentLeft: m(Icon, { name: Icons.MAIL }),
