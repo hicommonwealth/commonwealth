@@ -3,6 +3,7 @@ import 'components/quill_formatted_text.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import clamp from 'clamp-js';
 import { stringUpperFirst } from '@polkadot/util';
 import { loadScript } from '../../helpers';
 
@@ -231,18 +232,14 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     });
 };
 
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }, { suppressFadeout }> = {
+const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
   view: (vnode) => {
     const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
-      class: (collapse ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
       oncreate: (vnode2) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
-        const height = $(vnode2.dom).height();
-        vnode.state.suppressFadeout = height < 120;
-        setTimeout(() => m.redraw());
       }
     }, renderQuillDelta(doc, hideFormatting));
   }

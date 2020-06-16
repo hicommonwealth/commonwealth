@@ -3,6 +3,7 @@ import 'components/markdown_formatted_text.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import clamp from 'clamp-js';
 
 // Three-pass Markdown formatter.
 //
@@ -201,9 +202,7 @@ function applyBlockFormatters(parentText, hideFormatting) {
   });
 }
 
-const MarkdownFormattedText : m.Component<{
-  doc: string, hideFormatting?: boolean, collapse?: boolean
-}, { suppressFadeout: boolean }> = {
+const MarkdownFormattedText : m.Component<{ doc: string, hideFormatting?: boolean, collapse?: boolean }> = {
   view: (vnode) => {
     const { doc, hideFormatting, collapse } = vnode.attrs;
     if (!doc) return;
@@ -230,14 +229,7 @@ const MarkdownFormattedText : m.Component<{
       lastMatchEndingIndex = match.index + match[0].length;
     }
     results.push(applyBlockFormatters(doc.slice(lastMatchEndingIndex), hideFormatting));
-    return m('.MarkdownFormattedText', {
-      class: (collapse ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
-      oncreate: (vnode2) => {
-        const height = $(vnode2.dom).height();
-        vnode.state.suppressFadeout = height < 120;
-        setTimeout(() => m.redraw());
-      }
-    }, results);
+    return m('.MarkdownFormattedText', results);
   }
 };
 
