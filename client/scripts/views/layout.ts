@@ -15,9 +15,9 @@ import { featherIcon } from 'helpers';
 
 const CHAIN_LOADING_TIMEOUT = 3000;
 
-export const LoadingLayout: m.Component<{ activeTag: string, wideLayout: boolean }> = {
+export const LoadingLayout: m.Component<{ wideLayout: boolean }> = {
   view: (vnode) => {
-    const { activeTag, wideLayout } = vnode.attrs;
+    const { wideLayout } = vnode.attrs;
 
     return m('.Layout.LoadingLayout.mithril-app', [
       m(Header),
@@ -30,9 +30,9 @@ export const LoadingLayout: m.Component<{ activeTag: string, wideLayout: boolean
   }
 };
 
-export const Layout: m.Component<{ scope: string, activeTag?: string, wideLayout?: boolean }, { loadingScope }> = {
+export const Layout: m.Component<{ scope: string, wideLayout?: boolean }, { loadingScope }> = {
   view: (vnode) => {
-    const { scope, activeTag, wideLayout } = vnode.attrs;
+    const { scope, wideLayout } = vnode.attrs;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
@@ -55,7 +55,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, wideLayout
       ]);
     } else if (!app.loginStatusLoaded()) {
       // Wait for /api/status to return with the user's login status
-      return m(LoadingLayout, { activeTag, wideLayout });
+      return m(LoadingLayout, { wideLayout });
     } else if (scope && !scopeMatchesChain && !scopeMatchesCommunity) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
@@ -73,10 +73,10 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, wideLayout
       vnode.state.loadingScope = scope;
       if (scopeMatchesChain) {
         initChain(scope);
-        return m(LoadingLayout, { activeTag, wideLayout });
+        return m(LoadingLayout, { wideLayout });
       } else if (scopeMatchesCommunity) {
         initCommunity(scope);
-        return m(LoadingLayout, { activeTag, wideLayout });
+        return m(LoadingLayout, { wideLayout });
       }
     } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're
@@ -85,7 +85,7 @@ export const Layout: m.Component<{ scope: string, activeTag?: string, wideLayout
         vnode.state.loadingScope = null;
         m.redraw();
       });
-      return m(LoadingLayout, { activeTag, wideLayout });
+      return m(LoadingLayout, { wideLayout });
     }
 
     return m('.Layout.mithril-app', [

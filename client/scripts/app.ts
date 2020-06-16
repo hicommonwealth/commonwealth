@@ -323,8 +323,7 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, wideLayout }, [ vnode ]);
+      return m(Layout, { scope, wideLayout }, [ vnode ]);
     },
   });
 
@@ -356,7 +355,7 @@ $(() => {
     '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), { scoped: true }),
 
     '/:scope':                   importRoute(import('views/pages/discussions'), { scoped: true }),
-    '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/discussions/:tag':  importRoute(import('views/pages/discussions'), { scoped: true }),
     '/:scope/tags':              importRoute(import('views/pages/tags'), { scoped: true }),
     '/:scope/members':           importRoute(import('views/pages/members'), { scoped: true }),
     // '/:scope/chat':              importRoute(import('views/pages/chat'), { scoped: true }),
