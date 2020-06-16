@@ -42,7 +42,10 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   try {
     const userOwnedAddresses = await req.user.getAddresses();
     const draft = await models.DiscussionDraft.findOne({
-      where: { id, author_id: author.id },
+      where: {
+        id,
+        author_id: author.id
+      },
     });
     if (!draft) return next(new Error(Errors.NotFound));
     if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.author_id) === -1) {
@@ -51,10 +54,10 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     if (body) draft.body = body;
     if (title) draft.title = title;
     if (tag) draft.tag = tag;
-    await tag.save();
+    await draft.save();
     attachFiles();
 
-    return res.json({ status: 'Success', result: tag.toJSON() });
+    return res.json({ status: 'Success', result: draft.toJSON() });
   } catch (e) {
     return next(e);
   }
