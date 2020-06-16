@@ -15,8 +15,8 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import labelEdgewareEvent from '../../../../../shared/events/edgeware/filters/labeler';
-import { getProposalUrl } from '../../../../../shared/utils';
+import labelEdgewareEvent from '../../../../shared/events/edgeware/filters/labeler';
+import { getProposalUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;

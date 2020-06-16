@@ -3,7 +3,7 @@ import Infinite from 'mithril-infinite';
 import app from 'state';
 
 import { PopoverMenu, Button, Icons, ButtonGroup } from 'construct-ui';
-import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
+import { HeaderBatchNotificationRow } from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 

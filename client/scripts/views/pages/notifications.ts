@@ -3,7 +3,7 @@ import 'pages/notifications.scss';
 import m from 'mithril';
 
 import app from 'state';
-import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
+import { HeaderBatchNotificationRow } from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import { NotificationCategories } from 'types';
 import { Button, ButtonGroup } from 'construct-ui';
