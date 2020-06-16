@@ -6,7 +6,10 @@ import { formatNumber } from '@polkadot/util';
 import { Icon, Icons } from 'construct-ui';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
+import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
+import PageLoading from "views/pages/loading";
+
 
 const model = {
   perPage: 20,
@@ -36,7 +39,8 @@ const model = {
 
 const PresentationComponent = (state, chain: Substrate) => {
   const validators = state.dynamic.validators;
-  if (!validators) return;
+  if (!validators) return m(PageLoading, {message:"Loading Validators..."});
+  
 
   const lastHeaders = (app.chain.base === ChainBase.Substrate)
     ? (app.chain as Substrate).staking.lastHeaders
@@ -75,49 +79,23 @@ const PresentationComponent = (state, chain: Substrate) => {
           m('th.val-action', ''),
         ]),
         currentValidators.map((validator) => {
-        // total stake
-          const total = chain.chain.coins(validators[validator].exposure.total);
-          // own stake
-          const bonded = chain.chain.coins(validators[validator].exposure.own);
-          // other stake
-          const nominated = chain.chain.coins(total.asBN.sub(bonded.asBN));
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
           const eraPoints = validators[validator].eraPoints;
-          const commissionPer = validators[validator].commissionPer;
-          const hasNominated: boolean = app.vm.activeAccount && nominators
-            && !!nominators.find(({ stash }) => stash === app.vm.activeAccount.address);
           const blockCount = validators[validator].blockCount;
           const hasMessage = validators[validator]?.hasMessage;
           const isOnline = validators[validator]?.isOnline;
-          // add validator to collection if hasNominated already
-          if (hasNominated) {
-            state.nominations.push(validator);
-            state.originalNominations.push(validator);
-          }
           return m(ValidatorRow, {
             stash: validator,
             controller,
-            total,
-            bonded,
-            nominated,
             nominators,
-            hasNominated,
-            commissionPer,
             eraPoints,
             blockCount,
             hasMessage,
-            isOnline,
-            onChangeHandler: (result) => {
-              if (state.nominations.indexOf(result) === -1) {
-                state.nominations.push(result);
-              } else {
-                state.nominations = state.nominations.filter((n) => n !== result);
-              }
-            }
+            isOnline
           });
         }),
       ])
@@ -129,29 +107,18 @@ const PresentationComponent = (state, chain: Substrate) => {
           m('th.val-stash', 'Stash'),
           m('th.val-points', 'Nominations'),
           m('th.val-commission', 'Commission'),
-          // m('th.val-age', 'Validator Age'),
           m('th.val-action', ''),
         ]),
         waitingValidators.map((validator) => {
-          const total = chain.chain.coins(0);
-          const bonded = chain.chain.coins(0);
-          const nominated = chain.chain.coins(0);
-          const commissionPer = validators[validator].commissionPer;
-          const nominators = [];
           const controller = validators[validator].controller;
           const eraPoints = validators[validator].eraPoints;
           const toBeElected = validators[validator].toBeElected;
           const blockCount = validators[validator].blockCount;
           const hasMessage = validators[validator]?.hasMessage;
           const isOnline = validators[validator]?.isOnline;
-          return m(ValidatorRow, {
+          return m(ValidatorRowWaiting, {
             stash: validator,
             controller,
-            total,
-            bonded,
-            nominated,
-            nominators,
-            commissionPer,
             waiting: true,
             eraPoints,
             toBeElected,

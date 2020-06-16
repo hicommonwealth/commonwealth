@@ -1,28 +1,31 @@
 import m from 'mithril';
 import app from 'state';
 import BN from 'bn.js';
+import { Tooltip } from 'construct-ui';
 import { ChainBase } from 'models';
-import { pluralize } from 'helpers';
-import { Icons, Icon } from 'construct-ui';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
-import { DeriveStakingQuery, DeriveAccountInfo } from '@polkadot/api-derive/types';
+import { IAccountInfo } from 'controllers/chain/substrate/staking';
+import { DeriveStakingQuery } from '@polkadot/api-derive/types';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
+import ImOnline from './im_online';
+import Identity from './identity';
+
 const PERBILL_PERCENT = 10_000_000;
 
-interface IValidatorState {
+export interface IValidatorState {
   dynamic: {
-    info: DeriveAccountInfo;
+    info: IAccountInfo;
     query: DeriveStakingQuery;
     byAuthor: Record<string, string>;
   },
   isNominating: boolean;
 }
 
-interface StakingState {
+export interface StakingState {
   commission?: string;
   nominators: [string, Balance][];
   stakeTotal?: BN;
@@ -30,7 +33,7 @@ interface StakingState {
   stakeOwn?: BN;
 }
 
-function expandInfo({ exposure, validatorPrefs }: DeriveStakingQuery): StakingState {
+export function expandInfo({ exposure, validatorPrefs }: DeriveStakingQuery): StakingState {
   let nominators: [string, Balance][] = [];
   let stakeTotal: BN | undefined;
   let stakeOther: BN | undefined;
@@ -66,85 +69,51 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     // info: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.info(attrs.stash) : null,
     query: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.query(attrs.stash)
+      : null,
+    info: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.info(attrs.stash)
       : null
   }),
   view: (vnode) => {
-    const { query } = vnode.state.dynamic;
+    const { query, info } = vnode.state.dynamic;
     const byAuthor = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.byAuthor
       : {};
-    const stakingInfo = query ? expandInfo(query) : null;
-    const nominators = stakingInfo
-      ? stakingInfo.nominators.map(([who, value]): any => ({ stash: who, balance: app.chain.chain.coins(value) }))
-      : [];
-    const nominatorsList = vnode.attrs.nominators.length
-      ? vnode.attrs.nominators
-      : nominators;
+    const stakingInfo = query
+      ? expandInfo(query)
+      : null;
+    const nominatorsList = vnode.attrs.nominators;
     return m('tr.ValidatorRow', [
-      (!vnode.attrs.waiting
-        && m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true }))
-      ),
-      m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
-      (vnode.attrs.waiting
-        && m('td.val-nominations', [
-          nominatorsList.length > 0 && [
-            m('a.val-nominators', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: ViewNominatorsModal,
-                  data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
-                });
-              }
-            }, pluralize(nominatorsList.length, 'Nomination')),
-          ]
-        ])
-      ),
-      (!vnode.attrs.waiting
-        && m('td.val-total', [
-          formatCoin(vnode.attrs.total, true),
-          ' ',
-          nominatorsList.length > 0 && [
-            '(',
-            m('a.val-nominators', {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: ViewNominatorsModal,
-                  data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
-                });
-              }
-            }, nominatorsList.length),
-            ')',
-          ],
-        ])
-      ),
-      (!vnode.attrs.waiting
-        && m('td.val-own', formatCoin(vnode.attrs.bonded, true))
-      ),
-      (!vnode.attrs.waiting
-        && m('td.val-own', formatCoin(vnode.attrs.nominated, true))
-      ),
+      m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
+      m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+      })),
+      m('td.val-total', [
+        formatCoin(app.chain.chain.coins(stakingInfo?.stakeTotal), true), ' ',
+        nominatorsList.length > 0 && [ '(',
+          m('a.val-nominators', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({
+                modal: ViewNominatorsModal,
+                data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
+              });
+            }
+          }, nominatorsList.length),
+          ')'],
+      ]),
+      m('td.val-own', formatCoin(app.chain.chain.coins(stakingInfo?.stakeOwn), true)),
+      m('td.val-other', formatCoin(app.chain.chain.coins(stakingInfo?.stakeOther), true)),
       m('td.val-commission', stakingInfo?.commission || ' '),
-      (!vnode.attrs.waiting
-        && m('td.val-points', vnode.attrs.eraPoints || ' ')
-      ),
-      (!vnode.attrs.waiting
-        && m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' ')
-      ),
-      m('td.val-im-online',
-        m('span.im-online-icons', [
-          vnode.attrs.toBeElected
-        && m(Icon, { name: Icons.ARROW_LEFT_CIRCLE, size: 'sm' }),
-          vnode.attrs.isOnline
-        && m(Icon, { name: Icons.WIFI, size: 'sm' }),
-          vnode.attrs.hasMessage
-        && m(Icon, { name: Icons.MESSAGE_SQUARE, size: 'sm' }),
-          vnode.attrs.blockCount
-          && m('label.block-count', vnode.attrs.blockCount)
-        ]))
+      m('td.val-points', vnode.attrs.eraPoints || ' '),
+      m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
+      m(ImOnline, {
+        toBeElected: vnode.attrs.toBeElected,
+        isOnline: vnode.attrs.isOnline,
+        hasMessage: vnode.attrs.hasMessage,
+        blockCount: vnode.attrs.blockCount
+      })
     ]);
   }
 });
