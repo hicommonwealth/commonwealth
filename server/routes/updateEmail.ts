@@ -28,7 +28,10 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   if (!user) return next(new Error(Errors.NoUser));
 
   user.email = email;
+  user.emailVerified = null;
   await user.save();
+
+  // TODO: Send new verification email
 
   return res.json({ status: 'Success', result: user.toJSON() });
 };

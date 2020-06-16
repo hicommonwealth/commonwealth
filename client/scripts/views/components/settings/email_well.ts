@@ -30,15 +30,6 @@ const EmailWell: m.Component<{}, IState> = {
         defaultValue: vnode.state.email || null,
         onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
       }),
-      m(Tooltip, {
-        content: vnode.state.emailVerified ? 'Email verified' : 'Email not verified',
-        position: 'top',
-        transitionDuration: 0,
-        trigger: m(Icon, {
-          size: 'lg',
-          name: vnode.state.emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
-        }),
-      }),
       m(Button, {
         label: 'Update Email',
         onclick: async () => {
@@ -58,6 +49,15 @@ const EmailWell: m.Component<{}, IState> = {
               : 'Failed to update email');
           }
         }
+      }),
+      m(Tooltip, {
+        content: vnode.state.emailVerified ? 'Email verified' : 'Email not verified',
+        position: 'top',
+        transitionDuration: 0,
+        trigger: m(Icon, {
+          size: 'lg',
+          name: vnode.state.emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
+        }),
       }),
     ]);
   },
