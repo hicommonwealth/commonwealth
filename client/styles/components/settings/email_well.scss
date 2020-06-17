@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .EmailWell {
   h4 {
     margin-top: 20px;
@@ -11,5 +13,9 @@
   p {
     display: inline-block;
     margin-left: 12px;
+  }
+  label {
+    margin-left: 4px;
+    color: rgb(85, 110, 122);
   }
 }

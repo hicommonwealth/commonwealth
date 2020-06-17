@@ -62,15 +62,11 @@ const EmailWell: m.Component<IAttrs, IState> = {
             }
           }
         }),
-        m(Tooltip, {
-          content: emailVerified ? 'Email verified' : 'Email not verified',
-          position: 'top',
-          transitionDuration: 0,
-          trigger: m(Icon, {
-            size: 'lg',
-            name: emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
-          }),
+        m(Icon, {
+          size: 'lg',
+          name: emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
         }),
+        m('label', emailVerified ? 'Verified' : 'Not Verified'),
         emailUpdated && m('p', 'Check your email to confirm this change'),
       ]),
       vnode.attrs.github && m('.GithubWell', [
