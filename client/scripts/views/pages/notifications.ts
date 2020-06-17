@@ -13,7 +13,6 @@ import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
-import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';

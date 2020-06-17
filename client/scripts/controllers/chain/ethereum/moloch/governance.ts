@@ -56,10 +56,6 @@ export default class MolochGovernance extends ProposalModule<
   public get useClientChainEntities() { return this._useClientChainEntities; }
 
   // INIT / DEINIT
-  protected _entityConstructor(entity: ChainEntity): MolochProposal {
-    return new MolochProposal(this._Members, this, entity);
-  }
-
   public async init(
     api: MolochAPI,
     Members: MolochMembers,
@@ -84,7 +80,8 @@ export default class MolochGovernance extends ProposalModule<
       console.log('Fetching moloch proposals from backend.');
       await this.app.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
       const entities = this.app.chainEntities.store.getByType(MolochEntityKind.Proposal);
-      entities.map((p) => this._entityConstructor(p));
+      const constructorFunc = (e: ChainEntity) => new MolochProposal(this._Members, this, e);
+      entities.map((p) => this._entityConstructor(constructorFunc, p));
     } else {
       console.log('Fetching moloch proposals from chain.');
       const fetcher = new MolochStorageFetcher(api.Contract, 1);

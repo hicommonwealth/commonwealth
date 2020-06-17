@@ -12,6 +12,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
+import MolochProposal from './proposal';
 
 export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
@@ -28,7 +29,8 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     switch (entity.type) {
       case MolochEntityKind.Proposal: {
-        this.governance.updateProposal(entity, event);
+        const constructorFunc = (e: ChainEntity) => new MolochProposal(this.accounts, this.governance, e);
+        this.governance.updateProposal(constructorFunc, entity, event);
         break;
       }
       default: {
