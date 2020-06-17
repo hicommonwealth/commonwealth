@@ -8,6 +8,7 @@ import { Button, ButtonGroup, Icon, Icons, List, ListItem, Menu, MenuItem, MenuD
          Popover, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
+import { getRoleInCommunity } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
@@ -18,6 +19,7 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import { setActiveAccount } from 'controllers/app/login';
 
 const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenuOpen: boolean }> = {
   view: (vnode) => {
@@ -33,6 +35,10 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
         }),
       ]),
     ]);
+
+    const activeAddressesWithRole = app.login.activeAddresses.filter((account) => {
+      return getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
+    });
 
     return m('.LoginSelector', {
       class: (app.chain || app.community) ? '' : 'no-community',
@@ -76,12 +82,18 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
             hoverCloseDelay: 0,
             position: 'top-end',
             content: m(Menu, [
+              activeAddressesWithRole.map((account) => m(MenuItem, {
+                onclick: (e) => {
+                  setActiveAccount(account);
+                },
+                label: m(User, { user: account, showRole: true }),
+              })),
               m(MenuItem, {
-                onclick: async () => app.modals.create({
+                onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
                 iconLeft: Icons.USER,
-                label: 'Switch address'
+                label: 'Add another address'
               }),
             ]),
             trigger: (app.chain || app.community) && m(Button, {
