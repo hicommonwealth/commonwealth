@@ -22,11 +22,18 @@ export abstract class ProposalModule<
   private _app: IApp;
   public get app() { return this._app; }
 
-  protected abstract _entityConstructor(entity: ChainEntity): ProposalT;
-  public updateProposal(entity: ChainEntity, event: ChainEvent): void {
+  protected _entityConstructor(constructorFunc: (e: ChainEntity) => ProposalT, entity: ChainEntity): ProposalT {
+    try {
+      return constructorFunc(entity);
+    } catch (e) {
+      console.error('failed to construct proposal from entity: ', entity);
+    }
+  }
+
+  public updateProposal(constructorFunc: (e: ChainEntity) => ProposalT, entity: ChainEntity, event: ChainEvent): void {
     const proposal = this.store.getByIdentifier(entity.typeId);
     if (!proposal) {
-      this._entityConstructor(entity);
+      this._entityConstructor(constructorFunc, entity);
     } else {
       proposal.update(event);
     }

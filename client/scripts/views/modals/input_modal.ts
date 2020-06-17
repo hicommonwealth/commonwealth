@@ -12,7 +12,7 @@ const InputModal = {
     const placeholder = vnode.attrs.placeholder;
     const promptTitle = vnode.attrs.title;
     const promptText = vnode.attrs.text;
-    return m('.InputModal', [
+    return m('form.InputModal', [
       m('.compact-modal-body', [
         m('h3', promptTitle),
         promptText && m('p', promptText),
@@ -21,13 +21,14 @@ const InputModal = {
           oncreate: (vvnode) => {
             if (defaultValue !== undefined) $(vvnode.dom).val(defaultValue);
             $(vvnode.dom).focus();
-          }
+          },
         }),
       ]),
       m('.compact-modal-actions', [
         m(Button, {
           label: 'Submit',
           type: 'submit',
+          intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
             vnode.attrs.retval.text = $(vnode.dom).find('input[type="text"]').val();
@@ -39,6 +40,7 @@ const InputModal = {
         }),
         m(Button, {
           label: 'Cancel',
+          intent: 'none',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');

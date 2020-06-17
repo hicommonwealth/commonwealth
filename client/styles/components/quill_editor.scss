@@ -23,9 +23,10 @@
 
     // 1. editor typography modifications
     .ql-editor {
-        font-size: 16px;
+        font-size: 15px;
         line-height: 1.45;
-        padding: 20px 18px;
+        padding: 20px 22px 28px;
+        max-height: 360px;
         pre {
             font-family: $monospace-fonts;
             margin-bottom: 8px;
