@@ -1,12 +1,10 @@
 .MembershipButton {
-    &.is-member:hover {
-        span {
-            display: none;
-        }
-        &:before {
-            content: 'Leave';
-            padding-left: 11px;
-            padding-right: 11px;
-        }
+}
+
+.MembershipButtonPopover {
+    z-index: 1005 !important;
+    .cui-menu {
+        min-width: 200px;
+        max-width: 200px;
     }
 }

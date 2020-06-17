@@ -1,22 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
+
+export const Errors = {
+  NeedAddress: 'Must provide address',
+  NeedChain: 'Must provide chain',
+  InvalidChain: 'Invalid chain',
+};
 
 const createAddress = async (models, req: Request, res: Response, next: NextFunction) => {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
   if (!req.body.address) {
-    return next(new Error('Must provide address'));
+    return next(new Error(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error('Must provide chain'));
+    return next(new Error(Errors.NeedChain));
   }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
   if (!chain) {
-    return next(new Error('Invalid chain'));
+    return next(new Error(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.findOne({

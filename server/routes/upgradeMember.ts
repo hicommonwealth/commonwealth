@@ -1,24 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  InvalidAddress: 'Invalid Address',
+  InvalidRole: 'Invalid Role',
+  NotLoggedIn: 'Not logged in',
+  MustBeAdmin: 'Must be an Admin to upgrade member',
+  NoMember: 'Cannot find member to upgrade!',
+  NoAdminDemotion: 'Cannot demote self',
+};
+
+const ValidRoles = ['admin', 'moderator', 'member'];
+
 const upgradeMember = async (models, req: Request, res: Response, next: NextFunction) => {
+  const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const { address, new_role } = req.body;
-  if (!address) return next(new Error('Invalid Address'));
-  if (!new_role) return next(new Error('Invalid Role'));
-  if (!req.user) return next(new Error('Not logged in'));
+  if (!address) return next(new Error(Errors.InvalidAddress));
+  if (!new_role) return next(new Error(Errors.InvalidRole));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   // if chain is present we know we are dealing with a chain first community
   const chainOrCommObj = (chain) ? { chain_id: chain.id } : { offchain_community_id: community.id };
+  const requesterAddresses = await req.user.getAddresses();
+  const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
   const requesterIsAdmin = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: req.user.address,
+      address_id: { [Op.in]: requesterAddressIds },
       permission: 'admin',
     },
   });
-  if (!requesterIsAdmin) return next(new Error('Must be an Admin to upgrade member'));
+  if (requesterIsAdmin.length < 1) return next(new Error(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {
@@ -26,19 +41,24 @@ const upgradeMember = async (models, req: Request, res: Response, next: NextFunc
     },
   });
 
-  let member = await models.Role.findOne({
+  if (!memberAddress) return next(new Error(Errors.InvalidAddress));
+
+  const member = await models.Role.findOne({
     where: {
       ...chainOrCommObj,
       address_id: memberAddress.id,
-      permission: ['moderator', 'member'],
     },
   });
+  if (!member) return next(new Error(Errors.NoMember));
+  if (requesterIsAdmin.some((r) => member.id === r.id)) return next(new Error(Errors.NoAdminDemotion));
 
-  if (!member) return next(new Error('Cannot find member to upgrade!'));
-  if (member.permission === 'admin') return next(new Error('Cannot demote admin'));
-  member = await member.update({
-    permission: new_role,
-  });
+  if (ValidRoles.includes(new_role)) {
+    member.permission = new_role;
+  } else {
+    return next(new Error(Errors.InvalidRole));
+  }
+
+  await member.save();
 
   return res.json({ status: 'Success', result: member.toJSON() });
 };

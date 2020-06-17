@@ -68,7 +68,6 @@ abstract class Proposal<
       throw new Error('cannot update state once marked completed');
     }
     this._completed.next(true);
-    store.update(this);
     this._initialized.complete();
   }
 

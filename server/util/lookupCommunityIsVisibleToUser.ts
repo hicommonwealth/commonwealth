@@ -39,7 +39,7 @@ const lookupCommunityIsVisibleToUser = async (models, params, user, next: NextFu
 
   if (community && community.privacyEnabled) {
     if (!user) return next(new Error('Invalid community or chain'));
-    const userAddressIds = await user.getAddresses().map((address) => address.id);
+    const userAddressIds = await user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userMembership = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-expressions */
-import 'pages/discussions.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
 
 import app from 'state';
-import DiscussionRow from 'views/components/discussion_row';
+import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 interface IWeeklyDiscussionListingAttrs {
   isCurrentWeek: boolean;
@@ -83,7 +82,7 @@ const WeeklyDiscussionListing: m.Component<IWeeklyDiscussionListingAttrs, IWeekl
       return;
     }
     return m('.WeeklyDiscussionListing', [
-      m('h4', heading),
+      // m('h4', heading),
       vnode.attrs.lastVisited
         ? m('div', proposalsByLastViewed())
         : m(threadGroup, proposals.map((proposal) => {

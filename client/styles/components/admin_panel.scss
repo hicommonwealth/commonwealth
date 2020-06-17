@@ -1,0 +1,103 @@
+.AdminPanelDialog {
+    .cui-table.metadata-management-table {
+        td {
+            padding: 10px 20px 0;
+            border-bottom: none !important;
+        }
+        tr:first-child td {
+            padding-top: 18px;
+        }
+    }
+    .cui-button.save-changes-button {
+        margin: 24px 20px;
+    }
+    .cui-dialog-content {
+        width: 800px; // style override: default 600px
+    }
+    .cui-dialog-body {
+        padding: 0;
+    }
+    .cui-tabs {
+        margin-top: 2px;
+        > :first-child {
+            margin-left: 15px;
+        }
+    }
+    .ManageRoleRow {
+        padding: 8px 0;
+    }
+
+    .AdminPanelContents {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        @media (min-width: 800px) {
+            flex-direction: row;
+        }
+        .panel-left {
+            width: 100%;
+            border-right: 1px #c5cdd1 solid;
+            min-height: 450px;
+            max-height: 600px;
+            overflow-y: scroll;
+
+            @media (min-width: 800px) {
+                width: 60%;
+            }
+            .RoleChild {
+                display: inline-block;
+                padding-right: 6px;
+
+                .role-x-icon {
+                    padding-left: 2px;
+                }
+            }
+            .metadata-management-table {
+                table-layout: fixed;
+            }
+            .InputPropertyRow {
+                .title-column {
+                    width: 110px;
+                }
+            }
+        }
+
+        .CommunityMetadataManagementTable {
+            td {
+                padding: 11px 20px;
+            }
+            .cui-button {
+                margin: 16px 20px;
+            }
+            .cui-tabs {
+                margin-top: 4px;
+            }
+        }
+
+        .panel-right {
+            width: 100%;
+            @media (min-width: 800px) {
+                width: 40%;
+            }
+
+            .AdminPanelTabs {
+                .UpgradeRolesForm, .WebhooksForm {
+                    padding: 0 20px 10px;
+                }
+                .members-list {
+                    min-height: 160px;
+                    max-height: 160px;
+                    overflow-y: scroll;
+                }
+                .admin-panel-tab-button {
+                    margin-top: 20px;
+                }
+                .active-webhooks {
+                    min-height: 160px;
+                    max-height: 160px;
+                    overflow-y: scroll;
+                }
+            }
+        }
+    }
+}

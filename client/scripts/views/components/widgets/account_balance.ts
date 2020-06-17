@@ -1,7 +1,7 @@
 import 'components/widgets/account_balance.scss';
 
 import { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import { Coin, formatCoin } from 'adapters/currency';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -47,8 +47,8 @@ const AccountBalance = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummar
       isNear && m('div.near-balance', [
         m('div.balance-type', [
           m('div.label', 'BALANCE'),
-          m('div.balance', dynamic.balance !== undefined ?
-            formatCoin(dynamic.balance) : '--')
+          m('div.balance', dynamic.balance !== undefined
+            ? formatCoin(dynamic.balance) : '--')
         ]),
       ]),
       isMoloch && m('div.moloch-balance', [
@@ -59,38 +59,38 @@ const AccountBalance = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummar
         m('div.balance-type', [
           m('div.label', 'SHARES'),
           // don't use denom label for share holdings -- should always be round number
-          m('div.balance', dynamic.balance !== undefined ?
-            `${dynamic.balance.toNumber()}` : '--')
+          m('div.balance', dynamic.balance !== undefined
+            ? `${dynamic.balance.toNumber()}` : '--')
         ]),
       ]),
       isSubstrate && [
         m('div.substrate-liquidity', [
           m('div.balance-type', [
             m('div.label', 'LIQUID'),
-            m('div.balance', dynamic.unlockedBalance !== undefined ?
-              formatCoin(dynamic.unlockedBalance) : '--')
+            m('div.balance', dynamic.unlockedBalance !== undefined
+              ? formatCoin(dynamic.unlockedBalance) : '--')
           ]),
           m('div.balance-type', [
             m('div.label', 'ILLIQUID'),
-            m('div.balance', dynamic.lockedBalance !== undefined ?
-              formatCoin(dynamic.lockedBalance) : '--')
+            m('div.balance', dynamic.lockedBalance !== undefined
+              ? formatCoin(dynamic.lockedBalance) : '--')
           ])
         ]),
         m('div.balance-type.controlling-row', [
           m('div.label', 'CONTROLLING'),
-          m('div.balance', dynamic.balance !== undefined ?
-            formatCoin(dynamic.balance) : '--')
+          m('div.balance', dynamic.balance !== undefined
+            ? formatCoin(dynamic.balance) : '--')
         ])
       ],
       isCosmos && m('div.cosmos-balance', [
         m('div.balance-type', [
           m('div.label', 'LIQUID'),
-          m('div.balance', dynamic.balance !== undefined ?
-            formatCoin(dynamic.balance) : '--')
+          m('div.balance', dynamic.balance !== undefined
+            ? formatCoin(dynamic.balance) : '--')
         ]),
         m('div.balance-type', [
           m('div.label', 'DELEGATORS'),
-          m('div.balance', dynamic.delegations !== undefined ? dynamic.delegations : '--' )
+          m('div.balance', dynamic.delegations !== undefined ? dynamic.delegations : '--')
         ])
       ]),
       m('a.btn', 'Manage Staking')

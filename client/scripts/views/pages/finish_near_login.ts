@@ -1,15 +1,15 @@
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
 import { initAppState } from 'app';
 
-import { updateActiveAddresses, createUserWithAddress, selectLogin } from 'controllers/app/login';
+import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase } from 'models';
+import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-import ListingPage from 'views/pages/_listing_page';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -62,41 +62,37 @@ const FinishNearLogin: m.Component<{}, IState> = {
       return m(PageNotFound);
     }
     if (vnode.state.validationError) {
-      return m(ListingPage, {
+      return m(Sublayout, {
         class: 'FinishNearLogin',
-        title: 'Near Login',
-        subtitle: 'Error!',
-        content: [
-          m('h3', 'NEAR account log in error: ' + vnode.state.validationError),
-          m('button.formular-button-primary', {
-            onclick: async (e) => {
-              e.preventDefault();
-              redirectToNextPage();
-            }
-          }, 'Return Home'),
-        ]
-      });
+      }, [
+        m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
+        m('button.formular-button-primary', {
+          onclick: async (e) => {
+            e.preventDefault();
+            redirectToNextPage();
+          }
+        }, 'Return Home'),
+      ]);
     } else if (vnode.state.validationCompleted) {
-      return m(ListingPage, {
+      return m(Sublayout, {
         class: 'FinishNearLogin',
-        content: [
-          m('div', {
-            oncreate: (e) => {
-              if (vnode.state.validatedAccount.profile.name !== undefined) {
-                redirectToNextPage();
-              } else {
-                app.modals.create({
-                  modal: LinkNewAddressModal,
-                  data: { alreadyInitializedAccount: vnode.state.validatedAccount },
-                  exitCallback: (e) => {
-                    redirectToNextPage();
-                  }
-                });
-              }
+      }, [
+        m('div', {
+          oncreate: (e) => {
+            if (vnode.state.validatedAccount.profile.name !== undefined) {
+              redirectToNextPage();
+            } else {
+              app.modals.create({
+                modal: LinkNewAddressModal,
+                data: { alreadyInitializedAccount: vnode.state.validatedAccount },
+                exitCallback: () => {
+                  redirectToNextPage();
+                }
+              });
             }
-          }),
-        ]
-      });
+          }
+        }),
+      ]);
     } else if (!vnode.state.validating) {
     // chain loaded and on near -- finish login
     // TODO: share one wallet account across all actual accounts and swap out
@@ -112,29 +108,31 @@ const FinishNearLogin: m.Component<{}, IState> = {
             }
             return createUserWithAddress(acct.address);
           })
-          .then(() => {
-            return acct.validate();
-          })
-          .then(async () => {
-            if (!app.isLoggedIn()) {
-              await initAppState();
-              updateActiveAddresses(app.login.selectedNode ? app.login.selectedNode.chain :
-                                    app.config.nodes.getByChain(app.activeChainId())[0].chain);
-            }
-            return await selectLogin(acct, true);
-          })
-          .then(() => {
-            vnode.state.validationCompleted = true;
-            vnode.state.validating = false;
-            vnode.state.validatedAccount = acct;
-            m.redraw();
-          })
-          .catch((err) => {
-            vnode.state.validationCompleted = true;
-            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
-            vnode.state.validating = false;
-            m.redraw();
-          });
+            .then(() => {
+              return acct.validate();
+            })
+            .then(async () => {
+              if (!app.isLoggedIn()) {
+                await initAppState();
+                const chain = app.login.selectedNode
+                  ? app.login.selectedNode.chain
+                  : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+                updateActiveAddresses(chain, true);
+              }
+              setActiveAccount(acct, true);
+            })
+            .then(() => {
+              vnode.state.validationCompleted = true;
+              vnode.state.validating = false;
+              vnode.state.validatedAccount = acct;
+              m.redraw();
+            })
+            .catch((err) => {
+              vnode.state.validationCompleted = true;
+              vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
+              vnode.state.validating = false;
+              m.redraw();
+            });
         } else {
           vnode.state.validationError = 'Sign-in failed.';
           vnode.state.validating = false;

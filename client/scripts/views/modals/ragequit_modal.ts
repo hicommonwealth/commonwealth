@@ -1,7 +1,7 @@
 import 'modals/ragequit_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { TextInputFormField } from 'views/components/forms';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
@@ -25,8 +25,8 @@ const RagequitModal: m.Component<IAttrs, IState> = {
           subtitle: 'Exchange your shares for ETH.',
           options: {
             value: vnode.state.sharesToBurn,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           },
           callback: (val) => {
@@ -39,11 +39,11 @@ const RagequitModal: m.Component<IAttrs, IState> = {
             e.preventDefault();
             const toBurn = new BN(vnode.state.sharesToBurn);
             vnode.attrs.account.ragequitTx(toBurn)
-            .then((result) => {
-              $(vnode.dom).trigger('modalforceexit');
-              m.redraw();
-            })
-            .catch((err) => notifyError(err));
+              .then((result) => {
+                $(vnode.dom).trigger('modalforceexit');
+                m.redraw();
+              })
+              .catch((err) => notifyError(err));
           }
         }, 'Ragequit'),
       ]),

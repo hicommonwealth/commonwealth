@@ -1,37 +1,37 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { formatAddressShort, link } from 'helpers';
+import m from 'mithril';
+import _ from 'lodash';
+import { formatAddressShort, link, getRoleInCommunity, formatAsTitleCase } from 'helpers';
+import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
 import { Account, Profile } from 'models';
-import Tooltip from 'views/components/tooltip';
 
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { Registration } from '@polkadot/types/interfaces';
-import { Data } from '@polkadot/types/primitive';
-import { u8aToString } from '@polkadot/util';
-import Substrate from 'client/scripts/controllers/chain/substrate/main';
-import { from } from 'rxjs';
-import SubstrateIdentity from 'client/scripts/controllers/chain/substrate/identity';
+import Substrate from 'controllers/chain/substrate/main';
+import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import { isAdminOrMod } from 'helpers/roles';
 
 interface IAttrs {
   user: Account<any> | [string, string];
   avatarSize?: number;
   avatarOnly?: boolean; // avatarOnly overrides most other properties
   hideAvatar?: boolean;
+  hideIdentityIcon?: boolean; // only applies to substrate identities
   linkify?: boolean;
   onclick?: any;
   tooltip?: boolean;
+  showRole?: boolean;
 }
 
 export interface ISubstrateIdentityAttrs {
   account: Account<any>;
   linkify: boolean;
   profile: Profile;
+  hideIdentityIcon: boolean; // only applies to substrate identities
 }
 
 export interface ISubstrateIdentityState {
@@ -49,20 +49,16 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
   }),
   view: (vnode) => {
     const { profile, linkify, account } = vnode.attrs;
-
     // return polkadot identity if possible
-    const displayNameHex = vnode.state.dynamic.identity?.info?.display;
-    const judgements = vnode.state.dynamic.identity?.judgements || [];
-    if (displayNameHex && judgements) {
-      // Polkadot identity judgements. See:
-      // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
-      // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
-      const isGood = _.some(judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable');
-      const isBad = _.some(judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
-      const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
-      const name = [ m(`span.identity-icon${
-        isGood ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${isGood ? '.green' : isBad ? '.red' : '.gray'}`), d2s(displayNameHex) ];
+    const identity = vnode.state.dynamic.identity;
+    const displayName = identity?.exists ? identity.username : undefined;
+    const quality = identity?.exists ? identity.quality : undefined;
+    if (displayName && quality) {
+      const name = [ displayName, m(`span.identity-icon${
+        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
+      }${quality === IdentityQuality.Good
+        ? '.green' : quality === IdentityQuality.Bad
+          ? '.red' : '.gray'}`) ];
 
       return linkify
         ? link(
@@ -84,13 +80,14 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
 
 const User : m.Component<IAttrs> = {
   view: (vnode) => {
-    const { avatarOnly, hideAvatar, user, linkify, tooltip } = vnode.attrs;
+    const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
     if (!user) return;
 
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
+    let role;
 
     if (vnode.attrs.user instanceof Array) {
       const chainId = vnode.attrs.user[1];
@@ -102,10 +99,18 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
+      role = isAdminOrMod(address);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
+      role = isAdminOrMod(account.address);
     }
+    const roleTag = role ? m(Tag, {
+      class: 'roleTag',
+      label: role.permission,
+      rounded: true,
+      size: 'sm',
+    }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -125,9 +130,9 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && app.chain.loaded)
+        (account instanceof SubstrateAccount && app.chain?.loaded)
           // substrate name
-          ? m(SubstrateIdentityWidget, { account, linkify, profile }) : [
+          ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link(`a.user-display-name${
@@ -135,7 +140,8 @@ const User : m.Component<IAttrs> = {
               profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
-          ]
+          ],
+        showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -150,17 +156,20 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && app.chain.loaded)
-          ? m(SubstrateIdentityWidget, { account, linkify: true, profile })
+        (account instanceof SubstrateAccount && app.chain?.loaded)
+          ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
+      roleTag,
     ]);
 
-    return tooltip ? m(Tooltip, { content: tooltipPopover }, userFinal) : userFinal;
+    return tooltip
+      ? m(Tooltip, { content: tooltipPopover, hoverOpenDelay: 1000, trigger: userFinal, key: profile?.address || '-' })
+      : userFinal;
   }
 };
 

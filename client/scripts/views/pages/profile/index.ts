@@ -7,12 +7,13 @@ import mixpanel from 'mixpanel-browser';
 import app from 'state';
 import { OffchainThread } from 'models';
 
+import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import ObjectPage from 'views/pages/_object_page';
 import Tabs from 'views/components/widgets/tabs';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
+import PageNotFound from '../404';
 
 // const SetProxyButton = {
 //   view: (vnode) => {
@@ -165,14 +166,16 @@ import ProfileBio from './profile_bio';
 //       isSubstrate && vnode.state.dynamic.proxyFor && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account is a proxy for: '),
-//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id],
+//                     showSecondaryName: true, linkify: true }),
 //           // TODO: resign proxy button
 //         ]),
 //       ]),
 //       isSubstrate && vnode.state.dynamic.delegation && m('.summary-row',  [
 //         m('p', [
 //           m('span', 'This account has assigned a delegate: '),
-//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id], showSecondaryName: true, linkify: true }),
+//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id]
+//                     showSecondaryName: true, linkify: true }),
 //         ]),
 //       ]),
 //     ]);
@@ -187,14 +190,16 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }> = {
+const ProfilePage: m.Component<{ address: string }, { }> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading);
+    if (!app.chain) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
-    if (!account) return m(PageLoading);
+    if (!account) {
+      return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
+    }
 
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
@@ -217,43 +222,42 @@ const ProfilePage: m.Component<{ address: string }> = {
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
-    return m(ObjectPage, {
+    return m(Sublayout, {
       class: 'ProfilePage',
-      content: [
-        m('.forum-container-alt', [
-          m(ProfileHeader, { account }),
-          m('.row.row-narrow.forum-row', [
-            m('.col-xs-8', [
-              m(Tabs, [{
-                name: allTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.All,
-                  content: { allContent }
-                })
-              }, {
-                name: threadsTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.Threads,
-                  content: { proposals }
-                }),
-              }, {
-                name: commentsTabTitle,
-                content: m(ProfileContent, {
-                  account,
-                  type: UserContent.Comments,
-                  content: { comments }
-                }),
-              }]),
-            ]),
-            m('.col-xs-4', [
-              m(ProfileBio, { account }),
-            ]),
+    }, [
+      m('.forum-container-alt', [
+        m(ProfileHeader, { account }),
+        m('.row.row-narrow.forum-row', [
+          m('.col-xs-8', [
+            m(Tabs, [{
+              name: allTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.All,
+                content: { allContent }
+              })
+            }, {
+              name: threadsTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.Threads,
+                content: { proposals }
+              }),
+            }, {
+              name: commentsTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.Comments,
+                content: { comments }
+              }),
+            }]),
+          ]),
+          m('.col-xs-4', [
+            m(ProfileBio, { account }),
           ]),
         ]),
-      ],
-    });
+      ]),
+    ]);
   },
 };
 

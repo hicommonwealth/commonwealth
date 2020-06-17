@@ -65,15 +65,15 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
       }
 
       return m('.ProposalExtensions', [
-        proposal.stage === SignalingProposalStage.PreVoting &&
-          'The proposal creator has not turned on signaling yet.',
+        proposal.stage === SignalingProposalStage.PreVoting
+          && 'The proposal creator has not turned on signaling yet.',
         proposal.stage === SignalingProposalStage.Voting && [
           `Signaling open through block ${proposal.endTime.blocknum} (`,
           m(CountdownUntilBlock, { block: proposal.endTime.blocknum }),
           ')',
         ],
-        proposal.stage === SignalingProposalStage.Completed &&
-          'Signaling proposal complete.',
+        proposal.stage === SignalingProposalStage.Completed
+          && 'Signaling proposal complete.',
         (proposal.data.author === user.address) && [
           m('button.formular-button-positive', {
             class: proposal.stage === SignalingProposalStage.PreVoting ? '' : 'disabled',
@@ -105,8 +105,8 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
         m('strong', votingBond ? votingBond.format() : '--'),
         ', which is returned when the election is completed.',
         // TODO XXX: check whether user has deposited a voting bond
-        //m('p', 'You have not deposited a voting bond for the current election.'),
-        //m('p', 'You have already deposited a voting bond for the current election.'),
+        // m('p', 'You have not deposited a voting bond for the current election.'),
+        // m('p', 'You have already deposited a voting bond for the current election.'),
       ]);
     }
   }
@@ -126,11 +126,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     }
 
     let user;
-    if (proposal instanceof EdgewareSignalingProposal ||
-        proposal instanceof SubstrateDemocracyProposal ||
-        proposal instanceof SubstrateDemocracyReferendum ||
-        proposal instanceof SubstratePhragmenElection ||
-        proposal instanceof SubstrateCollectiveProposal) {
+    if (proposal instanceof EdgewareSignalingProposal
+        || proposal instanceof SubstrateDemocracyProposal
+        || proposal instanceof SubstrateDemocracyReferendum
+        || proposal instanceof SubstratePhragmenElection
+        || proposal instanceof SubstrateCollectiveProposal) {
       user = app.vm.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
       user = app.vm.activeAccount as CosmosAccount;
@@ -146,7 +146,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Vote Yes',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -165,8 +165,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         createTXModal(proposal.submitVoteTx(new CosmosVote(user, CosmosVoteChoice.YES)));
       } else if (proposal instanceof MolochProposal) {
         proposal.submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
-        .then(() => m.redraw())
-        .catch((err) => notifyError(err.toString()));
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         throw new Error('Unimplemented proposal type - use election voting modal');
       } else {
@@ -179,7 +179,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Vote No',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -192,8 +192,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (vnode.state.conviction === undefined) throw new Error('Must select a conviction'); // TODO: new code, test
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false,
-          convictionToWeight(vnode.state.conviction))
-        ));
+          convictionToWeight(vnode.state.conviction))));
       } else if (proposal instanceof SubstrateCollectiveProposal) {
         createTXModal(proposal.submitVoteTx(new BinaryVote(user, false)));
       } else if (proposal instanceof CosmosProposal) {
@@ -210,7 +209,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Cancel Proposal',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -218,8 +217,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       });
       if (proposal instanceof MolochProposal) {
         proposal.abortTx()
-        .then(() => m.redraw())
-        .catch((err) => notifyError(err.toString()));
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -249,7 +248,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Cancel Proposal',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -257,8 +256,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       });
       if (proposal instanceof MolochProposal) {
         proposal.processTx()
-        .then(() => m.redraw())
-        .catch((err) => notifyError(err.toString()));
+          .then(() => m.redraw())
+          .catch((err) => notifyError(err.toString()));
       } else {
         throw new Error('Invalid proposal type');
       }
@@ -269,7 +268,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Vote Abstain',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -287,7 +286,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': 'Vote Veto',
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       mixpanel.people.increment('Votes');
       mixpanel.people.set({
@@ -306,7 +305,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         'Step No': 3,
         'Step': `Vote for choice ${choice.toString()}`,
         'Proposal Name': `${proposal.slug}: ${proposal.identifier}`,
-        'Scope': app.activeId() ,
+        'Scope': app.activeId(),
       });
       if (proposal instanceof EdgewareSignalingProposal) {
         createTXModal(proposal.submitVoteTx(new SignalingVote(proposal, user, [
@@ -373,9 +372,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       canVote = false;
     } else if (hasVotedForAnyChoice) {
       // enable re-voting for particular types
-      if (proposal instanceof SubstratePhragmenElection ||
-          proposal instanceof SubstrateDemocracyProposal ||
-          proposal instanceof SubstrateCollectiveProposal) {
+      if (proposal instanceof SubstratePhragmenElection
+          || proposal instanceof SubstrateDemocracyProposal
+          || proposal instanceof SubstrateCollectiveProposal) {
         canVote = true;
       } else {
         canVote = false;
@@ -392,7 +391,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         } else if (inx === 1) {
           cl = ['.no-button', 'button.formular-button-negative'];
         } else {
-          cl = ['.yes-button', 'button.formular-button-positive']
+          cl = ['.yes-button', 'button.formular-button-positive'];
         }
 
         return m(`${cl[0]}`, [
@@ -446,14 +445,14 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
     ]);
     // V2 only: moloch: sponsor
-    //const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
+    // const sponsorButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
     //  m('button.formular-button-positive', {
     //    class: !(proposal as MolochProposal).state.sponsored &&
     //    !(proposal as MolochProposal).state.processed
     //      ? '' : 'disabled',
     //    onclick: sponsorProposal,
     //  }, (proposal as MolochProposal).state.sponsored ? 'Sponsered' : 'Sponsor')
-    //]);
+    // ]);
     // moloch: process
     const processButton = (proposal.votingType === VotingType.MolochYesNo) && m('.yes-button', [
       m('button.formular-button-tertiary', {
@@ -486,7 +485,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         m('.button-row', [yesButton, abstainButton, noButton, noWithVetoButton]),
         m(ProposalExtensions, { proposal }),
       ];
-    } else if (proposal.votingType === VotingType.SimpleYesNoVoting && (proposal instanceof EdgewareSignalingProposal) && buttons.length === 2) {
+    } else if (proposal.votingType === VotingType.SimpleYesNoVoting
+               && (proposal instanceof EdgewareSignalingProposal)
+               && buttons.length === 2) {
       votingActionObj = [
         m('button-row', buttons),
         m(ProposalExtensions, { proposal }),
@@ -498,8 +499,8 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       ];
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       votingActionObj = [
-        [ m('.button-row', [yesButton, noButton, /*sponsorButton, */processButton, cancelButton]),
-        m(ProposalExtensions, { proposal }) ]
+        [ m('.button-row', [yesButton, noButton, /* sponsorButton, */processButton, cancelButton]),
+          m(ProposalExtensions, { proposal }) ]
       ];
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       votingActionObj = m(CannotVote, { text: '(TODO) Ranked choice voting unimplemented' });

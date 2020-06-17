@@ -59,11 +59,22 @@ module.exports = {
     },
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.svg'],
     modules: ['../client/scripts', '../client/styles', '../shared', '../node_modules', '../eth/types'],
   },
   module: {
     rules: [
+      {
+        test: /\.svg$/,
+        include: [
+          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
+        ],
+        use: [
+          {
+            loader: 'html-loader',
+          },
+        ],
+      },
       {
         test: /\.tsx?$/,
         include: [
@@ -92,6 +103,9 @@ module.exports = {
       },
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
+        exclude: [
+          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
+        ],
         use: {
           loader: 'file-loader',
           options: {

@@ -1,7 +1,7 @@
 import 'modals/edit_profile_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
 import {
   PROFILE_BIO_MAX_CHARS,
@@ -38,8 +38,8 @@ const EditProfileModal = {
       }
 
       vnode.state.saving = true;
-      if (!vnode.state.error) app.profiles.updateProfileForAccount(account, data).
-        then((result) => {
+      if (!vnode.state.error) app.profiles.updateProfileForAccount(account, data)
+        .then((result) => {
           vnode.state.saving = false;
           m.redraw();
         }).catch((error: any) => {
@@ -65,7 +65,7 @@ const EditProfileModal = {
             uploadCompleteCallback: (files) => {
               vnode.state.uploadsInProgress--;
               // update textarea
-              files.map((f) => {
+              files.forEach((f) => {
                 if (!f.uploadURL) return;
                 const url = f.uploadURL.replace(/\?.*/, '');
                 $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
@@ -77,28 +77,28 @@ const EditProfileModal = {
         m('input', {
           type: 'hidden',
           name: 'avatarUrl',
-          oncreate: (vnode) => account.profile && $(vnode.dom).val(account.profile.avatarUrl)
+          oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.avatarUrl)
         }),
         m('.text-input-wrapper', [
           m(CharacterLimitedTextInput, {
             name: 'name',
             placeholder: 'Display name',
-            oncreate: (vnode) => {
-              if (account.profile) $(vnode.dom).val(account.profile.name);
-              $(vnode.dom).focus();
+            oncreate: (vvnode) => {
+              if (account.profile) $(vvnode.dom).val(account.profile.name);
+              $(vvnode.dom).focus();
             },
             limit: 40,
           }),
           m(CharacterLimitedTextInput, {
             name: 'headline',
             placeholder: 'Headline',
-            oncreate: (vnode) => account.profile && $(vnode.dom).val(account.profile.headline),
+            oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.headline),
             limit: 80,
           }),
           m(ResizableTextarea, {
             name: 'bio',
             placeholder: 'Enter bio...',
-            oncreate: (vnode) => account.profile && $(vnode.dom).val(account.profile.bio)
+            oncreate: (vvnode) => account.profile && $(vvnode.dom).val(account.profile.bio)
             // TODO: character limit
           }),
         ]),

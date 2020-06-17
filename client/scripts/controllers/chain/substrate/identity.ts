@@ -1,4 +1,7 @@
+import _ from 'underscore';
+import BN from 'bn.js';
 import { Identity } from 'models';
+import { IHasId, ISerializable } from 'stores';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Registration,
@@ -9,7 +12,9 @@ import {
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, Option } from '@polkadot/types';
-import { Observable, Unsubscribable } from 'rxjs';
+import { Data } from '@polkadot/types/primitive';
+import { u8aToString } from '@polkadot/util';
+import { Observable, Unsubscribable, BehaviorSubject } from 'rxjs';
 import { map, takeWhile, first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import SubstrateChain from './shared';
@@ -23,22 +28,40 @@ export interface IIdentitySubs {
 
 type SubsCodec = [ BalanceOf, Vec<AccountId> ] & Codec;
 
-export default class SubstrateIdentity extends Identity<SubstrateCoin> {
+export enum IdentityQuality {
+  Good = 'good',
+  Bad = 'bad',
+  Unknown = 'unknown',
+}
+
+export interface ISubstrateIdentity extends IHasId {
+  address: string;
+  username: string;
+  quality: IdentityQuality;
+  deposit: string;
+  exists: boolean;
+}
+
+export default class SubstrateIdentity
+  extends Identity<SubstrateCoin>
+  implements ISerializable<ISubstrateIdentity> {
   // override identity prop
   public readonly account: SubstrateAccount;
 
   private _judgements: RegistrationJudgement[];
-  public get judgements() { return this._judgements; }
+  private _info: IdentityInfo;
+  public get info() { return this._info; }
+
+  private _quality: IdentityQuality;
+  public get quality() { return this._quality; }
 
   private _deposit: SubstrateCoin;
   public get deposit() { return this._deposit; }
 
-  private _info: IdentityInfo;
-  public get info() { return this._info; }
-
-  // set to false if identity was killed or cleared
-  private _exists: boolean;
-  public get exists() { return this._exists; }
+  // set to false if identity was killed or cleared, null if unresolved
+  private _exists: BehaviorSubject<boolean> = new BehaviorSubject(null);
+  public get exists() { return this._exists.value; }
+  public get exists$() { return this._exists.asObservable(); }
 
   // fetch all sub-accounts
   // all sub-accounts have names, but we don't currently fetch them, because
@@ -54,29 +77,65 @@ export default class SubstrateIdentity extends Identity<SubstrateCoin> {
   }
 
   private _subscription: Unsubscribable;
+  public get subscribed() { return !!this._subscription; }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
   private _Identities: SubstrateIdentities;
 
+  private _update() {
+    // update username
+    const d2s = (d: Data) => u8aToString(d.toU8a()).replace(/[^\x20-\x7E]/g, '');
+    this.username = d2s(this._info.display);
+
+    // update quality based on Polkadot identity judgements. See:
+    // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L126
+    // https://github.com/polkadot-js/apps/blob/master/packages/react-components/src/AccountName.tsx#L182
+    const isGood = _.some(this._judgements, (j) => j[1].toString() === 'KnownGood' || j[1].toString() === 'Reasonable');
+    const isBad = _.some(this._judgements, (j) => j[1].toString() === 'Erroneous' || j[1].toString() === 'LowQuality');
+    if (isGood) {
+      this._quality = IdentityQuality.Good;
+    } else if (isBad) {
+      this._quality = IdentityQuality.Bad;
+    } else if (!this._quality) {
+      this._quality = IdentityQuality.Unknown;
+    }
+    if (this._Identities.store.getById(this.id)) {
+      this._Identities.store.update(this);
+    } else {
+      this._Identities.store.add(this);
+    }
+  }
+
   // keeps track of changing registration info
-  private _subscribe() {
+  public subscribe() {
+    if (this.subscribed) {
+      return;
+    }
     this._subscription = this._Chain.query((api: ApiRx) => api.query.identity.identityOf(this.account.address)
-      .pipe(
-        takeWhile((rOpt: Option<Registration>) => rOpt.isSome, true),
-      ))
-      .subscribe((rOpt: Option<Registration>) => {
-        if (rOpt.isSome) {
-          const { judgements, deposit, info } = rOpt.unwrap();
-          this._judgements = judgements;
-          this._deposit = this._Chain.coins(deposit);
-          this._info = info;
-        } else {
-          this._exists = false;
-          this._judgements = [];
-          this._deposit = this._Chain.coins(0);
+      // TODO: re-enable this pipe to close identity registration subscriptions immediately, rather than wait for them
+      // Leaving it like this means more open subscriptions, but also we can update usernames in real-time.
+      //   to potentially load.
+      // .pipe(
+      //   takeWhile((rOpt: Option<Registration>) => rOpt.isSome, true),
+      // )
+    ).subscribe((rOpt: Option<Registration>) => {
+      if (rOpt.isSome) {
+        const { judgements, deposit, info } = rOpt.unwrap();
+        this._judgements = judgements;
+        this._info = info;
+        this._deposit = this._Chain.coins(deposit);
+        this._update();
+        if (!this.exists) {
+          this._exists.next(true);
         }
-      });
+      } else {
+        this._exists.next(false);
+        this._judgements = [];
+        this._quality = IdentityQuality.Unknown;
+        this._deposit = this._Chain.coins(0);
+      }
+    });
   }
 
   // unused -- subscription auto-terminated if account is killed
@@ -86,30 +145,38 @@ export default class SubstrateIdentity extends Identity<SubstrateCoin> {
     }
   }
 
+  public serialize(): ISubstrateIdentity {
+    return {
+      id: this.id,
+      address: this.account.address,
+      username: this.username,
+      quality: this.quality,
+      deposit: this.deposit.toString('hex'),
+      exists: this.exists,
+    };
+  }
+
+  public deserialize(data: ISubstrateIdentity): void {
+    // console.log(`Revived identity from localStorage: ${data.username}.`);
+    this._deposit = this._Chain.coins(new BN(data.deposit, 'hex'));
+    this._quality = data.quality;
+    this.username = data.username;
+    this._exists.next(data.exists);
+    this.subscribe();
+  }
+
   constructor(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Identities: SubstrateIdentities,
     who: SubstrateAccount,
-    registration: Registration
   ) {
-    const { judgements, deposit, info } = registration;
-
     // we use the address of the identity's owner as its identifier
-    super(who, who.address, info.display.toString());
+    super(who, who.address);
 
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Identities = Identities;
-
-    this._judgements = judgements;
-    this._deposit = this._Chain.coins(deposit);
-    this._info = info;
-    this._exists = true;
-
-    this._Identities.store.add(this);
-    // kick off subscription
-    this._subscribe();
   }
 
   public subName(sub: SubstrateAccount): Observable<string> {
@@ -168,6 +235,7 @@ export default class SubstrateIdentity extends Identity<SubstrateCoin> {
   }
 
   public async requestJudgementTx(regIdx: number, maxFee: SubstrateCoin) {
+    if (!this._judgements) throw new Error('judgements not yet loaded');
     // check that maxFee > judgement cost, and that account has enough funds
     const registrar = this._Identities.registrars[regIdx];
     if (!registrar) {
@@ -177,7 +245,7 @@ export default class SubstrateIdentity extends Identity<SubstrateCoin> {
     if (fee.gt(maxFee)) {
       throw new Error('registrar fee greater than provided maxFee');
     }
-    const previousJudgement = this.judgements.find(([ idx ]) => +idx === regIdx);
+    const previousJudgement = this._judgements.find(([ idx ]) => +idx === regIdx);
     if (previousJudgement && (previousJudgement[1].isErroneous || previousJudgement[1].isFeePaid)) {
       throw new Error('judgement is sticky and cannot be re-requested');
     }
@@ -194,7 +262,8 @@ export default class SubstrateIdentity extends Identity<SubstrateCoin> {
   }
 
   public canceljudgementRequestTx(regIdx: number) {
-    const judgement = this.judgements.find(([ idx ]) => +idx === regIdx);
+    if (!this._judgements) throw new Error('judgements not yet loaded');
+    const judgement = this._judgements.find(([ idx ]) => +idx === regIdx);
     if (!judgement) {
       throw new Error('judgement not found');
     } else {

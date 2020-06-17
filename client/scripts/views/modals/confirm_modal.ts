@@ -1,22 +1,9 @@
 import 'modals/confirm_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
-
-export const confirmationModalWithText = (text) => {
-  return async () : Promise<boolean> => {
-    let confirmed = false;
-    return new Promise((resolve) => {
-      app.modals.create({
-        modal: ConfirmModal,
-        data: { text: text },
-        completeCallback: () => confirmed = true,
-        exitCallback: () => resolve(confirmed)
-      });
-    });
-  };
-};
+import { Button } from 'construct-ui';
 
 const ConfirmModal = {
   confirmExit: async () => true,
@@ -27,8 +14,8 @@ const ConfirmModal = {
         m('h3', confirmText),
       ]),
       m('.compact-modal-actions', [
-        m('button', {
-          type: 'submit',
+        m(Button, {
+          intent: 'primary',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalcomplete');
@@ -36,19 +23,36 @@ const ConfirmModal = {
               $(vnode.dom).trigger('modalexit');
             }, 0);
           },
-          oncreate: (vnode) => {
-            $(vnode.dom).focus();
-          }
-        }, 'Yes'),
-        m('button', {
+          oncreate: (vvnode) => {
+            $(vvnode.dom).focus();
+          },
+          label: 'Yes',
+        }),
+        m(Button, {
+          intent: 'none',
           onclick: (e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
-          }
-        }, 'Cancel'),
+          },
+          label: 'Cancel',
+        }),
       ]),
     ]);
   }
+};
+
+export const confirmationModalWithText = (text) => {
+  return async () : Promise<boolean> => {
+    let confirmed = false;
+    return new Promise((resolve) => {
+      app.modals.create({
+        modal: ConfirmModal,
+        data: { text },
+        completeCallback: () => { confirmed = true; },
+        exitCallback: () => resolve(confirmed)
+      });
+    });
+  };
 };
 
 export default ConfirmModal;

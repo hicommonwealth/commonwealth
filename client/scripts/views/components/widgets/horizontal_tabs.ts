@@ -1,7 +1,7 @@
 import 'components/widgets/horizontal_tabs.scss';
 
-import { default as _ } from 'lodash';
-import { default as m } from 'mithril';
+import _ from 'lodash';
+import m from 'mithril';
 
 const HorizontalTabs = {
   view: (vnode) => {
@@ -21,10 +21,10 @@ const HorizontalTabs = {
       m('.tab-bar', [
         names.map((name, index) => {
           return m('a.tab-entry', {
-            class: (vnode.state.selectedIndex === index ? 'active' : '') +
-              (vnode.children[index].disabled ? ' disabled' : ''),
+            class: (vnode.state.selectedIndex === index ? 'active' : '')
+              + (vnode.children[index].disabled ? ' disabled' : ''),
             href: '#',
-            onclick: ((index, e) => { e.preventDefault(); vnode.state.selectedIndex = index; }).bind(this, index),
+            onclick: ((i, e) => { e.preventDefault(); vnode.state.selectedIndex = i; }).bind(this, index),
           }, name);
         }),
       ]),

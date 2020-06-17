@@ -1,14 +1,14 @@
 import { Coin } from 'adapters/currency';
-import { IIdentifiable } from 'adapters/shared';
 import Account from './Account';
+import { IHasId } from '../stores';
 
-abstract class Identity<C extends Coin> implements IIdentifiable {
+abstract class Identity<C extends Coin> implements IHasId {
   public readonly account: Account<C>;
-  public readonly identifier: string;
-  public readonly username: string;
-  constructor(account: Account<C>, identifier: string, username: string) {
+  public readonly id: string;
+  public username: string;
+  constructor(account: Account<C>, identifier: string, username?: string) {
     this.account = account;
-    this.identifier = identifier;
+    this.id = identifier;
     this.username = username;
   }
 }

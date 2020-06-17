@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const selectAddress = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -10,7 +11,7 @@ const selectAddress = async (models, req: Request, res: Response, next: NextFunc
   // get user's addresses
   const addresses = await req.user.getAddresses();
   const newSelectedAddress = addresses.filter((addr) => {
-    return addr.chain === req.body.chain && addr.address === req.body.address && !!addr.verified
+    return addr.chain === req.body.chain && addr.address === req.body.address && !!addr.verified;
   });
   if (newSelectedAddress.length === 0) {
     return next(new Error('Invalid address'));
@@ -18,7 +19,7 @@ const selectAddress = async (models, req: Request, res: Response, next: NextFunc
 
   // set other addresses to unselected
   const prevSelectedAddresses = addresses.filter((addr) => {
-    return addr.selected && (addr.chain !== req.body.chain || addr.address !== req.body.address)
+    return addr.selected && (addr.chain !== req.body.chain || addr.address !== req.body.address);
   });
   for (const prevSelectedAddress of prevSelectedAddresses) {
     prevSelectedAddress.selected = false;

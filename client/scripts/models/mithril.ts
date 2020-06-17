@@ -24,9 +24,9 @@ export interface IDynamicComponent<
 export const makeDynamicComponent = <
   Attrs = {}, State extends IDynamicVnodeStateLifecycle<Attrs, State> = { dynamic: {} }
 >(
-  component: IDynamicComponent<Attrs, State>,
-  debounceTime: number = 100,
-): IDynamicComponent<Attrs, State> => {
+    component: IDynamicComponent<Attrs, State>,
+    debounceTime: number = 100,
+  ): IDynamicComponent<Attrs, State> => {
   const oninit = component.oninit;
   const onremove = component.onremove;
   const onbeforeupdate = component.onbeforeupdate;
@@ -52,13 +52,14 @@ export const makeDynamicComponent = <
       ).pipe(
         // this throttle prevents the subscription from being hit too rapidly if several observables
         // update in quick succession
-        //throttle(() => interval(debounceTime)),
+        // throttle(() => interval(debounceTime)),
         takeUntil(vnode.state['_complete']),
       ).subscribe(([properties, results]) => {
         // swap out each dynamic value with new value from subscription
         for (let i = 0; i < properties.length; ++i) {
-          //console.log(`got update to ${properties[i]}: old = ${vnode.state.dynamic[name]}, new = ${results[i]}`);
-          vnode.state.dynamic[properties[i]] = results[i];
+          const name = properties[i];
+          // console.log(`got update to ${name}: old = ${vnode.state.dynamic[name]}, new = ${results[i]}`);
+          vnode.state.dynamic[name] = results[i];
         }
         // in theory, we could diff the old/new and only redraw if something changed, but
         // redraws are cheap enough that it's not a big deal

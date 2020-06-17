@@ -3,7 +3,6 @@ import {
   NodeInfo,
   AddressInfo,
   RoleInfo,
-  MembershipInfo,
   SocialAccount,
   OffchainTag,
   ContractCategory,
@@ -11,8 +10,9 @@ import {
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
+  StarredCommunity,
 } from 'models';
-
+import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
 import { Subject, ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
@@ -23,6 +23,7 @@ import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import ChainEntityController from './controllers/server/chain_entities';
+import CommunitiesController from './controllers/server/communities';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -50,6 +51,7 @@ export interface IApp {
   reactions: ReactionsController;
   tags: TagsController;
   chainEntities: ChainEntityController;
+  communities: CommunitiesController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -57,23 +59,33 @@ export interface IApp {
   activeId(): string;
   defaultScope(): string;
 
+  toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
+  // populated on login
   login: {
     email?: string;
+    emailInterval?: string;
     jwt?: string;
+    // all address infos for all chains/communities loaded
     addresses: AddressInfo[];
+    // contains all role data for every active + non-active address
+    // TODO: Turn this into a map, app.login.roles[community] or turn into stores/controllers
     roles: RoleInfo[];
-    memberships: MembershipInfo[];
+    // active addresses for a specific community or chain
+    // TODO: Rename to some accounts based name
     activeAddresses: Array<Account<any>>;
+    // TODO: Identify a use-case, implement a use case
     socialAccounts: SocialAccount[];
     selectedNode: NodeInfo;
     isSiteAdmin: boolean;
     disableRichText: boolean;
     notifications: NotificationsController;
     lastVisited: object;
+    starredCommunities: StarredCommunity[];
     unseenPosts: object;
   };
+  // stored on server-side
   config: {
     communities: OffchainCommunitiesStore;
     chains: ChainStore;
@@ -83,6 +95,7 @@ export interface IApp {
     defaultChain: string;
     invites: any[];
   };
+  // TODO: pull this into login
   vm: {
     activeAccount: Account<any>;
   };
@@ -90,6 +103,7 @@ export interface IApp {
   isLoggedIn(): boolean;
   isProduction(): boolean;
   serverUrl(): string;
+  loadingError: string;
 }
 
 const app: IApp = {
@@ -106,12 +120,14 @@ const app: IApp = {
   reactions: new ReactionsController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
+  communities: new CommunitiesController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
   activeId: () => app.community ? app.activeCommunityId() : app.activeChainId(),
   defaultScope: () => app.config.defaultChain,
 
+  toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
   login: {
@@ -119,12 +135,12 @@ const app: IApp = {
     activeAddresses: [],
     socialAccounts: [],
     roles: [],
-    memberships: [],
     selectedNode: null,
     isSiteAdmin: false,
     disableRichText: null,
     lastVisited: {},
     unseenPosts: {},
+    starredCommunities: [],
     notifications: new NotificationsController(),
   },
   config: {
@@ -148,7 +164,8 @@ const app: IApp = {
   vm: {
     activeAccount: null,
   },
-  serverUrl: () => '/api'
+  serverUrl: () => '/api',
+  loadingError: null,
 };
 
 export default app;

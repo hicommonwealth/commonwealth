@@ -1,0 +1,144 @@
+@import 'client/styles/shared';
+@import './index';
+
+.ViewProposalPage > .page-container > .container,
+.ViewProposalPage > .page-container > .container {
+    padding: 0;
+}
+.ViewProposalPage {
+    margin-bottom: 32px;
+}
+
+.ProposalHeader {
+    .proposal-header {
+        padding: $padding-top $gutter $padding;
+    }
+    .proposal-body {
+        padding: $padding $gutter ($padding + 6px);
+        border-top: 1px solid #e7e7e7;
+        .proposal-body-meta {
+            margin-bottom: 12px;
+        }
+        .proposal-body-content {
+        }
+    }
+    .TagEditor {
+        display: inline;
+    }
+
+    // proposal-tags
+    .ProposalHeaderCaretMenu,
+    .ProposalHeaderTags {
+        display: inline-block;
+        font-size: 14px;
+        .cui-icon {
+            position: relative;
+            top: -1px;
+        }
+        a {
+            cursor: pointer;
+            color: #888;
+            text-decoration: none;
+            margin-right: 10px;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        a:last-child {
+            margin-right: 0;
+        }
+    }
+
+    // proposal-title
+    .proposal-title {
+        margin-top: 5px;
+        .ProposalHeaderTitle,
+        .ProposalHeaderComments {
+            display: inline;
+            font-size: 23px;
+            font-weight: 600;
+            flex: 1;
+            line-height: 1.25;
+        }
+        .ProposalHeaderComments {
+            font-size: 17px;
+            margin-left: 6px;
+            color: #888;
+            position: relative;
+            top: -1px;
+            user-select: none;
+            white-space: nowrap;
+            .cui-icon {
+                position: relative;
+                top: -1px;
+                color: #888;
+                margin-left: 4px;
+            }
+        }
+    }
+
+    // proposal-meta
+    .ProposalHeaderAuthor,
+    .ProposalHeaderCreated,
+    .ProposalHeaderLastEdited,
+    .ProposalHeaderDelete,
+    .ProposalBodyDelete,
+    .ProposalHeaderOnchainId,
+    .ProposalHeaderOnchainStatus,
+    .ProposalHeaderSpacer,
+    .ProposalBodyEdit,
+    .ProposalBodyDelete,
+    .ProposalBodyCancelEdit,
+    .ProposalBodySaveEdit,
+    .ViewCountBlock,
+    .ProposalHeaderExternalLink {
+        display: inline-block;
+        color: #888;
+        font-size: 14px;
+        a:link,
+        a:visited {
+            color: #888;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .ProposalHeaderAuthor {
+        .User .user-display-name {
+            color: #888;
+        }
+    }
+    .ProposalHeaderExternalLink {
+        margin-top: 5px;
+        font-weight: 600;
+        a:link,
+        a:visited {
+            color: $primary-green;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    }
+    .ProposalHeaderSpacer {
+        margin: 0 7px;
+    }
+
+    // subscription button
+    .ProposalHeaderSubscriptionButton {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+
+    .ProposalHeaderPrivacyButtons {
+        position: absolute;
+        right: 20px;
+        top: 70px;
+    }
+
+    .ProposalBodyReaction {
+        margin-top: 18px;
+    }
+}

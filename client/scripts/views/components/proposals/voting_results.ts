@@ -1,6 +1,6 @@
 import 'components/proposals/voting_results.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { VoteOutcome } from 'edgeware-node-types/dist';
 import { u8aToString } from '@polkadot/util';
 
@@ -25,14 +25,13 @@ const ProposalVotingResults = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const votes = proposal.getVotes();
-    const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote ||
-      proposal.votingUnit === VotingUnit.ConvictionCoinVote;
+    const balanceWeighted = proposal.votingUnit === VotingUnit.CoinVote
+      || proposal.votingUnit === VotingUnit.ConvictionCoinVote;
 
     // TODO: fix up this function for cosmos votes
-    const showVotes = (votes : Array<IVote<any>>) =>
-      votes.length === 0 ?
-      m('.no-votes', 'No votes') :
-      votes.map(
+    const showVotes = (votes : Array<IVote<any>>) => votes.length === 0
+      ? m('.no-votes', 'No votes')
+      : votes.map(
         (vote) => {
           let balanceStr = '--';
           let balance;
@@ -54,97 +53,97 @@ const ProposalVotingResults = {
           ]) : vote instanceof DepositVote ? m('.vote', [
             m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
             m('.vote-deposit', formatCoin(vote.deposit, true)),
-          ]) :
-          vote instanceof CosmosVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
-            m('.vote-choice', vote.choice.toString()),
-            //balanceWeighted && balance && m('.vote-balance', balanceStr),
-          ]) :
-          vote instanceof MolochProposalVote ? m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true })),
-            m('.vote-choice', vote.choice.toString()),
-            balance && m('.vote-balance', balanceStr),
-          ]) :
-          m('.vote', [
-            m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
-          ]);
-        });
+          ])
+            : vote instanceof CosmosVote ? m('.vote', [
+              m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+              m('.vote-choice', vote.choice.toString()),
+              // balanceWeighted && balance && m('.vote-balance', balanceStr),
+            ])
+              : vote instanceof MolochProposalVote ? m('.vote', [
+                m('.vote-voter', m(User, { user: vote.account, linkify: true })),
+                m('.vote-choice', vote.choice.toString()),
+                balance && m('.vote-balance', balanceStr),
+              ])
+                : m('.vote', [
+                  m('.vote-voter', m(User, { user: vote.account, linkify: true, tooltip: true })),
+                ]);
+        }
+      );
 
     if (proposal instanceof EdgewareSignalingProposal) {
       return m('.ProposalVotingResults', [
-          m(Tabs, [{
-            name: 'Voters',
-            content: showVotes(votes)
-          }].concat(
-            proposal.data.choices.map((outcome) => {
-              return {
-                name: signalingVoteToString(outcome),
-                content: showVotes(votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))),
-              }
-            })
-          ))
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }].concat(
+          proposal.data.choices.map((outcome) => {
+            return {
+              name: signalingVoteToString(outcome),
+              content: showVotes(votes.filter((v) => signalingVoteToString(v.choices[0]) === signalingVoteToString(outcome))),
+            };
+          })
+        ))
       ]);
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       return m('.ProposalVotingResults', [
-          m(Tabs, [{
-            name: 'Voters',
-            content: showVotes(votes)
-          }, {
-            name: 'Yes',
-            content: showVotes(votes.filter((v) => v.choice === true))
-          }, {
-            name: 'No',
-            content: showVotes(votes.filter((v) => v.choice === false)),
-          }]),
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }, {
+          name: 'Yes',
+          content: showVotes(votes.filter((v) => v.choice === true))
+        }, {
+          name: 'No',
+          content: showVotes(votes.filter((v) => v.choice === false)),
+        }]),
       ]);
     } else if (proposal.votingType === VotingType.MolochYesNo) { // TODO: merge with above
       return m('.ProposalVotingResults', [
-          m(Tabs, [{
-            name: 'Voters',
-            content: showVotes(votes)
-          }, {
-            name: 'Yes',
-            content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
-          }, {
-            name: 'No',
-            content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
-          }]),
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }, {
+          name: 'Yes',
+          content: showVotes(votes.filter((v) => v.choice === MolochVote.YES))
+        }, {
+          name: 'No',
+          content: showVotes(votes.filter((v) => v.choice === MolochVote.NO)),
+        }]),
       ]);
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       return m('.ProposalVotingResults', [
-          m(Tabs, [{
-            name: 'Voters',
-            content: showVotes(votes)
-          }, {
-            name: 'Yes',
-            content: showVotes(votes.filter((v) => v.choice === true))
-          }, {
-            name: 'No',
-            content: showVotes(votes.filter((v) => v.choice === false)),
-          }]),
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }, {
+          name: 'Yes',
+          content: showVotes(votes.filter((v) => v.choice === true))
+        }, {
+          name: 'No',
+          content: showVotes(votes.filter((v) => v.choice === false)),
+        }]),
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       return m('.ProposalVotingResults', [
-          m(Tabs, [{
-            name: 'Voters',
-            content: showVotes(votes)
-          }, {
-            name: 'Yes',
-            content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))
-          }, {
-            name: 'No',
-            content: showVotes(votes.filter((v) =>
-              v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO))
-          }, {
-            name: 'Abstain',
-            content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))
-          }, {
-            name: 'Veto',
-            content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.VETO)),
-          }]),
+        m(Tabs, [{
+          name: 'Voters',
+          content: showVotes(votes)
+        }, {
+          name: 'Yes',
+          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.YES))
+        }, {
+          name: 'No',
+          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.NO || v.choice === CosmosVoteChoice.VETO))
+        }, {
+          name: 'Abstain',
+          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.ABSTAIN))
+        }, {
+          name: 'Veto',
+          content: showVotes(votes.filter((v) => v.choice === CosmosVoteChoice.VETO)),
+        }]),
       ]);
-    } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting &&
-               proposal instanceof CosmosProposal) {
+    } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting
+               && proposal instanceof CosmosProposal) {
       // special case for cosmos proposals in deposit stage
       return m('.ProposalVotingResults', showVotes(proposal.depositorsAsVotes));
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {

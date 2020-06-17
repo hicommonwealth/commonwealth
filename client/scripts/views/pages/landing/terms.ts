@@ -1,8 +1,7 @@
-/* tslint:disable:max-line-length */
+/* eslint-disable max-len */
 
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
-import LandingPage from 'views/pages/landing/landing';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
 
 const TermsOfService = `
@@ -120,13 +119,15 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 
 const TermsPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'TermsPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'TermsPage' });
   },
   view: (vnode) => {
-    return m(LandingPage, {
-      header: m('h1.page-title', 'Terms of Service'),
-      body: m('.landing-container', renderMultilineText(TermsOfService)),
-    });
+    return m('.TermsPage', [
+      m('.forum-container', [
+        m('h1.page-title', 'Terms of Service'),
+        renderMultilineText(TermsOfService),
+      ])
+    ]);
   }
 };
 

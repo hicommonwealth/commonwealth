@@ -1,7 +1,7 @@
 import 'modals/council_voting_modal.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
+import $ from 'jquery';
+import m from 'mithril';
 
 import app from 'state';
 
@@ -24,12 +24,10 @@ const CouncilVotingModal = {
     if (!(author instanceof SubstrateAccount)) return m('div', 'Council voting only supported on Substrate.');
 
     // get currently set approvals
-    let defaultSelection: string[];
-    let hasApprovals: boolean;
     const currentVote = (app.chain as Substrate).phragmenElections.activeElection.getVotes(author);
-    const currentApprovals = currentVote && currentVote.length > 0 && currentVote[0].votes || [];
-    hasApprovals = currentApprovals.length > 0;
-    defaultSelection = candidates
+    const currentApprovals = (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
+    const hasApprovals = currentApprovals.length > 0;
+    const defaultSelection = candidates
       .filter(([candidate]) => currentApprovals && currentApprovals.includes(candidate.address))
       .map(([candidate]) => candidate.address);
     if (vnode.state.votes === undefined) {
@@ -39,14 +37,17 @@ const CouncilVotingModal = {
     const submitVote = (e) => {
       vnode.state.error = '';
       if (!vnode.state.votes || vnode.state.votes.length === 0) {
-        return vnode.state.error = 'Select at least one candidate.';
+        vnode.state.error = 'Select at least one candidate.';
+        return;
       }
       const stake: SubstrateCoin = vnode.state.phragmenStakeAmount;
       if (!stake || stake.eqn(0)) {
-        return vnode.state.error = 'Must enter an amount.';
+        vnode.state.error = 'Must enter an amount.';
+        return;
       }
       if (stake.lt((app.chain as Substrate).chain.existentialdeposit)) {
-        return vnode.state.error = 'Amount locked must be above minimum balance.';
+        vnode.state.error = 'Amount locked must be above minimum balance.';
+        return;
       }
 
       const voteAccts: string[] = vnode.state.votes;
@@ -69,12 +70,12 @@ const CouncilVotingModal = {
         m('.chooser', [
           m('p', [
             `Lock any amount of ${(app.chain && app.chain.chain && app.chain.chain.denom) || 'balance'} to vote. `,
-            `You may unlock at any time.`
+            'You may unlock at any time.'
           ]),
           m('p', [
             `A ${formatCoin(votingBond)} bond will be reserved in case your vote becomes inactive (everyone you are `,
-            `voting for withdraws their candidacies). Once inactive, anyone can evict your voter record and claim `,
-            `your bond.`
+            'voting for withdraws their candidacies). Once inactive, anyone can evict your voter record and claim ',
+            'your bond.'
           ]),
           m('input[type="text"]', {
             class: 'phragmen-vote-amount',
@@ -112,12 +113,12 @@ const CouncilVotingModal = {
             e.preventDefault();
             const account = app.vm.activeAccount as SubstrateAccount;
             createTXModal((app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(account))
-            .then(() => {
-              $(vnode.dom).trigger('modalforceexit');
-            }, (err) => {
-              if (err) vnode.state.error = err;
-              m.redraw();
-            });
+              .then(() => {
+                $(vnode.dom).trigger('modalforceexit');
+              }, (err) => {
+                if (err) vnode.state.error = err;
+                m.redraw();
+              });
           }
         }, 'Retract vote'),
         m(SendingFrom, { author, showBalance: true }),

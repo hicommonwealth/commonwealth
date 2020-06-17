@@ -1,8 +1,8 @@
 import 'components/widgets/character_limited_text_input.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import _ from 'lodash';
+import $ from 'jquery';
 
 const debouncedRedraw = _.debounce(() => { m.redraw(); }, 100, { leading: true, trailing: true });
 
@@ -39,7 +39,7 @@ const CharacterLimitedTextInput: m.Component<IAttrs, IState> = {
     };
 
     return m('.CharacterLimitedTextInput', {
-      oncreate: (vnode) => setTimeout((() => $(vnode.dom).find('input[type="text"]').trigger('keyup')), 0)
+      oncreate: (vvnode) => setTimeout((() => $(vvnode.dom).find('input[type="text"]').trigger('keyup')), 0)
     }, [
       m('input[type="text"]', attrs),
       m('.character-limit-remaining', {

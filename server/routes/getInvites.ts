@@ -1,13 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NotLoggedIn: 'Not logged in',
+  NoUser: 'Cannot find associated User',
+  NoEmail: 'No email included for User, cannot query invites',
+};
+
 const getInvites = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error('Not Logged In'));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { user } = req;
 
-  if (!user) return next(new Error('Cannot find associated User'));
-  if (!user.email) return next(new Error('No email included for User, cannot query Invites'));
+  if (!user) return next(new Error(Errors.NoUser));
+  if (!user.email) return next(new Error(Errors.NoEmail));
 
   const invites = await models.InviteCode.findAll({
     where: {

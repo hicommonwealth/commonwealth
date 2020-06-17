@@ -22,7 +22,7 @@ export class AccountsStore<T extends IHasAddress> extends Store<T> {
 
   public getByAddress(address: string): T {
     if (this._storeAddress[address] === undefined) {
-      throw new Error('Invalid user: ' + address);
+      throw new Error(`Invalid user: ${address}`);
     }
     return this._storeAddress[address];
   }

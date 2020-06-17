@@ -7,8 +7,8 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
-import { selectLogin } from 'controllers/app/login';
 import { MolochEntityKind } from 'events/moloch/types';
+import { setActiveAccount } from 'controllers/app/login';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
@@ -62,13 +62,13 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       await this.webWallet.enable();
       await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
         const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
-        selectLogin(updatedAddress);
+        setActiveAccount(updatedAddress);
       });
     }
 
     await this.webWallet.web3.givenProvider.on('accountsChanged', (accounts) => {
       const updatedAddress = this.app.login.activeAddresses.find((addr) => addr.address === accounts[0]);
-      selectLogin(updatedAddress);
+      setActiveAccount(updatedAddress);
       api.updateSigner(accounts[0]);
     });
 

@@ -19,16 +19,18 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account: Account<any>, currentIdentity?: IdentityInfo) => {
+const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity | null) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
+    // wait for info to load before making it clickable, if identity exists
+    class: !currentIdentity || !currentIdentity.exists || currentIdentity.info ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
         data: { account: account as SubstrateAccount, currentIdentity },
       });
     },
-  }, currentIdentity ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
+  }, currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
 };
 
 export interface IProfileHeaderAttrs {
@@ -77,10 +79,11 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
                 clipboard.writeText(account.address);
                 vnode.state.copied = true;
                 setTimeout(() => {
-                  $(e.target).next('.copy-done').fadeOut(1000).promise().done(() => {
-                    vnode.state.copied = false;
-                    m.redraw();
-                  });
+                  $(e.target).next('.copy-done').fadeOut(1000).promise()
+                    .done(() => {
+                      vnode.state.copied = false;
+                      m.redraw();
+                    });
                 }, 1500);
               }
             }, 'Copy address'),
@@ -90,7 +93,7 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
         // Add in identity actions here
         m('.bio-actions', [
           (app.vm.activeAccount && account.address === app.vm.activeAccount.address) ? [
-            editIdentityAction(account, vnode.state.dynamic.identity?.info),
+            editIdentityAction(account, vnode.state.dynamic.identity),
             m('button.formular-button-primary', {
               onclick: () => {
                 app.modals.create({

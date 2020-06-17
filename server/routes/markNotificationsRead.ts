@@ -1,15 +1,22 @@
 import Sequelize from 'sequelize';
-const Op = Sequelize.Op;
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
+const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
+
+export const Errors = {
+  NotLoggedIn: 'Not lgoged in',
+  NoNotificationIds: 'Must specify notification ids',
+  WrongOwner: 'Notification not woned by user',
+};
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new Error(Errors.NotLoggedIn));
   }
   if (!req.body['notification_ids[]']) {
-    return next(new Error('must specifiy notification ids'));
+    return next(new Error(Errors.NoNotificationIds));
   }
 
   let idOptions;
@@ -25,7 +32,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   if (notifications.find((n) => n.Subscription.subscriber_id !== req.user.id)) {
-    return next(new Error('notification not owned by user'));
+    return next(new Error(Errors.WrongOwner));
   }
 
   // TODO: transactionalize this

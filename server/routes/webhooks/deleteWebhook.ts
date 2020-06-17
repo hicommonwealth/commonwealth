@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const deleteWebhook = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +16,7 @@ const deleteWebhook = async (models, req: Request, res: Response, next: NextFunc
   const adminRoles = await models.Role.findAll({
     where: {
       ...chainOrCommObj,
-      address_id: addresses.map((addr) => addr.id),
+      address_id: addresses.filter((addr) => !!addr.verified).map((addr) => addr.id),
       permission: ['admin']
     },
   });

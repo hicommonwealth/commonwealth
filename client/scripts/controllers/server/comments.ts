@@ -1,6 +1,6 @@
-import { default as $ } from 'jquery';
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import $ from 'jquery';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
@@ -64,6 +64,14 @@ class CommentsController {
     return this._store.nComments(proposal);
   }
 
+  public uniqueCommenters<T extends IUniqueId>(proposal: T) {
+    // Returns an array of [chain, address] arrays
+    // TODO: Use a better comparator to determine uniqueness
+    const comments = this._store.getByProposal(proposal);
+    return _.uniq(comments.map((c) => `${c.authorChain}#${c.author}`))
+      .map((slug) => slug.split(/#/));
+  }
+
   public lastCommented<T extends IUniqueId>(proposal: T) {
     const comments = this._store.getByProposal(proposal);
     if (comments.length === 0) return null;
@@ -75,12 +83,16 @@ class CommentsController {
     return _.uniq(authors);
   }
 
-  public async create<T extends IUniqueId>(address: string, proposalIdentifier: string, chain: string,
-    community: string, unescapedText: string, parentCommentId: any = null, attachments?: string[], mentions?: string[]) {
+  public async create<T extends IUniqueId>(
+    address: string, proposalIdentifier: string, chain: string,
+    community: string, unescapedText: string, parentCommentId: any = null,
+    attachments?: string[], mentions?: string[]
+  ) {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body: unescapedText };
     const versionHistory : string = JSON.stringify(firstVersion);
     try {
+      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         'author_chain': app.vm.activeAccount.chain.id,
         'chain': chain,
@@ -114,6 +126,7 @@ class CommentsController {
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     try {
+      // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
         'address': app.vm.activeAccount.address,
         'author_chain': app.vm.activeAccount.chain.id,
@@ -140,37 +153,46 @@ class CommentsController {
   }
 
   public async refresh(proposal, chainId: string, communityId: string) {
-    try {
-      const response = await $.get(`${app.serverUrl()}/viewComments`, {
-        chain: chainId,
-        community: communityId,
-        root_id: encodeURIComponent(proposal.uniqueIdentifier),
-      });
-      if (response.status !== 'Success') {
-        throw new Error(`Unsuccessful status: ${response.status}`);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // TODO: Change to GET /comments
+        const response = await $.get(`${app.serverUrl()}/viewComments`, {
+          chain: chainId,
+          community: communityId,
+          root_id: encodeURIComponent(proposal.uniqueIdentifier),
+        });
+        if (response.status !== 'Success') {
+          reject(new Error(`Unsuccessful status: ${response.status}`));
+        }
+        this._store.clearProposal(proposal);
+        Promise.all(response.result.map(async (comment) => {
+          // TODO: Comments should always have a linked Address
+          if (!comment.Address) console.error('Comment missing linked address');
+          const model = modelFromServer(comment);
+          this._store.add(model);
+          return model;
+        })).then((result) => {
+          resolve(result);
+        }).catch((error) => {
+          reject(error);
+        });
+      } catch (err) {
+        console.log('Failed to load comments');
+        reject(new Error(err.responseJSON?.error ? err.responseJSON.error : 'Error loading comments'));
       }
-      this._store.clearProposal(proposal);
-      await Promise.all(response.result.map(async (comment) => {
-        // TODO: Comments should always have a linked Address
-        if (!comment.Address) console.error('Comment missing linked address');
-        this._store.add(modelFromServer(comment));
-      }));
-    } catch (err) {
-      console.log('Failed to load comments');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading comments');
-    }
+    });
   }
 
   public async delete(comment) {
     const _this = this;
     return new Promise((resolve, reject) => {
-      $.post(app.serverUrl() + '/deleteComment', {
+      // TODO: Change to DELETE /comment
+      $.post(`${app.serverUrl()}/deleteComment`, {
         jwt: app.login.jwt,
         comment_id: comment.id,
       }).then((result) => {
-        this._store.remove(comment);
+        const existing = this._store.getById(comment.id);
+        this._store.remove(existing);
         resolve(result);
       }).catch((e) => {
         console.error(e);
@@ -192,6 +214,7 @@ class CommentsController {
       if (reset === CommentRefreshOption.LoadProposalComments) {
         args.proposals_only = 1;
       }
+      // TODO: Change to GET /comments
       const response = await $.get(`${app.serverUrl()}/bulkComments`, args);
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful status: ${response.status}`);

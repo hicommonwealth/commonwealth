@@ -1,19 +1,22 @@
 import $ from 'jquery';
 import app from 'state';
+import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork } from './types';
 import OffchainTag from './OffchainTag';
 
 class ChainInfo {
   public readonly id: string;
   public readonly symbol: string;
-  public readonly name: string;
+  public name: string;
   public readonly network: ChainNetwork;
   public readonly iconUrl: string;
-  public readonly description: string;
+  public description: string;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
+  public readonly chainObjectId: string;
+  public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags) {
+  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, adminsAndMods?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -22,6 +25,7 @@ class ChainInfo {
     this.description = description;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
+    this.adminsAndMods = adminsAndMods || [];
   }
 
   public static fromJSON(json) {
@@ -34,11 +38,64 @@ class ChainInfo {
       json.description,
       json.featured_tags,
       json.tags,
+      json.adminsAndMods,
     );
+  }
+
+  public async getAdminsAndMods(id: string) {
+    try {
+      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id, });
+      const roles = res.result.filter((r) => {
+        return r.permission === RolePermission.admin || r.permission === RolePermission.moderator;
+      });
+      this.setAdmins(roles);
+    } catch {
+      console.log('Failed to fetch admins/mods');
+    }
+  }
+
+  public setAdmins(roles) {
+    this.adminsAndMods = [];
+    roles.forEach((r) => {
+      this.adminsAndMods.push(new RoleInfo(
+        r.id,
+        r.address_id,
+        r.Address.address,
+        r.Address.chain,
+        r.chain_id,
+        r.offchain_community_id,
+        r.permission,
+        r.is_user_default
+      ));
+    });
+  }
+
+  public async updateChainData(name: string, description: string,) {
+    // TODO: Change to PUT /chain
+    const r = await $.post(`${app.serverUrl()}/updateChain`, {
+      'id': app.activeChainId(),
+      'name': name,
+      'description': description,
+      'jwt': app.login.jwt,
+    });
+    const updatedChain: ChainInfo = r.result;
+    this.name = updatedChain.name;
+    this.description = updatedChain.description;
+  }
+
+  public addFeaturedTag(tag: string) {
+    this.featuredTags.push(tag);
+  }
+
+  public removeFeaturedTag(tag: string) {
+    if (this.featuredTags.includes(tag)) {
+      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+    }
   }
 
   public async updateFeaturedTags(tags: string[]) {
     try {
+      // TODO: Change to PUT /chain
       await $.post(`${app.serverUrl()}/updateChain`, {
         'id': app.activeChainId(),
         'featured_tags[]': tags,

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const bulkThreads = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -14,17 +15,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     const publicThreads = await models.OffchainThread.findAll({
       where: publicThreadsQuery,
-      include: [
-        models.Address,
-        {
-          model: models.OffchainTag,
-          as: 'tags',
-          through: {
-            model: models.TaggedThread,
-            as: 'taggedThreads',
-          },
-        },
-      ],
+      include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
       order: [['created_at', 'DESC']],
     });
 
@@ -37,22 +28,12 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const allThreads = await models.OffchainThread.findAll({
     where: allThreadsQuery,
-    include: [
-      models.Address,
-      {
-        model: models.OffchainTag,
-        as: 'tags',
-        through: {
-          model: models.TaggedThread,
-          as: 'taggedThreads',
-        },
-      },
-    ],
+    include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
     order: [['created_at', 'DESC']],
   });
 
   const userAddresses = await req.user.getAddresses();
-  const userAddressIds = Array.from(userAddresses.map((address) => address.id));
+  const userAddressIds = Array.from(userAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id));
   const rolesQuery = (community)
     ? { address_id: { [Op.in]: userAddressIds }, offchain_community_id: community.id, }
     : { address_id: { [Op.in]: userAddressIds }, chain_id: chain.id };

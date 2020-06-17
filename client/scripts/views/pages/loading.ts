@@ -1,17 +1,23 @@
 import 'pages/loading.scss';
 
-import { default as m } from 'mithril';
-import ObjectPage from 'views/pages/_object_page';
+import m from 'mithril';
+import { Spinner } from 'construct-ui';
+import Sublayout from 'views/sublayout';
 
-const PageLoading: m.Component<{}> = {
+const LoadingPage: m.Component<{ message?: string }> = {
   view: (vnode) => {
-    return m(ObjectPage, {
-      class: 'PageLoading',
-      content: m('.loading-icon', [
-        m('span.icon-spinner2.animate-spin')
-      ]),
-    });
+    return m(Sublayout, {
+      class: 'LoadingPage',
+      leftSidebar: null,
+    }, [
+      m(Spinner, {
+        fill: true,
+        message: vnode.attrs.message,
+        size: 'xl',
+        style: 'visibility: visible; opacity: 1;'
+      }),
+    ]);
   }
 };
 
-export default PageLoading;
+export default LoadingPage;

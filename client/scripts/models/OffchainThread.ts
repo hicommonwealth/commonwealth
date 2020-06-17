@@ -20,11 +20,12 @@ class OffchainThread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public readonly tags: OffchainTag[];
+  public tag: OffchainTag;
   public readonly slug = 'discussion';
   public readonly url: string;
   public readonly versionHistory: string[];
-  public readonly community: string | number;
+  public readonly community: string;
+  public readonly chain: string;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -36,10 +37,11 @@ class OffchainThread implements IUniqueId {
     attachments: OffchainAttachment[],
     id: number,
     createdAt: moment.Moment,
-    tags: OffchainTag[],
+    tag: OffchainTag,
     kind: OffchainThreadKind,
     versionHistory: string[],
-    community: number | string,
+    community: string,
+    chain: string,
     privacy: boolean,
     readOnly: boolean,
     body?: string,
@@ -54,13 +56,14 @@ class OffchainThread implements IUniqueId {
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = createdAt;
-    this.tags = tags;
+    this.tag = tag;
     this.kind = kind;
     this.authorChain = authorChain;
     this.pinned = pinned;
     this.url = url;
     this.versionHistory = versionHistory;
     this.community = community;
+    this.chain = chain;
     this.privacy = privacy;
     this.readOnly = readOnly;
   }

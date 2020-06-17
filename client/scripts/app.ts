@@ -2,21 +2,23 @@ import 'lib/normalize.css';
 import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
+import 'construct.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
+import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
 
-import { Layout, LoadingLayout } from 'views/layouts';
+import { Layout, LoadingLayout } from 'views/layout';
 import { ChainInfo, CommunityInfo, NodeInfo,
   OffchainTag, ChainClass, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { default as moment } from 'moment-twitter';
-import { default as mixpanel } from 'mixpanel-browser';
+import moment from 'moment-twitter';
+import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
@@ -25,7 +27,7 @@ import ConfirmInviteModal from './views/modals/confirm_invite_modal';
 // On logout: called to reset everything
 export async function initAppState(updateSelectedNode = true): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(app.serverUrl() + '/status').then((data) => {
+    $.get(`${app.serverUrl()}/status`).then((data) => {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
@@ -51,18 +53,22 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       app.login.roles = data.roles || [];
+
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
-      app.config.notificationCategories = data.notificationCategories.map((json) => NotificationCategory.fromJSON(json));
+      app.config.notificationCategories = data.notificationCategories
+        .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
 
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
 
       // add roles data for user
-      (data.roles || []).forEach((role) => {
-        app.login.roles[role.offchain_community_id || role.chain_id] = role;
-      });
+      if (data.roles) {
+        data.roles = [];
+        data.roles.map((role) => app.login.roles.push(role));
+      }
 
       // update the selectedNode, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -70,34 +76,11 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         app.login.selectedNode = NodeInfo.fromJSON(data.user.selectedNode);
       }
       resolve();
-    }).catch((err) => {
+    }).catch((err: any) => {
+      app.loadingError = err.responseJSON.error;
       reject(err);
     });
   });
-}
-
-// called by the LayoutWithChain wrapper, which is triggered when the
-// user navigates to a page scoped to a particular chain
-export function initChain(chainId: string): Promise<void> {
-  if (chainId) {
-    const chainNodes = app.config.nodes.getByChain(chainId);
-    if (chainNodes && chainNodes.length > 0) {
-      return selectNode(chainNodes[0]);
-    } else {
-      throw new Error(`No nodes found for '${chainId}'`);
-    }
-  } else {
-    throw new Error(`No nodes found for '${chainId}'`);
-  }
-}
-
-export function initCommunity(communityId: string): Promise<void> {
-  const community = app.config.communities.getByCommunity(communityId);
-  if (community && community.length > 0) {
-    return selectCommunity(community[0]);
-  } else {
-    throw new Error(`No community found for '${communityId}'`);
-  }
 }
 
 export async function deinitChainOrCommunity() {
@@ -111,6 +94,7 @@ export async function deinitChainOrCommunity() {
     app.community = null;
   }
   app.login.selectedNode = null;
+  clearActiveAddresses();
 }
 
 export function handleInviteLinkRedirect() {
@@ -143,9 +127,8 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
   await app.community.init();
   console.log(`${c.name.toUpperCase()} started.`);
 
-  // Reset the available addresses, unless we were already on an
-  // offchain community in which case no change is needed
-  if (!oldCommunity) updateActiveAddresses();
+  // Initialize available addresses
+  updateActiveAddresses();
 
   // Redraw with community fully loaded
   m.redraw();
@@ -195,7 +178,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     const Near = (await import('./controllers/chain/near/main')).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default
+    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -212,28 +195,31 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // online before others. The solution should be to have some kind of
   // locking in place before modules start working.
   //
-  await app.chain.init(() => m.redraw());
-  console.log(`${n.chain.network.toUpperCase()} started.`);
+  app.chain.init(() => m.redraw()).then(() => {
+    // Emit chain as updated
+    app.chainAdapterReady.next(true);
+    console.log(`${n.chain.network.toUpperCase()} started.`);
+    // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
+    updateActiveAddresses(n.chain, true);
+  });
 
-  // Emit chain as updated
-  app.chainAdapterReady.next(true);
+  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
   handleInviteLinkRedirect();
 
-  // Reset the available addresses only if switching chains
-  if (!oldNode || n.chain !== oldNode.chain) {
-    updateActiveAddresses(n.chain);
-  }
+  // Try to instantiate Account<> objects for the new chain. However, app.chain.accounts.get() may not be able to
+  // create the Account object, so we also call this again in the callback that runs after the chain initializes
+  updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    $.post(app.serverUrl() + '/selectNode', {
+    $.post(`${app.serverUrl()}/selectNode`, {
       url: n.url,
       chain: n.chain.id,
       auth: true,
       jwt: app.login.jwt,
     }).then((res) => {
       if (res.status !== 'Success') {
-        throw new Error('got unsuccessful status: ' + res.status);
+        throw new Error(`got unsuccessful status: ${res.status}`);
       }
     }).catch((e) => console.error('Failed to select node on server'));
   }
@@ -242,12 +228,42 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   m.redraw();
 }
 
+// called by the LayoutWithChain wrapper, which is triggered when the
+// user navigates to a page scoped to a particular chain
+export function initChain(chainId: string): Promise<void> {
+  if (chainId) {
+    const chainNodes = app.config.nodes.getByChain(chainId);
+    if (chainNodes && chainNodes.length > 0) {
+      return selectNode(chainNodes[0]);
+    } else {
+      throw new Error(`No nodes found for '${chainId}'`);
+    }
+  } else {
+    throw new Error(`No nodes found for '${chainId}'`);
+  }
+}
+
+export function initCommunity(communityId: string): Promise<void> {
+  const community = app.config.communities.getByCommunity(communityId);
+  if (community && community.length > 0) {
+    return selectCommunity(community[0]);
+  } else {
+    throw new Error(`No community found for '${communityId}'`);
+  }
+}
+
 // set up mithril
 m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
   updateRoute.apply(this, args);
-  window.scrollTo(0, 0);
+  // wait until any redraws have happened before setting the scroll position
+  setTimeout(() => {
+    const html = document.getElementsByTagName('html')[0];
+    if (html) html.scrollTo(0, 0);
+    const body = document.getElementsByTagName('body')[0];
+    if (body) body.scrollTo(0, 0);
+  }, 0);
 };
 
 // set up ontouchmove blocker
@@ -258,7 +274,7 @@ document.ontouchmove = (event) => {
 // set up moment-twitter
 moment.updateLocale('en', {
   relativeTime: {
-    future : 'in %s',
+    future : 'just now',
     past   : '%s ago',
     s  : (num, withoutSuffix) => withoutSuffix ? 'now' : 'seconds',
     m  : '1 min',
@@ -277,7 +293,7 @@ moment.updateLocale('en', {
 $(() => {
   // set window error handler
   window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
-    notifyError('' + errorMsg);
+    notifyError(`${errorMsg}`);
     return false;
   };
 
@@ -288,11 +304,17 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean) => ({
+  interface RouteAttrs {
+    scoped: string | boolean;
+    wideLayout?: boolean;
+  }
+
+  const importRoute = (module, attrs: RouteAttrs) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
     render: (vnode) => {
+      const { scoped, wideLayout } = attrs;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -301,7 +323,7 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      return m(Layout, { scope }, [ vnode ]);
+      return m(Layout, { scope, wideLayout }, [ vnode ]);
     },
   });
 
@@ -313,52 +335,58 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), false),
-    '/about':                    importRoute(import('views/pages/landing/about'), false),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/':                         importRoute(import('views/pages/home'), { scoped: false, wideLayout: true }),
+    '/about':                    importRoute(import('views/pages/landing/about'), { scoped: false }),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), { scoped: false }),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), { scoped: false }),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false),
-    '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/subscriptions':            importRoute(import('views/pages/subscriptions'), false),
+    '/login':                    importRoute(import('views/pages/login'), { scoped: false }),
+    '/settings':                 importRoute(import('views/pages/settings'), { scoped: false }),
+    '/notifications':            importRoute(import('views/pages/notifications'), { scoped: false }),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), { scoped: false }),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), { scoped: false }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notifications':     importRoute(import('views/pages/notifications'), true),
+    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), { scoped: true }),
 
-    '/:scope':                   importRoute(import('views/pages/discussions'), true),
-    '/:scope/discussions/:tag':  importRoute(import('views/pages/discussions'), true),
-    '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
-    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal'), true),
-    '/:scope/council':           importRoute(import('views/pages/council'), true),
-    '/:scope/login':             importRoute(import('views/pages/login'), true),
-    '/:scope/new/link':          importRoute(import('views/pages/threads/NewLinkPage'), true),
-    '/:scope/new/thread':        importRoute(import('views/pages/threads/NewThreadPage'), true),
-    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
-    '/:scope/admin':             importRoute(import('views/pages/admin'), true),
-    '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/web3login':         importRoute(import('views/pages/web3_login'), true),
+    '/:scope':                   importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/discussions/:tag':  importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/tags':              importRoute(import('views/pages/tags'), { scoped: true }),
+    '/:scope/members':           importRoute(import('views/pages/members'), { scoped: true }),
+    // '/:scope/chat':              importRoute(import('views/pages/chat'), { scoped: true }),
+    '/:scope/proposals':         importRoute(import('views/pages/proposals'), { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), { scoped: true }),
+    '/:scope/council':           importRoute(import('views/pages/council'), { scoped: true }),
+    '/:scope/login':             importRoute(import('views/pages/login'), { scoped: true }),
+    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), { scoped: true }),
+    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), { scoped: true }),
+    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), { scoped: true }),
+    '/:scope/admin':             importRoute(import('views/pages/admin'), { scoped: true }),
+    '/:scope/settings':          importRoute(import('views/pages/settings'), { scoped: true }),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), { scoped: true }),
 
-    '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
+    '/:scope/account/:address':  importRoute(import('views/pages/profile'), { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.vm.activeAccount)
         ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute(import('views/pages/questions'), true),
-    // '/:scope/requests':          importRoute(import('views/pages/requests'), true),
-    // '/:scope/validators':        importRoute(import('views/pages/validators'), true),
+    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
+    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
+    // '/:scope/validators':        importRoute(import('views/pages/validators'), { scoped: true }),
 
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),
+    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), { scoped: true }),
   });
+
+  // initialize construct-ui focus manager
+  FocusManager.showFocusOnlyOnTab();
 
   // initialize mixpanel, before adding an alias or tracking identity
   try {
@@ -371,8 +399,8 @@ $(() => {
   }
 
   // handle login redirects
-  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') && !m.route.param('path').startsWith('/login')) {
+  if (m.route.param('loggedin') && m.route.param('loggedin').toString() === 'true'
+      && m.route.param('path') && !m.route.param('path').startsWith('/login')) {
     // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
     // handle param-based redirect after email login
 
@@ -476,17 +504,19 @@ $(() => {
       }
     }
     m.redraw();
+  }).catch((err) => {
+    m.redraw();
   });
 });
 
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////
 // For browserify-hmr
 // See browserify-hmr module.hot API docs for hooks docs.
 declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
   // module.hot.dispose((data: any) => {
-  // 	m.redraw();
+  //   m.redraw();
   // })
 }
-///////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////

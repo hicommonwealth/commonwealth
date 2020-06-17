@@ -1,0 +1,70 @@
+@import 'client/styles/shared';
+@import './index';
+
+.ProposalComment {
+    padding: $padding $gutter ($padding + 6px);
+    border-top: 1px solid #e7e7e7;
+    .comment-body-meta {
+        margin-bottom: 12px;
+    }
+}
+
+.ProposalComments {
+    .threading-level {
+        margin-left: 36px;
+    }
+    .new-comment-child {
+        margin-left: 36px;
+    }
+
+    .ProposalBodyAuthor,
+    .ProposalBodyCreated,
+    .ProposalBodyLastEdited,
+    .ProposalBodyReply,
+    .ProposalBodyEdit,
+    .ProposalBodyDelete,
+    .ProposalBodyCancelEdit,
+    .ProposalBodySaveEdit,
+    .ProposalBodySpacer {
+        display: inline-block;
+        color: #888;
+        font-size: 14px;
+        a:link,
+        a:visited,
+        .User a.user-display-name {
+            color: #888;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .ProposalBodySpacer {
+        margin: 0 7px;
+    }
+    .ProposalBodyText,
+    .ProposalBodyAttachments,
+    .ProposalBodyEditor {
+    }
+
+    .ProposalBodyReaction {
+        margin-top: 18px;
+    }
+}
+
+// .new-comment-error {
+//     @include error-text();
+//     margin: 20px 0 10px;
+// }
+// .comments-error {
+//     @include error-text();
+//     margin: 30px 0;
+// }
+
+//     .proposal-comment-text {
+//         word-break: break-word;
+//     }
+//     .proposal-comment-attachments {
+//         margin: 10px 0 20px;
+//         @include attachments;
+//     }

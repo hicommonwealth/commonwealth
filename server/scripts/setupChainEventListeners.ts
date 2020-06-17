@@ -34,11 +34,16 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup = false, migrate = false) => {
+const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');
-  await Promise.all(nodes.filter((node) => EventSupportingChains.includes(node.chain))
+  await Promise.all(nodes
+    .filter((node) => EventSupportingChains.includes(node.chain))
+    // filter out duplicate nods per-chain, only use one node
+    .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
+    // if migrating, only use chain specified, unless "all"
+    .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
       let subscribeFn;
@@ -78,7 +83,6 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       } else {
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
-
       const subscriber = await subscribeFn(handlers);
 
       // hook for clean exit

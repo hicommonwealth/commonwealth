@@ -1,10 +1,9 @@
 import { IApp } from 'state';
 import { StorageModule } from 'models';
-import { ProposalStore } from 'stores';
+import { PersistentStore } from 'stores';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Call,
-  Registration,
   AccountId,
   RegistrarInfo,
   IdentityJudgement,
@@ -12,15 +11,15 @@ import {
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { Vec, Option, Data } from '@polkadot/types';
-import { Unsubscribable, Observable, of } from 'rxjs';
-import { first, takeWhile, map } from 'rxjs/operators';
+import { Unsubscribable, Observable, of, never } from 'rxjs';
+import { first, takeWhile, flatMap, filter } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateIdentity from './identity';
+import SubstrateIdentity, { ISubstrateIdentity } from './identity';
 
-class SubstrateIdentityStore extends ProposalStore<SubstrateIdentity> { }
+class SubstrateIdentityStore extends PersistentStore<ISubstrateIdentity, SubstrateIdentity> { }
 
 export type SuperCodec = [ AccountId, Data ] & Codec;
 export type IdentityInfoProps = {
@@ -39,7 +38,7 @@ class SubstrateIdentities implements StorageModule {
   private _initialized: boolean = false;
   public get initialized() { return this._initialized; }
 
-  private _store: SubstrateIdentityStore = new SubstrateIdentityStore();
+  private _store: SubstrateIdentityStore;
   public get store() { return this._store; }
 
   private _Chain: SubstrateChain;
@@ -72,13 +71,17 @@ class SubstrateIdentities implements StorageModule {
       this._registrarSubscription.unsubscribe();
     }
     this._initialized = false;
+    if (!this.store) return; // TODO: why is the store sometimes missing? (#363)
     this.store.clear();
   }
+
+  // cache for identity queries that haven't yet resolved conclusively as existing
+  private _identityQueriesInProgress: { [address: string]: SubstrateIdentity } = {};
 
   // given an account, fetch the corresponding identity (works on sub-accounts)
   public get(who: SubstrateAccount): Observable<SubstrateIdentity> {
     // check immediately if we have the id
-    const existingIdentity = this.store.getByIdentifier(who.address);
+    const existingIdentity = this.store.getById(who.address);
     if (existingIdentity) {
       return of(existingIdentity);
     }
@@ -86,7 +89,7 @@ class SubstrateIdentities implements StorageModule {
     // NOTE: the block of code below is commented out, because we do not necessarily want to
     //   resolve sub-addresses to their super-identities -- this is a decision requiring discussion.
     // check for a super-identity (maybe they passed in a sub address)
-    let acctToFetch = who;
+    // let acctToFetch = who;
     // const superId = await this._Chain.query(
     //   (api: ApiRx) => api.query.identity.superOf<Option<SuperCodec>>(who.address).pipe(first())
     // ).toPromise();
@@ -100,20 +103,51 @@ class SubstrateIdentities implements StorageModule {
     // }
 
     // check on chain for registration we haven't seen yet & wait for it to appear
-    // if we have a super address to fetch, grab that instead
-    return this._Chain.query(
-      (api: ApiRx) => api.query.identity.identityOf<Option<Registration>>(acctToFetch.address)
-    ).pipe(
-      takeWhile((id) => !id.isSome, true),
-      map((id) => id.isSome
-        ? new SubstrateIdentity(this._Chain, this._Accounts, this, acctToFetch, id.unwrap())
-        : null),
+    let id = this._identityQueriesInProgress[who.address];
+    let identityExists$: Observable<boolean>;
+    if (!id) {
+      // Create a new "empty" identity and wait to see if it exists
+      id = new SubstrateIdentity(this._Chain, this._Accounts, this, who);
+      id.subscribe();
+      this._identityQueriesInProgress[who.address] = id;
+      identityExists$ = id.exists$;
+    } else {
+      // we've already created the identity and are waiting to see if it exists
+      identityExists$ = id.exists$;
+    }
+    return identityExists$.pipe(
+      filter((v) => typeof v === 'boolean'),
+      takeWhile((v) => !v, true),
+      flatMap((v) => {
+        // if true, then it should be in the store, and we can remove it from this cache.
+        // the takeWhile above means the observable closes immediately after the identity exists.
+        if (v === true) {
+          delete this._identityQueriesInProgress[who.address];
+          return of(id);
+        }
+
+        // if false, we keep it in the cache, and it will replay this "nonexistent" identity
+        // value indefinitely (until it is registered)
+        if (v === false) return of(id);
+
+        // should never be null/undefined
+        return never();
+      })
     );
   }
 
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
+    this._store = new SubstrateIdentityStore(
+      this._app.chain.id,
+      'identity',
+      (s: ISubstrateIdentity) => {
+        const id = new SubstrateIdentity(ChainInfo, Accounts, this, Accounts.fromAddress(s.address));
+        id.deserialize(s);
+        return id;
+      }
+    );
     return new Promise((resolve) => {
       this._Chain.api.pipe(first()).subscribe((api: ApiRx) => {
         // init consts
@@ -164,7 +198,7 @@ class SubstrateIdentities implements StorageModule {
     let requiredBalance = this.basicDeposit.add(this.fieldDeposit.muln(info.additional.length));
 
     // compare with preexisting deposit from old registration, if exists
-    const oldId = this.store.getByIdentifier(who.address);
+    const oldId = this.store.getById(who.address);
     if (oldId && oldId.deposit.lt(requiredBalance)) {
       requiredBalance = requiredBalance.sub(oldId.deposit);
     } else if (oldId && oldId.deposit.gte(requiredBalance)) {

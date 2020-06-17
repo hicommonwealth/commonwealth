@@ -9,6 +9,7 @@ import moment from 'moment';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
+import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -21,10 +22,17 @@ describe('Thread Tests', () => {
   const community = 'staking';
   const chain = 'ethereum';
 
+  const title = 'test title';
+  const body = 'test body';
+  const tagName = 'test tag';
+  const tagId = undefined;
+  const kind = 'forum';
+
   const markdownThread = require('../../util/fixtures/markdownThread');
   let adminJWT;
   let adminAddress;
   let userJWT;
+  let userId;
   let userAddress;
   let thread;
 
@@ -44,25 +52,26 @@ describe('Thread Tests', () => {
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
+    userId = res.user_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
 
   describe('/createThread', () => {
-    const title = 'test title';
-    const body = 'test body';
-    const kind = 'forum';
     const readOnly = true;
 
     it('should create a discussion thread', async () => {
       const res = await modelUtils.createThread({
-        chain,
         address: userAddress,
-        jwt: userJWT,
-        title,
-        body,
         kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
@@ -74,13 +83,15 @@ describe('Thread Tests', () => {
 
     it('should fail to create a thread without a kind', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title,
-        body,
-        readOnly,
+        address: userAddress,
         kind: null,
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
@@ -89,13 +100,15 @@ describe('Thread Tests', () => {
 
     it('should fail to create a forum thread with an empty title', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title: '',
-        body,
-        readOnly,
+        address: userAddress,
         kind,
+        chainId: chain,
+        communityId: community,
+        title: '',
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
@@ -104,13 +117,15 @@ describe('Thread Tests', () => {
 
     it('should fail to create a question thread with an empty title', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title: '',
-        body,
-        readOnly,
+        address: userAddress,
         kind: 'question',
+        chainId: chain,
+        communityId: community,
+        title: '',
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
@@ -119,13 +134,15 @@ describe('Thread Tests', () => {
 
     it('should fail to create a request thread with an empty title', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title: '',
-        body,
-        readOnly,
+        address: userAddress,
         kind: 'request',
+        chainId: chain,
+        communityId: community,
+        title: '',
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
@@ -134,13 +151,16 @@ describe('Thread Tests', () => {
 
     it('should fail to create a link thread with an empty title', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title: '',
-        body,
-        readOnly,
+        address: userAddress,
         kind: 'link',
+        chainId: chain,
+        communityId: community,
+        title: '',
+        tagName,
+        tagId,
+        body,
+        url: 'http://commonwealth.im',
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
@@ -149,45 +169,50 @@ describe('Thread Tests', () => {
 
     it('should fail to create a link thread with an empty URL', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title,
-        body,
-        readOnly,
+        address: userAddress,
         kind: 'link',
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
         url: null,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
       expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
     });
 
-    it('should fail to create a thread with too many tags', async () => {
+    it('should fail to create a thread without a tag name', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title,
-        body,
-        readOnly,
+        address: userAddress,
         kind,
-        tags: ['1', '2', '3', '4']
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName: undefined,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.TooManyTags);
     });
 
     it('should fail to create a comment on a readOnly thread', async () => {
       const tRes = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
         title,
+        tagName,
+        tagId,
         body,
         readOnly,
-        kind,
+        jwt: userJWT,
       });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
@@ -205,13 +230,16 @@ describe('Thread Tests', () => {
 
     it('should create a thread with mentions to non-existent addresses', async () => {
       const res = await modelUtils.createThread({
-        chain,
         address: userAddress,
-        jwt: userJWT,
-        title,
-        body,
         kind,
-        mentions: '0x1234',
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        mentions: ['0x1234'],
+        jwt: userJWT,
       });
       expect(res.status).to.equal('Success');
       expect(res.result).to.not.be.null;
@@ -222,20 +250,62 @@ describe('Thread Tests', () => {
     });
   });
 
+  describe('/bulkThreads', () => {
+    it('should return bulk threads for a public chain', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          chain,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it('should return bulk threads for a public community', async () => {
+      const res = await chai.request.agent(app)
+        .get('/api/bulkThreads')
+        .set('Accept', 'application/json')
+        .query({
+          community,
+          jwt: adminJWT,
+        });
+      expect(res.body.result).to.not.be.null;
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+    });
+    it.skip('should pass as admin of private community', async () => {
+      const communityArgs: modelUtils.CommunityArgs = {
+        jwt: userJWT,
+        isAuthenticatedForum: 'false',
+        privacyEnabled: 'true',
+        invitesEnabled: 'true',
+        id: 'test',
+        name: 'test community',
+        creator_address: userAddress,
+        creator_chain: chain,
+        description: 'test enabled community',
+        default_chain: chain,
+      };
+
+      const testCommunity = await modelUtils.createCommunity(communityArgs);
+    });
+  });
+
   describe('/createComment', () => {
-    const kind = 'forum';
 
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
-        chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        privacy: false,
-        readOnly: false,
-        tags: ['tag', 'tag2', 'tag3'],
+        address: userAddress,
         kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
@@ -345,90 +415,81 @@ describe('Thread Tests', () => {
   });
 
   describe('/editThread', () => {
-    const kind = 'forum';
-
     beforeEach(async () => {
       const res2 = await modelUtils.createThread({
-        chain,
         address: adminAddress,
-        jwt: adminJWT,
-        title: decodeURIComponent(markdownThread.title),
-        body: decodeURIComponent(markdownThread.body),
-        privacy: true,
-        readOnly: true,
-        tags: ['tag', 'tag2', 'tag3'],
         kind,
+        chainId: chain,
+        communityId: undefined,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: adminJWT,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
       thread = res2.result;
     });
 
-    it('Should turn off privacy', async () => {
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+    it('should turn off privacy', async () => {
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = true;
       const privacy = false;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
+          'privacy': privacy,
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off read_only', async () => {
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+    it('should turn off read_only', async () => {
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
-          'privacy': privacy,
           'read_only': readOnly,
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
-      expect(res.body.result.read_only).to.be.equal(readOnly);
-      expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.read_only).to.be.equal(false);
     });
 
-    it('Should turn off both read_only and privacy', async () => {
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+    it('should turn off both read_only and privacy', async () => {
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = false;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -436,26 +497,24 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should turn off, and then on, both read_only and privacy', async () => {
+    it('should turn off, and then on, both read_only and privacy', async () => {
       // turning off privacy properties
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       let readOnly = false;
       const privacy = false;
       let res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -463,20 +522,19 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
 
       // turning on read_only
       readOnly = true;
       res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -484,26 +542,24 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
-    it('Should fail to turn a public thread private', async () => {
+    it('should fail to turn a public thread private', async () => {
       // turning off privacy
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       let privacy = false;
       let res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -511,20 +567,19 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(privacy);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
 
       // failing to turn on privacy, thread.private stays false.
       privacy = true;
       res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread.id,
           'kind': thread.kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -532,27 +587,25 @@ describe('Thread Tests', () => {
           'jwt': adminJWT,
         });
       expect(res.body.result).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.read_only).to.be.equal(readOnly);
       expect(res.body.result.private).to.be.equal(false);
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
     });
 
     it('should fail to edit an admin\'s post as a user', async () => {
       const thread_id = thread.id;
       const thread_kind = thread.kind;
-      const body = thread.body;
-      const recentEdit : any = { timestamp: moment(), body };
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread_id,
           'kind': thread_kind,
-          'body': encodeURIComponent(body),
+          'body': thread.body,
           'version_history': versionHistory,
           'attachments[]': null,
           'privacy': privacy,
@@ -565,13 +618,62 @@ describe('Thread Tests', () => {
 
     it('should fail to edit a thread without passing a thread id', async () => {
       const thread_kind = thread.kind;
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .put('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': null,
+          'kind': thread_kind,
+          'body': thread.body,
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
+    });
+
+    it('should fail to edit a thread without passing a body', async () => {
+      const thread_id = thread.id;
+      const thread_kind = thread.kind;
+      const recentEdit : any = { timestamp: moment(), body: thread.body };
+      const versionHistory = JSON.stringify(recentEdit);
+      const readOnly = false;
+      const privacy = true;
+      const res = await chai.request(app)
+        .put('/api/editThread')
+        .set('Accept', 'application/json')
+        .send({
+          'thread_id': thread_id,
+          'kind': thread_kind,
+          'body': null,
+          'version_history': versionHistory,
+          'attachments[]': null,
+          'privacy': privacy,
+          'read_only': readOnly,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
+    });
+
+    it('should fail to edit a thread without passing a thread id', async () => {
+      const thread_kind = thread.kind;
       const body = thread.body;
       const recentEdit : any = { timestamp: moment(), body };
       const versionHistory = JSON.stringify(recentEdit);
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': null,
@@ -597,7 +699,7 @@ describe('Thread Tests', () => {
       const readOnly = false;
       const privacy = true;
       const res = await chai.request(app)
-        .post('/api/editThread')
+        .put('/api/editThread')
         .set('Accept', 'application/json')
         .send({
           'thread_id': thread_id,
@@ -621,18 +723,18 @@ describe('Thread Tests', () => {
   });
 
   describe('/editComment', () => {
-    const title = 'test title';
-    const body = 'test body';
-    const kind = 'forum';
 
     it('should edit a comment', async () => {
       const text = 'tes text';
       const tRes = await modelUtils.createThread({
-        chain,
+        chainId: chain,
+        communityId: community,
         address: userAddress,
         jwt: userJWT,
         title,
         body,
+        tagName,
+        tagId,
         kind,
       });
       const cRes = await modelUtils.createComment({
@@ -659,19 +761,21 @@ describe('Thread Tests', () => {
   });
 
   describe('/viewCount', () => {
-    const kind = 'forum';
 
     it('should track views on chain', async () => {
       let res = await modelUtils.createThread({
-        chain,
         address: userAddress,
-        jwt: userJWT,
-        title: 't',
-        body: 't',
         kind,
+        chainId: chain,
+        communityId: undefined,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       const object_id = res.result.id;
-
+      expect(object_id).to.not.be.null;
       // should track first view
       res = await chai.request(app)
         .post('/api/viewCount')
@@ -709,13 +813,15 @@ describe('Thread Tests', () => {
 
     it('should track views on community', async () => {
       let res = await modelUtils.createThread({
-        chain,
-        community,
         address: userAddress,
-        jwt: userJWT,
-        title: 't',
-        body: 't',
         kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
       });
       const object_id = res.result.id;
 
@@ -738,7 +844,7 @@ describe('Thread Tests', () => {
         .send({ chain });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Must provide object_id');
+      expect(res.body.error).to.equal(ViewCountErrors.NoObjectId);
     });
 
     it('should not track views without chain or community', async () => {
@@ -748,7 +854,7 @@ describe('Thread Tests', () => {
         .send({ object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Must provide chain or community');
+      expect(res.body.error).to.equal(ViewCountErrors.NoChainOrComm);
     });
 
     it('should not track views with invalid chain or community', async () => {
@@ -758,7 +864,7 @@ describe('Thread Tests', () => {
         .send({ chain: 'adkgjkjgda', object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Invalid community or chain');
+      expect(res.body.error).to.equal(ViewCountErrors.InvalidChainOrComm);
     });
 
     it('should not track views with invalid object_id', async () => {
@@ -768,7 +874,7 @@ describe('Thread Tests', () => {
         .send({ chain, object_id: '9999' });
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
-      expect(res.body.error).to.equal('Invalid offchain thread');
+      expect(res.body.error).to.equal(ViewCountErrors.InvalidThread);
     });
   });
 });

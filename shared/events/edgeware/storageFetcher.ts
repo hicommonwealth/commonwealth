@@ -11,6 +11,7 @@ import { Option, Vec } from '@polkadot/types';
 import { BalanceOf, AccountId, Hash, BlockNumber } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
+import { isFunction } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import {
@@ -74,7 +75,7 @@ export default class extends IStorageFetcher<ApiPromise> {
   }
 
   private async _fetchDemocracyProposals(): Promise<CWEvent<ISubstrateEventData>[]> {
-    log.info('Migrating democracy proposals...');
+    log.info('Fetching democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
     const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await this._api.queryMulti(
       publicProps.map(([ idx ]) => [ this._api.query.democracy.depositOf, idx ])
@@ -82,7 +83,15 @@ export default class extends IStorageFetcher<ApiPromise> {
     const proposedEvents = _.zip(publicProps, deposits)
       .map(([ [ idx, hash, proposer ], depositOpt ]): ISubstrateDemocracyProposed => {
         if (!depositOpt.isSome) return null;
-        const [ deposit ] = depositOpt.unwrap();
+  
+        // handle kusama vs edgeware depositOpt order
+        const depositors = depositOpt.unwrap();
+        let deposit: BalanceOf;
+        if (isFunction((depositors[1] as BalanceOf).mul)) {
+          deposit = depositors[1];
+        } else {
+          deposit = depositors[0];
+        }
         return {
           kind: SubstrateEventKind.DemocracyProposed,
           proposalIndex: +idx,

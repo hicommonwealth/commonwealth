@@ -1,69 +1,7 @@
 @import 'client/styles/shared';
 
 .EditTagModal {
-  font-size: 13.5px;
-  border-radius: 1px;
-  .compact-modal-title {
-    display: flex;
-    justify-content: space-between;   
-    background-color: #36393F;
-    border-bottom: 1px solid gray;
-    .CompactModalExitButton {
-      position: relative;
-      top: -8px;
-      right: 0;
-      font-size: 28px;
+    .buttons .cui-button {
+        margin-right: 10px;
     }
-  }
-  .compact-modal-body {
-    width: 500px;
-    background-color: #36393F;
-    color: white;
-    @include xs-max {
-      width: initial;
-    }
-  }
-  .form-group {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 10px;
-    margin-bottom: 0px;
-    .form-title {
-      padding: 10px 0;
-    }
-    input, textarea {
-      background-color: #3E4046;
-      color: white;
-      border: none;
-      width: 75%;
-    }
-    .tag-form-description {
-      height: 100px;
-    }
-  }
-  .CheckboxFormField {
-    .form-field {
-      width: 75%;
-      display: flex;
-      justify-content: left;
-      padding: 10px 0;
-      margin: 0;
-      align-items: center
-    }
-    input {
-      width: min-content;
-      height: min-content;
-    }
-  }
-  .compact-modal-bottom {
-    background-color: #36393F;
-    padding: 16px 28px;
-    button {
-      background-color: #0B70A3;
-      background-image: none;
-      border-radius: 1px;
-      font-weight: 400;
-      font-size: inherit;
-    }
-  }
 }

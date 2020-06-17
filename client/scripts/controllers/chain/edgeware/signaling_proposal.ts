@@ -10,7 +10,7 @@ import {
   Account, Proposal, ProposalStatus, ProposalEndTime, IVote, VotingType,
   VotingUnit, ChainClass, ChainEntity, ChainEvent
 } from 'models';
-import { default as SubstrateChain } from 'controllers/chain/substrate/shared';
+import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -223,7 +223,9 @@ export class EdgewareSignalingProposal
   private _subscribeVoters(): Unsubscribable {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => api.query.voting.voteRecords<Option<VoteRecord>>(this.data.voteIndex)),
-      takeWhile<Option<VoteRecord>>((v) => v.isSome && this.initialized && !this.completed),
+      takeWhile<Option<VoteRecord>>((v) => v.isSome && this.initialized),
+      // permit one vote query even if completed
+      takeWhile<Option<VoteRecord>>((v) => !this.completed, true),
 
       // grab latest voter balances as well, to avoid subscribing to each on vote-creation
       flatMap((v) => combineLatest(

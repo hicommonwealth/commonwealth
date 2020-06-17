@@ -1,5 +1,3 @@
-
-const sleep = require('sleep-promise');
 const truffleContract = require('truffle-contract');
 const Web3 = require('web3');
 const provider = new Web3.providers.HttpProvider('http://localhost:9545');

@@ -1,10 +1,42 @@
-module.exports = (sequelize, DataTypes) => {
-  const SocialAccount = sequelize.define('SocialAccount', {
-    provider: { type: DataTypes.STRING },
-    provider_username: { type: DataTypes.STRING },
-    provider_userid: { type: DataTypes.STRING },
-    access_token: { type: DataTypes.STRING },
-    refresh_token: { type: DataTypes.STRING },
+import * as Sequelize from 'sequelize';
+import { UserInstance, UserAttributes } from './user';
+
+export interface SocialAccountAttributes {
+  id?: number;
+  provider: string;
+  provider_username: string;
+  provider_userid: string;
+  access_token: string;
+  refresh_token: string;
+  created_at?: Date;
+  updated_at?: Date;
+
+  // associations
+  User?: UserAttributes | UserAttributes['id'];
+}
+
+export interface SocialAccountInstance extends Sequelize.Instance<SocialAccountAttributes>, SocialAccountAttributes {
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  setUser: Sequelize.BelongsToSetAssociationMixin<UserInstance, UserInstance['id']>;
+}
+
+export interface SocialAccountModel extends Sequelize.Model<SocialAccountInstance, SocialAccountAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): SocialAccountModel => {
+  const SocialAccount = sequelize.define<SocialAccountInstance, SocialAccountAttributes>('SocialAccount', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    provider: { type: dataTypes.STRING },
+    provider_username: { type: dataTypes.STRING },
+    provider_userid: { type: dataTypes.STRING },
+    access_token: { type: dataTypes.STRING },
+    refresh_token: { type: dataTypes.STRING },
+    created_at: { type: dataTypes.DATE, allowNull: false },
+    updated_at: { type: dataTypes.DATE, allowNull: false },
   }, {
     underscored: true,
     indexes: [

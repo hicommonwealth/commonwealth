@@ -4,22 +4,9 @@
     box-sizing: border-box;
 }
 html, body {
-    position: relative;
     height: 100%;
-}
-@include xs-max {
-    html, body {
-        position: fixed;
-        overflow: hidden;
-        box-sizing: border-box;
-        width: 100%;
-        .mithril-app {
-            height: 100%;
-            width: 100%;
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
-        }
-    }
+    box-sizing: border-box;
+    width: 100%;
 }
 html {
     font-family: $fonts;
@@ -27,8 +14,43 @@ html {
     line-height: 1.4;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #f7f7f7;
+    background: #fafafa;
+    overflow-y: scroll;
+    &.modal-open {
+        overflow-y: hidden;
+    }
 }
+.mithril-app {
+    height: 100%;
+    width: 100%;
+}
+.container {
+    position: relative;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    @include xs-max {
+        padding: 0 1rem;
+    }
+}
+.layout-container {
+    padding-top: $header-height + $vertical-padding;
+    padding-bottom: $vertical-padding;
+    margin-left: $horizontal-padding;
+    margin-right: $horizontal-padding;
+}
+.forum-container {
+    background: #fff;
+    padding: 20px 32px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.07);
+    margin-bottom: 16px;
+}
+
+//
+// typography
+//
+
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
 }
@@ -36,10 +58,14 @@ strong {
     font-weight: 700;
 }
 a {
-    color: #111;
+    color: $theme-accent-dark;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 a:visited {
-    color: #777;
+    color: lighten($theme-accent-dark, 4%);
 }
 ul,
 ol {
@@ -74,6 +100,10 @@ pre {
     background: #444;
 }
 
+//
+// basic components
+//
+
 input[type="submit"],
 input[type="button"],
 button,
@@ -96,9 +126,6 @@ a.btn {
     text-overflow: ellipsis;
     &:hover {
         background: #f2f2f2;
-    }
-    &:focus {
-        box-shadow: 0 0 3px 1px #08c;
     }
     &:disabled,
     &.disabled, {
@@ -177,13 +204,6 @@ button[type="submit"] {
     background-color: #41a360;
     background-image: linear-gradient(-180deg, #61cc82 -25%, #41a360 100%);
     color: #fff;
-    &:hover {
-        background-color: lighten(#41a360, 2%);
-        background-image: linear-gradient(-180deg, lighten(#61cc82, 2%) -25%, lighten(#41a360, 2%) 100%);
-    }
-    &:focus {
-        box-shadow: 0 0 3px 1px #41a360;
-    }
 }
 
 input[type="radio"],
@@ -226,49 +246,118 @@ td, th {
     border-bottom: 1px solid #e5e5e5;
 }
 
-body.modal-open {
-    overflow-y: hidden;
-}
-.app-loading  {
-    min-height: calc(100vh - 80px);
-    padding-top: calc(50vh - 240px);
-    text-align: center;
-    p {
-        font-size: 14px;
-        margin: 30px;
-        color: #333;
+//
+// construct-ui overrides
+// TODO: move to construct.scss
+//
+
+// Small changes to input styles
+.cui-input input,
+.cui-input textarea {
+    font-size: 15px;
+    &::placeholder {
+        color: #aaa;
     }
-    .icon-spinner2 {
-        margin-top: 160px;
-    }
-    svg.feather-icon {
-        margin-top: 150px;
+    &:focus::placeholder {
+        color: #999;
     }
 }
 
-.mithril-app.app-error {
-    padding: 40px;
-    margin: 0 auto;
-    max-width: 720px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 1.35;
-    color: #555;
+// The declarative construct-ui toaster doesn't allow
+// position to be set by default, so we just override it here
+.cui-toaster.cui-toaster-top {
+    top: auto;
+    bottom: 0;
+    z-index: 99999;
 }
 
-.container {
+.cui-tag.cui-none.cui-xs {
+    border-color: #f1f3f5;
+    padding-top: 0;
+    padding-bottom: 0;
+    cursor: pointer;
     position: relative;
-    max-width: 1180px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 20px;
-    @include xs-max {
-        padding: 0 1rem;
+    top: -1px;
+    &:hover {
+        border-color: darken(#f1f3f5, 2%);
+        background: darken(#f1f3f5, 2%);
     }
 }
 
-@media (max-width: 680px) {
-    .hidden-on-mobile {
-        display: none;
+// reduce padding on menus
+.cui-menu {
+    padding: 2px 0;
+}
+.cui-menu > .cui-menu-divider {
+    margin: 2px 0;
+}
+
+// darken color on menus
+.cui-menu > .cui-button.cui-basic {
+    color: #546e7c;
+}
+
+// allow menus to be wider by default
+.cui-menu {
+    max-width: 240px;
+}
+
+// align text in menus to the left by default
+.cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
+    text-align: left;
+}
+
+// adjust dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+}
+.cui-dialog-header h3 {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+.cui-dialog-header > button.cui-dialog-close-button {
+    position: relative;
+    top: 1px;
+}
+
+// fix .cui-switch styling
+.cui-switch .cui-control-indicator {
+    height: 18px;
+    width: 34px;
+}
+
+// button styles
+.cui-button {
+    font-weight: 600 !important;
+}
+.cui-button.cui-menu-item {
+    font-weight: 400 !important;
+}
+
+// menu styles
+.cui-menu {
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
     }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
+}
+
+// select list styles
+.cui-popover.cui-select-list .cui-popover-content {
+    padding: 10px;
+}
+
+// empty state override
+.cui-empty-state.cui-empty-state-fill {
+    z-index: initial;
+}
+.cui-spinner.cui-spinner-fill {
+    z-index: initial;
 }

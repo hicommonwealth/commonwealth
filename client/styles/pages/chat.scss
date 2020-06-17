@@ -1,0 +1,66 @@
+@import 'client/styles/shared';
+
+.Chat {
+    position: relative;
+    height: calc(100vh - 50px);
+    background: #fff;
+
+    .chat-messages,
+    .chat-composer,
+    .chat-composer-unavailable {
+        padding: 13px 24px;
+    }
+    .chat-messages {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: calc(100vh - 100px);
+        border-bottom: 1px solid #eee;
+        overflow-y: scroll;
+        .chat-message-placeholder {
+            margin: 16px 0;
+            color: #999;
+        }
+        .chat-message-group {
+            margin: 18px 0;
+        }
+        .chat-message-group + .chat-message-group {
+            margin-top: 20px;
+        }
+        .chat-message-group-timestamp {
+            float: right;
+            color: #aaa;
+        }
+        .chat-message-text {
+            margin: 2px 0;
+        }
+        .User {
+            margin-bottom: 2px;
+            a {
+                color: #999;
+                text-decoration: none;
+            }
+        }
+        .chat-messages-typing {
+            color: #aaa;
+            margin: 8px 0;
+        }
+    }
+    .chat-composer {
+        position: absolute;
+        bottom: 0;
+        textarea.ResizableTextarea {
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            resize: none;
+            min-height: 0;
+            max-height: 110px;
+        }
+    }
+    .chat-composer-unavailable {
+        position: absolute;
+        bottom: 0;
+        color: #aaa;
+    }
+}

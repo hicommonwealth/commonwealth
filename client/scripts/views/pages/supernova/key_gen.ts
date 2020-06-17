@@ -1,8 +1,7 @@
 import 'pages/supernova/key_gen.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
-import ObjectPage from '../_object_page';
 import CodeBlock from '../../components/widgets/code_block';
 import SupernovaPreheader from './supernova_preheader';
 
@@ -29,7 +28,7 @@ async function generateKeys() {
     publicKey: keys.publicKey,
     supernovaAddress: keys.cosmosAddress,
   });
-  const blob = new Blob([json], {type: 'application/json;charset=utf-8'});
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
   const url = window.URL.createObjectURL(blob);
 
   const a = document.createElement('a');
@@ -57,7 +56,7 @@ const BrowserKeygen: m.Component<{}, { url, keys, showKey, showMnemonic }> = {
               download: 'keys.json',
               onclick: (e) => {
                 e.preventDefault();
-                generateKeys().then((keys) => vnode.state.keys = keys);
+                generateKeys().then((keys) => { vnode.state.keys = keys; });
               }
             }, 'Generate and download')
           ])
@@ -69,16 +68,14 @@ const BrowserKeygen: m.Component<{}, { url, keys, showKey, showMnemonic }> = {
           onclick: (e) => {
             e.preventDefault();
             vnode.state.showKey = true;
-          }}, m(CodeBlock, '[Click to reveal]')
-        ),
+          } }, m(CodeBlock, '[Click to reveal]')),
         vnode.state.showKey && m(CodeBlock, `${vnode.state.keys.privateKey}`),
         m('span', 'Private mnemonic'),
         !vnode.state.showMnemonic && m('.codeblock-wrapper', {
           onclick: (e) => {
             e.preventDefault();
             vnode.state.showMnemonic = true;
-          }}, m(CodeBlock, '[Click to reveal]')
-        ),
+          } }, m(CodeBlock, '[Click to reveal]')),
         vnode.state.showMnemonic && m(CodeBlock, `${vnode.state.keys.mnemonic}`),
         m('span', 'Public key'),
         m(CodeBlock, `${vnode.state.keys.publicKey}`),
@@ -99,19 +96,19 @@ const SupernovaCLIKeygen: m.Component = {
           m('a', {
             href: 'https://github.com/hicommonwealth/supernova-lockdrop'
           }, 'CLI repo'),
-          ` from GitHub. `,
+          ' from GitHub. ',
         ]),
         m(CodeBlock, [
-          `git clone https://github.com/hicommonwealth/supernova-lockdrop.git`,
+          'git clone https://github.com/hicommonwealth/supernova-lockdrop.git',
         ]),
         m('p', [
-          `You will need to install Node v11.6 to run the lockdrop scripts. If you don't `,
-          `have it installed, we recommend using NVM to install Node:`,
+          'You will need to install Node v11.6 to run the lockdrop scripts. If you don\'t ',
+          'have it installed, we recommend using NVM to install Node:',
         ]),
         m(CodeBlock, [
-          `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n`,
-          `nvm install 11.6.0\n`,
-          `nvm use 11.6.0\n`,
+          'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash\n',
+          'nvm install 11.6.0\n',
+          'nvm use 11.6.0\n',
         ]),
         m('p', [
           'Then, run ',
@@ -143,15 +140,15 @@ const GaiaCLIKeygen: m.Component = {
           m('a', {
             href: 'https://golang.org/doc/install'
           }, 'official docs'),
-          `. Then set your `,
-          `environment variables in the command line as follows:`
+          '. Then set your ',
+          'environment variables in the command line as follows:'
         ]),
         m(CodeBlock, [
-          `mkdir -p $HOME/go/bin\n`,
-          `echo "export GOPATH=$HOME/go" >> ~/.bash_profile\n`,
-          `echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile\n`,
-          `echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile\n`,
-          `source ~/.bash_profile`
+          'mkdir -p $HOME/go/bin\n',
+          'echo "export GOPATH=$HOME/go" >> ~/.bash_profile\n',
+          'echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile\n',
+          'echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile\n',
+          'source ~/.bash_profile'
         ])
       ]),
       m('.step', [
@@ -166,11 +163,11 @@ const GaiaCLIKeygen: m.Component = {
           ' branch.'
         ]),
         m(CodeBlock, [
-          `mkdir -p $GOPATH/src/github.com/cosmos\n`,
-          `cd $GOPATH/src/github.com/cosmos\n`,
-          `git clone https://github.com/cosmos/cosmos-sdk\n`,
-          `cd cosmos-sdk && git checkout master\n`,
-          `make tools install`
+          'mkdir -p $GOPATH/src/github.com/cosmos\n',
+          'cd $GOPATH/src/github.com/cosmos\n',
+          'git clone https://github.com/cosmos/cosmos-sdk\n',
+          'cd cosmos-sdk && git checkout master\n',
+          'make tools install'
         ]),
         m('p', [
           'Then verify the installation by running ',
@@ -183,7 +180,7 @@ const GaiaCLIKeygen: m.Component = {
       m('.step', [
         m('h4', 'Step 3. Generate keys'),
         m('p', 'Run the following command, inserting your desired username:'),
-        m(CodeBlock, `gaiacli keys add <USERNAME>`),
+        m(CodeBlock, 'gaiacli keys add <USERNAME>'),
         m('p', 'Save the keys and phrase somewhere secure. To display them, run:'),
         m(CodeBlock, 'gaiacli keys show <USERNAME>')
       ])
@@ -193,25 +190,22 @@ const GaiaCLIKeygen: m.Component = {
 
 const SupernovaKeygen: m.Component<{}, IState> = {
   view: (vnode: m.VnodeDOM<{}, IState>) => {
-    return m(ObjectPage, {
-      class: 'SupernovaKeygen',
-      content: [
-        m('.forum-container.keygen-layout', [
-          m(SupernovaPreheader),
-          m('h2.page-title', 'Generate Supernova Address'),
-          m('a.supernova-back', {
-            href: '/supernova',
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set('/supernova');
-            }
-          }, '« Back'),
-          m(BrowserKeygen),
-          m(SupernovaCLIKeygen),
-          m(GaiaCLIKeygen)
-        ])
-      ]
-    });
+    return m('.SupernovaKeygen', [
+      m('.forum-container.keygen-layout', [
+        m(SupernovaPreheader),
+        m('h2.page-title', 'Generate Supernova Address'),
+        m('a.supernova-back', {
+          href: '/supernova',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/supernova');
+          }
+        }, '« Back'),
+        m(BrowserKeygen),
+        m(SupernovaCLIKeygen),
+        m(GaiaCLIKeygen)
+      ])
+    ]);
   }
 };
 

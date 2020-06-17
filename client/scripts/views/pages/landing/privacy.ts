@@ -1,8 +1,7 @@
-/* tslint:disable:max-line-length */
+/* eslint-disable max-len */
 
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
-import LandingPage from 'views/pages/landing/landing';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { renderMultilineText } from 'helpers';
 
 const PrivacyPolicy = `
@@ -114,13 +113,15 @@ If you have any questions about this Privacy Statement, please contact us at: he
 
 const PrivacyPage = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', {'Page Name': 'PrivacyPage'});
+    mixpanel.track('PageVisit', { 'Page Name': 'PrivacyPage' });
   },
   view: (vnode) => {
-    return m(LandingPage, {
-      header: m('h1.page-title', 'Privacy Policy'),
-      body: m('.landing-container', renderMultilineText(PrivacyPolicy)),
-    });
+    return m('.PrivacyPage', [
+      m('.forum-container', [
+        m('h1.page-title', 'Privacy Policy'),
+        renderMultilineText(PrivacyPolicy),
+      ]),
+    ]);
   }
 };
 

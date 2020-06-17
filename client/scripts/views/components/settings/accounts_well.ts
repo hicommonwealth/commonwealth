@@ -1,11 +1,13 @@
 import 'components/settings/accounts_well.scss';
 
 import m from 'mithril';
+import _ from 'lodash';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 import { formatCoin, Coin } from 'adapters/currency';
 import { orderAccountsByAddress, link } from 'helpers';
-import { selectLogin, unlinkLogin } from 'controllers/app/login';
+import { unlinkLogin } from 'controllers/app/login';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 import { AddressInfo, ChainClass } from 'models';
@@ -16,22 +18,12 @@ import RagequitModal from 'views/modals/ragequit_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 
-interface IAttrs {
-  account: AddressInfo;
-  onclick?: (e: Event) => any;
-}
-
-interface IState {
-  removing: boolean;
-}
-
-const AccountRow : m.Component<IAttrs, IState> = {
-  view: (vnode: m.VnodeDOM<IAttrs, IState>): m.Vnode => {
+const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
+  view: (vnode): m.Vnode => {
     const { account } = vnode.attrs;
-    const isActiveAccount =
-      app.vm.activeAccount &&
-      app.vm.activeAccount.chain.id === account.chain &&
-      app.vm.activeAccount.address === account.address;
+    const isActiveAccount = app.vm.activeAccount
+      && app.vm.activeAccount.chain.id === account.chain
+      && app.vm.activeAccount.address === account.address;
 
     return m('.AccountRow', {
       key: `${account.chain}#${account.address}`,
@@ -66,12 +58,9 @@ const AccountRow : m.Component<IAttrs, IState> = {
         ]) : [],
       ]),
       m('.action-col', [
-        // TODO: re-enable this as 'go to chain and account'
-        // (app.chain || app.community) && m('button.formular-button-primary', {
-        //   class: isActiveAccount ? 'disabled' : '',
-        //   onclick: () => selectLogin(account),
-        // }, 'Switch account'),
-        m('button.formular-button-negative', {
+        m(Button, {
+          intent: 'negative',
+          size: 'sm',
           class: vnode.state.removing ? ' disabled' : '',
           onclick: async () => {
             const confirmed = await confirmationModalWithText('Are you sure you want to remove this account?')();
@@ -83,7 +72,9 @@ const AccountRow : m.Component<IAttrs, IState> = {
               });
             }
           },
-        }, vnode.state.removing ? 'Removing...' : 'Remove'),
+          disabled: vnode.state.removing,
+          label: vnode.state.removing ? 'Removing...' : 'Remove'
+        }),
       ]),
     ]);
   },
@@ -91,17 +82,23 @@ const AccountRow : m.Component<IAttrs, IState> = {
 
 const AccountsWell: m.Component<{}> = {
   view: () => {
+    const addressGroups = Object.entries(_.groupBy(app.login.addresses, (account) => account.chain));
+
     return m('.AccountsWell', [
       m('h4', 'Linked Addresses'),
       m('.address-listing-explanation', 'Log into your account using any of these addresses'),
-      app.login.addresses
-        .sort(orderAccountsByAddress)
-        .map((account) => m(AccountRow, { account })),
+      addressGroups.map(([chain_id, addresses]) => m('.address-group', [
+        m('h4', app.config.chains.getById(chain_id).name),
+        addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
+      ])),
       app.login.addresses.length === 0
-        && m('.no-accounts', `No addresses`),
-      m('button.formular-button-primary.add-account', {
+        && m('.no-accounts', 'No addresses'),
+      m(Button, {
+        intent: 'primary',
+        class: 'add-account',
         onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-      }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+        label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
+      }),
     ]);
   },
 };

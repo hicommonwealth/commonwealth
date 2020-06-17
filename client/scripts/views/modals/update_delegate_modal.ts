@@ -1,7 +1,7 @@
 import 'modals/update_delegate_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { TextInputFormField } from 'views/components/forms';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { notifyError } from 'controllers/app/notifications';
@@ -28,8 +28,8 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
           subtitle: 'Update your selected delegate.',
           options: {
             value: vnode.state.newDelegateKey,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           },
           callback: (val) => {
@@ -41,11 +41,11 @@ const UpdateDelegateModal: m.Component<IAttrs, IState> = {
           onclick: (e) => {
             e.preventDefault();
             vnode.attrs.account.updateDelegateKeyTx(vnode.state.newDelegateKey)
-            .then((result) => {
-              $(vnode.dom).trigger('modalforceexit');
-              m.redraw();
-            })
-            .catch((err) => notifyError(err.toString()));
+              .then((result) => {
+                $(vnode.dom).trigger('modalforceexit');
+                m.redraw();
+              })
+              .catch((err) => notifyError(err.toString()));
           }
         }, 'Update Delegate'),
       ]),

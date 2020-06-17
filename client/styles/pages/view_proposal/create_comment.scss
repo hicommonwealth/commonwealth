@@ -1,0 +1,28 @@
+@import 'client/styles/shared';
+@import './index';
+
+.CreateComment {
+    padding: $padding $gutter ($padding + 6px);
+    border-top: 1px solid #e7e7e7;
+
+    .User {
+        font-size: 14px;
+    }
+    .User .user-display-name {
+    }
+
+    .QuillEditor {
+        margin: 14px 0 18px;
+        .ql-toolbar, .ql-editor {
+            background: #fff;
+        }
+        .ql-editor {
+            min-height: 100px;
+            border-radius: 2px;
+        }
+    }
+    .new-comment-error {
+        color: $error-red;
+        font-weight: 700;
+    }
+}

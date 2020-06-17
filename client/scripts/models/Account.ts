@@ -87,10 +87,10 @@ abstract class Account<C extends Coin> {
     // command line always adds an implicit newline.
     if (!signature && (this.seed || this.mnemonic || this.chainBase === ChainBase.NEAR)) {
       // construct signature from private key
-      signature = await this.signMessage(this._validationToken + '\n');
+      signature = await this.signMessage(`${this._validationToken}\n`);
     } else if (signature && !txParams) {
       const withoutNewline = !(await this.isValidSignature(this._validationToken, signature));
-      const withNewline = !(await this.isValidSignature(this._validationToken + '\n', signature));
+      const withNewline = !(await this.isValidSignature(`${this._validationToken}\n`, signature));
       if (withNewline && withoutNewline) {
         throw new Error('invalid signature');
       }
@@ -112,7 +112,7 @@ abstract class Account<C extends Coin> {
       } else {
         params.signature = signature;
       }
-      return await Promise.resolve($.post(this.app.serverUrl() + '/verifyAddress', params));
+      return Promise.resolve($.post(`${this.app.serverUrl()}/verifyAddress`, params));
     } else {
       throw new Error('signature or key required for validation');
     }

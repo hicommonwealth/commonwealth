@@ -1,22 +1,16 @@
-import { default as toastr } from 'toastr';
+import app from 'state';
 
-toastr.options.positionClass = 'toast-bottom-left';
-toastr.options.hideDuration = 500;
-toastr.options.timeOut = 4000;
-toastr.options.escapeHtml = true;
-
-export function notifyError(message: string) {
-  toastr.error(message);
+export function notifyError(message: string, allowDuplicates?: boolean) {
+  if (!allowDuplicates && app.toasts.getList().find((toast: any) => toast['_message'] === message)) return;
+  app.toasts.createError(message);
 }
 
-export function notifySuccess(message: string) {
-  toastr.success(message);
+export function notifySuccess(message: string, allowDuplicates?: boolean) {
+  if (!allowDuplicates && app.toasts.getList().find((toast: any) => toast['_message'] === message)) return;
+  app.toasts.createSuccess(message);
 }
 
-export function notifyWarning(message: string) {
-  toastr.warning(message);
-}
-
-export function notifyInfo(message: string) {
-  toastr.info(message);
+export function notifyInfo(message: string, allowDuplicates?: boolean) {
+  if (!allowDuplicates && app.toasts.getList().find((toast: any) => toast['_message'] === message)) return;
+  app.toasts.createInfo(message);
 }

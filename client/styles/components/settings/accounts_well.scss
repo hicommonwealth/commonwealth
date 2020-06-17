@@ -1,10 +1,12 @@
 @import 'client/styles/shared';
 
 .AccountsWell {
-    @include well;
     h4 {
         margin: 0;
         margin-bottom: 2px;
+    }
+    .address-group h4 {
+        margin: 10px 0;
     }
     .address-listing-explanation {
         color: #999;

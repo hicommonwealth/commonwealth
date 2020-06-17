@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-expressions */
-import 'pages/discussions.scss';
+import 'pages/discussions/index.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
 import $ from 'jquery';
+import { Button } from 'construct-ui';
 
 import app from 'state';
 import { RolePermission } from 'models';
@@ -13,9 +14,12 @@ import UpgradeMemberModal from '../../modals/upgrade_member_modal';
 import ManageCommunityModal from '../../modals/manage_community_modal';
 
 export const isCommunityAdmin = () => {
-  const role = app.login.roles.find((role) => (role.chain_id && role.chain_id === app.activeChainId())
-                                    || (role.offchain_community_id && role.offchain_community_id === app.activeCommunityId()));
-  return role?.permission === RolePermission.admin;
+  const role = app.login.roles.find((r) => {
+    return ((r.chain_id && r.chain_id === app.activeChainId())
+            || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId()))
+    && r.permission === RolePermission.admin;
+  });
+  return role !== undefined;
 };
 
 export const sortAdminsAndModsFirst = (a, b) => {
@@ -56,7 +60,7 @@ const InviteButton = (vnode, account, isCommunity) => {
     && app.community
     && app.vm.activeAccount
     && (app.community.meta.invitesEnabled || isAdminOrModOfChain(vnode, account))
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
@@ -66,25 +70,27 @@ const InviteButton = (vnode, account, isCommunity) => {
           },
         });
       },
-    }, 'Invite members');
+      label: 'Invite members',
+    });
 };
 
 const UpgradeMemberButton = (vnode, account) => {
   return app.vm.activeAccount
     && isAdminOrMod(vnode, account)
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
           modal: UpgradeMemberModal,
         });
       },
-    }, 'Upgrade member');
+      label: 'Upgrade member'
+    });
 };
 
 const ManageCommunityButton = (vnode, account) => {
   return isAdmin(vnode, account)
-    && m('button', {
+    && m(Button, {
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
@@ -95,7 +101,8 @@ const ManageCommunityButton = (vnode, account) => {
           }
         });
       },
-    }, 'Manage community');
+      label: 'Manage community'
+    });
 };
 
 interface IChainOrCommunityRolesState {
@@ -116,14 +123,16 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
 
     const loadCommunity = async () => {
       try {
+        // TODO: Change to GET /members
         const bulkMembers = await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj);
-        if (bulkMembers.status !== 'Success') throw new Error(`Could not fetch members`);
+        if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         vnode.state.roleData = bulkMembers.result;
 
         if (isAdmin(vnode, app.vm.activeAccount)) {
+          // TODO: Change to GET /webhooks
           const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-                                       { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
-          if (webhooks.status !== 'Success') throw new Error(`Could not fetch community webhooks`);
+            { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+          if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
           vnode.state.webhooks = webhooks.result;
         }
         vnode.state.loadingFinished = true;

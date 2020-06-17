@@ -1,24 +1,31 @@
-import sgMail from '@sendgrid/mail';
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
-
-sgMail.setApiKey(SENDGRID_API_KEY);
 import { factory, formatFilename } from '../../shared/logging';
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(SENDGRID_API_KEY);
+
 const log = factory.getLogger(formatFilename(__filename));
+
+export const Errors = {
+  NoEmail: 'Must provide email',
+  InvalidChain: 'Invalid chain',
+  AlreadyRegisterd: 'Already registered',
+  InvalidEmail: 'Invalid email',
+};
 
 const registerWaitingList = async (models, req: Request, res: Response, next: NextFunction) => {
   const email = req.body.email;
   const address = req.body.address;
   const chain = await models.Chain.findOne({ where: { id: req.body.chain }});
-  const existingUser = await models.User.findOne({ where: { email: email }});
+  const existingUser = await models.User.findOne({ where: { email } });
   // TODO: Check if the address already exists
   // TODO: Check if it conforms to the public key format for he chain
   if (!req.body.email) {
-    return next(new Error('Must provide email'));
+    return next(new Error(Errors.NoEmail));
   }
   if (!chain) {
-    return next(new Error('Invalid chain'));
+    return next(new Error(Errors.InvalidChain));
   }
 
   if (existingUser) {
@@ -28,7 +35,7 @@ const registerWaitingList = async (models, req: Request, res: Response, next: Ne
     }});
     if (existingRegistration) {
       // existing user, already on waitlist
-      return next(new Error('Already registered'));
+      return next(new Error(Errors.AlreadyRegisterd));
     } else {
       // existing user, add to waitlist
       const newRegistration = await models.WaitlistRegistration.create({
@@ -47,7 +54,7 @@ const registerWaitingList = async (models, req: Request, res: Response, next: Ne
 
     const recentTokens = await models.LoginToken.findAndCountAll({
       where: {
-        email: email,
+        email,
         created_at: {
           $gte: moment().subtract(LOGIN_RATE_LIMIT_MINS, 'minutes').toDate()
         }
@@ -64,9 +71,9 @@ const registerWaitingList = async (models, req: Request, res: Response, next: Ne
 
     const validEmailRegex = /\S+@\S+\.\S+/;
     if (!email) {
-      return next(new Error('Missing email'));
+      return next(new Error(Errors.NoEmail));
     } else if (!validEmailRegex.test(email)) {
-      return next(new Error('Invalid email'));
+      return next(new Error(Errors.InvalidEmail));
     }
     const tokenObj = await models.LoginToken.createForEmail(email);
     const registrationLink = SERVER_URL + `/api/finishLogin?token=${tokenObj.token}&email=${email}`;

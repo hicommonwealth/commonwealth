@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -38,7 +39,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const userAddresses = await req.user.getAddresses();
   const isUser = userAddresses
-    .filter((addr) => addr.verified)
+    .filter((addr) => !!addr.verified)
     .filter((add) => add.address === addressObj.address);
 
   if (isUser.length === 0) {
@@ -59,17 +60,12 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
   });
   if (!role) return next(new Error(Errors.RoleCreationFailure));
 
-  const membership = await models.Membership.create({
-    user_id: req.user.id,
-    community: community.id,
-  });
-
   const updatedCode = await code.update({
     used: true,
   });
   if (!updatedCode) return next(new Error(Errors.CodeUpdateFailure));
 
-  return res.json({ status: 'Success', result: { updatedCode, membership } });
+  return res.json({ status: 'Success', result: { updatedCode, role } });
 };
 
 export default acceptInvite;

@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import '../types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const status = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -49,11 +50,10 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       loggedIn: false,
     });
   }
-  const [addresses, socialAccounts, memberships, selectedNode,
-    isAdmin, disableRichText, lastVisited] = await Promise.all([
+  // TODO: fetch all this data with a single query
+  const [addresses, socialAccounts, selectedNode, isAdmin, disableRichText, lastVisited] = await Promise.all([
     user.getAddresses().filter((address) => !!address.verified),
     user.getSocialAccounts(),
-    user.getMemberships(),
     user.getSelectedNode(),
     user.isAdmin,
     user.disableRichText,
@@ -81,6 +81,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
+  // get starred communities for user
+  const starredCommunities = await models.StarredCommunity.findAll({
+    where: { user_id: req.user.id }
+  });
+
   // get invites for user
   const invites = await models.InviteCode.findAll({
     where: {
@@ -89,10 +94,15 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     },
   });
 
+  // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
   const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
   const unseenPosts = {};
   await Promise.all(commsAndChains.map(async (c) => {
     const [name, time] = c;
+    if (isNaN(new Date(time as string).getDate())) {
+      unseenPosts[name] = {};
+      return;
+    }
     const threadNum = await models.OffchainThread.findAndCountAll({
       where: {
         kind: { [Op.or]: ['forum', 'link'] },
@@ -142,6 +152,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     loggedIn: true,
     user: {
       email: user.email,
+      emailInterval: user.emailNotificationInterval,
       jwt: jwtToken,
       addresses,
       socialAccounts,
@@ -149,7 +160,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       isAdmin,
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
-      memberships,
+      starredCommunities,
       unseenPosts
     }
   });

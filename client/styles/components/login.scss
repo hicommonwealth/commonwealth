@@ -1,36 +1,16 @@
 @import 'client/styles/shared';
 
 .Login {
-    .login-well {
-        background: #f9f8f6;
-        border-radius: 4px;
-        padding: 26px 30px 30px;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    @include login;
-    h4, .login-option {
-        width: 100%;
-        max-width: 320px;
-        margin: 0 auto 12px;
-        text-align: center;
-        color: #111;
-    }
     h4 {
-        margin-top: 40px;
-        font-size: 16px;
+        margin: 12px 0;
+        font-size: 18px;
     }
-    // web3 login button with icon
-    // only used for NEAR right now...
-    a.btn.login-wallet-button.formular-button-black {
-        margin-bottom: 26px;
-        padding: 10px 0;
+    .form-divider {
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 5px;
     }
-    img.login-wallet-icon {
-        width: 17px;
-        display: inline-block;
-        margin: -3px 0;
-        margin-right: 10px;
+    .cui-form .cui-form-group {
+        margin-top: 8px;
     }
 }

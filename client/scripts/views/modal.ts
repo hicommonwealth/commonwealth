@@ -1,6 +1,3 @@
-//
-// MODALS
-//
 // Modals are Mithril components rendered within the Layout system,
 // which manages a stack of currently displayed modals on the screen.
 // They have a few unique properties:
@@ -9,6 +6,9 @@
 // - They can emit `modalcomplete`, which triggers completeCallback().
 // - They can emit `modalexit`, which exits after confirming.
 // - They can emit `modalforceexit`, which force exits without confirming.
+//
+// The modalcomplete event should only be used to trigger a
+// completeCallback(), and otherwise should be omitted.
 //
 // You can instantiate a modal by calling `app.modals.create` and
 // providing a few parameters: `modal`, `data`, `completeCallback`,
@@ -36,8 +36,8 @@
 
 import 'modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 
 import app from 'state';
 import { featherIcon, symbols } from 'helpers';
@@ -92,8 +92,8 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
 const Modal = {
   view: (vnode) => {
     const spec = vnode.attrs.spec;
-    const completeCallback = spec.completeCallback || Function();
-    const exitCallback = spec.exitCallback || Function();
+    const completeCallback = spec.completeCallback || (() => undefined);
+    const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
 
     return m('.Modal', {

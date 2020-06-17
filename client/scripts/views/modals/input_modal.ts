@@ -1,8 +1,55 @@
 import 'modals/input_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import app from 'state';
+import { Button } from 'construct-ui';
+
+const InputModal = {
+  confirmExit: async () => true,
+  view: (vnode) => {
+    const defaultValue = vnode.attrs.value;
+    const placeholder = vnode.attrs.placeholder;
+    const promptTitle = vnode.attrs.title;
+    const promptText = vnode.attrs.text;
+    return m('form.InputModal', [
+      m('.compact-modal-body', [
+        m('h3', promptTitle),
+        promptText && m('p', promptText),
+        m('input[type="text"]', {
+          placeholder,
+          oncreate: (vvnode) => {
+            if (defaultValue !== undefined) $(vvnode.dom).val(defaultValue);
+            $(vvnode.dom).focus();
+          },
+        }),
+      ]),
+      m('.compact-modal-actions', [
+        m(Button, {
+          label: 'Submit',
+          type: 'submit',
+          intent: 'primary',
+          onclick: (e) => {
+            e.preventDefault();
+            vnode.attrs.retval.text = $(vnode.dom).find('input[type="text"]').val();
+            $(vnode.dom).trigger('modalcomplete');
+            setTimeout(() => {
+              $(vnode.dom).trigger('modalexit');
+            }, 0);
+          }
+        }),
+        m(Button, {
+          label: 'Cancel',
+          intent: 'none',
+          onclick: (e) => {
+            e.preventDefault();
+            $(vnode.dom).trigger('modalexit');
+          }
+        }),
+      ]),
+    ]);
+  }
+};
 
 export const inputModalWithText = (title, text?, placeholder?, value?) => {
   return async () : Promise<string> => {
@@ -18,48 +65,6 @@ export const inputModalWithText = (title, text?, placeholder?, value?) => {
       });
     });
   };
-};
-
-const InputModal = {
-  confirmExit: async () => true,
-  view: (vnode) => {
-    const defaultValue = vnode.attrs.value;
-    const placeholder = vnode.attrs.placeholder;
-    const promptTitle = vnode.attrs.title;
-    const promptText = vnode.attrs.text;
-    return m('.InputModal', [
-      m('.compact-modal-body', [
-        m('h3', promptTitle),
-        promptText && m('p', promptText),
-        m('input[type="text"]', {
-          placeholder: placeholder,
-          oncreate: (vnode) => {
-            if (defaultValue !== undefined) $(vnode.dom).val(defaultValue);
-            $(vnode.dom).focus();
-          }
-        }),
-      ]),
-      m('.compact-modal-actions', [
-        m('button', {
-          type: 'submit',
-          onclick: (e) => {
-            e.preventDefault();
-            vnode.attrs.retval.text = $(vnode.dom).find('input[type="text"]').val();
-            $(vnode.dom).trigger('modalcomplete');
-            setTimeout(() => {
-              $(vnode.dom).trigger('modalexit');
-            }, 0);
-          }
-        }, 'Submit'),
-        m('button', {
-          onclick: (e) => {
-            e.preventDefault();
-            $(vnode.dom).trigger('modalexit');
-          }
-        }, 'Cancel'),
-      ]),
-    ]);
-  }
 };
 
 export default InputModal;

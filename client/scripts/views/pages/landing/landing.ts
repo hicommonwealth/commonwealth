@@ -1,6 +1,6 @@
 import 'pages/landing/landing.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 
 import app from 'state';
 import { symbols } from 'helpers';

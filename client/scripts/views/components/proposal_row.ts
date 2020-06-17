@@ -21,43 +21,43 @@ import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;
   if (pHash.length < 16) return pHash;
-  return pHash.slice(0, 16) + '…' + pHash.slice(pHash.length - 3);
-}
+  return `${pHash.slice(0, 16)}…${pHash.slice(pHash.length - 3)}`;
+};
 
-export const getStatusClass = (proposal: AnyProposal) =>
-  proposal.isPassing === ProposalStatus.Passing ? 'pass' :
-  proposal.isPassing === ProposalStatus.Passed ? 'pass' :
-  proposal.isPassing === ProposalStatus.Failing ? 'fail' :
-  proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
+export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === ProposalStatus.Passing ? 'pass'
+  : proposal.isPassing === ProposalStatus.Passed ? 'pass'
+    : proposal.isPassing === ProposalStatus.Failing ? 'fail'
+      : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
   if (proposal.completed) return 'Completed';
 
-  const countdown =
-    proposal.endTime.kind === 'fixed' ?
-    [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ] :
-    proposal.endTime.kind === 'fixed_block' ?
-    [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.blocknum) }), ' left' ] :
-    proposal.endTime.kind === 'dynamic' ?
-    [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ] :
-    proposal.endTime.kind === 'threshold' ?
-    `Waiting for ${proposal.endTime.threshold} yes votes` :
-    proposal.endTime.kind === 'not_started' ?
-    'Not yet started' :
-    proposal.endTime.kind === 'queued' ?
-    'Queued' :
-    proposal.endTime.kind === 'unavailable' ?
-    '' : '';
-  const status =
-    proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted ? 'Waiting to start' :
-    proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod ?
-        (proposal.isPassing === ProposalStatus.Passed ? 'Passed - In grace period' : 'Failed - In grace period') :
-    proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue ? 'In processing queue' :
-    proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess ? 'Ready to process' :
-    proposal.isPassing === ProposalStatus.Passed ? 'Passed' :
-    proposal.isPassing === ProposalStatus.Failed ? 'Did not pass' :
-    proposal.isPassing === ProposalStatus.Passing ? 'Passing' :
-    proposal.isPassing === ProposalStatus.Failing ? 'Will not pass' : '';
+  const countdown = proposal.endTime.kind === 'fixed'
+    ? [ m(Countdown, { duration: moment.duration(proposal.endTime.time.diff(moment())) }), ' left' ]
+    : proposal.endTime.kind === 'fixed_block'
+      ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.blocknum) }), ' left' ]
+      : proposal.endTime.kind === 'dynamic'
+        ? [ m(Countdown, { duration: blocknumToDuration(proposal.endTime.getBlocknum()) }), ' left' ]
+        : proposal.endTime.kind === 'threshold'
+          ? `Waiting for ${proposal.endTime.threshold} yes votes`
+          : proposal.endTime.kind === 'not_started'
+            ? 'Not yet started'
+            : proposal.endTime.kind === 'queued'
+              ? 'Queued'
+              : proposal.endTime.kind === 'unavailable'
+                ? '' : '';
+  const status = proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted
+    ? 'Waiting to start'
+    : proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod
+      ? (proposal.isPassing === ProposalStatus.Passed ? 'Passed - In grace period' : 'Failed - In grace period')
+      : proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue
+        ? 'In processing queue'
+        : proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess
+          ? 'Ready to process'
+          : proposal.isPassing === ProposalStatus.Passed ? 'Passed'
+            : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
+              : proposal.isPassing === ProposalStatus.Passing ? 'Passing'
+                : proposal.isPassing === ProposalStatus.Failing ? 'Will not pass' : '';
   if (proposal.isPassing === ProposalStatus.Passing
       || proposal.isPassing === ProposalStatus.Failing
       || (proposal instanceof MolochProposal
@@ -86,7 +86,7 @@ export const getSecondaryStatusText = (proposal: AnyProposal): string | null => 
   } else {
     return null;
   }
-}
+};
 
 export const getSupportText = (proposal: AnyProposal) => {
   if (typeof proposal.support === 'number') {
@@ -106,31 +106,30 @@ export const getSupportText = (proposal: AnyProposal) => {
   }
 };
 
-export const getProposalPieChart = (proposal) =>
-  typeof proposal.support === 'number' ?
-    m(ProposalPieChart, {
-      id: `CHART_${proposal.shortIdentifier}`,
-      getData: () => ({
-        chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
-        chartLabels: [ 'Yes', 'No' ].reverse(),
-        chartColors: [ '#1db955', '#d0021b' ].reverse(),
-        formatter: (d, index) => [formatPercentShort(d)],
-      })
-    }) :
-    m(ProposalPieChart, {
-      id: `CHART_${proposal.shortIdentifier}`,
-      getData: () => ({
-        chartValues: [
-          // add a small amount so the voted slice always shows up
-          proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-          ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars) /
-            (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
-        ].reverse(),
-        chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
-        chartColors: [ '#0088cc', '#dddddd' ].reverse(),
-        formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
-      })
-    });
+export const getProposalPieChart = (proposal) => typeof proposal.support === 'number'
+  ? m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [ proposal.support, 1 - proposal.support ].reverse(),
+      chartLabels: [ 'Yes', 'No' ].reverse(),
+      chartColors: [ '#1db955', '#d0021b' ].reverse(),
+      formatter: (d, index) => [formatPercentShort(d)],
+    })
+  })
+  : m(ProposalPieChart, {
+    id: `CHART_${proposal.shortIdentifier}`,
+    getData: () => ({
+      chartValues: [
+        // add a small amount so the voted slice always shows up
+        proposal.support.inDollars / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+        ((app.chain as Substrate).chain.totalbalance.inDollars - proposal.support.inDollars)
+            / (app.chain as Substrate).chain.totalbalance.inDollars + 0.004,
+      ].reverse(),
+      chartLabels: [ 'Voted', 'Not yet voted' ].reverse(),
+      chartColors: [ '#0088cc', '#dddddd' ].reverse(),
+      formatter: (d, index) => [ `${Math.round((d - 0.004) * 10000000) / 100000}%` ],
+    })
+  });
 
 interface IPieChartAttrs {
   id?: string;
@@ -178,8 +177,8 @@ const ProposalPieChart: m.Component<IPieChartAttrs, IPieChartState> = {
               layout: { left: 0, right: 0, top: 0, bottom: 0 },
               tooltips: {
                 callbacks: {
-                  label: (tooltipItem, data) => {
-                    const dataset = data.datasets[tooltipItem.datasetIndex];
+                  label: (tooltipItem, data2) => {
+                    const dataset = data2.datasets[tooltipItem.datasetIndex];
                     const item = dataset.data[tooltipItem.index];
                     return dataset.formatter ? dataset.formatter(item, tooltipItem.index) : item.toString();
                   }

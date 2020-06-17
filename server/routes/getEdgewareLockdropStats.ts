@@ -12,6 +12,7 @@ import {
 } from './getEdgewareLockdropLookup';
 const { toBN } = Web3.utils;
 import { factory, formatFilename } from '../../shared/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const MAINNET_LOCKDROP_ORIG = '0x1b75B90e60070d37CfA9d87AFfD124bB345bf70a';
@@ -24,6 +25,10 @@ const generalizedLocks = {
     '0xdB0E7d784D6A7ca2CBDA6CE26ac3b1Bd348C06F8',
     '0x3BfC20f0B9aFcAcE800D73D2191166FF16540258',
   ],
+};
+
+export const Errors = {
+  NoLockingEvent: 'No locking events returned from the API',
 };
 
 export const isHex = (inputString) => {
@@ -366,7 +371,7 @@ export const getCountsByBlock = async (web3, contracts) => {
   allEvents.sort((a, b) => a.blockNumber - b.blockNumber);
 
   if (allEvents.length === 0) {
-    throw new Error('No locking events returned from the API');
+    throw new Error(Errors.NoLockingEvent);
   }
 
   // set number of blocks to quantize our x-axis to

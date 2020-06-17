@@ -8,7 +8,6 @@ import app from 'state';
 import { formatAsTitleCase } from 'helpers';
 import { CreateInviteLink } from 'views/pages/admin';
 
-import { selectLogin } from 'controllers/app/login';
 import { CommunityInfo } from 'models';
 
 import { inputModalWithText } from 'views/modals/input_modal';
@@ -64,8 +63,10 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
 
           let postType: string;
           if (selection === 'address') {
+            // TODO: Change to POST /member
             postType = '/addMember';
           } else if (selection === 'email') {
+            // TODO: Change to POST /invite
             postType = '/createInvite';
           } else {
             return;
@@ -100,7 +101,7 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
             m.redraw();
           });
         }
-      }, selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add')
+      }, selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add');
     };
 
     return m('.CreateInviteModal', [
@@ -115,7 +116,7 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           m('.community-url', `commonwealth.im/${id}`),
         ]),
         m('form', [
-          m('h4', `Option 1: Add member by address`),
+          m('h4', 'Option 1: Add member by address'),
           m(DropdownFormField, {
             name: 'invitedAddressChain',
             choices: chains,
@@ -132,9 +133,9 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           m('input[type="text"]', {
             name: 'address',
             autocomplete: 'off',
-            placeholder: `Address`,
-            oncreate: (vnode) => {
-              $(vnode.dom).focus();
+            placeholder: 'Address',
+            oncreate: (vvnode) => {
+              $(vvnode.dom).focus();
             }
           }),
           getInviteButton('address'),

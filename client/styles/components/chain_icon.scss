@@ -1,9 +1,28 @@
+$icon-size: 32px;
+$icon-background: #111;
+$icon-text: #fff;
+
 .ChainIcon {
     img.chain-icon {
-        display: inline-block;
-        width: 34px;
-        height: 34px;
+        width: $icon-size;
+        height: $icon-size;
         border-radius: 9999px;
-        background: #111;
+        background: $icon-background;
+    }
+}
+
+.CommunityIcon {
+    .community-icon {
+        width: $icon-size;
+        height: $icon-size;
+        border-radius: 9999px;
+        background: $icon-background;
+
+        // text
+        color: $icon-text;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        padding-top: 7px;
     }
 }

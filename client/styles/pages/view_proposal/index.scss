@@ -1,0 +1,23 @@
+@import 'client/styles/shared';
+
+$padding-top: 12px;
+$padding: 24px;
+$gutter: 0; // 34px;
+
+@mixin supports-jump-highlight() {
+    &.highlighted {
+        background-color: #ffd;
+    }
+    &.highlighted.highlightAnimationComplete {
+        background-color: #fff;
+        transition: background-color 1s ease-in-out;
+    }
+}
+
+.ViewProposalPage {
+    .ProposalHeader,
+    .ProposalBody,
+    .ProposalComment {
+        @include supports-jump-highlight();
+    }
+}

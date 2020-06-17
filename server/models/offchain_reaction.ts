@@ -1,12 +1,45 @@
-module.exports = (sequelize, DataTypes) => {
-  const OffchainReaction = sequelize.define('OffchainReaction', {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: DataTypes.STRING, allowNull: true },
-    thread_id: { type: DataTypes.INTEGER, allowNull: true },
-    comment_id: { type: DataTypes.INTEGER, allowNull: true },
-    address_id: { type: DataTypes.INTEGER, allowNull: false },
-    reaction: { type: DataTypes.STRING, allowNull: false },
-    community: { type: DataTypes.STRING, allowNull: true },
+import * as Sequelize from 'sequelize';
+
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+import { AddressAttributes } from './address';
+
+export interface OffchainReactionAttributes {
+  id?: number;
+  chain?: string;
+  thread_id?: number;
+  comment_id?: number;
+  address_id: number;
+  reaction: string;
+  community?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+  Address?: AddressAttributes;
+}
+
+export interface OffchainReactionInstance
+extends Sequelize.Instance<OffchainReactionAttributes>, OffchainReactionAttributes {
+
+}
+
+export interface OffchainReactionModel extends Sequelize.Model<OffchainReactionInstance, OffchainReactionAttributes> {
+
+}
+
+export default (
+  sequelize: Sequelize.Sequelize,
+  dataTypes: Sequelize.DataTypes,
+): OffchainReactionModel => {
+  const OffchainReaction = sequelize.define<OffchainReactionInstance, OffchainReactionAttributes>('OffchainReaction', {
+    id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    chain: { type: dataTypes.STRING, allowNull: true },
+    thread_id: { type: dataTypes.INTEGER, allowNull: true },
+    comment_id: { type: dataTypes.INTEGER, allowNull: true },
+    address_id: { type: dataTypes.INTEGER, allowNull: false },
+    reaction: { type: dataTypes.STRING, allowNull: false },
+    community: { type: dataTypes.STRING, allowNull: true },
   }, {
     underscored: true,
     indexes: [

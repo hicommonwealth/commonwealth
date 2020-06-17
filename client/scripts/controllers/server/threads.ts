@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import { default as _ } from 'lodash';
-import { default as moment } from 'moment-twitter';
+import _ from 'lodash';
+import moment from 'moment-twitter';
 import { ProposalStore, TagsStore } from 'stores';
 import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
-import { default as $ } from 'jquery';
+import $ from 'jquery';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 
@@ -18,10 +18,11 @@ const modelFromServer = (thread) => {
     attachments,
     thread.id,
     moment(thread.created_at),
-    thread.tags,
+    thread.tag,
     thread.kind,
     thread.version_history,
     thread.community,
+    thread.chain,
     thread.private,
     thread.read_only,
     decodeURIComponent(thread.body),
@@ -51,14 +52,15 @@ class ThreadsController {
     return result;
   }
 
-  public create(
+  public async create(
     address: string,
     kind: string,
     chainId: string,
     communityId: string,
     title: string,
+    tagName: string,
+    tagId: number,
     body?: string,
-    tags?: string[],
     url?: string,
     attachments?: string[],
     mentions?: string[],
@@ -68,31 +70,35 @@ class ThreadsController {
     const timestamp = moment();
     const firstVersion : any = { timestamp, body };
     const versionHistory : string = JSON.stringify(firstVersion);
-    return $.post(`${app.serverUrl()}/createThread`, {
-      'author_chain': app.vm.activeAccount.chain.id,
-      'chain': chainId,
-      'community': communityId,
-      'address': address,
-      'title': encodeURIComponent(title),
-      'body': encodeURIComponent(body),
-      'kind': kind,
-      'versionHistory': versionHistory,
-      'attachments[]': attachments,
-      'mentions[]': mentions,
-      'tags[]': tags,
-      'url': url,
-      'privacy': privacy,
-      'readOnly': readOnly,
-      'jwt': app.login.jwt,
-    }).then((response) => {
+
+    try {
+      // TODO: Change to POST /thread
+      const response = await $.post(`${app.serverUrl()}/createThread`, {
+        'author_chain': app.vm.activeAccount.chain.id,
+        'chain': chainId,
+        'community': communityId,
+        'address': address,
+        'title': encodeURIComponent(title),
+        'body': encodeURIComponent(body),
+        'kind': kind,
+        'versionHistory': versionHistory,
+        'attachments[]': attachments,
+        'mentions[]': mentions,
+        'tag_name': tagName,
+        'tag_id': tagId,
+        'url': url,
+        'privacy': privacy,
+        'readOnly': readOnly,
+        'jwt': app.login.jwt,
+      });
       const result = modelFromServer(response.result);
       this._store.add(result);
       return result;
-    }, (err) => {
+    } catch (err) {
       console.log('Failed to create thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-        'Failed to create thread');
-    });
+      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+        : 'Failed to create thread');
+    }
   }
 
   public async edit(
@@ -103,13 +109,14 @@ class ThreadsController {
     privacy?: boolean
   ) {
     const newBody = body || proposal.body;
-    const newReadOnly = readOnly || proposal.readOnly;
-    const newPrivacy = privacy || proposal.privacy;
+    const newReadOnly = (typeof readOnly === 'boolean') ? readOnly : proposal.readOnly;
+    const newPrivacy = (typeof privacy === 'boolean') ? privacy : proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
-
-    try {
-      const response = await $.post(`${app.serverUrl()}/editThread`, {
+    await $.ajax({
+      url: `${app.serverUrl()}/editThread`,
+      type: 'PUT',
+      data: {
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
@@ -118,26 +125,30 @@ class ThreadsController {
         'read_only': newReadOnly,
         'privacy': newPrivacy,
         'jwt': app.login.jwt
-      });
-      const result = modelFromServer(response.result);
-      if (this._store.getByIdentifier(result.id)) {
-        this._store.remove(this._store.getByIdentifier(result.id));
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to edit thread');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to edit thread');
       }
-      this._store.add(result);
-      return result;
-    } catch (err) {
-      console.log('Failed to edit thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error :
-        'Failed to edit thread');
-    }
+    });
   }
 
   public async delete(proposal) {
     const _this = this;
     return new Promise((resolve, reject) => {
+      // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {
-        jwt: app.login.jwt,
-        thread_id: proposal.id,
+        'jwt': app.login.jwt,
+        'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);
         resolve(result);
@@ -150,6 +161,7 @@ class ThreadsController {
   }
 
   public refreshAll(chainId: string, communityId: string, reset = false) {
+    // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
       chain: chainId,
       community: communityId,

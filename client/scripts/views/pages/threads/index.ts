@@ -7,6 +7,18 @@ import { OffchainThreadKind, CommunityInfo, NodeInfo } from 'models';
 import { re_weburl } from '../../../lib/url-validation';
 import { updateLastVisited } from '../../../controllers/app/login';
 
+enum NewThreadErrors {
+  NoBody = 'Thread body cannot be blank',
+  NoTag = 'Thread must have a tag',
+  NoTitle = 'Title cannot be blank',
+  NoUrl = 'URL cannot be blank',
+}
+
+export const formDataIncomplete = (state) : string => {
+  if (!state.form.title) return NewThreadErrors.NoTitle;
+  if (!state.form.tag) return NewThreadErrors.NoTag;
+};
+
 export const parseMentionsForServer = (text, isMarkdown) => {
   // Extract links to Commonwealth profiles, so they can be processed by the server as mentions
   const regexp = RegExp('\\[\\@.+?\\]\\(.+?\\)', 'g');
@@ -39,16 +51,16 @@ export const newThread = (
   readOnly?: boolean
 ) => {
   if (!form.title) {
-    return ({ title: 'Title cannot be blank' });
+    return ({ title: NewThreadErrors.NoTitle });
   }
-  if (form.tags?.length > 3) {
-    return ({ tags: 'Threads may only have up to three tags' });
+  if (!form.tagName) {
+    return ({ tag: NewThreadErrors.NoTag });
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
-    return ({ url: 'URL cannot be blank' });
+    return ({ url: NewThreadErrors.NoUrl });
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
-    return ({ editor: 'Thread cannot be blank' });
+    return ({ editor: NewThreadErrors.NoBody });
   }
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
@@ -63,7 +75,7 @@ export const newThread = (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tags, title, url } = form;
+  const { tagName, tagId, title, url } = form;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();
@@ -85,8 +97,9 @@ export const newThread = (
         chainId,
         communityId,
         title,
+        tagName,
+        tagId,
         bodyText,
-        tags,
         url,
         attachments,
         mentions,
@@ -109,13 +122,11 @@ export const newThread = (
       const tagNames = Array.isArray(activeEntity?.meta?.tags)
         ? activeEntity.meta.tags.map((t) => t.name)
         : [];
-      result.tags.forEach((tag) => {
-        if (!tagNames.includes(tag.name)) {
-          activeEntity.meta.tags.push(tag);
-        }
-      });
+      if (!tagNames.includes(result.tag.name)) {
+        activeEntity.meta.tags.push(result.tag);
+      }
     } catch (e) {
-      console.log(`Error adding new ${activeEntity} tags.`);
+      console.log(`Error adding new tag to ${activeEntity}.`);
     }
 
     mixpanel.track('Create Thread', {
@@ -127,7 +138,7 @@ export const newThread = (
 };
 
 export function detectURL(str: string) {
-  if (str.slice(0, 4) !== 'http') str = 'http://' + str;
+  if (str.slice(0, 4) !== 'http') str = `http://${str}`;
   return !!str.match(re_weburl);
 }
 
@@ -136,7 +147,7 @@ export const newLink = (form, quillEditorState, author, kind = OffchainThreadKin
 };
 
 export const getLinkTitle = async (url: string) => {
-  if (url.slice(0, 4) !== 'http') url = 'http://' + url;
+  if (url.slice(0, 4) !== 'http') url = `http://${url}`;
   const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
   if (response.status === 404) return '404: Not Found';
   if (response.status === 500) return '500: Server Error';

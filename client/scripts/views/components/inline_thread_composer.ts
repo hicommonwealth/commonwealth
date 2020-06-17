@@ -1,15 +1,16 @@
 import 'components/inline_thread_composer.scss';
 
-import { default as m } from 'mithril';
-import { default as _ } from 'lodash';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import _ from 'lodash';
+import $ from 'jquery';
+import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, OffchainTag } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
-import { detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
+import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from './autocomplete_tag_form';
 import { isCommunityAdmin } from '../pages/discussions/roles';
 
@@ -24,9 +25,16 @@ interface ILinkPostState {
   autoTitleOverride: boolean;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
   titleSelected: boolean;
+}
+
+interface IThreadForm {
+  tagName?: string;
+  tagId?: number;
+  url?: string;
+  title?: string;
 }
 
 const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
@@ -37,7 +45,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     if (!form) vnode.state.form = { title, url };
     else if (!autoTitleOverride) vnode.state.form = Object.assign(form, { title, url });
     else Object.assign(vnode.state.form, { url });
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
     if (title === '404: Not Found' || title === '500: Server Error') {
       vnode.state.error.url = title;
@@ -45,14 +53,6 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     } else {
       delete vnode.state.error.url;
     }
-
-    const invalidForm = (
-      !author
-      || Object.values(vnode.state.error).length
-      || !vnode.state.form.title
-      || !vnode.state.form.url
-      || !vnode.state.form.tags
-    );
 
     const createLink = (e?) => {
       if (e) e.preventDefault();
@@ -71,7 +71,8 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
     }, 1);
     const { closed } = vnode.state;
     return closed ? null : m('.LinkPost', [
-      m('input[type="text"].form-field', {
+      m(Input, {
+        fluid: true,
         name: 'link-title',
         oninput: (e) => {
           vnode.state.autoTitleOverride = true;
@@ -93,29 +94,37 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         editorNamespace: 'new-link-inline',
         onkeyboardSubmit: createLink,
       }),
+      m(AutoCompleteTagForm, {
+        tags: app.tags.getByCommunity(app.activeId()),
+        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
+        },
+        updateParentErrors: (err: string) => {
+          if (err) vnode.state.error = err;
+          else delete vnode.state.error;
+          m.redraw();
+        },
+        tabindex: 3,
+      }),
       m('.bottom-panel', [
         m('.actions', [
-          m('button', {
+          m(Button, {
+            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
             type: 'submit',
+            intent: 'primary',
             onclick: createLink,
             tabindex: 4,
-          }, 'Create link'),
-          // m('button', {
-          //   class: !author ? 'disabled' : '',
-          //   type: 'cancel',
-          //   onclick: closeComposer,
-          // }, 'Cancel'),
-        ]),
-        m('.tag-selection', [
-          m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => { vnode.state.form.tags = tags; },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
+            label: 'Create link'
+          }),
+          m(Button, {
+            class: !author ? 'disabled' : '',
+            type: 'cancel',
+            onclick: closeComposer,
+            basic: true,
+            outlined: false,
+            label: 'Cancel',
           }),
         ]),
       ]),
@@ -141,7 +150,7 @@ interface ITextPostState {
   uploadsInProgress: number;
   closed: boolean;
   error: any;
-  form: any;
+  form: IThreadForm;
   quillEditorState: any;
 }
 
@@ -153,7 +162,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
   view: (vnode: m.VnodeDOM<ITextPostAttrs, ITextPostState>) => {
     const { author, closeComposer, title } = vnode.attrs;
     const { closed } = vnode.state;
-    const activeEntity = app.community ? app.community : app.chain;
+    const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (!vnode.state.error) vnode.state.error = {};
     if (closed) return null;
     vnode.state.form = vnode.state.form ? Object.assign(vnode.state.form, { title }) : { title };
@@ -179,15 +188,41 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         editorNamespace: 'new-thread-inline',
         onkeyboardSubmit: createThread,
       }),
+      m(AutoCompleteTagForm, {
+        tags: app.tags.getByCommunity(app.activeId()),
+        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+        updateFormData: (tagName: string, tagId?: number) => {
+          vnode.state.form.tagName = tagName;
+          vnode.state.form.tagId = tagId;
+        },
+        updateParentErrors: (err: string) => {
+          if (err) vnode.state.error = err;
+          else delete vnode.state.error;
+          m.redraw();
+        },
+        tabindex: 3,
+      }),
       m('.bottom-panel', [
         m('.actions', [
-          m('button', {
+          m(Button, {
+            class: !author || formDataIncomplete(vnode.state) ? 'disabled' : '',
             type: 'submit',
+            intent: 'primary',
             onclick: createThread,
+            tabindex: 4,
+            label: 'Create thread'
+          }),
+          m(Button, {
+            class: !author ? 'disabled' : '',
+            type: 'cancel',
+            onclick: closeComposer,
+            basic: true,
+            outlined: false,
+            label: 'Cancel',
             tabindex: 4
-          }, 'Create thread'),
-          m('.property-group', [
-            m('input[type="radio"]', {
+          }),
+          m('.privacy-selection', [
+            m(Radio, {
               name: 'properties',
               value: 'public',
               id: 'public-thread',
@@ -195,50 +230,30 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
               onclick: () => {
                 vnode.state.readOnly = false;
                 vnode.state.privacy = false;
-              }
+              },
+              label: 'Public',
             }),
-            m('label', {
-              for: 'public-thread',
-            }, 'Public'),
-            m('input[type="radio"]', {
+            m(Radio, {
               name: 'properties',
               value: 'private',
               id: 'private-thread',
               onclick: () => {
                 vnode.state.readOnly = false;
                 vnode.state.privacy = true;
-              }
+              },
+              label: 'Private (Only admins/mods)',
             }),
-            m('label', {
-              for: 'private-thread',
-            }, 'Private (Only admins/mods)'),
-            m('input[type="radio"]', {
+            m(Radio, {
               name: 'properties',
               value: 'readOnly',
               id: 'read-only',
               onclick: () => {
                 vnode.state.readOnly = true;
                 vnode.state.privacy = false;
-              }
+              },
+              label: 'Read-Only',
             }),
-            m('label', {
-              for: 'read-only',
-            }, 'Read-Only'),
           ]),
-        ]),
-        m('.tag-selection', [
-          m(AutoCompleteTagForm, {
-            results: activeEntity.meta.tags || [],
-            updateFormData: (tags: string[]) => {
-              vnode.state.form.tags = tags;
-            },
-            updateParentErrors: (err: string) => {
-              if (err) vnode.state.error = err;
-              else delete vnode.state.error;
-              m.redraw();
-            },
-            tabindex: 3,
-          }),
         ]),
         (typeof vnode.state.error === 'string' || Object.entries(vnode.state.error).length > 0)
           && m('.error-message', [
@@ -308,7 +323,7 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
         if (e.keyCode === 17) vnode.state.ctrlkeydown = false;
       },
     }, [
-      m('.flex-wrap', {
+      m('.top-panel', {
         onclick: (e) => {
           e.stopPropagation();
           if (vnode.state.open) return;
@@ -317,21 +332,17 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
         },
       }, [
         m('.thread-avatar', [
-          m(User, { user: author, avatarOnly: true, avatarSize: 28 }),
+          m(User, { user: author, avatarOnly: true, avatarSize: 30 }),
         ]),
         m('.thread-content', [
           m('.thread-title', [
-            m('input[type="text"].form-field', {
+            m(Input, {
+              fluid: true,
               name: 'thread-composer',
-              placeholder: 'Start a thread, or paste a link',
+              placeholder: 'Start a thread...',
               autocomplete: 'off',
               onfocus: (e) => {
                 vnode.state.open = true;
-              },
-              onblur: (e) => {
-                if (e.relatedTarget && $(e.relatedTarget).hasClass('ql-editor')) return; // handle tabbing
-                if (vnode.state.mousedown || vnode.state.ctrlkeydown || textTitle || linkTitle) return;
-                vnode.state.open = false;
               },
               oninput: async (e) => {
                 const { value } = e.target;

@@ -36,7 +36,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       vnode.state.disabled = true;
       vnode.state.success = false;
       vnode.state.failure = false;
-
+      // TODO: Change to POST /webhook
       $.post(`${app.serverUrl()}/createWebhook`, {
         ...chainOrCommObj,
         webhookUrl,
@@ -80,7 +80,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
               vnode.state.disabled = true;
               vnode.state.success = false;
               vnode.state.failure = false;
-
+              // TODO: Change to DELETE /webhook
               $.post(`${app.serverUrl()}/deleteWebhook`, {
                 ...chainOrCommObj,
                 webhookUrl: webhook.url,
@@ -89,7 +89,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
               }).then((result) => {
                 vnode.state.disabled = false;
                 if (result.status === 'Success') {
-                  const idx = vnode.attrs.webhooks.findIndex((webhook) => webhook.url === `${webhook.url}`);
+                  const idx = vnode.attrs.webhooks.findIndex((w) => `${w.url}` === `${webhook.url}`);
                   if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
                   vnode.state.success = true;
                   vnode.state.successMsg = 'Webhook deleted!';

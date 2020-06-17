@@ -1,8 +1,8 @@
 import 'modals/waiting_list_modal.scss';
 
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import $ from 'jquery';
+import mixpanel from 'mixpanel-browser';
 import app from 'state';
 
 const sampleAddresses = {
@@ -35,11 +35,11 @@ const WaitingListModal = {
         !app.isLoggedIn() && m('input[type="text"]', {
           name: 'email',
           placeholder: 'Email',
-          oncreate: (vnode) => {
-            $(vnode.dom).focus();
+          oncreate: (vvnode) => {
+            $(vvnode.dom).focus();
           }
         }),
-        m('p.optional', 'Optional: Provide your ' + chainName + ' address for priority access'),
+        m('p.optional', `Optional: Provide your ${chainName} address for priority access`),
         m('input[type="text"]', {
           name: 'address',
           placeholder: sampleAddresses[chain] || '',
@@ -55,9 +55,9 @@ const WaitingListModal = {
             vnode.state.disabled = true;
             vnode.state.success = false;
             vnode.state.failure = false;
-            $.post(app.serverUrl() + '/registerWaitingList', {
-              email: email,
-              address: address,
+            $.post(`${app.serverUrl()}/registerWaitingList`, {
+              email,
+              address,
               chain: chainIDs[chain],
             }).then((response) => {
               vnode.state.disabled = false;
@@ -84,9 +84,9 @@ const WaitingListModal = {
           }
         }, 'Sign up for access'),
         vnode.state.success && m('.waiting-list-message.success', [
-          !app.isLoggedIn() ?
-            'Check your email to complete registration' :
-            'You\'re all set!'
+          !app.isLoggedIn()
+            ? 'Check your email to complete registration'
+            : 'You\'re all set!'
         ]),
         vnode.state.failure && m('.waiting-list-message.error', [
           vnode.state.error || 'An error occurred'

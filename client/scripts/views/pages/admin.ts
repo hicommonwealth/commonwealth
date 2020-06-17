@@ -1,38 +1,27 @@
 import 'pages/admin.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
-import app from 'state';
-
+import $ from 'jquery';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 import { SubmittableResult, ApiRx } from '@polkadot/api';
-import { blockperiodToDuration, formatDuration } from 'helpers';
-import { formatCoin } from 'adapters/currency';
-import Tabs from 'views/components/widgets/tabs';
-import { ChainInfo, NodeInfo } from 'models';
-import PageLoading from 'views/pages/loading';
-
-// import { OffchainComment, Proposal, AnyProposal } from 'models/models';
-// import { default as CommentsController } from 'controllers/server/comments';
-// import { default as AdminController } from 'controllers/server/comments';
-
-import ListingPage from 'views/pages/_listing_page';
-
-// for styleguide: models
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-// for styleguide: widgets
-import DropdownButton from 'views/components/widgets/dropdown_button';
-import User from 'views/components/widgets/user';
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
-import PopopenTruncatedText from 'views/components/widgets/popopen_truncated_text';
-import { switchMap } from 'rxjs/operators';
-import Substrate from 'controllers/chain/substrate/main';
 import { ISubmittableResult } from '@polkadot/types/types';
+import { switchMap } from 'rxjs/operators';
+
+import app from 'state';
+import Sublayout from 'views/sublayout';
+import { blockperiodToDuration, formatDuration } from 'helpers';
+import { ChainInfo, NodeInfo } from 'models';
+import { formatCoin } from 'adapters/currency';
+import Substrate from 'controllers/chain/substrate/main';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+
+import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
+import { DropdownFormField } from 'views/components/forms';
+import Tabs from 'views/components/widgets/tabs';
+import User from 'views/components/widgets/user';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
-import { DropdownFormField } from '../components/forms';
-import EdgewareFunctionPicker from '../components/edgeware_function_picker';
-
+import PageLoading from 'views/pages/loading';
 
 interface IChainManagerAttrs {
   success?: string;
@@ -46,78 +35,80 @@ interface IChainManagerState {
 
 const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
   view: (vnode) => {
+    const nodeRows = (chain) => (app.config.nodes.getByChain(chain.id) || [])
+      .map((node, nodeIndex) => {
+        return m('li.chain-node', [
+          m('span', node.url),
+          ' ',
+          m('a', {
+            href: '#',
+            onclick: (e) => {
+              e.preventDefault();
+              if (!app.login.jwt) return alert('Login required');
+              if (!app.login.isSiteAdmin) return alert('Admin required');
+              vnode.attrs.success = null;
+              vnode.attrs.error = null;
+              if (!confirm('Are you sure?')) return;
+              // TODO: Change to DELETE /chainNoode
+              $.post(`${app.serverUrl()}/deleteChainNode`, {
+                id: chain.id,
+                node_url: node.url,
+                auth: true,
+                jwt: app.login.jwt,
+              }).then((result) => {
+                if (result.status !== 'Success') return;
+                app.config.nodes.remove(node);
+                vnode.attrs.success = 'Successfully deleted';
+                m.redraw();
+              }, (err) => {
+                vnode.state.error = err.responseJSON
+                  ? err.responseJSON.error
+                  : (`${err.status}: ${err.statusText}`);
+                m.redraw();
+              });
+            }
+          }, 'Remove'),
+        ]);
+      });
 
-    const nodeRows = (chain) =>
-      (app.config.nodes.getByChain(chain.id) || []).map((node, nodeIndex) => m('li.chain-node', [
-        m('span', node.url),
-        ' ',
-        m('a', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            if (!app.login.jwt) return alert('Login required');
-            if (!app.login.isSiteAdmin) return alert('Admin required');
-            vnode.attrs.success = null;
-            vnode.attrs.error = null;
-            if (!confirm('Are you sure?')) return;
-            $.post(app.serverUrl() + '/deleteChainNode', {
-              id: chain.id,
-              node_url: node.url,
-              auth: true,
-              jwt: app.login.jwt,
-            }).then((result) => {
-              if (result.status !== 'Success') return;
-              app.config.nodes.remove(node);
-              vnode.attrs.success = 'Successfully deleted';
-              m.redraw();
-            }, (err) => {
-              vnode.state.error = err.responseJSON ?
-                err.responseJSON.error :
-                (err.status + ': ' + err.statusText);
-              m.redraw();
-            });
-          }
-        }, 'Remove'),
-      ]));
-
-    const addNodeRow = (chain) =>
-      m('li', [
-        m('a', {
-          href: '#',
-          onclick: (e) => {
-            e.preventDefault();
-            if (!app.login.jwt) return alert('Login required');
-            if (!app.login.isSiteAdmin) return alert('Admin required');
-            vnode.attrs.success = null;
-            vnode.attrs.error = null;
-            const url = prompt('Enter the node url:');
-            $.post(app.serverUrl() + '/addChainNode', {
-              id: chain.id,
-              name: chain.name,
-              symbol: chain.symbol,
-              network: chain.network,
-              node_url: url,
-              auth: true,
-              jwt: app.login.jwt,
-            }).then((result) => {
-              app.config.nodes.add(new NodeInfo(result.result.id, result.result.chain, result.result.url));
-              vnode.state.success = 'Sucessfully added';
-              m.redraw();
-            }, (err) => {
-              vnode.state.error = err.responseJSON ?
-                err.responseJSON.error :
-                (err.status + ': ' + err.statusText);
-              m.redraw();
-            });
-          }
-        }, 'Add')
-      ]);
+    const addNodeRow = (chain) => m('li', [
+      m('a', {
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          if (!app.login.jwt) return alert('Login required');
+          if (!app.login.isSiteAdmin) return alert('Admin required');
+          vnode.attrs.success = null;
+          vnode.attrs.error = null;
+          const url = prompt('Enter the node url:');
+          // TODO: Change to POST /chainNode
+          $.post(`${app.serverUrl()}/addChainNode`, {
+            id: chain.id,
+            name: chain.name,
+            symbol: chain.symbol,
+            network: chain.network,
+            node_url: url,
+            auth: true,
+            jwt: app.login.jwt,
+          }).then((result) => {
+            app.config.nodes.add(new NodeInfo(result.result.id, result.result.chain, result.result.url));
+            vnode.state.success = 'Sucessfully added';
+            m.redraw();
+          }, (err) => {
+            vnode.state.error = err.responseJSON
+              ? err.responseJSON.error
+              : (`${err.status}: ${err.statusText}`);
+            m.redraw();
+          });
+        }
+      }, 'Add')
+    ]);
 
     return m('.ChainManager', [
-        m('button', {
-          onclick: (e) => app.modals.create({ modal: CreateCommunityModal })
-        }, 'Add a new offchain community'),
-        (app.config.chains.getAll() || []).map((chain) => m('.chain-row', [
+      m('button', {
+        onclick: (e) => app.modals.create({ modal: CreateCommunityModal })
+      }, 'Add a new offchain community'),
+      (app.config.chains.getAll() || []).map((chain) => m('.chain-row', [
         m('h3', [
           m('strong', chain.name),
           m('span.lighter', {
@@ -125,7 +116,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           }, chain.symbol),
         ]),
         m('.chain-subtitle', {
-            style: 'margin: -14px 0 10px; color: #999;'
+          style: 'margin: -14px 0 10px; color: #999;'
         }, `${chain.id} (Network: ${chain.network})`),
         m('ul.chain-info', [
           nodeRows(chain),
@@ -137,7 +128,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
           m('strong', community.name),
         ]),
         m('.chain-subtitle', {
-            style: 'margin: -14px 0 10px; color: #999;'
+          style: 'margin: -14px 0 10px; color: #999;'
         }, `${community.id}`),
       ])),
       vnode.state.success && m('.success-message', {
@@ -221,174 +212,35 @@ const ChainStats: m.Component<{}> = {
   view: (vnode) => {
     const header = (label) => m('h4.header', { style: 'margin: 15px 0;' }, label);
     const stat = (label, content) => m('.stat', [ m('.label', label), m('.value', content) ]);
-    const formatBlocks = (blocks) =>
-      [blocks, ' blocks - ', formatDuration(blockperiodToDuration(blocks))];
+    const formatBlocks = (blocks) => [blocks, ' blocks - ', formatDuration(blockperiodToDuration(blocks))];
 
     return m('.ChainStats', {
       style: 'padding: 5px 24px; border: 1px solid #eee; margin-bottom: 40px;'
     }, [
       m('style', '.ChainStats .stat > * { display: inline-block; width: 50%; }'),
       header('ChainInfo'),
-      stat('ChainInfo',               app.activeChainId()),
-      stat('ChainInfo Name',          app.chain.name?.toString()),
-      stat('ChainInfo Version',       app.chain.version?.toString()),
-      stat('ChainInfo Runtime',       app.chain.runtimeName?.toString()),
+      stat('ChainInfo', app.activeChainId()),
+      stat('ChainInfo Name', app.chain.name?.toString()),
+      stat('ChainInfo Version', app.chain.version?.toString()),
+      stat('ChainInfo Runtime', app.chain.runtimeName?.toString()),
       header('Block Production'),
-      stat('Current block',       app.chain.block?.height),
-      stat('Last block created',  app.chain.block?.lastTime.format('HH:mm:ss')),
-      stat('Target block time',   app.chain.block?.duration + ' sec'),
+      stat('Current block', app.chain.block?.height),
+      stat('Last block created', app.chain.block?.lastTime.format('HH:mm:ss')),
+      stat('Target block time', `${app.chain.block?.duration} sec`),
       header('Balances'),
-      stat('Total EDG',           formatCoin((app.chain as Substrate).chain.totalbalance)),
+      stat('Total EDG', formatCoin((app.chain as Substrate).chain.totalbalance)),
       stat('Existential deposit', formatCoin((app.chain as Substrate).chain.existentialdeposit)),
-      //stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
-      stat('Creation fee',        formatCoin((app.chain as Substrate).chain.creationfee)),
+      // stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
+      stat('Creation fee', formatCoin((app.chain as Substrate).chain.creationfee)),
       header('Democracy Proposals'),
-      stat('Launch period',       formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)),
-      stat('Minimum deposit',     formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)),
+      stat('Launch period', formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)),
+      stat('Minimum deposit', formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)),
       header('Phragmen Elections'),
-      stat('Term length',         formatBlocks((app.chain as Substrate).phragmenElections.termDuration)),
-      stat('Voting bond',         formatCoin((app.chain as Substrate).phragmenElections.votingBond)),
-      stat('Candidacy bond',      formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)),
+      stat('Term length', formatBlocks((app.chain as Substrate).phragmenElections.termDuration)),
+      stat('Voting bond', formatCoin((app.chain as Substrate).phragmenElections.votingBond)),
+      stat('Candidacy bond', formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)),
       m('br'),
     ]);
-  }
-};
-
-const ComponentLibrary: m.Component<{}> = {
-  view: (vnode) => {
-    const accts = (app.chain) ? (app.chain as Substrate).accounts.store.getAll() :
-      app.community.accounts.store.getAll();
-    const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.`;
-    const preformatted =
-      `$ hs-airdrop ~/.gnupg/secring.gpg 0x12345678 ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5
-$ hs-airdrop ~/.ssh/id_rsa ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5
-$ hs-airdrop ~/.ssh/id_rsa ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 0.5 --bare
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 5000
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 2 # shares
-$ hs-airdrop ts1q5z7yym8xrh4quqg3kw498ngy7hnd4sruqyxnxd 1000000 --sponsor`;
-    const placeholder = 'Placeholder...';
-
-    return [
-      // type
-      m('h4', 'Typography'),
-      m('.well', [
-        m('h1', 'Header 1'),
-        m('h2', 'Header 2'),
-        m('h3', 'Header 3'),
-        m('h4', 'Header 4'),
-        m('p', lorem),
-        m('blockquote', lorem),
-        m('pre', preformatted),
-        m('ul', [
-          m('li', 'First, unlock your wallet'),
-          m('li', 'Second, sign a message'),
-          m('li', 'Third, send a transaction'),
-        ]),
-        m('ol', [
-          m('li', 'First, unlock your wallet'),
-          m('li', 'Second, sign a message'),
-          m('li', 'Third, send a transaction'),
-        ]),
-      ]),
-
-      // inputs
-      m('h4', 'Inputs'),
-      m('.well', [
-        m('.form-group', [
-          m('input[type="text"]', { placeholder: placeholder }),
-          m('input[type="submit"]', { value: 'Submit Button' }),
-          m('input[type="button"]', { value: 'Cancel Button' }),
-          m('textarea', { placeholder: placeholder }),
-        ]),
-        m('.form-group', [
-          m('input[type="checkbox"]', { id: 'check1' }),
-          m('label', { for: 'check1' }, 'Option One'),
-          m('input[type="checkbox"]', { id: 'check2' }),
-          m('label', { for: 'check2' }, 'Option Two'),
-          m('input[type="checkbox"]', { id: 'check3' }),
-          m('label', { for: 'check3' }, 'Option Three'),
-        ]),
-        m('.form-group', [
-          m('input[type="radio"]', { id: 'radio1', name: 'group1' }),
-          m('label', { for: 'radio1' }, 'Option One'),
-          m('input[type="radio"]', { id: 'radio2', name: 'group1' }),
-          m('label', { for: 'radio2' }, 'Option Two'),
-          m('input[type="radio"]', { id: 'radio3', name: 'group1' }),
-          m('label', { for: 'radio3' }, 'Option Three'),
-        ]),
-        m('select', [
-          m('option', { value: 'eth', }, 'Ethereum'),
-          m('option', { value: 'atom', }, 'Cosmos'),
-          m('option', { value: 'dot', }, 'Polkadot'),
-          m('option', { value: 'edg', }, 'Edgeware'),
-        ]),
-      ]),
-
-      // buttons
-      m('h4', 'Buttons'),
-      m('.well', [
-        m('button', 'HTML Button'),
-        m('br'),
-        m('button', { type: 'submit', }, 'HTML Button'),
-        m('br'),
-        m('button.disabled', 'HTML Button'),
-        m('br'),
-        m('button.disabled', { type: 'submit', }, 'HTML Button'),
-      ]),
-
-      m('h4', 'Formular Buttons'),
-      m('.well', [
-        m('button.formular-button-positive', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-negative', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-secondary', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-tertiary', 'HTML Button'),
-        m('br'),
-        m('button.formular-button-black', 'HTML Button'),
-      ]),
-
-      // Dropdown Button
-      m('h4', 'Dropdown Button'),
-      m('.well', [
-        m(DropdownButton, [
-          m('li', 'Option one'),
-          m('li', 'Option two'),
-        ])
-      ]),
-
-      // User
-      m('h4', 'User Widgets'),
-      m('section', [
-        accts.length > 0 ? [
-          m(User, { user: accts[0] }),
-          m(User, { user: accts[0] }),
-          m(User, { user: accts[0], linkify: true }),
-        ] : 'No user',
-      ]),
-
-      // PopopenTruncatedText
-      m('h4', 'Popopen Text'),
-      m('section', [
-        m(PopopenTruncatedText, { text: lorem, limit: 200 }),
-      ]),
-
-      // ResizableTextarea
-      m('h4', 'Auto-resize Textarea'),
-      m('section', [
-        m(ResizableTextarea, { placeholder }),
-        m('br'),
-        m(ResizableTextarea, { placeholder, rows: 1 }),
-      ]),
-    ];
   }
 };
 
@@ -451,7 +303,6 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
     }
   },
   view: (vnode: m.VnodeDOM<{}, IAdminActionsState>) => {
-
     let adminChoices;
     if (vnode.state.profiles) {
       adminChoices = Object.keys(vnode.state.profiles).map((key) => {
@@ -469,19 +320,19 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             vnode.state.inprogress = true;
             f().subscribe(() => {
               vnode.state.inprogress = false;
-              //EdgewareTesting.get().isTesting = false;
-            }, (e: Error) => {
-              console.error('Test error: ', e);
+              // EdgewareTesting.get().isTesting = false;
+            }, (err: Error) => {
+              console.error('Test error: ', err);
               vnode.state.inprogress = false;
-              //EdgewareTesting.get().isTesting = false;
+              // EdgewareTesting.get().isTesting = false;
             });
-          } catch (e) {
+          } catch (err) {
             vnode.state.inprogress = false;
-            //EdgewareTesting.get().isTesting = false;
-            throw e;
+            // EdgewareTesting.get().isTesting = false;
+            throw err;
           }
         },
-      }, vnode.state.inprogress ? `Test in progress...` : `Start ${testName}`);
+      }, vnode.state.inprogress ? 'Test in progress...' : `Start ${testName}`);
     };
 
     return m('.AdminActions', [
@@ -503,10 +354,10 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
       m('.form', [
         m('.form-left', [
           // TD: verify this is correct char lim
-          m('.caption', {style: 'margin-top: 20px;'}, 'Choose a possible admin'),
+          m('.caption', { style: 'margin-top: 20px;' }, 'Choose a possible admin'),
           m(DropdownFormField, {
             name: 'alt-del',
-            options: { style: 'padding: 5px'},
+            options: { style: 'padding: 5px' },
             choices: adminChoices,
             callback: (result) => {
               vnode.state.selected_profile = result;
@@ -522,10 +373,10 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
         ]),
         m('.form-left', [
           // TD: verify this is correct char lim
-          m('.caption', {style: 'margin-top: 20px;'}, 'Choose a role'),
+          m('.caption', { style: 'margin-top: 20px;' }, 'Choose a role'),
           m(DropdownFormField, {
             name: 'alt-del',
-            options: { style: 'padding: 5px'},
+            options: { style: 'padding: 5px' },
             choices: [
               {
                 name: 'siteAdmin',
@@ -538,7 +389,9 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
                 value: 'chainAdmin'
               }
             ],
-            callback: (result) => vnode.state.role = result
+            callback: (result) => {
+              vnode.state.role = result;
+            }
           })
         ]),
         m('button', {
@@ -546,34 +399,33 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
           onclick: (e) => {
             e.preventDefault();
             vnode.state.inprogress = true;
-            console.log(vnode.state.selected_profile);
-            console.log(vnode.state.role);
-            $.post(app.serverUrl() + '/updateAdminStatus', {
+            // TODO: Change to PUT /adminStatus
+            $.post(`${app.serverUrl()}/updateAdminStatus`, {
               admin: app.vm.activeAccount.address,
               address: vnode.state.selected_profile, // the address to be changed
               role: vnode.state.role,
               jwt: app.login.jwt,
             }).then((response) => {
-                if (response.status === 'Success') {
-                  if (!app.isLoggedIn()) {
-                    mixpanel.track('Add Admin', {
-                      'Step No': 1,
-                      'Step': 'Add Admin'
-                    });
-                  }
-                  m.redraw();
-                } else {
-                  // error tracking
+              if (response.status === 'Success') {
+                if (!app.isLoggedIn()) {
+                  mixpanel.track('Add Admin', {
+                    'Step No': 1,
+                    'Step': 'Add Admin'
+                  });
                 }
-                vnode.state.inprogress = false;
-              }, (err) => {
-                vnode.state.failure = true;
-                vnode.state.disabled = false;
-                if (err.responseJSON) vnode.state.error = err.responseJSON.error;
                 m.redraw();
+              } else {
+                // error tracking
+              }
+              vnode.state.inprogress = false;
+            }, (err) => {
+              vnode.state.failure = true;
+              vnode.state.disabled = false;
+              if (err.responseJSON) vnode.state.error = err.responseJSON.error;
+              m.redraw();
             });
           }
-        }, vnode.state.inprogress ? `Adding ${vnode.state.selected_profile}` : `Add admin`),
+        }, vnode.state.inprogress ? `Adding ${vnode.state.selected_profile}` : 'Add admin'),
       ]),
       m('br'),
       m('br'),
@@ -592,7 +444,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
         m('select', { name: 'uses' }, [
           m('option', { value: 'none', }, 'Unlimited'),
           m('option', { value: 1, }, 'Once'),
-          //m('option', { value: 2, }, 'Twice'),
+          // m('option', { value: 2, }, 'Twice'),
         ]),
         m('label', { for: 'time', }, 'Expires after:'),
         m('select', { name: 'time' }, [
@@ -607,6 +459,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
             e.preventDefault();
             const time = $(vnode.dom).find('[name="time"] option:selected').val();
             const uses = $(vnode.dom).find('[name="uses"] option:selected').val();
+            // TODO: Change to POST /inviteLink
             $.post(`${app.serverUrl()}/createInviteLink`, {
               community_id: app.activeCommunityId(),
               time,
@@ -643,7 +496,7 @@ const InviteLinkRow: m.Component<{data}, {link}> = {
       m('td', [m('input', {
         disabled: true,
         value: `${url}`
-      }),]),
+      }), ]),
       m('td.active', `${active} `),
       m('td.multi_use', `${multi_use} `),
       m('td.used', `${used} `),
@@ -658,6 +511,7 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
     vnode.state.links = [];
   },
   oncreate: (vnode) => {
+    // TODO: Change to GET /inviteLinks
     $.get(`${app.serverUrl()}/getInviteLinks`, {
       address: app.vm.activeAccount.address,
       community_id: app.activeCommunityId(),
@@ -677,13 +531,13 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
     return m('.InviteLinkTable', [
       m('h3', `All Historic Invite Links for "${app.activeCommunityId()}"`),
       m('table', [
-        (vnode.state.links.length > 0) &&
-        m('tr', [
+        (vnode.state.links.length > 0)
+        && m('tr', [
           m('th', 'Link'), m('th', 'Active?'), m('th', 'Uses'),
           m('th', 'Times Used'), m('th', 'Time Limit'), m('th', 'Date Created'),
         ]),
-        (vnode.state.links.length > 0) ?
-          vnode.state.links.sort((a, b) => (a.created_at < b.created_at) ? 1 : -1).map((link) => {
+        (vnode.state.links.length > 0)
+          ? vnode.state.links.sort((a, b) => (a.created_at < b.created_at) ? 1 : -1).map((link) => {
             return m(InviteLinkRow, {
               data: link,
             });
@@ -713,10 +567,10 @@ const GenericInviteLinks: m.Component<{}, {newlinks}> = {
 
 const AdminPage: m.Component<{}> = {
   oncreate: (vnode) => {
-      mixpanel.track('PageVisit', {
-        'Page Name': 'AdminPage',
-        'Scope': app.activeId() ,
-      });
+    mixpanel.track('PageVisit', {
+      'Page Name': 'AdminPage',
+      'Scope': app.activeId(),
+    });
   },
   view: (vnode) => {
     if (!app.login.isSiteAdmin) {
@@ -724,27 +578,23 @@ const AdminPage: m.Component<{}> = {
       return m(PageLoading);
     }
 
-    return m(ListingPage, {
+    return m(Sublayout, {
       class: 'AdminPage',
-      title: 'Admin',
-      subtitle: 'Manage the Commonwealth site internals',
-      content: m('.forum-container', [
+    }, [
+      m('.forum-container', [
         m(Tabs, [{
           name: 'Admin',
-          content: app.community ? [ m(AdminActions), ] :
-            app.chain ? [ m(AdminActions), m(SudoForm), m(ChainStats) ] : []
+          content: app.community ? [ m(AdminActions), ]
+            : app.chain ? [ m(AdminActions), m(SudoForm), m(ChainStats) ] : []
         }, {
           name: 'Manage Chains and Nodes',
           content: m(ChainManager),
-        }, {
-          name: 'Component Library',
-          content: m(ComponentLibrary),
         }, {
           name: 'Generic Invite Links',
           content: m(GenericInviteLinks),
         }]),
       ]),
-    });
+    ]);
   }
 };
 

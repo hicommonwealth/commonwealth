@@ -1,6 +1,6 @@
 import 'components/proposals/convictions_table.scss';
 
-import { default as m } from 'mithril';
+import m from 'mithril';
 import { formatDuration, blockperiodToDuration } from 'helpers';
 import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
 import Substrate from 'controllers/chain/substrate/main';
@@ -24,7 +24,7 @@ export const ConvictionsChooser = {
           e.preventDefault();
           vnode.state.selectedConviction = c.toString();
           vnode.attrs.callback(c.toString());
-        }).bind(c)
+        })
       }, [
         `${convictionToWeight(c)}x weight (${convictionToLocktime(c)}x locktime)`
       ]))

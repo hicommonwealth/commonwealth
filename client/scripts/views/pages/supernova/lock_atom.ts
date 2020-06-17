@@ -1,12 +1,11 @@
 import 'pages/supernova/lock_atom.scss';
 
 import app from 'state';
-import { default as m } from 'mithril';
-import { default as mixpanel } from 'mixpanel-browser';
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
 
 import { CosmosAccount } from 'controllers/chain/cosmos/account';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import ObjectPage from 'views/pages/_object_page';
 import Cosmos from 'controllers/chain/cosmos/main';
 import { ChainBase } from 'models';
 import { TextInputFormField, DropdownFormField } from '../../components/forms';
@@ -33,20 +32,17 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
   },
   view: (vnode: m.VnodeDOM<{}, IState>) => {
     const loading = (error?) => {
-      return m(ObjectPage, {
-        class: 'SupernovaLockATOMPage',
-        content: [
-          m('.forum-container.lockATOM-layout', [
-            m(SupernovaPreheader),
-            m('h2.page-title', 'Lock ATOM'),
-            m('.app-loading', [
-              !error && m('span.icon-spinner2.animate-spin'),
-              !error && m('p', 'Loading...'),
-              error && m('p', 'ERROR: ' + error)
-            ])
+      return m('.SupernovaLockATOMPage', [
+        m('.forum-container.lockATOM-layout', [
+          m(SupernovaPreheader),
+          m('h2.page-title', 'Lock ATOM'),
+          m('.app-loading', [
+            !error && m('span.icon-spinner2.animate-spin'),
+            !error && m('p', 'Loading...'),
+            error && m('p', `ERROR: ${error}`)
           ])
-        ]
-      });
+        ])
+      ]);
     };
     if (!app.chain) {
       // loading
@@ -98,115 +94,112 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
     const loggedInAddress = app.vm.activeAccount ? app.vm.activeAccount.address : '';
     vnode.state.supernovaAddress = loggedInAddress;
 
-    return m(ObjectPage, {
-      class: 'SupernovaLockATOMPage',
-      content: [
-        m('.forum-container.lockATOM-layout', [
-          m(SupernovaPreheader),
-          m('h2.page-title', 'Lock ATOM'),
-          m('a.supernova-back', {
-            href: '/supernova',
-            onclick: (e) => {
-              e.preventDefault();
-              m.route.set('/supernova');
-            }
-          }, '« Back'),
-          m('.form-container', [
-            m('.form', [
-              m('.form-left', [
-                m('.caption', 'Lock Amount'),
-                m(TextInputFormField, {
-                  options: {
-                    name: 'lockAmount',
-                    placeholder: 'Enter amount'
-                  },
-                  callback: (result) => vnode.state.lockAmount = +result
-                })
-              ]),
-              m('span.explanation', 'The amount of ATOM to lock.')
+    return m('.SupernovaLockATOMPage', [
+      m('.forum-container.lockATOM-layout', [
+        m(SupernovaPreheader),
+        m('h2.page-title', 'Lock ATOM'),
+        m('a.supernova-back', {
+          href: '/supernova',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set('/supernova');
+          }
+        }, '« Back'),
+        m('.form-container', [
+          m('.form', [
+            m('.form-left', [
+              m('.caption', 'Lock Amount'),
+              m(TextInputFormField, {
+                options: {
+                  name: 'lockAmount',
+                  placeholder: 'Enter amount'
+                },
+                callback: (result) => { vnode.state.lockAmount = +result; }
+              })
             ]),
-            m('.form', [
-              m('.form-left', [
-                m('.caption', 'Supernova Address'),
-                m(TextInputFormField, {
-                  options: {
-                    name: 'supernovaAddress',
-                    placeholder: 'Enter address here: cosmos123...',
-                    value: loggedInAddress,
-                  },
-                  style: 'margin-bottom: 0px;',
-                  callback: (result) => vnode.state.supernovaAddress = result
-                })]),
-              m('span.explanation', [
-                `Your DUST will go to this address. You can generate a key `,
-                m('a', {
-                  href: '/supernova/keygen',
-                  target: '_blank',
-                }, `here`),
-                `.`,
+            m('span.explanation', 'The amount of ATOM to lock.')
+          ]),
+          m('.form', [
+            m('.form-left', [
+              m('.caption', 'Supernova Address'),
+              m(TextInputFormField, {
+                options: {
+                  name: 'supernovaAddress',
+                  placeholder: 'Enter address here: cosmos123...',
+                  value: loggedInAddress,
+                },
+                style: 'margin-bottom: 0px;',
+                callback: (result) => { vnode.state.supernovaAddress = result; }
+              })]),
+            m('span.explanation', [
+              'Your DUST will go to this address. You can generate a key ',
+              m('a', {
+                href: '/supernova/keygen',
+                target: '_blank',
+              }, 'here'),
+              '.',
+            ])
+          ]),
+          m('.form', [
+            m('.form-left', [
+              m('.caption', 'Choose a validator'),
+              m(DropdownFormField, {
+                name: 'alt-del',
+                options: { style: 'padding: 5px' },
+                choices: validatorChoices,
+                callback: (result) => { vnode.state.delegate = result; }
+              })
+            ]),
+            m('.explanation', [
+              m('span', [
+                'This list contains all active Cosmos ',
+                'validators. Choose one to delegate to. ',
               ])
-            ]),
-            m('.form', [
-              m('.form-left', [
-                m('.caption', 'Choose a validator'),
-                m(DropdownFormField, {
-                  name: 'alt-del',
-                  options: { style: 'padding: 5px' },
-                  choices: validatorChoices,
-                  callback: (result) => vnode.state.delegate = result
-                })
-              ]),
-              m('.explanation', [
-                m('span', [
-                  'This list contains all active Cosmos ',
-                  'validators. Choose one to delegate to. ',
-                ])
-              ])
-            ]),
-            m('.wallets', [
-              m('.buttons', [
-                m('a.btn.cw-lock-button', {
-                  href: '#',
-                  onclick: async (e) => {
-                    e.preventDefault();
-                    if (!validateInputs()) return;
-                    const lockAmount = vnode.state.lockAmount;
-                    const delegate = vnode.state.delegate;
-                    if (app.vm.activeAccount) {
-                      createTXModal((app.vm.activeAccount as CosmosAccount).delegateTx(
-                        delegate,
-                        app.chain.chain.coins(lockAmount),
-                        JSON.stringify({ supernovaAddress: vnode.state.supernovaAddress }),
-                      ));
-                    } else {
-                      vnode.state.error = 'You must link an ATOM account to Commonwealth.';
-                      m.redraw();
-                    }
+            ])
+          ]),
+          m('.wallets', [
+            m('.buttons', [
+              m('a.btn.cw-lock-button', {
+                href: '#',
+                onclick: async (e) => {
+                  e.preventDefault();
+                  if (!validateInputs()) return;
+                  const lockAmount = vnode.state.lockAmount;
+                  const delegate = vnode.state.delegate;
+                  if (app.vm.activeAccount) {
+                    createTXModal((app.vm.activeAccount as CosmosAccount).delegateTx(
+                      delegate,
+                      app.chain.chain.coins(lockAmount),
+                      JSON.stringify({ supernovaAddress: vnode.state.supernovaAddress }),
+                    ));
+                  } else {
+                    vnode.state.error = 'You must link an ATOM account to Commonwealth.';
+                    m.redraw();
                   }
-                }, 'Lock using Commonwealth UI'),
-                m('a.btn.cli-button', {
-                  href: '#',
-                  onclick: (e) => {
-                    e.preventDefault();
-                    console.log(vnode.state.instructional);
-                    vnode.state.instructional = !vnode.state.instructional;
-                    vnode.state.error = '';
-                  }
-                }, 'Get lockdrop-cli instructions'),
-              ]),
-              m('.wallet-disclaimer', [
-                m('p', [
-                  'This will send a transaction bonding your stake to the ',
-                  'Cosmos validator, which also signals your Supernova address.',
-                ]),
+                }
+              }, 'Lock using Commonwealth UI'),
+              m('a.btn.cli-button', {
+                href: '#',
+                onclick: (e) => {
+                  e.preventDefault();
+                  console.log(vnode.state.instructional);
+                  vnode.state.instructional = !vnode.state.instructional;
+                  vnode.state.error = '';
+                }
+              }, 'Get lockdrop-cli instructions'),
+            ]),
+            m('.wallet-disclaimer', [
+              m('p', [
+                'This will send a transaction bonding your stake to the ',
+                'Cosmos validator, which also signals your Supernova address.',
               ]),
             ]),
           ]),
-          vnode.state.error && m('.lock-error', vnode.state.error),
-          vnode.state.instructional && m(ATOMInstructions)
         ]),
-      ]
-    });
+        vnode.state.error && m('.lock-error', vnode.state.error),
+        vnode.state.instructional && m(ATOMInstructions)
+      ]),
+    ]);
   }
 };
 

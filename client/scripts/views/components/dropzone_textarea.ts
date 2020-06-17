@@ -1,8 +1,8 @@
 import 'components/dropzone_textarea.scss';
 
-import { default as $ } from 'jquery';
-import { default as m } from 'mithril';
-import { default as Dropzone } from 'dropzone';
+import $ from 'jquery';
+import m from 'mithril';
+import Dropzone from 'dropzone';
 import { featherIcon } from 'helpers';
 import app from 'state';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
@@ -39,7 +39,9 @@ const DropzoneTextarea: m.Component<IAttrs, IState> = {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
-        $.post(app.serverUrl() + '/getUploadSignature', {
+        // TODO: Change to POST /uploadSignature
+        // TODO: Reuse code since this is called in other places
+        $.post(`${app.serverUrl()}/getUploadSignature`, {
           name: file.name, // tokyo.png
           mimetype: file.type, // image/png
           auth: true,
@@ -53,7 +55,7 @@ const DropzoneTextarea: m.Component<IAttrs, IState> = {
           setTimeout(() => vnode.state.dropzone.processFile(file));
         }).catch((err : any) => {
           done('Failed to get an S3 signed upload URL',
-               err.responseJSON ? err.responseJSON.error : err.responseText);
+            err.responseJSON ? err.responseJSON.error : err.responseText);
         });
       },
       sending: (file, xhr) => {

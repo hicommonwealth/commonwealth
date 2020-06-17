@@ -8,8 +8,8 @@ import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent } from 'm
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
-import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
 import SubstrateIdentities from './identities';
+import SubstrateChain, { handleSubstrateEntityUpdate } from './shared';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;
@@ -64,11 +64,11 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
-    await this._postModuleLoad(!useClientChainEntities);
     if (useClientChainEntities) {
       await this.chain.initChainEntities();
     }
-    this.chain.initEventLoop();
+    await this._postModuleLoad(!useClientChainEntities);
+    await this.chain.initEventLoop();
 
     this._loaded = true;
   }

@@ -11,9 +11,9 @@ import { MolochEventKinds, MolochEventChains } from 'events/moloch/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import MolochTitlerFunc from 'events/moloch/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import ListingPage from './_listing_page';
-import Tabs from '../components/widgets/tabs';
-import { DropdownFormField } from '../components/forms';
+import Tabs from 'views/components/widgets/tabs';
+import { DropdownFormField } from 'views/components/forms';
+import Sublayout from 'views/sublayout';
 
 const NotificationButtons: m.Component = {
   oninit: (vnode) => {
@@ -98,8 +98,8 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     return m('.SubscriptionRow', [
       m('h3', `${vnode.state.subscription.objectId}`),
       m('h4', `Subscription Type: ${vnode.state.subscription.category}`),
-      activeSubscription &&
-        m('button.pauseButton', {
+      activeSubscription
+        && m('button.pauseButton', {
           class: activeSubscription.isActive ? '' : 'formular-button-negative',
           href: '#',
           onclick: async (e) => {
@@ -152,7 +152,7 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
       subscriptions = subscriptions.filter((subscription) => chainIds.includes(subscription.objectId));
     }
     if (communities) {
-      const communtyIds = communities.map((com) => {return com.id; });
+      const communtyIds = communities.map((com) => { return com.id; });
       subscriptions = subscriptions.filter((subscription) => communtyIds.includes(subscription.objectId));
     }
     return m('button.PauseToggle', {
@@ -216,15 +216,15 @@ const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
+    // TODO: Change to GET /subscriptions
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.login.jwt,
     }).then((result) => {
-      result.result.map((sub) => {
+      result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
       m.redraw();
     }, (error) => {
-      console.dir(error);
       m.route.set('/');
     });
   },
@@ -436,11 +436,10 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
 
 const SubscriptionsPage: m.Component = {
   view: () => {
-    return m(ListingPage, {
-      title: 'Subscriptions',
-      subtitle: 'Manage your Commonwealth Subscriptions + Notifications',
+    return m(Sublayout, {
       class: 'SubscriptionsPage',
-      content: m('.forum-container', [
+    }, [
+      m('.forum-container', [
         m(Tabs, [{
           name: 'Active Subscriptions',
           content: m(ActiveSubscriptions),
@@ -459,7 +458,7 @@ const SubscriptionsPage: m.Component = {
         },
         ]),
       ]),
-    });
+    ]);
   },
 };
 
