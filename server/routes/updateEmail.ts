@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'shared/logging';
 import moment from 'moment';
-import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from 'server/config';
+import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
+import { factory, formatFilename } from '../../shared/logging';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -31,6 +31,10 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   });
   if (!user) return next(new Error(Errors.NoUser));
 
+  user.email = email;
+  user.emailVerified = null;
+  await user.save();
+
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
     where: {
@@ -54,20 +58,19 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
+    subject: 'Verify your Commonwealth email',
     templateId: 'd-2b00abbf123e4b5981784d17151e86be', // TODO: Set this to Verification Template, not Sign In Template
     dynamic_template_data: {
       loginLink,
     },
   };
-  sgMail.send(msg).then(async (result) => {
-    user.email = email;
-    user.emailVerified = null;
-    await user.save();
+  try {
+    await sgMail.send(msg);
     res.json({ status: 'Success', result: user.toJSON() });
-  }).catch((e) => {
+  } catch (e) {
     log.error(`Could not send authentication email: ${loginLink}`);
-    res.status(500).json({ error: 'Could not send login email', message: e.message });
-  });
+    res.status(500).json({ error: 'Could not send login email', message: e.message, });
+  }
 };
 
 export default updateEmail;
