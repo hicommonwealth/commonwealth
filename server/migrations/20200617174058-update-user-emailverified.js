@@ -1,23 +1,15 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.createTable('users', { id: Sequelize.INTEGER });
-    */
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn('Users', 'tempEmailVerified', { type: Sequelize.BOOLEAN });
+    await queryInterface.sequelize.query(`UPDATE \"Users\" SET "tempEmailVerified"=true WHERE 'emailVerified' IS NOT NULL`);
+    await queryInterface.removeColumn('Users', 'emailVerified');
+    await queryInterface.renameColumn('Users', 'tempEmailVerified', 'emailVerified');
   },
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('Users', 'emailVerified');
+    await queryInterface.addColumn('Users', 'emailVerified', { type: Sequelize.DATE });
   }
 };
