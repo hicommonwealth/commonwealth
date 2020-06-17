@@ -40,7 +40,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
     vnode.state.tagId = vnode.attrs.thread.tag.id;
   },
   oninit: (vnode) => {
-    if (vnode.state.isOpen === undefined) vnode.state.isOpen = false;
+    vnode.state.isOpen = vnode.attrs.popoverMenu ? true : false;
   },
   view: (vnode) => {
     return m('.TagEditor', [
@@ -60,7 +60,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
           }
         }),
         hasBackdrop: true,
-        isOpen: vnode.attrs.popoverMenu ? vnode.attrs.popoverMenu : vnode.state.isOpen,
+        isOpen: vnode.state.isOpen,
         inline: false,
         onClose: () => { vnode.state.isOpen = false; },
         title: 'Edit Tags',
