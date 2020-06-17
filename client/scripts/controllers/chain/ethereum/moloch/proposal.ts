@@ -107,8 +107,8 @@ export default class MolochProposal extends Proposal<
   private _Members: MolochMembers;
   private _Gov: MolochGovernance;
 
-  private _yesShares: number;
-  private _noShares: number;
+  private _yesShares: number = 0;
+  private _noShares: number = 0;
 
   public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
   public get title(): string {
@@ -268,6 +268,11 @@ export default class MolochProposal extends Proposal<
         const member = this._Members.getFromJSON(memberJson);
         const choice = e.data.vote === 1 ? MolochVote.YES : e.data.vote === 2 ? MolochVote.NO : MolochVote.NULL;
         this.addOrUpdateVote(new MolochProposalVote(member, choice));
+        if (choice === MolochVote.YES) {
+          this._yesShares += +e.data.shares;
+        } else if (choice === MolochVote.NO) {
+          this._noShares += +e.data.shares;
+        }
         break;
       }
       case MolochEventKind.Abort: {
@@ -282,6 +287,8 @@ export default class MolochProposal extends Proposal<
         this.data.aborted = false;
         this.data.didPass = e.data.didPass;
         this.data.status = e.data.didPass ? 'PASSED' : 'FAILED';
+        this._yesShares = +e.data.yesVotes;
+        this._noShares = +e.data.noVotes;
         this.complete(this._Gov.store);
         break;
       }

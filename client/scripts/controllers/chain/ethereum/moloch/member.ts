@@ -47,7 +47,7 @@ export default class MolochMember extends EthereumAccount {
     super(app, ChainInfo, Accounts, address);
     this._Members = Members;
     if (data) {
-      if (address.toLowerCase() !== data.id) {
+      if (address.toLowerCase() !== data.id.toLowerCase()) {
         throw new Error('member does not correspond with account');
       }
       this._isMember = true;

@@ -48,7 +48,7 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
+import TokenManagementModal from 'views/modals/token_management_modal';
 
 import { getProposalUrl } from '../../../../shared/utils';
 
@@ -468,8 +468,9 @@ const ActionMenu : m.Component<IMenuAttrs> = {
           }, 'Rage quit'),
           (activeAcct instanceof EthereumAccount && (app.chain instanceof Moloch)) && m('li', {
             onclick: (e) => app.modals.create({
-              modal: TokenApprovalModal,
+              modal: TokenManagementModal,
               data: {
+                accounts: (app.chain as Moloch).ethAccounts,
                 account: activeAcct,
                 contractAddress: (app.chain as Moloch).governance.api.contractAddress,
                 tokenAddress: (app.chain as Moloch).governance.api.tokenContract.address,

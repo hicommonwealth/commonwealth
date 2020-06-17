@@ -2,8 +2,9 @@ import BN from 'bn.js';
 
 import { ProposalModule, ITXModalData, ChainEntity } from 'models';
 
+import { ERC20Token } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { BigNumber } from 'ethers/utils';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import MolochStorageFetcher from 'events/moloch/storageFetcher';
 import MolochEventSubscriber from 'events/moloch/subscriber';
@@ -13,6 +14,7 @@ import { MolochEntityKind } from 'events/moloch/types';
 import MolochProposal from './proposal';
 import MolochMembers from './members';
 import MolochAPI from './api';
+import MolochMember from './member';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
@@ -80,7 +82,9 @@ export default class MolochGovernance extends ProposalModule<
     // fetch all proposals
     if (!this._useClientChainEntities) {
       console.log('Fetching moloch proposals from backend.');
-      await this.app.chainEntities.refresh(this.app.chain.id, true);
+      await this.app.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+      const entities = this.app.chainEntities.store.getByType(MolochEntityKind.Proposal);
+      entities.map((p) => this._entityConstructor(p));
     } else {
       console.log('Fetching moloch proposals from chain.');
       const fetcher = new MolochStorageFetcher(api.Contract, 1);
@@ -93,9 +97,7 @@ export default class MolochGovernance extends ProposalModule<
         processor,
       );
     }
-    const entities = this.app.chainEntities.store.getByType(MolochEntityKind.Proposal);
-    entities.map((p) => this._entityConstructor(p));
-    this._proposalCount = new BN(entities.length);
+    this._proposalCount = new BN(this.store.getAll().length);
     this._initialized = true;
   }
 
@@ -109,6 +111,7 @@ export default class MolochGovernance extends ProposalModule<
 
   // web wallet only create proposal transaction
   public async createPropWebTx(
+    submitter: MolochMember,
     applicantAddress: string,
     tokenTribute: BN,
     sharesRequested: BN,
@@ -129,17 +132,16 @@ export default class MolochGovernance extends ProposalModule<
     }
 
     // first, we must approve xfer of proposal deposit tokens from the submitter
-    const approvalTx = await this._api.tokenContract.approve(
-      this._api.userAddress,
-      this.proposalDeposit.toString(),
-      { gasLimit: this._api.gasLimit }
+    const approvalTxReceipt = await submitter.approveTokenTx(
+      new ERC20Token(this._api.tokenContract.address, this.proposalDeposit),
+      this._api.contractAddress,
     );
-    const approvalTxReceipt = await approvalTx.wait();
     if (approvalTxReceipt.status !== 1) {
       throw new Error('failed to approve proposal deposit');
     }
 
     // once approved we assume the applicant has approved the tribute and proceed
+    // TODO: this assumes the active user is the signer on the contract -- we should make this explicit
     const tx = await this._api.Contract.submitProposal(
       applicantAddress.toLowerCase(),
       tokenTribute.toString(),

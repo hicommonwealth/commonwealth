@@ -4,6 +4,7 @@ import { Coin } from 'adapters/currency';
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
@@ -53,14 +54,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public async init(
     onServerLoaded? : () => void,
     initChainModuleFn?: () => Promise<void>,
-    loadIncompleteEntities = false,
+    entityRefresh = EntityRefreshOption.CompletedEntities,
   ): Promise<void> {
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);
 
     // if we're loading entities from chain, only pull completed
-    await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);
+    await this.app.chainEntities.refresh(this.meta.chain.id, entityRefresh);
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
     await initChainModuleFn();

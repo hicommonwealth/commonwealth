@@ -441,7 +441,7 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
     // moloch: cancel
     const cancelButton = (proposal.votingType === VotingType.MolochYesNo) && m('.veto-button', [
       m('button.formular-button-negative', {
-        class: (proposal as MolochProposal).canAbort(user) || (proposal as MolochProposal).completed ? '' : 'disabled',
+        class: (proposal as MolochProposal).canAbort(user) && !(proposal as MolochProposal).completed ? '' : 'disabled',
         onclick: cancelProposal,
       }, (proposal as MolochProposal).isAborted ? 'Cancelled' : 'Cancel')
     ]);

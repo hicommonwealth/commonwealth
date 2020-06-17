@@ -7,7 +7,7 @@ import app from 'state';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { notifyError } from 'controllers/app/notifications';
-import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
+import { ProposalType, proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import {
   TextInputFormField,
@@ -17,6 +17,7 @@ import {
 } from 'views/components/forms';
 import { CosmosToken } from 'adapters/chain/cosmos/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import SendingFrom from 'views/components/sending_from';
@@ -28,7 +29,6 @@ import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
 import { CompactModalExitButton } from '../../modal';
 import { slugify } from '../../../helpers';
 import { createTXModal } from '../tx_signing_modal';
-
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -240,8 +240,10 @@ const NewProposalForm = {
         if (typeof vnode.state.tokenTribute !== 'number') throw new Error('Invalid token tribute');
         if (typeof vnode.state.sharesRequested !== 'number') throw new Error('Invalid shares requested');
         if (!vnode.state.title) throw new Error('Invalid title');
+        if (!(app.vm.activeAccount instanceof MolochMember)) throw new Error('Must be member to submit proposal.');
         const details = JSON.stringify({ title: vnode.state.title, description: vnode.state.description || '' });
         (app.chain as Moloch).governance.createPropWebTx(
+          app.vm.activeAccount,
           vnode.state.applicantAddress,
           new BN(vnode.state.tokenTribute),
           new BN(vnode.state.sharesRequested),

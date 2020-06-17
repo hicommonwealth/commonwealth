@@ -8,7 +8,6 @@ import {
 import { providers } from 'ethers';
 
 import { IApp } from 'state';
-import { Coin } from 'adapters/currency';
 import { Account, ITXModalData } from 'models';
 import { Erc20Factory } from 'Erc20Factory';
 import { EthereumCoin, ERC20Token } from 'adapters/chain/ethereum/types';
@@ -36,6 +35,20 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     );
     const balance = await token.balanceOf(this.address);
     return new ERC20Token(contractAddress, new BN(balance.toString(), 10));
+  }
+
+  public async sendTokenTx(toSend: ERC20Token, recipient: string) {
+    if (!this._Chain) return;
+    const token = Erc20Factory.connect(
+      toSend.contractAddress,
+      (new providers.Web3Provider(this._Chain.api.currentProvider as any)).getSigner(this.address),
+    );
+    const transferTx = await token.transfer(recipient, toSend.asBN.toString(10), { gasLimit: 3000000 });
+    const transferTxReceipt = await transferTx.wait();
+    if (transferTxReceipt.status !== 1) {
+      throw new Error('failed to transfer tokens');
+    }
+    return transferTxReceipt;
   }
 
   public async approveTokenTx(toApprove: ERC20Token, spender: string) {

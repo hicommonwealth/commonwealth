@@ -15,6 +15,12 @@ import {
 } from 'events/interfaces';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
 
+export enum EntityRefreshOption {
+  AllEntities = 'all-entities',
+  CompletedEntities = 'completed-entities',
+  Nothing = 'nothing',
+}
+
 const get = (route, args, callback) => {
   return $.get(app.serverUrl() + route, args).then((resp) => {
     if (resp.status === 'Success') {
@@ -55,9 +61,10 @@ class ChainEntityController {
     entity.addEvent(event);
   }
 
-  public refresh(chain: string, loadIncompleteEntities: boolean = false) {
+  public refresh(chain: string, refreshOption: EntityRefreshOption) {
+    if (refreshOption === EntityRefreshOption.Nothing) return;
     const options: any = { chain };
-    if (!loadIncompleteEntities) {
+    if (refreshOption === EntityRefreshOption.CompletedEntities) {
       options.completed = true;
     }
     return get('/bulkEntities', options, (result) => {

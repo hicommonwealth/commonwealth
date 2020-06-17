@@ -4,6 +4,7 @@ import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
 import { selectLogin } from 'controllers/app/login';
@@ -48,7 +49,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await super.init(async () => {
       await this.chain.resetApi(this.meta);
       await this.chain.initMetadata();
-    }, onServerLoaded, !useClientChainEntities);
+    }, onServerLoaded, EntityRefreshOption.Nothing);
     await this.ethAccounts.init(this.chain);
     await this.chain.initEventLoop();
     await this.webWallet.enable();

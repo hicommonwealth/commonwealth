@@ -103,6 +103,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   }
 
   public init(ChainInfo: EthereumChain): Promise<void> {
+    this._Chain = ChainInfo;
     return new Promise((resolve, reject) => {
       // TODO: verify this boilerplate code also works with Ethereum chain API
       // UPDATE: it did not, so it was delete.

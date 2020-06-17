@@ -4,6 +4,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
@@ -76,7 +77,9 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
         typesAlias: { voting: { Tally: 'VotingTally' } },
       });
       await this.chain.initMetadata();
-    }, onServerLoaded, !useClientChainEntities);
+    }, onServerLoaded, useClientChainEntities
+      ? EntityRefreshOption.CompletedEntities
+      : EntityRefreshOption.AllEntities);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
