@@ -32,6 +32,7 @@ const createTag = async (models, req, res: Response, next: NextFunction) => {
 
   const options = {
     name: req.body.name,
+    description: req.body.description,
     ...chainOrCommObj2,
   };
 

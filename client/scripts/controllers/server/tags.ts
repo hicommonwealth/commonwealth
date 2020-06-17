@@ -75,7 +75,7 @@ class TagsController {
     }
   }
 
-  public async add(name: string,) {
+  public async add(name: string, description: string) {
     try {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
@@ -84,6 +84,7 @@ class TagsController {
       const response = await $.post(`${app.serverUrl()}/createTag`, {
         ...chainOrCommObj,
         'name': name,
+        'description': description,
         'jwt': app.login.jwt,
       });
       const result = modelFromServer(response.result);
