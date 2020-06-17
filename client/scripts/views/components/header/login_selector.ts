@@ -55,7 +55,7 @@ const LoginSelector : m.Component<{}, {}> = {
             compact: true,
             label: (!app.chain && !app.community) ? 'No community selected'
               : (app.login.activeAddresses.length === 0 || app.vm.activeAccount === null) ? 'No address selected'
-              : m(User, { user: app.vm.activeAccount, showRole: true }),
+              : m(User, { user: app.vm.activeAccount }),
             iconRight: Icons.CHEVRON_DOWN,
           }),
           content: m(Menu, [
