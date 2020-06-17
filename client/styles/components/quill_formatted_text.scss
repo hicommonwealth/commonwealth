@@ -168,7 +168,7 @@
 }
 
 @mixin hidden-formatting {
-    p.hidden-formatting {
+    .hidden-formatting {
         margin: 6px 0;
         &:first-child {
             margin-top: 0;
