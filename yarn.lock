@@ -737,7 +737,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.4.5", "@babel/runtime@^7.5.4", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.4.5", "@babel/runtime@^7.5.4", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.8.7"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.8.7.tgz#8fefce9802db54881ba59f90bb28719b4996324d"
   integrity sha512-+AATMUFppJDw6aiR5NVPHqIQBlV/Pj8wY/EZH+lmvRdUo9xBaz/rF3alAwFJQavvKfeOlPE7oaaDHVbcySbCsg==
@@ -889,20 +889,22 @@
     eventemitter3 "^4.0.4"
     rxjs "^6.5.5"
 
-"@polkadot/extension-dapp@^0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@polkadot/extension-dapp/-/extension-dapp-0.21.1.tgz#8746a43fef8e7f818bf801e0415445cd554f5db3"
-  integrity sha512-qky1AURWqWaeuzVTkdcvEUf1eWQJp06wFZg3D2MzA0f8+ARfT73ccdo+xE71IkC/SLWYYoT14/UqF+7K6Adphg==
+"@polkadot/extension-dapp@^0.30.1":
+  version "0.30.1"
+  resolved "https://registry.yarnpkg.com/@polkadot/extension-dapp/-/extension-dapp-0.30.1.tgz#9e65d83d5fddde08e0cdc468398a4fa0c136ce39"
+  integrity sha512-P3f1ozqmQvrBuYURmpon8Lz8Hdh1IwtBLA3+ihjy1xPUPTz587BqdgvIjUfuyztcmx6gQ7lKoooHwn0cILJpPw==
   dependencies:
-    "@babel/runtime" "^7.8.3"
-    "@polkadot/extension-inject" "^0.21.1"
+    "@babel/runtime" "^7.10.2"
+    "@polkadot/extension-inject" "0.30.1"
+    "@polkadot/util" "^2.13.0-beta.3"
+    "@polkadot/util-crypto" "^2.13.0-beta.3"
 
-"@polkadot/extension-inject@^0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@polkadot/extension-inject/-/extension-inject-0.21.1.tgz#fc6595ae25f0ae37c2c416fd8a81fbef43dc7752"
-  integrity sha512-2KgDp2ZEghgcc8E72bWKStwMDWs/4Scbwcig5PaQwfLObSqwEgqHYNkbeTf4gSC9AMw9VVBF4NP/WoR6Amu25Q==
+"@polkadot/extension-inject@0.30.1":
+  version "0.30.1"
+  resolved "https://registry.yarnpkg.com/@polkadot/extension-inject/-/extension-inject-0.30.1.tgz#d5b0abafbb14ed81ff2cf50530a94408d4cfa03c"
+  integrity sha512-npFGKq6zDcY+JxIjaeo9E6zzk+2EC100mCmuY9Brs1UMTzWi2fmMbGc3KT+i7IVJHGMina7thFHx/UWfzgWF5w==
   dependencies:
-    "@babel/runtime" "^7.8.3"
+    "@babel/runtime" "^7.10.2"
 
 "@polkadot/keyring@^2.13", "@polkadot/keyring@^2.13.1":
   version "2.13.1"
@@ -1000,7 +1002,7 @@
     "@types/store" "^2.0.2"
     store "^2.0.12"
 
-"@polkadot/util-crypto@2.13.1", "@polkadot/util-crypto@^2.13", "@polkadot/util-crypto@^2.13.1":
+"@polkadot/util-crypto@2.13.1", "@polkadot/util-crypto@^2.13", "@polkadot/util-crypto@^2.13.0-beta.3", "@polkadot/util-crypto@^2.13.1":
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/@polkadot/util-crypto/-/util-crypto-2.13.1.tgz#02ae12f02d5a636bb8ff5c8804d4696a1308624b"
   integrity sha512-AZZCwzW6EOql/KTKfDNgUUKpaGkKEk04cxMWdUzU52gmCLcGS8NXdl/YEs+R8JmQsF41q11gcSD/WzTFuv4ehQ==
@@ -1019,7 +1021,7 @@
     tweetnacl "^1.0.3"
     xxhashjs "^0.2.2"
 
-"@polkadot/util@2.13.1", "@polkadot/util@^2.13", "@polkadot/util@^2.13.1":
+"@polkadot/util@2.13.1", "@polkadot/util@^2.13", "@polkadot/util@^2.13.0-beta.3", "@polkadot/util@^2.13.1":
   version "2.13.1"
   resolved "https://registry.yarnpkg.com/@polkadot/util/-/util-2.13.1.tgz#59cbe50822026a9849589a10c5ee15a5754dce62"
   integrity sha512-k1GrS3W5c57sLJJyKYF2bq7H5d8vn6jzTaK8rDM7hRp9Ai2Crl4SjyY+5Tdr0LWG+UTybfc8rIieJklB3amA3w==

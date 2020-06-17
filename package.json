@@ -52,7 +52,7 @@
     "@lunie/cosmos-keys": "^0.0.11",
     "@openzeppelin/contracts": "^2.4.0",
     "@polkadot/api": "1.18.1",
-    "@polkadot/extension-dapp": "^0.21.1",
+    "@polkadot/extension-dapp": "^0.30.1",
     "@polkadot/keyring": "^2.13",
     "@polkadot/ui-identicon": "^0.41.1",
     "@polkadot/util": "^2.13",

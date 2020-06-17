@@ -31,10 +31,6 @@ class EdgewareSignaling extends ProposalModule<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
 
-  protected _entityConstructor(entity: ChainEntity): EdgewareSignalingProposal {
-    return new EdgewareSignalingProposal(this._Chain, this._Accounts, this, entity);
-  }
-
   public init(ChainInfo: SubstrateChain, Accounts: SubstrateAccounts): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -51,7 +47,8 @@ class EdgewareSignaling extends ProposalModule<
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
         const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
-        const proposals = entities.map((e) => this._entityConstructor(e));
+        const constructorFunc = (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e);
+        const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
         this._initialized = true;
         resolve();
       },
