@@ -10,26 +10,28 @@ import { DropdownFormField, RadioSelectorFormField } from 'views/components/form
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { SocialAccount } from 'models';
-import { Button, Input, Icons, Icon, Tooltip } from 'construct-ui';
+import { Button, Input, Icons, Icon, Tooltip, Classes } from 'construct-ui';
 
 interface IState {
   email: string;
   emailVerified: boolean;
+  emailUpdated: boolean;
   githubAccount: SocialAccount;
 }
 
 interface IAttrs {
-  github?: boolean;
+  github: boolean;
 }
 
 const EmailWell: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.email = app.login.email;
+    vnode.state.emailUpdated = false;
     vnode.state.emailVerified = app.login.emailVerified;
     vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
   },
   view: (vnode) => {
-    const { githubAccount, email, emailVerified } = vnode.state;
+    const { githubAccount, email, emailVerified, emailUpdated } = vnode.state;
     return [
       m('.EmailWell', [
         m('h4', 'Email'),
@@ -39,7 +41,8 @@ const EmailWell: m.Component<IAttrs, IState> = {
           onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
         }),
         m(Button, {
-          label: 'Update Email',
+          label: 'Update email',
+          disabled: (email === app.login.email),
           onclick: async () => {
             try {
               if (email === app.login.email) return;
@@ -49,6 +52,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
               });
               app.login.email = response.result.email;
               vnode.state.emailVerified = false;
+              vnode.state.emailUpdated = true;
               m.redraw();
             } catch (err) {
               console.log('Failed to update email');
@@ -67,6 +71,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             name: emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
           }),
         }),
+        emailUpdated && m('p', 'Check your email to confirm this change'),
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [

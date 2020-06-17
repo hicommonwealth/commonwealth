@@ -1,4 +1,6 @@
 import 'pages/subscriptions.scss';
+import 'components/sidebar/index.scss';
+
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -10,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
@@ -66,21 +68,23 @@ const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[]
       m('h2', 'Notifications:'),
       m('.MarkAllButtons', [
         m('h4', 'For all current notifications:'),
-        m(Button, {
-          label: 'Mark all as read',
-          onclick: (e) => {
-            e.preventDefault();
-            if (notifications.length < 1) return;
-            app.login.notifications.markAsRead(notifications).then(() => m.redraw());
-          }
-        }),
-        m(Button, {
-          label: 'Clear all read',
-          onclick: (e) => {
-            e.preventDefault();
-            app.login.notifications.clearAllRead().then(() => m.redraw());
-          }
-        }),
+        m(ButtonGroup, [
+          m(Button, {
+            label: 'Mark all as read',
+            onclick: (e) => {
+              e.preventDefault();
+              if (notifications.length < 1) return;
+              app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+            }
+          }),
+          m(Button, {
+            label: 'Clear all read',
+            onclick: (e) => {
+              e.preventDefault();
+              app.login.notifications.clearAllRead().then(() => m.redraw());
+            }
+          }),
+        ])
       ]),
       mentionsSubscription
         && m('.MentionsButton', [
@@ -586,7 +590,7 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, m('.SidebareMenu', [
+    }, m('.SidebarMenu', [
       m(List, {
         interactive: true,
         size: 'lg',
@@ -682,8 +686,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     if (!app.loginStatusLoaded()) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
-    }, [
-      m(SubscriptionsPageSideBar, {
+      leftSidebar: m(SubscriptionsPageSideBar, {
         selectedFilter,
         communities,
         chains,
@@ -692,6 +695,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
           m.redraw();
         },
       }),
+    }, [
       m('.forum-container', [
         (selectedFilter === 'default')
           && m(UserSubscriptions, { subscriptions }),
