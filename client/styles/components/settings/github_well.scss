@@ -1,7 +1,15 @@
-@import 'client/styles/shared';
+// @import 'client/styles/shared';
 
 .GithubWell {
+    margin-top: 12px;
+    
     input {
         margin-right: 12px;
+    }
+    a:visited {
+        color: rgb(97, 125, 138);
+        &:hover {
+            color: darken(rgb(97,125,138), 5%);
+        }
     }
 }

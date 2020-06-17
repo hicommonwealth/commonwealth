@@ -29,9 +29,9 @@ const SettingsPage: m.Component<{}> = {
         ? m('.forum-container', 'Loading...')
         : m('.forum-container', [
           m('h2.page-title', 'Settings'),
-          m(EmailWell),
-          m('br'),
-          m(GithubWell),
+          m(EmailWell, { github: true, }),
+          // m('br'),
+          // m(GithubWell),
           m('br'),
           m(AccountsWell),
           m('br'),
