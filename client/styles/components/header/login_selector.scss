@@ -1,26 +1,8 @@
 @import 'client/styles/shared';
 
-.LoginSelector {
-    margin-left: $header-spacing;
+.LoginSelectorUserBlock {
+    flex: 1;
     display: flex;
-    padding-left: 4px;
-    .login-selector-left {
-        flex: 1;
-        display: flex;
-    }
-    .login-selector-right {
-        padding-left: $header-spacing;
-    }
-    &.no-community {
-        padding-left: 0;
-        .login-selector-right {
-            padding-left: 0;
-        }
-    }
-
-    button.cui-button {
-        position: relative;
-    }
     .User.avatar-only,
     .login-selector-user {
         margin-top: 2px;
@@ -50,6 +32,14 @@
                 margin: 0;
             }
         }
+    }
+}
+
+.LoginSelector {
+    margin-left: $header-spacing;
+    padding-left: 4px;
+    button.cui-button {
+        position: relative;
     }
 }
 
