@@ -8,7 +8,6 @@ import app from 'state';
 import { link } from 'helpers';
 
 import { AddressInfo, CommunityInfo, NodeInfo } from 'models';
-import { isMember } from 'views/components/membership_button';
 import User from 'views/components/widgets/user';
 import { ChainIcon } from 'views/components/chain_icon';
 

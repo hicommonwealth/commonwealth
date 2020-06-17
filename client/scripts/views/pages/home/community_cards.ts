@@ -1,11 +1,13 @@
 import 'pages/home/community_cards.scss';
 
 import m from 'mithril';
-import { link } from 'helpers';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
-import MembershipButton, { isMember } from 'views/components/membership_button';
-import app from 'state';
 import { Button, Icons } from 'construct-ui';
+
+import app from 'state';
+import { link } from 'helpers';
+import { isMember } from 'helpers/roles';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import MembershipButton from 'views/components/membership_button';
 
 const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {

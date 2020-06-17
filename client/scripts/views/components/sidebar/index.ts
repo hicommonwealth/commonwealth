@@ -11,7 +11,7 @@ import {
 
 import app, { ApiStatus } from 'state';
 import { featherIcon, link, pluralize } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
+import { isRoleOfCommunity, isMember } from 'helpers/roles';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { ProposalType } from 'identifiers';
@@ -25,7 +25,6 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
 import { getSelectableCommunities } from 'views/components/header/community_selector';
-import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';

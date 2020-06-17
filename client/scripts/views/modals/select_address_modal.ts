@@ -8,7 +8,6 @@ import app from 'state';
 import { Account, RoleInfo } from 'models';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
-import { isMember } from 'views/components/membership_button';
 import { isSameAccount, formatAsTitleCase, getRoleInCommunity } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 

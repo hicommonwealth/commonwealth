@@ -6,10 +6,10 @@ import $ from 'jquery';
 import app from 'state';
 
 import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
+import { isMember } from 'helpers/roles';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import { isMember } from 'views/components/membership_button';
 import {
   ChainInfo,
   SocialAccount,
