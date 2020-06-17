@@ -58,7 +58,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           evtHandlers,
           skipCatchup,
           () => discoverReconnectRange(models, node.chain),
-          migrate,
+          !!migrate,
         );
       } else if (MolochEventChains.includes(node.chain)) {
         const api = await createMolochApi(node.url, 1, '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7');

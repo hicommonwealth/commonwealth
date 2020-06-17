@@ -36,7 +36,8 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
+import TokenManagementModal from 'views/modals/token_management_modal';
+import Moloch from 'client/scripts/controllers/chain/ethereum/moloch/adapter';
 
 const TagListings: m.Component<{}, { showMore: boolean }> = {
   view: (vnode) => {
@@ -225,7 +226,13 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
-              modal: TokenApprovalModal,
+              modal: TokenManagementModal,
+              data: {
+                account: activeAccount as MolochMember,
+                accounts: ((activeAccount as MolochMember).app.chain as Moloch).ethAccounts,
+                contractAddress: ((activeAccount as MolochMember).app.chain as Moloch).governance.api.contractAddress,
+                tokenAddress: ((activeAccount as MolochMember).app.chain as Moloch).governance.api.tokenContract.address,
+              }
             }),
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),

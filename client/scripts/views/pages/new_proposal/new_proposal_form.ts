@@ -26,6 +26,7 @@ import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
+import MolochMember from 'client/scripts/controllers/chain/ethereum/moloch/member';
 
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -252,6 +253,7 @@ const NewProposalForm = {
         if (!vnode.state.title) throw new Error('Invalid title');
         const details = JSON.stringify({ title: vnode.state.title, description: vnode.state.description || '' });
         (app.chain as Moloch).governance.createPropWebTx(
+          author as MolochMember,
           vnode.state.applicantAddress,
           new BN(vnode.state.tokenTribute),
           new BN(vnode.state.sharesRequested),
