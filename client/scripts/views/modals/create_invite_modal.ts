@@ -73,8 +73,8 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           }
 
           $.post(app.serverUrl() + postType, {
-            address: app.vm.activeAccount.address,
-            author_chain: app.vm.activeAccount.chain,
+            address: app.user.activeAccount.address,
+            author_chain: app.user.activeAccount.chain,
             community: id,
             invitedAddress: selection === 'address' ? address : '',
             invitedAddressChain: selection === 'address' ? vnode.state.selectedChain : '',

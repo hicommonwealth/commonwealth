@@ -39,7 +39,7 @@ interface IThreadForm {
 
 export const NewThreadForm: m.Component<{}, IState> = {
   view: (vnode: VnodeDOM<{}, IState>) => {
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
@@ -259,7 +259,7 @@ const NewThreadPage: m.Component = {
       return;
     }
 
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 

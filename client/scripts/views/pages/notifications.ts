@@ -673,16 +673,12 @@ interface ISubscriptionsPageState {
 
 const SubscriptionsPage: m.Component<{}, ISubscriptionsPageState> = {
   oninit: (vnode) => {
-    const communityIds = app.login.roles
-      .filter((role) => role.offchain_community_id)
-      .map((r) => r.offchain_community_id);
+    const communityIds = app.user.getCommunitiesOfRoles();
     vnode.state.communities = _.uniq(
       app.config.communities.getAll()
         .filter((c) => communityIds.includes(c.id))
     );
-    const chainIds = app.login.roles
-      .filter((role) => role.chain_id)
-      .map((r) => r.chain_id);
+    const chainIds = app.user.getChainsOfRoles();
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()
         .filter((c) => chainIds.includes(c.id))

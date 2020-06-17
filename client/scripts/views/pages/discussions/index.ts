@@ -251,8 +251,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     };
 
     const { tag } = vnode.attrs;
-    const activeAddressInfo = app.vm.activeAccount && app.login.addresses
-      .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
+    const activeAddressInfo = app.user.activeAccount && app.login.addresses
+      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url

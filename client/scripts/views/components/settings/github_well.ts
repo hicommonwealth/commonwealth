@@ -16,7 +16,7 @@ interface IState {
 
 const GithubWell: m.Component<{}, IState> = {
   oninit: (vnode) => {
-    vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
+    vnode.state.githubAccount = app.user.socialAccounts.find((sa) => sa.provider === 'github');
   },
   view: (vnode) => {
     const { githubAccount } = vnode.state;

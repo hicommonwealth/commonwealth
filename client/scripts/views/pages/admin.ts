@@ -148,7 +148,7 @@ interface ISudoFormState {
 
 const SudoForm: m.Component<{}, ISudoFormState> = {
   view: (vnode) => {
-    const author = app.vm.activeAccount as SubstrateAccount;
+    const author = app.user.activeAccount as SubstrateAccount;
     if (!(app.chain as Substrate).chain.sudoKey) {
       return m('.SudoForm', {
         style: 'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;'
@@ -401,7 +401,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             vnode.state.inprogress = true;
             // TODO: Change to PUT /adminStatus
             $.post(`${app.serverUrl()}/updateAdminStatus`, {
-              admin: app.vm.activeAccount.address,
+              admin: app.user.activeAccount.address,
               address: vnode.state.selected_profile, // the address to be changed
               role: vnode.state.role,
               jwt: app.login.jwt,
@@ -513,7 +513,7 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
   oncreate: (vnode) => {
     // TODO: Change to GET /inviteLinks
     $.get(`${app.serverUrl()}/getInviteLinks`, {
-      address: app.vm.activeAccount.address,
+      address: app.user.activeAccount.address,
       community_id: app.activeCommunityId(),
       jwt: app.login.jwt,
     }).then((res) => {

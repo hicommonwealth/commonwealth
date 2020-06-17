@@ -114,7 +114,7 @@ export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | Offchai
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (!isSameAccount(app.vm.activeAccount, proposal.author)) return;
+    if (!isSameAccount(app.user.activeAccount, proposal.author)) return;
 
     return m('.ProposalHeaderDelete', [
       m('a', {
@@ -157,9 +157,9 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
-    const canEdit = (app.vm.activeAccount?.address === proposal.author
-                     && app.vm.activeAccount?.chain.id === proposal.authorChain)
-      || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId());
+    const canEdit = (app.user.activeAccount?.address === proposal.author
+                     && app.user.activeAccount?.chain.id === proposal.authorChain)
+      || app.user.isRoleOfCommunity('admin', { chain: app.activeChainId(), community: app.activeCommunityId() });
 
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
@@ -250,8 +250,8 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
     if (!(proposal instanceof OffchainThread)) return;
     if (!app.isLoggedIn()) return;
 
-    const canEdit = app.vm.activeAccount?.address === proposal.author
-      && app.vm.activeAccount?.chain.id === proposal.authorChain;
+    const canEdit = app.user.activeAccount?.address === proposal.author
+      && app.user.activeAccount?.chain.id === proposal.authorChain;
     if (!canEdit) return;
 
     return m('.ProposalHeaderPrivacyButtons', [

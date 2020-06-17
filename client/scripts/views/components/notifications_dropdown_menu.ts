@@ -9,8 +9,9 @@ import { sortNotifications } from 'helpers/notifications';
 
 const NotificationsDrowdownMenu: m.Component<{},{}> = {
   view: (vnode) => {
-    const notifications = app.login.notifications
-      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+    // TODO: Add helper directly on controller
+    const notifications = app.user.notifications
+      ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');

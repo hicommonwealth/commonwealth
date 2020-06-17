@@ -126,7 +126,7 @@ const Chat = {
         ])),
       ]),
       !app.isLoggedIn() ? m('.chat-composer-unavailable', 'Log in to join chat')
-        : !app.vm.activeAccount ? m('.chat-composer-unavailable', 'Set up account to join chat')
+        : !app.user.activeAccount ? m('.chat-composer-unavailable', 'Set up account to join chat')
           : !vnode.state.chat.isConnected ? m('.chat-composer-unavailable', 'Waiting for connection')
             : m('form.chat-composer', [
               m(ResizableTextarea, {
@@ -152,7 +152,7 @@ const Chat = {
                     if (!vnode.state.chat.isConnected) return;
                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
                     const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.vm.activeAccount.address, app.login.jwt);
+                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.login.jwt);
                     vnode.state.oninput = false; // HACK: clear the typing debounce
                     $textarea.val('');
                   }

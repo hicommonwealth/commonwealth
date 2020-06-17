@@ -89,7 +89,7 @@ const TagListings: m.Component<{}, { showMore: boolean }> = {
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
-    const activeAccount = app.vm.activeAccount;
+    const activeAccount = app.user.activeAccount;
 
     // chain menu
     const chains = {};
@@ -245,8 +245,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           label: 'Tags',
           onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
         }),
-        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-          && m(AdminPanel),
+        app.user.isRoleOfCommunity('admin', { chain: app.activeChainId(), community: app.activeCommunityId() }) && m(AdminPanel),
       ]),
       // // chat (all communities)
       // m(ListItem, {

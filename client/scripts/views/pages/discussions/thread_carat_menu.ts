@@ -74,10 +74,10 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
-    const canEditThread = app.vm.activeAccount
-      && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-          || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-          || proposal.author === app.vm.activeAccount.address);
+    const canEditThread = app.user.activeAccount
+      && (app.user.isRoleOfCommunity( 'admin', { chain: app.activeChainId(), community: app.activeCommunityId() })
+        || app.user.isRoleOfCommunity('moderator', { chain: app.activeChainId(), community: app.activeCommunityId() })
+        || proposal.author === app.user.activeAccount.address);
 
     return [
       m(PopoverMenu, {

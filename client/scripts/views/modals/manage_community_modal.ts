@@ -40,7 +40,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       $.post(`${app.serverUrl()}/createWebhook`, {
         ...chainOrCommObj,
         webhookUrl,
-        address: app.vm.activeAccount.address,
+        address: app.user.activeAccount.address,
         auth: true,
         jwt: app.login.jwt,
       }).then((result) => {

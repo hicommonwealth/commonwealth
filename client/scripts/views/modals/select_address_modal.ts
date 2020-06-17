@@ -22,7 +22,7 @@ const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
 
     return m('.SelectAddressOption', {
       key: `${account.chain.id}-${account.address}`,
-      class: isSameAccount(app.vm.activeAccount, account) ? 'selected' : '',
+      class: isSameAccount(app.user.activeAccount, account) ? 'selected' : '',
       onclick: async (e) => {
         e.preventDefault();
         await setActiveAccount(account);

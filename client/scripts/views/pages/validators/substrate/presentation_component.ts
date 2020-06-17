@@ -29,8 +29,8 @@ const PresentationComponent = (state, chain: Substrate) => {
             balance: chain.chain.coins(value),
           }));
           const controller = validators[validator].controller;
-          const hasNominated: boolean = app.vm.activeAccount && nominators
-            && !!nominators.find(({ stash }) => stash === app.vm.activeAccount.address);
+          const hasNominated: boolean = app.user.activeAccount && nominators
+            && !!nominators.find(({ stash }) => stash === app.user.activeAccount.address);
           // add validator to collection if hasNominated already
           if (hasNominated) {
             state.nominations.push(validator);

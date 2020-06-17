@@ -41,7 +41,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {

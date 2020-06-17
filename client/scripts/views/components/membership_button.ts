@@ -18,31 +18,24 @@ const MembershipButton: m.Component<{
   view: (vnode) => {
     const { chain, community, onMembershipChanged, address } = vnode.attrs; // TODO: onMembershipChanged
     if (!chain && !community) return;
-    if (!app.login.roles) return;
+    if (app.user.roles.length === 0) return;
 
     const createRoleWithAddress = (a, e) => {
-      // TODO: Change to POST /role
-      $.post('/api/createRole', {
-        jwt: app.login.jwt,
-        address_id: a.id,
-        chain,
-        community,
-      }).then((result) => {
-        // handle state updates
-        app.login.roles.push(result.result);
-        if (onMembershipChanged) onMembershipChanged(true);
-        vnode.state.loading = false;
-        m.redraw();
-        // notify
-        const name = chain
-          ? app.config.chains.getById(chain)?.name
-          : app.config.communities.getById(community)?.name;
-        notifySuccess(`Joined ${name}`);
-      }).catch((err: any) => {
-        vnode.state.loading = false;
-        m.redraw();
-        notifyError(err.responseJSON.error);
-      });
+      app.user.createRole(a, { chain, community })
+        .then(() => {
+          if (onMembershipChanged) onMembershipChanged(true);
+          vnode.state.loading = false;
+          m.redraw();
+          // notify
+          const name = chain
+            ? app.config.chains.getById(chain)?.name
+            : app.config.communities.getById(community)?.name;
+          notifySuccess(`Joined ${name}`);
+        }).catch((err: any) => {
+          vnode.state.loading = false;
+          m.redraw();
+          notifyError(err.responseJSON.error);
+        });
     };
 
     const deleteRole = async (a, e) => {
@@ -54,42 +47,28 @@ const MembershipButton: m.Component<{
         m.redraw();
         return;
       }
-      // TODO: Change to DELETE /role
-      $.post('/api/deleteRole', {
-        jwt: app.login.jwt,
-        address_id: a.id,
-        chain,
-        community,
-      }).then((result) => {
-        // handle state updates
-        const index = chain
-          ? app.login.roles.findIndex((r) => r.chain_id === chain && r.address_id === a.id)
-          : app.login.roles.findIndex((r) => r.offchain_community_id === community && r.address_id === a.id);
-        if (index !== -1) app.login.roles.splice(index, 1);
-        if (onMembershipChanged) onMembershipChanged(false);
-        vnode.state.loading = false;
-        m.redraw();
-        // notify
-        const name = chain
-          ? app.config.chains.getById(chain)?.name
-          : app.config.communities.getById(community)?.name;
-        notifySuccess(`Left ${name}`);
-      }).catch((err: any) => {
-        vnode.state.loading = false;
-        m.redraw();
-        notifyError(err.responseJSON.error);
-      });
+      app.user.deleteRole(a, { chain, community })
+        .then(() => {
+          if (onMembershipChanged) onMembershipChanged(false);
+          vnode.state.loading = false;
+          m.redraw();
+          // notify
+          const name = chain
+            ? app.config.chains.getById(chain)?.name
+            : app.config.communities.getById(community)?.name;
+          notifySuccess(`Left ${name}`);
+        }).catch((err: any) => {
+          vnode.state.loading = false;
+          m.redraw();
+          notifyError(err.responseJSON.error);
+        });
     };
 
     const hasAnyExistingRole = isMember(chain, community, address);
 
     if (!address) {
-      const existingRolesAddressIDs = community
-        ? app.login.roles.filter((role) => role.offchain_community_id === community).map((role) => role.address_id)
-        : app.login.roles.filter((role) => role.chain_id === chain).map((role) => role.address_id);
-      const existingJoinableAddresses: AddressInfo[] = community
-        ? app.login.addresses
-        : app.login.addresses.filter((a) => a.chain === chain);
+      const existingRolesAddressIDs = app.user.getAddressIdsFromRoles({ chain, community });
+      const existingJoinableAddresses = app.user.getJoinableAddresses({ chain, community });
 
       return m(PopoverMenu, {
         class: 'MembershipButtonPopover',

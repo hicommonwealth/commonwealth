@@ -103,10 +103,10 @@ const Notifications = {
     const notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
     // const newCommunitySubscription = app.login.notifications.subscriptions
     //   .find((v) => v.category === NotificationCategories.NewCommunity);
-    const chainOrCommunitySubscription = app.vm.activeAccount
-      && app.vm.activeAccount.chain
+    const chainOrCommunitySubscription = app.user.activeAccount
+      && app.user.activeAccount.chain
       && app.login.notifications.subscriptions
-        .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.vm.activeAccount.chain.id);
+        .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.user.activeAccount.chain.id);
     return m('.Notifications', [
       m('.row', [
         // notifications
@@ -160,7 +160,7 @@ const Notifications = {
         //           .then(() => m.redraw());
         //         } else {
         //           app.login.notifications.subscribe(
-        //             NotificationCategories.NewThread, app.vm.activeAccount.chain.id
+        //             NotificationCategories.NewThread, app.user.activeAccount.chain.id
         //           ).then(() => m.redraw());
         //         }
         //       }

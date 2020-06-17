@@ -12,7 +12,6 @@ import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import AutoCompleteTagForm from './autocomplete_tag_form';
-import { isCommunityAdmin } from '../pages/discussions/roles';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -287,7 +286,7 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
   },
   view: (vnode: m.VnodeDOM<IInlineThreadComposerAttrs, IInlineThreadComposerState>) => {
     const { threadType, textTitle, linkTitle, url } = vnode.state;
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     if (!author) return null;
 
     const getTitleForLinkPost = _.debounce(async () => {

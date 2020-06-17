@@ -37,21 +37,21 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
     return m('.LoginSelector', {
       class: (app.chain || app.community) ? '' : 'no-community',
     }, [
-      (app.chain || app.community) && m('.login-selector-left', app.vm.activeAccount
+      (app.chain || app.community) && m('.login-selector-left', app.user.activeAccount
         // if address selected
         ? [
-          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
+          m(User, { user: app.user.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
           m('.login-selector-user', [
             m('.user-info', [
-              m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-              m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                ? `@${app.vm.activeAccount.address}`
-                : `${app.vm.activeAccount.address.slice(0, 6)}...`)
+              m(User, { user: app.user.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
+              m('.user-address', app.user.activeAccount.chain.id === 'near'
+                ? `@${app.user.activeAccount.address}`
+                : `${app.user.activeAccount.address.slice(0, 6)}...`)
             ])
           ]),
         ]
         // if no address is selected
-        : app.login.activeAddresses.length === 0 ? m(Button, {
+        : app.user.activeAddresses.length === 0 ? m(Button, {
           intent: 'none',
           iconLeft: Icons.USER_PLUS,
           size: 'sm',
@@ -116,7 +116,7 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
                 label: 'Profile',
                 iconLeft: Icons.USER,
                 onclick: (e) => {
-                  m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
+                  m.route.set(`/${app.user.activeAccount.chain.id}/account/${app.user.activeAccount.address}`);
                 },
               }),
               m(MenuItem, {

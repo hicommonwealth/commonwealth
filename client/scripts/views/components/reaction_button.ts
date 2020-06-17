@@ -35,8 +35,8 @@ const ReactionButton: m.Component<IAttrs, IState> = {
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const disabled = !app.vm.activeAccount || vnode.state.loading;
-    const activeAddress = app.vm.activeAccount?.address;
+    const disabled = !app.user.activeAccount || vnode.state.loading;
+    const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
     let hasReactedType;
@@ -58,7 +58,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
-        // if it's a community use the app.vm.activeAccount.chain.id instead of author chain
+        // if it's a community use the app.user.activeAccount.chain.id instead of author chain
         const chainId = app.activeCommunityId() ? null : app.activeChainId();
         const communityId = app.activeCommunityId();
         if (hasReacted) {
@@ -67,7 +67,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
           app.reactions.delete(reaction).then(() => {
             if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
               || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-              app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId).then(() => {
+              app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
                 vnode.state.loading = false;
                 m.redraw();
               });
@@ -78,7 +78,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
           });
         } else {
           vnode.state.loading = true;
-          app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
+          app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId)
             .then(() => {
               vnode.state.loading = false;
               m.redraw();

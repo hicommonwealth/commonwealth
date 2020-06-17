@@ -25,7 +25,6 @@ const NewTagModal = {
             intent: 'primary',
             onclick: (e) => {
               e.preventDefault();
-              // if (!isCommunityAdmin()) return;
               const name = $(vnode.dom).find('input.new-tag-name').val().toString();
               const description = $(vnode.dom).find('input.new-tag-∂escription').val().toString();
               if (!name.trim()) return;

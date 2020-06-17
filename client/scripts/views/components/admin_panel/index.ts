@@ -28,7 +28,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         // TODO: Change to GET /webhooks
         const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-          { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+          { ...chainOrCommObj, auth: true, jwt: app.user.jwt });
         if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
         vnode.state.webhooks = webhooks.result;
         vnode.state.roleData = bulkMembers.result;

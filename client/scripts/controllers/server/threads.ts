@@ -74,7 +74,7 @@ class ThreadsController {
     try {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
-        'author_chain': app.vm.activeAccount.chain.id,
+        'author_chain': app.user.activeAccount.chain.id,
         'chain': chainId,
         'community': communityId,
         'address': address,
@@ -89,7 +89,7 @@ class ThreadsController {
         'url': url,
         'privacy': privacy,
         'readOnly': readOnly,
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
@@ -124,7 +124,7 @@ class ThreadsController {
         'attachments[]': attachments,
         'read_only': newReadOnly,
         'privacy': newPrivacy,
-        'jwt': app.login.jwt
+        'jwt': app.user.jwt
       },
       success: (response) => {
         const result = modelFromServer(response.result);
@@ -147,7 +147,7 @@ class ThreadsController {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
         'thread_id': proposal.id,
       }).then((result) => {
         _this.store.remove(proposal);

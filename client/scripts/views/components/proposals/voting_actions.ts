@@ -47,11 +47,11 @@ const ProposalExtensions: m.Component<{ proposal, callback?, setConviction? }> =
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const callback = vnode.attrs.callback;
-    const user: SubstrateAccount = app.vm.activeAccount as SubstrateAccount;
+    const user: SubstrateAccount = app.user.activeAccount as SubstrateAccount;
     if (vnode.attrs.proposal instanceof EdgewareSignalingProposal) {
       const advanceSignalingProposal = (e) => {
         e.preventDefault();
-        const acct = app.vm.activeAccount as SubstrateAccount;
+        const acct = app.user.activeAccount as SubstrateAccount;
         createTXModal((app.chain as Edgeware).signaling.advance(acct, proposal as EdgewareSignalingProposal));
       };
 
@@ -119,9 +119,9 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
       return m(CannotVote, { text: 'Treasury proposals are processed by council motion or democracy proposal' });
     } else if (!app.isLoggedIn()) {
       return m(CannotVote, { action: 'Log in to vote' });
-    } else if (!app.vm.activeAccount) {
+    } else if (!app.user.activeAccount) {
       return m(CannotVote, { action: 'Create a Web3 address' });
-    } else if (!proposal.canVoteFrom(app.vm.activeAccount)) {
+    } else if (!proposal.canVoteFrom(app.user.activeAccount)) {
       return m(CannotVote, { text: 'Cannot vote from this account' });
     }
 
@@ -131,11 +131,11 @@ const ProposalVotingActions: m.Component<{ proposal: AnyProposal }, { conviction
         || proposal instanceof SubstrateDemocracyReferendum
         || proposal instanceof SubstratePhragmenElection
         || proposal instanceof SubstrateCollectiveProposal) {
-      user = app.vm.activeAccount as SubstrateAccount;
+      user = app.user.activeAccount as SubstrateAccount;
     } else if (proposal instanceof CosmosProposal) {
-      user = app.vm.activeAccount as CosmosAccount;
+      user = app.user.activeAccount as CosmosAccount;
     } else if (proposal instanceof MolochProposal) {
-      user = app.vm.activeAccount as EthereumAccount;
+      user = app.user.activeAccount as EthereumAccount;
     } else {
       return m(CannotVote, { text: 'Unrecognized proposal type' });
     }

@@ -43,12 +43,12 @@ const ActionForm: m.Component<IActionFormAttrs, IActionFormState> = {
     return m('.NewStashForm', [
       (vnode.attrs.onChangeHandler) ? inputComponent : m('h4', vnode.attrs.titleMsg),
       (vnode.attrs.actionHandler) && m('button.formular-button-primary', {
-        class: app.vm.activeAccount ? '' : 'disabled',
+        class: app.user.activeAccount ? '' : 'disabled',
         onclick: (e) => {
           e.preventDefault();
           const value = vnode.state.data || vnode.attrs.defaultValue;
           if (!value) return;
-          const sender = app.vm.activeAccount;
+          const sender = app.user.activeAccount;
           try {
             vnode.state.sending = true;
             if (sender instanceof SubstrateAccount) {

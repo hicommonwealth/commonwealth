@@ -99,16 +99,11 @@ const ConfirmInviteModal = {
                 onclick: (e) => {
                   e.preventDefault();
                   if (vnode.state.selectedAddress) {
-                    $.post(`${app.serverUrl()}/acceptInvite`, {
-                      address: vnode.state.selectedAddress,
-                      reject: false,
-                      inviteCode: invites[vnode.state.location].id,
-                      jwt: app.login.jwt,
-                    }).then((result) => {
+                    app.user.acceptInvite(vnode.state.selectedAddress, invites[vnode.state.location].id)
+                    .then(() => {
                       app.config.invites = app.config.invites.filter(
                         (invite) => invite.community_name !== invites[vnode.state.location].community_name
                       );
-                      app.login.roles.push(result.result.role);
                       vnode.state.accepted.push(vnode.state.location);
                       vnode.state.selectedAddress = null;
                       m.redraw();

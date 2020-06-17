@@ -24,6 +24,7 @@ import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
+import UserController from './controllers/server/user';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -52,7 +53,7 @@ export interface IApp {
   tags: TagsController;
   chainEntities: ChainEntityController;
   communities: CommunitiesController;
-
+  user: UserController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -121,6 +122,7 @@ const app: IApp = {
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
   communities: new CommunitiesController(),
+  user: new UserController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -160,7 +162,7 @@ const app: IApp = {
   isProduction: () => {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
   },
-  // TODO: Remove VM property, migrate activeAccount to app.login
+  // TODO: Remove VM property, migrate activeAccount to app.user
   vm: {
     activeAccount: null,
   },

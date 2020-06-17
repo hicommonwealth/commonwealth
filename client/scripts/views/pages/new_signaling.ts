@@ -60,7 +60,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
       return;
     }
 
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const newThread = () => {
       if (!vnode.state.form.title || !vnode.state.form.description) {
         vnode.state.error = 'Both title and description are required.';
@@ -108,7 +108,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
         m('h2.page-title', 'New Signaling Proposal'),
         m(Grid, [
           m(Col, { span }, [
-            !app.vm.activeAccount
+            !app.user.activeAccount
               ? m(Callout, {
                 icon: Icons.ALERT_TRIANGLE,
                 intent: 'primary',
@@ -150,7 +150,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                 m(FormGroup, [
                   m(RadioGroup, {
                     value: vnode.state.voteType,
-                    disabled: !app.vm.activeAccount,
+                    disabled: !app.user.activeAccount,
                     options: [{
                       label: 'Binary',
                       value: 'binary',
@@ -176,7 +176,7 @@ export const NewSignalingPage: m.Component<{}, ISignalingPageState> = {
                 ]),
                 vnode.state.voteOutcomes.map((outcome, index) => m(FormGroup, [ m(Input, {
                   value: outcome,
-                  disabled: !app.vm.activeAccount || vnode.state.voteType === 'binary',
+                  disabled: !app.user.activeAccount || vnode.state.voteType === 'binary',
                   contentLeft: m(Tag, { label: `Option ${index + 1}` })
                 }) ])),
                 m(ButtonGroup, { fluid: true }, [

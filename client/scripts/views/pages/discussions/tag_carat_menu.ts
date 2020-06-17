@@ -2,13 +2,12 @@ import m from 'mithril';
 import { PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { isCommunityAdmin } from 'views/pages/discussions/roles';
 import EditTagModal from 'views/modals/edit_tag_modal';
 
 const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!isCommunityAdmin()) return;
+    if (!app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
 
     const { tag } = vnode.attrs;
     if (!tag) return;
