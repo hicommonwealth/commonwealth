@@ -119,7 +119,7 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
     // no member addresses - preview the community
   } else if (memberAddresses.length === 1) {
     // one member address - start the community with that address (don't check for default address)
-    setActiveAccount(app.login.activeAddresses[0]);
+    setActiveAccount(memberAddresses[0]);
   } else {
     const existingAddress = chain
       ? getDefaultAddressInCommunity(chain.id, null)
