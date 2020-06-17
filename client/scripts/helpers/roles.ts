@@ -26,6 +26,20 @@ export function isRoleOfCommunity(
   return userRole;
 }
 
+export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any> | undefined) => {
+  if (!app.isLoggedIn()) return false;
+  if (!app.login.roles) return false;
+
+  const addressinfo: AddressInfo | undefined = (address instanceof Account)
+    ? app.login.addresses.find((a) => address.address === a.address && address.chain.id === a.chain)
+    : address;
+  const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
+
+  return chain ? roles.map((r) => r.chain_id).indexOf(chain) !== -1
+    : community ? roles.map((r) => r.offchain_community_id).indexOf(community) !== -1
+      : false;
+};
+
 export function isAdminOrMod(address: string) {
   if (!app.activeId()) return;
   const role = app.activeChainId()

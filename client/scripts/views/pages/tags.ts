@@ -13,7 +13,7 @@ import { OffchainThreadKind } from 'models';
 
 import Sublayout from 'views/sublayout';
 import { isCommunityAdmin } from 'views/pages/discussions/roles';
-import { inputModalWithText } from 'views/modals/input_modal';
+import NewTagModal from 'views/modals/new_tag_modal';
 import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 
@@ -224,10 +224,7 @@ export const NewTagButton: m.Component = {
       iconLeft: Icons.PLUS,
       onclick: async (e) => {
         e.preventDefault();
-        if (!isCommunityAdmin()) return;
-        const tag = await inputModalWithText('New Tag:')();
-        if (!tag) return;
-        app.tags.add(tag).then(() => { m.redraw(); });
+        app.modals.create({ modal: NewTagModal });
       },
     });
   },

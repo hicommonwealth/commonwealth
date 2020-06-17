@@ -165,56 +165,19 @@
 
 // mixin for collapsing large text blocks to <200px in height
 @mixin collapsible {
-    &.collapsed {
-        max-height: 180px;
-        overflow: hidden;
-        h1, h2, h3, h4, h5, h6 {
-            font-size: 1em;
-            margin: 0;
-        }
-        &:after {
-            content: "";
-            position: absolute;
-            z-index: 1;
-            bottom: 0;
-            left: 0;
-            pointer-events: none;
-            background-image: linear-gradient(
-                to bottom,
-                hsla(0, 0%, 100%, 0) 0%,
-                hsla(0, 0%, 100%, 0.013) 9.4%,
-                hsla(0, 0%, 100%, 0.049) 17.5%,
-                hsla(0, 0%, 100%, 0.104) 24.7%,
-                hsla(0, 0%, 100%, 0.175) 31.1%,
-                hsla(0, 0%, 100%, 0.259) 36.8%,
-                hsla(0, 0%, 100%, 0.352) 42.1%,
-                hsla(0, 0%, 100%, 0.45) 47.1%,
-                hsla(0, 0%, 100%, 0.55) 52.1%,
-                hsla(0, 0%, 100%, 0.648) 57.2%,
-                hsla(0, 0%, 100%, 0.741) 62.5%,
-                hsla(0, 0%, 100%, 0.825) 68.3%,
-                hsla(0, 0%, 100%, 0.896) 74.8%,
-                hsla(0, 0%, 100%, 0.951) 82.1%,
-                hsla(0, 0%, 100%, 0.987) 90.5%,
-                hsl(0, 0%, 100%) 100%
-            );
-            width: 100%;
-            height: 4em;
-        }
-        &.suppress-fadeout:after {
-            display: none;
-        }
-    }
 }
 
 @mixin hidden-formatting {
-    p.hidden-formatting {
+    .hidden-formatting {
         margin: 6px 0;
         &:first-child {
             margin-top: 0;
         }
         &:last-child {
             margin-bottom: 0;
+        }
+        .hidden-formatting-listitem + .hidden-formatting-listitem {
+            margin-top: 6px;
         }
     }
 }

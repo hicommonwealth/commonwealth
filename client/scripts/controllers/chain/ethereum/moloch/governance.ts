@@ -52,10 +52,6 @@ export default class MolochGovernance extends ProposalModule<
   public get fetcher() { return this._fetcher; }
 
   // INIT / DEINIT
-  protected _entityConstructor(entity): MolochProposal {
-    throw new Error('not implemented');
-  }
-
   public async init(
     api: MolochAPI,
     MolochMembers: MolochMembers,

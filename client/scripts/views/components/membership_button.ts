@@ -6,24 +6,11 @@ import { Button, Icon, Icons, MenuItem, MenuDivider, PopoverMenu } from 'constru
 
 import app from 'state';
 import { Account, AddressInfo } from 'models';
+import { isMember } from 'helpers/roles';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
-
-export const isMember = (chain: string, community: string, address?: AddressInfo | Account<any> | undefined) => {
-  if (!app.isLoggedIn()) return false;
-  if (!app.login.roles) return false;
-
-  const addressinfo: AddressInfo | undefined = (address instanceof Account)
-    ? app.login.addresses.find((a) => address.address === a.address && address.chain.id === a.chain)
-    : address;
-  const roles = app.login.roles.filter((role) => addressinfo ? role.address_id === addressinfo.id : true);
-
-  return chain ? roles.map((r) => r.chain_id).indexOf(chain) !== -1
-    : community ? roles.map((r) => r.offchain_community_id).indexOf(community) !== -1
-      : false;
-};
 
 const MembershipButton: m.Component<{
   chain?: string, community?: string, onMembershipChanged?, address?
@@ -117,10 +104,7 @@ const MembershipButton: m.Component<{
               disabled: cannotJoinPrivateCommunity,
               hasAnyExistingRole: hasExistingRole,
               iconLeft: hasExistingRole ? Icons.CHECK : null,
-              label: [
-                m(User, { user: [a.address, a.chain] }),
-                ` ${a.address.slice(0, 6)}...`,
-              ],
+              label: m(User, { user: [a.address, a.chain], showRole: true }),
               onclick: hasExistingRole ? deleteRole.bind(this, a) : createRoleWithAddress.bind(this, a),
             });
           }),

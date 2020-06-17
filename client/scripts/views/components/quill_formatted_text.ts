@@ -4,7 +4,8 @@ import 'components/quill_formatted_text.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { stringUpperFirst } from '@polkadot/util';
-import { loadScript } from '../../helpers';
+import { Icon, Icons } from 'construct-ui';
+import { loadScript } from 'helpers';
 
 interface IQuillJSON {
   ops: IQuillOps[];
@@ -112,26 +113,39 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
   });
 
   // then, render each group
+
+  const getGroupTag = (group) => group.listtype === 'bullet' ? 'ul'
+    : group.listtype === 'ordered'      ? 'ol'
+      : (group.listtype === 'checked' || group.listtype === 'unchecked') ? 'ul.checklist'
+        : 'div';
+  const getParentTag = (parent) => parent.attributes && parent.attributes.list === 'bullet' ? 'li'
+    : parent.attributes && parent.attributes.list === 'ordered' ? 'li'
+      : parent.attributes && parent.attributes.list === 'checked' ? 'li.checked'
+        : parent.attributes && parent.attributes.list === 'unchecked' ? 'li.unchecked'
+          : 'div';
   return hideFormatting
     ? groups.map((group) => {
-      return m('p.hidden-formatting', group.parents.map((parent) => {
-        return parent.children.map((child) => {
-          if (child.insert?.image) return;
-          if (child.insert?.mention) return m('span', child.insert.mention.value);
-          if (child.insert?.twitter) return; // return m('span', '[tweet]');
-          if (child.insert?.video) return; // return m('span', '[video]');
-          return m('span', `${child.insert}`);
-        });
+      return m(`${getGroupTag(group)}.hidden-formatting`, group.parents.map((parent) => {
+        return m(`${getParentTag(parent)}.hidden-formatting-inner`, [
+          parent.children.map((child) => {
+            if (child.insert?.mention)
+              return m('span.mention', child.insert.mention.denotationChar + child.insert.mention.value);
+            if (child.insert?.image) return m(Icon, { name: Icons.IMAGE });
+            if (child.insert?.twitter) return m(Icon, { name: Icons.IMAGE });
+            if (child.insert?.video) return m(Icon, { name: Icons.IMAGE });
+            if (child.attributes?.link) return m('a', {
+              href: child.attributes.link,
+              target: '_blank',
+              noreferrer: 'noreferrer',
+              noopener: 'noopener',
+            }, `${child.insert}`);
+            return m('span', `${child.insert}`);
+          })
+        ]);
       }));
     })
     : groups.map((group) => {
-      const groupTag = group.listtype === 'bullet'
-        ? 'ul'
-        : group.listtype === 'ordered'
-          ? 'ol'
-          : group.listtype === 'checked' || group.listtype === 'unchecked'
-            ? 'ul.checklist'
-            : 'div';
+      const groupTag = getGroupTag(group);
       return m(groupTag, group.parents.map((parent) => {
         // render empty parent nodes as .between-paragraphs
         if (!parent.attributes && parent.children.length === 1 && parent.children[0].insert === '\n') {
@@ -186,7 +200,9 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
           let result;
           if (child.insert?.mention) {
             result = m('span.mention', {
-              onclick: (e) => alert(child.insert.mention.id)
+              onclick: (e) => {
+                //alert(child.insert.mention.id)
+              }
             }, child.insert.mention.denotationChar + child.insert.mention.value);
           } else if (child.attributes?.link) {
             result = m('a', {
@@ -231,18 +247,14 @@ const renderQuillDelta = (delta, hideFormatting = false) => {
     });
 };
 
-const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }, { suppressFadeout }> = {
+const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
   view: (vnode) => {
     const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
-      class: (collapse ? 'collapsed' : '') + (vnode.state.suppressFadeout ? ' suppress-fadeout' : ''),
       oncreate: (vnode2) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
-        const height = $(vnode2.dom).height();
-        vnode.state.suppressFadeout = height < 120;
-        setTimeout(() => m.redraw());
       }
     }, renderQuillDelta(doc, hideFormatting));
   }

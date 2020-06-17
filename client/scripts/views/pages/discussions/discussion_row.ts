@@ -87,11 +87,13 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                   return m(QuillFormattedText, {
                     doc,
                     collapse: !vnode.state.expanded,
+                    hideFormatting: true,
                   });
                 } catch (e) {
                   return m(MarkdownFormattedText, {
                     doc: body,
                     collapse: !vnode.state.expanded,
+                    hideFormatting: true,
                   });
                 }
               })(),

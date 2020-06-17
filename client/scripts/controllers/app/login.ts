@@ -6,10 +6,10 @@ import $ from 'jquery';
 import app from 'state';
 
 import { getRoleInCommunity, getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
+import { isMember } from 'helpers/roles';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import { isMember } from 'views/components/membership_button';
 import {
   ChainInfo,
   SocialAccount,
@@ -115,11 +115,14 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
       : isMember(null, app.community.meta.id, address);
   });
 
-  if (memberAddresses.length === 0) {
-    // no member addresses - preview the community
-  } else if (memberAddresses.length === 1) {
-    // one member address - start the community with that address (don't check for default address)
+  if (memberAddresses.length === 1) {
+    // one member address - start the community with that address
+    setActiveAccount(memberAddresses[0]);
+  } else if (app.login.activeAddresses.length === 1) {
+    // one non-member address - start the community with that address
     setActiveAccount(app.login.activeAddresses[0]);
+  } else if (app.login.activeAddresses.length === 0) {
+    // no addresses - preview the community
   } else {
     const existingAddress = chain
       ? getDefaultAddressInCommunity(chain.id, null)
