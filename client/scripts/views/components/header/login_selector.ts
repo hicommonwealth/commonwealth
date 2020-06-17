@@ -21,7 +21,7 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import { setActiveAccount } from 'controllers/app/login';
 
-const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenuOpen: boolean }> = {
+const LoginSelector : m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
@@ -40,127 +40,72 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
       return getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
     });
 
-    return m('.LoginSelector', {
-      class: (app.chain || app.community) ? '' : 'no-community',
-    }, [
-      (app.chain || app.community) && m('.login-selector-left', app.vm.activeAccount
-        // if address selected
-        ? [
-          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-          m('.login-selector-user', [
-            m('.user-info', [
-              m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-              m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                ? `@${app.vm.activeAccount.address}`
-                : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-            ])
-          ]),
-        ]
-        // if no address is selected
-        : app.login.activeAddresses.length === 0 ? m(Button, {
-          intent: 'none',
-          iconLeft: Icons.USER_PLUS,
-          size: 'sm',
-          fluid: true,
-          label: 'Link new address',
-          onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-        })
-        // if addresses are available, but none is selected
-        : m(Button, {
-          label: 'Select an address',
-          fluid: true,
-          size: 'sm',
-          onclick: () => app.modals.create({ modal: SelectAddressModal }),
-        })),
-      app.isLoggedIn() && m('.login-selector-right', [
-        // logged in
-        m(ButtonGroup, { fluid: true }, [
-          (app.chain || app.community) && m(Popover, {
-            class: 'login-selector-popover',
-            closeOnContentClick: true,
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            position: 'top-end',
-            content: m(Menu, [
+    return m('.LoginSelector', [
+      m(ButtonGroup, { fluid: true }, [
+        m(Popover, {
+          class: 'login-selector-popover',
+          closeOnContentClick: true,
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          position: 'top-end',
+          trigger: m(Button, {
+            intent: 'none',
+            size: 'sm',
+            fluid: true,
+            compact: true,
+            label: (!app.chain && !app.community) ? 'No community selected'
+              : (app.login.activeAddresses.length === 0 || app.vm.activeAccount === null) ? 'No address selected'
+              : m(User, { user: app.vm.activeAccount, showRole: true }),
+            iconRight: Icons.CHEVRON_DOWN,
+          }),
+          content: m(Menu, [
+            // address selector - only shown in communities
+            (app.chain || app.community) && [
               activeAddressesWithRole.map((account) => m(MenuItem, {
                 onclick: (e) => {
                   setActiveAccount(account);
                 },
-                label: m(User, { user: account, showRole: true }),
+              label: m(User, { user: account, showRole: true }),
               })),
               m(MenuItem, {
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
                 iconLeft: Icons.USER,
-                label: 'Add another address'
+                label: 'Connect another address'
               }),
-            ]),
-            trigger: (app.chain || app.community) && m(Button, {
-              intent: 'none',
-              size: 'sm',
-              fluid: true,
-              compact: true,
-              label: m(Icon, { name: Icons.CHEVRON_DOWN }),
-              onclick: (e) => {
-                vnode.state.switchAddressMenuOpen = !vnode.state.switchAddressMenuOpen;
-              }
+              m(MenuDivider),
+            ],
+            // always shown
+            m(MenuItem, {
+              onclick: () => m.route.set('/settings'),
+              iconLeft: Icons.SETTINGS,
+              label: 'Settings'
             }),
-          }),
-          m(Popover, {
-            class: 'login-selector-popover',
-            closeOnContentClick: true,
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            position: 'top-end',
-            trigger: m(Button, {
-              intent: 'none',
-              size: 'sm',
-              fluid: true,
-              compact: true,
-              label: m(Icon, { name: Icons.SETTINGS }),
-              onclick: (e) => {
-                vnode.state.userMenuOpen = !vnode.state.userMenuOpen;
-              }
+            m(MenuItem, {
+              onclick: () => app.modals.create({ modal: FeedbackModal }),
+              iconLeft: Icons.SEND,
+              label: 'Send feedback',
             }),
-            content: m(Menu, [
-              m(MenuItem, {
-                label: 'Profile',
-                iconLeft: Icons.USER,
-                onclick: (e) => {
-                  m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-                },
-              }),
-              m(MenuItem, {
-                onclick: () => m.route.set('/settings'),
-                iconLeft: Icons.SETTINGS,
-                label: 'Settings'
-              }),
-              m(MenuItem, {
-                onclick: () => app.modals.create({ modal: FeedbackModal }),
-                iconLeft: Icons.SEND,
-                label: 'Send feedback',
-              }),
-              m(MenuItem, {
-                onclick: () => {
-                  $.get(`${app.serverUrl()}/logout`).then(async () => {
-                    await initAppState();
-                    notifySuccess('Logged out');
-                    m.route.set('/');
-                    m.redraw();
-                  }).catch((err) => {
-                    // eslint-disable-next-line no-restricted-globals
-                    location.reload();
-                  });
-                  mixpanel.reset();
-                },
-                iconLeft: Icons.X_SQUARE,
-                label: 'Logout'
-              }),
-            ]),
-          }),
-        ]),
-      ])
+            m(MenuItem, {
+              onclick: () => {
+                $.get(`${app.serverUrl()}/logout`).then(async () => {
+                  await initAppState();
+                  notifySuccess('Logged out');
+                  m.route.set('/');
+                  m.redraw();
+                }).catch((err) => {
+                  // eslint-disable-next-line no-restricted-globals
+                  location.reload();
+                });
+                mixpanel.reset();
+              },
+              iconLeft: Icons.X_SQUARE,
+              label: 'Logout'
+            }),
+          ]),
+        }),
+      ]),
     ]);
   }
 };
