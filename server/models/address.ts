@@ -178,8 +178,13 @@ export default (
         const signedPayload = new ExtrinsicPayload(new TypeRegistry(), params).toU8a(true);
         isValid = signerKeyring.verify(signedPayload, hexToU8a(signatureString));
       } else {
-        const signedMessage = stringToU8a(`${addressModel.verification_token}\n`);
-        isValid = signerKeyring.verify(signedMessage, hexToU8a(`0x${signatureString}`));
+        const signedMessageNewline = stringToU8a(`${addressModel.verification_token}\n`);
+        const signedMessageNoNewline = stringToU8a(addressModel.verification_token);
+        const signatureU8a = signatureString.slice(0, 2) === '0x'
+          ? hexToU8a(signatureString)
+          : hexToU8a(`0x${signatureString}`);
+        isValid = signerKeyring.verify(signedMessageNewline, signatureU8a)
+          || signerKeyring.verify(signedMessageNoNewline, signatureU8a);
       }
     } else if (chain.network === 'cosmos') {
       const signatureData = JSON.parse(signatureString);

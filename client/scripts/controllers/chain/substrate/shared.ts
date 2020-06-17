@@ -52,6 +52,11 @@ import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
 import { SubstrateAccount } from './account';
+import SubstrateDemocracyProposal from './democracy_proposal';
+import { SubstrateDemocracyReferendum } from './democracy_referendum';
+import { SubstrateTreasuryProposal } from './treasury_proposal';
+import { SubstrateCollectiveProposal } from './collective_proposal';
+import { EdgewareSignalingProposal } from '../edgeware/signaling_proposal';
 
 export type HandlerId = number;
 
@@ -79,10 +84,16 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
 export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
   switch (entity.type) {
     case SubstrateEntityKind.DemocracyProposal: {
-      return chain.democracyProposals.updateProposal(entity, event);
+      const constructorFunc = (e) => new SubstrateDemocracyProposal(
+        chain.chain, chain.accounts, chain.democracyProposals, e
+      );
+      return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
     }
     case SubstrateEntityKind.DemocracyReferendum: {
-      return chain.democracy.updateProposal(entity, event);
+      const constructorFunc = (e) => new SubstrateDemocracyReferendum(
+        chain.chain, chain.accounts, chain.democracy, e
+      );
+      return chain.democracy.updateProposal(constructorFunc, entity, event);
     }
     case SubstrateEntityKind.DemocracyPreimage: {
       if (event.data.kind === SubstrateEventKind.PreimageNoted) {
@@ -99,19 +110,31 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       break;
     }
     case SubstrateEntityKind.TreasuryProposal: {
-      return chain.treasury.updateProposal(entity, event);
+      const constructorFunc = (e) => new SubstrateTreasuryProposal(
+        chain.chain, chain.accounts, chain.treasury, e
+      );
+      return chain.treasury.updateProposal(constructorFunc, entity, event);
     }
     case SubstrateEntityKind.CollectiveProposal: {
       const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
       if (collectiveName && collectiveName === 'technicalCommittee' && chain.class === ChainClass.Kusama) {
-        return chain.technicalCommittee.updateProposal(entity, event);
+        const constructorFunc = (e) => new SubstrateCollectiveProposal(
+          chain.chain, chain.accounts, chain.technicalCommittee, e
+        );
+        return chain.technicalCommittee.updateProposal(constructorFunc, entity, event);
       } else {
-        return chain.council.updateProposal(entity, event);
+        const constructorFunc = (e) => new SubstrateCollectiveProposal(
+          chain.chain, chain.accounts, chain.council, e
+        );
+        return chain.council.updateProposal(constructorFunc, entity, event);
       }
     }
     case SubstrateEntityKind.SignalingProposal: {
       if (chain.class === ChainClass.Edgeware) {
-        return chain.signaling.updateProposal(entity, event);
+        const constructorFunc = (e) => new EdgewareSignalingProposal(
+          chain.chain, chain.accounts, chain.signaling, e
+        );
+        return chain.signaling.updateProposal(constructorFunc, entity, event);
       } else {
         console.error('Received signaling update on non-edgeware chain!');
         break;

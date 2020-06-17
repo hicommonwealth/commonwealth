@@ -3,7 +3,6 @@ import 'components/markdown_formatted_text.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import clamp from 'clamp-js';
 
 // Three-pass Markdown formatter.
 //
