@@ -64,14 +64,14 @@ export const populateDraft = async (state, draft) => {
     } catch {
       discardedMarkdown = discardedDraft.body;
     }
-    const isTitleUnchanged = (titleInput as HTMLInputElement).value === discardedDraft.title;
-    console.log(isTitleUnchanged);
-    const isBodyUnchanged = formBodyDelta
-      ? _.isEqual(formBodyDelta, discardedDelta)
+    const titleIsChanged = discardedDraft.title
+      && (titleInput as HTMLInputElement).value !== discardedDraft.title;
+    const bodyIsChanged = formBodyDelta
+      ? !_.isEqual(formBodyDelta, discardedDelta)
       : formBodyMarkdown
-        ? formBodyMarkdown === discardedMarkdown
+        ? formBodyMarkdown !== discardedMarkdown
         : false;
-    if (!isBodyUnchanged || !isTitleUnchanged) {
+    if (bodyIsChanged || titleIsChanged) {
       confirmed = await confirmationModalWithText(overwriteDraftMsg)();
     }
   } else if (quill.getLength() > 1) {
