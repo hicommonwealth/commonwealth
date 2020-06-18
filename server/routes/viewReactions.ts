@@ -6,7 +6,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoCommentOrThreadId: 'Must provide a comment or thread id',
+  NoCommentOrThreadId: 'Must provide a comment or thread ID',
 };
 
 const viewReactions = async (models, req: Request, res: Response, next: NextFunction) => {

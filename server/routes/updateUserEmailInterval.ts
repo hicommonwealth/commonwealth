@@ -7,8 +7,8 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
   NoInterval: 'Must provide notification email interval',
   NoEmail: 'Must have email connected to user',
-  NoUser: 'Could not find a user model',
-  InvalidInterval: 'Invalid Interval',
+  NoUser: 'Invalid user',
+  InvalidInterval: 'Invalid notification interval',
 };
 
 const updateUserEmailInterval = async (models, req: Request, res: Response, next: NextFunction) => {

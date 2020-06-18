@@ -1,4 +1,4 @@
-import 'components/settings/accounts_well.scss';
+import 'pages/settings/accounts_well.scss';
 
 import m from 'mithril';
 import _ from 'lodash';

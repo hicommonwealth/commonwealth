@@ -14,10 +14,10 @@ export const Errors = {
   NotBlob: 'Data must be a valid JSON blob',
   InvalidProfile: 'Invalid profile, or profile owned by someone else',
   NoName: 'Must provide a name',
-  NameTooShort: `Your name must be at least ${PROFILE_NAME_MIN_CHARS} characters.`,
-  NameTooLong: `Your name can't be over ${PROFILE_NAME_MAX_CHARS} characters.`,
-  HeadlineTooLong: `Your headline can't be over ${PROFILE_HEADLINE_MAX_CHARS} characters.`,
-  BioTooLong: `Your bio can't be over ${PROFILE_BIO_MAX_CHARS} characters.`,
+  NameTooShort: `Name must be at least ${PROFILE_NAME_MIN_CHARS} characters`,
+  NameTooLong: `Name must be less than ${PROFILE_NAME_MAX_CHARS} characters`,
+  HeadlineTooLong: `Headline must be less than ${PROFILE_HEADLINE_MAX_CHARS} characters`,
+  BioTooLong: `Bio must be less than ${PROFILE_BIO_MAX_CHARS} characters`,
 };
 
 const updateProfile = async (models, req: Request, res: Response, next: NextFunction) => {

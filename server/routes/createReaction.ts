@@ -11,9 +11,9 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoPostId: 'Must provide a comment or thread id',
-  NoReaction: 'Must provide a reaction string',
-  NoProposalMatch: 'No matching proposal found.'
+  NoPostId: 'Must provide a comment or thread ID',
+  NoReaction: 'Must provide a reaction',
+  NoProposalMatch: 'No matching proposal found'
 };
 
 const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
