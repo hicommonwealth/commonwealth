@@ -7,7 +7,7 @@ import { Button, Icon, Icons, PopoverMenu, MenuItem } from 'construct-ui';
 
 const SubscriptionButton = {
   view: (vnode) => {
-    const subscriptions = app.login.notifications;
+    const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions
       .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.activeId());
     const communityOrChain = app.activeChainId() ? app.activeChainId() : app.activeCommunityId();

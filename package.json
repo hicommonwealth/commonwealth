@@ -91,6 +91,7 @@
     "bn.js": "^4.11.8",
     "chart.js": "^2.8.0",
     "cheerio": "1.0.0-rc.3",
+    "clamp-js": "^0.7.0",
     "clean-webpack-plugin": "^0.1.19",
     "clipboard-polyfill": "^2.8.6",
     "commander": "^2.19.0",

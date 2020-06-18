@@ -34,8 +34,8 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
-    stakingLedger: (app.chain.base === ChainBase.Substrate && app.vm.activeAccount)
-      ? (app.vm.activeAccount as SubstrateAccount).stakingLedger
+    stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
+      ? (app.user.activeAccount as SubstrateAccount).stakingLedger
       : null,
   }),
   view: (vnode) => {
@@ -83,7 +83,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('h3', 'Manage Staking'),
         m('.preheader-item-text', [
           m('a.btn.formular-button-primary', {
-            class: app.vm.activeAccount ? '' : 'disabled',
+            class: app.user.activeAccount ? '' : 'disabled',
             href: '#',
             onclick: (e) => {
               e.preventDefault();
@@ -99,7 +99,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('h3', 'Claim Payout'),
         m('.preheader-item-text', [
           m('a.btn.formular-button-primary', {
-            class: app.vm.activeAccount ? '' : 'disabled',
+            class: app.user.activeAccount ? '' : 'disabled',
             href: '#',
             onclick: (e) => {
               e.preventDefault();
@@ -115,7 +115,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('h3', 'Update nominations'),
         m('.preheader-item-text', [
           m('a.btn.formular-button-primary', {
-            class: app.vm.activeAccount ? '' : 'disabled',
+            class: app.user.activeAccount ? '' : 'disabled',
             href: '#',
             onclick: (e) => {
               e.preventDefault();

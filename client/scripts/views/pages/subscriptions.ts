@@ -19,7 +19,7 @@ const NotificationButtons: m.Component = {
   view: (vnode) => {
     let notifications: any[];
     if (app.loginStatusLoaded) {
-      notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+      notifications = app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
     }
     return m('.NotificationButtons', [
       m('h2', 'Notifications:'),
@@ -27,13 +27,13 @@ const NotificationButtons: m.Component = {
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
         }
       }, 'Mark all as read'),
       m('button', {
         onclick: (e) => {
           e.preventDefault();
-          app.login.notifications.clearAllRead().then(() => m.redraw());
+          app.user.notifications.clearAllRead().then(() => m.redraw());
         }
       }, 'Clear all read'),
     ]);
@@ -47,7 +47,7 @@ interface ICoCSubscriptionsButtonAttrs {
 
 const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAttrs, {}> = {
   view: (vnode) => {
-    const subscriptions = app.login.notifications;
+    const subscriptions = app.user.notifications;
     const { chain, community } = vnode.attrs;
     const communityOrChain = community || chain;
     const communitySubscription = subscriptions.subscriptions
@@ -87,7 +87,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
   },
   view: (vnode) => {
     const { subscription } = vnode.state;
-    const subscriptions = app.login.notifications;
+    const subscriptions = app.user.notifications;
     const activeSubscription = subscriptions.subscriptions
       .find((v) => v.category === subscription.category && v.objectId === subscription.objectId);
     if (activeSubscription) {
@@ -144,7 +144,7 @@ interface IPauseToggleAttrs {
 const PauseToggle: m.Component<IPauseToggleAttrs> = {
   view: (vnode) => {
     const { pause, text, chains, communities } = vnode.attrs;
-    let { subscriptions } = app.login.notifications;
+    let { subscriptions } = app.user.notifications;
     if (chains) {
       const chainIds = chains.map((chain) => { return chain.id; });
       subscriptions = subscriptions.filter((subscription) => chainIds.includes(subscription.objectId));
@@ -157,10 +157,10 @@ const PauseToggle: m.Component<IPauseToggleAttrs> = {
       onclick: async (e) => {
         if (subscriptions.length > 0) {
           if (pause) {
-            await app.login.notifications.disableSubscriptions(subscriptions);
+            await app.user.notifications.disableSubscriptions(subscriptions);
             m.redraw();
           } else {
-            await app.login.notifications.enableSubscriptions(subscriptions);
+            await app.user.notifications.enableSubscriptions(subscriptions);
             m.redraw();
           }
         }
@@ -216,7 +216,7 @@ const ActiveSubscriptions: m.Component<{}, IActiveSubscriptionsState> = {
     if (!app.isLoggedIn) m.route.set('/');
     // TODO: Change to GET /subscriptions
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
-      jwt: app.login.jwt,
+      jwt: app.user.jwt,
     }).then((result) => {
       result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
@@ -323,7 +323,7 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
     const { chain, kind } = vnode.attrs;
     const { title, description } = vnode.attrs.titler(kind);
     const objectId = `${chain}-${kind}`;
-    const subscription = app.loginStatusLoaded && app.login.notifications.subscriptions
+    const subscription = app.loginStatusLoaded && app.user.notifications.subscriptions
       .find((sub) => sub.category === NotificationCategories.ChainEvent
         && sub.objectId === objectId);
     return m('.EventSubscriptionRow', [
@@ -333,9 +333,9 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
         onclick: async (e) => {
           e.preventDefault();
           if (subscription && subscription.isActive) {
-            await app.login.notifications.disableSubscriptions([ subscription ]);
+            await app.user.notifications.disableSubscriptions([ subscription ]);
           } else {
-            await app.login.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
+            await app.user.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
           }
           setTimeout(() => { m.redraw(); }, 0);
         }
@@ -372,7 +372,7 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
       vnode.state.eventKinds = [];
     }
 
-    const allSubscriptions = app.login.notifications.subscriptions
+    const allSubscriptions = app.user.notifications.subscriptions
       .filter((sub) => sub.category === NotificationCategories.ChainEvent
         && vnode.state.eventKinds.find((kind) => sub.objectId === `${vnode.state.chain}-${kind}`));
     const allActiveSubscriptions = allSubscriptions.filter((sub) => sub.isActive);
@@ -401,11 +401,11 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
           onclick: async (e) => {
             e.preventDefault();
             if (vnode.state.isSubscribedAll) {
-              await app.login.notifications.disableSubscriptions(allActiveSubscriptions);
+              await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
             } else {
               await Promise.all(
                 vnode.state.eventKinds.map((kind) => {
-                  return app.login.notifications.subscribe(
+                  return app.user.notifications.subscribe(
                     NotificationCategories.ChainEvent,
                     `${vnode.state.chain}-${kind.toString()}`
                   );

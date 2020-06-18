@@ -35,8 +35,8 @@ class TagsController {
         'name': tag.name,
         'description': tag.description,
         'featured_order': featured_order,
-        'address': app.vm.activeAccount.address,
-        'jwt': app.login.jwt
+        'address': app.user.activeAccount.address,
+        'jwt': app.user.jwt
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -55,11 +55,11 @@ class TagsController {
   public async update(threadId: number, tagName: string, tagId?: number) {
     try {
       const response = await $.post(`${app.serverUrl()}/updateTags`, {
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
         'thread_id': threadId,
         'tag_id': tagId,
         'tag_name': tagName,
-        'address': app.vm.activeAccount.address,
+        'address': app.user.activeAccount.address,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -85,7 +85,7 @@ class TagsController {
         ...chainOrCommObj,
         'name': name,
         'description': description,
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -108,7 +108,7 @@ class TagsController {
         'id': tag.id,
         'community': tag.communityId,
         'chain': tag.chainId,
-        'jwt': app.login.jwt
+        'jwt': app.user.jwt
       });
       this._store.remove(this._store.getById(tag.id));
     } catch (err) {

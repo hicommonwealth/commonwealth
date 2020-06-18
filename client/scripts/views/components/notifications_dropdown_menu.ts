@@ -9,7 +9,7 @@ import { sortNotifications } from 'helpers/notifications';
 
 const NotificationButtons: m.Component = {
   view: (vnode) => {
-    const notifications = app.login.notifications.notifications;
+    const notifications = app.user.notifications.notifications;
     return m(ButtonGroup, {
       class: 'NotificationButtons',
       fluid: true,
@@ -20,7 +20,7 @@ const NotificationButtons: m.Component = {
         onclick: (e) => {
           e.preventDefault();
           if (notifications.length < 1) return;
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
         },
       }),
       m(Button, {
@@ -33,8 +33,9 @@ const NotificationButtons: m.Component = {
 
 const NotificationsDropdownMenu: m.Component = {
   view: (vnode) => {
-    const notifications = app.login.notifications
-      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+    // TODO: Add helper directly on controller
+    const notifications = app.user.notifications
+      ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');

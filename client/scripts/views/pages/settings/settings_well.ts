@@ -61,8 +61,8 @@ const SettingsWell: m.Component<{}, IState> = {
                 notifySuccess('Setting saved');
               },
               choices: [
-                { label: 'Rich Text', value: 'richtext', checked: !app.login.disableRichText },
-                { label: 'Markdown', value: 'markdown', checked: app.login.disableRichText === true }
+                { label: 'Rich Text', value: 'richtext', checked: !app.user.disableRichText },
+                { label: 'Markdown', value: 'markdown', checked: app.user.disableRichText === true }
               ],
               name: 'composer',
             })

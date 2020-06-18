@@ -44,8 +44,8 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
-              if (!app.login.jwt) return alert('Login required');
-              if (!app.login.isSiteAdmin) return alert('Admin required');
+              if (!app.user.jwt) return alert('Login required');
+              if (!app.user.isSiteAdmin) return alert('Admin required');
               vnode.attrs.success = null;
               vnode.attrs.error = null;
               if (!confirm('Are you sure?')) return;
@@ -54,7 +54,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
                 id: chain.id,
                 node_url: node.url,
                 auth: true,
-                jwt: app.login.jwt,
+                jwt: app.user.jwt,
               }).then((result) => {
                 if (result.status !== 'Success') return;
                 app.config.nodes.remove(node);
@@ -76,8 +76,8 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
         href: '#',
         onclick: (e) => {
           e.preventDefault();
-          if (!app.login.jwt) return alert('Login required');
-          if (!app.login.isSiteAdmin) return alert('Admin required');
+          if (!app.user.jwt) return alert('Login required');
+          if (!app.user.isSiteAdmin) return alert('Admin required');
           vnode.attrs.success = null;
           vnode.attrs.error = null;
           const url = prompt('Enter the node url:');
@@ -89,7 +89,7 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
             network: chain.network,
             node_url: url,
             auth: true,
-            jwt: app.login.jwt,
+            jwt: app.user.jwt,
           }).then((result) => {
             app.config.nodes.add(new NodeInfo(result.result.id, result.result.chain, result.result.url));
             vnode.state.success = 'Sucessfully added';
@@ -148,7 +148,7 @@ interface ISudoFormState {
 
 const SudoForm: m.Component<{}, ISudoFormState> = {
   view: (vnode) => {
-    const author = app.vm.activeAccount as SubstrateAccount;
+    const author = app.user.activeAccount as SubstrateAccount;
     if (!(app.chain as Substrate).chain.sudoKey) {
       return m('.SudoForm', {
         style: 'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;'
@@ -401,10 +401,10 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             vnode.state.inprogress = true;
             // TODO: Change to PUT /adminStatus
             $.post(`${app.serverUrl()}/updateAdminStatus`, {
-              admin: app.vm.activeAccount.address,
+              admin: app.user.activeAccount.address,
               address: vnode.state.selected_profile, // the address to be changed
               role: vnode.state.role,
-              jwt: app.login.jwt,
+              jwt: app.user.jwt,
             }).then((response) => {
               if (response.status === 'Success') {
                 if (!app.isLoggedIn()) {
@@ -464,7 +464,7 @@ export const CreateInviteLink: m.Component<{onChangeHandler?: Function}, {link}>
               community_id: app.activeCommunityId(),
               time,
               uses,
-              jwt: app.login.jwt,
+              jwt: app.user.jwt,
             }).then((response) => {
               const linkInfo = response.result;
               const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
@@ -513,9 +513,9 @@ const InviteLinkTable: m.Component<{links}, {links}> = {
   oncreate: (vnode) => {
     // TODO: Change to GET /inviteLinks
     $.get(`${app.serverUrl()}/getInviteLinks`, {
-      address: app.vm.activeAccount.address,
+      address: app.user.activeAccount.address,
       community_id: app.activeCommunityId(),
-      jwt: app.login.jwt,
+      jwt: app.user.jwt,
     }).then((res) => {
       res.data.map((link) => vnode.state.links.push(link));
       m.redraw();
@@ -573,7 +573,7 @@ const AdminPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.login.isSiteAdmin) {
+    if (!app.user.isSiteAdmin) {
       m.route.set('/', {}, { replace: true });
       return m(PageLoading);
     }

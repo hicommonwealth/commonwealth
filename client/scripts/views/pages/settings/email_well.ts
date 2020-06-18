@@ -26,11 +26,11 @@ interface IAttrs {
 
 const EmailWell: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
-    vnode.state.email = app.login.email;
+    vnode.state.email = app.user.email;
     vnode.state.emailInputUpdated = false;
     vnode.state.verificationSent = false;
-    vnode.state.emailVerified = app.login.emailVerified;
-    vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
+    vnode.state.emailVerified = app.user.emailVerified;
+    vnode.state.githubAccount = app.user.socialAccounts.find((sa) => sa.provider === 'github');
     vnode.state.errorMessage = null;
   },
   view: (vnode) => {
@@ -41,7 +41,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
         m(Input, {
           placeholder: 'name@example.com',
           contentLeft: m(Icon, { name: Icons.MAIL }),
-          defaultValue: app.login.email || null,
+          defaultValue: app.user.email || null,
           oninput: (e) => {
             vnode.state.emailInputUpdated = true;
             vnode.state.verificationSent = false;
@@ -57,7 +57,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
             try {
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
                 'email': vnode.state.email,
-                'jwt': app.login.jwt,
+                'jwt': app.user.jwt,
               });
               vnode.state.emailVerified = false;
               vnode.state.verificationSent = true;
@@ -101,7 +101,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
               if (githubAccount) {
                 $.ajax({
                   url: `${app.serverUrl()}/githubAccount`,
-                  data: { jwt: app.login.jwt },
+                  data: { jwt: app.user.jwt },
                   type: 'DELETE',
                   success: (result) => {
                     vnode.state.githubAccount = null;

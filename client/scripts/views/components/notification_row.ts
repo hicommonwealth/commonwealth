@@ -8,7 +8,7 @@ import app from 'state';
 import { slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
-import { Notification } from 'models';
+import { Notification, AddressInfo } from 'models';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
@@ -53,7 +53,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
+  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -112,7 +112,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
+  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -185,7 +185,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
         onclick: async () => {
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
-          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
           if (!label.linkUrl) return;
           await m.route.set(label.linkUrl);
           m.redraw.sync();
@@ -202,13 +202,17 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {
           const notificationArray: Notification[] = [];
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
           await m.route.set(path);
           m.redraw.sync();
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
-        m(User, { user: author as [string, string], avatarOnly: true, avatarSize: 36 }),
+        m(User, {
+          user: new AddressInfo(null, (author as [string, string])[0], (author as [string, string])[1], null),
+          avatarOnly: true,
+          avatarSize: 36
+        }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),
           notificationBody && m('.comment-body-excerpt', notificationBody),

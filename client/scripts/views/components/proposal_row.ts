@@ -7,7 +7,7 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { Coin } from 'adapters/currency';
 import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
-import { ProposalStatus, VotingType, AnyProposal, ChainBase } from 'models';
+import { ProposalStatus, VotingType, AnyProposal, ChainBase, AddressInfo } from 'models';
 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
@@ -296,14 +296,14 @@ const ProposalRow: m.Component<IRowAttrs> = {
             m('.proposal-row-metadata', [
               m('.proposal-user', [
                 m(User, {
-                  user: [(proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id],
+                  user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
                   hideAvatar: true,
                   tooltip: true,
                 }),
               ]),
               m('.proposal-user-mobile', [
                 m(User, {
-                  user: [(proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id],
+                  user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
                   hideAvatar: true,
                   tooltip: true,
                 }),

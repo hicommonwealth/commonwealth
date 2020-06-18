@@ -8,7 +8,6 @@ import { Button } from 'construct-ui';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from '../modal';
 import { TextInputFormField, CheckboxFormField, TextareaFormField } from '../components/forms';
-import { isCommunityAdmin } from '../pages/discussions/roles';
 
 interface IEditTagModalAttrs {
   description: string,
@@ -30,7 +29,7 @@ interface IEditTagModalForm {
 
 const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
   view: (vnode: m.VnodeDOM<IEditTagModalAttrs, IEditTagModalState>) => {
-    if (!isCommunityAdmin()) return null;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, description, name } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { description, id, name };

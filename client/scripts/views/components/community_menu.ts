@@ -19,7 +19,7 @@ const CommunityMenuChain: m.Component<{ chain: string, nodeList: NodeInfo[], add
 
     const active = app.activeChainId() === chain
       && (!address
-          || (address.chain === app.vm.activeAccount?.chain.id && address.address === app.vm.activeAccount?.address));
+          || (address.chain === app.user.activeAccount?.chain.id && address.address === app.user.activeAccount?.address));
 
     return m('a.CommunityMenuChain', {
       href: '#',
@@ -31,13 +31,13 @@ const CommunityMenuChain: m.Component<{ chain: string, nodeList: NodeInfo[], add
     }, [
       m('.icon-inner', [
         m(ChainIcon, { chain: nodeList[0].chain }),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: address, avatarOnly: true, avatarSize: 16 }),
       ]),
       m('.content-inner', [
         m('.sidebar-name', nodeList[0].chain.name),
         m('.sidebar-user', [
           'Joined as ',
-          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+          m(User, { user: address, avatarSize, hideAvatar: true })
         ]),
       ]),
     ]);
@@ -49,7 +49,7 @@ const CommunityMenuCommunity: m.Component<{ community: CommunityInfo, address: A
     const { community, address } = vnode.attrs;
     const active = app.activeCommunityId() === community.id
       && (!address
-          || (address.chain === app.vm.activeAccount?.chain.id && address.address === app.vm.activeAccount?.address));
+          || (address.chain === app.user.activeAccount?.chain.id && address.address === app.user.activeAccount?.address));
 
     return m('a.CommunityMenuCommunity', {
       href: '#',
@@ -61,13 +61,13 @@ const CommunityMenuCommunity: m.Component<{ community: CommunityInfo, address: A
     }, [
       m('.icon-inner', [
         m('.name', community.name.slice(0, 2).toLowerCase()),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: address, avatarOnly: true, avatarSize: 16 }),
       ]),
       m('.content-inner', [
         m('.sidebar-name', community.name),
         m('.sidebar-user', [
           'Joined as ',
-          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+          m(User, { user: address, avatarSize, hideAvatar: true })
         ]),
       ]),
     ]);
@@ -101,22 +101,22 @@ const CommunityMenu: m.Component<{}> = {
       }
     });
 
-    const chainRoles = app.login.roles.filter((role) => !role.offchain_community_id);
-    const communityRoles = app.login.roles.filter((role) => role.offchain_community_id);
+    const chainRoles = app.user.getChainRoles();
+    const communityRoles = app.user.getCommunityRoles();
 
     return m('.CommunityMenu', [
       chainRoles.length > 0 && m('h4', 'Chains'),
       chainRoles.map((role) => {
-        const address = app.login.addresses.find((a) => a.id === role.address_id);
+        const address = app.user.addresses.find((a) => a.id === role.address_id);
         return m(CommunityMenuChain, { chain: role.chain_id, nodeList: chains[role.chain_id], address });
       }),
       chainRoles.length > 0 && m('h4', 'Communities'),
       communityRoles.map((role) => {
-        const address = app.login.addresses.find((a) => a.id === role.address_id);
+        const address = app.user.addresses.find((a) => a.id === role.address_id);
         const community = app.config.communities.getAll().find((c) => c.id === role.offchain_community_id);
         return m(CommunityMenuCommunity, { community, address });
       }),
-      app.login.roles.length > 0 && m('hr'),
+      app.user.roles.length > 0 && m('hr'),
       m(CommunityMenuLink, {
         onclick: (e) => {
           e.preventDefault();

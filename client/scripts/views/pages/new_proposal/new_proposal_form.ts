@@ -36,7 +36,7 @@ const NewProposalForm = {
   },
   view: (vnode) => {
     const callback = vnode.attrs.callback;
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;
     const activeEntity = app.community || app.chain;
 
@@ -106,7 +106,7 @@ const NewProposalForm = {
       return m('.NewProposalForm', 'Invalid proposal type');
     }
 
-    if (hasAction && !(app.vm.activeAccount as SubstrateAccount).isCouncillor) {
+    if (hasAction && !(app.user.activeAccount as SubstrateAccount).isCouncillor) {
       dataLoaded = false;
     }
 

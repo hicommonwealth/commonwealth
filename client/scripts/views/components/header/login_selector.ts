@@ -5,10 +5,9 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
 import { Button, ButtonGroup, Icon, Icons, List, ListItem, Menu, MenuItem, MenuDivider,
-         Popover, PopoverMenu } from 'construct-ui';
+  Popover, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
-import { getRoleInCommunity } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
@@ -36,8 +35,12 @@ const LoginSelector : m.Component<{}, {}> = {
       ]),
     ]);
 
-    const activeAddressesWithRole = app.login.activeAddresses.filter((account) => {
-      return getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
+    const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
+      return app.user.getRoleInCommunity({
+        account,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
     });
 
     return m('.LoginSelector', [
@@ -54,8 +57,8 @@ const LoginSelector : m.Component<{}, {}> = {
             fluid: true,
             compact: true,
             label: (!app.chain && !app.community) ? 'No community'
-              : (app.login.activeAddresses.length === 0 || app.vm.activeAccount === null) ? 'No address'
-                : m(User, { user: app.vm.activeAccount }),
+              : (app.user.activeAccounts.length === 0 || app.user.activeAccount === null) ? 'No address'
+                : m(User, { user: app.user.activeAccount }),
             iconRight: Icons.CHEVRON_DOWN,
           }),
           content: m(Menu, { class: 'LoginSelectorMenu' }, [

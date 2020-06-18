@@ -33,7 +33,7 @@ const ConfirmInviteModal = {
     vnode.state.location = 0;
     vnode.state.isComplete = false;
     vnode.state.selectedAddress = null;
-    vnode.state.addresses = app.login.addresses;
+    vnode.state.addresses = app.user.addresses;
     vnode.state.accepted = [];
   },
   oncreate: (vnode) => {
@@ -52,7 +52,7 @@ const ConfirmInviteModal = {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(User, { user: [account.address, account.chain], linkify: false, avatarSize: 16 })
+        m(User, { user: account, linkify: false, avatarSize: 16 })
       ]);
     };
 
@@ -98,16 +98,14 @@ const ConfirmInviteModal = {
                 onclick: (e) => {
                   e.preventDefault();
                   if (vnode.state.selectedAddress) {
-                    $.post(`${app.serverUrl()}/acceptInvite`, {
+                    app.user.acceptInvite({
                       address: vnode.state.selectedAddress,
-                      reject: false,
-                      inviteCode: invites[vnode.state.location].id,
-                      jwt: app.login.jwt,
-                    }).then((result) => {
+                      inviteCode: invites[vnode.state.location].id
+                    })
+                    .then(() => {
                       app.config.invites = app.config.invites.filter(
                         (invite) => invite.community_name !== invites[vnode.state.location].community_name
                       );
-                      app.login.roles.push(result.result.role);
                       vnode.state.accepted.push(vnode.state.location);
                       vnode.state.selectedAddress = null;
                       m.redraw();
@@ -130,7 +128,7 @@ const ConfirmInviteModal = {
                   $.post(`${app.serverUrl()}/acceptInvite`, {
                     inviteCode: invites[vnode.state.location].id,
                     reject: true,
-                    jwt: app.login.jwt,
+                    jwt: app.user.jwt,
                   }).then((result) => {
                     app.config.invites = app.config.invites.filter(
                       (invite) => invite.community_name !== invites[vnode.state.location].community_name
