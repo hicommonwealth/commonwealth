@@ -4,18 +4,18 @@ import 'components/settings/github_well.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { Colors } from 'construct-ui';
 
 import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
 import { SocialAccount } from 'models';
-import { Button, Input, Icons, Icon, Tooltip, Classes } from 'construct-ui';
+import { Button, Colors, Input, Icons, Icon, Tooltip, Classes } from 'construct-ui';
 
 interface IState {
   email: string;
-  emailVerified: boolean;
+  emailInputUpdated: boolean;
   emailUpdated: boolean;
+  emailVerified: boolean;
   githubAccount: SocialAccount;
 }
 
@@ -26,31 +26,35 @@ interface IAttrs {
 const EmailWell: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.email = app.login.email;
+    vnode.state.emailInputUpdated = false;
     vnode.state.emailUpdated = false;
     vnode.state.emailVerified = app.login.emailVerified;
     vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
   },
   view: (vnode) => {
-    const { githubAccount, email, emailVerified, emailUpdated } = vnode.state;
+    const { email, githubAccount, emailInputUpdated, emailVerified, emailUpdated } = vnode.state;
     return [
       m('.EmailWell', [
         m('h4', 'Email'),
         m(Input, {
           contentLeft: m(Icon, { name: Icons.MAIL }),
-          defaultValue: email || null,
-          oninput: (e) => { vnode.state.email = (e.target as any).value; },
+          defaultValue: app.login.email || null,
+          oninput: (e) => {
+            vnode.state.emailInputUpdated = true;
+            vnode.state.email = (e.target as any).value;
+          },
         }),
         m(Button, {
-          label: 'Update email',
-          disabled: email === app.login.email,
+          intent: 'primary',
+          label: (!emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
+          class: 'update-email-button',
+          disabled: !emailInputUpdated && emailVerified,
           onclick: async () => {
             try {
-              if (email === app.login.email) return;
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
-                'email': email,
+                'email': vnode.state.email,
                 'jwt': app.login.jwt,
               });
-              app.login.email = response.result.email;
               vnode.state.emailVerified = false;
               vnode.state.emailUpdated = true;
               m.redraw();
@@ -74,15 +78,14 @@ const EmailWell: m.Component<IAttrs, IState> = {
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [
-          m(Input, {
-            value: `github.com/${githubAccount?.username}`,
+          githubAccount && m(Input, {
+            value: `github.com/${githubAccount.username || ''}`,
             contentLeft: m(Icon, { name: Icons.GITHUB }),
             disabled: true,
           }),
           m(Button, {
             label: githubAccount ? 'Unlink Github' : 'Link Github',
-            href: githubAccount ? '' : `${app.serverUrl()}/auth/github`,
-            intent: githubAccount ? 'negative' : 'none',
+            intent: githubAccount ? 'negative' : 'primary',
             onclick: () => {
               if (githubAccount) {
                 $.ajax({
@@ -103,6 +106,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
                   timestamp: (+new Date()).toString(),
                   path: m.route.get()
                 }));
+                document.location = `${app.serverUrl()}/auth/github` as any;
                 m.redraw();
               }
             },
