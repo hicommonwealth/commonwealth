@@ -1,4 +1,4 @@
-import 'components/settings/send_edg_well.scss';
+import 'pages/settings/send_edg_well.scss';
 
 import m from 'mithril';
 import app from 'state';

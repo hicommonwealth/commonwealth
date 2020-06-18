@@ -1,5 +1,5 @@
-import 'components/settings/email_well.scss';
-import 'components/settings/github_well.scss';
+import 'pages/settings/email_well.scss';
+import 'pages/settings/github_well.scss';
 
 import m from 'mithril';
 import $ from 'jquery';

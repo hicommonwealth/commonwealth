@@ -1,4 +1,4 @@
-import 'components/settings/settings_well.scss';
+import 'pages/settings/settings_well.scss';
 
 import m from 'mithril';
 import app from 'state';
