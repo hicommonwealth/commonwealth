@@ -23,16 +23,11 @@ describe('Draft Tests', () => {
 
   const title = 'test title';
   const body = 'test body';
-  const tagName = 'test tag';
-  const tagId = undefined;
-  const kind = 'forum';
+  const tag = 'test tag';
 
-  let adminJWT;
-  let adminAddress;
   let userJWT;
   let userId;
   let userAddress;
-  let thread;
 
   before(async () => {
     await resetDatabase();
@@ -45,7 +40,7 @@ describe('Draft Tests', () => {
   });
 
   describe('/createDraft', () => {
-    it('should create a discussion draft with all thread params', async () => {
+    it('should successfully create a community discussion draft with all reqd params', async () => {
       const res = await chai.request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
@@ -53,18 +48,42 @@ describe('Draft Tests', () => {
           'address': userAddress,
           'author_chain': chain,
           'chain': chain,
-          'community': undefined,
+          'community': null,
           'title': title,
-          'tag': tagName,
+          'tag': tag,
           'body': body,
           'jwt': userJWT,
         });
+      const { result } = res.body;
       expect(res).to.have.status(200);
-      expect(res.body.result).to.not.be.null;
-      expect(res.body.result.title).to.equal(title);
-      expect(res.body.result.body).to.equal(body);
-      expect(res.body.result.Address).to.not.be.null;
-      expect(res.body.result.Address.address).to.equal(userAddress);
+      expect(result).to.not.be.null;
+      expect(result.title).to.equal(title);
+      expect(result.body).to.equal(body);
+      expect(result.Address).to.not.be.null;
+      expect(result.Address.address).to.equal(userAddress);
+    });
+
+    it('should successfully create a chain discussion draft with all reqd params', async () => {
+      const res = await chai.request(app)
+        .post('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': null,
+          'community': community,
+          'title': title,
+          'tag': tag,
+          'body': body,
+          'jwt': userJWT,
+        });
+      const { result } = res.body;
+      expect(res).to.have.status(200);
+      expect(result).to.not.be.null;
+      expect(result.title).to.equal(title);
+      expect(result.body).to.equal(body);
+      expect(result.Address).to.not.be.null;
+      expect(result.Address.address).to.equal(userAddress);
     });
 
     it('should create a discussion draft without a title', async () => {
@@ -75,18 +94,19 @@ describe('Draft Tests', () => {
           'address': userAddress,
           'author_chain': chain,
           'chain': chain,
-          'community': undefined,
+          'community': null,
           'title': null,
-          'tag': tagName,
+          'tag': tag,
           'body': body,
           'jwt': userJWT,
         });
+      const { result } = res.body;
       expect(res).to.have.status(200);
-      expect(res.body.result).to.not.be.null;
-      expect(res.body.result.body).to.equal(body);
-      expect(res.body.result.tag).to.equal(tagName);
-      expect(res.body.result.Address).to.not.be.null;
-      expect(res.body.result.Address.address).to.equal(userAddress);
+      expect(result).to.not.be.null;
+      expect(result.body).to.equal(body);
+      expect(result.tag).to.equal(tag);
+      expect(result.Address).to.not.be.null;
+      expect(result.Address.address).to.equal(userAddress);
     });
 
     it('should create a discussion draft without a tag', async () => {
@@ -97,18 +117,19 @@ describe('Draft Tests', () => {
           'address': userAddress,
           'author_chain': chain,
           'chain': chain,
-          'community': undefined,
+          'community': null,
           'title': title,
           'tag': null,
           'body': body,
           'jwt': userJWT,
         });
+      const { result } = res.body;
       expect(res).to.have.status(200);
-      expect(res.body.result).to.not.be.null;
-      expect(res.body.result.title).to.equal(title);
-      expect(res.body.result.body).to.equal(body);
-      expect(res.body.result.Address).to.not.be.null;
-      expect(res.body.result.Address.address).to.equal(userAddress);
+      expect(result).to.not.be.null;
+      expect(result.title).to.equal(title);
+      expect(result.body).to.equal(body);
+      expect(result.Address).to.not.be.null;
+      expect(result.Address.address).to.equal(userAddress);
     });
 
     it('should fail to create a discussion draft missing a body and attachment', async () => {
@@ -119,11 +140,71 @@ describe('Draft Tests', () => {
           'address': userAddress,
           'author_chain': chain,
           'chain': chain,
-          'community': undefined,
+          'community': null,
           'title': title,
-          'tag': tagName,
+          'tag': tag,
           'body': null,
           'attachments[]': null,
+          'jwt': userJWT,
+        });
+      expect(res).to.not.have.status(200);
+    });
+  });
+
+  describe('/editDraft', () => {
+    let firstDraft;
+    beforeEach(async () => {
+      const res = await chai.request(app)
+        .post('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'title': title,
+          'tag': tag,
+          'body': body,
+          'jwt': userJWT,
+        });
+      firstDraft = res.body.result;
+    });
+
+    it('should successfully edit a draft', async () => {
+      const res = await chai.request(app)
+        .patch('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'id': firstDraft.id,
+          'title': `${title} edited`,
+          'tag': `${tag} edited`,
+          'body': `${body} edited`,
+          'jwt': userJWT,
+        });
+      const { result } = res.body;
+      expect(res).to.have.status(200);
+      expect(result.title).to.equal(`${title} edited`);
+      expect(result.tag).to.equal(`${tag} edited`);
+      expect(result.body).to.equal(`${body} edited`);
+    });
+
+    it('should fail to edit a draft when missing an id', async () => {
+      const res = await chai.request(app)
+        .patch('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'id': null,
+          'title': title,
+          'tag': tag,
+          'body': body,
           'jwt': userJWT,
         });
       expect(res).to.not.have.status(200);
@@ -138,9 +219,9 @@ describe('Draft Tests', () => {
         .query({
           'jwt': userJWT
         });
-      expect(res.body.result).to.not.be.null;
-      expect(res.body).to.not.be.null;
+      const { result } = res.body;
       expect(res).to.have.status(200);
+      expect(result).to.not.be.null;
     });
   });
 });

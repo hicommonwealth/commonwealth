@@ -61,7 +61,7 @@ class DraftsController {
   }
 
   public async edit(
-    draftId: number,
+    id: number,
     title: string,
     body: string,
     tagName: string,
@@ -76,7 +76,7 @@ class DraftsController {
           'author_chain': app.vm.activeAccount.chain.id,
           'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
-          'id': draftId,
+          'id': id,
           'body': body,
           'title': title,
           'tag': tagName,
