@@ -137,7 +137,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
     community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (category === NotificationCategories.NewThread) ? (getCommunityUrl)(community_id || chain_id) : (getProposalUrl as any)(...args);
+  const path = (category === NotificationCategories.NewThread) ? (getCommunityUrl as any)(community_id || chain_id) : (getProposalUrl as any)(...args);
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
