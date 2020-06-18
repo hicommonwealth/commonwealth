@@ -35,54 +35,52 @@ interface IThreadForm {
 
 export const populateDraft = async (state, draft) => {
   const a = app;
-  const { fromDraft, quillEditorState } = state;
-  const { body, title, tag, id } = draft;
-  const quill = quillEditorState.editor;
+  const { fromDraft } = state;
+  const quill = state.quillEditorState.editor;
   let confirmed = true;
   debugger
-  if (!quillEditorState.markdownMode) { //if editor is rich text
-    
-    if () {
-      quillEditorState.markdownMode = true;
+  if (fromDraft) {
+    const formBody = quill.getContents();
+    let formBodyDelta;
+    let formBodyMarkdown;
+    try {
+      formBodyDelta = JSON.stringify(formBody.ops[0]);
+    } catch {
+      formBodyMarkdown = formBody;
     }
-    if (fromDraft) {
-      const formBody = quill.getContents();
-      let formBodyDelta;
-      let formBodyMarkdown;
-      try {
-        formBodyDelta = JSON.stringify(formBody.ops[0]);
-      } catch {
-        formBodyMarkdown = formBody;
-      }
-      const discardedDraft = app.login.discussionDrafts.store
-        .getByCommunity(app.activeId())
-        .filter((d) => d.id === fromDraft)[0].body;
-      let discardedDelta;
-      let discardedMarkdown;
-      try {
-        discardedDelta = JSON.parse(discardedDelta);
-      } catch {
-        discardedMarkdown = discardedDraft;
-      }
-      if (formBodyDelta !== discardedDelta) {
-        confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
-      }
-      // logic for checking loaded types
-    } else if (quill.getLength() > 1) {
+    const discardedDraft = app.login.discussionDrafts.store
+      .getByCommunity(app.activeId())
+      .filter((d) => d.id === fromDraft)[0].body;
+    let discardedDelta;
+    let discardedMarkdown;
+    try {
+      discardedDelta = JSON.parse(discardedDelta);
+    } catch {
+      discardedMarkdown = discardedDraft;
+    }
+    if (formBodyDelta !== discardedDelta) {
       confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
     }
-  } else if (!quillEditorState.markdownMode && !quill.delta) {
-    quillEditorState.markdownMode = true;
+  } else if (quill.getLength() > 1) {
+    confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
   }
   if (!confirmed) return;
-  if (body) {
+  let newDraftMarkdown;
+  let newDraftDelta;
+  if (draft.body) {
     try {
-      const doc = JSON.parse(body);
-      quill.setContents(doc);
+      newDraftDelta = JSON.parse(draft.body);
     } catch (e) {
-      // TODO: figure out Markdown strategy
+      newDraftMarkdown = draft.body;
     }
   }
+  if (newDraftDelta && state.quillEditorState.markdownMode) {
+    state.quillEditorState.markdownMode = false;
+  } else if (newDraftMarkdown && !state.quillEditorState.markdownMode) {
+    state.quillEditorState.markdownMode = true;
+  }
+  quill.setContents(newDraftDelta || newDraftMarkdown);
+
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   (titleInput as HTMLInputElement).value = draft.title;
   state.form.title = draft.title;
