@@ -12,7 +12,7 @@ import { getRoleInCommunity } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import LoginModal from 'views/modals/login_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
@@ -53,19 +53,21 @@ const LoginSelector : m.Component<{}, {}> = {
             size: 'sm',
             fluid: true,
             compact: true,
-            label: (!app.chain && !app.community) ? 'No community selected'
-              : (app.login.activeAddresses.length === 0 || app.vm.activeAccount === null) ? 'No address selected'
-              : m(User, { user: app.vm.activeAccount }),
+            label: (!app.chain && !app.community) ? 'No community'
+              : (app.login.activeAddresses.length === 0 || app.vm.activeAccount === null) ? 'No address'
+                : m(User, { user: app.vm.activeAccount }),
             iconRight: Icons.CHEVRON_DOWN,
           }),
-          content: m(Menu, [
+          content: m(Menu, { class: 'LoginSelectorMenu' }, [
             // address selector - only shown in communities
             (app.chain || app.community) && [
               activeAddressesWithRole.map((account) => m(MenuItem, {
+                align: 'left',
+                basic: true,
                 onclick: (e) => {
                   setActiveAccount(account);
                 },
-              label: m(User, { user: account, showRole: true }),
+                label: m(UserBlock, { user: account, avatarSize: 24 }),
               })),
               m(MenuItem, {
                 onclick: () => app.modals.create({

@@ -114,3 +114,18 @@
         color: #999;
     }
 }
+
+.UserBlock {
+    display: flex;
+    .profile-block-left {
+        padding-right: 16px;
+        margin: 5px 0;
+    }
+    .profile-block-right {
+        flex: 1;
+        .profile-block-name,
+        .profile-block-address {
+            text-align: left;
+        }
+    }
+}

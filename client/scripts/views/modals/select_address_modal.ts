@@ -6,8 +6,7 @@ import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
 import { Account, RoleInfo } from 'models';
-import ProfileBlock from 'views/components/widgets/profile_block';
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase, getRoleInCommunity } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
@@ -35,7 +34,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex }> = {
             vnode.state.selectedIndex = index;
           },
         }, [
-          m(ProfileBlock, { account }),
+          m(UserBlock, { user: account }),
           role && m('.role-permission', [
             m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
             role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
