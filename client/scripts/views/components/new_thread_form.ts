@@ -3,6 +3,7 @@ import 'components/new_thread_form.scss';
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
+import Quill from 'quill-2.0-dev/quill';
 import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem } from 'construct-ui';
 
 import app from 'state';
@@ -34,18 +35,17 @@ interface IThreadForm {
 }
 
 export const populateDraft = async (state, draft) => {
-  const a = app;
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
+  const Delta = Quill.import('delta');
   let confirmed = true;
   if (fromDraft) {
-    const formBody = quill.getContents();
     let formBodyDelta;
     let formBodyMarkdown;
-    try {
-      formBodyDelta = JSON.stringify(formBody.ops[0]);
-    } catch {
-      formBodyMarkdown = formBody;
+    if (state.quillEditorState.markdownMode) {
+      formBodyMarkdown = quill.getText();
+    } else {
+      formBodyDelta = quill.getContents();
     }
     const discardedDraft = app.login.discussionDrafts.store
       .getByCommunity(app.activeId())
@@ -53,13 +53,19 @@ export const populateDraft = async (state, draft) => {
     let discardedDelta;
     let discardedMarkdown;
     try {
-      discardedDelta = JSON.parse(discardedDraft);
+      discardedDelta = new Delta(JSON.parse(discardedDraft));
     } catch {
       discardedMarkdown = discardedDraft;
     }
-    if ((formBodyDelta && formBodyDelta !== discardedDelta)
-      || (formBodyMarkdown && formBodyMarkdown !== discardedMarkdown)
-      || !(formBodyDelta && discardedDelta)) {
+    console.log({
+      formBodyDelta,
+      discardedDelta,
+      discardedMarkdown
+    });
+
+    const isUnchanged = _.isEqual(formBodyDelta, discardedDelta)
+      || formBodyMarkdown === discardedMarkdown;
+    if (!isUnchanged) {
       confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
     }
   } else if (quill.getLength() > 1) {
