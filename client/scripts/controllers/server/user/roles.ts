@@ -59,7 +59,7 @@ export default class extends Base {
       inviteCode: options.inviteCode,
       jwt: this.jwt,
     }).then((result) => {
-      this.roles.push(result.result.role);
+      this.addRole(result.result.role);
     });
   }
 
