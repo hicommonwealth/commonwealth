@@ -65,6 +65,7 @@ export const populateDraft = async (state, draft) => {
     confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
   }
   if (!confirmed) return;
+
   let newDraftMarkdown;
   let newDraftDelta;
   if (draft.body) {
@@ -79,6 +80,7 @@ export const populateDraft = async (state, draft) => {
   } else if (newDraftMarkdown && !state.quillEditorState.markdownMode) {
     state.quillEditorState.markdownMode = true;
   }
+
   quill.setContents(newDraftDelta || newDraftMarkdown);
 
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
@@ -138,8 +140,6 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
     ]);
 
     const discussionDrafts = app.login.discussionDrafts.store.getByCommunity(app.activeId());
-    const a = app;
-    debugger
     // TODO: Community-scope tags in /status & store
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
