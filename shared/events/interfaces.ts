@@ -2,13 +2,26 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ISubstrateEventData, SubstrateEventKind, SubstrateEntityKind, EdgewareEventChains } from './edgeware/types';
-import { MolochEntityKind, IMolochEventData, MolochEventKind, MolochEventChains } from './moloch/types';
+import {
+  ISubstrateEventData,
+  SubstrateEventKind,
+  SubstrateEntityKind,
+  EdgewareEventChains,
+  SubstrateEventKinds
+} from './edgeware/types';
+import {
+  MolochEntityKind,
+  IMolochEventData,
+  MolochEventKind,
+  MolochEventChains,
+  MolochEventKinds
+} from './moloch/types';
 
 // add other events here as union types
 export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
 export type IChainEventData = ISubstrateEventData | IMolochEventData;
 export type IChainEventKind = SubstrateEventKind | MolochEventKind;
+export const ChainEventKinds = [...SubstrateEventKinds, ...MolochEventKinds]
 export const EventSupportingChains = [...EdgewareEventChains, ...MolochEventChains];
 export enum EntityEventKind {
   Create = 0,

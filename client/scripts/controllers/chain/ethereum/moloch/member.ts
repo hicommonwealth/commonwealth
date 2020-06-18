@@ -67,6 +67,7 @@ export default class MolochMember extends EthereumAccount {
     const m = await this._Members.api.Contract.members(this.address);
     if (!m.exists) {
       this._isMember = false;
+      this._shares.next(new MolochShares(this._Members.api.contractAddress, new BN(0)));
     } else {
       this._isMember = true;
       this._delegateKey = m.delegateKey.toLowerCase();

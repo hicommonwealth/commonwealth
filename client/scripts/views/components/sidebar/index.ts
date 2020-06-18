@@ -115,12 +115,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain?.base === ChainBase.CosmosSDK)
       ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
+    const molochProposals = (app.chain?.class === ChainClass.Moloch)
+      ? (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed).length : 0;
+
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.base === ChainBase.Substrate
         || app.chain.class === ChainClass.Moloch);
-    const showMolochMenuOptions = app.chain?.class === ChainClass.Moloch;
+    const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as MolochMember)?.shares?.gtn(0);
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
@@ -175,18 +179,18 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
       (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
           m('h4', 'Vote & Stake'),
-          // proposals (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && m(ListItem, {
-              active: onProposalPage(m.route.get()),
-              label: 'Proposals',
-              onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-              contentRight: [
-                allSubstrateGovernanceProposals > 0
-                  && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
-                cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
-              ],
-            }),
+          // proposals (substrate, cosmos, moloch only)
+          hasProposals && m(ListItem, {
+            active: onProposalPage(m.route.get()),
+            label: 'Proposals',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+            contentRight: [
+              allSubstrateGovernanceProposals > 0
+                && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+              cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
+              molochProposals > 0 && m(Tag, { rounded: true, label: molochProposals }),
+            ],
+          }),
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
@@ -203,21 +207,21 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           //     label: 'Validators',
           //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
           //   }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => {
               m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
             },
             label: 'New proposal',
             contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
             }),
             label: 'Update delegate key',
             contentLeft: m(Icon, { name: Icons.KEY }),
           }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
             }),

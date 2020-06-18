@@ -83,7 +83,7 @@ export default class extends IStorageFetcher<ApiPromise> {
     const proposedEvents = _.zip(publicProps, deposits)
       .map(([ [ idx, hash, proposer ], depositOpt ]): ISubstrateDemocracyProposed => {
         if (!depositOpt.isSome) return null;
-  
+
         // handle kusama vs edgeware depositOpt order
         const depositors = depositOpt.unwrap();
         let deposit: BalanceOf;

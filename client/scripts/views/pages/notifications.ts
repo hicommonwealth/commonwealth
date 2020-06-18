@@ -9,7 +9,9 @@ import _ from 'lodash';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'events/edgeware/types';
+import { SubstrateEventKinds, EdgewareEventChains } from 'events/edgeware/types';
+import { MolochEventKinds, MolochEventChains } from 'events/moloch/types';
+import MolochTitlerFunc from 'events/moloch/filters/titler';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input } from 'construct-ui';
@@ -477,15 +479,18 @@ interface IEventSubscriptionState {
 const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionState> = {
   oninit: (vnode) => {
     vnode.state.chain = vnode.attrs.chain.id;
-    vnode.state.eventKinds = SubstrateEventKinds;
+    vnode.state.eventKinds = [];
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
   },
   view: (vnode) => {
     let titler;
-    if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
+    if (EdgewareEventChains.includes(vnode.state.chain)) {
       titler = EdgewareTitlerFunc;
       vnode.state.eventKinds = SubstrateEventKinds;
+    } else if (MolochEventChains.includes(vnode.state.chain)) {
+      titler = MolochTitlerFunc;
+      vnode.state.eventKinds = MolochEventKinds;
     } else {
       titler = null;
       vnode.state.eventKinds = [];
@@ -547,7 +552,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
           EventSubscriptionRow,
           { chain: vnode.state.chain, kind, titler },
         ))
-        : m('No events available on this chain.')
+        : m('.error', 'No events available on this chain.')
     ]);
   }
 };

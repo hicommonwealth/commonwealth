@@ -14,9 +14,7 @@ import { AddressInfo, ChainClass } from 'models';
 import User from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import RagequitModal from 'views/modals/ragequit_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 
 const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
