@@ -73,10 +73,6 @@ export interface IApp {
     defaultChain: string;
     invites: any[];
   };
-  // TODO: pull this into login
-  vm: {
-    activeAccount: Account<any>;
-  };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
   isProduction(): boolean;
@@ -125,10 +121,6 @@ const app: IApp = {
   },
   isProduction: () => {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
-  },
-  // TODO: Remove VM property, migrate activeAccount to app.user
-  vm: {
-    activeAccount: null,
   },
   serverUrl: () => '/api',
   loadingError: null,
