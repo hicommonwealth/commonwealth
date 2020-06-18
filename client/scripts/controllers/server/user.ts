@@ -385,11 +385,14 @@ export default class {
   }
 
   // TODO: Should this use active chain/community?
-  public isAdmin(options: { account: Account<any> | AddressInfo }): boolean {
+  public isAdmin(options: { account: Account<any> | AddressInfo | string }): boolean {
     if (!options.account) return false;
     return this._roles.findIndex((r) => {
-      return r.address === options.account.address
-        && r.permission === RolePermission.admin;
+      if (typeof options.account === 'string') {
+        return r.address === options.account && r.permission === RolePermission.admin;
+      } else {
+        return r.address === options.account.address && r.permission === RolePermission.admin;
+      }
     }) !== -1;
   }
 
