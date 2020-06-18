@@ -24,7 +24,7 @@ import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
-import UserController from './controllers/server/user';
+import UserController from './controllers/server/user/index';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
