@@ -18,7 +18,7 @@ import { Request, Response, NextFunction } from 'express';
 
 const finishEmailLogin = async (models, req: Request, res: Response, next: NextFunction) => {
   const previousUser = req.user;
-  if (req.user && req.user.email) {
+  if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);
   }
 
@@ -60,10 +60,10 @@ const finishEmailLogin = async (models, req: Request, res: Response, next: NextF
         ]);
         await existingUser.setSocialAccounts(oldSocialAccounts.concat(newSocialAccounts));
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
-        if (!existingUser.emailVerified) {
-          existingUser.emailVerified = true;
-          await existingUser.save();
-        }
+      }
+      if (!existingUser.emailVerified) {
+        existingUser.emailVerified = true;
+        await existingUser.save();
       }
       return redirectWithLoginSuccess(res, email, tokenObj.redirect_path);
     });

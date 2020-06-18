@@ -61,6 +61,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
               });
               vnode.state.emailVerified = false;
               vnode.state.verificationSent = true;
+              vnode.state.errorMessage = null;
               m.redraw();
             } catch (err) {
               vnode.state.errorMessage = err.responseJSON.error;
