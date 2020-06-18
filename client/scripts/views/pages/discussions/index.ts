@@ -94,9 +94,9 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
-    const allLastVisited = (typeof app.login.lastVisited === 'string')
-      ? JSON.parse(app.login.lastVisited)
-      : app.login.lastVisited;
+    const allLastVisited = (typeof app.user.lastVisited === 'string')
+      ? JSON.parse(app.user.lastVisited)
+      : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
       updateLastVisited(app.community
@@ -251,7 +251,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     };
 
     const { tag } = vnode.attrs;
-    const activeAddressInfo = app.user.activeAccount && app.login.addresses
+    const activeAddressInfo = app.user.activeAccount && app.user.addresses
       .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
 
     const activeNode = app.chain?.meta;

@@ -19,7 +19,7 @@ interface IState {
 
 const SettingsWell: m.Component<{}, IState> = {
   oninit: (vnode) => {
-    vnode.state.email = app.login.email;
+    vnode.state.email = app.user.email;
   },
   view: (vnode) => {
     const nodes = (app.chain && app.chain.meta ? [] : [{
@@ -46,12 +46,12 @@ const SettingsWell: m.Component<{}, IState> = {
           label: 'Update Email',
           onclick: async () => {
             try {
-              if (vnode.state.email === app.login.email) return;
+              if (vnode.state.email === app.user.email) return;
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
                 'email': vnode.state.email,
-                'jwt': app.login.jwt,
+                'jwt': app.user.jwt,
               });
-              app.login.email = response.result.email;
+              app.user.setEmail(response.result.email);
             } catch (err) {
               console.log('Failed to update email');
               throw new Error((err.responseJSON && err.responseJSON.error)
@@ -89,8 +89,8 @@ const SettingsWell: m.Component<{}, IState> = {
                 notifySuccess('Setting saved');
               },
               choices: [
-                { label: 'Rich Text', value: 'richtext', checked: !app.login.disableRichText },
-                { label: 'Markdown', value: 'markdown', checked: app.login.disableRichText === true }
+                { label: 'Rich Text', value: 'richtext', checked: !app.user.disableRichText },
+                { label: 'Markdown', value: 'markdown', checked: app.user.disableRichText === true }
               ],
               name: 'composer',
             })

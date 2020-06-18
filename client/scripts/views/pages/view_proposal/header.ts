@@ -8,7 +8,6 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
 import {
@@ -159,7 +158,11 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
 
     const canEdit = (app.user.activeAccount?.address === proposal.author
                      && app.user.activeAccount?.chain.id === proposal.authorChain)
-      || app.user.isRoleOfCommunity('admin', { chain: app.activeChainId(), community: app.activeCommunityId() });
+      || app.user.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
 
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
@@ -220,7 +223,7 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
     if (!proposal) return;
     if (!app.isLoggedIn()) return;
 
-    const subscription = app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
+    const subscription = app.user.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
 
     return m(Button, {
       class: 'ProposalHeaderSubscriptionButton',
@@ -229,9 +232,9 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
       onclick: (e) => {
         e.preventDefault();
         if (subscription?.isActive) {
-          app.login.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
+          app.user.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
         } else {
-          app.login.notifications.subscribe(
+          app.user.notifications.subscribe(
             NotificationCategories.NewComment, proposal.uniqueIdentifier,
           ).then(() => m.redraw());
         }

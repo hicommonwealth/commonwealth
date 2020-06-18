@@ -36,7 +36,7 @@ const GithubWell: m.Component<{}, IState> = {
             if (githubAccount) {
               $.ajax({
                 url: `${app.serverUrl()}/githubAccount`,
-                data: { jwt: app.login.jwt },
+                data: { jwt: app.user.jwt },
                 type: 'DELETE',
                 success: (result) => {
                   vnode.state.githubAccount = null;

@@ -107,8 +107,8 @@ const accountVerifiedCallback = async (account, vnode) => {
     if (app.community) {
       updateActiveAddresses(undefined, true);
     } else if (app.chain) {
-      const chain = app.login.selectedNode
-        ? app.login.selectedNode.chain
+      const chain = app.user.selectedNode
+        ? app.user.selectedNode.chain
         : app.config.nodes.getByChain(app.activeChainId())[0].chain;
       updateActiveAddresses(chain, true);
     } else {
@@ -282,7 +282,7 @@ const LinkNewAddressModal = {
         vnode.state.error && m('.error-message', vnode.state.error),
         m('p.link-address-precopy', vnode.attrs.loggingInWithAddress ? [
           'Select a wallet:'
-        ] : app.login.activeAddresses.length === 0 ? [
+        ] : app.user.activeAccounts.length === 0 ? [
           'Select a wallet:'
         ] : [
           m('.link-address-combined-warning', [
@@ -652,7 +652,7 @@ const LinkNewAddressModal = {
                 } catch (e) {
                   vnode.state.error = 'Invalid address';
                 }
-                if (app.login.activeAddresses.find((acct) => acct.address === address)) {
+                if (app.user.activeAccounts.find((acct) => acct.address === address)) {
                   vnode.state.error = 'You have already linked this address';
                 }
               }

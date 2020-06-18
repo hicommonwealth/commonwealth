@@ -78,10 +78,10 @@ const Chat = {
     };
     const server = CHAT_SERVER.startsWith('localhost') ? `ws://${CHAT_SERVER}` : `wss://${CHAT_SERVER}`;
     const chatRoomUrl = `${server}/?room=${vnode.attrs.room}`;
-    vnode.state.chat = new ChatController(chatRoomUrl, SOCKET_PURPOSE, app.login.jwt, (connected) => {
+    vnode.state.chat = new ChatController(chatRoomUrl, SOCKET_PURPOSE, app.user.jwt, (connected) => {
       if (connected) {
         vnode.state.messages = [];
-        vnode.state.chat.initializeScrollback(app.login.jwt);
+        vnode.state.chat.initializeScrollback(app.user.jwt);
         scrollToChatBottom();
       }
     });
@@ -91,7 +91,7 @@ const Chat = {
     vnode.state.outgoingTypingInputHandler = _.throttle((e) => {
       if (!vnode.state.chat.isConnected) return;
       if (e && e.target && $(e.target).val() === '') return;
-      vnode.state.chat.sendTypingIndicator(app.login.jwt);
+      vnode.state.chat.sendTypingIndicator(app.user.jwt);
     }, TYPING_INDICATOR_OUTGOING_FREQUENCY, { leading: true, trailing: false });
   },
   view: (vnode) => {
@@ -152,7 +152,7 @@ const Chat = {
                     if (!vnode.state.chat.isConnected) return;
                     const $textarea = $(e.target).closest('form').find('textarea.ResizableTextarea');
                     const message = $textarea.val();
-                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.login.jwt);
+                    vnode.state.chat.send('message', message, app.chain.meta.chain.id, app.user.activeAccount.address, app.user.jwt);
                     vnode.state.oninput = false; // HACK: clear the typing debounce
                     $textarea.val('');
                   }

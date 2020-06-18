@@ -5,8 +5,6 @@ import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
-import { getAllRolesInCommunity, getDefaultAddressInCommunity } from 'helpers';
-import { isMember } from 'helpers/roles';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -35,7 +33,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity(account, { chain, community });
+    const role = app.user.getRoleInCommunity({ account, chain, community });
 
     if (!role) {
       if (!suppressNotification && app.user.activeAccount !== account) {
@@ -93,14 +91,14 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
 }
 
 export function clearActiveAddresses() {
-  app.user.setActiveAddresses([]);
+  app.user.setActiveAccounts([]);
   app.user.setActiveAccount(null);
 }
 
 export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
-  app.user.setActiveAddresses(
+  app.user.setActiveAccounts(
     chain
       ? app.user.addresses
         .filter((a) => a.chain === chain.id)
@@ -112,10 +110,10 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
   );
 
   // select the address that the new chain should be initialized with
-  const memberAddresses = app.user.activeAddresses.filter((address) => {
+  const memberAddresses = app.user.activeAccounts.filter((account) => {
     return chain
-      ? isMember(chain.id, null, address)
-      : isMember(null, app.community.meta.id, address);
+      ? app.user.isMember({ chain: chain.id, account })
+      : app.user.isMember({ community: app.community.meta.id, account });
   });
 
   if (memberAddresses.length === 0) {
@@ -125,11 +123,11 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
     setActiveAccount(memberAddresses[0]);
   } else {
     const existingAddress = chain
-      ? getDefaultAddressInCommunity(chain.id, null)
-      : getDefaultAddressInCommunity(null, app.community.meta.id);
+      ? app.user.getDefaultAddressInCommunity({ chain: chain.id })
+      : app.user.getDefaultAddressInCommunity({ community: app.community.meta.id });
 
     if (existingAddress) {
-      const account = app.user.activeAddresses.find((a) => {
+      const account = app.user.activeAccounts.find((a) => {
         return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
       });
       if (account) setActiveAccount(account);
@@ -150,7 +148,7 @@ export function updateActiveUser(data) {
     app.user.setSiteAdmin(false);
     app.user.setLastVisited({});
     app.user.setUnseenPosts({});
-    app.user.setActiveAddresses([]);
+    app.user.setActiveAccounts([]);
     app.user.setActiveAccount(null);
   } else {
     app.user.setEmail(data.email);
@@ -171,14 +169,14 @@ export function updateActiveUser(data) {
 // creates SubstrateAccount with only a private key
 export async function createUserWithSeed(seed: string): Promise<Account<any>> {
   // Look for unlocked account with the same seed
-  const existingDevAccount = app.user.activeAddresses.find((user) => user.getSeed() === seed);
+  const existingDevAccount = app.user.activeAccounts.find((user) => user.getSeed() === seed);
   if (existingDevAccount) {
     throw new Error('User with this seed already exists');
   }
 
   const account = (app.chain.accounts as SubstrateAccounts).fromSeed(seed);
   // Look for account with the same public key
-  const existingUser = app.user.activeAddresses.find((user) => user.address === account.address);
+  const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
   if (existingUser) {
     account.setSeed(seed);
     // TODO: what should we do here?
@@ -216,12 +214,12 @@ export function unlinkLogin(account) {
   }).then((result) => {
     // Remove from all address stores in the frontend state.
     // This might be more gracefully handled by calling initAppState again.
-    let index = app.user.activeAddresses.indexOf(account);
-    app.user.activeAddresses.splice(index, 1);
+    let index = app.user.activeAccounts.indexOf(account);
+    app.user.activeAccounts.splice(index, 1);
     index = app.user.addresses.indexOf(app.user.addresses.find((a) => a.address === account.address));
     app.user.addresses.splice(index, 1);
 
     if (!unlinkingCurrentlyActiveAccount) return;
-    app.user.activeAccount = app.user.activeAddresses.length > 0 ? app.user.activeAddresses[0] : null;
+    app.user.setActiveAccount(app.user.activeAccounts.length > 0 ? app.user.activeAccounts[0] : null);
   });
 }

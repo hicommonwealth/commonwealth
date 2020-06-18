@@ -5,8 +5,6 @@ import $ from 'jquery';
 import { Button, Icon, Icons, MenuItem, MenuDivider, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo } from 'models';
-import { isMember } from 'helpers/roles';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
@@ -21,7 +19,7 @@ const MembershipButton: m.Component<{
     if (app.user.roles.length === 0) return;
 
     const createRoleWithAddress = (a, e) => {
-      app.user.createRole(a, { chain, community })
+      app.user.createRole({ address: a, chain, community })
         .then(() => {
           if (onMembershipChanged) onMembershipChanged(true);
           vnode.state.loading = false;
@@ -47,7 +45,7 @@ const MembershipButton: m.Component<{
         m.redraw();
         return;
       }
-      app.user.deleteRole(a, { chain, community })
+      app.user.deleteRole({ address: a, chain, community })
         .then(() => {
           if (onMembershipChanged) onMembershipChanged(false);
           vnode.state.loading = false;
@@ -64,7 +62,7 @@ const MembershipButton: m.Component<{
         });
     };
 
-    const hasAnyExistingRole = isMember(chain, community, address);
+    const hasAnyExistingRole = app.user.isMember({ account: address, chain, community });
 
     if (!address) {
       const existingRolesAddressIDs = app.user.getAddressIdsFromRoles({ chain, community });

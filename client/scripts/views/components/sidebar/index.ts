@@ -11,7 +11,6 @@ import {
 
 import app, { ApiStatus } from 'state';
 import { featherIcon, link, pluralize } from 'helpers';
-import { isRoleOfCommunity, isMember } from 'helpers/roles';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { ProposalType } from 'identifiers';
@@ -100,8 +99,14 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         chains[n.chain.network] = [n];
       }
     });
-    const myChains = Object.entries(chains).filter(([c, nodeList]) => isMember(c, null));
-    const myCommunities = app.config.communities.getAll().filter((c) => isMember(null, c.id));
+    const myChains = Object.entries(chains).filter(([c, nodeList]) => app.user.isMember({
+      chain: c,
+      account: app.user.activeAccount,
+    }));
+    const myCommunities = app.config.communities.getAll().filter((c) => app.user.isMember({
+      community: c.id,
+      account: app.user.activeAccount,
+    }));
 
     // sidebar menu
     const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
@@ -245,7 +250,11 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           label: 'Tags',
           onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
         }),
-        app.user.isRoleOfCommunity('admin', { chain: app.activeChainId(), community: app.activeCommunityId() }) && m(AdminPanel),
+        app.user.isRoleOfCommunity({
+          role: 'admin',
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        }) && m(AdminPanel),
       ]),
       // // chat (all communities)
       // m(ListItem, {

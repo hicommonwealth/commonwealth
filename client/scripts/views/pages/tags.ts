@@ -27,7 +27,7 @@ const ToggleFeaturedTagButton: m.Component<{
   id, description, featured, name, addFeaturedTag, removeFeaturedTag
 }, {form: IEditTagForm}> = {
   view: (vnode) => {
-    if (!app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
 
     vnode.state.form = { description, id, name, featured };
@@ -99,7 +99,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       contentRight: [
         count && m('.tag-count', pluralize(count, 'post')),
         m(ToggleFeaturedTagButton, { description, featured, id, name, addFeaturedTag, removeFeaturedTag }),
-        (app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) && m(Button, {
+        (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) && m(Button, {
           class: 'edit-button',
           size: 'xs',
           onclick: (e) => {
@@ -260,7 +260,7 @@ const TagSelector: m.Component<{}, { refreshed, featuredTagIds }> = {
       featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
-          if (app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
+          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
             dragula([document.querySelector('.featured-tag-list')])
               .on('drop', async (el, target, source) => {
                 const reorder = Array.from(source.children).map((child) => {
@@ -285,7 +285,7 @@ const TagsPage = {
       m('.forum-container', [
         m(TagSelector),
         m('br'),
-        app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(NewTagButton),
+        app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(NewTagButton),
       ]),
     ]);
   },

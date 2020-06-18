@@ -56,7 +56,7 @@ const UpgradeMemberModal = {
             new_role: newRole,
             address: member,
             community: app.activeCommunityId(),
-            jwt: app.login.jwt,
+            jwt: app.user.jwt,
           }).then((result) => {
             vnode.state.disabled = false;
             if (result.status === 'Success') {

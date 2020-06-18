@@ -12,7 +12,7 @@ class SettingsController {
         key: 'disableRichText',
         value: value ? 'true' : 'false',
       }).then((result) => {
-        app.user.disableRichText = value;
+        app.user.setDisableRichText(value);
         resolve();
       }).catch((e) => {
         console.error(e);

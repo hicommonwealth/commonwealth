@@ -8,7 +8,7 @@ import app from 'state';
 import { Account, RoleInfo } from 'models';
 import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase, getRoleInCommunity } from 'helpers';
+import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
 interface ISelectAddressOptionAttrs {
@@ -40,8 +40,12 @@ const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
 
 const SelectAddressModal = {
   view: (vnode) => {
-    const activeAddressesByRole: Array<[Account<any>, RoleInfo]> = app.login.activeAddresses.map((account) => {
-      const role = getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
+    const activeAddressesByRole: Array<[Account<any>, RoleInfo]> = app.user.activeAccounts.map((account) => {
+      const role = app.user.getRoleInCommunity({
+        account,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
       return [account, role];
     });
 

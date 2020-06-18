@@ -51,7 +51,7 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
           ]),
         ]
         // if no address is selected
-        : app.user.activeAddresses.length === 0 ? m(Button, {
+        : app.user.activeAccounts.length === 0 ? m(Button, {
           intent: 'none',
           iconLeft: Icons.USER_PLUS,
           size: 'sm',

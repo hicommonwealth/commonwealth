@@ -93,7 +93,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         vnode.state.sendingComment = false;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
-        await app.login.notifications.refresh();
+        await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
         vnode.state.error = err.message;

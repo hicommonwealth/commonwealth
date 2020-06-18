@@ -22,35 +22,36 @@ export const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-const isAdminOrModOfChain = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === app.user.activeAccount.address
-    && role.Address.chain === app.user.activeAccount.chain.id
-    && role.permission !== RolePermission.member)) !== -1;
-};
+// const isAdminOrModOfChain = (vnode, account) => {
+//   if (!account) return false;
+//   return vnode.state.roleData.findIndex((role) => (
+//     role.Address.address === app.user.activeAccount.address
+//     && role.Address.chain === app.user.activeAccount.chain.id
+//     && role.permission !== RolePermission.member)) !== -1;
+// };
 
-const isAdminOrMod = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === account.address
-    && role.permission !== RolePermission.member)) !== -1;
-};
+// const isAdminOrMod = (vnode, account) => {
+//   if (!account) return false;
+//   return vnode.state.roleData.findIndex((role) => (
+//     role.Address.address === account.address
+//     && role.permission !== RolePermission.member)) !== -1;
+// };
 
-const isAdmin = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === account.address
-    && role.permission === RolePermission.admin)) !== -1;
-};
+// const isAdmin = (vnode, account) => {
+//   if (!account) return false;
+//   return vnode.state.roleData.findIndex((role) => (
+//     role.Address.address === account.address
+//     && role.permission === RolePermission.admin)) !== -1;
+// };
 
 const InviteButton = (vnode, account, isCommunity) => {
   if (!isCommunity) return;
   // invite button, if invites are enabled, OR if the current account is a mod or admin
-  return app.login
+  return app.user
     && app.community
     && app.user.activeAccount
-    && (app.community.meta.invitesEnabled || isAdminOrModOfChain(vnode, account))
+    // TODO: Ensure the right role check is used
+    && (app.community.meta.invitesEnabled || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -67,7 +68,7 @@ const InviteButton = (vnode, account, isCommunity) => {
 
 const UpgradeMemberButton = (vnode, account) => {
   return app.user.activeAccount
-    && isAdminOrMod(vnode, account)
+    && app.user.isAdminOrMod({ account })
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -80,7 +81,7 @@ const UpgradeMemberButton = (vnode, account) => {
 };
 
 const ManageCommunityButton = (vnode, account) => {
-  return isAdmin(vnode, account)
+  return app.user.isAdmin({ account })
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -119,10 +120,13 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         vnode.state.roleData = bulkMembers.result;
 
-        if (isAdmin(vnode, app.user.activeAccount)) {
+        if (app.user.isAdminOfEntity({
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        })) {
           // TODO: Change to GET /webhooks
           const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-            { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+            { ...chainOrCommObj, auth: true, jwt: app.user.jwt });
           if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
           vnode.state.webhooks = webhooks.result;
         }

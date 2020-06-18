@@ -24,16 +24,16 @@ const SubscriptionRow: m.Component<ISubscriptionRow> = {
         onclick: (e) => {
           e.preventDefault();
           if (vnode.attrs.subscription.isActive) {
-            app.login.notifications.disableSubscriptions([vnode.attrs.subscription]).then(() => m.redraw());
+            app.user.notifications.disableSubscriptions([vnode.attrs.subscription]).then(() => m.redraw());
           } else {
-            app.login.notifications.enableSubscriptions([vnode.attrs.subscription]).then(() => m.redraw());
+            app.user.notifications.enableSubscriptions([vnode.attrs.subscription]).then(() => m.redraw());
           }
         }
       }, vnode.attrs.subscription.isActive ? 'Disable' : 'Enable'),
       m('button.formular-button-primary', {
         onclick: (e) => {
           e.preventDefault();
-          app.login.notifications.deleteSubscription(vnode.attrs.subscription).then(() => m.redraw());
+          app.user.notifications.deleteSubscription(vnode.attrs.subscription).then(() => m.redraw());
         }
       }, 'Delete'),
     ]);
@@ -86,7 +86,7 @@ const NotificationRow: m.Component<INotificationRow> = {
         !vnode.attrs.notification.isRead && m('a.notification-mark-read', {
           onclick: (e) => {
             e.preventDefault();
-            app.login.notifications.markAsRead([vnode.attrs.notification]).then(() => m.redraw());
+            app.user.notifications.markAsRead([vnode.attrs.notification]).then(() => m.redraw());
           }
         }, 'Mark read'),
       ]),
@@ -99,13 +99,13 @@ const Notifications = {
     if (!app.isLoggedIn()) {
       return m('div', 'Must be logged in to view notifications.');
     }
-    const subscriptions = app.login.notifications.subscriptions.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
-    const notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
-    // const newCommunitySubscription = app.login.notifications.subscriptions
+    const subscriptions = app.user.notifications.subscriptions.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    const notifications = app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    // const newCommunitySubscription = app.user.notifications.subscriptions
     //   .find((v) => v.category === NotificationCategories.NewCommunity);
     const chainOrCommunitySubscription = app.user.activeAccount
       && app.user.activeAccount.chain
-      && app.login.notifications.subscriptions
+      && app.user.notifications.subscriptions
         .find((v) => v.category === NotificationCategories.NewThread && v.objectId === app.user.activeAccount.chain.id);
     return m('.Notifications', [
       m('.row', [
@@ -116,19 +116,19 @@ const Notifications = {
             m('button.formular-button-primary', {
               onclick: (e) => {
                 e.preventDefault();
-                app.login.notifications.refresh().then(() => m.redraw());
+                app.user.notifications.refresh().then(() => m.redraw());
               }
             }, 'Refresh'),
             m('button.formular-button-primary', {
               onclick: (e) => {
                 e.preventDefault();
-                app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+                app.user.notifications.markAsRead(notifications).then(() => m.redraw());
               }
             }, 'Mark all as read'),
             m('button.formular-button-primary', {
               onclick: (e) => {
                 e.preventDefault();
-                app.login.notifications.clearAllRead().then(() => m.redraw());
+                app.user.notifications.clearAllRead().then(() => m.redraw());
               }
             }, 'Clear all read'),
             notifications.map((notification) => m(NotificationRow, { notification })),
@@ -144,9 +144,9 @@ const Notifications = {
         //       onclick: (e) => {
         //         e.preventDefault();
         //         if (newCommunitySubscription && newCommunitySubscription.isActive) {
-        //           app.login.notifications.disableSubscriptions([newCommunitySubscription]).then(() => m.redraw());
+        //           app.user.notifications.disableSubscriptions([newCommunitySubscription]).then(() => m.redraw());
         //         } else {
-        //           app.login.notifications.subscribe(NotificationCategories.NewCommunity, '').then(() => m.redraw());
+        //           app.user.notifications.subscribe(NotificationCategories.NewCommunity, '').then(() => m.redraw());
         //         }
         //       }
         //     }, newCommunitySubscription && newCommunitySubscription.isActive
@@ -156,10 +156,10 @@ const Notifications = {
         //       onclick: (e) => {
         //         e.preventDefault();
         //         if (chainOrCommunitySubscription && chainOrCommunitySubscription.isActive) {
-        //           app.login.notifications.disableSubscriptions([chainOrCommunitySubscription])
+        //           app.user.notifications.disableSubscriptions([chainOrCommunitySubscription])
         //           .then(() => m.redraw());
         //         } else {
-        //           app.login.notifications.subscribe(
+        //           app.user.notifications.subscribe(
         //             NotificationCategories.NewThread, app.user.activeAccount.chain.id
         //           ).then(() => m.redraw());
         //         }

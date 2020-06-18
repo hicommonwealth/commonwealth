@@ -164,7 +164,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {
           const notificationArray: Notification[] = [];
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
           await m.route.set(target);
           m.redraw.sync();
           if (next) setTimeout(() => next(), 1);
@@ -208,7 +208,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         onclick: async () => {
           const notificationArray: Notification[] = [];
           notificationArray.push(notification);
-          app.login.notifications.markAsRead(notificationArray).then(() => m.redraw());
+          app.user.notifications.markAsRead(notificationArray).then(() => m.redraw());
           if (!label.linkUrl) return;
           await m.route.set(label.linkUrl);
           m.redraw.sync();

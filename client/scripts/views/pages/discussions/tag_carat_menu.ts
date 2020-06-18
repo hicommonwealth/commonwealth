@@ -7,7 +7,7 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
-    if (!app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
 
     const { tag } = vnode.attrs;
     if (!tag) return;

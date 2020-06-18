@@ -205,7 +205,10 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    await app.user.selectNode(n.url, n.chain.id);
+    await app.user.selectNode({
+      url: n.url,
+      chain: n.chain.id
+    });
   }
 
   // Redraw with chain fully loaded

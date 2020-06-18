@@ -15,7 +15,6 @@ import app, { LoginState } from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
@@ -79,7 +78,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
 
-    const notificationSubscription = app.login.notifications.subscriptions
+    const notificationSubscription = app.user.notifications.subscriptions
       .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
 
     return m('.ProposalHeader', {
@@ -91,7 +90,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           proposal instanceof OffchainThread
             && (proposal.tag
                 || (app.user.activeAccount?.address === (proposal as OffchainThread).author)
-                || isRoleOfCommunity('admin', { chain: app.activeChainId(), community: app.activeCommunityId() }))
+                || app.user.isRoleOfCommunity({ role: 'admin', chain: app.activeChainId(), community: app.activeCommunityId() }))
             && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
           m(ProposalHeaderSpacer),

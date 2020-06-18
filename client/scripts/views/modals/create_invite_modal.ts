@@ -80,7 +80,7 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
             invitedAddressChain: selection === 'address' ? vnode.state.selectedChain : '',
             invitedEmail: selection === 'email' ? emailAddress : '',
             auth: true,
-            jwt: app.login.jwt,
+            jwt: app.user.jwt,
           }).then((result) => {
             vnode.state.disabled = false;
             if (result.status === 'Success') {

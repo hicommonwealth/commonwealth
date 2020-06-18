@@ -42,7 +42,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
         webhookUrl,
         address: app.user.activeAccount.address,
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       }).then((result) => {
         vnode.state.disabled = false;
         if (result.status === 'Success') {
@@ -85,7 +85,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                 ...chainOrCommObj,
                 webhookUrl: webhook.url,
                 auth: true,
-                jwt: app.login.jwt,
+                jwt: app.user.jwt,
               }).then((result) => {
                 vnode.state.disabled = false;
                 if (result.status === 'Success') {

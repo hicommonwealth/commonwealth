@@ -29,7 +29,7 @@ interface IEditTagModalForm {
 
 const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
   view: (vnode: m.VnodeDOM<IEditTagModalAttrs, IEditTagModalState>) => {
-    if (!app.user.isAdmin({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, description, name } = vnode.attrs;
     if (!vnode.state.form) {
       vnode.state.form = { description, id, name };

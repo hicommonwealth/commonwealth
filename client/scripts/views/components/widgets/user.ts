@@ -3,7 +3,7 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link, getRoleInCommunity, formatAsTitleCase } from 'helpers';
+import { formatAddressShort, link, formatAsTitleCase } from 'helpers';
 import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
@@ -13,7 +13,6 @@ import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
-import { isAdminOrMod } from 'helpers/roles';
 
 interface IAttrs {
   user: Account<any> | [string, string];
@@ -99,11 +98,11 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = isAdminOrMod(address);
+      role = app.user.isAdminOrMod({ account: address });
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = isAdminOrMod(account.address);
+      role = app.user.isAdminOrMod({ account });
     }
     const roleTag = role ? m(Tag, {
       class: 'roleTag',
