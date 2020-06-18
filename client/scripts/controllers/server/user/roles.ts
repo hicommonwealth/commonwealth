@@ -70,6 +70,7 @@ export default class extends Base {
    */
   public getRoleInCommunity(options: { account?: Account<any>, chain?: string, community?: string }): RoleInfo {
     const account = options.account || this.activeAccount;
+    if (!account) return;
     const address_id = this.addresses.find((a) => {
       return a.address === account.address && a.chain === account.chain.id;
     })?.id;
@@ -186,6 +187,7 @@ export default class extends Base {
    * @param options A chain or a community ID
    */
   public isAdminOfEntity(options: { chain?: string, community?: string }): boolean {
+    if (!this.activeAccount) return false;
     const adminRole = this.roles.find((role) => {
       return (role.address === this.activeAccount.address
         && role.permission === RolePermission.admin
