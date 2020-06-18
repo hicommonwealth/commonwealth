@@ -111,7 +111,8 @@ class DraftsController {
           'id': draftId,
         }
       }).then((result) => {
-        _this.store.remove(modelFromServer(result.response));
+        const draft = _this.store.getById(draftId);
+        _this.store.remove(draft);
         resolve(result);
       }).catch((e) => {
         console.error(e);

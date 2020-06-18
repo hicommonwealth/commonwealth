@@ -49,7 +49,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     const addTag = (tag?) => {
       const newTag = tag || (document.getElementsByClassName('autocomplete-tag-input')[0]
         .firstChild as HTMLInputElement).value;
-      tags.push({ name: newTag, id: undefined, description: '' });
+      tags.push({ name: newTag, id: null, description: '' });
       setTimeout(() => { vnode.state.selectedTag = newTag; m.redraw(); }, 1);
       updateFormData(newTag);
       if (!tag) manuallyClosePopover();
@@ -64,7 +64,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       view: (vnode_) => {
         return m('a.no-matching-tags', {
           href: '#',
-          onclick: addTag,
+          onclick: () => addTag(),
         }, 'No matches found. Add tag?');
       }
     };
