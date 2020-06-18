@@ -87,6 +87,11 @@ export default function (
         // }
         default: return null;
       }
+    case 'offences':
+      switch (method) {
+        case 'Offence': return SubstrateEventKind.Offence;
+        default: return null;
+      }
     default:
       return null;
   }

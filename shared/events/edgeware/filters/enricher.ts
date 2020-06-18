@@ -7,6 +7,7 @@ import {
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
+import { Kind, OpaqueTimeSlot } from '@polkadot/types/interfaces/offences';
 import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
 import { CWEvent } from '../../interfaces';
 
@@ -85,7 +86,6 @@ export default async function (
           }
         };
       }
-
       /**
        * Democracy Events
        */
@@ -488,7 +488,20 @@ export default async function (
           }
         };
       }
-
+      /**
+       * Offences Events
+       */
+      case SubstrateEventKind.Offence: {
+        const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, boolean ];
+        return {
+          data: {
+            kind,
+            offenceKind,
+            opaqueTimeSlot,
+            applied: typeof applied === 'undefined' ? true : applied
+          }
+        };
+      }
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }

@@ -186,7 +186,10 @@ export default class extends IEventHandler {
         const { proposalHash } = event.data;
         return updateEntityFn(SubstrateEntityKind.SignalingProposal, proposalHash, true);
       }
-
+      case SubstrateEventKind.Offence: {
+        const { opaqueTimeSlot } = event.data;
+        return updateEntityFn(SubstrateEntityKind.Offence, opaqueTimeSlot.toString(), true);
+      }
       default: {
         log.trace(`no archival action needed for event of kind ${event.data.kind.toString()}`);
         return dbEvent;

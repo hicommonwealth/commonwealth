@@ -1,4 +1,6 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
+import { bool } from '@polkadot/types';
+import { Kind, OpaqueTimeSlot } from '@polkadot/types/interfaces/offences';
 
 /**
  * To implement a new form of event, add it to this enum, and add its
@@ -32,6 +34,7 @@ export enum SubstrateEntityKind {
   TreasuryProposal = 'treasury-proposal',
   CollectiveProposal = 'collective-proposal',
   SignalingProposal = 'signaling-proposal',
+  Offence = 'offences-offence',
 }
 
 // Each kind of event we handle
@@ -89,6 +92,9 @@ export enum SubstrateEventKind {
 
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
+
+  // offences event
+  Offence = 'offence',
 }
 
 interface ISubstrateEvent {
@@ -374,6 +380,16 @@ export interface ISubstrateTreasuryRewardMintingV2 extends ISubstrateEvent {
   potAddress: SubstrateAccountId;
 }
 
+/**
+ * Offences Events
+ */
+export interface ISubstrateOffence extends ISubstrateEvent {
+  kind: SubstrateEventKind.Offence;
+  offenceKind: Kind;
+  opaqueTimeSlot: OpaqueTimeSlot;
+  applied: boolean;
+}
+
 export type ISubstrateEventData =
   ISubstrateSlash
   | ISubstrateReward
@@ -412,6 +428,7 @@ export type ISubstrateEventData =
   | ISubstrateSignalingVotingCompleted
   | ISubstrateTreasuryRewardMinting
   | ISubstrateTreasuryRewardMintingV2
+  | ISubstrateOffence
 // eslint-disable-next-line semi-style
 ;
 
@@ -510,6 +527,10 @@ export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
       return SubstrateEntityKind.SignalingProposal;
     }
 
+    // Offences Events
+    case SubstrateEventKind.Offence: {
+      return SubstrateEntityKind.Offence;
+    }
     default: {
       return null;
     }

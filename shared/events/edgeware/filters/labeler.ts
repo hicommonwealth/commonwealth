@@ -89,7 +89,16 @@ const labelEdgewareEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
-
+    /**
+     * Offences Events
+     */
+    case SubstrateEventKind.Offence: {
+      const { offenceKind, opaqueTimeSlot, applied } = data;
+      return {
+        heading: 'Offence',
+        label: `There is an offence reported of the kind ${offenceKind} happened at the time slot ${opaqueTimeSlot} and applied ${applied}.`,
+      };
+    }
     /**
      * Democracy Events
      */

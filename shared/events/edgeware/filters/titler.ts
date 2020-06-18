@@ -37,6 +37,16 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
     }
 
     /**
+     * Offences Events
+     */
+    case SubstrateEventKind.Offence: {
+      return {
+        title: 'Offence Reported',
+        description: 'There is an offence reported of the given kind happened at the time slot.',
+      };
+    }
+
+    /**
      * Democracy Events
      */
     case SubstrateEventKind.VoteDelegated: {
