@@ -8,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',
-  NoBodyOrAttachment: 'Forum posts must include body or attachment',
+  NoBodyOrAttachment: 'Must provide body or attachment',
   IncorrectOwner: 'Not owned by this user',
 };
 

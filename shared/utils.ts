@@ -16,4 +16,4 @@ export const getCommunityUrl = (community) => {
   return (process.env.NODE_ENV === 'production')
     ? `https://commonwealth.im/${community}`
     : `http://localhost:8080/${community}`;
-}
+};

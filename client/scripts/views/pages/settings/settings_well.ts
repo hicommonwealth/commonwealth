@@ -1,4 +1,4 @@
-import 'components/settings/settings_well.scss';
+import 'pages/settings/settings_well.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -14,13 +14,9 @@ import { Icon, Icons, Button, Input } from 'construct-ui';
 interface IState {
   initialized: boolean;
   showMoreSettings: boolean;
-  email: string;
 }
 
 const SettingsWell: m.Component<{}, IState> = {
-  oninit: (vnode) => {
-    vnode.state.email = app.login.email;
-  },
   view: (vnode) => {
     const nodes = (app.chain && app.chain.meta ? [] : [{
       name: 'node',
@@ -36,30 +32,6 @@ const SettingsWell: m.Component<{}, IState> = {
 
     return m('.SettingsWell', [
       m('form', [
-        m('h4', 'Email'),
-        m(Input, {
-          contentLeft: m(Icon, { name: Icons.MAIL }),
-          defaultValue: vnode.state.email || null,
-          onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
-        }),
-        m(Button, {
-          label: 'Update Email',
-          onclick: async () => {
-            try {
-              if (vnode.state.email === app.login.email) return;
-              const response = await $.post(`${app.serverUrl()}/updateEmail`, {
-                'email': vnode.state.email,
-                'jwt': app.login.jwt,
-              });
-              app.login.email = response.result.email;
-            } catch (err) {
-              console.log('Failed to update email');
-              throw new Error((err.responseJSON && err.responseJSON.error)
-                ? err.responseJSON.error
-                : 'Failed to update email');
-            }
-          }
-        }),
         m('h4', 'Connect to'),
         m('.nodes', [
           m(DropdownFormField, {

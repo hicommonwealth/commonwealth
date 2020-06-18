@@ -5,7 +5,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoReactionId: 'Must provide reaction_id',
+  NoReactionId: 'Must provide reaction ID',
   AddressNotOwned: 'Not owned by this user',
 };
 

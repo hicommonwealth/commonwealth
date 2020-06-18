@@ -6,7 +6,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NotAdmin: 'Must be admin',
-  NeedParams: 'Must provide chain id and url',
+  NeedParams: 'Must provide chain ID and url',
   ChainNotFound: 'Chain not found',
   NodeNotFound: 'Node not found',
 };
