@@ -33,8 +33,7 @@ export enum SubstrateEntityKind {
   DemocracyPreimage = 'democracy-preimage',
   TreasuryProposal = 'treasury-proposal',
   CollectiveProposal = 'collective-proposal',
-  SignalingProposal = 'signaling-proposal',
-  Offence = 'offences-offence',
+  SignalingProposal = 'signaling-proposal'
 }
 
 // Each kind of event we handle
@@ -527,10 +526,6 @@ export function eventToEntity(event: SubstrateEventKind): SubstrateEntityKind {
       return SubstrateEntityKind.SignalingProposal;
     }
 
-    // Offences Events
-    case SubstrateEventKind.Offence: {
-      return SubstrateEntityKind.Offence;
-    }
     default: {
       return null;
     }
