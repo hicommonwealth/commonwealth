@@ -12,6 +12,7 @@ export const Errors = {
   NoEmail: 'Must provide email to update.',
   NoUser: 'Could not find user',
   InvalidEmail: 'Invalid Email',
+  EmailInUse: 'Invalid email, already exists',
 };
 
 const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -23,6 +24,15 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   if (!validEmailRegex.test(email)) {
     return next(new Error(Errors.InvalidEmail));
   }
+
+  // check if email is already in use
+  const existingUser = await models.User.findOne({
+    where: {
+      email,
+    }
+  });
+  console.dir(existingUser);
+  if (existingUser) return next(new Error(Errors.EmailInUse));
 
   const user = await models.User.findOne({
     where: {
