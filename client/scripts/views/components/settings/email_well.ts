@@ -48,7 +48,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
           intent: 'primary',
           label: (!emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
-          disabled: !emailInputUpdated && emailVerified,
+          disabled: (!emailInputUpdated && emailVerified) || emailUpdated,
           onclick: async () => {
             try {
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
@@ -74,7 +74,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
         m('label', {
           style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
         }, emailVerified ? 'Verified' : 'Not verified'),
-        emailUpdated && m('p', 'Check your email to confirm this change'),
+        emailUpdated && m('p', 'Check your email for a confirmation link'),
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [
