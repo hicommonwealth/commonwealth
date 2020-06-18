@@ -30,12 +30,6 @@ const NotificationButtons: m.Component = {
           app.user.notifications.markAsRead(notifications).then(() => m.redraw());
         }
       }, 'Mark all as read'),
-      m('button', {
-        onclick: (e) => {
-          e.preventDefault();
-          app.user.notifications.clearAllRead().then(() => m.redraw());
-        }
-      }, 'Clear all read'),
     ]);
   }
 };

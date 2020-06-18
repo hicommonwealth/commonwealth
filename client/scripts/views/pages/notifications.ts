@@ -42,13 +42,6 @@ const Notifications = {
               app.user.notifications.markAsRead(notifications).then(() => m.redraw());
             }
           }),
-          m(Button, {
-            label: 'Clear all read',
-            onclick: (e) => {
-              e.preventDefault();
-              app.user.notifications.clearAllRead().then(() => m.redraw());
-            }
-          }),
         ]),
         m('.NotificationsList', [
           notifications.map((notification) => m(NotificationRow, { notifications: [notification] })),
