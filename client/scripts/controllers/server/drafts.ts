@@ -84,7 +84,6 @@ class DraftsController {
           'jwt': app.login.jwt
         }
       });
-      debugger
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
@@ -99,6 +98,7 @@ class DraftsController {
   }
 
   public async delete(draftId: number) {
+    const _this = this;
     return new Promise((resolve, reject) => {
       $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
@@ -111,7 +111,7 @@ class DraftsController {
           'id': draftId,
         }
       }).then((result) => {
-        // _this.store.remove(draft);
+        _this.store.remove(modelFromServer(result.response));
         resolve(result);
       }).catch((e) => {
         console.error(e);

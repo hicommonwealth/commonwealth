@@ -9,7 +9,6 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
       user_id: req.user.id,
     }
   });
-  console.log(addresses);
   const addressIds = Array.from(addresses.map((address) => address.id));
 
   const drafts = await models.DiscussionDraft.findAll({
