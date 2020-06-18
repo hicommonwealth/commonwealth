@@ -19,19 +19,20 @@ import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
 import EmailWell from 'views/components/settings/email_well';
 
-const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmailStatus: boolean, }> = {
+const EmailPanel: m.Component<{}, { email: string, interval: string, updateIntervalMessage: string, }> = {
   oninit: (vnode) => {
-    vnode.state.updateEmailStatus = false;
+    vnode.state.updateIntervalMessage = null;
     vnode.state.interval = app.login.emailInterval;
     vnode.state.email = app.login.email;
   },
   view: (vnode) => {
+    const { updateIntervalMessage, interval, email } = vnode.state;
     return m('.EmailPanel', [
       m(EmailWell),
       m('.EmailInterval', [
         m('h4', 'Receive notification emails:'),
         m(Select, {
-          defaultValue: vnode.state.interval,
+          defaultValue: interval,
           options: ['daily', 'weekly', 'monthly', 'never'],
           onchange: async (e) => {
             vnode.state.interval = (e.target as any).value;
@@ -42,27 +43,36 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateEmail
                 'jwt': app.login.jwt,
               });
               app.login.emailInterval = response.result.emailNotificationInterval;
+              vnode.state.updateIntervalMessage = 'Successfully updated!';
+              m.redraw();
             } catch (err) {
               vnode.state.interval = app.login.emailInterval;
+              vnode.state.updateIntervalMessage = 'Error updating email interval';
+              m.redraw();
               console.log('Failed to update email notification interval');
               throw new Error((err.responseJSON && err.responseJSON.error)
                 ? err.responseJSON.error
                 : 'Failed to update email notification interval');
             }
           },
-        })
+        }),
+        vnode.state.updateIntervalMessage && m('p.user-feedback', updateIntervalMessage),
       ]),
     ]);
   },
 };
 
-const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }> = {
+const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }, { updated: string, }> = {
+  oninit: (vnode) => {
+    vnode.state.updated = null;
+  },
   view: (vnode) => {
     let notifications: any[];
     if (app.loginStatusLoaded) {
       notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
     }
     const { subscriptions } = vnode.attrs;
+    const { updated } = vnode.state;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     return m('.UserNotifications', [
       m('h2', 'Notifications:'),
@@ -74,17 +84,24 @@ const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[]
             onclick: (e) => {
               e.preventDefault();
               if (notifications.length < 1) return;
-              app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+              app.login.notifications.markAsRead(notifications).then(() => {
+                vnode.state.updated = 'Success!';
+                m.redraw();
+              });
             }
           }),
           m(Button, {
             label: 'Clear all read',
             onclick: (e) => {
               e.preventDefault();
-              app.login.notifications.clearAllRead().then(() => m.redraw());
+              app.login.notifications.clearAllRead().then(() => {
+                vnode.state.updated = 'Success!';
+                m.redraw();
+              });
             }
           }),
-        ])
+        ]),
+        updated && m('p.user-feedback', updated),
       ]),
       mentionsSubscription
         && m('.MentionsButton', [
