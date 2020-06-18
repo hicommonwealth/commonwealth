@@ -22,28 +22,6 @@ export const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-// const isAdminOrModOfChain = (vnode, account) => {
-//   if (!account) return false;
-//   return vnode.state.roleData.findIndex((role) => (
-//     role.Address.address === app.user.activeAccount.address
-//     && role.Address.chain === app.user.activeAccount.chain.id
-//     && role.permission !== RolePermission.member)) !== -1;
-// };
-
-// const isAdminOrMod = (vnode, account) => {
-//   if (!account) return false;
-//   return vnode.state.roleData.findIndex((role) => (
-//     role.Address.address === account.address
-//     && role.permission !== RolePermission.member)) !== -1;
-// };
-
-// const isAdmin = (vnode, account) => {
-//   if (!account) return false;
-//   return vnode.state.roleData.findIndex((role) => (
-//     role.Address.address === account.address
-//     && role.permission === RolePermission.admin)) !== -1;
-// };
-
 const InviteButton = (vnode, account, isCommunity) => {
   if (!isCommunity) return;
   // invite button, if invites are enabled, OR if the current account is a mod or admin
