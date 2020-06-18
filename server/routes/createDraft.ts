@@ -21,15 +21,15 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
   const draftContent = community ? {
     community: community.id,
     author_id: author.id,
-    title,
-    body,
-    tag
+    title: title || null,
+    body: body || null,
+    tag: tag || null
   } : {
     chain: chain.id,
     author_id: author.id,
-    title,
-    body,
-    tag
+    title: title || null,
+    body: body || null,
+    tag: tag || null
   };
 
   const draft = await models.DiscussionDraft.create(draftContent);
