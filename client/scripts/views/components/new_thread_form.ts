@@ -38,7 +38,6 @@ export const populateDraft = async (state, draft) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   let confirmed = true;
-  debugger
   if (fromDraft) {
     const formBody = quill.getContents();
     let formBodyDelta;
@@ -54,11 +53,13 @@ export const populateDraft = async (state, draft) => {
     let discardedDelta;
     let discardedMarkdown;
     try {
-      discardedDelta = JSON.parse(discardedDelta);
+      discardedDelta = JSON.parse(discardedDraft);
     } catch {
       discardedMarkdown = discardedDraft;
     }
-    if (formBodyDelta !== discardedDelta) {
+    if ((formBodyDelta && formBodyDelta !== discardedDelta)
+      || (formBodyMarkdown && formBodyMarkdown !== discardedMarkdown)
+      || !(formBodyDelta && discardedDelta)) {
       confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
     }
   } else if (quill.getLength() > 1) {
@@ -81,7 +82,9 @@ export const populateDraft = async (state, draft) => {
     state.quillEditorState.markdownMode = true;
   }
 
-  quill.setContents(newDraftDelta || newDraftMarkdown);
+  setTimeout(() => {
+    state.quillEditorState.editor.setContents(newDraftDelta || newDraftMarkdown);
+  }, 1);
 
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   (titleInput as HTMLInputElement).value = draft.title;
@@ -140,7 +143,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
     ]);
 
     const discussionDrafts = app.login.discussionDrafts.store.getByCommunity(app.activeId());
-    // TODO: Community-scope tags in /status & store
+    // TODO: Community-scope drafts in /status & store
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
