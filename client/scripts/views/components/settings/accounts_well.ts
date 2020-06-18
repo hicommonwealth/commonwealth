@@ -33,7 +33,7 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
     }, [
       m('.avatar-col', [
         m(User, {
-          user: [account.address, account.chain],
+          user: account,
           avatarOnly: true,
           avatarSize: 32,
           linkify: true,
@@ -43,7 +43,7 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
       m('.info-col', [
         m('.username', [
           m(User, {
-            user: [account.address, account.chain],
+            user: account,
             hideAvatar: true,
             linkify: true,
             tooltip: true,

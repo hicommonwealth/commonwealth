@@ -7,7 +7,7 @@ import { formatAddressShort, link, formatAsTitleCase } from 'helpers';
 import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
-import { Account, Profile } from 'models';
+import { Account, Profile, AddressInfo } from 'models';
 
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -15,7 +15,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
 
 interface IAttrs {
-  user: Account<any> | [string, string];
+  user: Account<any> | AddressInfo;
   avatarSize?: number;
   avatarOnly?: boolean; // avatarOnly overrides most other properties
   hideAvatar?: boolean;
@@ -88,9 +88,9 @@ const User : m.Component<IAttrs> = {
     let profile; // profile is used to retrieve the chain and address later
     let role;
 
-    if (vnode.attrs.user instanceof Array) {
-      const chainId = vnode.attrs.user[1];
-      const address = vnode.attrs.user[0];
+    if (vnode.attrs.user instanceof AddressInfo) {
+      const chainId = vnode.attrs.user.chain;
+      const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       const chain = app.config.chains.getById(chainId);
       // only load account if it's possible to, using the current chain
@@ -98,7 +98,7 @@ const User : m.Component<IAttrs> = {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = app.user.isAdminOrMod({ account: address });
+      role = app.user.isAdminOrMod({ account: vnode.attrs.user });
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);

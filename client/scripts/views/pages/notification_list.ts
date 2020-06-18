@@ -3,7 +3,7 @@ import 'pages/notifications.scss';
 import m from 'mithril';
 
 import app from 'state';
-import { NotificationSubscription, Notification, OffchainComment } from 'models';
+import { NotificationSubscription, Notification, OffchainComment, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { NotificationCategories } from 'types';
@@ -77,7 +77,7 @@ const NotificationRow: m.Component<INotificationRow> = {
         // category === NotificationCategories.NewCommunity ? 'New community' :
         category === NotificationCategories.NewThread ? `New thread #${thread}`
           : category === NotificationCategories.NewComment ? [
-            (comment && m(User, { user: [comment.author, comment.authorChain], hideAvatar: true })),
+            (comment && m(User, { user: new AddressInfo(null, comment.author, comment.authorChain, null), hideAvatar: true })),
             ' commented'
           ] : 'Unknown notification'
       ]),

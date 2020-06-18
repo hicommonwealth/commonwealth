@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
+import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -43,7 +43,10 @@ const ReactionButton: m.Component<IAttrs, IState> = {
     if (hasReacted) hasReactedType = rxn.reaction;
 
     const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-      return m('.reacting-user', m(User, { user: [rxn_.author, rxn_.author_chain], linkify: true }));
+      return m('.reacting-user', m(User, {
+        user: new AddressInfo(null, rxn_.author, rxn_.author_chain, null),
+        linkify: true
+      }));
     });
     if (reactors.length < (likes || dislikes).length) {
       const diff = (likes || dislikes).length - reactors.length;

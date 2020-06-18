@@ -226,9 +226,10 @@ export default class {
    * @param account An arbitrary Commonwealth account
    * @param options A chain or a community ID
    */
-  public getRoleInCommunity(options: { account: Account<any>, chain?: string, community?: string }) {
+  public getRoleInCommunity(options: { account?: Account<any>, chain?: string, community?: string }): RoleInfo {
+    const account = options.account || this._activeAccount;
     const address_id = this._addresses.find((a) => {
-      return a.address === options.account.address && a.chain === options.account.chain.id;
+      return a.address === account.address && a.chain === account.chain.id;
     })?.id;
 
     return this._roles.find((r) => {
@@ -314,6 +315,17 @@ export default class {
       .map((r) => r.chain_id);
   }
 
+  public getActiveAccountsByRole(): [Account<any>, RoleInfo][] {
+    return this.activeAccounts.map((account) => {
+      const role = this.getRoleInCommunity({
+        account,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
+      return [account, role];
+    });
+  }
+
   /**
    * Given a chain/community ID, grabs the first admin role
    * @param options A chain or a community ID
@@ -328,13 +340,14 @@ export default class {
 
   /**
    * Given a chain/community ID, determines if the
-   * active user is an admin of the specified community.
+   * active account is an admin of the specified community.
    * @param options A chain or a community ID
    */
   public isAdminOfEntity(options: { chain?: string, community?: string }): boolean {
     const adminRole = this._roles.find((role) => {
-      return role.permission === RolePermission.admin && (
-        (role.offchain_community_id === options.community) || (role.chain_id === options.chain)
+      return (role.address === this._activeAccount.address
+        && role.permission === RolePermission.admin
+        && (role.offchain_community_id === options.community || role.chain_id === options.chain)
       );
     });
 
@@ -342,75 +355,60 @@ export default class {
   }
 
   /**
-   * Checks if any active roles are admins or moderators of a specifiedd chain/community
+   * Given a chain/community ID, determines if the
+   * active account is an admin or moderator of the
+   * specified community.
    * @param options A chain or a community ID
    */
-  public isAdminOrModOfEntity(options: { chain?: string, community?: string }): boolean {
-    const roleChecker = (r) => (r.permission === RolePermission.admin || r.permission === RolePermission.moderator);
+  public isAdminOrModOfEntity(options: { account?: Account<any>, chain?: string, community?: string }): boolean {
+    const account = options.account || this._activeAccount;
+    if (!account) return false;
+
+    const activeRoleCheck = (r) => (
+      r.address === account.address && (
+        r.permission === RolePermission.admin
+        || r.permission === RolePermission.moderator
+      )
+    );
+
     this._roles.forEach((r) => {
-      if (options.chain) {
-        if (r.chain_id === options.chain && roleChecker(r)) {
-          return true;
-        }
-      } else if (options.community) {
-        if (r.offchain_community_id === options.community && roleChecker(r)) {
-          return true;
-        }
+      if (r.chain_id === options.chain && activeRoleCheck(r)) {
+        return true;
+      }
+
+      if (r.offchain_community_id === options.community && activeRoleCheck(r)) {
+        return true;
       }
     });
 
     return false;
   }
 
-  // TODO: Should we use active account instead of passing one in?
-  public isAdminOrMod(options: { account: Account<any> | AddressInfo | string }): boolean {
-    if (!options.account) return false;
+  public isAdminOrMod(options: { account?: AddressInfo | Account<any> }): boolean {
+    const account = options.account || this._activeAccount;
+    if (!account) return false;
     return this._roles.findIndex((r) => {
-      if (typeof options.account === 'string') {
-        return r.address === options.account && r.permission !== RolePermission.member;
-      } else {
-        return r.address === options.account.address && r.permission !== RolePermission.member;
-      }
+      return r.address === account.address && r.permission !== RolePermission.member;
     }) !== -1;
   }
 
-  // TODO: Should we use active account instead of passing on in?
-  public isAdminOrModOfChain(options: { account: Account<any> | AddressInfo, chain: string }): boolean {
-    if (!options.account) return false;
+  public isAdminOrModOfChain(options: { account?: AddressInfo | Account<any> }): boolean {
+    const account = options.account || this._activeAccount;
+    if (!account) return false;
     return this._roles.findIndex((r) => {
-      return r.address === options.account.address
+      const chain = (account instanceof AddressInfo) ? account.chain : account.chain.id;
+      return r.address === account.address
         && r.permission !== RolePermission.member
-        && r.address_chain === options.account.chain;
+        && r.address_chain === chain;
     }) !== -1;
   }
 
-  // TODO: Should this use active chain/community?
-  public isAdmin(options: { account: Account<any> | AddressInfo | string }): boolean {
-    if (!options.account) return false;
+  public isAdmin(options: { account?: AddressInfo | Account<any> }): boolean {
+    const account = options.account || this._activeAccount;
+    if (!account) return false;
     return this._roles.findIndex((r) => {
-      if (typeof options.account === 'string') {
-        return r.address === options.account && r.permission === RolePermission.admin;
-      } else {
-        return r.address === options.account.address && r.permission === RolePermission.admin;
-      }
+      return r.address === account.address && r.permission === RolePermission.admin;
     }) !== -1;
-  }
-
-  /**
-   * Given an arbitrary list of roles, determines if any of
-   * the current user's roles coincide with one that is passed in.
-   * @param adminsOrMods A list of admins and mods of an arbitrary chain/community
-   */
-  public isAdminOrModFromList(adminsOrMods: RoleInfo[]): boolean {
-    adminsOrMods.forEach((r) => {
-      this._roles.forEach((rr) => {
-        if (r.address === rr.address) {
-          return true;
-        }
-      });
-    });
-
-    return false;
   }
 
   /**

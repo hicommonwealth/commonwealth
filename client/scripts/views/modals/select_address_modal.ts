@@ -40,14 +40,7 @@ const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
 
 const SelectAddressModal = {
   view: (vnode) => {
-    const activeAddressesByRole: Array<[Account<any>, RoleInfo]> = app.user.activeAccounts.map((account) => {
-      const role = app.user.getRoleInCommunity({
-        account,
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      });
-      return [account, role];
-    });
+    const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
@@ -56,12 +49,12 @@ const SelectAddressModal = {
       m('.compact-modal-body', [
         m('.select-existing-address', [
           m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
-          activeAddressesByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
+          activeAccountsByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
         ]),
         m('br'),
         m('.join-with-new-address', [
           m('.modal-header', 'Select an address to join this community:'),
-          activeAddressesByRole.map(([account, role]) => !role && m(SelectAddressOption, { account, role })),
+          activeAccountsByRole.map(([account, role]) => !role && m(SelectAddressOption, { account, role })),
         ]),
       ]),
     ]);

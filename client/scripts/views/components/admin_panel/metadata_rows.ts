@@ -20,7 +20,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
           && role.Address.chain === app.user.activeAccount?.chain.id;
         return m('.RoleChild', [
           m(User, {
-            user: [role.Address.address, role.Address.chain],
+            user: role.Address,
             tooltip: true,
           }),
           !isSelf && m(Icon, {

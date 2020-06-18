@@ -53,7 +53,7 @@ const ConfirmInviteModal = {
           vnode.state.selectedAddress = account.address;
         },
       }, [
-        m(User, { user: [account.address, account.chain], linkify: false, avatarSize: 16 })
+        m(User, { user: account, linkify: false, avatarSize: 16 })
       ]);
     };
 

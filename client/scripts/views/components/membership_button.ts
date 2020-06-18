@@ -82,7 +82,7 @@ const MembershipButton: m.Component<{
               hasAnyExistingRole: hasExistingRole,
               iconLeft: hasExistingRole ? Icons.CHECK : null,
               label: [
-                m(User, { user: [a.address, a.chain] }),
+                m(User, { user: a }),
                 ` ${a.address.slice(0, 6)}...`,
               ],
               onclick: hasExistingRole ? deleteRole.bind(this, a) : createRoleWithAddress.bind(this, a),

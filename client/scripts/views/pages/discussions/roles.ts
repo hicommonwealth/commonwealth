@@ -133,7 +133,7 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
         vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
           return m('.member-item', [
             m(User, {
-              user: [role.Address.address, role.Address.chain],
+              user: role.Address,
               linkify: true,
               tooltip: true,
             }),

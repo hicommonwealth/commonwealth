@@ -31,13 +31,13 @@ const CommunityMenuChain: m.Component<{ chain: string, nodeList: NodeInfo[], add
     }, [
       m('.icon-inner', [
         m(ChainIcon, { chain: nodeList[0].chain }),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: address, avatarOnly: true, avatarSize: 16 }),
       ]),
       m('.content-inner', [
         m('.sidebar-name', nodeList[0].chain.name),
         m('.sidebar-user', [
           'Joined as ',
-          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+          m(User, { user: address, avatarSize, hideAvatar: true })
         ]),
       ]),
     ]);
@@ -61,13 +61,13 @@ const CommunityMenuCommunity: m.Component<{ community: CommunityInfo, address: A
     }, [
       m('.icon-inner', [
         m('.name', community.name.slice(0, 2).toLowerCase()),
-        m(User, { user: [address.address, address.chain], avatarOnly: true, avatarSize: 16 }),
+        m(User, { user: address, avatarOnly: true, avatarSize: 16 }),
       ]),
       m('.content-inner', [
         m('.sidebar-name', community.name),
         m('.sidebar-user', [
           'Joined as ',
-          m(User, { user: [address.address, address.chain], avatarSize, hideAvatar: true })
+          m(User, { user: address, avatarSize, hideAvatar: true })
         ]),
       ]),
     ]);

@@ -33,7 +33,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ account, chain, community });
+    const role = app.user.getRoleInCommunity({ chain, community });
 
     if (!role) {
       if (!suppressNotification && app.user.activeAccount !== account) {

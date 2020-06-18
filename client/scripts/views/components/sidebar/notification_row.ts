@@ -8,7 +8,7 @@ import app from 'state';
 import { slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
-import { Notification } from 'models';
+import { Notification, AddressInfo } from 'models';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
@@ -53,7 +53,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
+  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
@@ -112,7 +112,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
     notificationBody = null;
   }
 
-  const actorName = m(User, { user: [author_address, author_chain], hideAvatar: true });
+  const actorName = m(User, { user: new AddressInfo(null, author_address, author_chain, null), hideAvatar: true });
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments

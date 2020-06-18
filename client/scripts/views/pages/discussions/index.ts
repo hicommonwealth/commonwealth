@@ -16,7 +16,7 @@ import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
-import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
+import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
@@ -55,7 +55,7 @@ const CommunitySidebar: m.Component<{ tag?: string }> = {
       m('h4', 'Admins & Mods'),
       (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
         return m('.community-admin', [
-          m(User, { user: [r.address, r.address_chain], showRole: true })
+          m(User, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
         ]);
       }),
     ]);
