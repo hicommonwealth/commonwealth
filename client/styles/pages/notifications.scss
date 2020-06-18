@@ -7,7 +7,7 @@
         margin-bottom: 24px;
     }
     .NotificationsList {
-        li:nth-child(1) {
+        > li.NotificationRow:nth-child(1) {
             border-top: 1px solid #ddd;
         }
     }
