@@ -14,7 +14,7 @@ import { Button, Colors, Input, Icons, Icon, Tooltip, Classes } from 'construct-
 interface IState {
   email: string;
   emailInputUpdated: boolean;
-  emailUpdated: boolean;
+  verificationSent: boolean;
   emailVerified: boolean;
   githubAccount: SocialAccount;
 }
@@ -27,12 +27,12 @@ const EmailWell: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.email = app.login.email;
     vnode.state.emailInputUpdated = false;
-    vnode.state.emailUpdated = false;
+    vnode.state.verificationSent = false;
     vnode.state.emailVerified = app.login.emailVerified;
     vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
   },
   view: (vnode) => {
-    const { email, githubAccount, emailInputUpdated, emailVerified, emailUpdated } = vnode.state;
+    const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent } = vnode.state;
     return [
       m('.EmailWell', [
         m('h4', 'Email'),
@@ -41,6 +41,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
           defaultValue: app.login.email || null,
           oninput: (e) => {
             vnode.state.emailInputUpdated = true;
+            vnode.state.verificationSent = false;
             vnode.state.email = (e.target as any).value;
           },
         }),
@@ -48,7 +49,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
           intent: 'primary',
           label: (!emailInputUpdated && !emailVerified) ? 'Retry verification' : 'Update email',
           class: 'update-email-button',
-          disabled: (!emailInputUpdated && emailVerified) || emailUpdated,
+          disabled: (!emailInputUpdated && emailVerified) || verificationSent,
           onclick: async () => {
             try {
               const response = await $.post(`${app.serverUrl()}/updateEmail`, {
@@ -56,7 +57,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
                 'jwt': app.login.jwt,
               });
               vnode.state.emailVerified = false;
-              vnode.state.emailUpdated = true;
+              vnode.state.verificationSent = true;
               m.redraw();
             } catch (err) {
               console.log('Failed to update email');
@@ -66,15 +67,18 @@ const EmailWell: m.Component<IAttrs, IState> = {
             }
           }
         }),
-        m(Icon, {
-          size: 'lg',
-          intent: emailVerified ? 'positive' : 'warning',
-          name: emailVerified ? Icons.CHECK_CIRCLE : Icons.ALERT_CIRCLE,
-        }),
-        m('label', {
-          style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
-        }, emailVerified ? 'Verified' : 'Not verified'),
-        emailUpdated && m('p', 'Check your email for a confirmation link'),
+        verificationSent
+          ? m('label', 'Check your email for a confirmation link')
+          : [
+            m(Icon, {
+              size: 'lg',
+              intent: emailVerified ? 'positive' : 'warning',
+              name: emailVerified ? Icons.CHECK_CIRCLE : Icons.ALERT_CIRCLE,
+            }),
+            m('label', {
+              style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
+            }, emailVerified ? 'Verified' : 'Not verified'),
+          ],
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [
