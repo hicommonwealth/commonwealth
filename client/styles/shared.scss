@@ -1,3 +1,5 @@
+@import 'construct-ui/src/_shared/_colors';
+
 $fonts: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: 'iA Writer Duospace', monospace;
 
@@ -9,9 +11,8 @@ $offwhite-extralight: #fcfbfa;
 $offwhite-light: #f9f8f6;
 $offwhite-dark: #282625;
 $badge-red: #de243b;    // radish red for badges
-$badge-lightred: #fa3e3e; // salmon red for weak badges
-$error-red: #d32e26;    // fleshy red for error messages
-$success-green: green;
+$error-red: $red800;
+$success-green: $light_green800;
 
 $primary-green: #41a360;
 
@@ -252,16 +253,6 @@ $header-spacing: 14px; // padding between header items
         padding: 0;
         margin: 2px 0;
         border-bottom: 1px solid #ececec;
-    }
-    ul li .alert-badge {
-        float: right;
-        margin-top: 2px;
-        padding: 3px 3px 2px;
-        border-radius: 2px;
-        color: $offwhite-extralight;;
-        background: $badge-lightred;
-        font-size: 12px;
-        line-height: 1;
     }
 }
 
