@@ -38,8 +38,8 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   if (recentTokens.count >= LOGIN_RATE_LIMIT_TRIES) {
     return res.json({
       status: 'Error',
-      message: 'You\'ve tried to log in several times already. ' +
-        `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`
+      message: 'You\'ve tried to log in several times already. '
+        + `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`
     });
   }
 
