@@ -41,7 +41,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       rootProposal
     } = vnode.attrs;
     let { parentComment } = vnode.attrs;
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const parentType = parentComment ? CommentParent.Comment : CommentParent.Proposal;
     if (!parentComment) parentComment = null;
     if (vnode.state.uploadsInProgress === undefined) {
@@ -93,7 +93,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         vnode.state.sendingComment = false;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
-        await app.login.notifications.refresh();
+        await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
         vnode.state.error = err.message;

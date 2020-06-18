@@ -2,15 +2,40 @@ import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
 
-import { PopoverMenu, Button, Icons } from 'construct-ui';
-import { HeaderBatchNotificationRow } from 'views/components/sidebar/notification_row';
+import { PopoverMenu, Button, Icons, ButtonGroup } from 'construct-ui';
+import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 
-const NotificationsDrowdownMenu: m.Component<{},{}> = {
+const NotificationButtons: m.Component = {
   view: (vnode) => {
-    const notifications = app.login.notifications
-      ? app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
+    const notifications = app.user.notifications.notifications;
+    return m(ButtonGroup, {
+      class: 'NotificationButtons',
+      fluid: true,
+      basic: true,
+    }, [
+      m(Button, {
+        label: 'Mark all as read',
+        onclick: (e) => {
+          e.preventDefault();
+          if (notifications.length < 1) return;
+          app.user.notifications.markAsRead(notifications).then(() => m.redraw());
+        },
+      }),
+      m(Button, {
+        label: 'See all',
+        onclick: (e) => m.route.set('/notifications'),
+      }),
+    ]);
+  }
+};
+
+const NotificationsDropdownMenu: m.Component = {
+  view: (vnode) => {
+    // TODO: Add helper directly on controller
+    const notifications = app.user.notifications
+      ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');
@@ -28,19 +53,22 @@ const NotificationsDrowdownMenu: m.Component<{},{}> = {
         align: 'left',
       },
       class: 'notification-menu',
-      content: m('.notification-list', [
-        notifications.length > 0
-          ? m(Infinite, {
-            maxPages: 1, // prevents rollover/repeat
-            pageData: () => sortedNotifications,
-            item: (data, opts, index) => {
-              return m(HeaderBatchNotificationRow, { notifications: data });
-            },
-          })
-          : m('li.no-notifications', 'No Notifications'),
-      ]),
+      content: [
+        m('.notification-list', [
+          notifications.length > 0
+            ? m(Infinite, {
+              maxPages: 1, // prevents rollover/repeat
+              pageData: () => sortedNotifications,
+              item: (data, opts, index) => {
+                return m(NotificationRow, { notifications: data });
+              },
+            })
+            : m('li.no-notifications', 'No Notifications'),
+        ]),
+        m(NotificationButtons),
+      ]
     });
   },
 };
 
-export default NotificationsDrowdownMenu;
+export default NotificationsDropdownMenu;

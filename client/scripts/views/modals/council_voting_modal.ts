@@ -18,7 +18,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 
 const CouncilVotingModal = {
   view: (vnode) => {
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const candidates = vnode.attrs.candidates || [];
     if (!author) return m('div', 'Must be logged in');
     if (!(author instanceof SubstrateAccount)) return m('div', 'Council voting only supported on Substrate.');
@@ -51,7 +51,7 @@ const CouncilVotingModal = {
       }
 
       const voteAccts: string[] = vnode.state.votes;
-      const voteObj = new PhragmenElectionVote(app.vm.activeAccount as SubstrateAccount, voteAccts, stake);
+      const voteObj = new PhragmenElectionVote(app.user.activeAccount as SubstrateAccount, voteAccts, stake);
       createTXModal((app.chain as Substrate).phragmenElections.activeElection.submitVoteTx(voteObj)).then(() => {
         $(vnode.dom).trigger('modalforceexit');
       }, (err) => {
@@ -111,7 +111,7 @@ const CouncilVotingModal = {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
-            const account = app.vm.activeAccount as SubstrateAccount;
+            const account = app.user.activeAccount as SubstrateAccount;
             createTXModal((app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(account))
               .then(() => {
                 $(vnode.dom).trigger('modalforceexit');

@@ -25,9 +25,9 @@ const NewTagModal = {
             intent: 'primary',
             onclick: (e) => {
               e.preventDefault();
-              // if (!isCommunityAdmin()) return;
-              const name = $(vnode.dom).find('input.new-tag-name').val().toString();
-              const description = $(vnode.dom).find('input.new-tag-∂escription').val().toString();
+              const $parent = $(vnode.dom).closest('.NewTagModal');
+              const name = $parent.find('.new-tag-name input').val().toString();
+              const description = $parent.find('.new-tag-description input').val().toString();
               if (!name.trim()) return;
               app.tags.add(name, description).then(() => { m.redraw(); });
               $(vnode.dom).trigger('modalexit');

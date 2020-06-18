@@ -92,7 +92,7 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
         ]),
         // Add in identity actions here
         m('.bio-actions', [
-          (app.vm.activeAccount && account.address === app.vm.activeAccount.address) ? [
+          (app.user.activeAccount && account.address === app.user.activeAccount.address) ? [
             editIdentityAction(account, vnode.state.dynamic.identity),
             m('button.formular-button-primary', {
               onclick: () => {

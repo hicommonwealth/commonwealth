@@ -172,7 +172,7 @@ export const newThread = (
     updateLastVisited(app.activeCommunityId()
       ? (activeEntity.meta as CommunityInfo)
       : (activeEntity.meta as NodeInfo).chain, true);
-    await app.login.notifications.refresh();
+    await app.user.notifications.refresh();
     m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
     try {

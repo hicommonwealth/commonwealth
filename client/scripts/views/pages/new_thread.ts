@@ -21,7 +21,7 @@ const NewThreadPage: m.Component = {
       return;
     }
 
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     if (!activeEntity) return m(PageLoading);
 

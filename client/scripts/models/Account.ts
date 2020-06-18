@@ -100,7 +100,7 @@ abstract class Account<C extends Coin> {
       const params : any = {
         address: this.address,
         chain: this.chain.id,
-        jwt: this.app.login.jwt,
+        jwt: this.app.user.jwt,
       };
       // If txParams is provided, the signature is actually for a
       // transaction, not a message. The transaction should be a

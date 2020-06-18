@@ -71,9 +71,9 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
           ]),
           m('br'),
           m('h4', 'Select an admin'),
-          app.login.addresses.length === 0
+          app.user.addresses.length === 0
             && m('.no-active-address', 'No address found. You must have an address before creating a community.'),
-          app.login.addresses.map((addr) => {
+          app.user.addresses.map((addr) => {
             return m('.form-field', [
               m('input[type="radio"]', {
                 name: 'addr_select',
@@ -118,7 +118,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
               privacyEnabled: privacyEnabled ? 'true' : 'false',
               invitesEnabled: invitesEnabled ? 'true' : 'false',
               auth: true,
-              jwt: app.login.jwt,
+              jwt: app.user.jwt,
             }).then((result) => {
               const newCommunityInfo = new CommunityInfo(
                 result.result.id,

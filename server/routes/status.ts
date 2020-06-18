@@ -168,6 +168,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     loggedIn: true,
     user: {
       email: user.email,
+      emailVerified: user.emailVerified,
       emailInterval: user.emailNotificationInterval,
       jwt: jwtToken,
       addresses,

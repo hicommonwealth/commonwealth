@@ -6,9 +6,9 @@ const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NotLoggedIn: 'Not lgoged in',
-  NoNotificationIds: 'Must specify notification ids',
-  WrongOwner: 'Notification not woned by user',
+  NotLoggedIn: 'Not logged in',
+  NoNotificationIds: 'Must specify notification IDs',
+  WrongOwner: 'Notification not owned by user',
 };
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {

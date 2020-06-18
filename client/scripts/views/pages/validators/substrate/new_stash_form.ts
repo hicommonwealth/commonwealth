@@ -75,7 +75,7 @@ const NewStashForm: m.Component<{}, IStashFormState> = {
         const { controllerAddress, bondAmount, rewardDestination } = vnode.state;
         if (controllerAddress && bondAmount && rewardDestination) {
           console.log(controllerAddress, bondAmount, rewardDestination);
-          const sender = (app.vm.activeAccount as SubstrateAccount);
+          const sender = (app.user.activeAccount as SubstrateAccount);
           return sender.bondTx(controllerAddress, bondAmount, rewardDestination);
         }
       },

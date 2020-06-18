@@ -77,7 +77,7 @@ class ChainInfo {
       'id': app.activeChainId(),
       'name': name,
       'description': description,
-      'jwt': app.login.jwt,
+      'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
     this.name = updatedChain.name;
@@ -100,7 +100,7 @@ class ChainInfo {
       await $.post(`${app.serverUrl()}/updateChain`, {
         'id': app.activeChainId(),
         'featured_tags[]': tags,
-        'jwt': app.login.jwt
+        'jwt': app.user.jwt
       });
     } catch (err) {
       console.log('Failed to update featured tags');

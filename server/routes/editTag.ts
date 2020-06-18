@@ -6,11 +6,11 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in.',
-  NoTagId: 'Must supply tag ID.',
-  NotAdmin: 'Must be an admin to edit or feature tags.',
+  NotLoggedIn: 'Not logged in',
+  NoTagId: 'Must supply tag ID',
+  NotAdmin: 'Must be an admin to edit or feature tags',
   NotVerified: 'Must have a verified address to edit or feature tags',
-  TagNotFound: 'Tag not found.'
+  TagNotFound: 'Tag not found'
 };
 
 const editTag = async (models, req: Request, res: Response, next: NextFunction) => {

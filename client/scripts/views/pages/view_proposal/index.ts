@@ -15,7 +15,6 @@ import app, { LoginState } from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType } from 'identifiers';
 import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
@@ -79,7 +78,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         : app.community.accounts.get(proposal.author, proposal.authorChain))
       : proposal.author;
 
-    const notificationSubscription = app.login.notifications.subscriptions
+    const notificationSubscription = app.user.notifications.subscriptions
       .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
 
     return m('.ProposalHeader', {
@@ -90,10 +89,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderTags, { proposal }),
           proposal instanceof OffchainThread
             && (proposal.tag
-                || (app.vm.activeAccount?.address === (proposal as OffchainThread).author)
-                || isRoleOfCommunity(
-                  app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId()
-                ))
+                || (app.user.activeAccount?.address === (proposal as OffchainThread).author)
+                || app.user.isRoleOfCommunity({ role: 'admin', chain: app.activeChainId(), community: app.activeCommunityId() }))
             && m(ProposalHeaderSpacer),
           m(ProposalHeaderViewCount, { viewCount }),
           m(ProposalHeaderSpacer),
@@ -130,7 +127,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderLastEdited, { proposal }),
 
           !getSetGlobalEditingStatus(GlobalStatus.Get)
-            && isSameAccount(app.vm.activeAccount, author)
+            && isSameAccount(app.user.activeAccount, author)
             && !vnode.state.editing
             && [
               m(ProposalHeaderSpacer),
@@ -214,10 +211,10 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         m(ProposalBodyLastEdited, { item: comment }),
 
         // !vnode.state.editing
-        //   && app.vm.activeAccount
+        //   && app.user.activeAccount
         //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        //   && app.vm.activeAccount?.chain.id === comment.authorChain
-        //   && app.vm.activeAccount?.address === comment.author
+        //   && app.user.activeAccount?.chain.id === comment.authorChain
+        //   && app.user.activeAccount?.address === comment.author
         //   && [
         //     m(ProposalBodySpacer),
         //     m(ProposalBodyEdit, {
@@ -231,10 +228,10 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         //   ],
 
         !vnode.state.editing
-        && app.vm.activeAccount
+        && app.user.activeAccount
         && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        && app.vm.activeAccount?.chain.id === comment.authorChain
-        && app.vm.activeAccount?.address === comment.author
+        && app.user.activeAccount?.chain.id === comment.authorChain
+        && app.user.activeAccount?.address === comment.author
         && [
           m(ProposalBodySpacer),
           m(PopoverMenu, {
@@ -260,7 +257,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         // For now, we are limiting threading to 1 level deep
         // Comments whose parents are other comments should not display the reply option
         // !vnode.state.editing
-        //   && app.vm.activeAccount
+        //   && app.user.activeAccount
         //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
         //   && parentType === CommentParent.Proposal
         //   && [
@@ -395,7 +392,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
       comments
       && m('.proposal-comments', AllComments(comments, replyParent)),
       // create comment
-      app.vm.activeAccount
+      app.user.activeAccount
         && !getSetGlobalReplyStatus(GlobalStatus.Get)
         && m(CreateComment, {
           callback: createdCommentCallback,

@@ -5,7 +5,7 @@ import mixpanel from 'mixpanel-browser';
 import { Tooltip } from 'construct-ui';
 
 import app from 'state';
-import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal } from 'models';
+import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -35,15 +35,18 @@ const ReactionButton: m.Component<IAttrs, IState> = {
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const disabled = !app.vm.activeAccount || vnode.state.loading;
-    const activeAddress = app.vm.activeAccount?.address;
+    const disabled = !app.user.activeAccount || vnode.state.loading;
+    const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
     let hasReactedType;
     if (hasReacted) hasReactedType = rxn.reaction;
 
     const reactors = (likes || dislikes).slice(0, MAX_VISIBLE_REACTING_ACCOUNTS).map((rxn_) => {
-      return m('.reacting-user', m(User, { user: [rxn_.author, rxn_.author_chain], linkify: true }));
+      return m('.reacting-user', m(User, {
+        user: new AddressInfo(null, rxn_.author, rxn_.author_chain, null),
+        linkify: true
+      }));
     });
     if (reactors.length < (likes || dislikes).length) {
       const diff = (likes || dislikes).length - reactors.length;
@@ -58,7 +61,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
-        // if it's a community use the app.vm.activeAccount.chain.id instead of author chain
+        // if it's a community use the app.user.activeAccount.chain.id instead of author chain
         const chainId = app.activeCommunityId() ? null : app.activeChainId();
         const communityId = app.activeCommunityId();
         if (hasReacted) {
@@ -67,7 +70,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
           app.reactions.delete(reaction).then(() => {
             if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
               || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-              app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId).then(() => {
+              app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
                 vnode.state.loading = false;
                 m.redraw();
               });
@@ -78,7 +81,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
           });
         } else {
           vnode.state.loading = true;
-          app.reactions.create(app.vm.activeAccount.address, post, type, chainId, communityId)
+          app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId)
             .then(() => {
               vnode.state.loading = false;
               m.redraw();

@@ -4,7 +4,7 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoTagId: 'Must supply tag ID',
+  NoTagId: 'Must provide tag ID',
   NotAdmin: 'Only admins can delete tags',
   TagNotFound: 'Tag not found',
   DeleteFail: 'Could not delete tag',

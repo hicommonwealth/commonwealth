@@ -7,15 +7,12 @@ import { Tag, Button } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo } from 'models';
 import User, { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase, getRoleInCommunity } from 'helpers';
+import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex }> = {
   view: (vnode) => {
-    const activeAddressesByRole: Array<[Account<any>, RoleInfo]> = app.login.activeAddresses.map((account) => {
-      const role = getRoleInCommunity(account, app.activeChainId(), app.activeCommunityId());
-      return [account, role];
-    });
+    const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
@@ -24,10 +21,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex }> = {
       m('.compact-modal-body', [
         // m('.select-existing-address', [
         //   m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
-        //   activeAddressesByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
+        //   activeAccountsByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
         // ]),
         // m('br'),
-        activeAddressesByRole.map(([account, role], index) => !role && m('.SelectAddressOption', {
+        activeAccountsByRole.map(([account, role], index) => !role && m('.SelectAddressOption', {
           class: vnode.state.selectedIndex === index ? 'selected' : '',
           onclick: async (e) => {
             e.preventDefault();

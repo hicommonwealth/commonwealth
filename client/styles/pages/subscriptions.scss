@@ -1,11 +1,12 @@
 @import 'client/styles/shared';
 
 .SubscriptionsPage {
-  .Sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
+
+  .user-feedback {
+    margin-left: 12px;
+    color: #444;
   }
+
   .SubscriptionRow {
     border: solid 1px #eee;
     border-radius: 3px;
@@ -80,13 +81,12 @@
 
   .UserNotifications {
     .MarkAllButtons, .MentionsButton {
+      h4 {
+        margin-right: 12px;
+      }
       display: flex;
       flex-direction: row;
       align-items: center;
-
-      button {
-        margin-left: 12px;
-      }
     }
 
   }

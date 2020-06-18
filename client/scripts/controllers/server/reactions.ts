@@ -34,12 +34,12 @@ class ReactionsController {
 
   public async create(address: string, post: any, reaction: string, chainId: string, communityId: string) {
     const options = {
-      author_chain: app.vm.activeAccount.chain.id,
+      author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
       community: communityId,
       address,
       reaction,
-      jwt: app.login.jwt,
+      jwt: app.user.jwt,
     };
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
@@ -92,7 +92,7 @@ class ReactionsController {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /reaction
       $.post(`${app.serverUrl()}/deleteReaction`, {
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
         reaction_id: reaction.id,
       }).then((result) => {
         _this.store.remove(reaction);
