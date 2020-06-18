@@ -16,7 +16,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import labelEdgewareEvent from '../../../../shared/events/edgeware/filters/labeler';
-import { getProposalUrl } from '../../../../shared/utils';
+import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -137,7 +137,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
     community: community_id,
   };
   const args = comment_id ? [root_type, pseudoProposal, { id: comment_id }] : [root_type, pseudoProposal];
-  const path = (getProposalUrl as any)(...args);
+  const path = (category === NotificationCategories.NewThread) ? (getCommunityUrl as any)(community_id || chain_id) : (getProposalUrl as any)(...args);
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
