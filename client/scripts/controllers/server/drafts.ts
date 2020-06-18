@@ -40,15 +40,15 @@ class DraftsController {
   ) {
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
-        'address': app.vm.activeAccount.address,
-        'author_chain': app.vm.activeAccount.chain.id,
+        'address': app.user.activeAccount.address,
+        'author_chain': app.user.activeAccount.chain.id,
         'chain': app.activeChainId(),
         'community': app.activeCommunityId(),
         'title': title,
         'body': body,
         'attachments[]': attachments,
         'tag': tagName,
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
@@ -72,8 +72,8 @@ class DraftsController {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
         data: {
-          'address': app.vm.activeAccount.address,
-          'author_chain': app.vm.activeAccount.chain.id,
+          'address': app.user.activeAccount.address,
+          'author_chain': app.user.activeAccount.chain.id,
           'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
           'id': id,
@@ -81,7 +81,7 @@ class DraftsController {
           'title': title,
           'tag': tagName,
           'attachments[]': attachments,
-          'jwt': app.login.jwt
+          'jwt': app.user.jwt
         }
       });
       const result = modelFromServer(response.result);
@@ -103,11 +103,11 @@ class DraftsController {
       $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
-          'address': app.vm.activeAccount.address,
-          'author_chain': app.vm.activeAccount.chain.id,
+          'address': app.user.activeAccount.address,
+          'author_chain': app.user.activeAccount.chain.id,
           'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
-          'jwt': app.login.jwt,
+          'jwt': app.user.jwt,
           'id': draftId,
         }
       }).then((result) => {
@@ -123,7 +123,7 @@ class DraftsController {
   }
 
   public async refreshAll(reset = false) {
-    if (!app.login || !app.login.jwt) {
+    if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh drafts');
     }
     const response = await $.get(`${app.serverUrl()}/drafts`, {

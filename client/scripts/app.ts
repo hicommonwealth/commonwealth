@@ -445,7 +445,7 @@ $(() => {
       }
       // grab discussion drafts
       if (app.loginState === LoginState.LoggedIn) {
-        app.login.discussionDrafts.refreshAll().then(() => m.redraw());
+        app.user.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
       let wsUrl = app.serverUrl();

@@ -63,7 +63,7 @@ export const saveDraft = (
     (async () => {
       let result;
       try {
-        result = await app.login.discussionDrafts.edit(
+        result = await app.user.discussionDrafts.edit(
           existingDraft,
           title,
           bodyText,
@@ -82,7 +82,7 @@ export const saveDraft = (
     (async () => {
       let result;
       try {
-        result = await app.login.discussionDrafts.create(
+        result = await app.user.discussionDrafts.create(
           title,
           bodyText,
           tagName,

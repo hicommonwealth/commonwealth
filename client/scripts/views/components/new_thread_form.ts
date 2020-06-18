@@ -54,7 +54,7 @@ export const populateDraft = async (state, draft) => {
       formBodyDelta = quill.getContents();
     }
 
-    const discardedDraft = app.login.discussionDrafts.store
+    const discardedDraft = app.user.discussionDrafts.store
       .getByCommunity(app.activeId())
       .filter((d) => d.id === fromDraft)[0];
     let discardedDelta;
@@ -109,7 +109,7 @@ export const populateDraft = async (state, draft) => {
 
 export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
   view: (vnode: VnodeDOM<{ header: boolean }, IState>) => {
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
@@ -155,7 +155,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
       ]),
     ]);
 
-    const discussionDrafts = app.login.discussionDrafts.store.getByCommunity(app.activeId());
+    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     // TODO: Community-scope drafts in /status & store
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -320,7 +320,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 vnode.state.error = newThread(form, quillEditorState, author);
                 if (!vnode.state.error) {
                   if (vnode.state.fromDraft) {
-                    await app.login.discussionDrafts.delete(vnode.state.fromDraft);
+                    await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {

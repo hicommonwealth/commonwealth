@@ -11,6 +11,7 @@ import {
 } from 'models';
 
 import NotificationsController from '../notifications';
+import DraftsController from '../drafts';
 
 export default class {
   private _activeAccount: Account<any>;
@@ -75,6 +76,10 @@ export default class {
     this._starredCommunities = starredCommunities;
   }
 
+  private _discussionDrafts: DraftsController = new DraftsController();
+  public get discussionDrafts(): DraftsController { return this._discussionDrafts; }
+  private _setDiscussionDrafts(drafts: DraftsController): void { this._discussionDrafts = drafts; }
+
   private _unseenPosts: object;
   public get unseenPosts(): object { return this._unseenPosts; }
   private _setUnseenPosts(unseenPosts: object): void { this._unseenPosts = unseenPosts; }
@@ -138,6 +143,7 @@ export default class {
   public setSiteAdmin(isAdmin: boolean): void { this._setSiteAdmin(isAdmin); }
   public setDisableRichText(disableRichText: boolean): void { this._setDisableRichText(disableRichText); }
   public setNotifications(notifications: NotificationsController): void { this._setNotifications(notifications); }
+  public setDiscussionDrafts(drafts: DraftsController): void { this.setDiscussionDrafts(drafts); }
   public setLastVisited(lastVisited: object): void { this._setLastVisited(lastVisited); }
 
   public setStarredCommunities(star: StarredCommunity[]): void { this._setStarredCommunities(star); }
