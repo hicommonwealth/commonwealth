@@ -12,38 +12,12 @@ import {
 import Base from './base';
 
 export default class extends Base {
-  /*
-    Address logic
-  */
-
-  public getDefaultAddressInCommunity(options: { chain?: string, community?: string }) {
-    const role = this.roles.find((r) => {
-      const communityMatches = options.chain
-        ? r.chain_id === options.chain
-        : r.offchain_community_id === options.community;
-      return communityMatches && r.is_user_default;
-    });
-
-    if (!role) return;
-    return this.addresses.find((a) => a.id === role.address_id);
-  }
-
-  /*
-    Roles logic
-  */
-
   public getChainRoles(): RoleInfo[] {
     return this.roles.filter((role) => !role.offchain_community_id);
   }
 
   public getCommunityRoles(): RoleInfo[] {
     return this.roles.filter((role) => role.offchain_community_id);
-  }
-
-  public setRoles(roles: RoleInfo[] = []): void {
-    roles.forEach((role) => {
-      this.roles.push(role);
-    });
   }
 
   public createRole(options: { address: AddressInfo, chain?: string, community?: string }): JQueryPromise<void> {
@@ -54,7 +28,7 @@ export default class extends Base {
       ...options,
     }).then((result) => {
       // handle state updates
-      this.roles.push(result.result);
+      this.addRole(result.result);
     });
   }
 
@@ -66,16 +40,15 @@ export default class extends Base {
       ...options,
     }).then((result) => {
       // handle state updates
-      const index = options.chain
-        ? this.roles.findIndex((r) => (
-          r.chain_id === options.chain
-            && r.address_id === options.address.id
-        ))
-        : this.roles.findIndex((r) => (
-          r.offchain_community_id === options.community
-            && r.address_id === options.address.id
-        ));
-      if (index !== -1) this.roles.splice(index, 1);
+      if (options.chain) {
+        this.removeRole((r) => {
+          return r.chain_id === options.chain && r.address_id === options.address.id;
+        });
+      } else {
+        this.removeRole((r) => {
+          return r.offchain_community_id === options.community && r.address_id === options.address.id;
+        });
+      }
     });
   }
 

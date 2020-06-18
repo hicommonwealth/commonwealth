@@ -87,6 +87,19 @@ export default class {
   public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
+  public setRoles(roles: RoleInfo[] = []): void {
+    roles.forEach((role) => {
+      this._roles.push(role);
+    });
+  }
+  public addRole(role: RoleInfo): void {
+    this._roles.push(role);
+  }
+  public removeRole(predicate: (r) => boolean): void {
+    const index = this.roles.findIndex(predicate)
+    if (index !== -1) this._roles.splice(index, 1);
+  }
+
   public setAddresses(addresses: AddressInfo[]): void { this._setAddresses(addresses); }
   public addAddress(address: AddressInfo): void { this._addresses.push(address); }
   public removeAddress(address: AddressInfo): void {
