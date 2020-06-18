@@ -20,7 +20,7 @@ const sendFeedback = async (models, req: Request, res: Response, next: NextFunct
 
   const urlText = req.body.url || '<Unknown URL>';
 
-  const data = JSON.stringify({ text: userText + ' @ ' + urlText + ': \n' + req.body.text });
+  const data = JSON.stringify({ text: `${userText} @ ${urlText}:\n${req.body.text}` });
   request
     .post(SLACK_FEEDBACK_WEBHOOK)
     .send(data)

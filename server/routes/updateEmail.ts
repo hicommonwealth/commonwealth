@@ -9,10 +9,10 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoEmail: 'Must provide email to update.',
-  NoUser: 'Could not find user',
-  InvalidEmail: 'Invalid Email',
-  EmailInUse: 'Invalid email, already exists',
+  NoEmail: 'Must provide email',
+  NoUser: 'Could not find a user with this email',
+  InvalidEmail: 'Invalid email',
+  EmailInUse: 'Email already linked to another account',
 };
 
 const updateEmail = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +31,6 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
       email,
     }
   });
-  console.dir(existingUser);
   if (existingUser) return next(new Error(Errors.EmailInUse));
 
   const user = await models.User.findOne({

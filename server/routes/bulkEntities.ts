@@ -1,7 +1,7 @@
 import { Response, NextFunction, Request } from 'express';
 
 export const Errors = {
-  NeedChain: 'Must specify entity chain',
+  NeedChain: 'Must provide a chain to fetch entities from',
   InvalidChain: 'Invalid chain',
 };
 

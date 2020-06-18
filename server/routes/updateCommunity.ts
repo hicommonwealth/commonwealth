@@ -5,7 +5,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoCommunityId: 'Must provide community id',
+  NoCommunityId: 'Must provide community ID',
   CantChangeNetwork: 'Cannot change community network',
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
