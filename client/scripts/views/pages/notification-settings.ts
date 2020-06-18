@@ -60,47 +60,11 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateInter
   },
 };
 
-const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }, { updated: string, }> = {
-  oninit: (vnode) => {
-    vnode.state.updated = null;
-  },
+const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[] }> = {
   view: (vnode) => {
-    let notifications: any[];
-    if (app.loginStatusLoaded) {
-      notifications = app.login.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
-    }
     const { subscriptions } = vnode.attrs;
-    const { updated } = vnode.state;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     return m('.UserNotifications', [
-      m('h2', 'Notifications:'),
-      m('.MarkAllButtons', [
-        m('h4', 'For all current notifications:'),
-        m(ButtonGroup, [
-          m(Button, {
-            label: 'Mark all as read',
-            onclick: (e) => {
-              e.preventDefault();
-              if (notifications.length < 1) return;
-              app.login.notifications.markAsRead(notifications).then(() => {
-                vnode.state.updated = 'Success!';
-                m.redraw();
-              });
-            }
-          }),
-          m(Button, {
-            label: 'Clear all read',
-            onclick: (e) => {
-              e.preventDefault();
-              app.login.notifications.clearAllRead().then(() => {
-                vnode.state.updated = 'Success!';
-                m.redraw();
-              });
-            }
-          }),
-        ]),
-        updated && m('p.user-feedback', updated),
-      ]),
       mentionsSubscription
         && m('.MentionsButton', [
           m('h4', 'Mentions:'),
