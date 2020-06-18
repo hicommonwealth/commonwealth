@@ -37,6 +37,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
       m('.EmailWell', [
         m('h4', 'Email'),
         m(Input, {
+          placeholder: 'name@example.com',
           contentLeft: m(Icon, { name: Icons.MAIL }),
           defaultValue: app.login.email || null,
           oninput: (e) => {
