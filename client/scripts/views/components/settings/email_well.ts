@@ -82,7 +82,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
               name: emailVerified ? Icons.CHECK_CIRCLE : Icons.ALERT_CIRCLE,
             }),
             m('label', {
-              style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
+              style: { color: emailVerified ? Colors.GREEN500 : Colors.ORANGE900 }
             }, emailVerified ? 'Verified' : 'Not verified'),
           ],
         errorMessage && m('p.error', errorMessage),
