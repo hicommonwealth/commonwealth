@@ -217,6 +217,10 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
+              data: {
+                account: activeAccount as MolochMember,
+                delegateKey: (activeAccount as MolochMember).delegateKey,
+              },
             }),
             label: 'Update delegate key',
             contentLeft: m(Icon, { name: Icons.KEY }),
@@ -224,6 +228,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
+              data: { account: activeAccount as MolochMember },
             }),
             label: 'Rage quit',
             contentLeft: m(Icon, { name: Icons.FILE_MINUS }),

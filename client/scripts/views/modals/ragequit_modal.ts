@@ -17,9 +17,11 @@ interface IState {
 
 const RagequitModal: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+    const acct = vnode.attrs.account;
     return m('.RagequitModal', [
       m('.header', 'Ragequit'),
       m('.compact-modal-body', [
+        m('.data-label', [ `Share holdings: ${acct?.shares?.format() ?? '--'}` ]),
         m(TextInputFormField, {
           title: 'Shares to burn',
           subtitle: 'Exchange your shares for ETH.',

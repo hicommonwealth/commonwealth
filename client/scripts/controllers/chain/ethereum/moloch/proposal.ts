@@ -379,7 +379,7 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (this._Gov.api.userAddress !== this.applicantAddress) {
+    if (this._Gov.api.userAddress.toLowerCase() !== this.applicantAddress.toLowerCase()) {
       throw new Error('only applicant can abort');
     }
 
