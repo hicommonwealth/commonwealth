@@ -55,6 +55,9 @@ export const saveDraft = (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
   const { title, tagName } = form;
+  if (!bodyText && !title) {
+    return new Error('No body or title');
+  }
   const attachments = [];
   if (existingDraft) {
     (async () => {

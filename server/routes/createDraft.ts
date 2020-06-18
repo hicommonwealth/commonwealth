@@ -6,7 +6,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoBodyOrAttachments: 'Drafts must include body or attachment',
+  InsufficientData: 'Drafts must include title, body, or attachment',
 };
 
 const createDraft = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -14,8 +14,8 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { title, body, tag } = req.body;
 
-  if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
-    return next(new Error(Errors.NoBodyOrAttachments));
+  if (!title && !body && !req.body['attachments[]']?.length) {
+    return next(new Error(Errors.InsufficientData));
   }
 
   const draftContent = community ? {

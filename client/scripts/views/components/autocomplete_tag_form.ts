@@ -68,8 +68,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         }, 'No matches found. Add tag?');
       }
     };
-
-    if (activeTag instanceof OffchainTag) {
+    if ((activeTag as OffchainTag)?.id) {
       (vnode.state.selectedTag as any) = activeTag;
     } else if (typeof activeTag === 'string') {
       addTag(activeTag);
