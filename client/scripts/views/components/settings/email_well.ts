@@ -17,6 +17,7 @@ interface IState {
   verificationSent: boolean;
   emailVerified: boolean;
   githubAccount: SocialAccount;
+  errorMessage: string;
 }
 
 interface IAttrs {
@@ -30,9 +31,10 @@ const EmailWell: m.Component<IAttrs, IState> = {
     vnode.state.verificationSent = false;
     vnode.state.emailVerified = app.login.emailVerified;
     vnode.state.githubAccount = app.login.socialAccounts.find((sa) => sa.provider === 'github');
+    vnode.state.errorMessage = null;
   },
   view: (vnode) => {
-    const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent } = vnode.state;
+    const { email, githubAccount, emailInputUpdated, emailVerified, verificationSent, errorMessage } = vnode.state;
     return [
       m('.EmailWell', [
         m('h4', 'Email'),
@@ -61,6 +63,8 @@ const EmailWell: m.Component<IAttrs, IState> = {
               vnode.state.verificationSent = true;
               m.redraw();
             } catch (err) {
+              vnode.state.errorMessage = err.responseJSON.error;
+              m.redraw();
               console.log('Failed to update email');
               throw new Error((err.responseJSON && err.responseJSON.error)
                 ? err.responseJSON.error
@@ -80,6 +84,7 @@ const EmailWell: m.Component<IAttrs, IState> = {
               style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
             }, emailVerified ? 'Verified' : 'Not verified'),
           ],
+        errorMessage && m('p.error', errorMessage),
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [
