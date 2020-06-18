@@ -17,27 +17,15 @@ import User from 'views/components/widgets/user';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
-import MembershipButton, { isMember } from 'views/components/membership_button';
 import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
+import TagCaratMenu from './tag_carat_menu';
 
-interface IDiscussionPageAttrs {
-  activeTag?: string;
-}
-
-interface IDiscussionPageState {
-  lookback?: number;
-  postsDepleted?: boolean;
-  lastVisitedUpdated?: boolean;
-  hasOlderPosts?: boolean;
-  defaultLookback: number;
-}
-
-const CommunitySidebar: m.Component<{ activeTag?: string }> = {
+const CommunitySidebar: m.Component<{ tag?: string }> = {
   view: (vnode) => {
-    const { activeTag } = vnode.attrs;
+    const { tag } = vnode.attrs;
     if (!app.chain && !app.community) return;
 
     const activeNode = app.chain?.meta;
@@ -57,9 +45,10 @@ const CommunitySidebar: m.Component<{ activeTag?: string }> = {
       ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     return m('.CommunitySidebar', [
-      activeTag && [
-        m('h4', `About #${activeTag}`),
-        m('p', app.tags.store.getByName(activeTag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      m(TagCaratMenu, { tag }),
+      tag && [
+        m('h4', `About #${tag}`),
+        m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
       ],
       m('h4', `About ${communityName}`),
       m('p', communityDescription),
@@ -73,7 +62,15 @@ const CommunitySidebar: m.Component<{ activeTag?: string }> = {
   }
 };
 
-const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
+interface IDiscussionPageState {
+  lookback?: number;
+  postsDepleted?: boolean;
+  lastVisitedUpdated?: boolean;
+  hasOlderPosts?: boolean;
+  defaultLookback: number;
+}
+
+const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -253,7 +250,7 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
       ]);
     };
 
-    const { activeTag } = vnode.attrs;
+    const { tag } = vnode.attrs;
     const activeAddressInfo = app.vm.activeAccount && app.login.addresses
       .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
 
@@ -266,12 +263,12 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     return m(Sublayout, {
       class: 'DiscussionsPage',
       rightSidebar: (app.chain || app.community) && [
-        activeTag ? m(CommunitySidebar, { activeTag }) : m(CommunitySidebar)
+        tag ? m(CommunitySidebar, { tag }) : m(CommunitySidebar)
       ],
     }, [
       (app.chain || app.community) && [
-        activeTag
-          ? getSingleTagListing(activeTag)
+        tag
+          ? getSingleTagListing(tag)
           : getHomepageListing(),
       ]
     ]);

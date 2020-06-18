@@ -109,14 +109,14 @@ class ThreadsController {
     privacy?: boolean
   ) {
     const newBody = body || proposal.body;
-    const newReadOnly = readOnly || proposal.readOnly;
-    const newPrivacy = privacy || proposal.privacy;
+    const newReadOnly = (typeof readOnly === 'boolean') ? readOnly : proposal.readOnly;
+    const newPrivacy = (typeof privacy === 'boolean') ? privacy : proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
-
-    try {
-      // TODO: Change to PUT /thread
-      const response = await $.post(`${app.serverUrl()}/editThread`, {
+    await $.ajax({
+      url: `${app.serverUrl()}/editThread`,
+      type: 'PUT',
+      data: {
         'thread_id': proposal.id,
         'kind': proposal.kind,
         'body': encodeURIComponent(newBody),
@@ -125,18 +125,21 @@ class ThreadsController {
         'read_only': newReadOnly,
         'privacy': newPrivacy,
         'jwt': app.login.jwt
-      });
-      const result = modelFromServer(response.result);
-      if (this._store.getByIdentifier(result.id)) {
-        this._store.remove(this._store.getByIdentifier(result.id));
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to edit thread');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to edit thread');
       }
-      this._store.add(result);
-      return result;
-    } catch (err) {
-      console.log('Failed to edit thread');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
-        : 'Failed to edit thread');
-    }
+    });
   }
 
   public async delete(proposal) {

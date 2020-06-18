@@ -33,3 +33,39 @@
     url("iAWriterDuospace-BoldItalic.woff2") format("woff2"),
     url("iAWriterDuospace-BoldItalic.woff") format("woff");
 }
+
+@font-face {
+  font-family: "iA Writer Quattro";
+  font-weight: normal;
+  font-style: normal;
+  src: url("iAWriterQuattroS-Regular.eot") format("embedded-opentype"),
+    url("iAWriterQuattroS-Regular.woff2") format("woff2"),
+    url("iAWriterQuattroS-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "iA Writer Quattro";
+  font-weight: normal;
+  font-style: italic;
+  src: url("iAWriterQuattroS-Italic.eot") format("embedded-opentype"),
+    url("iAWriterQuattroS-Italic.woff2") format("woff2"),
+    url("iAWriterQuattroS-Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: "iA Writer Quattro";
+  font-weight: bold;
+  font-style: normal;
+  src: url("iAWriterQuattroS-Bold.eot") format("embedded-opentype"),
+    url("iAWriterQuattroS-Bold.woff2") format("woff2"),
+    url("iAWriterQuattroS-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "iA Writer Quattro";
+  font-weight: bold;
+  font-style: italic;
+  src: url("iAWriterQuattroS-BoldItalic.eot") format("embedded-opentype"),
+    url("iAWriterQuattroS-BoldItalic.woff2") format("woff2"),
+    url("iAWriterQuattroS-BoldItalic.woff") format("woff");
+}

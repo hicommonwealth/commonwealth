@@ -173,7 +173,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
       ]),
       canEdit && proposal.tag && m(ProposalHeaderSpacer),
       canEdit && m(TagEditor, {
-        popoverMenu: true,
         thread: proposal,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
       }),
@@ -261,7 +260,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
-          app.threads.edit(proposal, null, null, true).then(() => m.redraw());
+          app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
       }),
