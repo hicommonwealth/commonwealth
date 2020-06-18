@@ -1,10 +1,10 @@
-
 import 'components/settings/email_well.scss';
 import 'components/settings/github_well.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { Colors } from 'construct-ui';
 
 import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
@@ -38,11 +38,11 @@ const EmailWell: m.Component<IAttrs, IState> = {
         m(Input, {
           contentLeft: m(Icon, { name: Icons.MAIL }),
           defaultValue: email || null,
-          onkeyup: (e) => { vnode.state.email = (e.target as any).value; },
+          oninput: (e) => { vnode.state.email = (e.target as any).value; },
         }),
         m(Button, {
           label: 'Update email',
-          disabled: (email === app.login.email),
+          disabled: email === app.login.email,
           onclick: async () => {
             try {
               if (email === app.login.email) return;
@@ -64,16 +64,18 @@ const EmailWell: m.Component<IAttrs, IState> = {
         }),
         m(Icon, {
           size: 'lg',
-          name: emailVerified ? Icons.CHECK_CIRCLE : Icons.X_CIRCLE,
+          intent: emailVerified ? 'positive' : 'warning',
+          name: emailVerified ? Icons.CHECK_CIRCLE : Icons.ALERT_CIRCLE,
         }),
-        m('label', emailVerified ? 'Verified' : 'Not Verified'),
+        m('label', {
+          style: { color: emailVerified ? Colors.GREEN900 : Colors.ORANGE900 }
+        }, emailVerified ? 'Verified' : 'Not verified'),
         emailUpdated && m('p', 'Check your email to confirm this change'),
       ]),
       vnode.attrs.github && m('.GithubWell', [
         m('form', [
-          // m('h4', 'Github'),
           m(Input, {
-            value: githubAccount?.username || '',
+            value: `github.com/${githubAccount?.username}`,
             contentLeft: m(Icon, { name: Icons.GITHUB }),
             disabled: true,
           }),
