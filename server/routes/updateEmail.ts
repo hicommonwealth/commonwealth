@@ -55,7 +55,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: 'Verify your Commonwealth email',
-    templateId: 'd-2b00abbf123e4b5981784d17151e86be', // TODO: Set this to Verification Template, not Sign In Template
+    templateId: 'd-a0c28546fecc49fb80a3ba9e535bff48',
     dynamic_template_data: {
       loginLink,
     },
