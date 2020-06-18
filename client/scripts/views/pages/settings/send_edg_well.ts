@@ -12,7 +12,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { first } from 'rxjs/operators';
-import AddressInput from '../addresses/address_input';
+import AddressInput from 'views/components/addresses/address_input';
 
 const getBalanceTransferChecks = (
   senderBalance : SubstrateCoin,

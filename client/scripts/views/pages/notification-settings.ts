@@ -17,7 +17,6 @@ import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/Poss
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
-import EmailWell from 'views/components/settings/email_well';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateIntervalMessage: string, }> = {
   oninit: (vnode) => {
@@ -28,7 +27,6 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateInter
   view: (vnode) => {
     const { updateIntervalMessage, interval, email } = vnode.state;
     return m('.EmailPanel', [
-      m(EmailWell),
       m('.EmailInterval', [
         m('h4', 'Receive notification emails:'),
         m(Select, {
