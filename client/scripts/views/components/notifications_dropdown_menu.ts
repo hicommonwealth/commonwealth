@@ -3,7 +3,7 @@ import Infinite from 'mithril-infinite';
 import app from 'state';
 
 import { PopoverMenu, Button, Icons, ButtonGroup } from 'construct-ui';
-import { HeaderBatchNotificationRow } from 'views/components/notification_row';
+import NotificationRow from 'views/components/notification_row';
 import { Notification } from 'models';
 import { sortNotifications } from 'helpers/notifications';
 
@@ -59,7 +59,7 @@ const NotificationsDropdownMenu: m.Component = {
               maxPages: 1, // prevents rollover/repeat
               pageData: () => sortedNotifications,
               item: (data, opts, index) => {
-                return m(HeaderBatchNotificationRow, { notifications: data });
+                return m(NotificationRow, { notifications: data });
               },
             })
             : m('li.no-notifications', 'No Notifications'),

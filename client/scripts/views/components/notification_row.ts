@@ -150,34 +150,11 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   });
 };
 
-interface IHeaderBatchNotificationRow {
-  notifications: Notification[];
-}
-
-export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow> = {
+const NotificationRow: m.Component<{ notifications: Notification[] }> = {
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
-    const getHeaderNotificationRow = (userAccount, createdAt, title, excerpt, target: string, next?: Function) => {
-      return m('li.HeaderNotificationRow', {
-        class: notifications[0].isRead ? '' : 'unread',
-        onclick: async () => {
-          const notificationArray: Notification[] = [];
-          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
-          await m.route.set(target);
-          m.redraw.sync();
-          if (next) setTimeout(() => next(), 1);
-        },
-      }, [
-        m(User, { user: userAccount, avatarOnly: true, avatarSize: 36 }),
-        m('.comment-body', [
-          m('.comment-body-title', title),
-          excerpt && m('.comment-body-excerpt', excerpt),
-          m('.comment-body-created', createdAt.fromNow()),
-        ]),
-      ]);
-    };
 
     const notificationData = typeof notification.data === 'string'
       ? JSON.parse(notification.data)
@@ -203,7 +180,7 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         chainId,
         notification.chainEvent.data,
       );
-      return m('li.HeaderNotificationRow', {
+      return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         onclick: async () => {
           const notificationArray: Notification[] = [];
@@ -221,14 +198,25 @@ export const HeaderBatchNotificationRow: m.Component<IHeaderBatchNotificationRow
         ]),
       ]);
     } else {
-      return getHeaderNotificationRow(
-        author,
-        createdAt,
-        notificationHeader,
-        notificationBody,
-        path,
-        pageJump
-      );
+      return m('li.NotificationRow', {
+        class: notifications[0].isRead ? '' : 'unread',
+        onclick: async () => {
+          const notificationArray: Notification[] = [];
+          app.login.notifications.markAsRead(notifications).then(() => m.redraw());
+          await m.route.set(path);
+          m.redraw.sync();
+          if (pageJump) setTimeout(() => pageJump(), 1);
+        },
+      }, [
+        m(User, { user: author as [string, string], avatarOnly: true, avatarSize: 36 }),
+        m('.comment-body', [
+          m('.comment-body-title', notificationHeader),
+          notificationBody && m('.comment-body-excerpt', notificationBody),
+          m('.comment-body-created', createdAt.fromNow()),
+        ]),
+      ]);
     }
   },
 };
+
+export default NotificationRow;
