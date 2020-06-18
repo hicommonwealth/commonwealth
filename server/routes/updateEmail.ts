@@ -1,3 +1,4 @@
+import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import moment from 'moment';
 import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
@@ -29,6 +30,7 @@ const updateEmail = async (models, req: Request, res: Response, next: NextFuncti
   const existingUser = await models.User.findOne({
     where: {
       email,
+      id: { [Sequelize.Op.ne]: req.user.id }
     }
   });
   if (existingUser) return next(new Error(Errors.EmailInUse));

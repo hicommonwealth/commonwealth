@@ -63,7 +63,7 @@ export default (
   }, {
     underscored: true,
     indexes: [
-      { fields: ['email'] },
+      { fields: ['email'], unique: true },
     ],
   });
 
