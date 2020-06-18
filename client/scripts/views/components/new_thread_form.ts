@@ -38,6 +38,12 @@ export const populateDraft = async (state, draft) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
+
+  // If overwritten form body comes from a previous draft, we check whether
+  // there have been changes made to the draft, and prompt with a confirmation
+  // modal if there have been.
+  const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
+  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   let confirmed = true;
   if (fromDraft) {
     let formBodyDelta;
@@ -47,32 +53,33 @@ export const populateDraft = async (state, draft) => {
     } else {
       formBodyDelta = quill.getContents();
     }
+
     const discardedDraft = app.login.discussionDrafts.store
       .getByCommunity(app.activeId())
-      .filter((d) => d.id === fromDraft)[0].body;
+      .filter((d) => d.id === fromDraft)[0];
     let discardedDelta;
     let discardedMarkdown;
     try {
-      discardedDelta = new Delta(JSON.parse(discardedDraft));
+      discardedDelta = new Delta(JSON.parse(discardedDraft.body));
     } catch {
-      discardedMarkdown = discardedDraft;
+      discardedMarkdown = discardedDraft.body;
     }
-    console.log({
-      formBodyDelta,
-      discardedDelta,
-      discardedMarkdown
-    });
-
-    const isUnchanged = _.isEqual(formBodyDelta, discardedDelta)
-      || formBodyMarkdown === discardedMarkdown;
-    if (!isUnchanged) {
-      confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
+    const isTitleUnchanged = (titleInput as HTMLInputElement).value === discardedDraft.title;
+    console.log(isTitleUnchanged);
+    const isBodyUnchanged = formBodyDelta
+      ? _.isEqual(formBodyDelta, discardedDelta)
+      : formBodyMarkdown
+        ? formBodyMarkdown === discardedMarkdown
+        : false;
+    if (!isBodyUnchanged || !isTitleUnchanged) {
+      confirmed = await confirmationModalWithText(overwriteDraftMsg)();
     }
   } else if (quill.getLength() > 1) {
-    confirmed = await confirmationModalWithText('Load draft? Current form will not be saved.')();
+    confirmed = await confirmationModalWithText(overwriteDraftMsg)();
   }
   if (!confirmed) return;
 
+  // Now we populate the form with its new contents
   let newDraftMarkdown;
   let newDraftDelta;
   if (draft.body) {
@@ -91,11 +98,8 @@ export const populateDraft = async (state, draft) => {
   if (newDraftDelta) {
     state.quillEditorState.editor.setContents(newDraftDelta);
   } else if (newDraftMarkdown) {
-    const bodyEditor = document.querySelector('div.new-thread-form-body .ql-editor');
-    (bodyEditor as HTMLElement).innerText = newDraftMarkdown;
+    state.quillEditorState.editor.setText(newDraftMarkdown);
   }
-
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   (titleInput as HTMLInputElement).value = draft.title;
   state.form.title = draft.title;
   state.activeTag = draft.tag;
