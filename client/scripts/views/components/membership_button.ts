@@ -81,10 +81,7 @@ const MembershipButton: m.Component<{
               disabled: cannotJoinPrivateCommunity,
               hasAnyExistingRole: hasExistingRole,
               iconLeft: hasExistingRole ? Icons.CHECK : null,
-              label: [
-                m(User, { user: a }),
-                ` ${a.address.slice(0, 6)}...`,
-              ],
+              label: m(User, { user: a, showRole: true }),
               onclick: hasExistingRole ? deleteRole.bind(this, a) : createRoleWithAddress.bind(this, a),
             });
           }),

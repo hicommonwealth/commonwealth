@@ -1,0 +1,22 @@
+@import 'client/styles/shared';
+
+.EmailWell {
+    h4 {
+        margin-top: 20px;
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+    input, button {
+        margin-right: 12px;
+    }
+    label {
+        margin-left: 6px;
+        color: #444;
+    }
+    .error {
+        margin: 10px 0;
+        color: $error-red;
+        font-weight: 600;
+    }
+}

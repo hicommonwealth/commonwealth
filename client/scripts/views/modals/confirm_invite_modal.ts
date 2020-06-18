@@ -7,7 +7,6 @@ import mixpanel from 'mixpanel-browser';
 
 import { orderAccountsByAddress } from 'helpers';
 
-import ProfileBlock from 'views/components/widgets/profile_block';
 import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
 import LinkNewAddressModal from './link_new_address_modal';

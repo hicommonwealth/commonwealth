@@ -13,4 +13,15 @@
     .cui-form .cui-form-group {
         margin-top: 8px;
     }
+    .login-message {
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: 600;
+        &.success {
+            color: $success-green;
+        }
+        &.failure {
+            color: $error-red;
+        }
+    }
 }

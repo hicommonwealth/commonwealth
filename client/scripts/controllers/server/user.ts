@@ -33,6 +33,10 @@ export default class {
   public get emailInterval(): string { return this._emailInterval; }
   private _setEmailInterval(emailInterval: string): void { this._emailInterval = emailInterval; }
 
+  private _emailVerified: boolean;
+  public get emailVerified(): boolean { return this._emailVerified; }
+  private _setEmailVerified(emailVerified: boolean): void { this._emailVerified = emailVerified; }
+
   private _jwt: string;
   public get jwt(): string { return this._jwt; }
   private _setJWT(JWT: string): void { this._jwt = JWT; }
@@ -88,6 +92,7 @@ export default class {
   public setActiveAccount(account: Account<any>): void { this._setActiveAccount(account); }
   public setEmail(email: string): void { this._setEmail(email); }
   public setEmailInterval(emailInterval: string): void { this._setEmailInterval(emailInterval); }
+  public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
   public setAddresses(addresses: AddressInfo[]): void { this._setAddresses(addresses); }

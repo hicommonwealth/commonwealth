@@ -116,11 +116,14 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
       : app.user.isMember({ community: app.community.meta.id, account });
   });
 
-  if (memberAddresses.length === 0) {
-    // no member addresses - preview the community
-  } else if (memberAddresses.length === 1) {
-    // one member address - start the community with that address (don't check for default address)
+  if (memberAddresses.length === 1) {
+    // one member address - start the community with that address
     setActiveAccount(memberAddresses[0]);
+  } else if (app.user.activeAccounts.length === 1) {
+    // one non-member address - start the community with that address
+    setActiveAccount(app.user.activeAccounts[0]);
+  } else if (app.user.activeAccounts.length === 0) {
+    // no addresses - preview the community
   } else {
     const existingAddress = chain
       ? app.user.getDefaultAddressInCommunity({ chain: chain.id })
@@ -153,6 +156,7 @@ export function updateActiveUser(data) {
   } else {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
+    app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
     app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype)));

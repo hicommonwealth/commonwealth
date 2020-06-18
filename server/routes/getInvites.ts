@@ -5,8 +5,8 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoUser: 'Cannot find associated User',
-  NoEmail: 'No email included for User, cannot query invites',
+  NoUser: 'Cannot find associated user',
+  NoEmail: 'No email for associated user',
 };
 
 const getInvites = async (models, req: Request, res: Response, next: NextFunction) => {

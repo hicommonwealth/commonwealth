@@ -5,7 +5,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoObjectId: 'Must provide object_id',
+  NoObjectId: 'Must provide object ID',
   NoChainOrComm: 'Must provide chain or community',
   InvalidChainOrComm: 'Invalid chain or community',
   InvalidThread: 'Invalid offchain thread',

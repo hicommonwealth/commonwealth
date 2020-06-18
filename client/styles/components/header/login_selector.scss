@@ -2,55 +2,6 @@
 
 .LoginSelector {
     margin-left: $header-spacing;
-    display: flex;
-    padding-left: 4px;
-    .login-selector-left {
-        flex: 1;
-        display: flex;
-    }
-    .login-selector-right {
-        padding-left: $header-spacing;
-    }
-    &.no-community {
-        padding-left: 0;
-        .login-selector-right {
-            padding-left: 0;
-        }
-    }
-
-    button.cui-button {
-        position: relative;
-    }
-    .User.avatar-only,
-    .login-selector-user {
-        margin-top: 2px;
-    }
-    .User.avatar-only {
-        overflow: visible;
-        padding-right: 10px;
-        position: relative;
-        top: 1px;
-    }
-    .login-selector-user {
-        line-height: 1.1;
-        .user-info {
-            position: relative;
-            padding-right: 6px;
-            .User {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 110px;
-                font-size: 13px;
-            }
-            .user-address {
-                font-size: 12px;
-                font-weight: 400;
-                color: #777;
-                margin: 0;
-            }
-        }
-    }
 }
 
 .login-selector-popover {

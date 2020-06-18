@@ -5,21 +5,22 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
 import { Button, ButtonGroup, Icon, Icons, List, ListItem, Menu, MenuItem, MenuDivider,
-         Popover, PopoverMenu } from 'construct-ui';
+  Popover, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import LoginModal from 'views/modals/login_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import { setActiveAccount } from 'controllers/app/login';
 
-const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenuOpen: boolean }> = {
+const LoginSelector : m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
@@ -34,121 +35,82 @@ const LoginSelector : m.Component<{}, { switchAddressMenuOpen: boolean, userMenu
       ]),
     ]);
 
-    return m('.LoginSelector', {
-      class: (app.chain || app.community) ? '' : 'no-community',
-    }, [
-      (app.chain || app.community) && m('.login-selector-left', app.user.activeAccount
-        // if address selected
-        ? [
-          m(User, { user: app.user.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-          m('.login-selector-user', [
-            m('.user-info', [
-              m(User, { user: app.user.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-              m('.user-address', app.user.activeAccount.chain.id === 'near'
-                ? `@${app.user.activeAccount.address}`
-                : `${app.user.activeAccount.address.slice(0, 6)}...`)
-            ])
-          ]),
-        ]
-        // if no address is selected
-        : app.user.activeAccounts.length === 0 ? m(Button, {
-          intent: 'none',
-          iconLeft: Icons.USER_PLUS,
-          size: 'sm',
-          fluid: true,
-          label: 'Link new address',
-          onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-        })
-        // if addresses are available, but none is selected
-        : m(Button, {
-          label: 'Select an address',
-          fluid: true,
-          size: 'sm',
-          onclick: () => app.modals.create({ modal: SelectAddressModal }),
-        })),
-      app.isLoggedIn() && m('.login-selector-right', [
-        // logged in
-        m(ButtonGroup, { fluid: true }, [
-          (app.chain || app.community) && m(Popover, {
-            class: 'login-selector-popover',
-            closeOnContentClick: true,
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            position: 'top-end',
-            content: m(Menu, [
+    const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
+      return app.user.getRoleInCommunity({
+        account,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
+    });
+
+    return m('.LoginSelector', [
+      m(ButtonGroup, { fluid: true }, [
+        m(Popover, {
+          class: 'login-selector-popover',
+          closeOnContentClick: true,
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          position: 'top-end',
+          trigger: m(Button, {
+            intent: 'none',
+            size: 'sm',
+            fluid: true,
+            compact: true,
+            label: (!app.chain && !app.community) ? 'No community'
+              : (app.user.activeAccounts.length === 0 || app.user.activeAccount === null) ? 'No address'
+                : m(User, { user: app.user.activeAccount }),
+            iconRight: Icons.CHEVRON_DOWN,
+          }),
+          content: m(Menu, { class: 'LoginSelectorMenu' }, [
+            // address selector - only shown in communities
+            (app.chain || app.community) && [
+              activeAddressesWithRole.map((account) => m(MenuItem, {
+                align: 'left',
+                basic: true,
+                onclick: (e) => {
+                  setActiveAccount(account);
+                },
+                label: m(UserBlock, { user: account, avatarSize: 24 }),
+              })),
               m(MenuItem, {
-                onclick: async () => app.modals.create({
+                onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
                 iconLeft: Icons.USER,
-                label: 'Switch address'
+                label: 'Connect another address'
               }),
-            ]),
-            trigger: (app.chain || app.community) && m(Button, {
-              intent: 'none',
-              size: 'sm',
-              fluid: true,
-              compact: true,
-              label: m(Icon, { name: Icons.CHEVRON_DOWN }),
-              onclick: (e) => {
-                vnode.state.switchAddressMenuOpen = !vnode.state.switchAddressMenuOpen;
-              }
+              m(MenuDivider),
+            ],
+            // always shown
+            m(MenuItem, {
+              onclick: () => m.route.set('/settings'),
+              iconLeft: Icons.SETTINGS,
+              label: 'Settings'
             }),
-          }),
-          m(Popover, {
-            class: 'login-selector-popover',
-            closeOnContentClick: true,
-            transitionDuration: 0,
-            hoverCloseDelay: 0,
-            position: 'top-end',
-            trigger: m(Button, {
-              intent: 'none',
-              size: 'sm',
-              fluid: true,
-              compact: true,
-              label: m(Icon, { name: Icons.SETTINGS }),
-              onclick: (e) => {
-                vnode.state.userMenuOpen = !vnode.state.userMenuOpen;
-              }
+            m(MenuItem, {
+              onclick: () => app.modals.create({ modal: FeedbackModal }),
+              iconLeft: Icons.SEND,
+              label: 'Send feedback',
             }),
-            content: m(Menu, [
-              m(MenuItem, {
-                label: 'Profile',
-                iconLeft: Icons.USER,
-                onclick: (e) => {
-                  m.route.set(`/${app.user.activeAccount.chain.id}/account/${app.user.activeAccount.address}`);
-                },
-              }),
-              m(MenuItem, {
-                onclick: () => m.route.set('/settings'),
-                iconLeft: Icons.SETTINGS,
-                label: 'Settings'
-              }),
-              m(MenuItem, {
-                onclick: () => app.modals.create({ modal: FeedbackModal }),
-                iconLeft: Icons.SEND,
-                label: 'Send feedback',
-              }),
-              m(MenuItem, {
-                onclick: () => {
-                  $.get(`${app.serverUrl()}/logout`).then(async () => {
-                    await initAppState();
-                    notifySuccess('Logged out');
-                    m.route.set('/');
-                    m.redraw();
-                  }).catch((err) => {
-                    // eslint-disable-next-line no-restricted-globals
-                    location.reload();
-                  });
-                  mixpanel.reset();
-                },
-                iconLeft: Icons.X_SQUARE,
-                label: 'Logout'
-              }),
-            ]),
-          }),
-        ]),
-      ])
+            m(MenuItem, {
+              onclick: () => {
+                $.get(`${app.serverUrl()}/logout`).then(async () => {
+                  await initAppState();
+                  notifySuccess('Logged out');
+                  m.route.set('/');
+                  m.redraw();
+                }).catch((err) => {
+                  // eslint-disable-next-line no-restricted-globals
+                  location.reload();
+                });
+                mixpanel.reset();
+              },
+              iconLeft: Icons.X_SQUARE,
+              label: 'Logout'
+            }),
+          ]),
+        }),
+      ]),
     ]);
   }
 };

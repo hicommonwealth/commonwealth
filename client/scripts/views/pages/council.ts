@@ -15,8 +15,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
-import ProfileBlock from 'views/components/widgets/profile_block';
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { createTXModal } from 'views/modals/tx_signing_modal';
@@ -113,7 +112,7 @@ const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
     const canBeRetracted = app.user.activeAccount && voterAccount.address === myAccount.address;
 
     return link('a.CouncilElectionVoter', `/${voterAccount.chain.id}/account/${voterAccount.address}`, [
-      m('.col-member', m(ProfileBlock, { account: voterAccount })),
+      m('.col-member', m(UserBlock, { user: voterAccount })),
       m('.col-info', [
         m('.metadata-item', `Locked ${stake}`),
         (canBeReaped || canBeRetracted) && m('a', {

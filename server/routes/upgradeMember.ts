@@ -5,12 +5,12 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  InvalidAddress: 'Invalid Address',
-  InvalidRole: 'Invalid Role',
+  InvalidAddress: 'Invalid address',
+  InvalidRole: 'Invalid role',
   NotLoggedIn: 'Not logged in',
-  MustBeAdmin: 'Must be an Admin to upgrade member',
-  NoMember: 'Cannot find member to upgrade!',
-  NoAdminDemotion: 'Cannot demote self',
+  MustBeAdmin: 'Must be an admin to upgrade member',
+  NoMember: 'Cannot find member to upgrade',
+  NoAdminDemotion: 'Cannot remove yourself as admin',
 };
 
 const ValidRoles = ['admin', 'moderator', 'member'];

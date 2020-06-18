@@ -2,60 +2,49 @@ import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import { Tag, Button } from 'construct-ui';
 
-import { Tag } from 'construct-ui';
 import app from 'state';
 import { Account, RoleInfo } from 'models';
-import ProfileBlock from 'views/components/widgets/profile_block';
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 
-interface ISelectAddressOptionAttrs {
-  account;
-  role;
-}
-
-const SelectAddressOption: m.Component<ISelectAddressOptionAttrs> = {
-  view: (vnode: m.VnodeDOM<ISelectAddressOptionAttrs>) => {
-    const { account, role } = vnode.attrs;
-
-    return m('.SelectAddressOption', {
-      key: `${account.chain.id}-${account.address}`,
-      class: isSameAccount(app.user.activeAccount, account) ? 'selected' : '',
-      onclick: async (e) => {
-        e.preventDefault();
-        await setActiveAccount(account);
-        $(vnode.dom).trigger('modalexit');
-      },
-    }, [
-      m(ProfileBlock, { account }),
-      role && m('.role-permission', [
-        m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
-        role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
-      ]),
-    ]);
-  }
-};
-
-const SelectAddressModal = {
+const SelectAddressModal: m.Component<{}, { selectedIndex }> = {
   view: (vnode) => {
     const activeAccountsByRole: Array<[Account<any>, RoleInfo]> = app.user.getActiveAccountsByRole();
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Select address'),
+        m('h3', 'Add address'),
       ]),
       m('.compact-modal-body', [
-        m('.select-existing-address', [
-          m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
-          activeAccountsByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
-        ]),
+        // m('.select-existing-address', [
+        //   m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
+        //   activeAccountsByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
+        // ]),
+        // m('br'),
+        activeAccountsByRole.map(([account, role], index) => !role && m('.SelectAddressOption', {
+          class: vnode.state.selectedIndex === index ? 'selected' : '',
+          onclick: async (e) => {
+            e.preventDefault();
+            vnode.state.selectedIndex = index;
+          },
+        }, [
+          m(UserBlock, { user: account }),
+          role && m('.role-permission', [
+            m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
+            role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
+          ]),
+        ])),
         m('br'),
-        m('.join-with-new-address', [
-          m('.modal-header', 'Select an address to join this community:'),
-          activeAccountsByRole.map(([account, role]) => !role && m(SelectAddressOption, { account, role })),
-        ]),
+        m(Button, {
+          label: 'Join community',
+          intent: 'primary',
+          disabled: vnode.state.selectedIndex === undefined,
+          onclick: (e) => {
+          }
+        }),
       ]),
     ]);
   }

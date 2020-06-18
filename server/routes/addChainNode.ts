@@ -8,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   MustBeAdmin: 'Must be admin',
-  MissingParams: 'Must provide chain id, name, symbol, network, and node url',
+  MissingParams: 'Must provide chain ID, name, symbol, network, and node url',
   NodeExists: 'Node already exists',
   MustSpecifyContract: 'This is a contract, you must specify a contract address',
 };
