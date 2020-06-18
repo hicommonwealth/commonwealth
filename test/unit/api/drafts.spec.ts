@@ -4,12 +4,9 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import sleep from 'sleep-promise';
-import moment from 'moment';
-import { Errors as ThreadErrors } from 'server/routes/createThread';
-import { Errors as EditThreadErrors } from 'server/routes/editThread';
-import { Errors as CreateCommentErrors } from 'server/routes/createComment';
-import { Errors as ViewCountErrors } from 'server/routes/viewCount';
+import { Errors as DeleteDraftErrors } from 'server/routes/deleteDraft';
+import { Errors as CreateDraftErrors } from 'server/routes/createDraft';
+import { Errors as EditDraftErrors } from 'server/routes/editDraft';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -26,14 +23,20 @@ describe('Draft Tests', () => {
   const tag = 'test tag';
 
   let userJWT;
-  let userId;
   let userAddress;
+  let user2Address;
+  let user2JWT;
 
   before(async () => {
     await resetDatabase();
-    const res = await modelUtils.createAndVerifyAddress({ chain });
+    let res = await modelUtils.createAndVerifyAddress({ chain });
+    user2Address = res.address;
+    user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+    expect(user2Address).to.not.be.null;
+    expect(user2JWT).to.not.be.null;
+
+    res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
-    userId = res.user_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -148,6 +151,7 @@ describe('Draft Tests', () => {
           'jwt': userJWT,
         });
       expect(res).to.not.have.status(200);
+      expect(res.body.error).to.equal(CreateDraftErrors.NoBodyOrAttachments);
     });
   });
 
@@ -167,6 +171,7 @@ describe('Draft Tests', () => {
           'body': body,
           'jwt': userJWT,
         });
+      expect(res).to.have.status(200);
       firstDraft = res.body.result;
     });
 
@@ -207,7 +212,83 @@ describe('Draft Tests', () => {
           'body': body,
           'jwt': userJWT,
         });
+      const { result } = res.body;
       expect(res).to.not.have.status(200);
+      expect(res.body.error).to.equal(EditDraftErrors.NoId);
+    });
+
+    it('should fail to edit a draft when attempted by non-owning user', async () => {
+      const res = await chai.request(app)
+        .patch('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': user2Address,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'id': firstDraft.id,
+          'title': title,
+          'tag': tag,
+          'body': body,
+          'jwt': user2JWT,
+        });
+      const { result } = res.body;
+      expect(res).to.not.have.status(200);
+      expect(res.body.error).to.equal(EditDraftErrors.NotOwner);
+    });
+  });
+
+  describe('/deleteDraft', () => {
+    let draft;
+    beforeEach(async () => {
+      const res = await chai.request(app)
+        .post('/api/drafts')
+        .set('Accept', 'application/json')
+        .send({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'title': title,
+          'tag': tag,
+          'body': body,
+          'jwt': userJWT,
+        });
+      draft = res.body.result;
+    });
+
+    it('should delete a provided draft', async () => {
+      const res = await chai.request(app)
+        .get('/api/drafts')
+        .set('Accept', 'application/json')
+        .query({
+          'address': userAddress,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'id': draft.id,
+          'jwt': userJWT
+        });
+      const { result } = res.body;
+      expect(res).to.have.status(200);
+      expect(result).to.not.be.null;
+    });
+
+    it('should fail to delete a provided draft when attempted by non-owning user', async () => {
+      const res = await chai.request(app)
+        .get('/api/drafts')
+        .set('Accept', 'application/json')
+        .query({
+          'address': user2Address,
+          'author_chain': chain,
+          'chain': chain,
+          'community': null,
+          'id': draft.id,
+          'jwt': user2JWT
+        });
+      const { result } = res.body;
+      expect(res).to.not.have.status(200);
+      expect(res.body.error).to.be.equal(DeleteDraftErrors.NotOwner);
     });
   });
 

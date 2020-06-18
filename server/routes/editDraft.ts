@@ -44,7 +44,6 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id,
-        author_id: author.id
       },
       include: [
         models.Address,
