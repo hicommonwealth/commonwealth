@@ -151,7 +151,7 @@ describe('Draft Tests', () => {
           'jwt': userJWT,
         });
       expect(res).to.not.have.status(200);
-      expect(res.body.error).to.equal(CreateDraftErrors.NoBodyOrAttachments);
+      expect(res.body.error).to.equal(CreateDraftErrors.InsufficientData);
     });
   });
 
