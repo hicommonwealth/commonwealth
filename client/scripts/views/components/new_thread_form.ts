@@ -82,9 +82,12 @@ export const populateDraft = async (state, draft) => {
     state.quillEditorState.markdownMode = true;
   }
 
-  setTimeout(() => {
-    state.quillEditorState.editor.setContents(newDraftDelta || newDraftMarkdown);
-  }, 1);
+  if (newDraftDelta) {
+    state.quillEditorState.editor.setContents(newDraftDelta);
+  } else if (newDraftMarkdown) {
+    const bodyEditor = document.querySelector('div.new-thread-form-body .ql-editor');
+    (bodyEditor as HTMLElement).innerText = newDraftMarkdown;
+  }
 
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   (titleInput as HTMLInputElement).value = draft.title;
