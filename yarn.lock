@@ -5649,6 +5649,13 @@ ethashjs@~0.0.7:
     ethereumjs-util "^4.0.1"
     miller-rabin "^4.0.0"
 
+ethereum-block-by-date@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/ethereum-block-by-date/-/ethereum-block-by-date-1.2.2.tgz#58a975accd409d5d0a14fb39baf9ba8bf0e81560"
+  integrity sha512-2a3Ll/798vqzB7CH3dMBCHsAMgJk/bNR1YvRj3sCxwWMxH4znA2ZRxLwx/MZY/hBAYrWf/GIg49dVG1uSqVdkw==
+  dependencies:
+    moment "^2.25.0"
+
 ethereum-bloom-filters@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/ethereum-bloom-filters/-/ethereum-bloom-filters-1.0.6.tgz#9cdebb3ec20de96ec4a434c6bad6ea5a513037aa"
@@ -10029,6 +10036,11 @@ moment@*, "moment@>= 2.9.0", moment@^2.10.2, moment@^2.20.0, moment@^2.23.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+
+moment@^2.25.0:
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.27.0.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
+  integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
 
 moment@~2.4.0:
   version "2.4.0"

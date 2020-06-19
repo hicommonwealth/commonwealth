@@ -1,5 +1,8 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
+import { WebsocketProvider } from 'web3-core/types';
+import { Web3Provider } from 'ethers/providers';
+import EthDater from 'ethereum-block-by-date';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
@@ -75,8 +78,11 @@ export default async function (
     // retrieve events from block
     const cwEvents: CWEvent<IMolochEventData>[] = await processor.process(event);
 
-    // send all events through event-handlers in sequence
-    await Promise.all(cwEvents.map((e) => handleEventFn(e)));
+    // process events in sequence
+    for (const cwEvent of cwEvents) {
+      // eslint-disable-next-line no-await-in-loop
+      await handleEventFn(cwEvent);
+    }
   };
 
   const subscriber = new Subscriber(api, chain);
@@ -88,17 +94,31 @@ export default async function (
       log.warn('No function to discover offline time found, skipping event catchup.');
       return;
     }
-    log.info('Fetching missed events since last startup...');
-    const offlineRange = await discoverReconnectRange();
-    if (!offlineRange) {
-      log.warn('No offline range found, skipping event catchup.');
+    log.info(`Fetching missed events since last startup of ${chain}...`);
+    let offlineRange: IDisconnectedRange;
+    try {
+      offlineRange = await discoverReconnectRange();
+      if (!offlineRange) {
+        log.warn('No offline range found, skipping event catchup.');
+        return;
+      }
+    } catch (e) {
+      log.error(`Could not discover offline range: ${e.message}. Skipping event catchup.`);
       return;
     }
 
-    const fetcher = new StorageFetcher(api, contractVersion);
+    // reuse provider interface for dater function
+    const web3 = new Web3((api.provider as Web3Provider)._web3Provider as WebsocketProvider);
+    const dater = new EthDater(web3);
+    const fetcher = new StorageFetcher(api, contractVersion, dater);
     try {
       const cwEvents = await fetcher.fetch(offlineRange);
-      await Promise.all(cwEvents.map((e) => handleEventFn(e)));
+
+      // process events in sequence
+      for (const cwEvent of cwEvents) {
+        // eslint-disable-next-line no-await-in-loop
+        await handleEventFn(cwEvent);
+      }
     } catch (e) {
       log.error(`Unable to fetch events from storage: ${e.message}`);
     }

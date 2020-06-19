@@ -31,19 +31,24 @@ export default class extends IEventHandler {
       log.trace(`found chain event type: ${dbEventType.id}`);
     }
 
-    // create event in db
-    const [ dbEvent, created ] = await this._models.ChainEvent.findOrCreate({
+    // check for duplicate event
+    const exists = await this._models.ChainEvent.findOne({
       where: {
         chain_event_type_id: dbEventType.id,
-        block_number: event.blockNumber,
-      },
-      defaults: { event_data: event.data }
+        event_data: event.data,
+      }
     });
-
-    if (!created) {
-      log.error('Received duplicate event!');
+    if (exists) {
+      log.error(`Received duplicate event: ${JSON.stringify(event)}`);
       return;
     }
+
+    // create event in db
+    const dbEvent = await this._models.ChainEvent.create({
+      chain_event_type_id: dbEventType.id,
+      block_number: event.blockNumber,
+      event_data: event.data
+    });
 
     return dbEvent;
   }

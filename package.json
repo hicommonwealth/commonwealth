@@ -105,6 +105,7 @@
     "edgeware-node-types": "^2.1.0",
     "eslint": "^6.8.0",
     "eslint-loader": "^2.1.1",
+    "ethereum-block-by-date": "^1.2.2",
     "ethereumjs-util": "^6.1.0",
     "ethereumjs-wallet": "^0.6.3",
     "ethers": "^4.0.39",

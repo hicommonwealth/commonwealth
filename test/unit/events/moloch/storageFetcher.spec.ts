@@ -1,4 +1,5 @@
 import chai from 'chai';
+import moment from 'moment';
 import Fetcher from '../../../../shared/events/moloch/storageFetcher';
 import { Moloch1Proposal, MolochEventKind } from '../../../../shared/events/moloch/types';
 import { Moloch1 } from '../../../../eth/types/Moloch1';
@@ -9,19 +10,35 @@ const makeApi = (proposals: Moloch1Proposal[]) => {
   return {
     periodDuration: async () => '1',
     summoningTime: async () => '2',
+    votingPeriodLength: async () => '3',
+    gracePeriodLength: async () => '2',
+    abortWindow: async () => '2',
     getProposalQueueLength: async () => proposals.length,
     proposalQueue: async (n: number) => proposals[n],
     provider: {
-      getBlock: async (n: number) => ({ timestamp: n }),
+      getBlock: async (n: number) => ({ timestamp: n * 1000 }),
       getBlockNumber: async () => 200,
     }
   } as unknown as Moloch1;
 };
 
+const makeDater = (minAvailableBlock = 0) => {
+  return {
+    getDate: (timestamp) => {
+      if (!timestamp) throw new Error('no timestamp given');
+      if ((timestamp / 1000) < minAvailableBlock) return undefined;
+      return {
+        date: `${timestamp / 1000}`,
+        block: timestamp / 1000,
+      };
+    }
+  };
+};
+
 describe('Moloch Storage Fetcher Tests', () => {
   it('should run gracefully with nothing in storage', async () => {
     const api = makeApi([]);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, []);
   });
@@ -42,10 +59,10 @@ describe('Moloch Storage Fetcher Tests', () => {
       maxTotalSharesAtYesVote: '2',
     } as unknown as Moloch1Proposal];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [{
-      blockNumber: 0,
+      blockNumber: 3,
       data: {
         kind: MolochEventKind.SubmitProposal,
         proposalIndex: 0,
@@ -75,11 +92,11 @@ describe('Moloch Storage Fetcher Tests', () => {
       maxTotalSharesAtYesVote: '2',
     } as unknown as Moloch1Proposal];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [
       {
-        blockNumber: 0,
+        blockNumber: 3,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: 0,
@@ -92,7 +109,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         }
       },
       {
-        blockNumber: 1,
+        blockNumber: 5,
         data: {
           kind: MolochEventKind.Abort,
           proposalIndex: 0,
@@ -101,6 +118,8 @@ describe('Moloch Storage Fetcher Tests', () => {
       },
     ]);
   });
+
+  // TODO: write test where we are still in abort window to verify block # synthesis
 
   it('should fetch a processed moloch1 proposal from storage', async () => {
     const proposals: Moloch1Proposal[] = [{
@@ -118,11 +137,11 @@ describe('Moloch Storage Fetcher Tests', () => {
       maxTotalSharesAtYesVote: '2',
     } as unknown as Moloch1Proposal];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [
       {
-        blockNumber: 0,
+        blockNumber: 3,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: 0,
@@ -135,7 +154,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         }
       },
       {
-        blockNumber: 1,
+        blockNumber: 8,
         data: {
           kind: MolochEventKind.ProcessProposal,
           proposalIndex: 0,
@@ -197,13 +216,13 @@ describe('Moloch Storage Fetcher Tests', () => {
       } as unknown as Moloch1Proposal,
     ];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     const range = { startBlock: 9 };
     const fetched = await fetcher.fetch(range);
     assert.sameDeepMembers(fetched.filter((p) => (p.data as any).proposalIndex === 0), []);
     assert.sameDeepMembers(fetched.filter((p) => (p.data as any).proposalIndex === 1), [
       {
-        blockNumber: 9,
+        blockNumber: 12,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: 1,
@@ -216,7 +235,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         }
       },
       {
-        blockNumber: 10,
+        blockNumber: 17,
         data: {
           kind: MolochEventKind.ProcessProposal,
           proposalIndex: 1,
@@ -232,7 +251,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     ]);
     assert.sameDeepMembers(fetched.filter((p) => (p.data as any).proposalIndex === 2), [
       {
-        blockNumber: 9,
+        blockNumber: 102,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: 2,
@@ -250,7 +269,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     const fetchedWithEnd = await fetcher.fetch(rangeWithEnd);
     assert.sameDeepMembers(fetchedWithEnd, [
       {
-        blockNumber: 9,
+        blockNumber: 12,
         data: {
           kind: MolochEventKind.SubmitProposal,
           proposalIndex: 1,
@@ -263,7 +282,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         }
       },
       {
-        blockNumber: 10,
+        blockNumber: 17,
         data: {
           kind: MolochEventKind.ProcessProposal,
           proposalIndex: 1,
@@ -283,7 +302,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     const api = makeApi([{
       startingPeriod: '1',
     } as any]);
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     fetcher.fetch().then(() => {
       done('should throw on proposal error');
     }).catch((err) => {
@@ -293,11 +312,13 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should throw error on api error', (done) => {
     const api = {} as any;
-    const fetcher = new Fetcher(api, 1);
+    const fetcher = new Fetcher(api, 1, makeDater());
     fetcher.fetch().then(() => {
       done('should throw on api error');
     }).catch((err) => {
       done();
     });
   });
+
+  // TODO: dater fail tests
 });
