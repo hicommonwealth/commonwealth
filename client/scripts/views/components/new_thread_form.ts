@@ -353,9 +353,17 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
             try {
               const doc = JSON.parse(body);
               doc.ops = doc.ops.slice(0, 3);
-              bodyComponent = m(QuillFormattedText, { doc, hideFormatting: true });
+              bodyComponent = m(QuillFormattedText, {
+                doc,
+                collapse: true,
+                hideFormatting: true,
+              });
             } catch (e) {
-              bodyComponent = m(MarkdownFormattedText, { doc: body.slice(0, 200), hideFormatting: true });
+              bodyComponent = m(MarkdownFormattedText, {
+                doc: body,
+                collapse: true,
+                hideFormatting: true,
+              });
             }
           }
           return m(ListItem, {
