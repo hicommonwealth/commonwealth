@@ -27,10 +27,10 @@ const nodes = [
   // [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.nearprotocol.com', 'near' ],
-  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1'],
+  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
-  [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
+  // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
 ];
 const resetServer = (models, closeMiddleware) => {
   log.debug('Resetting database...');

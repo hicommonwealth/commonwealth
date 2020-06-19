@@ -1,4 +1,5 @@
 import { SubstrateEntityKind } from '../../shared/events/edgeware/types';
+import { MolochEntityKind } from '../../shared/events/moloch/types';
 
 // given an "old style" identifier such as treasuryproposal_4, attempts to
 // fetch the corresponding chain entity from the database
@@ -25,7 +26,10 @@ export default async function (models, chain: string, identifier: string) {
     case 'treasuryproposal': {
       return findEntity(SubstrateEntityKind.TreasuryProposal.toString());
     }
-    // TODO: cosmosproposal, molochproposal
+    case 'molochproposal': {
+      return findEntity(MolochEntityKind.Proposal.toString());
+    }
+    // TODO: cosmosproposal
     // ignore council elections -- no commenting on them
     default: {
       return null;

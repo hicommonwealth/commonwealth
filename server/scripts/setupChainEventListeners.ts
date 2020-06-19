@@ -15,7 +15,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'created_at', 'DESC' ]],
+    order: [ [ 'block_number', 'DESC' ]],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
@@ -61,7 +61,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           !!migrate,
         );
       } else if (MolochEventChains.includes(node.chain)) {
-        const api = await createMolochApi(node.url, 1, '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7');
+        const api = await createMolochApi(node.url, 1, node.address);
         subscribeFn = (evtHandlers) => subscribeMolochEvents(
           node.chain,
           api,

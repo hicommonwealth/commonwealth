@@ -123,7 +123,7 @@ export default class extends IStorageFetcher<MolochApi> {
    *
    * @param range Determines the range of blocks to query events within.
    */
-  public async fetch(range?: IDisconnectedRange): Promise<CWEvent<IMolochEventData>[]> {
+  public async fetch(range?: IDisconnectedRange, fetchAllCompleted = false): Promise<CWEvent<IMolochEventData>[]> {
     // we need to fetch a few constants to convert voting periods into blocks
     this._periodDuration = +(await this._api.periodDuration());
     this._summoningTime = +(await this._api.summoningTime());
@@ -197,6 +197,14 @@ export default class extends IStorageFetcher<MolochApi> {
           proposalStartBlock
         );
         results.push(...events);
+
+        // halt fetch once we find a completed proposal in order to save data
+        // we may want to run once without this, in order to fetch backlog, or else develop a pagination
+        // strategy, but for now our API usage is limited.
+        if (!fetchAllCompleted && events.find((p) => p.data.kind === MolochEventKind.ProcessProposal)) {
+          log.debug(`Proposal ${proposalIndex} is marked processed, halting fetch.`);
+          break;
+        }
       } else if (proposalStartBlock < range.startBlock) {
         log.debug(`Moloch proposal start block (${proposalStartBlock}) is before ${range.startBlock}, ending fetch.`);
         break;

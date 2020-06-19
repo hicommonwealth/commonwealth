@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import EthDater from 'ethereum-block-by-date';
 
 import { ProposalModule, ITXModalData, ChainEntity } from 'models';
 
@@ -15,6 +16,7 @@ import MolochProposal from './proposal';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochMember from './member';
+import Moloch from './adapter';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
@@ -84,7 +86,7 @@ export default class MolochGovernance extends ProposalModule<
       entities.map((p) => this._entityConstructor(constructorFunc, p));
     } else {
       console.log('Fetching moloch proposals from chain.');
-      const fetcher = new MolochStorageFetcher(api.Contract, 1);
+      const fetcher = new MolochStorageFetcher(api.Contract, 1, new EthDater((this.app.chain as Moloch).chain.api));
       const subscriber = new MolochEventSubscriber(api.Contract, this.app.chain.id);
       const processor = new MolochEventProcessor(api.Contract, 1);
       await this.app.chainEntities.subscribeEntities(

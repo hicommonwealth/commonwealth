@@ -298,6 +298,135 @@ describe('Moloch Storage Fetcher Tests', () => {
     ]);
   });
 
+  it('should terminate fetch on completed due to argument', async () => {
+    const proposals: Moloch1Proposal[] = [
+      {
+        proposer: 'proposer',
+        applicant: 'applicant',
+        sharesRequested: '2',
+        startingPeriod: '1',
+        yesVotes: '2',
+        noVotes: '3',
+        processed: true,
+        didPass: false,
+        aborted: false,
+        tokenTribute: '4',
+        details: 'test',
+        maxTotalSharesAtYesVote: '2',
+      } as unknown as Moloch1Proposal,
+      {
+        proposer: 'proposer',
+        applicant: 'applicant',
+        sharesRequested: '2',
+        startingPeriod: '10',
+        yesVotes: '2',
+        noVotes: '3',
+        processed: true,
+        didPass: false,
+        aborted: false,
+        tokenTribute: '4',
+        details: 'test',
+        maxTotalSharesAtYesVote: '2',
+      } as unknown as Moloch1Proposal,
+    ];
+
+    const api = makeApi(proposals);
+    const fetcher = new Fetcher(api, 1, makeDater());
+
+    // should only fetch the first/most recent completed proposal
+    const fetched = await fetcher.fetch(null, false);
+    assert.sameDeepMembers(fetched, [
+      {
+        blockNumber: 12,
+        data: {
+          kind: MolochEventKind.SubmitProposal,
+          proposalIndex: 1,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          details: 'test',
+          startTime: 12,
+        }
+      },
+      {
+        blockNumber: 17,
+        data: {
+          kind: MolochEventKind.ProcessProposal,
+          proposalIndex: 1,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          didPass: false,
+          yesVotes: '2',
+          noVotes: '3',
+        }
+      },
+    ]);
+
+    // should fetch both completed proposals
+    const fetchedAll = await fetcher.fetch(null, true);
+    assert.sameDeepMembers(fetchedAll.filter((p) => (p.data as any).proposalIndex === 0), [
+      {
+        blockNumber: 3,
+        data: {
+          kind: MolochEventKind.SubmitProposal,
+          proposalIndex: 0,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          details: 'test',
+          startTime: 3,
+        }
+      },
+      {
+        blockNumber: 8,
+        data: {
+          kind: MolochEventKind.ProcessProposal,
+          proposalIndex: 0,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          didPass: false,
+          yesVotes: '2',
+          noVotes: '3',
+        }
+      },
+    ]);
+    assert.sameDeepMembers(fetchedAll.filter((p) => (p.data as any).proposalIndex === 1), [
+      {
+        blockNumber: 12,
+        data: {
+          kind: MolochEventKind.SubmitProposal,
+          proposalIndex: 1,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          details: 'test',
+          startTime: 12,
+        }
+      },
+      {
+        blockNumber: 17,
+        data: {
+          kind: MolochEventKind.ProcessProposal,
+          proposalIndex: 1,
+          member: 'proposer',
+          applicant: 'applicant',
+          tokenTribute: '4',
+          sharesRequested: '2',
+          didPass: false,
+          yesVotes: '2',
+          noVotes: '3',
+        }
+      },
+    ]);
+  });
+
   it('should throw error on proposal error', (done) => {
     const api = makeApi([{
       startingPeriod: '1',

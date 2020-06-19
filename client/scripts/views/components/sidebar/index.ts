@@ -176,11 +176,11 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         m(TagListings),
       ]),
       // proposals
-      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      hasProposals
         && m(List, { interactive: true }, [
           m('h4', 'Vote & Stake'),
           // proposals (substrate, cosmos, moloch only)
-          hasProposals && m(ListItem, {
+          m(ListItem, {
             active: onProposalPage(m.route.get()),
             label: 'Proposals',
             onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),

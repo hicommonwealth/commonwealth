@@ -28,6 +28,17 @@ export function createMolochApi(
   contractVersion: 1 | 2,
   contractAddress: string
 ): Promise<MolochApi> {
+  if (ethNetworkUrl.includes('infura')) {
+    if (process && process.env) {
+      const INFURA_API_KEY = process.env.INFURA_API_KEY;
+      if (!INFURA_API_KEY) {
+        throw new Error('no infura key found!');
+      }
+      ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
+    } else {
+      throw new Error('must use nodejs to connect to infura provider!');
+    }
+  }
   const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl);
   const provider = new providers.Web3Provider(web3Provider);
   const contract = contractVersion === 1
