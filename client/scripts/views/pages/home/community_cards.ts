@@ -4,8 +4,6 @@ import m from 'mithril';
 import { Button, Icons } from 'construct-ui';
 
 import app from 'state';
-import { link } from 'helpers';
-import { isMember } from 'helpers/roles';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import MembershipButton from 'views/components/membership_button';
 
@@ -13,13 +11,13 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
   view: (vnode) => {
     const { chain, nodeList, justJoinedChains } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
-    const visitedChain = !!app.login.unseenPosts[chain];
-    const updatedThreads = app.login.unseenPosts[chain]?.activePosts || 0;
+    const visitedChain = !!app.user.unseenPosts[chain];
+    const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
 
     return m('.home-card', [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chainInfo.name),
-      isMember(chain, null) && justJoinedChains.indexOf(chain) === -1 && [
+      app.user.isMember({ account: app.user.activeAccount, chain: chain as string, }) && justJoinedChains.indexOf(chain) === -1 && [
         app.isLoggedIn() && !visitedChain && m('.chain-new', m('.new-threads', 'New')),
         updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
@@ -47,8 +45,8 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
 const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
   view: (vnode) => {
     const { justJoinedCommunities, community } = vnode.attrs;
-    const visitedCommunity = !!app.login.unseenPosts[community.id];
-    const updatedThreads = app.login.unseenPosts[community.id]?.activePosts || 0;
+    const visitedCommunity = !!app.user.unseenPosts[community.id];
+    const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
 
     return m('.home-card', [
       m(CommunityIcon, { community }),
@@ -56,7 +54,7 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
         community.name,
         community.privacyEnabled && m('span.icon-lock'),
       ]),
-      isMember(null, community.id) && justJoinedCommunities.indexOf(community.id) === -1 && [
+      app.user.isMember({ account: app.user.activeAccount, community: community.id}) && justJoinedCommunities.indexOf(community.id) === -1 && [
         app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
         updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
       ],
@@ -132,16 +130,16 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
       otherCommunities = app.config.communities.getAll();
     } else {
       myChains = Object.entries(chains)
-        .filter(([c, nodeList]) => isMember(c, null) && vnode.state.justJoinedChains.indexOf(c) === -1);
+        .filter(([c, nodeList]) => app.user.isMember({ account: app.user.activeAccount, chain: c }) && vnode.state.justJoinedChains.indexOf(c) === -1);
 
       myCommunities = app.config.communities.getAll()
-        .filter((c) => isMember(null, c.id) && vnode.state.justJoinedCommunities.indexOf(c.id) === -1);
+        .filter((c) => app.user.isMember({ account: app.user.activeAccount, community: c.id }) && vnode.state.justJoinedCommunities.indexOf(c.id) === -1);
 
       otherChains = Object.entries(chains)
-        .filter(([c, nodeList]) => !isMember(c, null) || vnode.state.justJoinedChains.indexOf(c) !== -1);
+        .filter(([c, nodeList]) => !app.user.isMember({ account: app.user.activeAccount, chain: c }) || vnode.state.justJoinedChains.indexOf(c) !== -1);
 
       otherCommunities = app.config.communities.getAll()
-        .filter((c) => !isMember(null, c.id) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
+        .filter((c) => !app.user.isMember({ account: app.user.activeAccount, community: c.id }) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
     }
 
     return m('.HomepageCommunityCards', [

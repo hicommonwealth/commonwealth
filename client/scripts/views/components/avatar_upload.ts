@@ -42,7 +42,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
           name: file.name, // tokyo.png
           mimetype: file.type, // image/png
           auth: true,
-          jwt: app.login.jwt,
+          jwt: app.user.jwt,
         }).then((response) => {
           if (response.status !== 'Success') {
             return done('Failed to get an S3 signed upload URL', response.error);

@@ -26,7 +26,7 @@ export interface ICosmosDelegationState {
 
 export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDelegationState> = {
   view: (vnode) => {
-    const sender = app.vm.activeAccount;
+    const sender = app.user.activeAccount;
 
     return m('.ManageStakingModal', [
       m('.compact-modal-title', [
@@ -42,7 +42,7 @@ export const NewCosmosDelegationModal : m.Component<{ validatorAddr }, ICosmosDe
             }
           }),
           m('button.formular-button-primary', {
-            class: app.vm.activeAccount ? '' : 'disabled',
+            class: app.user.activeAccount ? '' : 'disabled',
             onclick: (e) => {
               e.preventDefault();
               try {
@@ -85,8 +85,8 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
     /*
       Check if we're already delegated to a validator and present the unbond option if so
     */
-    if (app.vm.activeAccount) {
-      const account = app.chain.accounts.get(app.vm.activeAccount.address);
+    if (app.user.activeAccount) {
+      const account = app.chain.accounts.get(app.user.activeAccount.address);
       const delegation = (account.balance.value) ? account.delegations() : null;
       isDelegated = (delegation)
         ? (delegation[vnode.attrs.stash] !== 0) : false;
@@ -98,7 +98,7 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
       m('td.val-total', formatCoin(vnode.attrs.total, true)),
       m('td.val-action', [
         !isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.vm.activeAccount ? '' : 'disabled',
+          class: app.user.activeAccount ? '' : 'disabled',
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({
@@ -108,7 +108,7 @@ export const CosmosValidatorRow: m.Component<IValidatorAttrs> = {
           }
         }, 'Delegate'),
         isDelegated && m('button.nominate-validator.formular-button-primary', {
-          class: app.vm.activeAccount ? '' : 'disabled',
+          class: app.user.activeAccount ? '' : 'disabled',
           onclick: (e) => {
             e.preventDefault();
             app.modals.create({

@@ -20,13 +20,12 @@ import EthereumAccount from 'controllers/chain/ethereum/account';
 import { Account, ChainBase, ChainNetwork } from 'models';
 
 import { ChainIcon } from 'views/components/chain_icon';
-import ProfileBlock from 'views/components/widgets/profile_block';
 import CodeBlock from 'views/components/widgets/code_block';
 import { TextInputFormField, CheckboxFormField } from 'views/components/forms';
 import HedgehogLoginForm from 'views/components/hedgehog_login_form';
 import CharacterLimitedTextInput from 'views/components/widgets/character_limited_text_input';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import SubstrateChain from 'client/scripts/controllers/chain/substrate/shared';
 import AddressSwapper from '../components/addresses/address_swapper';
@@ -105,8 +104,8 @@ const accountVerifiedCallback = async (account, vnode) => {
     if (app.community) {
       updateActiveAddresses(undefined, true);
     } else if (app.chain) {
-      const chain = app.login.selectedNode
-        ? app.login.selectedNode.chain
+      const chain = app.user.selectedNode
+        ? app.user.selectedNode.chain
         : app.config.nodes.getByChain(app.activeChainId())[0].chain;
       updateActiveAddresses(chain, true);
     } else {
@@ -253,7 +252,7 @@ const LinkNewAddressModal = {
         vnode.state.error && m('.error-message', vnode.state.error),
         m('p.link-address-precopy', vnode.attrs.loggingInWithAddress ? [
           'Select a wallet:'
-        ] : app.login.activeAddresses.length === 0 ? [
+        ] : app.user.activeAccounts.length === 0 ? [
           'Select a wallet:'
         ] : [
           m('.link-address-combined-warning', [
@@ -623,7 +622,7 @@ const LinkNewAddressModal = {
                 } catch (e) {
                   vnode.state.error = 'Invalid address';
                 }
-                if (app.login.activeAddresses.find((acct) => acct.address === address)) {
+                if (app.user.activeAccounts.find((acct) => acct.address === address)) {
                   vnode.state.error = 'You have already linked this address';
                 }
               }
@@ -844,7 +843,7 @@ const LinkNewAddressModal = {
           m('p', vnode.state.isNewLogin ? 'Logged in:' : 'Profile created:'),
           m('.profile-block-preview', [
             vnode.state.newAddress
-              ? m(ProfileBlock, { account: vnode.state.newAddress })
+              ? m(UserBlock, { user: vnode.state.newAddress })
               : m('.error-message', 'There was an issue fetching your new account'),
           ]),
           m('br'),

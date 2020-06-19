@@ -16,7 +16,7 @@ import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
-import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
+import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
@@ -55,7 +55,7 @@ const CommunitySidebar: m.Component<{ tag?: string }> = {
       m('h4', 'Admins & Mods'),
       (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
         return m('.community-admin', [
-          m(User, { user: [r.address, r.address_chain], showRole: true })
+          m(User, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
         ]);
       }),
     ]);
@@ -94,9 +94,9 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
-    const allLastVisited = (typeof app.login.lastVisited === 'string')
-      ? JSON.parse(app.login.lastVisited)
-      : app.login.lastVisited;
+    const allLastVisited = (typeof app.user.lastVisited === 'string')
+      ? JSON.parse(app.user.lastVisited)
+      : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
       updateLastVisited(app.community
@@ -251,8 +251,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     };
 
     const { tag } = vnode.attrs;
-    const activeAddressInfo = app.vm.activeAccount && app.login.addresses
-      .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
+    const activeAddressInfo = app.user.activeAccount && app.user.addresses
+      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
 
     const activeNode = app.chain?.meta;
     const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url

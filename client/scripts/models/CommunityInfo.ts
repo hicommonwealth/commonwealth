@@ -82,7 +82,7 @@ class CommunityInfo {
       'description': description,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
-      'jwt': app.login.jwt,
+      'jwt': app.user.jwt,
     });
     const updatedCommunity: CommunityInfo = r.result;
     this.name = updatedCommunity.name;
@@ -107,7 +107,7 @@ class CommunityInfo {
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
         'featured_tags[]': tags,
-        'jwt': app.login.jwt
+        'jwt': app.user.jwt
       });
     } catch (err) {
       console.log('Failed to update featured tags');

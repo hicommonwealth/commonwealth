@@ -16,11 +16,11 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
 
     return m('.ManageRoleRow', [
       vnode.attrs.roledata?.map((role) => {
-        const isSelf = role.Address.address === app.vm.activeAccount?.address
-          && role.Address.chain === app.vm.activeAccount?.chain.id;
+        const isSelf = role.Address.address === app.user.activeAccount?.address
+          && role.Address.chain === app.user.activeAccount?.chain.id;
         return m('.RoleChild', [
           m(User, {
-            user: [role.Address.address, role.Address.chain],
+            user: role.Address,
             tooltip: true,
           }),
           !isSelf && m(Icon, {
@@ -32,7 +32,7 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
                 ...chainOrCommObj,
                 new_role: 'member',
                 address: role.Address.address,
-                jwt: app.login.jwt,
+                jwt: app.user.jwt,
               });
               if (res.status !== 'Success') {
                 throw new Error(`Got unsuccessful status: ${res.status}`);

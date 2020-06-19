@@ -6,7 +6,6 @@ import { Button, Icon, Icons, List, ListItem, SelectList } from 'construct-ui';
 import app from 'state';
 import { ChainInfo, CommunityInfo } from 'models';
 import { SwitchIcon } from 'helpers';
-import { isMember } from 'helpers/roles';
 
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ChainStatusIndicator from 'views/components/chain_status_indicator';
@@ -109,7 +108,10 @@ const CommunitySelector = {
                 class: app.communities.isStarred(item.id, null) ? 'starred' : '',
                 label: m(CommunityLabel, { chain: item }),
                 selected: app.activeChainId() === item.id,
-                contentRight: app.isLoggedIn() && isMember(item.id, null) && m('.community-star-toggle', {
+                contentRight: app.isLoggedIn() && app.user.isMember({
+                  account: app.user.activeAccount,
+                  chain: item.id
+                }) && m('.community-star-toggle', {
                   onclick: (e) => {
                     app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
                   }
@@ -122,7 +124,10 @@ const CommunitySelector = {
                 class: app.communities.isStarred(null, item.id) ? 'starred' : '',
                 label: m(CommunityLabel, { community: item }),
                 selected: app.activeCommunityId() === item.id,
-                contentRight: app.isLoggedIn() && isMember(null, item.id) && m('.community-star-toggle', {
+                contentRight: app.isLoggedIn() && app.user.isMember({
+                  account: app.user.activeAccount,
+                  community: item.id
+                }) && m('.community-star-toggle', {
                   onclick: (e) => {
                     app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
                   },

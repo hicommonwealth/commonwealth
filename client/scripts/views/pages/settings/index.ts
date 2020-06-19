@@ -1,4 +1,4 @@
-import 'pages/settings.scss';
+import 'pages/settings/index.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
@@ -7,10 +7,10 @@ import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { notifyInfo } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-import AccountsWell from 'views/components/settings/accounts_well';
-import SettingsWell from 'views/components/settings/settings_well';
-import SendEDGWell from 'views/components/settings/send_edg_well';
-import GithubWell from 'views/components/settings/github_well';
+import EmailWell from './email_well';
+import AccountsWell from './accounts_well';
+import SettingsWell from './settings_well';
+import SendEDGWell from './send_edg_well';
 
 const SettingsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -28,14 +28,14 @@ const SettingsPage: m.Component<{}> = {
         ? m('.forum-container', 'Loading...')
         : m('.forum-container', [
           m('h2.page-title', 'Settings'),
-          m(SettingsWell),
+          m(EmailWell, { github: true }),
           m('br'),
-          m(GithubWell),
+          m(SettingsWell),
           m('br'),
           m(AccountsWell),
           m('br'),
-          !app.community && app.vm.activeAccount && app.vm.activeAccount instanceof SubstrateAccount
-            && m(SendEDGWell, { sender: app.vm.activeAccount }),
+          !app.community && app.user.activeAccount && app.user.activeAccount instanceof SubstrateAccount
+            && m(SendEDGWell, { sender: app.user.activeAccount }),
         ])
     ]);
   }

@@ -91,7 +91,7 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
     vnode.state.delegate = validatorChoices[0].name;
 
     // default to current cosmos address
-    const loggedInAddress = app.vm.activeAccount ? app.vm.activeAccount.address : '';
+    const loggedInAddress = app.user.activeAccount ? app.user.activeAccount.address : '';
     vnode.state.supernovaAddress = loggedInAddress;
 
     return m('.SupernovaLockATOMPage', [
@@ -166,8 +166,8 @@ const SupernovaLockAtomPage: m.Component<{}, IState> = {
                   if (!validateInputs()) return;
                   const lockAmount = vnode.state.lockAmount;
                   const delegate = vnode.state.delegate;
-                  if (app.vm.activeAccount) {
-                    createTXModal((app.vm.activeAccount as CosmosAccount).delegateTx(
+                  if (app.user.activeAccount) {
+                    createTXModal((app.user.activeAccount as CosmosAccount).delegateTx(
                       delegate,
                       app.chain.chain.coins(lockAmount),
                       JSON.stringify({ supernovaAddress: vnode.state.supernovaAddress }),

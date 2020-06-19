@@ -1,7 +1,7 @@
 import m from 'mithril';
 import lity from 'lity';
 import app from 'state';
-import { OffchainThread, OffchainThreadKind } from 'models';
+import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import User from '../../components/widgets/user';
 import { link, slugify } from '../../../helpers';
 
@@ -13,7 +13,7 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
 
     return m('.ProfileProposal', [
       m('.summary', [
-        m(User, { user: [author, proposal.authorChain], linkify: true, hideAvatar: true }),
+        m(User, { user: new AddressInfo(null, author, proposal.authorChain, null), linkify: true, hideAvatar: true }),
         proposal.kind === OffchainThreadKind.Question ? ' added a question'
           : proposal.kind === OffchainThreadKind.Request ? ' added a task'
             : ' created a new thread',

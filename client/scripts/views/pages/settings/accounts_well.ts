@@ -1,4 +1,4 @@
-import 'components/settings/accounts_well.scss';
+import 'pages/settings/accounts_well.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
@@ -19,9 +19,9 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
     const { account } = vnode.attrs;
-    const isActiveAccount = app.vm.activeAccount
-      && app.vm.activeAccount.chain.id === account.chain
-      && app.vm.activeAccount.address === account.address;
+    const isActiveAccount = app.user.activeAccount
+      && app.user.activeAccount.chain.id === account.chain
+      && app.user.activeAccount.address === account.address;
 
     return m('.AccountRow', {
       key: `${account.chain}#${account.address}`,
@@ -30,7 +30,7 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
     }, [
       m('.avatar-col', [
         m(User, {
-          user: [account.address, account.chain],
+          user: account,
           avatarOnly: true,
           avatarSize: 32,
           linkify: true,
@@ -40,7 +40,7 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
       m('.info-col', [
         m('.username', [
           m(User, {
-            user: [account.address, account.chain],
+            user: account,
             hideAvatar: true,
             linkify: true,
             tooltip: true,
@@ -80,7 +80,7 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
 
 const AccountsWell: m.Component<{}> = {
   view: () => {
-    const addressGroups = Object.entries(_.groupBy(app.login.addresses, (account) => account.chain));
+    const addressGroups = Object.entries(_.groupBy(app.user.addresses, (account) => account.chain));
 
     return m('.AccountsWell', [
       m('h4', 'Linked Addresses'),
@@ -89,7 +89,7 @@ const AccountsWell: m.Component<{}> = {
         m('h4', app.config.chains.getById(chain_id).name),
         addresses.sort(orderAccountsByAddress).map((account) => m(AccountRow, { account })),
       ])),
-      app.login.addresses.length === 0
+      app.user.addresses.length === 0
         && m('.no-accounts', 'No addresses'),
       m(Button, {
         intent: 'primary',

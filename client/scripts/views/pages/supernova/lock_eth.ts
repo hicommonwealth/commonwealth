@@ -63,7 +63,7 @@ const SupernovaLockETHPage: m.Component<{}, IState> = {
     });
   },
   view: (vnode: m.VnodeDOM<{}, IState>) => {
-    const author = app.vm.activeAccount;
+    const author = app.user.activeAccount;
 
     if (!vnode.state.initialized) {
       vnode.state.initialized = true;

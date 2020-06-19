@@ -4,8 +4,8 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoCommunity: 'Must include community_id',
-  NotAdminOrMod: 'Must be an admin/mod to create Invite Link',
+  NoCommunity: 'Must include community ID',
+  NotAdminOrMod: 'Must be an admin/mod to create invite links',
   InvalidCommunity: 'Invalid community',
   ErrorFetchingLinks: 'Error fetching links',
 };

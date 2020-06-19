@@ -15,8 +15,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
-import ProfileBlock from 'views/components/widgets/profile_block';
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { createTXModal } from 'views/modals/tx_signing_modal';
@@ -38,7 +37,7 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
     const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
       .filter((v) => v.votes.includes(account.address));
 
-    const hasMyVote = app.vm.activeAccount && votes.filter((v) => v.account === app.vm.activeAccount);
+    const hasMyVote = app.user.activeAccount && votes.filter((v) => v.account === app.user.activeAccount);
 
     return m('.CollectiveMember', {
       onclick: (e) => {
@@ -103,22 +102,22 @@ interface ICouncilElectionVoterAttrs {
 
 const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
   view: (vnode) => {
-    const myAccount = app.vm.activeAccount as SubstrateAccount;
+    const myAccount = app.user.activeAccount as SubstrateAccount;
     const voter = vnode.attrs.vote as PhragmenElectionVote;
     const voterAccount: SubstrateAccount = voter.account;
     const canBeReaped: boolean = (app.chain as Substrate).phragmenElections.activeElection.isDefunctVoter(voterAccount);
     const isPresentationPhase: boolean = false;
     const lastActive: number = null;
     const stake: string = voter.stake.format();
-    const canBeRetracted = app.vm.activeAccount && voterAccount.address === myAccount.address;
+    const canBeRetracted = app.user.activeAccount && voterAccount.address === myAccount.address;
 
     return link('a.CouncilElectionVoter', `/${voterAccount.chain.id}/account/${voterAccount.address}`, [
-      m('.col-member', m(ProfileBlock, { account: voterAccount })),
+      m('.col-member', m(UserBlock, { user: voterAccount })),
       m('.col-info', [
         m('.metadata-item', `Locked ${stake}`),
         (canBeReaped || canBeRetracted) && m('a', {
           href: '#',
-          class: (isPresentationPhase || !app.vm.activeAccount) ? 'disabled' : '',
+          class: (isPresentationPhase || !app.user.activeAccount) ? 'disabled' : '',
           onclick: (e) => {
             e.preventDefault();
             if (canBeRetracted) {
@@ -144,7 +143,7 @@ const CollectiveVotingButton: m.Component<{ candidates }> = {
   view: (vnode) => {
     const { candidates } = vnode.attrs;
     return m('a.proposals-action.CollectiveVotingButton', {
-      class: !app.vm.activeAccount ? 'disabled' : '',
+      class: !app.user.activeAccount ? 'disabled' : '',
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({
@@ -162,7 +161,7 @@ const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
 
     // TODO: Retract candidacy buttons
     return m('a.proposals-action.CandidacyButton', {
-      class: (!app.vm.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected)
+      class: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected)
         ? 'disabled' : '',
       onclick: (e) => {
         e.preventDefault();
@@ -201,9 +200,9 @@ const CouncilPage: m.Component<{}> = {
     const candidacyBond = app.chain && formatCoin((app.chain as Substrate).phragmenElections.candidacyBond);
     const voters = app.chain && (app.chain as Substrate).phragmenElections.activeElection.getVoters();
     const electionIndex = app.chain && (app.chain as Substrate).phragmenElections.round;
-    const activeAccountIsCandidate = app.chain && app.vm.activeAccount
-      && app.vm.activeAccount.chainBase === ChainBase.Substrate
-        && !!candidates.find(([ who ]) => who.address === app.vm.activeAccount.address);
+    const activeAccountIsCandidate = app.chain && app.user.activeAccount
+      && app.user.activeAccount.chainBase === ChainBase.Substrate
+        && !!candidates.find(([ who ]) => who.address === app.user.activeAccount.address);
 
     return m(Sublayout, {
       class: 'CouncilPage',

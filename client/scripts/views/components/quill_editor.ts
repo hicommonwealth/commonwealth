@@ -376,7 +376,7 @@ const instantiateEditor = (
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       }).then((response) => {
         if (response.status !== 'Success') {
           document.getElementsByClassName('spinner-wrap')[0].remove();
@@ -802,7 +802,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
     // Otherwise, just set vnode.state.markdownMode based on the app setting
     if (vnode.state.markdownMode === undefined) {
-      vnode.state.markdownMode = !!(app.login?.disableRichText);
+      vnode.state.markdownMode = !!(app.user?.disableRichText);
     }
 
     // Set vnode.state.clearUnsavedChanges on first initialization

@@ -8,7 +8,7 @@ export const Errors = {
   NoCommunityId: 'Error finding community',
   NoTimeLimit: 'Must provide a time limit',
   InvalidCommunity: 'Invalid community',
-  NotAdminMod: 'Must be an admin/mod to create Invite Link',
+  NotAdminMod: 'Must be an admin/mod to create invite links in this community',
   InvalidUses: 'Must provide a valid number of uses',
 };
 

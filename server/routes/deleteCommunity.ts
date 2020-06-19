@@ -5,7 +5,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NeedCommunityId: 'Must provide community_id',
+  NeedCommunityId: 'Must provide community ID',
   NotCreate: 'Only the original creator can delete this community',
 };
 

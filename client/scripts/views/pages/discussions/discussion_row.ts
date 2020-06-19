@@ -8,7 +8,7 @@ import { Icon, Icons, Tag } from 'construct-ui';
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, OffchainTag } from 'models';
+import { OffchainThread, OffchainThreadKind, OffchainTag, AddressInfo } from 'models';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
@@ -69,7 +69,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           ]),
           m('.discussion-meta', [
             m(User, {
-              user: [proposal.author, proposal.authorChain],
+              user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
               linkify: true,
               tooltip: true,
               showRole: true,
@@ -114,7 +114,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           // comments
           m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
             m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
-              return m(User, { user: [address, chain], avatarOnly: true, tooltip: true, avatarSize: 20 });
+              return m(User, { user: new AddressInfo(null, address, chain, null), avatarOnly: true, tooltip: true, avatarSize: 20 });
             })),
             link(
               'a.commenters-label',
