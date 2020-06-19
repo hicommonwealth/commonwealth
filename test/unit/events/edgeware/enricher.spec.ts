@@ -704,6 +704,22 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
 
+  /** offences events */
+  it.only('should enrich new offence event', async () => {
+    const kind = SubstrateEventKind.Offence;
+    const event = constructEvent([ 'offline', '10000', true ], 'offences', [ 'Kind', 'OpaqueTimeSlot', 'boolean' ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        offenceKind: 'offline',
+        opaqueTimeSlot: '10000',
+        applied: true
+      }
+    });
+  });
+
   /** other */
   it('should not enrich invalid event', (done) => {
     const kind = 'invalid-event' as SubstrateEventKind;

@@ -1,6 +1,4 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
-import { bool } from '@polkadot/types';
-import { Kind, OpaqueTimeSlot } from '@polkadot/types/interfaces/offences';
 
 /**
  * To implement a new form of event, add it to this enum, and add its
@@ -384,8 +382,8 @@ export interface ISubstrateTreasuryRewardMintingV2 extends ISubstrateEvent {
  */
 export interface ISubstrateOffence extends ISubstrateEvent {
   kind: SubstrateEventKind.Offence;
-  offenceKind: Kind;
-  opaqueTimeSlot: OpaqueTimeSlot;
+  offenceKind: string;
+  opaqueTimeSlot: string;
   applied: boolean;
 }
 

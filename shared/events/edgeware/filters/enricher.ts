@@ -496,8 +496,8 @@ export default async function (
         return {
           data: {
             kind,
-            offenceKind,
-            opaqueTimeSlot,
+            offenceKind: offenceKind.toString(),
+            opaqueTimeSlot: opaqueTimeSlot.toString(),
             applied: typeof applied === 'undefined' ? true : applied
           }
         };
