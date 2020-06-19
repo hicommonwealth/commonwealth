@@ -301,7 +301,6 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 try {
                   saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   if (vnode.attrs.isModal) {
-                    $(vnode.dom).trigger('modalcomplete');
                     setTimeout(() => {
                       $(vnode.dom).trigger('modalexit');
                     }, 0);
@@ -326,7 +325,6 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   if (vnode.state.fromDraft) {
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
-                  $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
                     $(vnode.dom).trigger('modalexit');
                   }, 0);

@@ -2,7 +2,7 @@ import moment from 'moment-twitter';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
-class DiscussionDraft<T extends IUniqueId> {
+class DiscussionDraft {
   public readonly id: number;
   public readonly author: string;
   public readonly authorChain: string;

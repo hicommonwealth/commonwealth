@@ -8,7 +8,7 @@ class DraftStore extends IdStore<DiscussionDraft> {
   public add(draft: DiscussionDraft) {
     super.add(draft);
     this.getAll().sort(byAscendingCreationDate);
-    const parentEntity = draft.community ? draft.community : draft.chain;
+    const parentEntity = draft.community || draft.chain;
     if (!this._storeCommunity[parentEntity]) {
       this._storeCommunity[parentEntity] = [];
     }
@@ -19,7 +19,7 @@ class DraftStore extends IdStore<DiscussionDraft> {
 
   public remove(draft: DiscussionDraft) {
     super.remove(draft);
-    const parentEntity = draft.community ? draft.community : draft.chain;
+    const parentEntity = draft.community || draft.chain;
     const communityStore = this._storeCommunity[parentEntity];
     const matchingDraft = communityStore.filter((t) => t.id === draft.id)[0];
     const proposalIndex = communityStore.indexOf(matchingDraft);
