@@ -14,6 +14,10 @@ enum NewThreadErrors {
   NoUrl = 'URL cannot be blank',
 }
 
+enum NewDraftErrors {
+  InsufficientData = 'Draft must have a title, body, or attachment'
+}
+
 export const formDataIncomplete = (state) : string => {
   if (!state.form.title) return NewThreadErrors.NoTitle;
   if (!state.form.tag) return NewThreadErrors.NoTag;
@@ -48,15 +52,13 @@ export const saveDraft = (
   author,
   existingDraft?
 ) => {
-  const chainId = app.activeCommunityId() ? null : app.activeChainId();
-  const communityId = app.activeCommunityId();
   const bodyText = !quillEditorState ? ''
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
   const { title, tagName } = form;
   if (!bodyText && !title) {
-    return new Error('No body or title');
+    return ({ draft: NewDraftErrors.InsufficientData });
   }
   const attachments = [];
   if (existingDraft) {
@@ -90,6 +92,7 @@ export const saveDraft = (
         );
       } catch (e) {
         console.error(e);
+        return ({ draft: e });
       }
       mixpanel.track('Save discussion draft', {
         'Step No': 2,

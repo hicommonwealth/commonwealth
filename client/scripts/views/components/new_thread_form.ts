@@ -156,7 +156,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     ]);
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    // TODO: Community-scope drafts in /status & store
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
@@ -299,12 +299,12 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               onclick: () => {
                 const { form, quillEditorState } = vnode.state;
                 try {
-                  saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
-                  if (vnode.attrs.isModal) {
+                  vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  if (vnode.attrs.isModal && !vnode.state.error.draft) {
                     setTimeout(() => {
                       $(vnode.dom).trigger('modalexit');
                     }, 0);
-                  } else {
+                  } else if (!vnode.state.error.draft) {
                     m.route.set(`/${app.activeId()}`);
                   }
                 } catch (e) {
