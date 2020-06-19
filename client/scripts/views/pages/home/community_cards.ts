@@ -30,14 +30,14 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
         onclick: (e) => m.route.set(`/${chain}`),
         label: m.trust('Go to community &rarr;')
       }),
-      app.isLoggedIn() && m('.chain-membership', [
-        m(MembershipButton, {
-          chain,
-          onMembershipChanged: (created) => {
-            if (created && !isMember(chain, null)) justJoinedChains.push(chain);
-          }
-        })
-      ]),
+      // app.isLoggedIn() && m('.chain-membership', [
+      //   m(MembershipButton, {
+      //     chain,
+      //     onMembershipChanged: (created) => {
+      //       if (created && !isMember(chain, null)) justJoinedChains.push(chain);
+      //     }
+      //   })
+      // ]),
     ]);
   }
 };
