@@ -300,11 +300,11 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 const { form, quillEditorState } = vnode.state;
                 try {
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
-                  if (vnode.attrs.isModal && !vnode.state.error.draft) {
+                  if (vnode.attrs.isModal && !vnode.state.error?.draft) {
                     setTimeout(() => {
                       $(vnode.dom).trigger('modalexit');
                     }, 0);
-                  } else if (!vnode.state.error.draft) {
+                  } else if (!vnode.state.error?.draft) {
                     m.route.set(`/${app.activeId()}`);
                   }
                 } catch (e) {

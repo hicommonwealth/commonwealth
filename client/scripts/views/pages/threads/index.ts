@@ -57,7 +57,7 @@ export const saveDraft = (
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
   const { title, tagName } = form;
-  if (!bodyText && !title) {
+  if (quillEditorState.editor.getText().length <= 1 && !title) {
     return ({ draft: NewDraftErrors.InsufficientData });
   }
   const attachments = [];
