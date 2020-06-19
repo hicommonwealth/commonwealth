@@ -163,7 +163,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header && m('h3', 'New Post'),
+        vnode.attrs.header && m('h2.page-title', 'New Post'),
         vnode.state.newType === 'Link' && m(Form, [
           typeSelector,
           m(FormGroup, [
@@ -345,7 +345,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
       ]),
       !!discussionDrafts.length
       && m('.new-thread-form-sidebar', [
-        m('h3', 'Saved drafts'),
+        m('h2', 'Saved drafts'),
         m(List, { interactive: true }, discussionDrafts.map((draft) => {
           const { body } = draft;
           let bodyComponent;
