@@ -2,9 +2,8 @@ import moment from 'moment-twitter';
 import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
-class DiscussionDraft implements IUniqueId {
+class DiscussionDraft<T extends IUniqueId> {
   public readonly id: number;
-  public readonly identifier: string;
   public readonly author: string;
   public readonly authorChain: string;
   public readonly title: string;
@@ -16,10 +15,6 @@ class DiscussionDraft implements IUniqueId {
   public readonly community: string;
   public readonly chain: string;
   public readonly slug = 'draft';
-
-  public get uniqueIdentifier() {
-    return `${this.slug}_${this.identifier}`;
-  }
 
   constructor(
     author: string,
@@ -36,7 +31,6 @@ class DiscussionDraft implements IUniqueId {
     this.body = body;
     this.attachments = attachments;
     this.id = id;
-    this.identifier = `${id}`;
     this.tag = tag;
     this.community = community;
     this.chain = chain;

@@ -4,7 +4,6 @@ import { DiscussionDraft, OffchainAttachment } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
@@ -126,9 +125,8 @@ class DraftsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh drafts');
     }
-    const response = await $.get(`${app.serverUrl()}/drafts`, {
-    });
     try {
+      const response = await $.get(`${app.serverUrl()}/drafts`, {});
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }
@@ -152,7 +150,6 @@ class DraftsController {
       }
       this._initialized = true;
     } catch (err) {
-      console.log('failed to load discussion drafts');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
         : 'Error loading discussion drafts');
@@ -161,7 +158,7 @@ class DraftsController {
 
   public deinit() {
     this._initialized = false;
-    // this.store.clear();
+    this._store.clear();
   }
 }
 
