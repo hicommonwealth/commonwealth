@@ -186,6 +186,7 @@ export default class extends IEventHandler {
         const { proposalHash } = event.data;
         return updateEntityFn(SubstrateEntityKind.SignalingProposal, proposalHash, true);
       }
+
       default: {
         log.trace(`no archival action needed for event of kind ${event.data.kind.toString()}`);
         return dbEvent;

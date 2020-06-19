@@ -89,6 +89,7 @@ const labelEdgewareEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
+
     /**
      * Offences Events
      */

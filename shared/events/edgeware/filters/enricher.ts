@@ -503,6 +503,7 @@ export default async function (
           }
         };
       }
+
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }
