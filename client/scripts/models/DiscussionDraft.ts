@@ -26,10 +26,10 @@ class DiscussionDraft implements IUniqueId {
     id: number,
     community: string,
     chain: string,
-    title?: string,
-    body?: string,
-    tag?: string,
-    attachments?: OffchainAttachment[],
+    title: string,
+    body: string,
+    tag: string,
+    attachments: OffchainAttachment[],
   ) {
     this.author = author;
     this.title = title;

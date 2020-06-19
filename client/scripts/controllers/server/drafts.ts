@@ -46,16 +46,16 @@ class DraftsController {
         'community': app.activeCommunityId(),
         'title': title,
         'body': body,
-        'attachments[]': attachments,
         'tag': tagName,
+        'attachments[]': attachments,
         'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to create draft');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
         : 'Failed to create draft');
     }
   }
@@ -77,8 +77,8 @@ class DraftsController {
           'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
           'id': id,
-          'body': body,
           'title': title,
+          'body': body,
           'tag': tagName,
           'attachments[]': attachments,
           'jwt': app.user.jwt
@@ -91,35 +91,35 @@ class DraftsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to edit draft');
-      throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
         : 'Failed to edit draft');
     }
   }
 
-  public async delete(draftId: number) {
-    const _this = this;
-    return new Promise((resolve, reject) => {
-      $.ajax(`${app.serverUrl()}/drafts`, {
+  public async delete(id: number) {
+    try {
+      const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
           'address': app.user.activeAccount.address,
           'author_chain': app.user.activeAccount.chain.id,
           'community': app.activeCommunityId(),
           'chain': app.activeChainId(),
+          'id': id,
           'jwt': app.user.jwt,
-          'id': draftId,
         }
-      }).then((result) => {
-        const draft = _this.store.getById(draftId);
-        _this.store.remove(draft);
-        resolve(result);
-      }).catch((e) => {
-        console.error(e);
-        notifyError('Could not delete draft');
-        reject(e);
       });
-    });
+      if (response.status !== 200) {
+        throw new Error(`${response.status} error: Failed to delete draft`);
+      }
+      const draft = this._store.getById(id);
+      this._store.remove(draft);
+    } catch (err) {
+      throw new Error((err.responseJSON && err.responseJSON.error)
+        ? err.responseJSON.error
+        : 'Failed to delete draft');
+    }
   }
 
   public async refreshAll(reset = false) {
