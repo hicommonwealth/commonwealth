@@ -23,8 +23,8 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
       { model: models.ChainEventType }
     ]
   });
-
-  if (!offences) return res.json({ status: 'Failure' }); // No Invites
+  // No Offences
+  if (!offences) return next(new Error('Failure'));
 
   return res.json({ status: 'Success', result: offences });
 };

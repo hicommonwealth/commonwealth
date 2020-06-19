@@ -196,7 +196,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   router.post('/createInvite', passport.authenticate('jwt', { session: false }), createInvite.bind(this, models));
   // TODO: Change to GET /invites
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
-  router.get('/getOffences', getOffences.bind(this, models));
+  router.get('/getOffences', passport.authenticate('jwt', { session: false }), getOffences.bind(this, models));
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member
