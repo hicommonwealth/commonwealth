@@ -7,7 +7,7 @@ import { ChainEntity, ChainEvent } from 'models';
 import app from 'state';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
 
-const get = (route, args, callback) => {
+export const get = (route, args, callback) => {
   return $.get(app.serverUrl() + route, args).then((resp) => {
     if (resp.status === 'Success') {
       callback(resp.result);

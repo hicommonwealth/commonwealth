@@ -7,6 +7,7 @@ import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
+import StakingServer from 'controllers/server/staking';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
@@ -23,8 +24,18 @@ interface IPreHeaderAttrs {
   nominations;
   sender: SubstrateAccount;
 }
+const offence = {
+  count: 0,
+  setCount(offences) {
+    offence.count = offences.length;
+    m.redraw();
+  }
+};
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
+  oncreate: async () => {
+    await StakingServer.offences(offence.setCount);
+  },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
@@ -93,6 +104,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
           m('.preheader-item-text', `${nominators.length}`),
+        ]),
+        m('.validators-preheader-item', [
+          m('h3', 'Total Offences'),
+          m('.preheader-item-text', `${offence.count}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Last Block'),
