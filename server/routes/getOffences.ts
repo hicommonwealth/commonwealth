@@ -17,16 +17,16 @@ const getOffences = async (models, req: Request, res: Response, next: NextFuncti
       $between: [startDate, endDate]
     };
   }
-  const invites = await models.ChainEvent.findAll({
+  const offences = await models.ChainEvent.findAll({
     where,
     include: [
       { model: models.ChainEventType }
     ]
   });
 
-  if (!invites) return res.json({ status: 'Failure' }); // No Invites
+  if (!offences) return res.json({ status: 'Failure' }); // No Invites
 
-  return res.json({ status: 'Success', result: invites });
+  return res.json({ status: 'Success', result: offences });
 };
 
 export default getOffences;
