@@ -107,8 +107,8 @@ export const populateDraft = async (state, draft) => {
   m.redraw();
 };
 
-export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
-  view: (vnode: VnodeDOM<{ header: boolean }, IState>) => {
+export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, IState> = {
+  view: (vnode: VnodeDOM<{ header: boolean, isModal: boolean }, IState>) => {
     const author = app.user.activeAccount;
     const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
@@ -234,7 +234,7 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 if (!Object.values(vnode.state.error).length) {
                   newLink(vnode.state.form, vnode.state.quillEditorState, author);
                 }
-                if (!vnode.state.error) {
+                if (vnode.attrs.isModal && !vnode.state.error) {
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
                     $(vnode.dom).trigger('modalexit');
@@ -300,10 +300,14 @@ export const NewThreadForm: m.Component<{ header: boolean }, IState> = {
                 const { form, quillEditorState } = vnode.state;
                 try {
                   saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
-                  $(vnode.dom).trigger('modalcomplete');
-                  setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
-                  }, 0);
+                  if (vnode.attrs.isModal) {
+                    $(vnode.dom).trigger('modalcomplete');
+                    setTimeout(() => {
+                      $(vnode.dom).trigger('modalexit');
+                    }, 0);
+                  } else {
+                    m.route.set(`/${app.activeId()}`);
+                  }
                 } catch (e) {
                   console.error(e);
                 }
