@@ -8,7 +8,7 @@ const getInvites = async (models, req: Request, res: Response, next: NextFunctio
   const { user } = req;
 
   if (!user) return next(new Error('Cannot find associated User'));
-  if (!user.email) return next(new Error('No aaemail included for User, cannot query Invites'));
+  if (!user.email) return next(new Error('No email included for User, cannot query Invites'));
 
   const invites = await models.InviteCode.findAll({
     where: {
