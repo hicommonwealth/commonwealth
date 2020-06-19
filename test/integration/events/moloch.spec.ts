@@ -85,14 +85,19 @@ async function submitProposal(
   api: MolochApi,
   token: Token,
   member: string,
-  applicant: string
+  applicant: string,
+  mineBlocks = false,
 ): Promise<void> {
+  if (mineBlocks) provider.send('evm_increaseTime', [2]);
   await token.transfer(applicant, 10);
+  if (mineBlocks) provider.send('evm_increaseTime', [2]);
   await token.approve(api.address, 5);
 
   const appSigner = provider.getSigner(applicant);
   const appToken = TokenFactory.connect(token.address, appSigner);
+  if (mineBlocks) provider.send('evm_increaseTime', [2]);
   await appToken.deployed();
+  if (mineBlocks) provider.send('evm_increaseTime', [2]);
   await appToken.approve(api.address, 5);
 
   const summonerBalance = await token.balanceOf(member);
@@ -104,6 +109,7 @@ async function submitProposal(
   assert.isAtLeast(+summonerAllowance, 5);
   assert.isAtLeast(+applicantAllowance, 5);
 
+  if (mineBlocks) provider.send('evm_increaseTime', [2]);
   await (api as Moloch1).submitProposal(applicant, 5, 5, 'hello');
 }
 
@@ -326,14 +332,14 @@ describe('Moloch Event Integration Tests', () => {
     const periodDuration = +(await api.periodDuration());
 
     // proposal 0: processed
-    await submitProposal(provider, api, token, member, applicant1);
+    await submitProposal(provider, api, token, member, applicant1, true);
     provider.send('evm_increaseTime', [2]);
     await api.submitVote(0, 1);
     provider.send('evm_increaseTime', [10]);
     await api.processProposal(0);
 
     // proposal 1: aborted
-    await submitProposal(provider, api, token, member, applicant2);
+    await submitProposal(provider, api, token, member, applicant2, true);
     provider.send('evm_increaseTime', [2]);
     const app2Signer = provider.getSigner(applicant2);
     const app2Moloch = Moloch1Factory.connect(api.address, app2Signer);
@@ -341,16 +347,19 @@ describe('Moloch Event Integration Tests', () => {
     await app2Moloch.abort(1);
 
     // proposal 2: started by prior applicant, voted on, not completed
+    provider.send('evm_increaseTime', [2]);
     await token.transfer(applicant1, 20);  // from summoner: you're gonna need it!
     const app1Signer = provider.getSigner(applicant1);
     const app1Token = TokenFactory.connect(token.address, app1Signer);
     await app1Token.deployed();
     const app1Moloch = Moloch1Factory.connect(api.address, app1Signer);
     await app1Moloch.deployed();
-    await submitProposal(provider, app1Moloch, app1Token, applicant1, applicant2);
+    await submitProposal(provider, app1Moloch, app1Token, applicant1, applicant2, true);
     provider.send('evm_increaseTime', [2]);
     await app1Moloch.submitVote(2, 2);
+    provider.send('evm_increaseTime', [2]);
     await api.submitVote(2, 1);
+    provider.send('evm_increaseTime', [2]);
 
     // perform migration
     const events: CWEvent<IMolochEventData>[] = [];
