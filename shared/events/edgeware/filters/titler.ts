@@ -42,7 +42,7 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
     case SubstrateEventKind.Offence: {
       return {
         title: 'Offence Reported',
-        description: 'There is an offence reported of the given kind happened at the time slot.',
+        description: 'An offence of given type is reported at timeslot.',
       };
     }
 

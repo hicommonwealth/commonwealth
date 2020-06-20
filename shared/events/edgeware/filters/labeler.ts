@@ -97,7 +97,10 @@ const labelEdgewareEvent: LabelerFilter = (
       const { offenceKind, opaqueTimeSlot, applied } = data;
       return {
         heading: 'Offence',
-        label: `There is an offence reported of the kind ${offenceKind} happened at the time slot ${opaqueTimeSlot} and applied ${applied}.`,
+        label: `An offence of type ${offenceKind} is reported and ${applied ? 'applied' : 'queued'} at time ${opaqueTimeSlot}.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
       };
     }
     /**

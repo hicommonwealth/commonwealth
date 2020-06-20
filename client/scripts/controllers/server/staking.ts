@@ -1,8 +1,8 @@
 import app from 'state';
-import { get } from './chain_entities';
+import { get } from 'lib/util';
 
 class StakingController {
-  public static offences(callback) {
+  public offences(callback) {
     return get('/getOffences', { chain: app.chain.id, jwt: app.login.jwt }, callback);
   }
 }

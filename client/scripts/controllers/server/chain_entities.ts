@@ -1,21 +1,9 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-import _ from 'lodash';
+import { get } from 'lib/util';
 
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent } from 'models';
-import app from 'state';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
-
-export const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
-};
 
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
