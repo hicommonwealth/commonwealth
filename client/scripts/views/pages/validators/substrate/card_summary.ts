@@ -14,15 +14,16 @@ const CardSummary: m.Component<IValidatorAttrs, {}> = {
   view: (vnode) => {
     const { total, value, title, currentBlock } = vnode.attrs;
     const percentage: number = (value.muln(10000).div(total).toNumber() / 100);
-    const percentageText: string = percentage < 0 || percentage > 100
-      ? ''
-      : `${percentage.toFixed(2)}%`;
-
+    const percentageText: number = percentage < 0 || percentage > 100
+      ? null
+      : percentage;
     return percentageText && m('.validators-preheader-item', [
       m('h3', title),
       currentBlock != undefined && m('span.preheader-item-text.bold-text', `#${currentBlock}`),
       m('span.preheader-item-text.gray-text', `${formatNumber(value)}/${formatNumber(total)}`),
-      m('.preheader-item-sub-text', percentageText)
+      //m('.preheader-item-sub-text', percentageText)
+      m('.bar-outer',
+        m('.bar-inner', { style: `width: ${(percentageText / 100) * 100}%` }))
     ]);
   },
 };
