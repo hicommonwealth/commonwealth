@@ -7,13 +7,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must provide id',
-  NotOwner: 'User does not have permission to edit this thread.',
+  NotOwner: 'User does not have permission to edit this draft.',
   NotFound: 'No draft found for that user'
 };
 
 const deleteDraft = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
+
   if (!req.body.id) {
     return next(new Error(Errors.NoId));
   }

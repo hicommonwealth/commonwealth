@@ -135,7 +135,7 @@ describe('Draft Tests', () => {
       expect(result.Address.address).to.equal(userAddress);
     });
 
-    it('should fail to create a discussion draft missing a body and attachment', async () => {
+    it('should fail to create a discussion draft missing a body, title, and attachment', async () => {
       const res = await chai.request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
@@ -144,7 +144,7 @@ describe('Draft Tests', () => {
           'author_chain': chain,
           'chain': chain,
           'community': null,
-          'title': title,
+          'title': null,
           'tag': tag,
           'body': null,
           'attachments[]': null,
@@ -259,9 +259,9 @@ describe('Draft Tests', () => {
 
     it('should delete a provided draft', async () => {
       const res = await chai.request(app)
-        .get('/api/drafts')
+        .delete('/api/drafts')
         .set('Accept', 'application/json')
-        .query({
+        .send({
           'address': userAddress,
           'author_chain': chain,
           'chain': chain,
@@ -276,9 +276,9 @@ describe('Draft Tests', () => {
 
     it('should fail to delete a provided draft when attempted by non-owning user', async () => {
       const res = await chai.request(app)
-        .get('/api/drafts')
+        .delete('/api/drafts')
         .set('Accept', 'application/json')
-        .query({
+        .send({
           'address': user2Address,
           'author_chain': chain,
           'chain': chain,
