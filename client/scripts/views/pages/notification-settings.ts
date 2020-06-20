@@ -1,4 +1,4 @@
-import 'pages/subscriptions.scss';
+// import 'pages/subscriptions.scss';
 import 'components/sidebar/index.scss';
 
 
@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
@@ -68,10 +68,12 @@ const UserNotifications: m.Component<{ subscriptions: NotificationSubscription[]
       mentionsSubscription
         && m('.MentionsButton', [
           m('h4', 'Mentions:'),
-          m(Button, {
-            label: mentionsSubscription.isActive ? 'On' : 'Off',
-            intent: mentionsSubscription.isActive ? 'positive' : 'none',
-            onclick: async (e) => {
+          m(Checkbox, {
+            size: 'lg',
+            // label: mentionsSubscription.isActive ? 'On' : 'Off',
+            // intent: mentionsSubscription.isActive ? 'positive' : 'none',
+            checked: mentionsSubscription.isActive,
+            onchange: async (e) => {
               e.preventDefault();
               if (mentionsSubscription.isActive) {
                 await app.user.notifications.disableSubscriptions([mentionsSubscription]);
@@ -130,21 +132,15 @@ const ChainOrCommunitySubscriptionButton: m.Component<ICoCSubscriptionsButtonAtt
   }
 };
 
-const ImmediateEmailButton: m.Component<{subscription: NotificationSubscription}> = {
+const ImmediateEmailCheckbox: m.Component<{subscription: NotificationSubscription}> = {
   view: (vnode) => {
     const { subscription } = vnode.attrs;
-    const tooltipContent = subscription.immediateEmail
-      ? 'Turn off immediate notification emails'
-      : 'Turn on immediate notification emails';
-    return m(Tooltip, {
-      content: tooltipContent,
-      hasArrow: true,
-      position: 'top',
-      trigger: m(Button, {
-        label: m(Icon, { name : Icons.MAIL }),
-        intent: subscription.immediateEmail ? 'positive' : 'none',
-        size: 'sm',
-        onclick: async () => {
+    return m('td', [
+      m(Checkbox, {
+        disabled: !subscription.isActive,
+        checked: subscription.immediateEmail && subscription.isActive,
+        size: 'lg',
+        onchange: async () => {
           if (subscription.immediateEmail) {
             await app.user.notifications.disableImmediateEmails([subscription]);
           } else {
@@ -152,8 +148,8 @@ const ImmediateEmailButton: m.Component<{subscription: NotificationSubscription}
           }
           m.redraw();
         },
-      }),
-    });
+      })
+    ]);
   },
 };
 
@@ -178,45 +174,45 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     if (activeSubscription) {
       vnode.state.subscription = activeSubscription;
     }
-    return m('.SubscriptionRow', [
-      m('h4', `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
-      activeSubscription && app.user.email
-      && m(ImmediateEmailButton, { subscription: activeSubscription }),
+    return m('tr.SubscriptionRow', [
+      m('td', `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
       activeSubscription
-        && m(Button, {
-          label: activeSubscription.isActive ? 'Pause' : 'Unpause',
-          intent: activeSubscription.isActive ? 'none' : 'negative',
-          iconLeft: activeSubscription.isActive ? Icons.VOLUME_2 : Icons.VOLUME_X,
-          class: '',
-          size: 'sm',
-          onclick: async (e) => {
-            e.preventDefault();
-            if (activeSubscription.isActive) {
-              await subscriptions.disableSubscriptions([activeSubscription]);
-            } else {
-              await subscriptions.enableSubscriptions([activeSubscription]);
+        && m('td', [
+          m(Checkbox, {
+            checked: activeSubscription.isActive,
+            class: '',
+            size: 'lg',
+            onclick: async (e) => {
+              e.preventDefault();
+              if (activeSubscription.isActive) {
+                await subscriptions.disableSubscriptions([activeSubscription]);
+              } else {
+                await subscriptions.enableSubscriptions([activeSubscription]);
+              }
+              m.redraw();
             }
-            m.redraw();
-          }
-        }),
-      m(Button, {
-        class: '',
-        size: 'sm',
-        onclick: (e) => {
-          e.preventDefault();
-          if (activeSubscription) {
-            subscriptions.deleteSubscription(activeSubscription).then(() => {
-              m.redraw();
-            });
-          } else {
-            subscriptions.subscribe(vnode.state.subscription.category, vnode.state.subscription.objectId).then(() => {
-              m.redraw();
-            });
-          }
-        },
-        label: activeSubscription ? 'Notifications on' : 'Notifications off',
-        iconLeft: activeSubscription ? Icons.BELL : Icons.BELL_OFF,
-      }),
+          }),
+        ]),
+      activeSubscription && app.user.email
+        && m(ImmediateEmailCheckbox, { subscription: activeSubscription }),
+      // m(Button, {
+      //   class: '',
+      //   size: 'sm',
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     if (activeSubscription) {
+      //       subscriptions.deleteSubscription(activeSubscription).then(() => {
+      //         m.redraw();
+      //       });
+      //     } else {
+      //       subscriptions.subscribe(vnode.state.subscription.category, vnode.state.subscription.objectId).then(() => {
+      //         m.redraw();
+      //       });
+      //     }
+      //   },
+      //   label: activeSubscription ? 'Notifications on' : 'Notifications off',
+      //   iconLeft: activeSubscription ? Icons.BELL : Icons.BELL_OFF,
+      // }),
     ]);
   }
 };
@@ -309,10 +305,17 @@ const ActiveSubscriptions: m.Component<{ subscriptions: NotificationSubscription
     return m('.ActiveSubscriptions', [
       m('h1', 'Active Subscriptions'),
       m(PauseButtons),
-      subscriptions.length > 0
-        ? subscriptions.sort((a, b) => a.objectId > b.objectId ? 1 : -1)
-          .map((subscription) => m(SubscriptionRow, { subscription }))
-        : m('div', 'No Active Subscriptions')
+      m(Table, {}, [
+        m('tr', [
+          m('th', null),
+          m('th', 'In app'),
+          m('th', 'By email'),
+        ]),
+        subscriptions.length > 0
+          ? subscriptions.sort((a, b) => a.objectId > b.objectId ? 1 : -1)
+            .map((subscription) => m(SubscriptionRow, { subscription }))
+          : m('div', 'No Active Subscriptions')
+      ]),
     ]);
   },
 };
@@ -571,17 +574,9 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
     return m('.Sidebar', {
       class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
         + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, m('.SidebarMenu', [
-      m(List, {
-        interactive: true,
-        size: 'lg',
-      }, [
-        // header
-        m('.title-selector', [
-          m('.title-selector-left', [
-            m('.community-name', 'Notifications Manager'),
-          ]),
-        ]),
+    }, [
+      m(List, { interactive: true, }, [
+        m('h4', 'Notification Settings'),
         m('h4', 'General'),
         m(SubscriptionSideBarListItem, {
           label: 'User Notifications',
@@ -616,7 +611,7 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
           });
         }),
       ])
-    ]));
+    ]);
   },
 };
 
