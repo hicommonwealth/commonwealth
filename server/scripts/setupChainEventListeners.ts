@@ -57,7 +57,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       if (node.chain === 'edgeware') {
         // must be ws
         const urlNoProtocol = url.replace(/ws?s:\/\//, '');
-        url = `ws://${urlNoProtocol}:9944`;
+        url = `ws://${urlNoProtocol}`;
       } else if (node.chain === 'kusama') {
         // requires wss and no port
         const urlPath = url.replace(/^ws?s:\/\//, '').replace(/:[0-9]*$/, '');
