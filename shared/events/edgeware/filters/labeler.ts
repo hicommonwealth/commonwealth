@@ -103,6 +103,31 @@ const labelEdgewareEvent: LabelerFilter = (
           : null,
       };
     }
+
+    /**
+     * ImOnline Events
+     */
+    case SubstrateEventKind.AllGood: {
+      const { currentIndex } = data;
+      return {
+        heading: 'Offence',
+        label: `At the end of the session ${currentIndex}, no offence was committed.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
+    case SubstrateEventKind.SomeOffline: {
+      const { currentIndex, validators } = data;
+      return {
+        heading: 'Offence',
+        label: `At the end of the session ${currentIndex}, ${validators.length} ${validators.length === 1 ? 'validator was' : 'validators were'} found to be offline.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
+
     /**
      * Democracy Events
      */

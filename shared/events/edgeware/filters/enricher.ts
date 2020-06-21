@@ -1,9 +1,11 @@
+import BN from 'bn.js';
 import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
   ReferendumInfo
 } from '@polkadot/types/interfaces';
+import { IdentificationTuple } from '@polkadot/types/interfaces/session';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -503,7 +505,35 @@ export default async function (
           }
         };
       }
+      /**
+       * ImOnline Events
+       */
+      case SubstrateEventKind.AllGood: {
+        const index: BN = await api.query.session.currentIndex();
+        // last session index
+        const currentIndex = index.toNumber() - 1;
 
+        return {
+          data: {
+            kind,
+            currentIndex
+          }
+        };
+      }
+      case SubstrateEventKind.SomeOffline: {
+        const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
+        const index: BN = await api.query.session.currentIndex();
+        // last session index
+        const currentIndex = index.toNumber() - 1;
+
+        return {
+          data: {
+            kind,
+            currentIndex,
+            validators
+          }
+        };
+      }
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }

@@ -92,6 +92,12 @@ export default function (
         case 'Offence': return SubstrateEventKind.Offence;
         default: return null;
       }
+    case 'imOnline':
+      switch (method) {
+        case 'AllGood': return SubstrateEventKind.AllGood;
+        case 'SomeOffline': return SubstrateEventKind.SomeOffline;
+        default: return null;
+      }
     default:
       return null;
   }

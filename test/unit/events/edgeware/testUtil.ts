@@ -56,6 +56,9 @@ export function constructFakeApi(callOverrides): ApiPromise {
       staking: {
         bonded: callOverrides['bonded'],
       },
+      session: {
+        currentIndex: callOverrides['currentIndex'],
+      },
       democracy: {
         referendumInfoOf: callOverrides['referendumInfoOf'],
         publicProps: callOverrides['publicProps'],

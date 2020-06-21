@@ -47,6 +47,21 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
     }
 
     /**
+     * ImOnline Events
+     */
+    case SubstrateEventKind.SomeOffline: {
+      return {
+        title: 'imOnline SomeOffline',
+        description: 'At the end of the session, at least one validator was found to be offline.',
+      };
+    }
+    case SubstrateEventKind.AllGood: {
+      return {
+        title: 'imOnline AllGood',
+        description: 'At the end of the session, no offence was committed.',
+      };
+    }
+    /**
      * Democracy Events
      */
     case SubstrateEventKind.VoteDelegated: {

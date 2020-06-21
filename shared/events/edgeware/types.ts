@@ -1,5 +1,6 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
-
+import { IdentificationTuple } from '@polkadot/types/interfaces/session';
+import { Vec } from '@polkadot/types';
 /**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).
@@ -90,8 +91,12 @@ export enum SubstrateEventKind {
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 
-  // offences event
+  // offences events
   Offence = 'offence',
+
+  // imOnline events
+  AllGood = 'all-good',
+  SomeOffline = 'some-offline'
 }
 
 interface ISubstrateEvent {
@@ -387,6 +392,20 @@ export interface ISubstrateOffence extends ISubstrateEvent {
   applied: boolean;
 }
 
+
+/**
+ * imOnline Events
+ */
+export interface ISubstrateAllGood extends ISubstrateEvent {
+  kind: SubstrateEventKind.AllGood;
+  currentIndex: number;
+}
+export interface ISubstrateSomeOffline extends ISubstrateEvent {
+  kind: SubstrateEventKind.SomeOffline;
+  currentIndex: number;
+  validators: Vec<IdentificationTuple>;
+}
+
 export type ISubstrateEventData =
   ISubstrateSlash
   | ISubstrateReward
@@ -426,6 +445,8 @@ export type ISubstrateEventData =
   | ISubstrateTreasuryRewardMinting
   | ISubstrateTreasuryRewardMintingV2
   | ISubstrateOffence
+  | ISubstrateSomeOffline
+  | ISubstrateAllGood
 // eslint-disable-next-line semi-style
 ;
 
