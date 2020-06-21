@@ -732,7 +732,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
-        currentIndex: 11,
+        sessionIndex: 11,
         validators
       }
     });
@@ -745,7 +745,7 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       blockNumber,
       data: {
         kind,
-        currentIndex: 11
+        sessionIndex: 11
       }
     });
   });

@@ -511,12 +511,12 @@ export default async function (
       case SubstrateEventKind.AllGood: {
         const index: BN = await api.query.session.currentIndex();
         // last session index
-        const currentIndex = index.toNumber() - 1;
+        const sessionIndex = index.toNumber() - 1;
 
         return {
           data: {
             kind,
-            currentIndex
+            sessionIndex
           }
         };
       }
@@ -524,12 +524,12 @@ export default async function (
         const [ validators ] = event.data as unknown as [ Vec<IdentificationTuple> ];
         const index: BN = await api.query.session.currentIndex();
         // last session index
-        const currentIndex = index.toNumber() - 1;
+        const sessionIndex = index.toNumber() - 1;
 
         return {
           data: {
             kind,
-            currentIndex,
+            sessionIndex,
             validators
           }
         };

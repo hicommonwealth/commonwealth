@@ -398,11 +398,11 @@ export interface ISubstrateOffence extends ISubstrateEvent {
  */
 export interface ISubstrateAllGood extends ISubstrateEvent {
   kind: SubstrateEventKind.AllGood;
-  currentIndex: number;
+  sessionIndex: number;
 }
 export interface ISubstrateSomeOffline extends ISubstrateEvent {
   kind: SubstrateEventKind.SomeOffline;
-  currentIndex: number;
+  sessionIndex: number;
   validators: Vec<IdentificationTuple>;
 }
 
