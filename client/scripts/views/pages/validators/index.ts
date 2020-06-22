@@ -108,8 +108,8 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     currentSession: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.session : null,
     currentEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.currentEra : null,
     activeEra: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).chain.activeEra : null,
-    stakingLedger: (app.chain.base === ChainBase.Substrate && app.vm.activeAccount)
-      ? (app.vm.activeAccount as SubstrateAccount).stakingLedger
+    stakingLedger: (app.chain.base === ChainBase.Substrate && app.user.activeAccount)
+      ? (app.user.activeAccount as SubstrateAccount).stakingLedger
       : null,
     lastHeader: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.lastHeader
@@ -124,7 +124,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       case ChainClass.Edgeware:
         vComponents = [
           m(SubstratePreHeader, {
-            sender: app.vm.activeAccount as SubstrateAccount,
+            sender: app.user.activeAccount as SubstrateAccount,
             nominations: vnode.state.nominations,
             nominationsHasChanged: vnode.state.nominationsHasChanged
           }),
@@ -134,7 +134,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       case ChainClass.Kusama:
         vComponents = [
           m(SubstratePreHeader, {
-            sender: app.vm.activeAccount as SubstrateAccount,
+            sender: app.user.activeAccount as SubstrateAccount,
             nominations: vnode.state.nominations,
             nominationsHasChanged: vnode.state.nominationsHasChanged
           }),

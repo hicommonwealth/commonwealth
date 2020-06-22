@@ -4,6 +4,10 @@ import passportGithub from 'passport-github';
 import passportJWT from 'passport-jwt';
 import { Request } from 'express';
 
+import { factory, formatFilename } from '../shared/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
+
 import { JWT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK } from './config';
 import { NotificationCategories } from '../shared/types';
 
@@ -68,9 +72,12 @@ function setupPassport(models) {
       } else if (req.user && req.user !== user) {
         // Github user has a user attached, and we're logged in to
         // a different user. Move the Github link to the new user.
+        // await githubAccount.setUser(req.user);
+        // return cb(null, req.user);
         // TODO: We should probably just block the login, rather than moving the Github account
-        await githubAccount.setUser(req.user);
-        return cb(null, req.user);
+        log.error('Github already linked to ');
+        return cb(null, null);
+
       } else {
         // Github account has a user attached, and we either aren't
         // logged in, or we're already logged in to that account.

@@ -8,7 +8,7 @@ class ChainEventsController {
   }
 
   public offences(callback) {
-    return get('/getOffences', { chain: app.chain.id, jwt: app.login.jwt }, callback);
+    return get('/getOffences', { chain: app.chain.id, jwt: app.user.jwt }, callback);
   }
 }
 

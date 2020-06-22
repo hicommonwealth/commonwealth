@@ -2,12 +2,12 @@ import 'components/quill_editor.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
-import Quill from 'quill';
+import Quill from 'quill-2.0-dev/quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
-import 'quill-mention';
+import QuillMention from 'quill-mention';
 
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -40,7 +40,7 @@ const instantiateEditor = (
 ) => {
   const Delta = Quill.import('delta');
   const Keyboard = Quill.import('modules/keyboard');
-  const Clipboard = Quill.import('modules/clipboard');
+  const Clipboard = Quill.import('modules/clipboard') as any;
   let quill;
 
   // Set up markdown mode helper
@@ -59,6 +59,9 @@ const instantiateEditor = (
 
   // Register markdown shortcuts
   Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
+
+  // Register mentions module
+  Quill.register({ 'modules/mention': QuillMention });
 
   const insertEmbeds = (text) => {
     const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
@@ -120,37 +123,19 @@ const instantiateEditor = (
 
   // Register a patch to prevent pasting into long documents causing the editor to jump
   class CustomClipboard extends Clipboard {
-    onPaste(e) {
-      // get current page offset before paste
-      const top = window.pageYOffset;
-      const left = window.pageXOffset;
-
-      if (e.defaultPrevented || !(this as any).quill.isEnabled()) return;
-      const plainText = e.clipboardData.getData('text/plain').replace(/\n/g, '\n\n').replace(/\n\n+/g, '\n\n');
-      const range = (this as any).quill.getSelection();
-      let delta = new Delta().retain(range.index);
-      (this as any).container.style.top = `${(window.pageYOffset || document.documentElement.scrollTop
-                                          || document.body.scrollTop || 0).toString()}px`;
-      (this as any).container.focus();
-      setTimeout(() => {
-        const editor = (this as any).quill;
-        editor.selection.update(Quill.sources.SILENT);
-        delta = delta.concat((this as any).convert()).delete(range.length);
-
-        // transform pasted text
-        if (isMarkdownMode()) {
-          delta = new Delta().retain(range.index).delete(range.length).insert(plainText);
-        }
-
-        // update editor with pasted content and selection
-        editor.updateContents(delta, Quill.sources.USER);
-        editor.setSelection(delta.length() - range.length, Quill.sources.SILENT);
-        const bounds = editor.getBounds(delta.length() - range.length, Quill.sources.SILENT);
-        editor.scrollingContainer.scrollTop = bounds.top;
-
-        // scroll window to previous position after paste
-        window.scrollTo({ top, left });
-      }, 1);
+    onCapturePaste(e) {
+      if (e.defaultPrevented || !this.quill.isEnabled()) return;
+      e.preventDefault();
+      const range = this.quill.getSelection(true);
+      if (range == null) return;
+      const html = e.clipboardData.getData('text/html');
+      const text = e.clipboardData.getData('text/plain');
+      const files = Array.from(e.clipboardData.files || []);
+      if (!html && files.length > 0) {
+        this.quill.uploader.upload(range, files);
+      } else {
+        this.onPaste(range, isMarkdownMode() ? { html: text, text } : { html, text });
+      }
     }
   }
 
@@ -247,12 +232,12 @@ const instantiateEditor = (
   const bindings = {
     // Don't insert hard tabs
     'tab': {
-      key: Keyboard.keys.TAB,
+      key: 'Tab',
       handler: () => true,
     },
     // Check for embeds on return
     'new line': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       shortKey: false,
       shiftKey: null,
       handler: (range, context) => {
@@ -266,7 +251,7 @@ const instantiateEditor = (
     },
     // Submit on cmd-Enter/ctrl-Enter
     'submit': {
-      key: Keyboard.keys.ENTER,
+      key: 'Enter',
       shortKey: true,
       handler: () => {
         if (onkeyboardSubmit) {
@@ -279,7 +264,7 @@ const instantiateEditor = (
     },
     // Close headers, code blocks, and blockquotes when backspacing the start of a line
     'header backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['header'],
       offset: 0,
@@ -288,7 +273,7 @@ const instantiateEditor = (
       }
     },
     'blockquote backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['blockquote'],
       offset: 0,
@@ -297,7 +282,7 @@ const instantiateEditor = (
       }
     },
     'code backspace': {
-      key: Keyboard.keys.BACKSPACE,
+      key: 'Backspace',
       collapsed: true,
       format: ['code-block'],
       offset: 0,
@@ -391,7 +376,7 @@ const instantiateEditor = (
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       }).then((response) => {
         if (response.status !== 'Success') {
           document.getElementsByClassName('spinner-wrap')[0].remove();
@@ -586,7 +571,7 @@ const instantiateEditor = (
     formats: hasFormats ? [
       'bold', 'italic', 'strike', 'code',
       'link', 'image', 'blockquote', 'code-block',
-      'header', 'list', 'twitter', 'video',
+      'header', 'list', 'twitter', 'video', 'mention',
     ] : [],
     theme,
   });
@@ -817,7 +802,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
     // Otherwise, just set vnode.state.markdownMode based on the app setting
     if (vnode.state.markdownMode === undefined) {
-      vnode.state.markdownMode = !!(app.login?.disableRichText);
+      vnode.state.markdownMode = !!(app.user?.disableRichText);
     }
 
     // Set vnode.state.clearUnsavedChanges on first initialization

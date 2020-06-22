@@ -38,7 +38,7 @@ const NewProposalPage = {
                 'Thread Type': 'Proposal',
                 'ProposalID': proposal.slug,
                 'Scope': app.activeId(),
-                'user' : app.vm.activeAccount.address,
+                'user' : app.user.activeAccount.address,
               });
               mixpanel.people.increment('Thread');
               mixpanel.people.set({

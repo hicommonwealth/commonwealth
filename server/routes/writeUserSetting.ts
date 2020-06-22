@@ -3,14 +3,20 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  InvalidUser: 'Invalid user',
+  NoKeyValue: 'Must provide key and value',
+  InvalidSetting: 'Invalid setting',
+};
+
 const writeUserSetting = async (models, req: Request, res: Response, next: NextFunction) => {
   const { key, value } = req.body;
 
   if (!req.user) {
-    return next(new Error('Invalid user'));
+    return next(new Error(Errors.InvalidUser));
   }
   if (!key || !value) {
-    return next(new Error('Key and value must be supplied'));
+    return next(new Error(Errors.NoKeyValue));
   }
 
   if (key === 'lastVisited') {
@@ -28,7 +34,7 @@ const writeUserSetting = async (models, req: Request, res: Response, next: NextF
     req.user.disableRichText = false;
     await req.user.save();
   } else {
-    return next(new Error('Invalid setting'));
+    return next(new Error(Errors.InvalidSetting));
   }
 
   return res.json({ status: 'Success', result: { key, value } });

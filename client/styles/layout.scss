@@ -15,6 +15,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     background: #fafafa;
+    overflow-y: scroll;
     &.modal-open {
         overflow-y: hidden;
     }
@@ -36,6 +37,8 @@ html {
 .layout-container {
     padding-top: $header-height + $vertical-padding;
     padding-bottom: $vertical-padding;
+    margin-left: $horizontal-padding;
+    margin-right: $horizontal-padding;
 }
 .forum-container {
     background: #fff;
@@ -45,7 +48,7 @@ html {
 }
 
 //
-// typographical styles
+// typography
 //
 
 h1, h2, h3, h4, h5, h6 {
@@ -55,10 +58,14 @@ strong {
     font-weight: 700;
 }
 a {
-    color: #111;
+    color: $theme-accent-dark;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
 }
 a:visited {
-    color: #777;
+    color: lighten($theme-accent-dark, 4%);
 }
 ul,
 ol {
@@ -329,10 +336,6 @@ td, th {
 
 // menu styles
 .cui-menu {
-    border: solid 1px #eee;
-    > .cui-menu-divider {
-        border-bottom: solid 1px #eee;
-    }
     > .cui-button.cui-basic {
         color: #333;
         .cui-icon svg {
@@ -349,4 +352,12 @@ td, th {
 // select list styles
 .cui-popover.cui-select-list .cui-popover-content {
     padding: 10px;
+}
+
+// empty state override
+.cui-empty-state.cui-empty-state-fill {
+    z-index: initial;
+}
+.cui-spinner.cui-spinner-fill {
+    z-index: initial;
 }

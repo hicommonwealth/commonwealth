@@ -51,6 +51,10 @@
 .User {
     display: inline-block;
     white-space: nowrap;
+    a {
+        text-decoration: none;
+        color: initial;
+    }
     .user-avatar {
         @include bareAvatar();
     }
@@ -70,7 +74,9 @@
         text-decoration: underline;
     }
     .roleTag {
-        margin-left: 8px;
+        margin-left: 6px;
+        margin-right: 0;
+        padding: 0 6px;
     }
 }
 
@@ -106,5 +112,20 @@
     }
     .user-address {
         color: #999;
+    }
+}
+
+.UserBlock {
+    display: flex;
+    .profile-block-left {
+        padding-right: 16px;
+        margin: 5px 0;
+    }
+    .profile-block-right {
+        flex: 1;
+        .profile-block-name,
+        .profile-block-address {
+            text-align: left;
+        }
     }
 }

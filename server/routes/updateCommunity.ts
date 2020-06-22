@@ -5,7 +5,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoCommunityId: 'Must provide community id',
+  NoCommunityId: 'Must provide community ID',
   CantChangeNetwork: 'Cannot change community network',
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
@@ -21,7 +21,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   });
   if (!community) return next(new Error(Errors.CommunityNotFound));
   else {
-    const userAddressIds = await req.user.getAddresses().map((address) => address.id);
+    const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const userRole = await models.Role.findOne({
       where: {
         address_id: userAddressIds,

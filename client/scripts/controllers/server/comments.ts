@@ -94,7 +94,7 @@ class CommentsController {
     try {
       // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
-        'author_chain': app.vm.activeAccount.chain.id,
+        'author_chain': app.user.activeAccount.chain.id,
         'chain': chain,
         'community': community,
         'address': address,
@@ -104,7 +104,7 @@ class CommentsController {
         'mentions[]': mentions,
         'text': encodeURIComponent(unescapedText),
         'versionHistory': versionHistory,
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
       });
       const { result } = res;
       this._store.add(modelFromServer(result));
@@ -128,15 +128,15 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
-        'address': app.vm.activeAccount.address,
-        'author_chain': app.vm.activeAccount.chain.id,
+        'address': app.user.activeAccount.address,
+        'author_chain': app.user.activeAccount.chain.id,
         'id': comment.id,
         'chain': comment.chain,
         'community': comment.community,
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
-        'jwt': app.login.jwt,
+        'jwt': app.user.jwt,
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -188,7 +188,7 @@ class CommentsController {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
       $.post(`${app.serverUrl()}/deleteComment`, {
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
         comment_id: comment.id,
       }).then((result) => {
         const existing = this._store.getById(comment.id);

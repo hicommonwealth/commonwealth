@@ -151,7 +151,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Manage Staking'),
           m('.preheader-item-text', [
             m('a.btn.formular-button-primary', {
-              class: app.vm.activeAccount ? '' : 'disabled',
+              class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
@@ -167,7 +167,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Claim Payout'),
           m('.preheader-item-text', [
             m('a.btn.formular-button-primary', {
-              class: app.vm.activeAccount ? '' : 'disabled',
+              class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
@@ -183,7 +183,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           m('h3', 'Update nominations'),
           m('.preheader-item-text', [
             m('a.btn.formular-button-primary', {
-              class: app.vm.activeAccount ? '' : 'disabled',
+              class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
                 e.preventDefault();

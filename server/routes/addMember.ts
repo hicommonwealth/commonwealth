@@ -4,11 +4,20 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NotLoggedIn: 'Not logged in',
+  InvalidCommunity: 'Invalid community',
+  NeedAddress: 'Must provide address to add',
+  MustBeAdmin: 'Must be an admin/mod to invite new members',
+  AddressNotFound: 'Address not found',
+  AlreadyMember: 'Already a member of this community',
+};
+
 const addMember = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
-  if (!community) return next(new Error('Invalid community'));
-  if (!req.user) return next(new Error('Not logged in'));
-  if (!req.body.invitedAddress) return next(new Error('Must provide address to add'));
+  if (!community) return next(new Error(Errors.InvalidCommunity));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
 
   // check that either invitesEnabled === true, or the user is an admin or mod
   if (!community.invitesEnabled) {
@@ -25,7 +34,7 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
         permission: ['admin', 'moderator'],
       },
     });
-    if (!requesterIsAdminOrMod) return next(new Error('Must be an admin/mod to invite new members'));
+    if (!requesterIsAdminOrMod) return next(new Error(Errors.MustBeAdmin));
   }
 
   const existingAddress = await models.Address.findOne({
@@ -34,7 +43,7 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
       chain: req.body.invitedAddressChain,
     },
   });
-  if (!existingAddress) return next(new Error('Address not found'));
+  if (!existingAddress) return next(new Error(Errors.AddressNotFound));
   const existingRole = await models.Role.findOne({
     where: {
       address_id: existingAddress.id,
@@ -42,7 +51,7 @@ const addMember = async (models, req: Request, res: Response, next: NextFunction
     },
   });
 
-  if (existingRole) return next(new Error('Already a member of this community'));
+  if (existingRole) return next(new Error(Errors.AlreadyMember));
 
   const role = await models.Role.create({
     address_id: existingAddress.id,

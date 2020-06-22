@@ -3,9 +3,13 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NoObjectType: 'Must provide object_type',
+};
+
 const viewChainObjects = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.object_type) {
-    return next(new Error('Must provide object_type'));
+    return next(new Error(Errors.NoObjectType));
   }
   const options: any = {
     where: { object_type: req.query.object_type },

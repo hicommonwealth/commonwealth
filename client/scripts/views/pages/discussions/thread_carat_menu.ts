@@ -1,7 +1,6 @@
 import m from 'mithril';
 import app from 'state';
 
-import { isRoleOfCommunity } from 'helpers/roles';
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTag } from 'models';
 import TagEditor from 'views/components/tag_editor';
@@ -11,18 +10,18 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
-    const notificationSubscription = app.login.notifications.subscriptions
+    const notificationSubscription = app.user.notifications.subscriptions
       .find((v) => v.category === NotificationCategories.NewComment && v.objectId === proposal.uniqueIdentifier);
 
     return m(MenuItem, {
       onclick: (e) => {
         e.preventDefault();
         if (notificationSubscription) {
-          app.login.notifications.deleteSubscription(notificationSubscription).then(() => {
+          app.user.notifications.deleteSubscription(notificationSubscription).then(() => {
             m.redraw();
           });
         } else {
-          app.login.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier).then(() => {
+          app.user.notifications.subscribe(NotificationCategories.NewComment, proposal.uniqueIdentifier).then(() => {
             m.redraw();
           });
         }
@@ -39,7 +38,7 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
     return m(MenuItem, {
       onclick: async (e) => {
         e.preventDefault();
-        const carat = (document.getElementsByClassName('cui-popover-trigger-active')[0] as HTMLButtonElement)
+        const carat = (document.getElementsByClassName('cui-popover-trigger-active')[0] as HTMLButtonElement);
         if (carat) carat.click();
         const confirmed = await confirmationModalWithText('Delete this entire thread?')();
         if (!confirmed) return;
@@ -53,65 +52,48 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-interface ITagEditorButtonAttrs {
-  popoverMenu: boolean,
-  openTagEditor: Function
-}
-
-export const TagEditorButton: m.Component<ITagEditorButtonAttrs, { isOpen: boolean }> = {
+const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openTagEditor } = vnode.attrs;
-    return [
-      m('.TagEditorButton', [
-        vnode.attrs.popoverMenu
-          ? m(MenuItem, {
-            iconLeft: Icons.TAG,
-            fluid: true,
-            label: 'Edit Tags',
-            onclick: (e) => {
-              e.preventDefault();
-              openTagEditor();
-            },
-          })
-          : m('a', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              openTagEditor();
-            },
-          }, [ 'Edit tags' ])
-      ]),
-    ];
+    return m('.TagEditorButton', [
+      m(MenuItem, {
+        iconLeft: Icons.TAG,
+        fluid: true,
+        label: 'Edit Tags',
+        onclick: (e) => {
+          e.preventDefault();
+          openTagEditor();
+        },
+      })
+    ]);
   }
 };
 
-interface IThreadCaratMenuAttrs {
-  proposal: OffchainThread;
-}
-
-const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { isOpen: boolean }> = {
+const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOpen: boolean }> = {
   view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    const canEditThread = app.vm.activeAccount
-      && (isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-          || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'moderator', app.activeId())
-          || proposal.author === app.vm.activeAccount.address);
     if (!app.isLoggedIn()) return;
-
-    const openTagEditor = () => {
-      vnode.state.isOpen = true;
-    };
+    const { proposal } = vnode.attrs;
+    const canEditThread = app.user.activeAccount
+      && (app.user.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      })
+      || app.user.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      })
+      || proposal.author === app.user.activeAccount.address);
 
     return [
       m(PopoverMenu, {
         transitionDuration: 0,
         closeOnOutsideClick: true,
-        menuAttrs: { size: 'sm' },
+        closeOnContentClick: true,
+        menuAttrs: {},
         content: [
-          canEditThread && m(TagEditorButton, {
-            popoverMenu: true,
-            openTagEditor,
-          }),
+          canEditThread && m(TagEditorButton, { openTagEditor: () => { vnode.state.tagEditorIsOpen = true; } }),
           canEditThread && m(ThreadDeletionButton, { proposal }),
           m(ThreadSubscriptionButton, { proposal }),
         ],
@@ -121,8 +103,9 @@ const ThreadCaratMenu: m.Component<IThreadCaratMenuAttrs, { isOpen: boolean }> =
           style: 'margin-right: 6px;'
         }),
       }),
-      vnode.state.isOpen && m(TagEditor, {
+      vnode.state.tagEditorIsOpen && m(TagEditor, {
         thread: vnode.attrs.proposal,
+        popoverMenu: true,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
       })
     ];

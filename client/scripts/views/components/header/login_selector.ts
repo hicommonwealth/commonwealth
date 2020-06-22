@@ -4,21 +4,23 @@ import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
-import { Button, Icon, Icons, List, ListItem, MenuItem, MenuDivider, PopoverMenu } from 'construct-ui';
+import { Button, ButtonGroup, Icon, Icons, List, ListItem, Menu, MenuItem, MenuDivider,
+  Popover, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
-import User from 'views/components/widgets/user';
+import User, { UserBlock } from 'views/components/widgets/user';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import LoginModal from 'views/modals/login_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import EditProfileModal from 'views/modals/edit_profile_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
+import { setActiveAccount } from 'controllers/app/login';
 
-const LoginSelector = {
+const LoginSelector : m.Component<{}, {}> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
@@ -33,98 +35,57 @@ const LoginSelector = {
       ]),
     ]);
 
-    return m('.LoginSelector', {
-      class: (app.chain || app.community) ? '' : 'no-community',
-    }, [
-      (app.chain || app.community) && m('.login-selector-left', app.vm.activeAccount
-        // if address selected
-        ? [
-          m(User, { user: app.vm.activeAccount, avatarOnly: true, avatarSize: 28, linkify: true }),
-          m('.login-selector-user', [
-            m('.user-info', [
-              m(User, { user: app.vm.activeAccount, hideAvatar: true, hideIdentityIcon: true }),
-              m('.user-address', app.vm.activeAccount.chain.id === 'near'
-                ? `@${app.vm.activeAccount.address}`
-                : `${app.vm.activeAccount.address.slice(0, 6)}...`)
-            ])
-          ]),
-        ]
-        // if no address is selected
-        : app.login.activeAddresses.length === 0 ? m(Button, {
-          intent: 'none',
-          iconLeft: Icons.USER_PLUS,
-          size: 'sm',
-          fluid: true,
-          label: 'Link new address',
-          onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
-        })
-        // if addresses are available, but none is selected
-        : m(Button, {
-          label: 'Select an address',
-          fluid: true,
-          size: 'sm',
-          onclick: () => app.modals.create({ modal: SelectAddressModal }),
-        })),
-      m('.login-selector-right', [
-        // logged in
-        app.isLoggedIn() && m(PopoverMenu, {
+    const activeAddressesWithRole = app.user.activeAccounts.filter((account) => {
+      return app.user.getRoleInCommunity({
+        account,
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
+    });
+
+    return m('.LoginSelector', [
+      m(ButtonGroup, { fluid: true }, [
+        m(Popover, {
+          class: 'login-selector-popover',
           closeOnContentClick: true,
           transitionDuration: 0,
           hoverCloseDelay: 0,
           position: 'top-end',
           trigger: m(Button, {
-            class: app.vm.activeAccount ? 'address-menu' : 'address-menu cui-button-icon',
             intent: 'none',
             size: 'sm',
             fluid: true,
-            label: m(Icon, { name: Icons.SETTINGS }),
+            compact: true,
+            label: (!app.chain && !app.community) ? 'No community'
+              : (app.user.activeAccounts.length === 0 || app.user.activeAccount === null) ? 'No address'
+                : m(User, { user: app.user.activeAccount }),
+            iconRight: Icons.CHEVRON_DOWN,
           }),
-          content: [
-            m(MenuItem, {
-              label: 'Go to profile',
-              iconLeft: Icons.USER,
-              onclick: (e) => {
-                m.route.set(`/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`);
-              },
-              disabled: !(
-                app.vm.activeAccount
-                  && app.vm.activeAccount.chain
-                  && m.route.get() !== `/${app.vm.activeAccount.chain.id}/account/${app.vm.activeAccount.address}`)
-            }),
-            app.vm.activeAccount
-              && m(MenuItem, {
+          content: m(Menu, { class: 'LoginSelectorMenu' }, [
+            // address selector - only shown in communities
+            (app.chain || app.community) && [
+              activeAddressesWithRole.map((account) => m(MenuItem, {
+                align: 'left',
+                basic: true,
+                onclick: (e) => {
+                  setActiveAccount(account);
+                },
+                label: m(UserBlock, { user: account, avatarSize: 24 }),
+              })),
+              m(MenuItem, {
                 onclick: () => app.modals.create({
-                  modal: EditProfileModal,
-                  data: app.vm.activeAccount
+                  modal: SelectAddressModal,
                 }),
-                iconLeft: Icons.EDIT,
-                label: 'Edit Profile'
+                iconLeft: Icons.USER,
+                label: 'Connect another address'
               }),
-            app.chain && m(MenuItem, {
-              onclick: async () => app.modals.create({
-                modal: EditIdentityModal,
-                data: { account: app.vm.activeAccount },
-              }),
-              iconLeft: Icons.LINK,
-              label: 'Set on-chain ID'
-            }),
-            m(MenuDivider),
-            (app.chain || app.community) && m(MenuItem, {
-              onclick: async () => app.modals.create({
-                modal: SelectAddressModal,
-              }),
-              iconLeft: Icons.USER,
-              label: 'Switch address'
-            }),
+              m(MenuDivider),
+            ],
+            // always shown
             m(MenuItem, {
               onclick: () => m.route.set('/settings'),
               iconLeft: Icons.SETTINGS,
               label: 'Settings'
-            }),
-            app.login?.isSiteAdmin && app.activeChainId() && m(MenuItem, {
-              onclick: () => m.route.set(`/${app.activeChainId()}/admin`),
-              iconLeft: Icons.USER,
-              label: 'Admin'
             }),
             m(MenuItem, {
               onclick: () => app.modals.create({ modal: FeedbackModal }),
@@ -147,9 +108,9 @@ const LoginSelector = {
               iconLeft: Icons.X_SQUARE,
               label: 'Logout'
             }),
-          ]
+          ]),
         }),
-      ])
+      ]),
     ]);
   }
 };

@@ -40,9 +40,9 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
       $.post(`${app.serverUrl()}/createWebhook`, {
         ...chainOrCommObj,
         webhookUrl,
-        address: app.vm.activeAccount.address,
+        address: app.user.activeAccount.address,
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       }).then((result) => {
         vnode.state.disabled = false;
         if (result.status === 'Success') {
@@ -91,7 +91,7 @@ const WebhooksForm: m.Component<IWebhooksFormAttrs, IWebhooksFormState> = {
                     ...chainOrCommObj,
                     webhookUrl: webhook.url,
                     auth: true,
-                    jwt: app.login.jwt,
+                    jwt: app.user.jwt,
                   }).then((result) => {
                     vnode.state.disabled = false;
                     if (result.status === 'Success') {
@@ -196,7 +196,7 @@ const UpgradeRolesForm: m.Component<IUpgradeRolesFormAttrs, IUpgradeRolesFormSta
             new_role: newRole,
             address: user.Address.address,
             ...chainOrCommObj,
-            jwt: app.login.jwt,
+            jwt: app.user.jwt,
           }).then((r) => {
             onRoleUpgrade(user, r.result);
           });

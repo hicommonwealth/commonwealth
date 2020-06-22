@@ -114,6 +114,17 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         hasMessage: vnode.attrs.hasMessage,
         blockCount: vnode.attrs.blockCount
       })
+      // m('td.val-age', '--'),
+      // m('td.val-action', [
+      //   m('button.nominate-validator.formular-button-primary', {
+      //     class: app.user.activeAccount ? '' : 'disabled',
+      //     onclick: (e) => {
+      //       e.preventDefault();
+      //       vnode.state.isNominating = !vnode.state.isNominating;
+      //       vnode.attrs.onChangeHandler(vnode.attrs.stash);
+      //     }
+      //   }, vnode.state.isNominating ? 'Un-Nominate' : 'Nominate'),
+      // ]),
     ]);
   }
 });

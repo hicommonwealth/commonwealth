@@ -10,8 +10,7 @@ import {
 } from 'construct-ui';
 
 import app, { ApiStatus } from 'state';
-import { featherIcon, link } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
+import { featherIcon, link, pluralize } from 'helpers';
 import { getProposalUrl } from 'shared/utils';
 import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
 import { ProposalType } from 'identifiers';
@@ -25,7 +24,6 @@ import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
 import { getSelectableCommunities } from 'views/components/header/community_selector';
-import { isMember } from 'views/components/membership_button';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
@@ -39,7 +37,7 @@ import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
-const TagListItems: m.Component<{}> = {
+const TagListings: m.Component<{}, { showMore: boolean }> = {
   view: (vnode) => {
     const featuredTags = {};
     const otherTags = {};
@@ -48,7 +46,7 @@ const TagListItems: m.Component<{}> = {
     const getTagRow = (name, id) => m(ListItem, {
       key: id,
       contentLeft: m(Icon, { name: Icons.HASH }),
-      label: name,
+      label: name.toLowerCase(),
       selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
       onclick: (e) => {
         e.preventDefault();
@@ -65,15 +63,24 @@ const TagListItems: m.Component<{}> = {
       }
     });
     const otherTagListing = Object.keys(otherTags)
-      .sort((a, b) => otherTags[b].name.localeCompare(otherTags[a].name))
+      .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
       .map((name, idx) => getTagRow(name, otherTags[name].id));
     const featuredTagListing = Object.keys(featuredTags)
       .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
       .map((name, idx) => getTagRow(name, featuredTags[name].id));
 
     return [
-      featuredTagListing,
-      otherTagListing,
+      m(List, featuredTagListing),
+      otherTagListing.length > 0 && [
+        vnode.state.showMore && m(List, { class: 'more-tags-list' }, otherTagListing),
+        m(ListItem, {
+          class: 'more-tags-toggle',
+          label: vnode.state.showMore ? 'Show less' : pluralize(otherTagListing.length, 'more tag'),
+          onclick: () => {
+            vnode.state.showMore = !vnode.state.showMore;
+          },
+        }),
+      ],
     ];
   }
 };
@@ -81,7 +88,7 @@ const TagListItems: m.Component<{}> = {
 const Sidebar: m.Component<{ activeTag: string }, {}> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
-    const activeAccount = app.vm.activeAccount;
+    const activeAccount = app.user.activeAccount;
 
     // chain menu
     const chains = {};
@@ -92,8 +99,14 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         chains[n.chain.network] = [n];
       }
     });
-    const myChains = Object.entries(chains).filter(([c, nodeList]) => isMember(c, null));
-    const myCommunities = app.config.communities.getAll().filter((c) => isMember(null, c.id));
+    const myChains = Object.entries(chains).filter(([c, nodeList]) => app.user.isMember({
+      chain: c,
+      account: app.user.activeAccount,
+    }));
+    const myCommunities = app.config.communities.getAll().filter((c) => app.user.isMember({
+      community: c.id,
+      account: app.user.activeAccount,
+    }));
 
     // sidebar menu
     const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
@@ -145,6 +158,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           });
         }),
         m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          label: 'Notification Settings',
+          onclick: (e) => m.route.set('/notification-settings'),
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.USER, }),
+          label: 'User Settings',
+          onclick: (e) => m.route.set('/settings'),
+        }),
+        m(ListItem, {
           contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
           label: 'Back to home',
           onclick: (e) => m.route.set('/'),
@@ -153,19 +176,19 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     ] : [
       // discussions
       m(List, { interactive: true }, [
-        m('h4', 'Discussions'),
+        m('h4', 'Discuss'),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.HOME }),
           active: onDiscussionsPage(m.route.get()),
           label: 'Home',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
         }),
-        m(TagListItems),
+        m(TagListings),
       ]),
       // proposals
       (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
         && m(List, { interactive: true }, [
-          m('h4', 'Voting & Staking'),
+          m('h4', 'Vote & Stake'),
           // proposals (substrate and cosmos only)
           !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
             && m(ListItem, {
@@ -214,7 +237,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
-          isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
+          app.user.isRoleOfCommunity({ role: 'admin', chain: app.activeChainId(), community: app.activeCommunityId() })
             && (app.community || app.chain)
             && m(AdminPanel),
           (app.community || app.chain)
@@ -230,7 +253,7 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         ]),
       // manage
       m(List, { interactive: true }, [
-        m('h4', 'Manage Community'),
+        m('h4', 'Manage'),
         m(ListItem, {
           active: onMembersPage(m.route.get()),
           label: 'Members',
@@ -242,8 +265,11 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           label: 'Tags',
           onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
         }),
-        isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId())
-          && m(AdminPanel),
+        app.user.isRoleOfCommunity({
+          role: 'admin',
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        }) && m(AdminPanel),
       ]),
       // // chat (all communities)
       // m(ListItem, {

@@ -19,12 +19,24 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
   }
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const thread = await models.OffchainThread.findOne({
       where: { id: req.body.thread_id, },
       include: [ models.Chain, models.OffchainCommunity ]
     });
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
+    const isVerifiedOwner = userOwnedAddressIds.indexOf(thread.author_id) !== -1;
+    const userRole = await models.Role.findOne({
+      where: thread.Chain ? {
+        address_id: userOwnedAddressIds,
+        chain_id: thread.Chain.id,
+      } : {
+        address_id: userOwnedAddressIds,
+        offchain_community_id: thread.OffchainCommunity.id,
+      },
+    });
+    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
+
+    if (!isVerifiedOwner && !isAdminOrMod) {
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 

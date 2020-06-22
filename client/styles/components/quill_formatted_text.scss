@@ -52,10 +52,10 @@
     }
     pre {
         font-family: $monospace-fonts;
-        font-size: 0.925em;
+        font-size: 0.866em;
         white-space: pre-wrap;
         margin: 22px 0;
-        padding: 10px 12px 12px;
+        padding: 12px 16px;
         background: #f4f4f4;
         border-radius: 3px;
     }
@@ -70,7 +70,7 @@
     // list styles
     ul, ol {
         li {
-            margin: 6px 0;
+            margin: 2px 0;
         }
     }
     ul.checklist {
@@ -139,16 +139,10 @@
     kbd,
     samp {
         font-family: $monospace-fonts;
-        font-size: 0.85em;
-        padding-bottom: 2px;
-        padding-top: 2px;
+        font-size: 0.833em;
+        padding: 2px 4px;
         background: #eee;
-        border-radius: 3px;
-    }
-    code:before,
-    code:after {
-        content: '\A0';
-        letter-spacing: -2px;
+        border-radius: 4px;
     }
     small {
         font-size: 80%;
@@ -171,57 +165,27 @@
 
 // mixin for collapsing large text blocks to <200px in height
 @mixin collapsible {
-    &.collapsed {
-        max-height: 180px;
-        overflow: hidden;
-        h1, h2, h3, h4, h5, h6 {
-            font-size: 1em;
-            margin: 0;
+}
+
+@mixin hidden-formatting {
+    .hidden-formatting {
+        margin: 6px 0;
+        &:first-child {
+            margin-top: 0;
         }
-        blockquote {
-            padding: 0 0 0 15px;
-            margin: 0;
-            border: none;
-            border-left: 2px solid #e8e8e8;
+        &:last-child {
+            margin-bottom: 0;
         }
-        &:after {
-            content: "";
-            position: absolute;
-            z-index: 1;
-            bottom: 0;
-            left: 0;
-            pointer-events: none;
-            background-image: linear-gradient(
-                to bottom,
-                hsla(0, 0%, 100%, 0) 0%,
-                hsla(0, 0%, 100%, 0.013) 9.4%,
-                hsla(0, 0%, 100%, 0.049) 17.5%,
-                hsla(0, 0%, 100%, 0.104) 24.7%,
-                hsla(0, 0%, 100%, 0.175) 31.1%,
-                hsla(0, 0%, 100%, 0.259) 36.8%,
-                hsla(0, 0%, 100%, 0.352) 42.1%,
-                hsla(0, 0%, 100%, 0.45) 47.1%,
-                hsla(0, 0%, 100%, 0.55) 52.1%,
-                hsla(0, 0%, 100%, 0.648) 57.2%,
-                hsla(0, 0%, 100%, 0.741) 62.5%,
-                hsla(0, 0%, 100%, 0.825) 68.3%,
-                hsla(0, 0%, 100%, 0.896) 74.8%,
-                hsla(0, 0%, 100%, 0.951) 82.1%,
-                hsla(0, 0%, 100%, 0.987) 90.5%,
-                hsl(0, 0%, 100%) 100%
-            );
-            width: 100%;
-            height: 4em;
-        }
-        &.suppress-fadeout:after {
-            display: none;
+        .hidden-formatting-listitem + .hidden-formatting-listitem {
+            margin-top: 6px;
         }
     }
 }
 
 .QuillFormattedText {
     position: relative;
-    line-height: 1.45;
+    line-height: 1.5;
     @include formatted-text();
     @include collapsible();
+    @include hidden-formatting();
 }

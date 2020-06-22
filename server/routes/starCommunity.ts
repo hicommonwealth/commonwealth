@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 
+export const Errors = {
+  NoStarValue: 'Must specify true or false to set starred status',
+};
+
 const starCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
 
@@ -24,7 +28,7 @@ const starCommunity = async (models, req: Request, res: Response, next: NextFunc
     }
     return res.json({ status: 'Success' });
   } else {
-    return next(new Error('Must specify true or false to set starred status'));
+    return next(new Error(Errors.NoStarValue));
   }
 };
 

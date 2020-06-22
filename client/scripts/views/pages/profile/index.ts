@@ -134,7 +134,7 @@ import PageNotFound from '../404';
 //         ]),
 //       ]),
 //       m('.summary-row', [
-//         (app.vm.activeAccount && account.address === app.vm.activeAccount.address) ? [
+//         (app.user.activeAccount && account.address === app.user.activeAccount.address) ? [
 //           // for your account
 //           isSubstrate && vnode.state.dynamic.proxyFor && m(ResignProxyButton, { account }),
 //           isSubstrate && m(SetProxyButton, { account }),
@@ -147,10 +147,10 @@ import PageNotFound from '../404';
 //           // for other accounts
 //           m('button.SendEDGButton', {
 //             disabled: !account
-//               || !app.vm.activeAccount
-//               || account.address === app.vm.activeAccount.address,
+//               || !app.user.activeAccount
+//               || account.address === app.user.activeAccount.address,
 //             onclick: async (e) => {
-//               const sender: Account<Coin> = app.vm.activeAccount;
+//               const sender: Account<Coin> = app.user.activeAccount;
 //               const amount = await inputModalWithText(`How much ${app.chain.currency}?`)();
 //               if (!amount || isNaN(parseInt(amount, 10))) return;
 //               const recipient = account;
