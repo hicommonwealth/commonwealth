@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -21,10 +22,12 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
   try {
     const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const thread = await models.OffchainThread.findOne({
-      where: { id: req.body.thread_id, },
+      where: {
+        id: req.body.thread_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
       include: [ models.Chain, models.OffchainCommunity ]
     });
-    const isVerifiedOwner = userOwnedAddressIds.indexOf(thread.author_id) !== -1;
     const userRole = await models.Role.findOne({
       where: thread.Chain ? {
         address_id: userOwnedAddressIds,

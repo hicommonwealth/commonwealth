@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
@@ -41,14 +42,13 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
   };
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const comment = await models.OffchainComment.findOne({
-      where: { id: req.body.id },
+      where: {
+        id: req.body.id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
     });
-
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
-      return next(new Error(Errors.NotAddrOwner));
-    }
     const arr = comment.version_history;
     arr.unshift(req.body.version_history);
     comment.version_history = arr;

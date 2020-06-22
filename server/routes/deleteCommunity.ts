@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,13 +19,13 @@ const deleteCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const community = await models.OffchainCommunity.findOne({
-      where: { id: req.body.community_id },
+      where: {
+        id: req.body.community_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
     });
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(community.creator_id) === -1) {
-      return next(new Error(Errors.NotCreate));
-    }
     const communityTags = await community.getTags();
     community.removeTags(communityTags);
     // actually delete

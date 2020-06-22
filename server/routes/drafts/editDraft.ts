@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from '../../../shared/logging';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
@@ -40,10 +41,11 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
   };
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id,
+        address_id: { [Op.in]: userOwnedAddressIds },
       },
       include: [
         models.Address,
@@ -51,9 +53,6 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
       ]
     });
     if (!draft) return next(new Error(Errors.NotFound));
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.address_id) === -1) {
-      return next(new Error(Errors.NotOwner));
-    }
     if (body) draft.body = body;
     if (title) draft.title = title;
     if (tag) draft.tag = tag;
