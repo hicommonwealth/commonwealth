@@ -3,11 +3,15 @@
 .Sublayout {
     display: flex;
     max-width: $sublayout-max-width;
-    margin: 0 auto;
+    margin: 0;
 
     > .left-sidebar {
         width: $sidebar-width;
         margin-right: $gutter-width;
+        min-width: 300px !important;
+        margin-right: 35px !important;
+        background-color: #F4F4F9 !important;
+        min-height: 100vh;
     }
     > .right-sidebar {
         width: $sidebar-width;

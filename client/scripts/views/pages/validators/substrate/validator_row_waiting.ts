@@ -36,7 +36,7 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
       : null;
     const nominatorsList = nominations[vnode.attrs.stash] || [];
 
-    return m('tr.ValidatorRow', [
+    return m(`tr.ValidatorRow${vnode.attrs.toBeElected ? '.waiting' : '.nextValidator'}`, [
       m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
       })),
