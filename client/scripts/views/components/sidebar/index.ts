@@ -37,7 +37,7 @@ import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
 import TokenApprovalModal from 'views/modals/token_approval_modal';
 
-const TagListings: m.Component<{}, { showMore: boolean }> = {
+const TagListings: m.Component<{}, {}> = {
   view: (vnode) => {
     const featuredTags = {};
     const otherTags = {};
@@ -71,16 +71,7 @@ const TagListings: m.Component<{}, { showMore: boolean }> = {
 
     return [
       m(List, featuredTagListing),
-      otherTagListing.length > 0 && [
-        vnode.state.showMore && m(List, { class: 'more-tags-list' }, otherTagListing),
-        m(ListItem, {
-          class: 'more-tags-toggle',
-          label: vnode.state.showMore ? 'Show less' : pluralize(otherTagListing.length, 'more tag'),
-          onclick: () => {
-            vnode.state.showMore = !vnode.state.showMore;
-          },
-        }),
-      ],
+      otherTagListing.length > 0 && m(List, { class: 'more-tags-list' }, otherTagListing),
     ];
   }
 };
