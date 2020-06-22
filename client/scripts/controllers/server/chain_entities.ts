@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
+import app from 'state';
 import { get } from 'lib/util';
-
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent } from 'models';
 import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
@@ -46,6 +46,10 @@ class ChainEntityController {
         this._store.add(entity);
       }
     });
+  }
+
+  public offences(callback) {
+    return get('/getOffences', { chain: app.chain.id, jwt: app.login.jwt }, callback);
   }
 
   public deinit() {

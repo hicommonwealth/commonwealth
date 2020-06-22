@@ -33,7 +33,7 @@ const offence = {
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async () => {
-    await app.staking.offences(offence.setCount);
+    await app.chainEntities.offences(offence.setCount);
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class

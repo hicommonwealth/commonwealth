@@ -19,7 +19,6 @@ import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import ReactionsController from './controllers/server/reactions';
-import StakingController from './controllers/server/staking';
 import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
@@ -50,7 +49,6 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
-  staking: StakingController;
   tags: TagsController;
   chainEntities: ChainEntityController;
   communities: CommunitiesController;
@@ -120,7 +118,6 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
-  staking: new StakingController(),
   tags: new TagsController(),
   chainEntities: new ChainEntityController(),
   communities: new CommunitiesController(),
