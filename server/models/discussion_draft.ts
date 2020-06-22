@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const DiscussionDraft = sequelize.define('DiscussionDraft', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    author_id: { type: DataTypes.INTEGER, allowNull: false },
+    address_id: { type: DataTypes.INTEGER, allowNull: false },
     title: { type: DataTypes.TEXT, allowNull: true },
     tag: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
@@ -12,14 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
     underscored: true,
     indexes: [
-      { fields: ['author_id'] },
+      { fields: ['address_id'] },
     ],
   });
 
   DiscussionDraft.associate = (models) => {
     models.DiscussionDraft.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.DiscussionDraft.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'author_id', targetKey: 'id' });
+    models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.DiscussionDraft.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
       constraints: false,

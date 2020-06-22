@@ -51,7 +51,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
       ]
     });
     if (!draft) return next(new Error(Errors.NotFound));
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.author_id) === -1) {
+    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.address_id) === -1) {
       return next(new Error(Errors.NotOwner));
     }
     if (body) draft.body = body;

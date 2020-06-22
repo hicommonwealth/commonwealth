@@ -13,7 +13,7 @@ const getDiscussionDrafts = async (models, req: Request, res: Response, next: Ne
 
   const drafts = await models.DiscussionDraft.findAll({
     where: {
-      author_id: {
+      address_id: {
         [Op.in]: addressIds,
       }
     },

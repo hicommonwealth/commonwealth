@@ -20,13 +20,13 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
 
   const draftContent = community ? {
     community: community.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     tag
   } : {
     chain: chain.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     tag

@@ -75,7 +75,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
   });
   const discussionDrafts = await models.DiscussionDraft.findAll({
     where: {
-      author_id: { [Op.in]: myAddressIds }
+      address_id: { [Op.in]: myAddressIds }
     },
     includes: [
       models.Address,

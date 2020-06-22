@@ -67,7 +67,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   const threadContent = community ? {
     community: community.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     version_history: versionHistory,
@@ -77,7 +77,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     read_only: readOnly,
   } : {
     chain: chain.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     version_history: versionHistory,
