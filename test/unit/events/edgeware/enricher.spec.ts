@@ -1,4 +1,5 @@
 import chai from 'chai';
+import BN from 'bn.js';
 import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, ReferendumInfo,
   Proposal, TreasuryProposal, Votes, Event, Extrinsic,
@@ -15,6 +16,7 @@ const { assert } = chai;
 
 const blockNumber = 10;
 const api = constructFakeApi({
+  currentIndex: async () => new BN(12),
   bonded: async (stash) => stash !== 'alice-stash'
     ? constructOption()
     : constructOption('alice' as unknown as AccountId),
@@ -704,6 +706,49 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
 
+  /** offences events */
+  it('should enrich new offence event', async () => {
+    const kind = SubstrateEventKind.Offence;
+    const event = constructEvent([ 'offline', '10000', true ], 'offences', [ 'Kind', 'OpaqueTimeSlot', 'boolean' ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        offenceKind: 'offline',
+        opaqueTimeSlot: '10000',
+        applied: true
+      }
+    });
+  });
+
+  /** imOnline events */
+  it('should enrich new some-offline event', async () => {
+    const kind = SubstrateEventKind.SomeOffline;
+    const validators = api.createType('Vec<IdentificationTuple>');
+    const event = constructEvent([ validators ], 'offences', [ 'Vec<IdentificationTuple>' ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        sessionIndex: 11,
+        validators
+      }
+    });
+  });
+  it('should enrich new all-good event', async () => {
+    const kind = SubstrateEventKind.AllGood;
+    const event = constructEvent([ ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        sessionIndex: 11
+      }
+    });
+  });
   /** other */
   it('should not enrich invalid event', (done) => {
     const kind = 'invalid-event' as SubstrateEventKind;

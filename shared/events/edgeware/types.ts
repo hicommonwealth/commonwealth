@@ -1,5 +1,6 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
-
+import { IdentificationTuple } from '@polkadot/types/interfaces/session';
+import { Vec } from '@polkadot/types';
 /**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).
@@ -31,7 +32,7 @@ export enum SubstrateEntityKind {
   DemocracyPreimage = 'democracy-preimage',
   TreasuryProposal = 'treasury-proposal',
   CollectiveProposal = 'collective-proposal',
-  SignalingProposal = 'signaling-proposal',
+  SignalingProposal = 'signaling-proposal'
 }
 
 // Each kind of event we handle
@@ -89,6 +90,13 @@ export enum SubstrateEventKind {
 
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
+
+  // offences events
+  Offence = 'offences-offence',
+
+  // imOnline events
+  AllGood = 'im-online-all-good',
+  SomeOffline = 'im-online-some-offline'
 }
 
 interface ISubstrateEvent {
@@ -374,6 +382,30 @@ export interface ISubstrateTreasuryRewardMintingV2 extends ISubstrateEvent {
   potAddress: SubstrateAccountId;
 }
 
+/**
+ * Offences Events
+ */
+export interface ISubstrateOffence extends ISubstrateEvent {
+  kind: SubstrateEventKind.Offence;
+  offenceKind: string;
+  opaqueTimeSlot: string;
+  applied: boolean;
+}
+
+
+/**
+ * imOnline Events
+ */
+export interface ISubstrateAllGood extends ISubstrateEvent {
+  kind: SubstrateEventKind.AllGood;
+  sessionIndex: number;
+}
+export interface ISubstrateSomeOffline extends ISubstrateEvent {
+  kind: SubstrateEventKind.SomeOffline;
+  sessionIndex: number;
+  validators: Vec<IdentificationTuple>;
+}
+
 export type ISubstrateEventData =
   ISubstrateSlash
   | ISubstrateReward
@@ -412,6 +444,9 @@ export type ISubstrateEventData =
   | ISubstrateSignalingVotingCompleted
   | ISubstrateTreasuryRewardMinting
   | ISubstrateTreasuryRewardMintingV2
+  | ISubstrateOffence
+  | ISubstrateSomeOffline
+  | ISubstrateAllGood
 // eslint-disable-next-line semi-style
 ;
 
