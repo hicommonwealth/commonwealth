@@ -6,7 +6,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState } from 'construct-ui';
+import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -65,7 +65,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > (scrollHeight - 400)) {
+      if (scrollPos > (scrollHeight - 4)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
           m.redraw();
@@ -112,7 +112,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
-    const getSingleTagListing = (tag) => {
+    const getSingleTagListing = (tag_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
           m(ProposalsLoadingRow),
@@ -127,7 +127,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.tag && thread.tag.name === tag)
+        .filter((thread) => thread.tag && thread.tag.name === tag_)
         .sort(orderDiscussionsbyLastComment);
 
       if (sortedThreads.length > 0) {
@@ -176,6 +176,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         return ago - (ago % week);
       });
       const weekIndexes = Object.keys(proposalsByWeek);
+      debugger
       vnode.state.hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
 
       // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
@@ -246,7 +247,13 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           m(EmptyChannelPlaceholder, { communityName }),
         ],
         allProposals.length !== 0
-        && getRecentPostsSortedByWeek()
+        && getRecentPostsSortedByWeek(),
+        vnode.state.hasOlderPosts
+        && m('.infinite-scroll-spinner-wrap', [
+          m(Spinner, {
+            active: vnode.state.hasOlderPosts,
+          })
+        ])
       ]);
     };
 

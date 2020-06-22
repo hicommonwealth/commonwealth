@@ -17,6 +17,7 @@ export const Errors = {
 };
 
 const getUploadSignature = async (models, req: Request, res: Response, next: NextFunction) => {
+  console.log(req);
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
