@@ -23,8 +23,18 @@ interface IPreHeaderAttrs {
   nominations;
   sender: SubstrateAccount;
 }
+const offence = {
+  count: null,
+  setCount(offences) {
+    offence.count = offences.length;
+    m.redraw();
+  }
+};
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
+  oncreate: async () => {
+    await app.chainEvents.offences(offence.setCount);
+  },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
@@ -93,6 +103,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
           m('.preheader-item-text', `${nominators.length}`),
+        ]),
+        m('.validators-preheader-item', [
+          m('h3', 'Total Offences'),
+          m('.preheader-item-text', offence.count === null
+            ? 'Loading'
+            : `${offence.count}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Last Block'),

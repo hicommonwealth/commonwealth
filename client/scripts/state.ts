@@ -15,6 +15,8 @@ import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
 import CommunitiesController from './controllers/server/communities';
+import ChainEventsController from './controllers/server/chain_events';
+import ChainEntityController from './controllers/server/chain_entities';
 import UserController from './controllers/server/user/index';
 
 export enum ApiStatus {
@@ -42,6 +44,8 @@ export interface IApp {
   threads: ThreadsController;
   reactions: ReactionsController;
   tags: TagsController;
+  chainEntities: ChainEntityController;
+  chainEvents: ChainEventsController;
   communities: CommunitiesController;
   user: UserController;
   // XXX: replace this with some app.chain helper
@@ -83,6 +87,8 @@ const app: IApp = {
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
+  chainEntities: new ChainEntityController(),
+  chainEvents: new ChainEventsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 

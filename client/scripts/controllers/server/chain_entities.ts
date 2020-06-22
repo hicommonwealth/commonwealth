@@ -1,10 +1,8 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-import _ from 'lodash';
-
+import app from 'state';
+import { get } from 'lib/util';
 import { ChainEntityStore } from 'stores';
 import { ChainEntity, ChainEvent, ChainEventType, IChainAdapter } from 'models';
-import app from 'state';
 import {
   CWEvent,
   eventToEntity,
@@ -20,16 +18,6 @@ export enum EntityRefreshOption {
   CompletedEntities = 'completed-entities',
   Nothing = 'nothing',
 }
-
-const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
-};
 
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
