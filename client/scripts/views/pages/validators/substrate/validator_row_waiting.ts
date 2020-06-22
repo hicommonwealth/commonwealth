@@ -29,7 +29,7 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
       ? expandInfo(query)
       : null;
     const nominatorsList = nominations[vnode.attrs.stash] || [];
-    return m(`tr.ValidatorRow${vnode.attrs.toBeElected ? '.nextValidator' : '.waiting'}`, [
+    return m(`tr.ValidatorRow${vnode.attrs.toBeElected ? '.waiting' : '.nextValidator'}`, [
       m('td.val-stash', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })),
       m('td.val-nominations', [
         m('a.val-nominations', {

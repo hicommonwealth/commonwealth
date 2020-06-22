@@ -11,16 +11,16 @@
     letter-spacing: 0.2px;
 }
 .bar-outer {
-  width: 20em;
-  height: 1em;
-  border: #999 1px solid;
+  width: inherit;
+  height: 2px;
+  border: #DFE8EE 1px solid;
+  margin-top: 8px !important;
 }
 
 .bar-inner {
   width: 0%;
-  height: 100%;
-  background-color: #3c0;
-
+  height: 2px;
+  background-color: #35D413;
 }
 
 .NewStashForm {
@@ -31,6 +31,22 @@
   button {
     margin: 6px 0;
   }
+}
+
+.LoadingPage .left-sidebar{
+  display: none !important;
+}
+
+// avatar div
+.user-avatar{
+  width: 25px !important;
+  height: 25px !important;
+  padding-right: 14px !important;
+}
+
+.Jdenticon{
+  width: 25px !important;
+  height: 25px !important;
 }
 
 // removed right sidebar
@@ -105,48 +121,63 @@
   }
 }
 
-.Jdenticon{
-    height: 20px !important;
-    width: 20px !important;
-}
-
 .Tabs a.tab-entry{
     padding-right: 30px !important;
     padding-left: 15px !important;
     font-size: 16px !important;
 }
 
-.val-hash{
-    overflow-wrap: break-word !important;
-    min-width: 500px !important;
-    padding-right: 10vw !important;
-}
 
 .Validators {
 
     font-family: 'Inter', sans-serif !important;
-    min-width: 70vw;
+    min-width: 80vw;
     overflow-x: scroll;
     padding-top: 40px !important;
     th {
-        @include small-gray;
         text-align: left;
         border-bottom: none;
-        overflow-wrap: break-word
+        overflow-wrap: break-word;
+        font-family: Inter;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 12px;
+        line-height: 120%;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
+        color: #999;
     }
     td {
-        font-size: 15px;
-        border-bottom: 1;
+        font-family: Inter;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
         padding-top: 15px;
         padding-bottom: 14px;
+        line-height: 120%;
+        letter-spacing: 0.2px;
         overflow: hidden;
+        overflow-wrap: break-word;
+    }
 
-    }
     td .User a.user-display-name {
-        font-size: 15px;
+        font-family: Inter;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        font-size: 16px;
+        line-height: 120%;
+        letter-spacing: -1.2px;
+        overflow-wrap: break-word !important;
+        
     }
+
     .val-name {
         font-weight: 700;
+        font-family: Inter;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
     }
     .val-action {
         text-align: right;
@@ -166,20 +197,43 @@
 }
 
 .ValidatorPage {
+    margin: 0 !important;
   .validators-preheader {
     display: flex;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     .validators-preheader-item {
       flex: 1;
       max-width: 200px;
       margin-right: 30px;
     }
     .validators-preheader-item h3 {
-      @include small-gray;
-      margin: 0 0 6px;
+        text-align: left;
+        border-bottom: none;
+        overflow-wrap: break-word;
+        font-family: Inter;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 12px;
+        line-height: 120%;
+        letter-spacing: 0.2px;
+        text-transform: uppercase;
+        color: #999;
     }
     .validators-preheader-item .validators-preheader-item-text {
-      font-size: 17px;
+      font-family: Inter;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 21px;
+      line-height: 120%;
+      letter-spacing: -0.2px;
+    }
+    .preheader-item-text{
+      font-family: Inter !important;
+      font-style: normal !important;
+      font-weight: normal !important;
+      font-size: 21px !important;
+      line-height: 120% !important;
+      letter-spacing: -0.2px !important;
     }
   }
 }
@@ -189,11 +243,6 @@
     padding-top: 75px !important;
 }
 
-.left-sidebar{
-    min-width: 300px !important;
-    margin-right: 40px !important;
-    background-color: #F4F4F9 !important;
-}
 
 .cui-list{
     background-color: #F4F4F9 !important;
@@ -230,4 +279,52 @@
 .gray-text{
     color: #536E7C !important;
     padding-left: 5px !important;
+}
+
+// Main Table
+
+.validators-table{
+  width: auto;
+  min-width: 1560px;
+  border-collapse: collapse !important;
+    // border-spacing: 40px !important;
+}
+
+.validators-table td{
+  padding-right: 50px;
+}
+
+
+// ----------------Waiting class styles
+// Column that shows nothing on waiting validators
+
+.waiting .val-im-online{
+    display: none !important;
+}
+
+
+
+.waiting td{
+    background-color: #5b7af64d !important;
+    padding-left: 10px !important;
+}
+
+
+// padding seperation around wifi
+.cui-icon-wifi{
+    padding-right: 5px !important;
+}
+
+
+.val-im-online{
+    padding-right: 0px !important;
+}
+
+.val-last-hash{
+  padding-right: 20px !important;
+}
+
+.val-controller, .val-stash{
+  // padding-right: 10px !important;
+
 }
