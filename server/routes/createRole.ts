@@ -55,7 +55,7 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
     is_active: true,
   });
 
-  return res.json({ status: 'Success', result: newRole.toJSON() });
+  return res.json({ status: 'Success', result: { newRole, subscription } });
 };
 
 export default createRole;
