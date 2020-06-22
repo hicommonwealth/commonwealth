@@ -3,8 +3,8 @@ const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
 const SubstrateEventKinds = {
-  AllGood : 'all-good',
-  SomeOffline : 'some-offline'
+  AllGood : 'im-online-all-good',
+  SomeOffline : 'im-online-some-offline'
 };
 
 module.exports = {
@@ -35,9 +35,9 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete('ChainEventTypes', {
         '$or' : [{
-          event_name: 'all-good'
+          event_name: SubstrateEventKinds.AllGood
         }, {
-          event_name: 'some-offline'
+          event_name: SubstrateEventKinds.SomeOffline
         }],
       }, { transaction: t });
     });

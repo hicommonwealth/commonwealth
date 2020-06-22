@@ -92,11 +92,11 @@ export enum SubstrateEventKind {
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 
   // offences events
-  Offence = 'offence',
+  Offence = 'offences-offence',
 
   // imOnline events
-  AllGood = 'all-good',
-  SomeOffline = 'some-offline'
+  AllGood = 'im-online-all-good',
+  SomeOffline = 'im-online-some-offline'
 }
 
 interface ISubstrateEvent {

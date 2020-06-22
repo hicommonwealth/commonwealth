@@ -3,7 +3,7 @@ const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
 const SubstrateEventKinds = {
-  Offence: 'offence'
+  Offence: 'offences-offence'
 };
 
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.bulkDelete('ChainEventTypes', {
-        event_name: 'offence',
+        event_name: SubstrateEventKinds.Offence,
       }, { transaction: t });
     });
   }
