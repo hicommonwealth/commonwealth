@@ -226,7 +226,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               class: !author ? 'disabled' : '',
               intent: 'primary',
               label: 'Create link',
-              name: 'submission',
+              name: 'submit',
               onclick: () => {
                 if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                   vnode.state.error.url = 'Must provide a valid URL.';
@@ -295,6 +295,25 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
           m(FormGroup, [
             m(Button, {
               class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              intent: 'primary',
+              onclick: async () => {
+                const { form, quillEditorState } = vnode.state;
+                vnode.state.error = newThread(form, quillEditorState, author);
+                if (!vnode.state.error) {
+                  if (vnode.state.fromDraft) {
+                    await app.user.discussionDrafts.delete(vnode.state.fromDraft);
+                  }
+                  setTimeout(() => {
+                    $(vnode.dom).trigger('modalexit');
+                  }, 0);
+                }
+              },
+              label: 'Create thread',
+              name: 'submit',
+              tabindex: 4
+            }),
+            m(Button, {
+              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
               intent: 'none',
               onclick: () => {
                 const { form, quillEditorState } = vnode.state;
@@ -311,27 +330,8 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   console.error(e);
                 }
               },
-              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Save as draft',
-              name: 'saving',
-              tabindex: 4
-            }),
-            m(Button, {
-              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-              intent: 'primary',
-              onclick: async () => {
-                const { form, quillEditorState } = vnode.state;
-                vnode.state.error = newThread(form, quillEditorState, author);
-                if (!vnode.state.error) {
-                  if (vnode.state.fromDraft) {
-                    await app.user.discussionDrafts.delete(vnode.state.fromDraft);
-                  }
-                  setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
-                  }, 0);
-                }
-              },
-              label: (vnode.state.uploadsInProgress > 0) ? 'Uploading...' : 'Create thread',
-              name: 'submission',
+              label: 'Save as draft',
+              name: 'save',
               tabindex: 4
             }),
           ]),
