@@ -17,6 +17,7 @@ import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/Poss
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
+import { async } from 'rxjs/internal/scheduler/async';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateIntervalMessage: string, }> = {
   oninit: (vnode) => {
@@ -615,6 +616,169 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
   },
 };
 
+interface IGeneralNewThreadsAndCommentsAttrs {
+  communities: CommunityInfo[];
+  subscriptions: NotificationSubscription[];
+}
+
+interface IGeneralCommunityNotificationsState {
+  generalStatus: boolean;
+  emailStatus: boolean;
+}
+
+const GeneralNewThreadsAndComments:
+  m.Component<IGeneralNewThreadsAndCommentsAttrs, IGeneralCommunityNotificationsState > = {
+    oninit: (vnode) => {
+      vnode.state.generalStatus = null;
+      vnode.state.emailStatus = null;
+    },
+    onupdate: (vnode) => {
+      const { communities, subscriptions } = vnode.attrs;
+      const communityIds = communities.map((c) => c.id);
+      const someThreads = subscriptions.some((s) => communityIds.includes(s.objectId));
+      const everyThread = subscriptions.every((s) => communityIds.includes(s.objectId));
+      vnode.state.generalStatus = (everyThread) ? true : (someThreads) ? null : false;
+    },
+    view: (vnode) => {
+      const { communities, subscriptions } = vnode.attrs;
+      const { generalStatus } = vnode.state;
+      return m('tr.GeneralNewThreadsAndComments', [
+        m('td', 'New threads and comments'),
+        m('td', [
+          m(Checkbox, {
+            indeterminate: (generalStatus === null),
+            checked: generalStatus,
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (generalStatus === null) {
+                console.dir('indeterminate');
+                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive
+                vnode.state.generalStatus = true;
+              } else if (generalStatus) {
+                console.dir('checked');
+                // TODO: For each NewThread subscription, mark isActive false
+                vnode.state.generalStatus = false;
+              } else {
+                console.dir('unchecked');
+                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive
+                vnode.state.generalStatus = null;
+              }
+              m.redraw();
+            }
+          }),
+        ]),
+        m('td', [
+          m(Checkbox, {
+            disabled: !generalStatus,
+            checked: emailStatus,
+            indeterminate: (generalStatus === null),
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (generalStatus) {
+                // TODO: mark all community-level subscriptions immediateEmail = false;
+              } else {
+                // TODO: mark all community-level subscriptions immediateEmail = true;
+              }
+              m.redraw();
+            }
+          })
+        ])
+      ]);
+    },
+  };
+
+interface IGeneralCommunityNotificationsAttrs {
+  subscriptions: NotificationSubscription[];
+  communities: CommunityInfo[];
+}
+
+const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsAttrs> = {
+  view: (vnode) => {
+    const { subscriptions, communities } = vnode.attrs;
+    const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    return [
+      mentionsSubscription
+        && m('tr.mentions', [
+          m('td', 'Mentions:'),
+          m('td', [
+            m(Checkbox, {
+              size: 'lg',
+              checked: mentionsSubscription.isActive,
+              onchange: async (e) => {
+                e.preventDefault();
+                if (mentionsSubscription.isActive) {
+                  await app.user.notifications.disableSubscriptions([mentionsSubscription]);
+                } else {
+                  await app.user.notifications.enableSubscriptions([mentionsSubscription]);
+                }
+                m.redraw();
+              }
+            }),
+          ]),
+          m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
+        ]),
+      m(GeneralNewThreadsAndComments, { communities, subscriptions }),
+        // m(GeneralPastThreadsAndComments, { subscriptions }),
+
+    ];
+  },
+};
+
+interface ICommunityNotificationsAttrs {
+  subscriptions: NotificationSubscription[];
+  communities: CommunityInfo[];
+}
+
+interface ICommunityNotificationsState {
+  selectedCommunity: CommunityInfo;
+  communityIds: string[];
+}
+
+const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
+  oninit: (vnode) => {
+    vnode.state.selectedCommunity = null;
+    vnode.state.communityIds = ['All communities'];
+    vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
+  },
+  view: (vnode) => {
+    const { subscriptions, communities } = vnode.attrs;
+    const { selectedCommunity, communityIds } = vnode.state;
+    return m('.CommunityNotifications', [
+      m('.header', [
+        m('h2', 'Discussions Notifications'),
+        m(Select, {
+          default: 'All communities',
+          options: communityIds,
+          onchange: (e) => {
+            const target = (e.target as any).value;
+            if (target === 'All communities') {
+              vnode.state.selectedCommunity = null;
+            } else {
+              const community = communities.find((c) => target === c.name);
+              vnode.state.selectedCommunity = community;
+            }
+            m.redraw();
+          },
+        }),
+      ]),
+      m(Table, {
+        class: 'NotificationsTable'
+      }, [
+        m('tr', [
+          m('th', null),
+          m('th', 'In app'),
+          m('th', 'By email'),
+        ]),
+        (selectedCommunity === null) && [
+          m(GeneralCommunityNotifications, { communities, subscriptions }),
+        ]
+      ])
+    ]);
+  }
+};
+
 interface INotificationSettingsState {
   selectedFilter: string;
   chains: ChainInfo[];
@@ -674,7 +838,8 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     }, [
       m('.forum-container', [
         (selectedFilter === 'default')
-          && m(UserSubscriptions, { subscriptions }),
+          && m(CommunityNotifications, { subscriptions, communities, }),
+        // && m(UserSubscriptions, { subscriptions }),
         (selectedFilter === 'active')
           && m(ActiveSubscriptions, { subscriptions }),
         (chainIds.includes(selectedFilter))
