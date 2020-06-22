@@ -1,6 +1,7 @@
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
+import { NotificationCategories } from '../../shared/types';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -45,6 +46,13 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
     address_id: req.body.address_id,
     offchain_community_id: community.id,
     permission: 'member',
+  });
+
+  const subscription = await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewThread,
+    object_id: (chain) ? chain.id : community.id,
+    is_active: true,
   });
 
   return res.json({ status: 'Success', result: newRole.toJSON() });
