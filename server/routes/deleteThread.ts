@@ -28,6 +28,10 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       },
       include: [ models.Chain, models.OffchainCommunity ]
     });
+    if (!thread) {
+      return next(new Error(DeleteThreadErrors.NoPermission));
+    }
+
     const userRole = await models.Role.findOne({
       where: thread.Chain ? {
         address_id: userOwnedAddressIds,
@@ -37,9 +41,9 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
         offchain_community_id: thread.OffchainCommunity.id,
       },
     });
-    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
 
-    if (!isVerifiedOwner && !isAdminOrMod) {
+    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
+    if (!isAdminOrMod) {
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 

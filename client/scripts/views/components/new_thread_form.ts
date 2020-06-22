@@ -14,6 +14,7 @@ import { OffchainTag } from 'client/scripts/models';
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 import { confirmationModalWithText } from '../modals/confirm_modal';
+import { notifySuccess } from '../../controllers/app/notifications';
 
 interface IState {
   form: IThreadForm,
@@ -320,6 +321,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 try {
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   if (vnode.attrs.isModal && !vnode.state.error?.draft) {
+                    notifySuccess('Draft saved');
                     setTimeout(() => {
                       $(vnode.dom).trigger('modalexit');
                     }, 0);
