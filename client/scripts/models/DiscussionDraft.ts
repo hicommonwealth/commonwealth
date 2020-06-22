@@ -1,5 +1,4 @@
 import moment from 'moment-twitter';
-import { IUniqueId } from './interfaces';
 import OffchainAttachment from './OffchainAttachment';
 
 class DiscussionDraft {
@@ -14,7 +13,6 @@ class DiscussionDraft {
   public readonly tag: string;
   public readonly community: string;
   public readonly chain: string;
-  public readonly slug = 'draft';
 
   constructor(
     author: string,
@@ -25,6 +23,7 @@ class DiscussionDraft {
     body: string,
     tag: string,
     attachments: OffchainAttachment[],
+    authorChain?: string,
   ) {
     this.author = author;
     this.title = title;
@@ -34,6 +33,7 @@ class DiscussionDraft {
     this.tag = tag;
     this.community = community;
     this.chain = chain;
+    this.authorChain = authorChain;
   }
 }
 

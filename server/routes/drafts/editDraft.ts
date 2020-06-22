@@ -58,7 +58,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     if (title) draft.title = title;
     if (tag) draft.tag = tag;
     await draft.save();
-    attachFiles();
+    await attachFiles();
 
     return res.json({ status: 'Success', result: draft.toJSON() });
   } catch (e) {

@@ -7,7 +7,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoId: 'Must provide id',
-  NotOwner: 'User does not have permission to edit this draft.',
+  NotOwner: 'User does not have permission to edit this draft',
   NotFound: 'No draft found for that user'
 };
 
