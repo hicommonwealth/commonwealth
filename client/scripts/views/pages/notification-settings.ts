@@ -641,7 +641,7 @@ const GeneralNewThreadsAndComments:
     },
     view: (vnode) => {
       const { communities, subscriptions } = vnode.attrs;
-      const { generalStatus } = vnode.state;
+      const { generalStatus, emailStatus } = vnode.state;
       return m('tr.GeneralNewThreadsAndComments', [
         m('td', 'New threads and comments'),
         m('td', [
