@@ -91,6 +91,44 @@ const labelEdgewareEvent: LabelerFilter = (
     }
 
     /**
+     * Offences Events
+     */
+    case SubstrateEventKind.Offence: {
+      const { offenceKind, opaqueTimeSlot, applied } = data;
+      return {
+        heading: 'Offence',
+        label: `An offence of type ${offenceKind} is reported and ${applied ? 'applied' : 'queued'} at time ${opaqueTimeSlot}.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
+
+    /**
+     * ImOnline Events
+     */
+    case SubstrateEventKind.AllGood: {
+      const { sessionIndex } = data;
+      return {
+        heading: 'Offence',
+        label: `At the end of the session ${sessionIndex}, no offence was committed.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
+    case SubstrateEventKind.SomeOffline: {
+      const { sessionIndex, validators } = data;
+      return {
+        heading: 'Offence',
+        label: `At the end of the session ${sessionIndex}, ${validators.length} ${validators.length === 1 ? 'validator was' : 'validators were'} found to be offline.`,
+        linkUrl: chainId
+          ? `/${chainId}/validators`
+          : null,
+      };
+    }
+
+    /**
      * Democracy Events
      */
     case SubstrateEventKind.VoteDelegated: {
