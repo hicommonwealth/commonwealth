@@ -48,10 +48,6 @@ class ChainEntityController {
     });
   }
 
-  public offences(callback) {
-    return get('/getOffences', { chain: app.chain.id, jwt: app.login.jwt }, callback);
-  }
-
   public deinit() {
     this.store.clear();
   }
