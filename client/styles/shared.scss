@@ -32,6 +32,9 @@ $horizontal-padding: 30px; // padding on sides of the page
 $gutter-width: 24px; // padding between columns
 $header-spacing: 14px; // padding between header items
 
+// construct-ui styles
+$menu-item-height: 30px;
+
 @mixin popout {
     animation: popout 0.05s ease;
     -webkit-animation: popout 0.05s ease;

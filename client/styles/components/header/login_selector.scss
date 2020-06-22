@@ -11,4 +11,12 @@
     .cui-menu {
         border: none;
     }
+    button.cui-button.cui-menu-item {
+        padding: 0 14px;
+        height: initial;
+        max-height: initial;
+        .UserBlock {
+            padding: 6px 0;
+        }
+    }
 }

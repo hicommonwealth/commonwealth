@@ -117,15 +117,23 @@
 
 .UserBlock {
     display: flex;
-    .profile-block-left {
-        padding-right: 16px;
-        margin: 5px 0;
+    .user-block-left {
+        padding-right: 13px;
+        margin-top: 4px;
     }
-    .profile-block-right {
+    .user-block-right {
         flex: 1;
-        .profile-block-name,
-        .profile-block-address {
+        line-height: 17px;
+        .user-block-name,
+        .user-block-address {
             text-align: left;
+        }
+        .user-block-name {
+            font-weight: 600;
+        }
+        .user-block-address {
+            color: #aaa;
+            font-size: 13px;
         }
     }
 }

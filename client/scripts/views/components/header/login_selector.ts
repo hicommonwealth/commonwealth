@@ -70,13 +70,12 @@ const LoginSelector : m.Component<{}, {}> = {
                 onclick: (e) => {
                   setActiveAccount(account);
                 },
-                label: m(UserBlock, { user: account, avatarSize: 24 }),
+                label: m(UserBlock, { user: account, avatarSize: 28 }),
               })),
               m(MenuItem, {
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
-                iconLeft: Icons.USER,
                 label: 'Connect another address'
               }),
               m(MenuDivider),
@@ -84,12 +83,12 @@ const LoginSelector : m.Component<{}, {}> = {
             // always shown
             m(MenuItem, {
               onclick: () => m.route.set('/settings'),
-              iconLeft: Icons.SETTINGS,
+              // iconLeft: Icons.SETTINGS,
               label: 'Settings'
             }),
             m(MenuItem, {
               onclick: () => app.modals.create({ modal: FeedbackModal }),
-              iconLeft: Icons.SEND,
+              // iconLeft: Icons.SEND,
               label: 'Send feedback',
             }),
             m(MenuItem, {
@@ -105,7 +104,7 @@ const LoginSelector : m.Component<{}, {}> = {
                 });
                 mixpanel.reset();
               },
-              iconLeft: Icons.X_SQUARE,
+              // iconLeft: Icons.X_SQUARE,
               label: 'Logout'
             }),
           ]),

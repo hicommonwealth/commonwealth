@@ -342,6 +342,15 @@ td, th {
             stroke: #333;
         }
     }
+    > .cui-menu-divider {
+        margin: 4px 0;
+    }
+    padding: 6px 0;
+    button.cui-button.cui-menu-item {
+        min-height: $menu-item-height;
+        height: $menu-item-height;
+        line-height: $menu-item-height;
+    }
 }
 
 // icon styles

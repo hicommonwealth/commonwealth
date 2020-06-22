@@ -183,7 +183,7 @@ export const UserBlock: m.Component<{
     const { user, avatarSize, hideIdentityIcon, tooltip, showRole } = vnode.attrs;
 
     return m('.UserBlock', [
-      m('.profile-block-left', [
+      m('.user-block-left', [
         m(User, {
           user,
           avatarOnly: true,
@@ -191,8 +191,8 @@ export const UserBlock: m.Component<{
           tooltip,
         }),
       ]),
-      m('.profile-block-right', [
-        m('.profile-block-name', [
+      m('.user-block-right', [
+        m('.user-block-name', [
           m(User, {
             user,
             hideAvatar: true,
@@ -201,7 +201,7 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m('.profile-block-address', {
+        m('.user-block-address', {
           class: user.profile?.address ? '' : 'no-address',
         }, [
           user.profile?.address && formatAddressShort(user.profile.address),
