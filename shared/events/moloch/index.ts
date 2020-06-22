@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { WebsocketProvider } from 'web3-core/types';
 import { Web3Provider } from 'ethers/providers';
 import EthDater from 'ethereum-block-by-date';
+import sleep from 'sleep-promise';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
@@ -23,28 +24,41 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createMolochApi(
+export async function createMolochApi(
   ethNetworkUrl: string,
   contractVersion: 1 | 2,
-  contractAddress: string
+  contractAddress: string,
+  retryTimeMs = 10 * 1000,
 ): Promise<MolochApi> {
-  if (ethNetworkUrl.includes('infura')) {
-    if (process && process.env) {
-      const INFURA_API_KEY = process.env.INFURA_API_KEY;
-      if (!INFURA_API_KEY) {
-        throw new Error('no infura key found!');
+  try {
+    if (ethNetworkUrl.includes('infura')) {
+      if (process && process.env) {
+        const INFURA_API_KEY = process.env.INFURA_API_KEY;
+        if (!INFURA_API_KEY) {
+          throw new Error('no infura key found!');
+        }
+        ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
+      } else {
+        throw new Error('must use nodejs to connect to infura provider!');
       }
-      ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
-    } else {
-      throw new Error('must use nodejs to connect to infura provider!');
     }
+    const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl);
+    const provider = new providers.Web3Provider(web3Provider);
+    const contract = contractVersion === 1
+      ? Moloch1Factory.connect(contractAddress, provider)
+      : Moloch2Factory.connect(contractAddress, provider);
+    await contract.deployed();
+
+    // fetch summoning time to guarantee connected
+    const summoningTime = await contract.summoningTime();
+    log.info('Connection successful!');
+    return contract;
+  } catch (err) {
+    log.error(`Moloch ${contractAddress} at ${ethNetworkUrl} failure: ${err.message}`);
+    await sleep(retryTimeMs);
+    log.error('Retrying connection...');
+    return createMolochApi(ethNetworkUrl, contractVersion, contractAddress, retryTimeMs);
   }
-  const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl);
-  const provider = new providers.Web3Provider(web3Provider);
-  const contract = contractVersion === 1
-    ? Moloch1Factory.connect(contractAddress, provider)
-    : Moloch2Factory.connect(contractAddress, provider);
-  return contract.deployed();
 }
 
 /**
