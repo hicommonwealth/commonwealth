@@ -30,19 +30,28 @@ export async function createMolochApi(
   contractAddress: string,
   retryTimeMs = 10 * 1000,
 ): Promise<MolochApi> {
-  try {
-    if (ethNetworkUrl.includes('infura')) {
-      if (process && process.env) {
-        const INFURA_API_KEY = process.env.INFURA_API_KEY;
-        if (!INFURA_API_KEY) {
-          throw new Error('no infura key found!');
-        }
-        ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
-      } else {
-        throw new Error('must use nodejs to connect to infura provider!');
+  if (ethNetworkUrl.includes('infura')) {
+    if (process && process.env) {
+      const INFURA_API_KEY = process.env.INFURA_API_KEY;
+      if (!INFURA_API_KEY) {
+        throw new Error('no infura key found!');
       }
+      ethNetworkUrl = `wss://mainnet.infura.io/ws/v3/${INFURA_API_KEY}`;
+    } else {
+      throw new Error('must use nodejs to connect to infura provider!');
     }
-    const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl);
+  }
+  try {
+    const web3Provider = new Web3.providers.WebsocketProvider(
+      ethNetworkUrl,
+      {
+        reconnect: {
+          auto: true,
+          delay: retryTimeMs,
+          onTimeout: true,
+        }
+      } as any,
+    );
     const provider = new providers.Web3Provider(web3Provider);
     const contract = contractVersion === 1
       ? Moloch1Factory.connect(contractAddress, provider)
