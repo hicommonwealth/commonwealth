@@ -29,6 +29,7 @@ const deleteComment = async (models, req: Request, res: Response, next: NextFunc
     });
     if (!comment) {
       return next(new Error(Errors.NotOwned))
+    }
     // actually delete
     await comment.destroy();
     return res.json({ status: 'Success' });

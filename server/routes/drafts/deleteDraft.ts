@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 import { factory, formatFilename } from '../../../shared/logging';
@@ -20,17 +21,15 @@ const deleteDraft = async (models, req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const draft = await models.DiscussionDraft.findOne({
       where: {
         id: req.body.id,
+        address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
     if (!draft) {
       return next(new Error(Errors.NotFound));
-    }
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(draft.address_id) === -1) {
-      return next(new Error(Errors.NotOwner));
     }
     await draft.destroy();
     return res.json({ status: 'Success' });

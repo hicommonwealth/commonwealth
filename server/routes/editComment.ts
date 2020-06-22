@@ -54,7 +54,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
     comment.version_history = arr;
     comment.text = req.body.body;
     await comment.save();
-    attachFiles();
+    await attachFiles();
     const finalComment = await models.OffchainComment.findOne({
       where: { id: comment.id },
       include: [models.Address, models.OffchainAttachment],

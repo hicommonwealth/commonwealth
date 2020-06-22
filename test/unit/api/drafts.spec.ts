@@ -234,7 +234,7 @@ describe('Draft Tests', () => {
         });
       const { result } = res.body;
       expect(res).to.not.have.status(200);
-      expect(res.body.error).to.equal(EditDraftErrors.NotOwner);
+      expect(res.body.error).to.equal(EditDraftErrors.NotFound);
     });
   });
 
@@ -288,21 +288,7 @@ describe('Draft Tests', () => {
         });
       const { result } = res.body;
       expect(res).to.not.have.status(200);
-      expect(res.body.error).to.be.equal(DeleteDraftErrors.NotOwner);
-    });
-  });
-
-  describe('/getDrafts', () => {
-    it('should return drafts for a given user', async () => {
-      const res = await chai.request(app)
-        .get('/api/drafts')
-        .set('Accept', 'application/json')
-        .query({
-          'jwt': userJWT
-        });
-      const { result } = res.body;
-      expect(res).to.have.status(200);
-      expect(result).to.not.be.null;
+      expect(res.body.error).to.be.equal(DeleteDraftErrors.NotFound);
     });
   });
 });
