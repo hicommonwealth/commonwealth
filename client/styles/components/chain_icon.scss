@@ -9,6 +9,9 @@ $icon-text: #fff;
         border-radius: 9999px;
         background: $icon-background;
     }
+    &.onclick img.chain-icon {
+        cursor: pointer;
+    }
 }
 
 .CommunityIcon {
@@ -24,5 +27,8 @@ $icon-text: #fff;
         font-weight: 600;
         font-size: 13px;
         padding-top: 7px;
+    }
+    &.onclick img.community-icon {
+        cursor: pointer;
     }
 }

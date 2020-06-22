@@ -28,13 +28,21 @@ export const getSelectableCommunities = () => {
     });
 };
 
-const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo, showStatus?: boolean }> = {
+const CommunityLabel: m.Component<{
+  chain?: ChainInfo,
+  community?: CommunityInfo,
+  showStatus?: boolean,
+  link?: boolean,
+}> = {
   view: (vnode) => {
-    const { chain, community, showStatus } = vnode.attrs;
+    const { chain, community, showStatus, link } = vnode.attrs;
 
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
-        m(ChainIcon, { chain }),
+        m(ChainIcon, {
+          chain,
+          onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
+        }),
       ]),
       m('.community-label-right', [
         m('.community-name-row', [
@@ -47,7 +55,10 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
 
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
-        m(CommunityIcon, { community }),
+        m(CommunityIcon, {
+          community,
+          onclick: link ? (() => m.route.set(`/${community.id}`)) : null
+        }),
       ]),
       m('.community-label-right', [
         m('.community-name-row', [
@@ -67,7 +78,7 @@ const CommunityLabel: m.Component<{ chain?: ChainInfo, community?: CommunityInfo
   }
 };
 
-const CurrentCommunityLabel: m.Component<{}> = {
+export const CurrentCommunityLabel: m.Component<{}> = {
   view: (vnode) => {
     const nodes = app.config.nodes.getAll();
     const activeNode = app.chain?.meta;
@@ -77,11 +88,11 @@ const CurrentCommunityLabel: m.Component<{}> = {
     const selectedCommunity = app.community;
 
     if (selectedNode) {
-      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true });
+      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
     } else if (selectedCommunity) {
-      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true });
+      return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true, link: true });
     } else {
-      return m(CommunityLabel, { showStatus: true });
+      return m(CommunityLabel, { showStatus: true, link: true });
     }
   }
 };
@@ -149,18 +160,10 @@ const CommunitySelector = {
             hasArrow: false
           },
           trigger: m(Button, {
-            align: 'left',
-            basic: true,
-            compact: true,
-            label: [
-              m(CurrentCommunityLabel),
-              m(SwitchIcon),
-            ],
-            style: 'min-width: 200px',
+            size: 'sm',
+            iconLeft: Icons.GLOBE,
           }),
         }),
-        //   app.isLoggedIn() && (app.community || app.chain)
-        //     && m(SubscriptionButton),
       ]),
     ]);
   }

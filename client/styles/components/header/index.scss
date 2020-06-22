@@ -21,10 +21,9 @@
         .header-breadcrumb {
             flex: 1;
         }
-        > .cui-button {
-            margin-left: $header-spacing;
-        }
-        > .cui-button-group {
+        > .cui-button,
+        > .cui-button-group,
+        > .CommunitySelector {
             margin-left: $header-spacing;
         }
         .cui-button-label {
@@ -67,7 +66,7 @@
             border-top: 1px #d8dee0 solid;
         }
         .cui-button:nth-child(1) {
-            border-right: 1px #d8dee0 solid; 
+            border-right: 1px #d8dee0 solid;
         }
     }
 }
