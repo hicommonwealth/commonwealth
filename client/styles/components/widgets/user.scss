@@ -117,23 +117,50 @@
 
 .UserBlock {
     display: flex;
+    line-height: 17px;
     .user-block-left {
         padding-right: 13px;
-        margin-top: 4px;
+        position: relative;
+        top: 5px;
     }
-    .user-block-right {
+    .user-block-center {
         flex: 1;
-        line-height: 17px;
+        line-height: 19px;
         .user-block-name,
         .user-block-address {
             text-align: left;
         }
         .user-block-name {
+            font-size: 14px;
             font-weight: 600;
         }
         .user-block-address {
-            color: #aaa;
             font-size: 13px;
+            opacity: 0.6;
+        }
+    }
+    .user-block-right {
+        display: flex;
+        align-items: center;
+        justify-content: right;
+        width: 60px;
+        .user-block-selected {
+            flex: 1;
+            text-align: right;
+        }
+    }
+    &.compact {
+        .user-block-left {
+            top: 4px;
+        }
+        .user-block-center {
+            line-height: 17px;
+            .user-block-name {
+                font-size: 14px;
+            }
+            .user-block-address {
+                font-size: 13px;
+            }
         }
     }
 }

@@ -10,8 +10,10 @@
     }
     .cui-menu {
         border: none;
+        max-width: 280px;
     }
     button.cui-button.cui-menu-item {
+        text-align: left;
         padding: 0 14px;
         height: initial;
         max-height: initial;

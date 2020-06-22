@@ -16,31 +16,32 @@ const SelectAddressModal: m.Component<{}, { selectedIndex }> = {
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Add address'),
+        m('h3', 'Connect another address'),
       ]),
       m('.compact-modal-body', [
-        // m('.select-existing-address', [
-        //   m('.modal-header', 'You have multiple addresses linked to this community. Select one:'),
-        //   activeAccountsByRole.map(([account, role]) => role && m(SelectAddressOption, { account, role })),
-        // ]),
-        // m('br'),
-        activeAccountsByRole.map(([account, role], index) => !role && m('.SelectAddressOption', {
-          class: vnode.state.selectedIndex === index ? 'selected' : '',
-          onclick: async (e) => {
-            e.preventDefault();
-            vnode.state.selectedIndex = index;
-          },
-        }, [
-          m(UserBlock, { user: account }),
-          role && m('.role-permission', [
-            m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
-            role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
-          ]),
-        ])),
+        m('.select-address-options', [
+          activeAccountsByRole.map(([account, role]) => role && m('.select-address-option.existing', [
+            m(UserBlock, { user: account }),
+          ])),
+          activeAccountsByRole.map(([account, role], index) => !role && m('.select-address-option', {
+            onclick: async (e) => {
+              e.preventDefault();
+              vnode.state.selectedIndex = index;
+            },
+          }, [
+            m(UserBlock, { user: account, selected: vnode.state.selectedIndex === index }),
+            role && m('.role-permission', [
+              m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
+              role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),
+            ]),
+          ])),
+        ]),
         m('br'),
         m(Button, {
-          label: 'Join community',
+          label: vnode.state.selectedIndex === undefined ? 'Select an address' : 'Join community with address',
           intent: 'primary',
+          compact: true,
+          fluid: true,
           disabled: vnode.state.selectedIndex === undefined,
           onclick: (e) => {
           }

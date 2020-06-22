@@ -8,6 +8,7 @@ import { Button, ButtonGroup, Icon, Icons, List, ListItem, Menu, MenuItem, MenuD
   Popover, PopoverMenu } from 'construct-ui';
 
 import app from 'state';
+import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { notifySuccess } from 'controllers/app/notifications';
 
@@ -70,9 +71,14 @@ const LoginSelector : m.Component<{}, {}> = {
                 onclick: (e) => {
                   setActiveAccount(account);
                 },
-                label: m(UserBlock, { user: account, avatarSize: 28 }),
+                label: m(UserBlock, {
+                  user: account,
+                  selected: isSameAccount(account, app.user.activeAccount),
+                  compact: true
+                }),
               })),
               m(MenuItem, {
+                style: 'margin-top: 4px',
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
