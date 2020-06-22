@@ -4,11 +4,11 @@ import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import { Icon, Icons } from 'construct-ui';
+import PageLoading from 'views/pages/loading';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
-import PageLoading from "views/pages/loading";
 
 
 const model = {
@@ -39,8 +39,7 @@ const model = {
 
 const PresentationComponent = (state, chain: Substrate) => {
   const validators = state.dynamic.validators;
-  if (!validators) return m(PageLoading, {message:"Loading Validators..."});
-  
+  if (!validators) return m(PageLoading, { message: 'Loading Validators...' });
 
   const lastHeaders = (app.chain.base === ChainBase.Substrate)
     ? (app.chain as Substrate).staking.lastHeaders
