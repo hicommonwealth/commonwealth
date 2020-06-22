@@ -4,25 +4,25 @@ import { byAscendingCreationDate } from '../helpers';
 
 // TODO: Differentiate between tags associated with a chain, and tags associated with a community
 class TagStore extends IdStore<OffchainTag> {
-  private _storeCommunity: { [identifier: string]: Array<OffchainTag> } = {};
+  private _tagsByCommunity: { [identifier: string]: Array<OffchainTag> } = {};
 
   public add(tag: OffchainTag) {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(tag);
     this.getAll().sort(byAscendingCreationDate);
     const parentEntity = tag.communityId ? tag.communityId : tag.chainId;
-    if (!this._storeCommunity[parentEntity]) {
-      this._storeCommunity[parentEntity] = [];
+    if (!this._tagsByCommunity[parentEntity]) {
+      this._tagsByCommunity[parentEntity] = [];
     }
-    this._storeCommunity[parentEntity].push(tag);
-    this._storeCommunity[parentEntity].sort(byAscendingCreationDate);
+    this._tagsByCommunity[parentEntity].push(tag);
+    this._tagsByCommunity[parentEntity].sort(byAscendingCreationDate);
     return this;
   }
 
   public remove(tag: OffchainTag) {
     super.remove(tag);
     const parentEntity = tag.communityId ? tag.communityId : tag.chainId;
-    const communityStore = this._storeCommunity[parentEntity];
+    const communityStore = this._tagsByCommunity[parentEntity];
     const matchingTag = communityStore.filter((t) => t.id === tag.id)[0];
     const proposalIndex = communityStore.indexOf(matchingTag);
     if (proposalIndex === -1) {
@@ -34,11 +34,11 @@ class TagStore extends IdStore<OffchainTag> {
 
   public clear() {
     super.clear();
-    this._storeCommunity = {};
+    this._tagsByCommunity = {};
   }
 
   public getByCommunity(communityId): Array<OffchainTag> {
-    return this._storeCommunity[communityId] || [];
+    return this._tagsByCommunity[communityId] || [];
   }
 
   public getByName(name, communityId): OffchainTag {

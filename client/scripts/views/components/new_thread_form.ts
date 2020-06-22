@@ -34,7 +34,7 @@ interface IThreadForm {
   title?: string;
 }
 
-export const populateDraft = async (state, draft) => {
+export const loadDraft = async (state, draft) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
@@ -376,7 +376,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 ? bodyComponent
                 : '')
             ],
-            onclick: () => populateDraft(vnode.state, draft),
+            onclick: () => loadDraft(vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
           });
         }))
