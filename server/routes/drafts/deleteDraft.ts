@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
-import { factory, formatFilename } from '../../shared/logging';
+import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
+import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
+import { factory, formatFilename } from '../../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

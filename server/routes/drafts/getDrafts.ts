@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from '../../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getDiscussionDrafts = async (models, req: Request, res: Response, next: NextFunction) => {

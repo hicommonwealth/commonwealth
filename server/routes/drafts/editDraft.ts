@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { factory, formatFilename } from '../../shared/logging';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
+import { factory, formatFilename } from '../../../shared/logging';
+import lookupCommunityIsVisibleToUser from '../../util/lookupCommunityIsVisibleToUser';
 
 const log = factory.getLogger(formatFilename(__filename));
 
