@@ -15,9 +15,9 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { EdgewareEventChains } from '../../../../shared/events/edgeware/types';
+import { SubstrateEventChains } from '../../../../shared/events/substrate/types';
 import { MolochEventChains } from '../../../../shared/events/moloch/types';
-import labelEdgewareEvent from '../../../../shared/events/edgeware/filters/labeler';
+import labelSubstrateEvent from '../../../../shared/events/substrate/filters/labeler';
 import labelMolochEvent from '../../../../shared/events/moloch/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
@@ -167,8 +167,8 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
       let label;
-      if (EdgewareEventChains.includes(chainId)) {
-        label = labelEdgewareEvent(
+      if (SubstrateEventChains.includes(chainId)) {
+        label = labelSubstrateEvent(
           notification.chainEvent.blockNumber,
           chainId,
           notification.chainEvent.data,

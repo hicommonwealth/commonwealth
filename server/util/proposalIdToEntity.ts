@@ -1,4 +1,4 @@
-import { SubstrateEntityKind } from '../../shared/events/edgeware/types';
+import { SubstrateEntityKind } from '../../shared/events/substrate/types';
 import { MolochEntityKind } from '../../shared/events/moloch/types';
 
 // given an "old style" identifier such as treasuryproposal_4, attempts to

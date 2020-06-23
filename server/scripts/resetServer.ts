@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import app from '../../server';
-import { SubstrateEventKinds, EdgewareEventChains } from '../../shared/events/edgeware/types';
+import { SubstrateEventKinds, SubstrateEventChains } from '../../shared/events/substrate/types';
 import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
 import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../../shared/logging';
@@ -387,7 +387,7 @@ const resetServer = (models, closeMiddleware) => {
 
     // initialize chain event types
     const initChainEventTypes = (chain) => {
-      if (EdgewareEventChains.includes(chain)) {
+      if (SubstrateEventChains.includes(chain)) {
         return Promise.all(
           SubstrateEventKinds.map((event_name) => {
             return models.ChainEventType.create({

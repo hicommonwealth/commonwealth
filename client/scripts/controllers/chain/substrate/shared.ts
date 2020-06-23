@@ -39,12 +39,12 @@ import {
   ChainEvent,
 } from 'models';
 
-import EdgewareStorageFetcher from 'events/edgeware/storageFetcher';
-import EdgewareEventSubscriber from 'events/edgeware/subscriber';
-import EdgewareEventProcessor from 'events/edgeware/processor';
+import SubstrateStorageFetcher from 'events/substrate/storageFetcher';
+import SubstrateEventSubscriber from 'events/substrate/subscriber';
+import SubstrateEventProcessor from 'events/substrate/processor';
 import {
-  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents, ISubstrateEventData
-} from 'events/edgeware/types';
+  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
+} from 'events/substrate/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -310,9 +310,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
-    const fetcher = new EdgewareStorageFetcher(this._apiPromise);
-    const subscriber = new EdgewareEventSubscriber(this._apiPromise);
-    const processor = new EdgewareEventProcessor(this._apiPromise);
+    const fetcher = new SubstrateStorageFetcher(this._apiPromise);
+    const subscriber = new SubstrateEventSubscriber(this._apiPromise);
+    const processor = new SubstrateEventProcessor(this._apiPromise);
     return this._app.chainEntities.subscribeEntities(
       this._app.chain,
       fetcher,

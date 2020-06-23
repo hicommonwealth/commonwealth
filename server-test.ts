@@ -17,7 +17,7 @@ import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
-import { SubstrateEventKinds } from './shared/events/edgeware/types';
+import { SubstrateEventKinds } from './shared/events/substrate/types';
 
 require('express-async-errors');
 

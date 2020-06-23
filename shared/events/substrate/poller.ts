@@ -1,5 +1,5 @@
 /**
- * Fetches historical events from edgeware chain.
+ * Fetches historical events from substrate chain.
  */
 import { ApiPromise } from '@polkadot/api';
 import { Hash } from '@polkadot/types/interfaces';

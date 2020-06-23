@@ -28,7 +28,7 @@ Adding a new Edgeware event requires the following steps:
   * Ensure your interface from step 3 contains the same identifying item as the rest of the events relating to that entity.
   * In [entityArchival.ts](../../server/eventHandlers/edgeware/entityArchival.ts), add the appropriate `createEntityFn` or `updateEntityFn` case for the new event.
   * If a migration of historical event data should be performed for the new event (typically not necessary), then you must add the event to the "auxiliary" union types at the bottom of [types.ts](edgeware/types.ts), and also to the `eventToEntity` function in [interfaces.ts](interfaces.ts). Additionally, you must add API queries that enable you to synthesize the event in [migration.ts](edgeware/migration.ts).
-6. Test out your change by triggering the event on a local testnet, and by writing a test case for the enricher, in [enricher.spec.ts](../../test/unit/events/edgeware/enricher.spec.ts).
+6. Test out your change by triggering the event on a local testnet, and by writing a test case for the enricher, in [enricher.spec.ts](../../test/unit/events/substrate/enricher.spec.ts).
 
 ## Adding a new entity
 
@@ -43,9 +43,9 @@ To add a new entity to Edgeware, you must perform the following steps:
   * Add cases for synthesizing the entity's events to [migration.ts](edgeware/migration.ts).
   * Add auxiliary types and `eventToEntity` cases at the bottom of [types.ts](edgeware/types.ts).
   * Add the new entity type to the [migration event handler](../../server/eventHandlers/edgeware/migration.ts).
-  * Add corresponding unit tests to [migration.spec.ts](../../test/unit/events/edgeware/migration.spec.ts) and optionally to [migrationHandler.spec.ts](../../test/unit/events/edgeware/migrationHandler.spec.ts)
+  * Add corresponding unit tests to [migration.spec.ts](../../test/unit/events/substrate/migration.spec.ts) and optionally to [migrationHandler.spec.ts](../../test/unit/events/substrate/migrationHandler.spec.ts)
 5. If required, update all corresponding controllers on the client side to handle the new entity.
-6. Test out your change by triggering the corresponding sequence of events on a local testnet (this may require migration as per [Upgrading](#Upgrading), and, if so, step 4 is mandatory), and ensuring the entity's fields and associations are populated as expected. Also consider testing by adding a test case to [entityArchivalHandler.spec.ts](../../test/unit/events/edgeware/entityArchivalHandler.spec.ts).
+6. Test out your change by triggering the corresponding sequence of events on a local testnet (this may require migration as per [Upgrading](#Upgrading), and, if so, step 4 is mandatory), and ensuring the entity's fields and associations are populated as expected. Also consider testing by adding a test case to [entityArchivalHandler.spec.ts](../../test/unit/events/substrate/entityArchivalHandler.spec.ts).
 
 ### What is a migration?
 

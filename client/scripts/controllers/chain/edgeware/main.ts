@@ -7,7 +7,6 @@ import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
-import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';

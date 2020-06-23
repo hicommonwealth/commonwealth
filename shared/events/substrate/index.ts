@@ -31,7 +31,7 @@ export async function createSubstrateProvider(url: string): Promise<WsProvider> 
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createEdgewareApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
+export function createSubstrateApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
   const registry = new TypeRegistry();
   if (isEdgeware) {
     const edgewareTypes = Object.values(edgewareDefinitions)
@@ -59,10 +59,10 @@ export function createEdgewareApi(provider: WsProvider, isEdgeware: boolean): Ap
 }
 
 /**
- * This is the main function for edgeware event handling. It constructs a connection
+ * This is the main function for substrate event handling. It constructs a connection
  * to the chain, connects all event-related modules, and initializes event handling.
  *
- * @param url The edgeware chain endpoint to connect to.
+ * @param url The substrate chain endpoint to connect to.
  * @param handler An event handler object for processing received events.
  * @param skipCatchup If true, skip all fetching of "historical" chain data that may have been
  *                    emitted during downtime.
@@ -70,7 +70,6 @@ export function createEdgewareApi(provider: WsProvider, isEdgeware: boolean): Ap
  * @returns An active block subscriber.
  */
 const subscribe: SubscribeFunc<ApiPromise, SubstrateBlock, ISubscribeOptions<ApiPromise>> = async (options) => {
-  // const api = await createEdgewareApi(provider, chain.startsWith('edgeware')).isReady;
   const { chain, api, handlers, skipCatchup, discoverReconnectRange, performMigration } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<ISubstrateEventData>) => {
