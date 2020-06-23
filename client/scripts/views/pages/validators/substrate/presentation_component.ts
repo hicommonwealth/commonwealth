@@ -17,7 +17,12 @@ const model = {
   currentTab: 'current',
   show: true,
   total: { waiting: 0, current: 0 },
-  sortKey: 'eraPoints',
+  sortKey: 'exposure.total',
+  sortIcon(key: string) {
+    return model.sortKey === key
+      ? Icons.ARROW_UP
+      : Icons.MINUS;
+  },
   reset(index) {
     model.currentPage = 1;
     model.show = true;
@@ -73,11 +78,26 @@ const PresentationComponent = (state, chain: Substrate) => {
         m('tr.validators-heading', [
           m('th.val-controller', 'Controller'),
           m('th.val-stash', 'Stash'),
-          m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.total') }, 'Total Stake'),
-          m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.own') }, 'Own Stake'),
-          m('th.val-total.pointer', { onclick: () => model.changeSort('otherTotal') }, 'Other Stake'),
-          m('th.val-commission', 'Commission'),
-          m('th.val-points.pointer', { onclick: () => model.changeSort('eraPoints') }, 'Points'),
+          m('th.val-total', 'Total Stake',
+            m(Icon, { name: model.sortIcon('exposure.total'),
+              size: 'lg',
+              onclick: () => model.changeSort('exposure.total') })),
+          m('th.val-total', 'Own Stake',
+            m(Icon, { name: model.sortIcon('exposure.own'),
+              size: 'lg',
+              onclick: () => model.changeSort('exposure.own') })),
+          m('th.val-total', 'Other Stake',
+            m(Icon, { name: model.sortIcon('otherTotal'),
+              size: 'lg',
+              onclick: () => model.changeSort('otherTotal') })),
+          m('th.val-commission', 'Commission',
+            m(Icon, { name: model.sortIcon('commissionPer'),
+              size: 'lg',
+              onclick: () => model.changeSort('commissionPer') })),
+          m('th.val-points', 'Points',
+            m(Icon, { name: model.sortIcon('eraPoints'),
+              size: 'lg',
+              onclick: () => model.changeSort('eraPoints') })),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
         ]),
@@ -96,10 +116,12 @@ const PresentationComponent = (state, chain: Substrate) => {
           const hasMessage = validators[validator]?.hasMessage;
           const isOnline = validators[validator]?.isOnline;
           const otherTotal = validators[validator]?.otherTotal;
+          const commission = validators[validator]?.commissionPer;
           return m(ValidatorRow, {
             stash: validator,
             total,
             bonded,
+            commission,
             otherTotal,
             controller,
             nominators,
@@ -161,10 +183,10 @@ const PresentationComponent = (state, chain: Substrate) => {
     }]),
     model.show
     && m('span', [
-      m(Icon, { name: Icons.ARROW_LEFT_CIRCLE, size: 'lg', onclick: model.previous }),
+      m(Icon, { name: Icons.SKIP_BACK, size: 'lg', onclick: model.previous }),
       m('label', { style: { marginLeft: '20px' } },
         `${model.currentPage}/${Math.ceil(model.total[model.currentTab] / model.perPage)}`),
-      m(Icon, { name: Icons.ARROW_RIGHT_CIRCLE, size: 'lg', onclick: model.next }),
+      m(Icon, { name: Icons.SKIP_FORWARD, size: 'lg', onclick: model.next }),
     ]));
 };
 

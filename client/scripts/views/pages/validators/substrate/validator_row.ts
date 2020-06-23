@@ -64,19 +64,11 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    // info: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.info(attrs.stash) : null,
-    query: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.query(attrs.stash)
-      : null
   }),
   view: (vnode) => {
-    const { query } = vnode.state.dynamic;
     const byAuthor = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.byAuthor
       : {};
-    const stakingInfo = query
-      ? expandInfo(query)
-      : null;
 
     const nominatorsList = vnode.attrs.nominators;
 
@@ -104,8 +96,8 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
           }, nominatorsList.length),
           ')'],
       ]),
-      m('td.val-commission', stakingInfo?.commission || ' '),
-      m('td.val-points', vnode.attrs.eraPoints || ' '),
+      m('td.val-commission', `${vnode.attrs.commission?.toFixed(2)}%` || ' '),
+      m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,

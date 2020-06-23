@@ -13,7 +13,7 @@ import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints, Nominatio
 import { InterfaceTypes, Codec } from '@polkadot/types/types';
 import { DeriveStakingValidators, DeriveStakingQuery,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
-  DeriveHeartbeatAuthor } from '@polkadot/api-derive/types';
+  DeriveHeartbeatAuthor, DeriveStakingElected } from '@polkadot/api-derive/types';
 import { IValidators } from './account';
 import SubstrateChain from './shared';
 
@@ -22,6 +22,10 @@ const MAX_HEADERS = 50;
 interface iInfo {
   stash: string;
   balance: number;
+}
+
+export interface ICommissionInfo {
+  [key: string]: number
 }
 
 export interface IAccountInfo extends DeriveAccountRegistration{
@@ -133,13 +137,16 @@ class SubstrateStaking implements StorageModule {
         api.query.staking.currentEra(),
         api.derive.staking.stashes(),
         api.derive.staking.currentPoints(),
-        api.derive.imOnline.receivedHeartbeats()
+        api.derive.imOnline.receivedHeartbeats(),
+        api.derive.staking.electedInfo()
       )),
 
       // fetch balances alongside validators
       flatMap((
-        [api, { nextElected, validators: currentSet }, era, allStashes, queryPoints, imOnline]:
-        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[], EraRewardPoints, Record<string, DeriveHeartbeatAuthor>]
+        [api, { nextElected, validators: currentSet }, era, allStashes,
+          queryPoints, imOnline, electedInfo]:
+        [ApiRx, DeriveStakingValidators, EraIndex, AccountId[],
+        EraRewardPoints, Record<string, DeriveHeartbeatAuthor>, DeriveStakingElected]
       ) => {
         const eraPoints: Record<string, string> = {};
         const entries = [...queryPoints.individual.entries()]
@@ -147,7 +154,14 @@ class SubstrateStaking implements StorageModule {
         entries.forEach(([accountId, points]): void => {
           eraPoints[accountId] = points;
         });
+        const commissionInfo: ICommissionInfo = {};
 
+        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          const key = accountId.toString();
+          commissionInfo[key] = commissionPer;
+          return commissionPer;
+        });
         // set of not yet but future validators
         const waiting = allStashes.filter((v) => !currentSet.includes(v));
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
@@ -165,16 +179,19 @@ class SubstrateStaking implements StorageModule {
           stakersCall.multi(toBeElected.map((elt) => stakersCallArgs(elt.toString()))),
           of(waiting),
           of(eraPoints),
-          of(imOnline)
+          of(imOnline),
+          of(commissionInfo)
         );
       }),
       auditTime(100),
       map(([
         currentSet, toBeElected, controllers, exposures,
-        nextUpControllers, nextUpExposures, waiting, eraPoints, imOnline
+        nextUpControllers, nextUpExposures, waiting, eraPoints,
+        imOnline, commissionInfo
       ] : [
         AccountId[], AccountId[], Vec<AccountId>, Exposure[],
-        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>, Record<string, DeriveHeartbeatAuthor>
+        Vec<AccountId>, Exposure[], Uint32Array[], Record<string, string>,
+        Record<string, DeriveHeartbeatAuthor>, ICommissionInfo
       ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
@@ -188,7 +205,8 @@ class SubstrateStaking implements StorageModule {
             eraPoints: eraPoints[key],
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
-            isOnline: imOnline[key]?.isOnline
+            isOnline: imOnline[key]?.isOnline,
+            commissionPer: commissionInfo[key]
           };
         }
         // add set of next elected
@@ -203,7 +221,8 @@ class SubstrateStaking implements StorageModule {
             eraPoints: eraPoints[key],
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
-            isOnline: imOnline[key]?.isOnline
+            isOnline: imOnline[key]?.isOnline,
+            commissionPer: commissionInfo[key]
           };
         }
         // add set of waiting validators

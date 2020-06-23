@@ -42,6 +42,7 @@ export interface IValidatorAttrs {
   blockCount?: u32;
   hasMessage?: boolean;
   isOnline?: boolean;
+  commission?: number;
 }
 
 export interface IValidatorPageState {
