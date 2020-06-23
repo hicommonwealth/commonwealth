@@ -178,6 +178,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
 interface IProposalCommentState {
   editing: boolean;
+  saving: boolean;
   replying: boolean;
   quillEditorState: any;
 }

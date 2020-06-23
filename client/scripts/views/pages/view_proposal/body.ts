@@ -270,6 +270,7 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
     return m('.ProposalBodyCancelEdit', [
       m(Button, {
         class: 'cancel-editing',
+        label: 'Cancel',
         disabled: parentState.saving,
         intent: 'none',
         onclick: async (e) => {
@@ -304,11 +305,15 @@ export const ProposalBodySaveEdit: m.Component<{
 
     return m('.ProposalBodySaveEdit', [
       m(Button, {
-        href: 'save-editing',
+        class: 'save-editing',
+        label: 'Save',
         disabled: parentState.saving,
         intent: 'primary',
         onclick: (e) => {
           e.preventDefault();
+          debugger
+          parentState.saving = true;
+          parentState.quillEditorState.editor.enable(false);
           const itemText = parentState.quillEditorState.markdownMode
             ? parentState.quillEditorState.editor.getText()
             : JSON.stringify(parentState.quillEditorState.editor.getContents());

@@ -28,6 +28,7 @@ interface ICreateCommentState {
   quillEditorState: any;
   uploadsInProgress;
   error;
+  saving: boolean;
   sendingComment;
 }
 
@@ -49,6 +50,9 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
     }
 
     const submitComment = async (e?) => {
+      debugger
+      vnode.state.saving = true;
+
       if (!vnode.state.quillEditorState || !vnode.state.quillEditorState.editor) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
@@ -60,10 +64,12 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         return;
       }
 
+      const { quillEditorState } = vnode.state;
+      quillEditorState.editor.enable(false);
+
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-      const { quillEditorState } = vnode.state;
 
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
@@ -100,7 +106,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         vnode.state.sendingComment = false;
         m.redraw();
       }
-
+      vnode.state.saving = false;
       mixpanel.track('Proposal Funnel', {
         'Step No': 2,
         'Step': 'Create Comment',
@@ -135,7 +141,8 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
           intent: 'primary',
           type: 'submit',
           compact: true,
-          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment
+            || vnode.state.saving || uploadsInProgress > 0,
           onclick: submitComment,
           label: (uploadsInProgress > 0)
             ? 'Uploading...'
