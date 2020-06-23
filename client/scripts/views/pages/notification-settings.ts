@@ -663,7 +663,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     const subscription = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    return m(SubscriptionRow, { subscription, label: 'New Threads' });
+    return subscription && m(SubscriptionRow, { subscription, label: 'New Threads' });
   },
 };
 
@@ -676,7 +676,6 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     return [
-      m('tr', [ m('td', `${community.name}, ${community.id}, ${community.privacyEnabled}?`)]),
       m(NewThreadRow, { community, subscriptions }),
     ];
   },
@@ -806,19 +805,21 @@ interface ICommunityNotificationsState {
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
     vnode.state.selectedCommunity = null;
-    // vnode.state.communityIds = ['All communities'];
-    vnode.state.communityIds = [];
+    vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
-
     // for testing, not production
     vnode.state.selectedCommunity = vnode.attrs.communities.find((c) => c.id === 'internal');
     // vnode.state.selectedCommunityId = vnode.state.selectedCommunity.name;
   },
+  onupdate: (vnode) => {
+    if (vnode.attrs.communities.length > 0) {
+      vnode.state.communityIds = ['All communities'];
+      vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
+    }
+  },
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
-    // vnode.state.selectedCommunityId = (selectedCommunity) ? vnode.state.communityIds.find((c) => c === selectedCommunity.name) : 'All communities';
-    // console.dir(vnode.state.selectedCommunityId);
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
@@ -830,13 +831,6 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
             vnode.state.selectedCommunity = communities.find((c) => c.name === target);
             console.dir(vnode.state.selectedCommunity);
             m.redraw();
-            // if (target === 'All communities') {
-            //   vnode.state.selectedCommunity = null;
-            // } else {
-            //   const community = communities.find((c) => target === c.name);
-            //   vnode.state.selectedCommunity = community;
-            // }
-            // m.redraw();
           }
         })
       ]),
@@ -867,13 +861,6 @@ interface INotificationSettingsState {
 
 const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   oninit: (vnode) => {
-    const communityIds = app.user.roles
-      .filter((role) => role.offchain_community_id)
-      .map((r) => r.offchain_community_id);
-    vnode.state.communities = _.uniq(
-      app.config.communities.getAll()
-        .filter((c) => communityIds.includes(c.id))
-    );
     const chainIds = app.user.roles
       .filter((role) => role.chain_id)
       .map((r) => r.chain_id);
@@ -883,6 +870,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     );
     vnode.state.selectedFilter = 'default';
     vnode.state.subscriptions = [];
+    vnode.state.communities = [];
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
@@ -896,6 +884,13 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     }, (error) => {
       m.route.set('/');
     });
+    const communityIds = app.user.roles
+      .filter((role) => role.offchain_community_id)
+      .map((r) => r.offchain_community_id);
+    vnode.state.communities = _.uniq(
+      app.config.communities.getAll()
+        .filter((c) => communityIds.includes(c.id))
+    );
   },
   view: (vnode) => {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
