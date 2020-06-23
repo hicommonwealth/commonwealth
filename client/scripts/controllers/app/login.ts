@@ -119,9 +119,6 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     setActiveAccount(memberAddresses[0]);
-  } else if (app.user.activeAccounts.length === 1) {
-    // one non-member address - start the community with that address
-    setActiveAccount(app.user.activeAccounts[0]);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {

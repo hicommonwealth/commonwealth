@@ -33,6 +33,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         m.redraw();
         vnode.state.selectedIndex = null;
         // select the address, and close the form
+        notifySuccess(`Switched to ${formatAddressShort(addressInfo.address)}`);
         app.user.setActiveAccount(account);
         $(e.target).trigger('modalexit');
       }).catch((err: any) => {

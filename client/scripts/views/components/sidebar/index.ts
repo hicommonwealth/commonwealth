@@ -23,7 +23,6 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
-import { getSelectableCommunities } from 'views/components/header/login_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
@@ -141,27 +140,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     }, (!app.community && !app.chain) ? [
       // no community
       m(List, { interactive: true }, [
-        m('h4', 'Commonwealth'),
-        app.isLoggedIn() && getSelectableCommunities().map((c: CommunityInfo | ChainInfo) => {
-          return m(ListItem, {
-            label: c.name,
-            onclick: (e) => m.route.set(`/${c.id}`),
-          });
-        }),
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
-          label: 'Notification Settings',
-          onclick: (e) => m.route.set('/notification-settings'),
-        }),
+        m('h4', 'Settings'),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER, }),
-          label: 'User Settings',
+          label: 'Settings',
           onclick: (e) => m.route.set('/settings'),
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
-          label: 'Back to home',
-          onclick: (e) => m.route.set('/'),
+          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          label: 'Notifications',
+          onclick: (e) => m.route.set('/notification-settings'),
         }),
       ]),
     ] : [
