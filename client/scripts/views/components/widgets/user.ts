@@ -212,7 +212,7 @@ export const UserBlock: m.Component<{
         ]),
       ]),
       m('.user-block-right', [
-        selected && m('.user-block-selected', '✓'),
+        m('.user-block-selected', selected ? '✓' : ''),
       ]),
     ]);
   }

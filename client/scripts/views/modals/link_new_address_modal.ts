@@ -96,6 +96,7 @@ const accountVerifiedCallback = async (account, vnode) => {
     mixpanel.people.set({
       'Last Address Created': new Date().toISOString()
     });
+    notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalexit');
   } else {
     // log in as the new user
@@ -852,6 +853,7 @@ const LinkNewAddressModal = {
               canExit = true;
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
+              notifySuccess('Success!!');
             }
           }, 'Close'),
         ]),
