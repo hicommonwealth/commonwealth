@@ -131,7 +131,7 @@
 .Validators {
 
     font-family: 'Inter', sans-serif !important;
-    min-width: 80vw;
+    min-width: 70vw;
     overflow-x: scroll;
     padding-top: 40px !important;
     th {
@@ -197,7 +197,7 @@
 }
 
 .ValidatorPage {
-    margin: 0 !important;
+    margin: 0 auto;
   .validators-preheader {
     display: flex;
     margin-bottom: 32px;
@@ -244,36 +244,37 @@
 }
 
 
-.cui-list{
-    background-color: #F4F4F9 !important;
-    margin-bottom: 0px !important;
-    padding-top: 20px !important;
-    padding-bottom: 20px !important;
-}
+// .cui-list{
+//     background-color: #F4F4F9 !important;
+//     margin-bottom: 0px !important;
+//     padding-top: 20px !important;
+//     padding-bottom: 20px !important;
+// }
 
-.cui-list h4{
-    font-family: Inter !important;
-    font-style: normal !important;
-    font-weight: bold !important;
-    font-size: 12px !important;
-    letter-spacing: -0.2px !important;
-}
+// .cui-list h4{
+//     font-family: Inter !important;
+//     font-style: normal !important;
+//     font-weight: bold !important;
+//     font-size: 12px !important;
+//     letter-spacing: -0.2px !important;
+// }
 
-.cui-list-item{
-    font-family: Inter !important;
-    font-style: normal !important;
-    font-weight: 500 !important;
-    font-size: 16px !important;
-    color: #536E7C !important;
-}
+// .cui-list-item{
+//     font-family: Inter !important;
+//     font-style: normal !important;
+//     font-weight: 500 !important;
+//     font-size: 16px !important;
+//     color: #536E7C !important;
+// }
 
-.cui-active{
-    color: white !important;
-}
+// .cui-active{
+//     color: white !important;
+//     background-color: #674EFA !important;
+// }
 
-.cui-list-item svg{
-    color: #536E7C !important;
-}
+// .cui-list-item svg{
+//     color: #536E7C !important;
+// }
 
 
 .gray-text{
@@ -285,13 +286,12 @@
 
 .validators-table{
   width: auto;
-  min-width: 1560px;
+  min-width: 1360px;
   border-collapse: collapse !important;
-    // border-spacing: 40px !important;
 }
 
 .validators-table td{
-  padding-right: 50px;
+  // padding-right: 50px;
 }
 
 
