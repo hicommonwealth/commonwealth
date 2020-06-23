@@ -72,12 +72,14 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
   let nodeUrl = node.url;
   const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
   nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
-  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1 && nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1;
+  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1
+    && nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1
+    && nodeUrl.indexOf('rpc.polkadot.io') === -1;
   const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
   if (nodeUrl.indexOf(':9944') !== -1) {
     nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
   }
-  const provider = new WsProvider(protocol + nodeUrl);
+  const provider = new WsProvider(protocol + nodeUrl, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());
@@ -124,7 +126,8 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
     }
     case SubstrateEntityKind.CollectiveProposal: {
       const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
-      if (collectiveName && collectiveName === 'technicalCommittee' && chain.class === ChainClass.Kusama) {
+      if (collectiveName && collectiveName === 'technicalCommittee'
+        && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
         const constructorFunc = (e) => new SubstrateCollectiveProposal(
           chain.chain, chain.accounts, chain.technicalCommittee, e
         );

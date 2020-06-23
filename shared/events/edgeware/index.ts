@@ -64,7 +64,7 @@ export default async function (
   discoverReconnectRange?: () => Promise<IDisconnectedRange>,
   performMigration?: boolean,
 ): Promise<IBlockSubscriber<any, SubstrateBlock>> {
-  const provider = new WsProvider(url);
+  const provider = new WsProvider(url, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());

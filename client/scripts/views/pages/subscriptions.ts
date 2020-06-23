@@ -358,7 +358,9 @@ const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   view: (vnode) => {
     let titler;
     // TODO: swap this to use EventSupportingChains somehow
-    if (vnode.state.chain.startsWith('edgeware') || vnode.state.chain.startsWith('kusama')) {
+    if (vnode.state.chain.startsWith('edgeware')
+      || vnode.state.chain.startsWith('kusama')
+      || vnode.state.chain.startsWith('polkadot')) {
       titler = EdgewareTitlerFunc;
       vnode.state.eventKinds = SubstrateEventKinds;
     } else {

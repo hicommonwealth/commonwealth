@@ -10,9 +10,11 @@ export type IChainEventData = ISubstrateEventData;
 export type IChainEventKind = SubstrateEventKind;
 export const EventSupportingChains = [
   'edgeware',
-  'edgeware-local',
+  // 'edgeware-local',
   'kusama',
-  'kusama-local',
+  // 'kusama-local',
+  'polkadot',
+  // 'polkadot-local',
 ];
 
 export interface CWEvent {
