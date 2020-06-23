@@ -34,7 +34,6 @@ export interface IAccountInfo extends DeriveAccountRegistration{
   isLowQuality: boolean;
   isReasonable: boolean;
   waitCount: number;
-  stash: string;
 }
 
 function extractNominators(nominations: [StorageKey, Option<Nominations>][]): Record<string, iInfo[]> {
@@ -111,7 +110,6 @@ class SubstrateStaking implements StorageModule {
         const isLowQuality = judgements.some(([, judgement]) => judgement.isLowQuality);
         info = {
           name,
-          stash: address,
           ...identity,
           isBad: isErroneous || isLowQuality,
           isErroneous,
@@ -124,7 +122,6 @@ class SubstrateStaking implements StorageModule {
         };
       }
       info.name = name || '';
-      info.stash = address || '';
       return info;
     }));
   }
