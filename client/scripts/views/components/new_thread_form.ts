@@ -117,7 +117,7 @@ export const loadDraft = async (state, draft) => {
   m.redraw();
 };
 
-export const cancelDraft = async (state, draft) => {
+export const cancelDraft = async (state) => {
 // First we check if the form has been updated, to avoid
   // losing any unsaved form data
   const confirmed = await checkForModifications(state);
@@ -357,29 +357,6 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               name: 'save',
               tabindex: 4
             }),
-            m(Button, {
-              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-              intent: 'none',
-              onclick: () => {
-                const { form, quillEditorState } = vnode.state;
-                try {
-                  vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
-                  if (vnode.attrs.isModal && !vnode.state.error?.draft) {
-                    notifySuccess('Draft saved');
-                    setTimeout(() => {
-                      $(vnode.dom).trigger('modalexit');
-                    }, 0);
-                  } else if (!vnode.state.error?.draft) {
-                    m.route.set(`/${app.activeId()}`);
-                  }
-                } catch (e) {
-                  console.error(e);
-                }
-              },
-              label: 'Save as draft',
-              name: 'save',
-              tabindex: 4
-            }),
           ]),
           error
             && (typeof error === 'string' || Object.keys(error).length)
@@ -425,7 +402,13 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             onclick: () => loadDraft(vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
           });
-        }))
+        })),
+        m(Button, {
+          class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+          intent: 'none',
+          onclick: () => cancelDraft(vnode.state),
+          label: 'Cancel draft',
+        }),
       ])
     ]);
   }
