@@ -57,6 +57,7 @@ interface IProposalHeaderAttrs {
 
 interface IProposalHeaderState {
   editing: boolean;
+  saving: boolean;
   quillEditorState: any;
   currentText: any;
 }
