@@ -363,9 +363,9 @@ describe('Moloch Event Integration Tests', () => {
     await submitProposal(provider, app1Moloch, app1Token, applicant1, applicant2, true);
     provider.send('evm_increaseTime', [2]);
     await app1Moloch.submitVote(2, 2);
-    provider.send('evm_increaseTime', [2]);
+    provider.send('evm_increaseTime', [1]);
     await api.submitVote(2, 1);
-    provider.send('evm_increaseTime', [2]);
+    provider.send('evm_increaseTime', [3]);
 
     // perform migration
     const events: CWEvent<IMolochEventData>[] = [];
