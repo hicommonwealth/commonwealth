@@ -1,5 +1,6 @@
 import m from 'mithril';
 import app from 'state';
+import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
@@ -16,6 +17,7 @@ const model = {
   currentTab: 'current',
   show: true,
   total: { waiting: 0, current: 0 },
+  sortKey: 'eraPoints',
   reset(index) {
     model.currentPage = 1;
     model.show = true;
@@ -33,6 +35,9 @@ const model = {
   next() {
     if (model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage))
       model.currentPage++;
+  },
+  changeSort(key: string) {
+    model.sortKey = key;
   }
 };
 
@@ -53,11 +58,11 @@ const PresentationComponent = (state, chain: Substrate) => {
   ).length;
 
   const currentValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === true))
-    .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+    .sort((val1, val2) => get(validators[val2], model.sortKey, 0) - get(validators[val1], model.sortKey, 0))
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   const waitingValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === false))
-    .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
+    .sort((val1, val2) => validators[val2].eraPoints - validators[val1].eraPoints)
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   return m('div',
@@ -68,11 +73,11 @@ const PresentationComponent = (state, chain: Substrate) => {
         m('tr.validators-heading', [
           m('th.val-controller', 'Controller'),
           m('th.val-stash', 'Stash'),
-          m('th.val-total', 'Total Stake'),
-          m('th.val-total', 'Own Stake'),
+          m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.total') }, 'Total Stake'),
+          m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.own') }, 'Own Stake'),
           m('th.val-total', 'Other Stake'),
           m('th.val-commission', 'Commission'),
-          m('th.val-points', 'Points'),
+          m('th.val-points.pointer', { onclick: () => model.changeSort('eraPoints') }, 'Points'),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
         ]),
