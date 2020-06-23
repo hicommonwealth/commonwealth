@@ -616,6 +616,39 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
   },
 };
 
+const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo }, {}> = {
+  view: (vnode) => {
+    const { subscriptions, community } = vnode.attrs;
+    const newThreadSubscription = subscriptions.find((s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id));
+    console.dir(newThreadSubscription);
+    return newThreadSubscription && m('tr', [
+      m('td', 'New Threads'),
+      m('td', [
+        m(Checkbox, {}),
+      ]),
+      m('td', [
+        m(Checkbox, {
+        }),
+      ]),
+    ]);
+  },
+};
+
+interface ICommunitySpecificNotificationsAttrs {
+  community: CommunityInfo;
+  subscriptions: NotificationSubscription[];
+}
+
+const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotificationsAttrs, {}> = {
+  view: (vnode) => {
+    const { community, subscriptions } = vnode.attrs;
+    return [
+      m('tr', [ m('td', `${community.name}, ${community.id}, ${community.privacyEnabled}?`)]),
+      m(NewThreadRow, { community, subscriptions }),
+    ];
+  },
+};
+
 interface IGeneralNewThreadsAndCommentsAttrs {
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
@@ -740,27 +773,37 @@ interface ICommunityNotificationsState {
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
     vnode.state.selectedCommunity = null;
-    vnode.state.communityIds = ['All communities'];
+    // vnode.state.communityIds = ['All communities'];
+    vnode.state.communityIds = [];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
+
+    // for testing, not production
+    vnode.state.selectedCommunity = vnode.attrs.communities.find((c) => c.id === 'internal');
+    // vnode.state.selectedCommunityId = vnode.state.selectedCommunity.name;
   },
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
+    // vnode.state.selectedCommunityId = (selectedCommunity) ? vnode.state.communityIds.find((c) => c === selectedCommunity.name) : 'All communities';
+    // console.dir(vnode.state.selectedCommunityId);
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
         m(Select, {
+          value: vnode.state.selectedCommunity?.name || 'All communities',
           options: vnode.state.communityIds,
           onchange: (e) => {
-            const target = (e.target as any).value;
-            vnode.state.selectedCommunityId = target;
-            if (target === 'All communities') {
-              vnode.state.selectedCommunity = null;
-            } else {
-              const community = communities.find((c) => target === c.name);
-              vnode.state.selectedCommunity = community;
-            }
+            const target = (e.currentTarget as any).value;
+            vnode.state.selectedCommunity = communities.find((c) => c.name === target);
+            console.dir(vnode.state.selectedCommunity);
             m.redraw();
+            // if (target === 'All communities') {
+            //   vnode.state.selectedCommunity = null;
+            // } else {
+            //   const community = communities.find((c) => target === c.name);
+            //   vnode.state.selectedCommunity = community;
+            // }
+            // m.redraw();
           }
         })
       ]),
@@ -772,9 +815,11 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
           m('th', 'In app'),
           m('th', 'By email'),
         ]),
-        (selectedCommunity === null) && [
-          m(GeneralCommunityNotifications, { communities, subscriptions }),
-        ]
+        // (selectedCommunityId === 'All communities') && [
+        //   m(GeneralCommunityNotifications, { communities, subscriptions }),
+        // ],
+        (!!selectedCommunity)
+          && m(CommunitySpecificNotifications, { subscriptions, community: selectedCommunity }),
       ]),
     ]);
   }
