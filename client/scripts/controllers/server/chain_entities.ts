@@ -13,7 +13,7 @@ import {
   IEventProcessor,
   IEventSubscriber
 } from 'events/interfaces';
-import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/edgeware/types';
+import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/substrate/types';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',

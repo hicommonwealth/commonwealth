@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import { combineLatest, of, BehaviorSubject, Unsubscribable } from 'rxjs';
-import { takeWhile, flatMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Unsubscribable } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
@@ -9,7 +9,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/edgeware/types';
+import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';

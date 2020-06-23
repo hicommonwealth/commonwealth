@@ -5,7 +5,7 @@ import WebSocket from 'ws';
 import {
   IEventHandler, CWEvent, eventToEntity, entityToFieldName, EntityEventKind, IChainEntityKind, IChainEventData
 } from '../../shared/events/interfaces';
-import { SubstrateEntityKind } from '../../shared/events/edgeware/types';
+import { SubstrateEntityKind } from '../../shared/events/substrate/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';

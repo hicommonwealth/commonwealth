@@ -1,12 +1,12 @@
-import { Unsubscribable, Observable } from 'rxjs';
-import { map, first } from 'rxjs/operators';
+import { Unsubscribable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { Codec } from '@polkadot/types/types';
-import { BlockNumber, Call, Balance, VoteThreshold, Hash, Proposal, PreimageStatus } from '@polkadot/types/interfaces';
+import { BlockNumber, Call, Balance, VoteThreshold, Hash } from '@polkadot/types/interfaces';
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/edgeware/types';
-import { ProposalModule, ChainEntity } from 'models';
+import { SubstrateEntityKind } from 'events/substrate/types';
+import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';

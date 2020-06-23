@@ -6,9 +6,9 @@ import {
   ISubstrateEventData,
   SubstrateEventKind,
   SubstrateEntityKind,
-  EdgewareEventChains,
+  SubstrateEventChains,
   SubstrateEventKinds
-} from './edgeware/types';
+} from './substrate/types';
 import {
   MolochEntityKind,
   IMolochEventData,
@@ -22,7 +22,7 @@ export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
 export type IChainEventData = ISubstrateEventData | IMolochEventData;
 export type IChainEventKind = SubstrateEventKind | MolochEventKind;
 export const ChainEventKinds = [...SubstrateEventKinds, ...MolochEventKinds];
-export const EventSupportingChains = [...EdgewareEventChains, ...MolochEventChains];
+export const EventSupportingChains = [...SubstrateEventChains, ...MolochEventChains];
 export enum EntityEventKind {
   Create = 0,
   Update,

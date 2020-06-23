@@ -1,5 +1,5 @@
 /**
- * Processes edgeware blocks and emits events.
+ * Processes substrate blocks and emits events.
  */
 import { ApiPromise } from '@polkadot/api';
 import { GenericEvent } from '@polkadot/types';
@@ -18,7 +18,7 @@ export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
   public get lastBlockNumber() { return this._lastBlockNumber; }
 
   /**
-   * Parse events out of an edgeware block and standardizes their format
+   * Parse events out of an substrate block and standardizes their format
    * for processing.
    *
    * @param block the block received for processing

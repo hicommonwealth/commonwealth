@@ -1,9 +1,9 @@
 import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
-import { Vote as SrmlVote, BlockNumber } from '@polkadot/types/interfaces';
+import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ITXModalData, ProposalModule, ChainEntity } from 'models';
-import { SubstrateEntityKind } from 'events/edgeware/types';
+import { ITXModalData, ProposalModule } from 'models';
+import { SubstrateEntityKind } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';

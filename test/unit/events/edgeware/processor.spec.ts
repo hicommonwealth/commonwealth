@@ -1,8 +1,8 @@
 import chai from 'chai';
 import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 
-import Processor from '../../../../shared/events/edgeware/processor';
-import { SubstrateEventKind, ISubstrateSlash } from '../../../../shared/events/edgeware/types';
+import Processor from '../../../../shared/events/substrate/processor';
+import { SubstrateEventKind, ISubstrateSlash } from '../../../../shared/events/substrate/types';
 import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;

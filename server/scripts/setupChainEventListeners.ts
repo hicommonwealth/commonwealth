@@ -3,14 +3,14 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import subscribeEdgewareEvents, {
-  createSubstrateProvider, createEdgewareApi
-} from '../../shared/events/edgeware/index';
+import subscribeSubstrateEvents, {
+  createSubstrateProvider, createSubstrateApi
+} from '../../shared/events/substrate/index';
 import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
 } from '../../shared/events/interfaces';
-import { EdgewareEventChains } from '../../shared/events/edgeware/types';
+import { SubstrateEventChains } from '../../shared/events/substrate/types';
 import { MolochEventChains } from '../../shared/events/moloch/types';
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -63,14 +63,14 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
       let subscriber: IEventSubscriber<any, any>;
-      if (EdgewareEventChains.includes(node.chain)) {
+      if (SubstrateEventChains.includes(node.chain)) {
         const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
         const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
         const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
         const url = protocol + node.url;
         const provider = await createSubstrateProvider(url);
-        const api = await createEdgewareApi(provider, node.chain.startsWith('edgeware')).isReady;
-        subscriber = await subscribeEdgewareEvents({
+        const api = await createSubstrateApi(provider, node.chain.startsWith('edgeware')).isReady;
+        subscriber = await subscribeSubstrateEvents({
           chain: node.chain,
           handlers,
           skipCatchup,

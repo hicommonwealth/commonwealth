@@ -1,5 +1,5 @@
 /**
- * Fetches events from edgeware chain in real time.
+ * Fetches events from substrate chain in real time.
  */
 import { ApiPromise } from '@polkadot/api';
 import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';

@@ -43,7 +43,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
  * This a labeler function, which takes event data and describes it in "plain english",
  * such that we can display a notification regarding its contents.
  */
-const labelEdgewareEvent: LabelerFilter = (
+const labelSubstrateEvent: LabelerFilter = (
   blockNumber: number,
   chainId: string,
   data: ISubstrateEventData,
@@ -420,4 +420,4 @@ const labelEdgewareEvent: LabelerFilter = (
   }
 };
 
-export default labelEdgewareEvent;
+export default labelSubstrateEvent;
