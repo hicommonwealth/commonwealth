@@ -616,19 +616,58 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
   },
 };
 
-const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo }, {}> = {
+const InAppCheckbox: m.Component<{ subscription: NotificationSubscription }> = {
+  view: (vnode) => {
+    const { subscription } = vnode.attrs;
+    return m(Checkbox, {
+      size: 'lg',
+      checked: subscription.isActive,
+      onchange: async (e) => {
+        e.preventDefault();
+        if (subscription.isActive) {
+          await app.user.notifications.disableImmediateEmails([subscription]);
+        } else {
+          await app.user.notifications.enableImmediateEmails([subscription]);
+        }
+        m.redraw();
+      }
+    });
+  },
+};
+
+const EmailCheckbox: m.Component<{ subscription: NotificationSubscription }> = {
+  view: (vnode) => {
+    const { subscription } = vnode.attrs;
+    return m(Checkbox, {
+      size: 'lg',
+      disabled: subscription.isActive,
+      checked: subscription.immediateEmail,
+      onchange: async (e) => {
+        e.preventDefault();
+        if (subscription.immediateEmail) {
+          await app.user.notifications.disableImmediateEmails([subscription]);
+        } else {
+          await app.user.notifications.enableImmediateEmails([subscription]);
+        }
+        m.redraw();
+      }
+    });
+  },
+};
+
+const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
-    const newThreadSubscription = subscriptions.find((s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id));
-    console.dir(newThreadSubscription);
-    return newThreadSubscription && m('tr', [
+    const subscription = subscriptions.find(
+      (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
+    );
+    return subscription && m('tr', [
       m('td', 'New Threads'),
       m('td', [
-        m(Checkbox, {}),
+        m(InAppCheckbox, { subscription, }),
       ]),
       m('td', [
-        m(Checkbox, {
-        }),
+        m(EmailCheckbox, { subscription, }),
       ]),
     ]);
   },
