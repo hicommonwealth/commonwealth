@@ -5,7 +5,7 @@ import { IApp } from 'state';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { mnemonicValidate } from '@polkadot/util-crypto';
+import bip39 from 'bip39';
 import EthereumChain from './chain';
 import EthereumAccount from './account';
 
@@ -17,14 +17,14 @@ export function addressFromSeed(seed: string): string {
   return getWalletFromSeed(seed).getAddressString();
 }
 
-export function addressFromMnemonic(bip39, mnemonic: string): string {
-  if (!mnemonicValidate(mnemonic)) throw new Error('Invalid mnemonic');
+export function addressFromMnemonic(mnemonic: string): string {
+  if (!bip39.validateMnemonic(mnemonic)) throw new Error('Invalid mnemonic');
   const seed = bip39.mnemonicToSeedSync('basket actual').toString('hex');
   return addressFromSeed(seed);
 }
 
-export function getWalletFromMnemonic(bip39, mnemonic: string): Wallet {
-  if (!mnemonicValidate(mnemonic)) throw new Error('Invalid mnemonic');
+export function getWalletFromMnemonic(mnemonic: string): Wallet {
+  if (!bip39.validateMnemonic(mnemonic)) throw new Error('Invalid mnemonic');
   const seed = bip39.mnemonicToSeedSync('basket actual').toString('hex');
   return getWalletFromSeed(seed);
 }
@@ -48,8 +48,6 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   public get store() { return this._store; }
 
   private _Chain: EthereumChain;
-  private _bip39;
-  public get bip39() { return this._bip39; }
 
   public get(address: string) {
     return this.fromAddress(address.toLowerCase());
@@ -84,7 +82,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
     return acct;
   }
   public fromMnemonic(mnemonic: string): EthereumAccount {
-    const address = addressFromMnemonic(this.bip39, mnemonic);
+    const address = addressFromMnemonic(mnemonic);
     const acct = this.fromAddress(address);
     acct.setMnemonic(mnemonic);
     return acct;
@@ -104,14 +102,7 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
 
   public init(ChainInfo: EthereumChain): Promise<void> {
     this._Chain = ChainInfo;
-    return new Promise((resolve, reject) => {
-      // TODO: verify this boilerplate code also works with Ethereum chain API
-      // UPDATE: it did not, so it was delete.
-      // TODO: implement
-
-      // only import bip39 on init to avoid leaking dependencies
-      import('bip39').then(() => resolve());
-    });
+    return Promise.resolve();
   }
 }
 

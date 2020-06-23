@@ -110,7 +110,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
   }
 
   protected addressFromMnemonic(mnemonic: string) {
-    return addressFromMnemonic(this._Accounts.bip39, mnemonic);
+    return addressFromMnemonic(mnemonic);
   }
 
   protected addressFromSeed(seed: string) {
@@ -147,7 +147,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
     if (this.seed) {
       privateKey = getWalletFromSeed(this.seed).getPrivateKey().toString('hex');
     } else if (this.mnemonic) {
-      privateKey = getWalletFromMnemonic(this._Accounts.bip39, this.mnemonic).getPrivateKey().toString('hex');
+      privateKey = getWalletFromMnemonic(this.mnemonic).getPrivateKey().toString('hex');
     } else if (this.wallet) {
       privateKey = this.wallet.getPrivateKey().toString('hex');
     } else {

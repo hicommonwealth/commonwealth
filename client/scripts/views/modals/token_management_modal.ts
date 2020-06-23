@@ -1,8 +1,8 @@
 import 'modals/token_management_modal.scss';
 
 import Web3 from 'web3';
-import { default as m } from 'mithril';
-import { default as $ } from 'jquery';
+import m from 'mithril';
+import $ from 'jquery';
 import { TextInputFormField, RadioSelectorFormField } from 'views/components/forms';
 import { ERC20Token } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
@@ -31,12 +31,12 @@ interface IState {
 const TokenManagementModal: m.Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.toggleValue = 'approve';
-    vnode.attrs.account.tokenBalance(vnode.attrs.tokenAddress).then((v) => {
-      vnode.state.tokensAvailable = v.toString();
-      m.redraw();
-    });
-    vnode.attrs.account.tokenAllowance(vnode.attrs.tokenAddress, vnode.attrs.contractAddress).then((v) => {
-      vnode.state.tokensAllocatedToContract = v.toString();
+    Promise.all([
+      vnode.attrs.account.tokenBalance(vnode.attrs.tokenAddress),
+      vnode.attrs.account.tokenAllowance(vnode.attrs.tokenAddress, vnode.attrs.contractAddress),
+    ]).then(([ tokensAvailable, tokensAllocated ]) => {
+      vnode.state.tokensAvailable = tokensAvailable.toString();
+      vnode.state.tokensAllocatedToContract = tokensAllocated.toString();
       m.redraw();
     });
   },
@@ -113,7 +113,7 @@ const TokenManagementModal: m.Component<IAttrs, IState> = {
         m('.token-data-label', [ `ERC20 contract address: ${vnode.attrs.tokenAddress}` ]),
         m('.token-data-label', [ `Your ERC20 holdings: ${vnode.state.tokensAvailable || '--'}` ]),
         m(RadioSelectorFormField, {
-          callback: async (value: ToggleAction) => {
+          callback: (value: ToggleAction) => {
             vnode.state.toggleValue = value;
             m.redraw();
           },
