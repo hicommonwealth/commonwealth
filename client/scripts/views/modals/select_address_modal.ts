@@ -108,6 +108,14 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         //   'separate voting and staking addresses.',
         // ]),
         m(Button, {
+          label: vnode.state.selectedIndex === undefined ? 'Select an address' : 'Join community with address',
+          intent: 'primary',
+          compact: true,
+          fluid: true,
+          disabled: vnode.state.selectedIndex === undefined || vnode.state.loading,
+          onclick: createRole.bind(this),
+        }),
+        m(Button, {
           label: 'Connect a new address',
           intent: 'none',
           compact: true,
@@ -116,14 +124,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           onclick: (e) => {
             app.modals.create({ modal: LinkNewAddressModal });
           },
-        }),
-        m(Button, {
-          label: vnode.state.selectedIndex === undefined ? 'Select an address' : 'Join community with address',
-          intent: 'primary',
-          compact: true,
-          fluid: true,
-          disabled: vnode.state.selectedIndex === undefined || vnode.state.loading,
-          onclick: createRole.bind(this),
         }),
       ]),
     ]);
