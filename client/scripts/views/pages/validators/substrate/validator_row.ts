@@ -86,7 +86,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     return m('tr.ValidatorRow', [
       m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
       m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
-        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-total', [
         formatCoin(app.chain.chain.coins(stakingInfo?.stakeTotal), true), ' ',
