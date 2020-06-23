@@ -75,7 +75,13 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const emitter = new EventEmitter();
   const handler = new MolochEventHandler(emitter);
   if (subscribe) {
-    await subscribeMolochEvents('test', api, 1, [ handler ], true);
+    await subscribeMolochEvents({
+      chain: 'test',
+      api,
+      contractVersion: 1,
+      handlers: [ handler ],
+      skipCatchup: true,
+    });
   }
   return { api, token, addresses, provider, handler };
 }
@@ -365,7 +371,14 @@ describe('Moloch Event Integration Tests', () => {
     const events: CWEvent<IMolochEventData>[] = [];
     handler.emitter.on('*', (evt: CWEvent<IMolochEventData>) => events.push(evt));
     const discoverReconnectRange = async () => ({ startBlock: 0 });
-    const subscription = await subscribeMolochEvents('test', api, 1, [ handler ], false, discoverReconnectRange);
+    const subscription = await subscribeMolochEvents({
+      chain: 'test',
+      api,
+      contractVersion: 1,
+      handlers: [ handler ],
+      skipCatchup: false,
+      discoverReconnectRange
+    });
     subscription.unsubscribe();
 
     // validate events

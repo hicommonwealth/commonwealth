@@ -7,11 +7,11 @@ import sleep from 'sleep-promise';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
-import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
+import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent, SubscribeFunc } from '../interfaces';
 import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
-import { IMolochEventData, MolochRawEvent, MolochApi } from './types';
+import { IMolochEventData, MolochRawEvent, MolochApi, IMolochSubscribeOptions } from './types';
 
 import { Moloch1Factory } from '../../../eth/types/Moloch1Factory';
 import { Moloch2Factory } from '../../../eth/types/Moloch2Factory';
@@ -81,14 +81,8 @@ export async function createMolochApi(
  * @param discoverReconnectRange A function to determine how long we were offline upon reconnection.
  * @returns An active block subscriber.
  */
-export default async function (
-  chain: string, // contract name
-  api: MolochApi,
-  contractVersion: 1 | 2,
-  handlers: IEventHandler<IMolochEventData>[],
-  skipCatchup: boolean = true,
-  discoverReconnectRange?: () => Promise<IDisconnectedRange>,
-): Promise<IEventSubscriber<MolochApi, MolochRawEvent>> {
+const subscribe: SubscribeFunc<MolochApi, MolochRawEvent, IMolochSubscribeOptions> = async (options) => {
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, contractVersion } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IMolochEventData>) => {
     let prevResult = null;
@@ -172,4 +166,6 @@ export default async function (
   }
 
   return subscriber;
-}
+};
+
+export default subscribe;

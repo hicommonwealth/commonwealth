@@ -21,7 +21,7 @@ import {
 export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
 export type IChainEventData = ISubstrateEventData | IMolochEventData;
 export type IChainEventKind = SubstrateEventKind | MolochEventKind;
-export const ChainEventKinds = [...SubstrateEventKinds, ...MolochEventKinds]
+export const ChainEventKinds = [...SubstrateEventKinds, ...MolochEventKinds];
 export const EventSupportingChains = [...EdgewareEventChains, ...MolochEventChains];
 export enum EntityEventKind {
   Create = 0,
@@ -65,6 +65,19 @@ export abstract class IEventSubscriber<Api, RawEvent> {
 
   public abstract unsubscribe(): void;
 }
+
+export interface ISubscribeOptions<Api> {
+  chain: string;
+  api: Api;
+  handlers: IEventHandler<IChainEventData>[];
+  skipCatchup?: boolean;
+  discoverReconnectRange?: () => Promise<IDisconnectedRange>;
+  performMigration?: boolean;
+}
+
+export type SubscribeFunc<
+  Api, RawEvent, Options extends ISubscribeOptions<Api>
+> = (options: Options) => Promise<IEventSubscriber<Api, RawEvent>>;
 
 export interface IDisconnectedRange {
   startBlock: number;

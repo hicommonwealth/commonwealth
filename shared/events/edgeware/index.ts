@@ -7,11 +7,24 @@ import Subscriber from './subscriber';
 import Poller from './poller';
 import Processor from './processor';
 import { SubstrateBlock, ISubstrateEventData } from './types';
-import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
+import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
+
+export async function createSubstrateProvider(url: string): Promise<WsProvider> {
+  const provider = new WsProvider(url);
+  let unsubscribe: () => void;
+  await new Promise((resolve) => {
+    unsubscribe = provider.on('connected', () => resolve());
+  });
+
+  // auto-unsubscribe once we establish a connection, then reconnect at API construction time
+  // TODO: remove this logic.
+  if (unsubscribe) unsubscribe();
+  return provider;
+}
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
@@ -56,23 +69,9 @@ export function createEdgewareApi(provider: WsProvider, isEdgeware: boolean): Ap
  * @param discoverReconnectRange A function to determine how long we were offline upon reconnection.
  * @returns An active block subscriber.
  */
-export default async function (
-  chain: string,
-  url = 'ws://localhost:9944',
-  handlers: IEventHandler<ISubstrateEventData>[],
-  skipCatchup: boolean,
-  discoverReconnectRange?: () => Promise<IDisconnectedRange>,
-  performMigration?: boolean,
-): Promise<IEventSubscriber<any, SubstrateBlock>> {
-  const provider = new WsProvider(url);
-  let unsubscribe: () => void;
-  await new Promise((resolve) => {
-    unsubscribe = provider.on('connected', () => resolve());
-  });
-  if (unsubscribe) unsubscribe();
-
-  const api = await createEdgewareApi(provider, chain.startsWith('edgeware')).isReady;
-
+const subscribe: SubscribeFunc<ApiPromise, SubstrateBlock, ISubscribeOptions<ApiPromise>> = async (options) => {
+  // const api = await createEdgewareApi(provider, chain.startsWith('edgeware')).isReady;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, performMigration } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<ISubstrateEventData>) => {
     let prevResult = null;
@@ -104,7 +103,7 @@ export default async function (
   // returns early, does not initialize the subscription
   if (performMigration) {
     const version = await api.rpc.state.getRuntimeVersion();
-    log.info(`Starting event migration for ${version.specName}:${version.specVersion} at ${url}.`);
+    log.info(`Starting event migration for ${version.specName}:${version.specVersion}.`);
     const fetcher = new StorageFetcher(api);
     const events = await fetcher.fetch();
     await Promise.all(events.map((event) => handleEventFn(event)));
@@ -162,7 +161,7 @@ export default async function (
   }
 
   try {
-    log.info(`Subscribing to Substrate endpoint at ${url}...`);
+    log.info(`Subscribing to ${chain} endpoint...`);
     subscriber.subscribe(processBlockFn);
 
     // handle reconnects with poller
@@ -172,4 +171,6 @@ export default async function (
   }
 
   return subscriber;
-}
+};
+
+export default subscribe;

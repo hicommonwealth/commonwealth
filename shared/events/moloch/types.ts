@@ -1,4 +1,5 @@
 import { Event } from 'ethers';
+import { ISubscribeOptions } from '../interfaces';
 import { Moloch1 } from '../../../eth/types/Moloch1';
 import { Moloch2 } from '../../../eth/types/Moloch2';
 
@@ -11,6 +12,10 @@ export type MolochApi = Moloch1 | Moloch2;
 export const MolochEventChains = [ 'moloch', 'moloch-local' ];
 
 export type MolochRawEvent = Event;
+
+export interface IMolochSubscribeOptions extends ISubscribeOptions<MolochApi> {
+  contractVersion: 1 | 2;
+}
 
 export enum MolochEntityKind {
   Proposal = 'proposal',

@@ -16,5 +16,11 @@ class StandaloneMolochEventHandler extends IEventHandler {
 const skipCatchup = false;
 
 createMolochApi(network, 1, contractAddress).then((api) => {
-  subscribeMolochEvents(chain, api, 1, [ new StandaloneMolochEventHandler() ]);
+  subscribeMolochEvents({
+    chain,
+    api,
+    contractVersion: 1,
+    handlers: [ new StandaloneMolochEventHandler() ],
+    skipCatchup,
+  });
 });

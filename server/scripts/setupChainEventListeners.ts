@@ -3,9 +3,13 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
+import subscribeEdgewareEvents, {
+  createSubstrateProvider, createEdgewareApi
+} from '../../shared/events/edgeware/index';
 import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
-import { IDisconnectedRange, IEventHandler, EventSupportingChains } from '../../shared/events/interfaces';
+import {
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
+} from '../../shared/events/interfaces';
 import { EdgewareEventChains } from '../../shared/events/edgeware/types';
 import { MolochEventChains } from '../../shared/events/moloch/types';
 
@@ -46,31 +50,6 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
     .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
-      let subscribeFn;
-      if (EdgewareEventChains.includes(node.chain)) {
-        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
-        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
-        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-        const url = protocol + node.url;
-        subscribeFn = (evtHandlers) => subscribeEdgewareEvents(
-          node.chain,
-          url,
-          evtHandlers,
-          skipCatchup,
-          () => discoverReconnectRange(models, node.chain),
-          !!migrate,
-        );
-      } else if (MolochEventChains.includes(node.chain)) {
-        const api = await createMolochApi(node.url, 1, node.address);
-        subscribeFn = (evtHandlers) => subscribeMolochEvents(
-          node.chain,
-          api,
-          1,
-          evtHandlers,
-          skipCatchup,
-          () => discoverReconnectRange(models, node.chain),
-        );
-      }
       const storageHandler = new EventStorageHandler(models, node.chain);
       const notificationHandler = new EventNotificationHandler(models, wss);
       const migrationHandler = new MigrationHandler(models, node.chain);
@@ -83,7 +62,34 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       } else {
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
-      const subscriber = await subscribeFn(handlers);
+      let subscriber: IEventSubscriber<any, any>;
+      if (EdgewareEventChains.includes(node.chain)) {
+        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
+        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
+        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+        const url = protocol + node.url;
+        const provider = await createSubstrateProvider(url);
+        const api = await createEdgewareApi(provider, node.chain.startsWith('edgeware')).isReady;
+        subscriber = await subscribeEdgewareEvents({
+          chain: node.chain,
+          handlers,
+          skipCatchup,
+          discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+          performMigration: !!migrate,
+          api,
+        });
+      } else if (MolochEventChains.includes(node.chain)) {
+        const contractVersion = 1;
+        const api = await createMolochApi(node.url, contractVersion, node.address);
+        subscriber = await subscribeMolochEvents({
+          chain: node.chain,
+          handlers,
+          skipCatchup,
+          discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+          api,
+          contractVersion,
+        });
+      }
 
       // hook for clean exit
       process.on('SIGTERM', () => {
