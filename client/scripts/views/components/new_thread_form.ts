@@ -35,7 +35,7 @@ interface IThreadForm {
   title?: string;
 }
 
-export const loadDraft = async (state, draft) => {
+export const checkForModifications = async (state) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
@@ -78,6 +78,15 @@ export const loadDraft = async (state, draft) => {
   } else if (quill.getLength() > 1) {
     confirmed = await confirmationModalWithText(overwriteDraftMsg)();
   }
+  return confirmed;
+};
+
+export const loadDraft = async (state, draft) => {
+  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+
+  // First we check if the form has been updated, to avoid
+  // losing any unsaved form data
+  const confirmed = await checkForModifications(state);
   if (!confirmed) return;
 
   // Now we populate the form with its new contents
@@ -105,6 +114,18 @@ export const loadDraft = async (state, draft) => {
   state.form.title = draft.title;
   state.activeTag = draft.tag;
   state.fromDraft = draft.id;
+  m.redraw();
+};
+
+export const cancelDraft = async (state, draft) => {
+// First we check if the form has been updated, to avoid
+  // losing any unsaved form data
+  const confirmed = await checkForModifications(state);
+  if (!confirmed) return;
+  state.form.body = '';
+  state.form.title = '';
+  state.activeTag = null;
+  state.fromDraft = NaN;
   m.redraw();
 };
 
@@ -311,6 +332,29 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               },
               label: 'Create thread',
               name: 'submit',
+              tabindex: 4
+            }),
+            m(Button, {
+              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              intent: 'none',
+              onclick: () => {
+                const { form, quillEditorState } = vnode.state;
+                try {
+                  vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  if (vnode.attrs.isModal && !vnode.state.error?.draft) {
+                    notifySuccess('Draft saved');
+                    setTimeout(() => {
+                      $(vnode.dom).trigger('modalexit');
+                    }, 0);
+                  } else if (!vnode.state.error?.draft) {
+                    m.route.set(`/${app.activeId()}`);
+                  }
+                } catch (e) {
+                  console.error(e);
+                }
+              },
+              label: 'Save as draft',
+              name: 'save',
               tabindex: 4
             }),
             m(Button, {
