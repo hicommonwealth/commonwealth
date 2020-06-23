@@ -35,7 +35,7 @@ interface IThreadForm {
   title?: string;
 }
 
-export const checkForModifications = async (state) => {
+export const checkForModifications = async (state, modalMsg) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
   const Delta = Quill.import('delta');
@@ -43,7 +43,6 @@ export const checkForModifications = async (state) => {
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
-  const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   let confirmed = true;
   if (fromDraft) {
@@ -73,10 +72,10 @@ export const checkForModifications = async (state) => {
         ? formBodyMarkdown !== discardedMarkdown
         : false;
     if (bodyIsChanged || titleIsChanged) {
-      confirmed = await confirmationModalWithText(overwriteDraftMsg)();
+      confirmed = await confirmationModalWithText(modalMsg)();
     }
   } else if (quill.getLength() > 1) {
-    confirmed = await confirmationModalWithText(overwriteDraftMsg)();
+    confirmed = await confirmationModalWithText(modalMsg)();
   }
   return confirmed;
 };
@@ -86,7 +85,8 @@ export const loadDraft = async (state, draft) => {
 
   // First we check if the form has been updated, to avoid
   // losing any unsaved form data
-  const confirmed = await checkForModifications(state);
+  const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
+  const confirmed = await checkForModifications(state, overwriteDraftMsg);
   if (!confirmed) return;
 
   // Now we populate the form with its new contents
@@ -118,9 +118,10 @@ export const loadDraft = async (state, draft) => {
 };
 
 export const cancelDraft = async (state) => {
-// First we check if the form has been updated, to avoid
+  // First we check if the form has been updated, to avoid
   // losing any unsaved form data
-  const confirmed = await checkForModifications(state);
+  const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
+  const confirmed = await checkForModifications(state, cancelDraftMessage);
   if (!confirmed) return;
   state.form.body = '';
   state.form.title = '';
