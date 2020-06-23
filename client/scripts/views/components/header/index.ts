@@ -14,8 +14,7 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import CommunitySelector, { CurrentCommunityLabel } from './community_selector';
-import LoginSelector from './login_selector';
+import LoginSelector, { CurrentCommunityLabel } from './login_selector';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
@@ -28,8 +27,6 @@ const Header: m.Component<{}> = {
         m(NewProposalButton, { fluid: false }),
         // notifications menu
         app.isLoggedIn() && m(NotificationsDropdownMenu),
-        // community menu
-        m(CommunitySelector),
         // invites menu
         app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
           size: 'sm',
