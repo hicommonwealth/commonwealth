@@ -65,7 +65,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     const onscroll = _.debounce(() => {
       const scrollHeight = $(document).height();
       const scrollPos = $(window).height() + $(window).scrollTop();
-      if (scrollPos > (scrollHeight - 4)) {
+      if (scrollPos > (scrollHeight - 400)) {
         if (vnode.state.hasOlderPosts && !vnode.state.postsDepleted) {
           vnode.state.lookback += vnode.state.defaultLookback;
           m.redraw();
@@ -248,10 +248,10 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         ],
         allProposals.length !== 0
         && getRecentPostsSortedByWeek(),
-        vnode.state.hasOlderPosts
+        !vnode.state.postsDepleted
         && m('.infinite-scroll-spinner-wrap', [
           m(Spinner, {
-            active: vnode.state.hasOlderPosts,
+            active: !vnode.state.postsDepleted,
           })
         ])
       ]);
