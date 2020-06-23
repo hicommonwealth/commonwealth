@@ -10,6 +10,7 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {
@@ -68,6 +69,16 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
               notifyError(err.responseJSON.error);
             });
           }
+        }),
+        m(Button, {
+          label: 'Connect a new address',
+          intent: 'primary',
+          compact: true,
+          fluid: true,
+          disabled: vnode.state.loading,
+          onclick: (e) => {
+            app.modals.create({ modal: LinkNewAddressModal });
+          },
         }),
       ]),
     ]);

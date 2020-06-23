@@ -29,4 +29,7 @@
             padding: 10px 16px;
         }
     }
+    button + button {
+        margin-top: 10px;
+    }
 }
