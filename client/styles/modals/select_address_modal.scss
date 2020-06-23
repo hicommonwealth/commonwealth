@@ -23,6 +23,9 @@
         &:hover {
             background: #fafafa;
         }
+        &.selected {
+            background: #e2e7ff !important;
+        }
         &.existing {
             cursor: initial;
             .UserBlock {

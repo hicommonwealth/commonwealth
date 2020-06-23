@@ -90,6 +90,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             ]),
           ])),
           activeAccountsByRole.map(([account, role], index) => !role && m('.select-address-option', {
+            class: vnode.state.selectedIndex === index ? 'selected' : '',
             onclick: async (e) => {
               e.preventDefault();
               vnode.state.selectedIndex = index;
