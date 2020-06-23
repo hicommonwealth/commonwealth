@@ -302,11 +302,6 @@ td, th {
     max-width: 240px;
 }
 
-// align text in menus to the left by default
-.cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
-    text-align: left;
-}
-
 // adjust dialog headers
 .cui-dialog-header {
     padding: 15px 15px 15px 25px;
@@ -336,6 +331,7 @@ td, th {
 
 // menu styles
 .cui-menu {
+    padding: 6px 0;
     > .cui-button.cui-basic {
         color: #333;
         .cui-icon svg {
@@ -345,7 +341,10 @@ td, th {
     > .cui-menu-divider {
         margin: 4px 0 6px;
     }
-    padding: 6px 0;
+    .cui-button-label {
+        width: 100%;
+        text-align: left;
+    }
     button.cui-button.cui-menu-item {
         min-height: $menu-item-height;
         height: $menu-item-height;
