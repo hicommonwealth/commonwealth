@@ -43,6 +43,7 @@ export const checkForModifications = async (state, modalMsg) => {
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
+
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   let confirmed = true;
   if (fromDraft) {
@@ -118,15 +119,21 @@ export const loadDraft = async (state, draft) => {
 };
 
 export const cancelDraft = async (state) => {
+  if (!state.fromDraft) {
+    return;
+  }
   // First we check if the form has been updated, to avoid
   // losing any unsaved form data
+  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
   const confirmed = await checkForModifications(state, cancelDraftMessage);
   if (!confirmed) return;
   state.form.body = '';
   state.form.title = '';
-  state.activeTag = null;
+  state.activeTag = undefined;
   state.fromDraft = NaN;
+  (titleInput as HTMLInputElement).value = '';
+  state.quillEditorState.editor.setText('\n');
   m.redraw();
 };
 

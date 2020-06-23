@@ -72,6 +72,8 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       (vnode.state.selectedTag as any) = activeTag;
     } else if (typeof activeTag === 'string') {
       addTag(activeTag);
+    } else if (!activeTag) {
+      vnode.state.selectedTag = null;
     }
 
     return m(SelectList, {
