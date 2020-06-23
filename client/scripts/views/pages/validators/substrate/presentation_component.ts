@@ -67,7 +67,7 @@ const PresentationComponent = (state, chain: Substrate) => {
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   const waitingValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === false))
-    .sort((val1, val2) => validators[val2].eraPoints - validators[val1].eraPoints)
+    .sort((val1, val2) => validators[val2].exposure - validators[val1].exposure)
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   return m('div',
