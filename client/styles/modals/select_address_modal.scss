@@ -16,6 +16,7 @@
         border-bottom: 1px solid #eee;
     }
     .select-address-option {
+        position: relative;
         border: 1px solid #eee;
         border-bottom: none;
         cursor: pointer;
@@ -23,8 +24,19 @@
             background: #fafafa;
         }
         &.existing {
-            opacity: 0.3;
             cursor: initial;
+            .UserBlock {
+                opacity: 0.3;
+            }
+            .role-remove {
+                cursor: pointer;
+                position: absolute;
+                right: 16px;
+                top: 18px;
+                &:hover .cui-icon svg {
+                    stroke: $error-red;
+                }
+            }
         }
         > .UserBlock {
             padding: 10px 16px;

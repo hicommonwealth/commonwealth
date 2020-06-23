@@ -47,7 +47,6 @@ const MembershipButton: m.Component<{
       }
       app.user.deleteRole({ address: a, chain, community })
         .then(() => {
-          if (onMembershipChanged) onMembershipChanged(false);
           vnode.state.loading = false;
           m.redraw();
           // notify
