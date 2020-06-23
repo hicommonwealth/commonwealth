@@ -25,17 +25,14 @@ const model = {
       model.currentTab = 'waiting';
     if (index > 1)
       model.show = false;
-    m.redraw();
   },
   previous() {
     if (model.currentPage > 1)
       model.currentPage--;
-    m.redraw();
   },
   next() {
     if (model.currentPage < Math.ceil(model.total[model.currentTab] / model.perPage))
       model.currentPage++;
-    m.redraw();
   }
 };
 
