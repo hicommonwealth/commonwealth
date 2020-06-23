@@ -156,6 +156,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription: NotificationSubscriptio
 
 interface ISubscriptionRowAttrs {
   subscription: NotificationSubscription;
+  label?: string;
 }
 
 interface ISubscriptionRowState {
@@ -168,6 +169,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     vnode.state.subscription = vnode.attrs.subscription;
   },
   view: (vnode) => {
+    const { label } = vnode.attrs;
     const { subscription } = vnode.state;
     const subscriptions = app.user.notifications;
     const activeSubscription = subscriptions.subscriptions
@@ -176,7 +178,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       vnode.state.subscription = activeSubscription;
     }
     return m('tr.SubscriptionRow', [
-      m('td', `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
+      m('td', label || `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
       activeSubscription
         && m('td', [
           m(Checkbox, {
@@ -661,15 +663,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     const subscription = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    return subscription && m('tr', [
-      m('td', 'New Threads'),
-      m('td', [
-        m(InAppCheckbox, { subscription, }),
-      ]),
-      m('td', [
-        m(EmailCheckbox, { subscription, }),
-      ]),
-    ]);
+    return m(SubscriptionRow, { subscription, label: 'New Threads' });
   },
 };
 
@@ -909,6 +903,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     const communityIds = communities.map((c) => c.id);
 
     if (!app.loginStatusLoaded()) return;
+    if (subscriptions.length < 1) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
       leftSidebar: m(SubscriptionsPageSideBar, {
