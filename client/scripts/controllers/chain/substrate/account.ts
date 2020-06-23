@@ -47,6 +47,7 @@ export interface IValidatorValue {
   blockCount?: u32,
   hasMessage?: boolean,
   isOnline?: boolean,
+  otherTotal?: BN,
 }
 export interface IValidators {
   [address: string]: IValidatorValue;

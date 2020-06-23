@@ -86,11 +86,11 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-total', [
-        formatCoin(app.chain.chain.coins(stakingInfo?.stakeTotal), true), ' '
+        formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
       ]),
-      m('td.val-own', formatCoin(app.chain.chain.coins(stakingInfo?.stakeOwn), true)),
+      m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
-        formatCoin(app.chain.chain.coins(stakingInfo?.stakeOther), true),
+        formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
         nominatorsList.length > 0 && [ '(',
           m('a.val-nominators', {
             href: '#',

@@ -181,6 +181,7 @@ class SubstrateStaking implements StorageModule {
           const key = currentSet[i].toString();
           result[key] = {
             exposure: exposures[i],
+            otherTotal: exposures[i]?.total.unwrap().sub(exposures[i]?.own.unwrap()),
             controller: controllers[i].toString(),
             isElected: true,
             toBeElected: false,
@@ -195,6 +196,7 @@ class SubstrateStaking implements StorageModule {
           const key = toBeElected[i].toString();
           result[key] = {
             exposure: nextUpExposures[i],
+            otherTotal: exposures[i]?.total.unwrap().sub(exposures[i]?.own.unwrap()),
             controller: nextUpControllers[i].toString(),
             isElected: false,
             toBeElected: true,

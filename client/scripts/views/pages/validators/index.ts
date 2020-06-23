@@ -26,6 +26,7 @@ import { SubstratePreHeader, SubstratePresentationComponent } from './substrate'
 export interface IValidatorAttrs {
   stash: string;
   total?: Coin;
+  otherTotal?: Coin;
   nominators?: any;
   error?: any;
   sending?: boolean;

@@ -75,13 +75,17 @@ const PresentationComponent = (state, chain: Substrate) => {
           m('th.val-stash', 'Stash'),
           m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.total') }, 'Total Stake'),
           m('th.val-total.pointer', { onclick: () => model.changeSort('exposure.own') }, 'Own Stake'),
-          m('th.val-total', 'Other Stake'),
+          m('th.val-total.pointer', { onclick: () => model.changeSort('otherTotal') }, 'Other Stake'),
           m('th.val-commission', 'Commission'),
           m('th.val-points.pointer', { onclick: () => model.changeSort('eraPoints') }, 'Points'),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
         ]),
         currentValidators.map((validator) => {
+          // total stake
+          const total = chain.chain.coins(validators[validator].exposure.total);
+          // own stake
+          const bonded = chain.chain.coins(validators[validator].exposure.own);
           const nominators = validators[validator].exposure.others.map(({ who, value }) => ({
             stash: who.toString(),
             balance: chain.chain.coins(value),
@@ -91,15 +95,12 @@ const PresentationComponent = (state, chain: Substrate) => {
           const blockCount = validators[validator].blockCount;
           const hasMessage = validators[validator]?.hasMessage;
           const isOnline = validators[validator]?.isOnline;
-          // const hasNominated: boolean = app.user.activeAccount && nominators
-          //   && !!nominators.find(({ stash }) => stash === app.user.activeAccount.address);
-          // // add validator to collection if hasNominated already
-          // if (hasNominated) {
-          //   state.nominations.push(validator);
-          //   state.originalNominations.push(validator);
-          // }
+          const otherTotal = validators[validator]?.otherTotal;
           return m(ValidatorRow, {
             stash: validator,
+            total,
+            bonded,
+            otherTotal,
             controller,
             nominators,
             eraPoints,
