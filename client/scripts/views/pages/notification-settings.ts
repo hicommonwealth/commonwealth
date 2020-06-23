@@ -720,7 +720,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
           m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
         ]),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
-        // m(GeneralPastThreadsAndComments, { subscriptions }),
+      // m(GeneralPastThreadsAndComments, { subscriptions }),
 
     ];
   },
@@ -739,7 +739,7 @@ interface ICommunityNotificationsState {
 
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
-    // vnode.state.selectedCommunity = null;
+    vnode.state.selectedCommunity = null;
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
   },
@@ -749,19 +749,11 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
-        m(CustomSelect, {
-          triggerAttrs: {
-            align: 'left',
-            style: 'width: 300px'
-          },
-          defaultValue: 'All communities',
+        m(Select, {
           options: vnode.state.communityIds,
-          onSelect: (v) => {
-            console.dir('hi zak');
-            // const target = (e.target as any).value;
-            const target = v;
-            console.log(v);
-            // vnode.state.selectedCommunityId = target;
+          onchange: (e) => {
+            const target = (e.target as any).value;
+            vnode.state.selectedCommunityId = target;
             if (target === 'All communities') {
               vnode.state.selectedCommunity = null;
             } else {
@@ -769,8 +761,8 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
               vnode.state.selectedCommunity = community;
             }
             m.redraw();
-          },
-        }),
+          }
+        })
       ]),
       m(Table, {
         class: 'NotificationsTable'
