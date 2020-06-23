@@ -311,7 +311,6 @@ export const ProposalBodySaveEdit: m.Component<{
         intent: 'primary',
         onclick: (e) => {
           e.preventDefault();
-          debugger
           parentState.saving = true;
           parentState.quillEditorState.editor.enable(false);
           const itemText = parentState.quillEditorState.markdownMode

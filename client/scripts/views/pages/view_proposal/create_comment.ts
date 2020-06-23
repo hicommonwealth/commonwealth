@@ -50,9 +50,6 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
     }
 
     const submitComment = async (e?) => {
-      debugger
-      vnode.state.saving = true;
-
       if (!vnode.state.quillEditorState || !vnode.state.quillEditorState.editor) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
@@ -65,7 +62,6 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       }
 
       const { quillEditorState } = vnode.state;
-      quillEditorState.editor.enable(false);
 
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
@@ -86,13 +82,16 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;
+      quillEditorState.editor.enable(false);
       const chainId = app.activeCommunityId() ? null : app.activeChainId();
       const communityId = app.activeCommunityId();
       try {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
           chainId, communityId, commentText, parentComment?.id, attachments, mentions);
         callback();
+        console.log(res);
         if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
           vnode.state.quillEditorState.editor.setContents();
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
@@ -102,6 +101,9 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
+        if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
+        }
         vnode.state.error = err.message;
         vnode.state.sendingComment = false;
         m.redraw();
@@ -141,8 +143,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
           intent: 'primary',
           type: 'submit',
           compact: true,
-          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment
-            || vnode.state.saving || uploadsInProgress > 0,
+          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
           onclick: submitComment,
           label: (uploadsInProgress > 0)
             ? 'Uploading...'

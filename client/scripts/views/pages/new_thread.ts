@@ -21,20 +21,21 @@ import PageLoading from 'views/pages/loading';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 
 interface IState {
-  form: IThreadForm,
-  error,
-  quillEditorState,
-  hasComment,
   autoTitleOverride,
+  error,
+  form: IThreadForm,
+  hasComment,
   newType,
+  quillEditorState,
+  sendingThread;
   uploadsInProgress,
 }
 
 interface IThreadForm {
   tagName?: string;
   tagId?: number;
-  url?: string;
   title?: string;
+  url?: string;
 }
 
 export const NewThreadForm: m.Component<{}, IState> = {
@@ -85,12 +86,14 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
+    const { hasComment, newType, sendingThread, uploadsInProgress } = vnode.state;
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
-      vnode.state.newType === 'Link' && m(Form, [
+      newType === 'Link' && m(Form, [
         typeSelector,
         m(FormGroup, [
           m(Input, {
@@ -117,7 +120,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           }),
         ]),
         m(FormGroup, [
-          vnode.state.hasComment ? m(QuillEditor, {
+          hasComment ? m(QuillEditor, {
             contentsDoc: '', // Prevent the editor from being filled in with previous content
             oncreateBind: (state) => {
               vnode.state.quillEditorState = state;
@@ -149,11 +152,15 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author ? 'disabled' : '',
+            class: !author || sendingThread ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
             name: 'submission',
             onclick: () => {
+              vnode.state.sendingThread = true;
+              if (vnode.state.quillEditorState?.editor) {
+                vnode.state.quillEditorState.editor.enable(false);
+              }
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
@@ -161,6 +168,10 @@ export const NewThreadForm: m.Component<{}, IState> = {
                 newLink(vnode.state.form, vnode.state.quillEditorState, author);
               }
               if (!vnode.state.error) {
+                vnode.state.sendingThread = false;
+                if (vnode.state.quillEditorState?.editor) {
+                  vnode.state.quillEditorState.editor.enable();
+                }
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');
@@ -179,7 +190,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           : m('.error-placeholder'),
       ]),
       //
-      vnode.state.newType === 'Discussion' && m(Form, [
+      newType === 'Discussion' && m(Form, [
         typeSelector,
         m(FormGroup, [
           m(Input, {
@@ -219,11 +230,19 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+            class: !author || sendingThread || uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
+              vnode.state.sendingThread = true;
+              if (vnode.state.quillEditorState?.editor) {
+                vnode.state.quillEditorState.editor.enable(false);
+              }
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
               if (!vnode.state.error) {
+                vnode.state.sendingThread = false;
+                if (vnode.state.quillEditorState?.editor) {
+                  vnode.state.quillEditorState.editor.enable();
+                }
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');
