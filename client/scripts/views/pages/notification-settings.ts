@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/edgeware/types';
 import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect } from 'construct-ui';
 import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
@@ -733,26 +733,35 @@ interface ICommunityNotificationsAttrs {
 
 interface ICommunityNotificationsState {
   selectedCommunity: CommunityInfo;
+  selectedCommunityId: string;
   communityIds: string[];
 }
 
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
-    vnode.state.selectedCommunity = null;
+    // vnode.state.selectedCommunity = null;
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
   },
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
-    const { selectedCommunity, communityIds } = vnode.state;
+    const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
-        m(Select, {
-          default: 'All communities',
-          options: communityIds,
-          onchange: (e) => {
-            const target = (e.target as any).value;
+        m(CustomSelect, {
+          triggerAttrs: {
+            align: 'left',
+            style: 'width: 300px'
+          },
+          defaultValue: 'All communities',
+          options: vnode.state.communityIds,
+          onSelect: (v) => {
+            console.dir('hi zak');
+            // const target = (e.target as any).value;
+            const target = v;
+            console.log(v);
+            // vnode.state.selectedCommunityId = target;
             if (target === 'All communities') {
               vnode.state.selectedCommunity = null;
             } else {
@@ -774,7 +783,7 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
         (selectedCommunity === null) && [
           m(GeneralCommunityNotifications, { communities, subscriptions }),
         ]
-      ])
+      ]),
     ]);
   }
 };
