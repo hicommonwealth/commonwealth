@@ -43,6 +43,7 @@ const LoginSelector : m.Component<{}, {}> = {
         community: app.activeCommunityId()
       });
     });
+    const isPrivateCommunity = app.community?.meta.privacyEnabled;
 
     return m('.LoginSelector', [
       m(ButtonGroup, { fluid: true }, [
@@ -82,7 +83,8 @@ const LoginSelector : m.Component<{}, {}> = {
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
-                label: 'Connect another address'
+                label: 'Connect another address',
+                disabled: isPrivateCommunity,
               }),
               m(MenuDivider),
             ],
