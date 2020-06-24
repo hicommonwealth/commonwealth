@@ -20,8 +20,8 @@ import {
   ISubstrateSignalingVotingStarted,
   ISubstrateSignalingVotingCompleted,
   ISubstrateCollectiveVoted
-} from '../../../../shared/events/edgeware/types';
-import fetch from '../../../../shared/events/edgeware/storageFetcher';
+} from '../../../../shared/events/substrate/types';
+import StorageFetcher from '../../../../shared/events/substrate/storageFetcher';
 
 const { assert } = chai;
 
@@ -185,7 +185,8 @@ const api = constructFakeApi({
 describe('Edgeware Event Migration Tests', () => {
   /** staking events */
   it('should generate all events', async () => {
-    const events = await fetch(api);
+    const fetcher = new StorageFetcher(api);
+    const events = await fetcher.fetch();
     assert.sameDeepMembers(events, [
       { blockNumber,
         data: {

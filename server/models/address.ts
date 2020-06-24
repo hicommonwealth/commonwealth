@@ -198,8 +198,8 @@ export default (
       // the account they registered with
       const generatedAddress = getCosmosAddress(pk);
       if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
-        isValid = secp256k1.verify(signHash, signature, pk);
+        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
+        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
       } else {
         isValid = false;
       }

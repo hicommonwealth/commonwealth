@@ -12,10 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import {
-  SubstrateEventKind, ISubstrateDemocracyProposed,
-  SubstrateEntityKind, ISubstratePreimageNoted,
-} from 'events/edgeware/types';
+import { SubstrateEventKind, ISubstrateDemocracyProposed } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';

@@ -9,14 +9,11 @@ import _ from 'lodash';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'events/edgeware/types';
-import EdgewareTitlerFunc from 'events/edgeware/filters/titler';
+import { SubstrateEventKinds } from 'events/substrate/types';
+import SubstrateTitlerFunc from 'events/substrate/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup } from 'construct-ui';
-import { typeIncompatibleAnonSpreadMessage } from 'graphql/validation/rules/PossibleFragmentSpreads';
 import Sublayout from 'views/sublayout';
-import Tabs from 'views/components/widgets/tabs';
-import { DropdownFormField } from 'views/components/forms';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateIntervalMessage: string, }> = {
   oninit: (vnode) => {
@@ -441,7 +438,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
   view: (vnode) => {
     let titler;
     if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
-      titler = EdgewareTitlerFunc;
+      titler = SubstrateTitlerFunc;
       vnode.state.eventKinds = SubstrateEventKinds;
     } else {
       titler = null;

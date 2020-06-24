@@ -1,7 +1,7 @@
 import { IApp } from 'state';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
-import EthereumAccounts from 'controllers/chain/ethereum/account';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';

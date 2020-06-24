@@ -15,7 +15,10 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import labelEdgewareEvent from '../../../../shared/events/edgeware/filters/labeler';
+import { SubstrateEventChains } from '../../../../shared/events/substrate/types';
+import { MolochEventChains } from '../../../../shared/events/moloch/types';
+import labelSubstrateEvent from '../../../../shared/events/substrate/filters/labeler';
+import labelMolochEvent from '../../../../shared/events/moloch/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -156,30 +159,29 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
 
-    const notificationData = typeof notification.data === 'string'
-      ? JSON.parse(notification.data)
-      : notification.data;
-    const {
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    } = getBatchNotificationFields(category, notificationData, notifications.length);
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      // TODO: use different labelers depending on chain
+      // use different labelers depending on chain
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
-      const label = labelEdgewareEvent(
-        notification.chainEvent.blockNumber,
-        chainId,
-        notification.chainEvent.data,
-      );
+      let label;
+      if (SubstrateEventChains.includes(chainId)) {
+        label = labelSubstrateEvent(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (MolochEventChains.includes(chainId)) {
+        label = labelMolochEvent(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else {
+        throw new Error(`invalid notification chain: ${chainId}`);
+      }
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         onclick: async () => {
@@ -198,6 +200,17 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
         ]),
       ]);
     } else {
+      const notificationData = typeof notification.data === 'string'
+        ? JSON.parse(notification.data)
+        : notification.data;
+      const {
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      } = getBatchNotificationFields(category, notificationData, notifications.length);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {

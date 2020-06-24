@@ -112,10 +112,10 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
     const { justJoinedChains, justJoinedCommunities } = vnode.state;
     const chains = {};
     app.config.nodes.getAll().forEach((n) => {
-      if (chains[n.chain.network]) {
-        chains[n.chain.network].push(n);
+      if (chains[n.chain.id]) {
+        chains[n.chain.id].push(n);
       } else {
-        chains[n.chain.network] = [n];
+        chains[n.chain.id] = [n];
       }
     });
 
