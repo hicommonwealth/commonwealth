@@ -6,10 +6,13 @@ import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
 import { Option, StorageKey, Vec } from '@polkadot/types';
 import { formatNumber } from '@polkadot/util';
-import { Observable, combineLatest, of } from 'rxjs';
+import { Observable, combineLatest, of, from } from 'rxjs';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
-import { EraIndex, AccountId, Exposure, SessionIndex, EraRewardPoints, Nominations } from '@polkadot/types/interfaces';
+import Substrate from 'controllers/chain/substrate/main';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { EraIndex, AccountId, Exposure,
+  SessionIndex, EraRewardPoints, Nominations, Balance } from '@polkadot/types/interfaces';
 import { InterfaceTypes, Codec } from '@polkadot/types/types';
 import { DeriveStakingValidators, DeriveStakingQuery,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
@@ -22,6 +25,12 @@ const MAX_HEADERS = 50;
 interface iInfo {
   stash: string;
   balance: number;
+}
+
+interface iRewad {
+  kind: string;
+  amount: string;
+  validator: string;
 }
 
 export interface ICommissionInfo {
@@ -246,6 +255,55 @@ class SubstrateStaking implements StorageModule {
   }
   public query(address: string): Observable<DeriveStakingQuery> {
     return this._Chain.query((api: ApiRx) => api.derive.staking.query(address));
+  }
+  public get annualPercentRate(): Observable<number> {
+    return this._Chain.api.pipe(
+      switchMap((api: ApiRx) => combineLatest(
+        of(api),
+        api.derive.staking.stashes(),
+        api.query.staking.currentEra(),
+        from(this._app.chainEvents.rewards()),
+        api.derive.staking.validators(),
+      )),
+      flatMap((
+        [api, allStashes, era, rewards, { validators: currentSet }]:
+        [ApiRx, AccountId[], EraIndex, iRewad[], DeriveStakingValidators]
+      ) => {
+        const validatorsCount = currentSet.length;
+        let totalReward = (this._app.chain as Substrate).chain.coins(0);
+        rewards.forEach((reward) => {
+          const valReward = (this._app.chain as Substrate).chain.coins(+reward.amount)
+          || (this._app.chain as Substrate).chain.coins(0);
+          totalReward = (this._app.chain as Substrate).chain.coins(totalReward.asBN.add(valReward.asBN));
+        });
+        // Different runtimes call for different access to stakers: old vs. new
+        const stakersCall = (api.query.staking.stakers)
+          ? api.query.staking.stakers
+          : api.query.staking.erasStakers;
+        // Different staking functions call for different function arguments: old vs. new
+        const stakersCallArgs = (account) => (api.query.staking.stakers)
+          ? account
+          : [era.toString(), account];
+        return combineLatest(
+          stakersCall.multi(allStashes.map((elt) => stakersCallArgs(elt.toString()))),
+          of(totalReward),
+          of(validatorsCount)
+        );
+      }),
+      auditTime(100),
+      map(([exposures, totalReward, validatorsCount ] : [Exposure[], SubstrateCoin, number ]) => {
+        let totalStaked = (this._app.chain as Substrate).chain.coins(0);
+
+        exposures.forEach((exposure) => {
+          const valStake = (this._app.chain as Substrate).chain.coins(exposure?.total.toBn())
+          || (this._app.chain as Substrate).chain.coins(0);
+          totalStaked = (this._app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
+        });
+        const n = 10000000;
+        const annualPercentageRate = totalReward.muln(n).div(totalStaked).toNumber() / n;
+        return ((annualPercentageRate / validatorsCount) * 365) * 100;
+      }),
+    );
   }
   public get lastHeader(): Observable<HeaderExtended> {
     return this._Chain.query(

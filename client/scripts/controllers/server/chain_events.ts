@@ -10,6 +10,12 @@ class ChainEventsController {
   public offences(callback) {
     return get('/getOffences', { chain: app.chain.id, jwt: app.user.jwt }, callback);
   }
+
+  public rewards() {
+    return new Promise((resolve) => {
+      return get('/getRewards', { chain: app.chain.id, jwt: app.user.jwt }, resolve);
+    });
+  }
 }
 
 export default ChainEventsController;

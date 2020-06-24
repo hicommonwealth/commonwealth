@@ -15,6 +15,7 @@ interface IPreHeaderState {
   dynamic: {
     validators: IValidators;
     sessionInfo: DeriveSessionProgress;
+    annualPercentRate: number;
   },
 }
 
@@ -41,10 +42,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     sessionInfo: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.sessionInfo
+      : null,
+    annualPercentRate: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.annualPercentRate
       : null
   }),
   view: (vnode) => {
-    const { validators, sessionInfo } = vnode.state.dynamic;
+    const { validators, sessionInfo, annualPercentRate } = vnode.state.dynamic;
     const { nominations, nominationsHasChanged, sender } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
@@ -127,6 +131,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         }),
       ]),
       m('.validators-preheader', [
+        m('.validators-preheader-item', [
+          m('h3', 'APR'),
+          m('.preheader-item-text', `${annualPercentRate.toFixed(3)}%`),
+        ]),
         m('.validators-preheader-item', [
           m('h3', 'Epoch / Session'),
           m('.preheader-item-text', `#${formatNumber(currentIndex)}`),
