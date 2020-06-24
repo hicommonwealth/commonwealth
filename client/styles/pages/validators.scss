@@ -1,9 +1,6 @@
 @import 'client/styles/shared';
-// font added
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 @mixin small-gray {
-    font-family: 'Inter', sans-serif !important;
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
@@ -14,7 +11,8 @@
   width: inherit;
   height: 2px;
   border: #DFE8EE 1px solid;
-  margin-top: 8px !important;
+  margin-top: 5px;
+  margin-right: 10px;
 }
 
 .bar-inner {
@@ -105,78 +103,40 @@
       font-family: iA Writer Quattro;
     }
   }
-  // .stash-actions {
-  //    float: right;
-  //     padding-top: 16px;
-  //     a.btn {
-  //         display: inline-block;
-  //         padding: 4px 14px;
-  //         margin-left: 12px;
-  //         min-width: 115px;
-  //     }
-  // }
+
   .chill-button {
     display: inline-block;
     margin-top: 6px;
   }
 }
 
-.Tabs a.tab-entry{
-    padding-right: 30px !important;
-    padding-left: 15px !important;
-    font-size: 16px !important;
-}
 
 
 .Validators {
-
-    font-family: 'Inter', sans-serif !important;
-    min-width: 70vw;
-    overflow-x: scroll;
-    padding-top: 40px !important;
+    width: 100%;
     th {
+        @include small-gray;
         text-align: left;
         border-bottom: none;
-        overflow-wrap: break-word;
-        font-family: Inter;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 12px;
-        line-height: 120%;
-        letter-spacing: 0.2px;
-        text-transform: uppercase;
-        color: #999;
+        overflow-wrap: break-word
     }
     td {
-        font-family: Inter;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 16px;
+ 
+        font-size: 15px;
+        border-bottom: 1;
         padding-top: 15px;
         padding-bottom: 14px;
-        line-height: 120%;
-        letter-spacing: 0.2px;
         overflow: hidden;
         overflow-wrap: break-word;
     }
 
     td .User a.user-display-name {
-        font-family: Inter;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 16px;
-        font-size: 16px;
-        line-height: 120%;
-        letter-spacing: -1.2px;
+        font-size: 15px;
         overflow-wrap: break-word !important;
         
     }
 
     .val-name {
-        font-weight: 700;
-        font-family: Inter;
-        font-style: normal;
-        font-weight: normal;
         font-size: 16px;
     }
     .val-action {
@@ -199,82 +159,43 @@
 .ValidatorPage {
     margin: 0 auto;
   .validators-preheader {
-    display: flex;
-    margin-bottom: 32px;
+    display: grid;
+    grid-row-gap: 30px;
+    grid-template-columns: auto auto auto auto auto;
+    margin-bottom: 30px;
     .validators-preheader-item {
-      flex: 1;
-      max-width: 200px;
-      margin-right: 30px;
+    //   flex: 1;
+      max-width: 157px !important;
+    //   margin-right: 20px;
     }
     .validators-preheader-item h3 {
-        text-align: left;
-        border-bottom: none;
-        overflow-wrap: break-word;
-        font-family: Inter;
-        font-style: normal;
-        font-weight: bold;
-        font-size: 12px;
-        line-height: 120%;
-        letter-spacing: 0.2px;
-        text-transform: uppercase;
-        color: #999;
+        @include small-gray;
+        margin: 0 0 6px;
     }
     .validators-preheader-item .validators-preheader-item-text {
-      font-family: Inter;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 21px;
-      line-height: 120%;
-      letter-spacing: -0.2px;
+        font-size: 17px;
     }
-    .preheader-item-text{
-      font-family: Inter !important;
-      font-style: normal !important;
-      font-weight: normal !important;
-      font-size: 21px !important;
-      line-height: 120% !important;
-      letter-spacing: -0.2px !important;
-    }
+  
   }
 }
 
-// Changes @author Asad Anwer
-.layout-container{
-    padding-top: 75px !important;
+.update-nominations{
+  display: block !important;
+  width: auto !important;
+  min-width: 200px !important;
 }
 
+@media only screen and (max-width: 1000px) {
+    .validators-preheader{
+        grid-template-columns: auto auto auto !important;
+    }    
+}
 
-// .cui-list{
-//     background-color: #F4F4F9 !important;
-//     margin-bottom: 0px !important;
-//     padding-top: 20px !important;
-//     padding-bottom: 20px !important;
-// }
-
-// .cui-list h4{
-//     font-family: Inter !important;
-//     font-style: normal !important;
-//     font-weight: bold !important;
-//     font-size: 12px !important;
-//     letter-spacing: -0.2px !important;
-// }
-
-// .cui-list-item{
-//     font-family: Inter !important;
-//     font-style: normal !important;
-//     font-weight: 500 !important;
-//     font-size: 16px !important;
-//     color: #536E7C !important;
-// }
-
-// .cui-active{
-//     color: white !important;
-//     background-color: #674EFA !important;
-// }
-
-// .cui-list-item svg{
-//     color: #536E7C !important;
-// }
+@media only screen and (max-width: 767px) {
+    .validators-preheader{
+        grid-template-columns: auto auto!important;
+    }    
+}
 
 
 .gray-text{
@@ -285,8 +206,8 @@
 // Main Table
 
 .validators-table{
-  width: auto;
-  min-width: 1360px;
+//   width: auto;
+//   max-width: 1360px;
   border-collapse: collapse !important;
 }
 
@@ -324,7 +245,3 @@
   padding-right: 20px !important;
 }
 
-.val-controller, .val-stash{
-  // padding-right: 10px !important;
-
-}

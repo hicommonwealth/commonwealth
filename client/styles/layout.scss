@@ -9,7 +9,7 @@ html, body {
     width: 100%;
 }
 html {
-    font-family: 'Inter', sans-serif !important;
+    font-family: $fonts;
     font-size: 15px;
     line-height: 1.4;
     -moz-osx-font-smoothing: grayscale;
