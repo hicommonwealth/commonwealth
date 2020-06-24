@@ -114,24 +114,55 @@
 
 .Validators {
     width: 100%;
+    .validators-table
+    {
+      width: 70vw;
+      display: flex;
+      flex-flow: column nowrap;
+      flex: 1 1 auto;
+    }
     th {
         @include small-gray;
         text-align: left;
         border-bottom: none;
-        overflow-wrap: break-word
+        overflow-wrap: break-word !important;
+        padding-right: 80px;
+        display: flex;
+        flex-flow: row nowrap;
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5em;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0px;
+        white-space: nowrap;
+
+    }
+    tr{
+      width: 100%;
+      display: flex;
+      flex-flow: row nowrap;
     }
     td {
- 
-        font-size: 15px;
-        border-bottom: 1;
-        padding-top: 15px;
-        padding-bottom: 14px;
-        overflow: hidden;
-        overflow-wrap: break-word;
+      display: flex;
+      flex-flow: row nowrap;
+      flex-grow: 1;
+      flex-basis: 0;
+      padding: 0.5em;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0px;
+      white-space: nowrap;
+      font-size: 1em;
+      border-bottom: 1;
+      padding-top: 15px;
+      padding-bottom: 14px;
+      overflow-wrap: break-word;
     }
-
     td .User a.user-display-name {
-        font-size: 15px;
+        font-size: 1em;
         overflow-wrap: break-word !important;
         
     }
@@ -201,18 +232,6 @@
 .gray-text{
     color: #536E7C !important;
     padding-left: 5px !important;
-}
-
-// Main Table
-
-.validators-table{
-//   width: auto;
-//   max-width: 1360px;
-  border-collapse: collapse !important;
-}
-
-.validators-table td{
-  // padding-right: 50px;
 }
 
 
