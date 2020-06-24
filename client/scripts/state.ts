@@ -25,6 +25,7 @@ import TagsController from './controllers/server/tags';
 import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
 import ChainEventsController from './controllers/server/chain_events';
+import UserController from './controllers/server/user/index';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -54,7 +55,7 @@ export interface IApp {
   chainEntities: ChainEntityController;
   chainEvents: ChainEventsController;
   communities: CommunitiesController;
-
+  user: UserController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
   activeCommunityId(): string;
@@ -64,29 +65,6 @@ export interface IApp {
   toasts: ToastStore;
   modals: ModalStore;
   loginState: LoginState;
-  // populated on login
-  login: {
-    email?: string;
-    emailInterval?: string;
-    jwt?: string;
-    // all address infos for all chains/communities loaded
-    addresses: AddressInfo[];
-    // contains all role data for every active + non-active address
-    // TODO: Turn this into a map, app.login.roles[community] or turn into stores/controllers
-    roles: RoleInfo[];
-    // active addresses for a specific community or chain
-    // TODO: Rename to some accounts based name
-    activeAddresses: Array<Account<any>>;
-    // TODO: Identify a use-case, implement a use case
-    socialAccounts: SocialAccount[];
-    selectedNode: NodeInfo;
-    isSiteAdmin: boolean;
-    disableRichText: boolean;
-    notifications: NotificationsController;
-    lastVisited: object;
-    starredCommunities: StarredCommunity[];
-    unseenPosts: object;
-  };
   // stored on server-side
   config: {
     communities: OffchainCommunitiesStore;
@@ -96,10 +74,6 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     invites: any[];
-  };
-  // TODO: pull this into login
-  vm: {
-    activeAccount: Account<any>;
   };
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
@@ -124,6 +98,7 @@ const app: IApp = {
   chainEntities: new ChainEntityController(),
   chainEvents: new ChainEventsController(),
   communities: new CommunitiesController(),
+  user: new UserController(),
 
   activeChainId: () => app.chain ? app.chain.id : null,
   activeCommunityId: () => app.community ? app.community.meta.id : null,
@@ -133,19 +108,6 @@ const app: IApp = {
   toasts: getToastStore(),
   modals: getModalStore(),
   loginState: LoginState.NotLoaded,
-  login: {
-    addresses: [],
-    activeAddresses: [],
-    socialAccounts: [],
-    roles: [],
-    selectedNode: null,
-    isSiteAdmin: false,
-    disableRichText: null,
-    lastVisited: {},
-    unseenPosts: {},
-    starredCommunities: [],
-    notifications: new NotificationsController(),
-  },
   config: {
     communities: new OffchainCommunitiesStore(),
     chains: new ChainStore(),
@@ -162,10 +124,6 @@ const app: IApp = {
   },
   isProduction: () => {
     return document.location.origin.indexOf('commonwealth.im') !== -1;
-  },
-  // TODO: Remove VM property, migrate activeAccount to app.login
-  vm: {
-    activeAccount: null,
   },
   serverUrl: () => '/api',
   loadingError: null,

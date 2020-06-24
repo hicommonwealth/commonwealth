@@ -8,7 +8,6 @@ import { Button, Icon, Icons, Tag } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
-import { isRoleOfCommunity } from 'helpers/roles';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
 import {
@@ -114,7 +113,7 @@ export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | Offchai
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (!isSameAccount(app.vm.activeAccount, proposal.author)) return;
+    if (!isSameAccount(app.user.activeAccount, proposal.author)) return;
 
     return m('.ProposalHeaderDelete', [
       m('a', {
@@ -157,9 +156,13 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
-    const canEdit = (app.vm.activeAccount?.address === proposal.author
-                     && app.vm.activeAccount?.chain.id === proposal.authorChain)
-      || isRoleOfCommunity(app.vm.activeAccount, app.login.addresses, app.login.roles, 'admin', app.activeId());
+    const canEdit = (app.user.activeAccount?.address === proposal.author
+                     && app.user.activeAccount?.chain.id === proposal.authorChain)
+      || app.user.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
+      });
 
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
@@ -173,7 +176,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
       ]),
       canEdit && proposal.tag && m(ProposalHeaderSpacer),
       canEdit && m(TagEditor, {
-        popoverMenu: true,
         thread: proposal,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
       }),
@@ -221,7 +223,7 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
     if (!proposal) return;
     if (!app.isLoggedIn()) return;
 
-    const subscription = app.login.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
+    const subscription = app.user.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
 
     return m(Button, {
       class: 'ProposalHeaderSubscriptionButton',
@@ -230,9 +232,9 @@ export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyPropos
       onclick: (e) => {
         e.preventDefault();
         if (subscription?.isActive) {
-          app.login.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
+          app.user.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
         } else {
-          app.login.notifications.subscribe(
+          app.user.notifications.subscribe(
             NotificationCategories.NewComment, proposal.uniqueIdentifier,
           ).then(() => m.redraw());
         }
@@ -251,8 +253,8 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
     if (!(proposal instanceof OffchainThread)) return;
     if (!app.isLoggedIn()) return;
 
-    const canEdit = app.vm.activeAccount?.address === proposal.author
-      && app.vm.activeAccount?.chain.id === proposal.authorChain;
+    const canEdit = app.user.activeAccount?.address === proposal.author
+      && app.user.activeAccount?.chain.id === proposal.authorChain;
     if (!canEdit) return;
 
     return m('.ProposalHeaderPrivacyButtons', [
@@ -261,7 +263,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
-          app.threads.edit(proposal, null, null, true).then(() => m.redraw());
+          app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
       }),

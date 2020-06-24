@@ -87,6 +87,13 @@ const PresentationComponent = (state, chain: Substrate) => {
           const blockCount = validators[validator].blockCount;
           const hasMessage = validators[validator]?.hasMessage;
           const isOnline = validators[validator]?.isOnline;
+          // const hasNominated: boolean = app.user.activeAccount && nominators
+          //   && !!nominators.find(({ stash }) => stash === app.user.activeAccount.address);
+          // // add validator to collection if hasNominated already
+          // if (hasNominated) {
+          //   state.nominations.push(validator);
+          //   state.originalNominations.push(validator);
+          // }
           return m(ValidatorRow, {
             stash: validator,
             controller,

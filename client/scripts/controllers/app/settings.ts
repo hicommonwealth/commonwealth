@@ -8,11 +8,11 @@ class SettingsController {
     if (!app.isLoggedIn()) return;
     return new Promise((resolve, reject) => {
       $.post(`${app.serverUrl()}/writeUserSetting`, {
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
         key: 'disableRichText',
         value: value ? 'true' : 'false',
       }).then((result) => {
-        app.login.disableRichText = value;
+        app.user.setDisableRichText(value);
         resolve();
       }).catch((e) => {
         console.error(e);

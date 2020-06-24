@@ -2,10 +2,18 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NotLoggedIn: 'Not logged in',
+  NoCommunity: 'Must include community ID',
+  NotAdminOrMod: 'Must be an admin/mod to create invite links',
+  InvalidCommunity: 'Invalid community',
+  ErrorFetchingLinks: 'Error fetching links',
+};
+
 const getInviteLinks = async (models, req, res, next) => {
-  if (!req.user) return next(new Error('Not logged in'));
+  if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { community_id } = req.query;
-  if (!community_id) return next(new Error('Error finding comunity'));
+  if (!community_id) return next(new Error(Errors.NoCommunity));
 
   const address = await models.Address.findOne({
     where: {
@@ -20,21 +28,21 @@ const getInviteLinks = async (models, req, res, next) => {
       permission: ['admin', 'moderator'],
     },
   });
-  if (!requesterIsAdminOrMod) return next(new Error('Must be an admin/mod to create Invite Link'));
+  if (!requesterIsAdminOrMod) return next(new Error(Errors.NotAdminOrMod));
 
   const community = await models.OffchainCommunity.findOne({
     where: {
       id: community_id,
     },
   });
-  if (!community) return next(new Error('Invalid community'));
+  if (!community) return next(new Error(Errors.InvalidCommunity));
 
   const inviteLinks = await models.InviteLink.findAll({
     where: {
       community_id: community.id,
     },
   });
-  if (!inviteLinks) return next(new Error('Error Fetching Links'));
+  if (!inviteLinks) return next(new Error(Errors.ErrorFetchingLinks));
 
   return res.json({ status: 'Success', data: inviteLinks });
 };

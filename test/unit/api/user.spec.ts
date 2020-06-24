@@ -126,7 +126,7 @@ describe('User Model Routes', () => {
     });
 
     it('should add an email to user with just an address', async () => {
-      const email = 'test@commonwealth.im';
+      const email = 'test2@commonwealth.im';
       const res = await chai.request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
@@ -147,6 +147,18 @@ describe('User Model Routes', () => {
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(updateEmailErrors.NoEmail);
+    });
+
+    it('should fail to update if email in use by another user', async () => {
+      const res = await chai.request(app)
+        .post('/api/updateEmail')
+        .set('Accept', 'application/json')
+        .send({
+          jwt: jwtToken,
+          email: 'test@commonwealth.im',
+        });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(updateEmailErrors.EmailInUse);
     });
 
     it('should fail with an invalid email', async () => {

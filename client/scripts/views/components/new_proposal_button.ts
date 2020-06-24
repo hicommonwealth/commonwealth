@@ -12,7 +12,7 @@ import NewThreadModal from 'views/modals/new_thread_modal';
 
 const NewProposalButton: m.Component<{ fluid: boolean }> = {
   view: (vnode) => {
-    const activeAccount = app.vm.activeAccount;
+    const activeAccount = app.user.activeAccount;
     const fluid = !!vnode.attrs.fluid;
 
     if (!app.isLoggedIn()) return;

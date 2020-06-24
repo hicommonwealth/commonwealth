@@ -4,12 +4,16 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  MutuallyExclusive: 'Cannot select mutually exclusive offchain threads and proposals only options',
+};
+
 const bulkComments = async (models, req: Request, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.query, req.user, next);
 
   if (req.query.offchain_threads_only && req.query.proposals_only) {
-    return next(new Error('cannot select mutually exclusive offchain threads and proposals only options'));
+    return next(new Error(Errors.MutuallyExclusive));
   }
   const whereOptions: any = {};
   if (community) {

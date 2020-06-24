@@ -10,7 +10,7 @@ export type EmailNotificationInterval = 'daily' | 'weekly' | 'monthly' | 'never'
 export interface UserAttributes {
   id?: number;
   email: string;
-  emailVerified?: Date;
+  emailVerified?: boolean;
   isAdmin?: boolean;
   lastVisited?: string;
   disableRichText?: boolean;
@@ -48,7 +48,7 @@ export default (
   const User = sequelize.define<UserInstance, UserAttributes>('User', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     email: { type: dataTypes.STRING },
-    emailVerified: { type: dataTypes.DATE, allowNull: true },
+    emailVerified: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     emailNotificationInterval: {
       type: dataTypes.ENUM,
       values: ['daily', 'weekly', 'monthly', 'never'],
@@ -63,7 +63,7 @@ export default (
   }, {
     underscored: true,
     indexes: [
-      { fields: ['email'] },
+      { fields: ['email'], unique: true },
     ],
   });
 

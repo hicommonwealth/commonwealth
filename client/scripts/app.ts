@@ -52,8 +52,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           tags: community.tags,
         }));
       });
-      app.login.roles = data.roles || [];
-
+      app.user.setRoles(data.roles);
       // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
@@ -62,18 +61,12 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       // update the login status
       updateActiveUser(data.user);
       app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
-      app.login.starredCommunities = data.user ? data.user.starredCommunities : [];
-
-      // add roles data for user
-      if (data.roles) {
-        data.roles = [];
-        data.roles.map((role) => app.login.roles.push(role));
-      }
+      app.user.setStarredCommunities(data.user ? data.user.starredCommunities : []);
 
       // update the selectedNode, unless we explicitly want to avoid
       // changing the current state (e.g. when logging in through link_new_address_modal)
       if (updateSelectedNode && data.user && data.user.selectedNode) {
-        app.login.selectedNode = NodeInfo.fromJSON(data.user.selectedNode);
+        app.user.setSelectedNode(NodeInfo.fromJSON(data.user.selectedNode));
       }
       resolve();
     }).catch((err: any) => {
@@ -93,7 +86,7 @@ export async function deinitChainOrCommunity() {
     await app.community.deinit();
     app.community = null;
   }
-  app.login.selectedNode = null;
+  app.user.setSelectedNode(null);
   clearActiveAddresses();
 }
 
@@ -138,8 +131,8 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 export async function selectNode(n?: NodeInfo): Promise<void> {
   // Select the default node, if one wasn't provided
   if (!n) {
-    if (app.login.selectedNode) {
-      n = app.login.selectedNode;
+    if (app.user.selectedNode) {
+      n = app.user.selectedNode;
     } else {
       n = app.config.nodes.getByChain(app.config.defaultChain)[0];
     }
@@ -212,16 +205,10 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
-    $.post(`${app.serverUrl()}/selectNode`, {
+    await app.user.selectNode({
       url: n.url,
-      chain: n.chain.id,
-      auth: true,
-      jwt: app.login.jwt,
-    }).then((res) => {
-      if (res.status !== 'Success') {
-        throw new Error(`got unsuccessful status: ${res.status}`);
-      }
-    }).catch((e) => console.error('Failed to select node on server'));
+      chain: n.chain.id
+    });
   }
 
   // Redraw with chain fully loaded
@@ -304,11 +291,17 @@ $(() => {
     }
   });
 
-  const importRoute = (module, scoped: string | boolean, wideLayout?: boolean) => ({
+  interface RouteAttrs {
+    scoped: string | boolean;
+    wideLayout?: boolean;
+  }
+
+  const importRoute = (module, attrs: RouteAttrs) => ({
     onmatch: (args, path) => {
       return module.then((p) => p.default);
     },
     render: (vnode) => {
+      const { scoped, wideLayout } = attrs;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -317,8 +310,7 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      const { activeTag } = vnode.attrs;
-      return m(Layout, { scope, activeTag, wideLayout }, [ vnode ]);
+      return m(Layout, { scope, wideLayout }, [ vnode ]);
     },
   });
 
@@ -330,54 +322,54 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), false, true),
-    '/about':                    importRoute(import('views/pages/landing/about'), false),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), false),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), false),
+    '/':                         importRoute(import('views/pages/home'), { scoped: false, wideLayout: true }),
+    '/about':                    importRoute(import('views/pages/landing/about'), { scoped: false }),
+    '/terms':                    importRoute(import('views/pages/landing/terms'), { scoped: false }),
+    '/privacy':                  importRoute(import('views/pages/landing/privacy'), { scoped: false }),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), false),
-    '/settings':                 importRoute(import('views/pages/settings'), false),
-    '/notifications':            importRoute(import('views/pages/notifications'), false),
+    '/login':                    importRoute(import('views/pages/login'), { scoped: false }),
+    '/settings':                 importRoute(import('views/pages/settings'), { scoped: false }),
+    '/notifications':            importRoute(import('views/pages/notifications'), { scoped: false }),
+    '/notification-settings':    importRoute(import('views/pages/notification-settings'), { scoped: false }),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), false),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), false),
+    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), { scoped: false }),
+    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), { scoped: false }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
-    '/:scope/notification-list':     importRoute(import('views/pages/notification_list'), true),
 
-    '/:scope':                   importRoute(import('views/pages/discussions'), true),
-    '/:scope/discussions/:activeTag': importRoute(import('views/pages/discussions'), true),
-    '/:scope/tags':              importRoute(import('views/pages/tags'), true),
-    '/:scope/members':           importRoute(import('views/pages/members'), true),
-    // '/:scope/chat':              importRoute(import('views/pages/chat'), true),
-    '/:scope/proposals':         importRoute(import('views/pages/proposals'), true),
-    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), true),
-    '/:scope/council':           importRoute(import('views/pages/council'), true),
-    '/:scope/login':             importRoute(import('views/pages/login'), true),
-    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), true),
-    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), true),
-    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), true),
-    '/:scope/admin':             importRoute(import('views/pages/admin'), true),
-    '/:scope/settings':          importRoute(import('views/pages/settings'), true),
-    '/:scope/web3login':         importRoute(import('views/pages/web3login'), true),
+    '/:scope':                   importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/discussions/:tag': importRoute(import('views/pages/discussions'), { scoped: true }),
+    '/:scope/tags':              importRoute(import('views/pages/tags'), { scoped: true }),
+    '/:scope/members':           importRoute(import('views/pages/members'), { scoped: true }),
+    // '/:scope/chat':              importRoute(import('views/pages/chat'), { scoped: true }),
+    '/:scope/proposals':         importRoute(import('views/pages/proposals'), { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), { scoped: true }),
+    '/:scope/council':           importRoute(import('views/pages/council'), { scoped: true }),
+    '/:scope/login':             importRoute(import('views/pages/login'), { scoped: true }),
+    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), { scoped: true }),
+    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), { scoped: true }),
+    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), { scoped: true }),
+    '/:scope/admin':             importRoute(import('views/pages/admin'), { scoped: true }),
+    '/:scope/settings':          importRoute(import('views/pages/settings'), { scoped: true }),
+    '/:scope/web3login':         importRoute(import('views/pages/web3login'), { scoped: true }),
 
-    '/:scope/account/:address':  importRoute(import('views/pages/profile'), true),
+    '/:scope/account/:address':  importRoute(import('views/pages/profile'), { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
-      return (app.vm.activeAccount)
-        ? `/${attrs.scope}/account/${app.vm.activeAccount.address}`
+      return (app.user.activeAccount)
+        ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute(import('views/pages/questions'), true),
-    // '/:scope/requests':          importRoute(import('views/pages/requests'), true),
-    '/:scope/validators':        importRoute(import('views/pages/validators'), true),
+    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
+    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
+    '/:scope/validators':        importRoute(import('views/pages/validators'), { scoped: true }),
 
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), true),
+    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), { scoped: true }),
   });
 
   // initialize construct-ui focus manager
@@ -419,7 +411,7 @@ $(() => {
       mixpanel.track('Logged In', {
         Step: 'Email'
       });
-      mixpanel.identify(app.login.email);
+      mixpanel.identify(app.user.email);
     }
     m.route.set(m.route.param('path'), {}, { replace: true });
   } else if (localStorage && localStorage.getItem && localStorage.getItem('githubPostAuthRedirect')) {
@@ -448,8 +440,8 @@ $(() => {
       let jwt;
       // refresh notifications once
       if (app.loginState === LoginState.LoggedIn) {
-        app.login.notifications.refresh().then(() => m.redraw());
-        jwt = app.login.jwt;
+        app.user.notifications.refresh().then(() => m.redraw());
+        jwt = app.user.jwt;
       }
 
       let wsUrl = app.serverUrl();
@@ -481,14 +473,14 @@ $(() => {
           WebsocketMessageType.Notification,
           (payload: IWebsocketsPayload<any>) => {
             if (payload.data && payload.data.subscription_id) {
-              const subscription = app.login.notifications.subscriptions.find(
+              const subscription = app.user.notifications.subscriptions.find(
                 (sub) => sub.id === payload.data.subscription_id
               );
               // note that payload.data should have the correct JSON form
               if (subscription) {
                 console.log('adding new notification from websocket:', payload.data);
                 const notification = Notification.fromJSON(payload.data, subscription);
-                app.login.notifications.update(notification);
+                app.user.notifications.update(notification);
                 m.redraw();
               }
             } else {

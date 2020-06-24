@@ -13,15 +13,6 @@ import CreateInviteModal from '../../modals/create_invite_modal';
 import UpgradeMemberModal from '../../modals/upgrade_member_modal';
 import ManageCommunityModal from '../../modals/manage_community_modal';
 
-export const isCommunityAdmin = () => {
-  const role = app.login.roles.find((r) => {
-    return ((r.chain_id && r.chain_id === app.activeChainId())
-            || (r.offchain_community_id && r.offchain_community_id === app.activeCommunityId()))
-    && r.permission === RolePermission.admin;
-  });
-  return role !== undefined;
-};
-
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission) return a.Address.address.localeCompare(b.Address.address);
   if (a.permission === RolePermission.admin) return -1;
@@ -31,35 +22,14 @@ export const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-const isAdminOrModOfChain = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === app.vm.activeAccount.address
-    && role.Address.chain === app.vm.activeAccount.chain.id
-    && role.permission !== RolePermission.member)) !== -1;
-};
-
-const isAdminOrMod = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === account.address
-    && role.permission !== RolePermission.member)) !== -1;
-};
-
-const isAdmin = (vnode, account) => {
-  if (!account) return false;
-  return vnode.state.roleData.findIndex((role) => (
-    role.Address.address === account.address
-    && role.permission === RolePermission.admin)) !== -1;
-};
-
 const InviteButton = (vnode, account, isCommunity) => {
   if (!isCommunity) return;
   // invite button, if invites are enabled, OR if the current account is a mod or admin
-  return app.login
+  return app.user
     && app.community
-    && app.vm.activeAccount
-    && (app.community.meta.invitesEnabled || isAdminOrModOfChain(vnode, account))
+    && app.user.activeAccount
+    // TODO: Ensure the right role check is used
+    && (app.community.meta.invitesEnabled || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -75,8 +45,8 @@ const InviteButton = (vnode, account, isCommunity) => {
 };
 
 const UpgradeMemberButton = (vnode, account) => {
-  return app.vm.activeAccount
-    && isAdminOrMod(vnode, account)
+  return app.user.activeAccount
+    && app.user.isAdminOrMod({ account })
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -89,7 +59,7 @@ const UpgradeMemberButton = (vnode, account) => {
 };
 
 const ManageCommunityButton = (vnode, account) => {
-  return isAdmin(vnode, account)
+  return app.user.isAdmin({ account })
     && m(Button, {
       onclick: (e) => {
         e.preventDefault();
@@ -128,10 +98,13 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         vnode.state.roleData = bulkMembers.result;
 
-        if (isAdmin(vnode, app.vm.activeAccount)) {
+        if (app.user.isAdminOfEntity({
+          chain: app.activeChainId(),
+          community: app.activeCommunityId()
+        })) {
           // TODO: Change to GET /webhooks
           const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-            { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+            { ...chainOrCommObj, auth: true, jwt: app.user.jwt });
           if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
           vnode.state.webhooks = webhooks.result;
         }
@@ -153,23 +126,23 @@ const ChainOrCommunityRoles: m.Component<{}, IChainOrCommunityRolesState> = {
     return m('.OffchainCommunityRoles', [
       vnode.state.roleData?.length > 0 && m('h4.sidebar-header', 'Members'),
       vnode.state.loadingFinished
-      && app.vm.activeAccount
+      && app.user.activeAccount
       && m('.members', [
         // list of mods/admins
         !vnode.state.roleData && m('.no-mods', 'None'),
         vnode.state.roleData.sort(sortAdminsAndModsFirst).map((role) => {
           return m('.member-item', [
             m(User, {
-              user: [role.Address.address, role.Address.chain],
+              user: role.Address,
               linkify: true,
               tooltip: true,
             }),
             role.permission !== RolePermission.member && m('span.role-level', ` (${role.permission})`),
           ]);
         }),
-        InviteButton(vnode, app.vm.activeAccount, isCommunity),
-        UpgradeMemberButton(vnode, app.vm.activeAccount),
-        ManageCommunityButton(vnode, app.vm.activeAccount),
+        InviteButton(vnode, app.user.activeAccount, isCommunity),
+        UpgradeMemberButton(vnode, app.user.activeAccount),
+        ManageCommunityButton(vnode, app.user.activeAccount),
       ])
     ]);
   },

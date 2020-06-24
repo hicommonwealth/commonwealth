@@ -12,8 +12,7 @@ import { link, pluralize } from 'helpers';
 import { OffchainThreadKind } from 'models';
 
 import Sublayout from 'views/sublayout';
-import { isCommunityAdmin } from 'views/pages/discussions/roles';
-import { inputModalWithText } from 'views/modals/input_modal';
+import NewTagModal from 'views/modals/new_tag_modal';
 import EditTagModal from 'views/modals/edit_tag_modal';
 import PageLoading from 'views/pages/loading';
 
@@ -28,7 +27,7 @@ const ToggleFeaturedTagButton: m.Component<{
   id, description, featured, name, addFeaturedTag, removeFeaturedTag
 }, {form: IEditTagForm}> = {
   view: (vnode) => {
-    if (!isCommunityAdmin()) return null;
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, description, featured, name, addFeaturedTag, removeFeaturedTag } = vnode.attrs;
 
     vnode.state.form = { description, id, name, featured };
@@ -100,7 +99,7 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
       contentRight: [
         count && m('.tag-count', pluralize(count, 'post')),
         m(ToggleFeaturedTagButton, { description, featured, id, name, addFeaturedTag, removeFeaturedTag }),
-        isCommunityAdmin() && m(Button, {
+        (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) && m(Button, {
           class: 'edit-button',
           size: 'xs',
           onclick: (e) => {
@@ -110,12 +109,8 @@ const TagRow: m.Component<ITagRowAttrs, {}> = {
               modal: EditTagModal,
               data: {
                 description,
-                featured,
-                featured_order,
                 id,
                 name,
-                addFeaturedTag,
-                removeFeaturedTag
               }
             });
           },
@@ -228,10 +223,7 @@ export const NewTagButton: m.Component = {
       iconLeft: Icons.PLUS,
       onclick: async (e) => {
         e.preventDefault();
-        if (!isCommunityAdmin()) return;
-        const tag = await inputModalWithText('New Tag:')();
-        if (!tag) return;
-        app.tags.add(tag).then(() => { m.redraw(); });
+        app.modals.create({ modal: NewTagModal });
       },
     });
   },
@@ -268,7 +260,7 @@ const TagSelector: m.Component<{}, { refreshed, featuredTagIds }> = {
       featuredTagListing.length > 0 && m(List, {
         class: 'featured-tag-list',
         oncreate: () => {
-          if (isCommunityAdmin()) {
+          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) {
             dragula([document.querySelector('.featured-tag-list')])
               .on('drop', async (el, target, source) => {
                 const reorder = Array.from(source.children).map((child) => {
@@ -293,7 +285,7 @@ const TagsPage = {
       m('.forum-container', [
         m(TagSelector),
         m('br'),
-        isCommunityAdmin() && m(NewTagButton),
+        app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(NewTagButton),
       ]),
     ]);
   },

@@ -1,15 +1,20 @@
 import { Response, NextFunction, Request } from 'express';
 
+export const Errors = {
+  NeedChain: 'Must provide a chain to fetch entities from',
+  InvalidChain: 'Invalid chain',
+};
+
 const bulkEntities = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.chain) {
-    return next(new Error('must specify entity chain'));
+    return next(new Error(Errors.NeedChain));
   }
 
   const chain = await models.Chain.findOne({
     where: { id: req.query.chain }
   });
   if (!chain) {
-    return next(new Error('Invalid chain'));
+    return next(new Error(Errors.InvalidChain));
   }
 
   const entityFindOptions: any = {

@@ -9,7 +9,7 @@ class CommunitiesController {
     if (chain && community) throw new Error('Invalid');
     if (!app.isLoggedIn()) return false;
 
-    return app.login.starredCommunities.findIndex((c) => {
+    return app.user.starredCommunities.findIndex((c) => {
       return chain
         ? c.chain === chain
         : c.community === community;
@@ -26,25 +26,25 @@ class CommunitiesController {
         chain,
         star: status,
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       } : {
         community,
         star: status,
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       };
 
       $.post(`${app.serverUrl()}/starCommunity`, params).then((response) => {
         if (status) {
           const json = response.result;
-          app.login.starredCommunities.push(new StarredCommunity(json.chain, json.community, json.user_id));
+          app.user.addStarredCommunity(new StarredCommunity(json.chain, json.community, json.user_id));
         } else {
-          const index = app.login.starredCommunities.findIndex((c) => {
+          const star = app.user.starredCommunities.find((c) => {
             return chain
               ? c.chain === chain
               : c.community === community;
           });
-          app.login.starredCommunities.splice(index, 1);
+          app.user.removeStarredCommunity(star);
         }
         m.redraw();
         resolve();

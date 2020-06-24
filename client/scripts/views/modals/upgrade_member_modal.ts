@@ -25,9 +25,10 @@ const UpgradeMemberModal = {
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
+      // TODO: Remove this as we should be getting role data from app.user controller
       vnode.state.roleData = response.result;
       if (vnode.state.roleData.findIndex((role) => {
-        return (role.Address.address === app.vm.activeAccount.address
+        return (role.Address.address === app.user.activeAccount.address
                 && role.permission === RolePermission.moderator);
       }) !== -1) {
         vnode.state.isMod = true;
@@ -55,7 +56,7 @@ const UpgradeMemberModal = {
             new_role: newRole,
             address: member,
             community: app.activeCommunityId(),
-            jwt: app.login.jwt,
+            jwt: app.user.jwt,
           }).then((result) => {
             vnode.state.disabled = false;
             if (result.status === 'Success') {

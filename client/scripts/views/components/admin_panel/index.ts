@@ -28,7 +28,7 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
         if (bulkMembers.status !== 'Success') throw new Error('Could not fetch members');
         // TODO: Change to GET /webhooks
         const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`,
-          { ...chainOrCommObj, auth: true, jwt: app.login.jwt });
+          { ...chainOrCommObj, auth: true, jwt: app.user.jwt });
         if (webhooks.status !== 'Success') throw new Error('Could not fetch community webhooks');
         vnode.state.webhooks = webhooks.result;
         vnode.state.roleData = bulkMembers.result;
@@ -102,33 +102,33 @@ const AdminPanel: m.Component<{}, { isOpen: boolean }> = {
     vnode.state.isOpen = false;
   },
   view: (vnode) => {
-    return [m(ListItem, {
-      href: '#',
-      class: 'AdminPanel',
-      onclick: (e) => {
-        e.preventDefault();
-        vnode.state.isOpen = true;
-      },
-      label: 'Manage Community',
-      contentLeft: m(Icon, { name: Icons.SETTINGS, }),
-    }),
-    m(Dialog, {
-      autofocus: true,
-      basic: false,
-      closeOnEscapeKey: true,
-      closeOnOutsideClick: true,
-      class: 'AdminPanelDialog',
-      content: m(AdminPanelContents, {
-        onChangeHandler: (v) => { vnode.state.isOpen = v; },
+    return [
+      m(ListItem, {
+        class: 'AdminPanel',
+        onclick: (e) => {
+          e.preventDefault();
+          vnode.state.isOpen = true;
+        },
+        label: 'Configuration',
       }),
-      hasBackdrop: true,
-      isOpen: vnode.state.isOpen,
-      inline: false,
-      onClose: () => { vnode.state.isOpen = false; },
-      title: 'Manage Community',
-      transitionDuration: 200,
-      footer: null,
-    })];
+      m(Dialog, {
+        autofocus: true,
+        basic: false,
+        closeOnEscapeKey: true,
+        closeOnOutsideClick: true,
+        class: 'AdminPanelDialog',
+        content: m(AdminPanelContents, {
+          onChangeHandler: (v) => { vnode.state.isOpen = v; },
+        }),
+        hasBackdrop: true,
+        isOpen: vnode.state.isOpen,
+        inline: false,
+        onClose: () => { vnode.state.isOpen = false; },
+        title: 'Manage Community',
+        transitionDuration: 200,
+        footer: null,
+      })
+    ];
   },
 };
 

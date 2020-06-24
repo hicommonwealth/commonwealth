@@ -34,7 +34,7 @@ const setDefaultRole = async (models, req, res: Response, next: NextFunction) =>
 
   const otherAddresses = await models.Address.findAll({
     where: {
-      id: { [Sequelize.Op.ne]: req.body.address_id },
+      id: { [Sequelize.Op.ne]: validAddress.id },
       user_id: req.user.id,
       verified: { [Sequelize.Op.ne]: null }
     }

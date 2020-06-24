@@ -1,8 +1,6 @@
 @import 'client/styles/shared';
 
 .DiscussionsPage {
-    display: flex;
-    justify-content: space-between;
     .discussions-main {
         position: relative;
         flex: 1;
@@ -10,19 +8,26 @@
         margin: 0px auto;
         background: #fff;
         box-shadow: 0 0 6px rgba(0,0,0,0.07);
+        border-radius: 3px;
         &.empty-list {
             height: calc(100vh - 200px);
         }
     }
 
     // sidebar
-    .CommunitySidebar h4 {
-        font-size: 14px;
-        color: #a0a0a0;
-        font-weight: 600;
-        margin: 12px 0 14px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #e7e7e7;
+    .CommunitySidebar {
+        padding-left: 12px;
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 26px 0 12px;
+            &:first-child {
+                margin-top: 12px;
+            }
+        }
+        p {
+            margin: 12px 0;
+        }
     }
 
     // content

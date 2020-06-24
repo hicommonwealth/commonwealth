@@ -15,7 +15,7 @@ const StashForm: m.Component<{ controller: SubstrateAccount }, {}> = {
         placeholder: 'Set a new controller',
         errorMsg: 'Can only set controller on Substrate based chain.',
         onChangeHandler: (newController) => (app.chain.accounts as SubstrateAccounts).fromAddress(newController),
-        actionHandler: (newController) => (app.vm.activeAccount as SubstrateAccount).setController(newController),
+        actionHandler: (newController) => (app.user.activeAccount as SubstrateAccount).setController(newController),
       }),
       m(ActionForm, {
         isTextInput: true,
@@ -24,7 +24,7 @@ const StashForm: m.Component<{ controller: SubstrateAccount }, {}> = {
         placeholder: 'Bond extra',
         errorMsg: 'Can only bond extra on Substrate based chain.',
         onChangeHandler: (bondAmount) => (app.chain.chain.coins(+bondAmount, true)),
-        actionHandler: (bondAmount) => (app.vm.activeAccount as SubstrateAccount).bondExtraTx(bondAmount),
+        actionHandler: (bondAmount) => (app.user.activeAccount as SubstrateAccount).bondExtraTx(bondAmount),
       }),
       m(ActionForm, {
         isTextInput: false,
@@ -43,7 +43,7 @@ const StashForm: m.Component<{ controller: SubstrateAccount }, {}> = {
         ],
         defaultValue: 'staked',
         onChangeHandler: (payee) => payee,
-        actionHandler: (payee) => (app.vm.activeAccount as SubstrateAccount).setPayee(payee),
+        actionHandler: (payee) => (app.user.activeAccount as SubstrateAccount).setPayee(payee),
       }),
     ]),
   ],

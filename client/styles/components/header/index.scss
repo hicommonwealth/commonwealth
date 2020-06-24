@@ -5,12 +5,12 @@
     top: 0;
     left: 0;
     right: 0;
-    padding: 0 30px;
+    padding: 0 $horizontal-padding;
     background: #fff;
     border-top: 6px solid $theme-base-color;
     border-bottom: 1px solid #eee;
     box-shadow: 0 0 4px rgba(0,0,0,0.07);
-    z-index: 1;
+    z-index: 2;
     .header-content {
         margin: 0 auto;
         max-width: $sublayout-max-width;
@@ -28,7 +28,7 @@
             margin-left: $header-spacing;
         }
         .cui-button-label {
-            font-size: 14px;
+            font-size: 104%;
         }
     }
 }
@@ -44,7 +44,6 @@
         max-width: 342px;
         margin: 0;
         padding: 0;
-        border-color: #d8dee0;
         background: none;
         overflow: hidden;
     }
@@ -60,5 +59,15 @@
         padding-top: 230px;
         color: #546e7d;
         font-weight: 600;
+    }
+    .NotificationButtons {
+        .cui-button {
+            margin: 0;
+            border-radius: 0;
+            border-top: 1px #d8dee0 solid;
+        }
+        .cui-button:nth-child(1) {
+            border-right: 1px #d8dee0 solid; 
+        }
     }
 }

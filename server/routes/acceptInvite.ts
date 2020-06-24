@@ -8,8 +8,8 @@ export const Errors = {
   NoAddressFound: (address) => `Cannot find Address: ${address}`,
   WrongOwner: 'Logged in user does not own address accepting invite',
   NoCommunityFound: (community) => `Cannot find community: ${community}`,
-  RoleCreationFailure: 'Failed to create new Role',
-  CodeUpdateFailure: 'Failed to Update Code',
+  RoleCreationFailure: 'Failed to create new role',
+  CodeUpdateFailure: 'Failed to update invite code',
 };
 
 const acceptInvite = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -39,7 +39,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
 
   const userAddresses = await req.user.getAddresses();
   const isUser = userAddresses
-    .filter((addr) => addr.verified)
+    .filter((addr) => !!addr.verified)
     .filter((add) => add.address === addressObj.address);
 
   if (isUser.length === 0) {

@@ -53,7 +53,7 @@ const NominatorForm: m.Component<{}, IClaimPayoutState> = {
         actionHandler: () => {
           const { era, validators } = vnode.state;
           if (era && validators) {
-            const sender = (app.vm.activeAccount as SubstrateAccount);
+            const sender = (app.user.activeAccount as SubstrateAccount);
             return sender.claimValidatorPayoutTx(era);
           }
         },
@@ -75,7 +75,7 @@ const ValidatorForm: m.Component<{}, IClaimPayoutState> = {
         actionHandler: () => {
           const { era } = vnode.state;
           if (era) {
-            const sender = (app.vm.activeAccount as SubstrateAccount);
+            const sender = (app.user.activeAccount as SubstrateAccount);
             return sender.claimValidatorPayoutTx(era);
           }
         },

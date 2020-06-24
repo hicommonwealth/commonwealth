@@ -14,18 +14,38 @@ import { link, articlize } from 'helpers';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
+import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
-import { OffchainThreadKind, NodeInfo, CommunityInfo } from 'models';
-import MembershipButton, { isMember } from 'views/components/membership_button';
+import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
+import TagCaratMenu from './tag_carat_menu';
 
-interface IDiscussionPageAttrs {
-  activeTag?: string;
-}
+const CommunitySidebar: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
+  view: (vnode) => {
+    const { communityName, communityDescription, tag } = vnode.attrs;
+    if (!app.chain && !app.community) return;
+
+    return m('.CommunitySidebar', [
+      m(TagCaratMenu, { tag }),
+      tag && [
+        m('h4', `About #${tag}`),
+        m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      ],
+      m('h4', `About ${communityName}`),
+      m('p', communityDescription),
+      m('h4', 'Admins & Mods'),
+      (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
+        return m('.community-admin', [
+          m(User, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
+        ]);
+      }),
+    ]);
+  }
+};
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -35,47 +55,7 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const CommunitySidebar: m.Component<{ activeTag?: string }> = {
-  view: (vnode) => {
-    const { activeTag } = vnode.attrs;
-    if (!app.chain && !app.community) return;
-
-    const activeNode = app.chain?.meta;
-    const selectedNodes = app.config.nodes.getAll().filter((n) => {
-      return activeNode
-        && n.url === activeNode.url
-        && n.chain
-        && activeNode.chain
-        && n.chain.id === activeNode.chain.id;
-    });
-    const selectedNode = selectedNodes && selectedNodes[0];
-    const selectedCommunity = app.community;
-
-    const communityName = selectedNode
-      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
-    const communityDescription = selectedNode
-      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
-
-    return m('.CommunitySidebar', [
-      activeTag && [
-        m('h4', `About #${activeTag}`),
-        m('p', app.tags.store.getByName(activeTag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-        m('br'),
-      ],
-      m('h4', `About ${communityName}`),
-      m('p', communityDescription),
-      m('br'),
-      m('h4', 'Admins & Mods'),
-      (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
-        return m('.community-admin', [
-          m(User, { user: [r.address, r.address_chain], showRole: true })
-        ]);
-      }),
-    ]);
-  }
-};
-
-const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> = {
+const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -99,9 +79,24 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
-    const allLastVisited = (typeof app.login.lastVisited === 'string')
-      ? JSON.parse(app.login.lastVisited)
-      : app.login.lastVisited;
+    const { tag } = vnode.attrs;
+    const activeAddressInfo = app.user.activeAccount && app.user.addresses
+      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
+
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
+    const selectedCommunity = app.community;
+
+    const communityName = selectedNode
+      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    const communityDescription = selectedNode
+      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
+
+    const allLastVisited = (typeof app.user.lastVisited === 'string')
+      ? JSON.parse(app.user.lastVisited)
+      : app.user.lastVisited;
     if (!vnode.state.lastVisitedUpdated) {
       vnode.state.lastVisitedUpdated = true;
       updateLastVisited(app.community
@@ -248,32 +243,20 @@ const DiscussionsPage: m.Component<IDiscussionPageAttrs, IDiscussionPageState> =
         // m(InlineThreadComposer),
         allProposals.length === 0
         && [
-          m('.no-threads', 'No threads'),
+          m(EmptyChannelPlaceholder, { communityName }),
         ],
         allProposals.length !== 0
         && getRecentPostsSortedByWeek()
       ]);
     };
 
-    const { activeTag } = vnode.attrs;
-    const activeAddressInfo = app.vm.activeAccount && app.login.addresses
-      .find((a) => a.address === app.vm.activeAccount.address && a.chain === app.vm.activeAccount.chain?.id);
-
-    const activeNode = app.chain?.meta;
-    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
-                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
-    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
-
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      rightSidebar: (app.chain || app.community) && [
-        activeTag ? m(CommunitySidebar, { activeTag }) : m(CommunitySidebar)
-      ],
+      rightSidebar: (app.chain || app.community) && m(CommunitySidebar, { communityName, communityDescription, tag })
     }, [
       (app.chain || app.community) && [
-        activeTag
-          ? getSingleTagListing(activeTag)
+        tag
+          ? getSingleTagListing(tag)
           : getHomepageListing(),
       ]
     ]);

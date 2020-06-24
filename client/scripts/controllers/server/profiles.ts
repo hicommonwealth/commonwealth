@@ -47,7 +47,7 @@ class ProfilesController {
         address: account.address,
         data: JSON.stringify(data),
         auth: true,
-        jwt: app.login.jwt,
+        jwt: app.user.jwt,
       }).then((result) => {
         if (!account.profile) {
           const profile = new Profile(account.chain.id, account.address);

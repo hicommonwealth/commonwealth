@@ -8,12 +8,18 @@ import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+export const Errors = {
+  NoId: 'Must provide id',
+  NotAddrOwner: 'Address not owned by this user',
+  NoProposal: 'No matching proposal found',
+};
+
 const editComment = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
 
   if (!req.body.id) {
-    return next(new Error('Must provide id'));
+    return next(new Error(Errors.NoId));
   }
 
   const attachFiles = async () => {
@@ -40,8 +46,8 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       where: { id: req.body.id },
     });
 
-    if (userOwnedAddresses.filter((addr) => addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
-      return next(new Error('Not owned by this user'));
+    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
+      return next(new Error(Errors.NotAddrOwner));
     }
     const arr = comment.version_history;
     arr.unshift(req.body.version_history);
@@ -68,7 +74,7 @@ const editComment = async (models, req: Request, res: Response, next: NextFuncti
       log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
     if (!proposal) {
-      throw new Error('No matching proposal found.');
+      throw new Error(Errors.NoProposal);
     }
 
     const cwUrl = getProposalUrl(prefix, proposal, comment);

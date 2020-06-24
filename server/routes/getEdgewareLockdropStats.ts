@@ -27,6 +27,10 @@ const generalizedLocks = {
   ],
 };
 
+export const Errors = {
+  NoLockingEvent: 'No locking events returned from the API',
+};
+
 export const isHex = (inputString) => {
   const re = /^(0x)?[0-9A-Fa-f]+$/g;
   const result = re.test(inputString);
@@ -367,7 +371,7 @@ export const getCountsByBlock = async (web3, contracts) => {
   allEvents.sort((a, b) => a.blockNumber - b.blockNumber);
 
   if (allEvents.length === 0) {
-    throw new Error('No locking events returned from the API');
+    throw new Error(Errors.NoLockingEvent);
   }
 
   // set number of blocks to quantize our x-axis to
