@@ -8,7 +8,7 @@
     letter-spacing: 0.2px;
 }
 .bar-outer {
-  width: inherit;
+  width: 125px;
   height: 2px;
   border: #DFE8EE 1px solid;
   margin-top: 5px;
@@ -37,14 +37,14 @@
 
 // avatar div
 .user-avatar{
-  width: 25px !important;
-  height: 25px !important;
-  padding-right: 14px !important;
+  width: 1.5em !important;
+  height: auto !important;
+  padding-right: 10px !important;
 }
 
 .Jdenticon{
-  width: 25px !important;
-  height: 25px !important;
+  width: 1.5em !important;
+  height: auto !important;
 }
 
 // removed right sidebar
@@ -125,7 +125,6 @@
         @include small-gray;
         text-align: left;
         border-bottom: none;
-        overflow-wrap: break-word !important;
         padding-right: 80px;
         display: flex;
         flex-flow: row nowrap;
@@ -136,7 +135,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         min-width: 0px;
-        white-space: nowrap;
+        white-space: normal;
 
     }
     tr{
@@ -164,7 +163,8 @@
     td .User a.user-display-name {
         font-size: 1em;
         overflow-wrap: break-word !important;
-        
+        // padding-bottom: 10px;
+        // margin-bottom: 10px;
     }
 
     .val-name {
@@ -192,7 +192,7 @@
   .validators-preheader {
     display: grid;
     grid-row-gap: 30px;
-    grid-template-columns: auto auto auto auto auto;
+    grid-template-columns: auto auto auto auto auto auto auto;
     margin-bottom: 30px;
     .validators-preheader-item {
     //   flex: 1;
@@ -256,11 +256,6 @@
 }
 
 
-.val-im-online{
-    padding-right: 0px !important;
-}
 
-.val-last-hash{
-  padding-right: 20px !important;
-}
+
 
