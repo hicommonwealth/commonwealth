@@ -110,7 +110,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         thread: vnode.attrs.proposal,
         popoverMenu: true,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; },
+        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
       })
     ];
   },

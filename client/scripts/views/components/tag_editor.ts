@@ -89,8 +89,12 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             onclick: async () => {
               const { tagName, tagId } = vnode.state;
               const { thread } = vnode.attrs;
-              const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
-              vnode.attrs.onChangeHandler(tag);
+              try {
+                const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
+                vnode.attrs.onChangeHandler(tag);
+              } catch (e) {
+                console.error(e);
+              }
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
               } else {
