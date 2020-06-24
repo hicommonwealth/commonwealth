@@ -181,10 +181,23 @@ const LoginSelector : m.Component<{}, {}> = {
             ],
             // communities list
             (getSelectableCommunities() as any).concat(['home']).map((item) => {
+              const getUnseenCount = (id) => {
+                const isNew = app.isLoggedIn() && !app.user.unseenPosts[id];
+                const unseenCount = app.user.unseenPosts[id]?.activePosts || 0;
+
+                return m('.unseen-count', [
+                  isNew && m('.pip', 'New'),
+                  unseenCount > 0 && m('.pip', unseenCount),
+                ]);
+              };
+
               if (item instanceof ChainInfo) return m(MenuItem, {
                 onclick: (e) => m.route.set(`/${item.id}`),
                 class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-                label: m(CommunityLabel, { chain: item }),
+                label: [
+                  m(CommunityLabel, { chain: item }),
+                  getUnseenCount(item.id),
+                ],
                 selected: app.activeChainId() === item.id,
                 contentRight: app.isLoggedIn() && app.user.isMember({
                   account: app.user.activeAccount,
@@ -201,7 +214,10 @@ const LoginSelector : m.Component<{}, {}> = {
               if (item instanceof CommunityInfo) return m(MenuItem, {
                 onclick: (e) => m.route.set(`/${item.id}`),
                 class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                label: m(CommunityLabel, { community: item }),
+                label: [
+                  m(CommunityLabel, { community: item }),
+                  getUnseenCount(item.id),
+                ],
                 selected: app.activeCommunityId() === item.id,
                 contentRight: app.isLoggedIn() && app.user.isMember({
                   account: app.user.activeAccount,

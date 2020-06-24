@@ -65,11 +65,27 @@
         padding: 0 14px;
         height: initial;
         max-height: initial;
+        .cui-button-label {
+            display: flex;
+        }
+        // for address selection
         .UserBlock {
             padding: 6px 0 8px;
         }
+        // for community selection
         .CommunityLabel {
             padding: 2px 0;
+        }
+        .unseen-count {
+            .pip {
+                display: inline-block;
+                background: $badge-red;
+                color: #fff;
+                border-radius: 9999px;
+                padding: 2px 6px;
+                margin: 3px 0 2px 4px;
+                font-size: 13px;
+            }
         }
     }
     .community-star-toggle .cui-icon svg {
