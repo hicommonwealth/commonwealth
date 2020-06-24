@@ -1,3 +1,5 @@
+import 'components/header/notifications_menu.scss';
+
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import app from 'state';
@@ -31,7 +33,7 @@ const NotificationButtons: m.Component = {
   }
 };
 
-const NotificationsDropdownMenu: m.Component = {
+const NotificationsMenu: m.Component = {
   view: (vnode) => {
     // TODO: Add helper directly on controller
     const notifications = app.user.notifications
@@ -46,13 +48,14 @@ const NotificationsDropdownMenu: m.Component = {
       trigger: m(Button, {
         iconLeft: Icons.BELL,
         size: 'sm',
+        label: m('.notification-badge', unreadNotifications),
       }),
       position: 'bottom-end',
       closeOnContentClick: true,
       menuAttrs: {
         align: 'left',
       },
-      class: 'notification-menu',
+      class: 'NotificationsMenu',
       content: [
         m('.notification-list', [
           notifications.length > 0
@@ -71,4 +74,4 @@ const NotificationsDropdownMenu: m.Component = {
   },
 };
 
-export default NotificationsDropdownMenu;
+export default NotificationsMenu;
