@@ -11,6 +11,7 @@ import { Errors as CreateInviteLinkErrors } from 'server/routes/createInviteLink
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
+import { NotificationCategories } from '../../../shared/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -355,6 +356,9 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.community_id).to.be.equal(community);
       expect(res.body.result.updatedCode.invited_email).to.be.equal(userEmail);
       expect(res.body.result.updatedCode.used).to.be.true;
+      expect(res.body.result.subscription).to.not.be.null;
+      expect(res.body.result.subscription.object_id).to.be.equal(community);
+      expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
     });
 
     it('should fail to accept an invite created by an admin as a user who does not own the address', async () => {
