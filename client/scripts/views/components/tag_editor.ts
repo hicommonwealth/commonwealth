@@ -92,8 +92,11 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
               try {
                 const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
                 vnode.attrs.onChangeHandler(tag);
-              } catch (e) {
-                console.error(e);
+              } catch (err) {
+                console.log('Failed to update tag');
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to update tag');
               }
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
