@@ -176,7 +176,6 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         return ago - (ago % week);
       });
       const weekIndexes = Object.keys(proposalsByWeek);
-      debugger
       vnode.state.hasOlderPosts = weekIndexes.findIndex((msecAgo) => +msecAgo > vnode.state.lookback) !== -1;
 
       // select the appropriate lastVisited timestamp from the chain||community & convert to Moment
