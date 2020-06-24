@@ -87,8 +87,8 @@ const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Select a community'),
+    return m('.CommunityLabel', [
+      m('.site-brand', 'Commonwealth'),
     ]);
   }
 };
@@ -149,9 +149,10 @@ const LoginSelector : m.Component<{}, {}> = {
             size: 'sm',
             fluid: true,
             compact: true,
-            label: (!app.chain && !app.community) ? 'No community'
-              : (app.user.activeAccounts.length === 0 || app.user.activeAccount === null) ? 'No address'
-                : m(User, { user: app.user.activeAccount }),
+            label: (!app.chain && !app.community) ? 'Select a community'
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount })
+                : app.user.activeAccounts.length === 0 ? 'No address'
+                  : 'Select an address',
             iconRight: Icons.CHEVRON_DOWN,
           }),
           content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -169,13 +170,12 @@ const LoginSelector : m.Component<{}, {}> = {
                   compact: true
                 }),
               })),
-              m(MenuItem, {
+              !isPrivateCommunity && m(MenuItem, {
                 style: 'margin-top: 4px',
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
-                label: 'Connect another address',
-                disabled: isPrivateCommunity,
+                label: 'Manage addresses',
               }),
               m(MenuDivider),
             ],

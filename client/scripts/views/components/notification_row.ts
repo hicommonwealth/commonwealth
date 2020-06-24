@@ -69,7 +69,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ' reacted 👍 to your post ', m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ' reacted 👍 to your post in ', m('span.commented-obj', decoded_title || community_name) ]);
+      : m('span', [ actorName, ' reacted 👍 to your comment in ', m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -128,7 +128,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = (!comment_id)
       ? m('span', [ actorName, ` and ${length} others reacted 👍 to your post `, m('span.commented-obj', decoded_title) ])
-      : m('span', [ actorName, ` and ${length} others reacted 👍 to your post in `, m('span.commented-obj', decoded_title || community_name) ]);
+      : m('span', [ actorName, ` and ${length} others reacted 👍 to your comment in `, m('span.commented-obj', decoded_title || community_name) ]);
   }
   const pseudoProposal = {
     id: root_id,
@@ -215,7 +215,9 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
         }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),
-          notificationBody && m('.comment-body-excerpt', notificationBody),
+          notificationBody
+            && category !== `${NotificationCategories.NewReaction}`
+            && m('.comment-body-excerpt', notificationBody),
           m('.comment-body-created', createdAt.fromNow()),
         ]),
       ]);

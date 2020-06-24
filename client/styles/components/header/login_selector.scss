@@ -7,13 +7,10 @@
     font-weight: 400;
     align-items: center;
 
-    &.CommunityLabelPlaceholder {
-        padding: 8px 0;
-        .community-name {
-            color: #aaa;
-        }
+    .site-brand {
+        font-size: 16px;
+        font-weight: 600;
     }
-
     .community-label-left {
         padding-right: 12px;
     }
