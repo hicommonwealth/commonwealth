@@ -75,17 +75,6 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
-    console.dir(`user: ${app.user.activeAccount}`);
-    console.dir(`isAdmin?: ${app.user.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    })}`);
-    console.dir(`isMod?: ${app.user.isRoleOfCommunity({
-      role: 'moderator',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    })}`);
 
     const canEditThread = app.user.activeAccount
       && (app.user.isRoleOfCommunity({
@@ -121,6 +110,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         thread: vnode.attrs.proposal,
         popoverMenu: true,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; },
       })
     ];
   },
