@@ -2,6 +2,7 @@ import m from 'mithril';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { ChainBase } from 'models';
+import {truncate} from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { Icons, Icon } from 'construct-ui';
@@ -65,7 +66,7 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
         info.twitter
           && m('p', [
             m(Icon, { name: Icons.TWITTER, size: 'sm' }),
-            m('label', `  ${info.twitter}`)
+            m('label', `  ${truncate(info.twitter)}`)
           ]),
         info.riot
           && m('p', [

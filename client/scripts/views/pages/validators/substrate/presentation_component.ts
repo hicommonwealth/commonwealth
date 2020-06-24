@@ -17,10 +17,13 @@ const model = {
   currentTab: 'current',
   show: true,
   total: { waiting: 0, current: 0 },
-  sortKey: 'exposure.total',
+  sortKey: 'exposure',
+  sortAsc: true,
   sortIcon(key: string) {
     return model.sortKey === key
-      ? Icons.ARROW_UP
+      ? model.sortAsc
+        ? Icons.ARROW_UP
+        : Icons.ARROW_DOWN
       : Icons.MINUS;
   },
   reset(index) {
@@ -42,6 +45,8 @@ const model = {
       model.currentPage++;
   },
   changeSort(key: string) {
+    if (key === model.sortKey)
+      model.sortAsc = !model.sortAsc;
     model.sortKey = key;
   }
 };
@@ -63,7 +68,11 @@ const PresentationComponent = (state, chain: Substrate) => {
   ).length;
 
   const currentValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === true))
-    .sort((val1, val2) => get(validators[val2], model.sortKey, 0) - get(validators[val1], model.sortKey, 0))
+    .sort((val1, val2) => {
+      if (model.sortAsc)
+        return get(validators[val2], model.sortKey, 0) - get(validators[val1], model.sortKey, 0);
+      return get(validators[val1], model.sortKey, 0) - get(validators[val2], model.sortKey, 0);
+    })
     .slice(model.perPage * (model.currentPage - 1), model.perPage * model.currentPage);
 
   const waitingValidators = Object.keys(validators).filter((validator) => (validators[validator].isElected === false))
@@ -76,7 +85,6 @@ const PresentationComponent = (state, chain: Substrate) => {
       name: 'Current Validators',
       content: m('table.validators-table', [
         m('tr.validators-heading', [
-          m('th.val-controller', 'Controller'),
           m('th.val-stash', 'Stash'),
           m('th.val-total', 'Total Stake',
             m(Icon, { name: model.sortIcon('exposure.total'),

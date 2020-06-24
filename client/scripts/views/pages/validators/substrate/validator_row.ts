@@ -73,7 +73,6 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     const nominatorsList = vnode.attrs.nominators;
 
     return m('tr.ValidatorRow', [
-      m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
       m('td.val-stash', m(Tooltip, { content: m(Identity, { stash: vnode.attrs.stash }),
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
