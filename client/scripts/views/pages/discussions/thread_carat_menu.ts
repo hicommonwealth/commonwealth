@@ -86,7 +86,6 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     })}`);
-    console.dir(`isAuthor?: ${proposal.author === app.user.activeAccount.address}`);
 
     const canEditThread = app.user.activeAccount
       && (app.user.isRoleOfCommunity({
