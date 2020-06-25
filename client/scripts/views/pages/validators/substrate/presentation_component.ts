@@ -110,7 +110,7 @@ const PresentationComponent = (state, chain: Substrate) => {
       name: 'Waiting Validators',
       content: m('table.validators-table', [
         m('tr.validators-heading', [
-          m('th.val-stash', 'Stash'),
+          m('th.val-stash-waiting', 'Stash'),
           m('th.val-nominations', 'Nominations'),
           m('th.val-waiting-commission', 'Commission'),
           m('th.val-action', ''),
