@@ -1,4 +1,3 @@
-import 'pages/_listing_page.scss';
 import 'pages/subscriptions.scss';
 
 import m from 'mithril';
