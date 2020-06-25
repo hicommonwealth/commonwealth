@@ -83,7 +83,6 @@ const app: IApp = {
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
-  chainEntities: new ChainEntityController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 
