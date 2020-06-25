@@ -139,15 +139,13 @@
     }
     th {
         @include small-gray;
-        font-size: 0.7vw !important;
         text-align: left;
         border-bottom: none;
-        padding-right: 80px;
         display: flex;
         flex-flow: row nowrap;
         flex-grow: 1;
         flex-basis: 0;
-        padding-right: 0.6em;
+        padding: 0 1vw 0 0.6;
         word-break: break-word;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -165,31 +163,40 @@
       flex-flow: row nowrap;
       flex-grow: 1;
       flex-basis: 0;
-      padding-right: 0.5em;
       word-break: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
-      min-width: 0px;
       white-space: nowrap;
-      font-size: 13px;
+      font-size: 15px;
       border-bottom: 1;
       padding-top: 15px;
       padding-bottom: 14px;
       overflow-wrap: break-word;
+      min-width: 0px;
     }
-    .val-controller, .val-stash{
-       min-width: 10vw !important;
+    .val-author, .val-block-author{
+      padding-left: 4vw !important;
     }
-    .val-im-online{
-      min-width: 1vw !important;
+
+    .val-block-number, .val-number{
+      flex: 0 0 10% !important;
+    }
+
+    .val-total{
+      flex: 0 0 10% !important;
+    }
+     .val-controller, .val-stash{
+       flex: 1 0 12% !important;
+    }
+    .val-points{
+      flex: 0 0 5% !important;
     }
 
     td .User a.user-display-name {
         font-size: 1em;
         overflow-wrap: break-word !important;
-        // padding-bottom: 10px;
-        // margin-bottom: 10px;
     }
+
 
     .val-name {
         font-size: 16px;
@@ -197,16 +204,17 @@
     .val-action {
         text-align: right;
     }
-    @media only screen and (max-width: 1000px) {
+    @media only screen and (max-width: 1300px) {
      th{
       //  padding-right: 5px !important;
-      //  font-size: 10px !important;
+       font-size: 1.2vw !important;
       //  font-weight: bold !important;
-      //  margin-right: 0.7em !important;
+       padding:1vw 1.2vw !important;
+      //  text-align: center !important;
      }
       td{
-        font-size: 1vw !important;
-        margin-right: 0.6em !important;
+        font-size: 1.2vw !important;
+        padding: 1vw 1.2vw !important;
       }
     }
     @include sm-max {
@@ -223,8 +231,6 @@
     }
 }
 
-
-
 .ValidatorPage {
     margin: 0 auto;
   .validators-preheader {
@@ -232,11 +238,9 @@
     grid-row-gap: 30px;
     grid-template-columns: auto auto auto auto auto auto auto;
     margin-bottom: 30px;
-    .validators-preheader-item {
-    //   flex: 1;
-      // max-width: 157px;
-    //   margin-right: 20px;
-    }
+    // .validators-preheader-item {
+  
+    // }
     .validators-preheader-item h3 {
         @include small-gray;
         margin: 0 0 6px;

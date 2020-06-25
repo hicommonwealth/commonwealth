@@ -50,13 +50,14 @@
     }
 
     .compact-modal-title {
-        display: none;
         padding: 24px 28px 20px;
-        background: #272524;
-        color: #fff;
+        // background: #272524;
+        color: #000;
         h1, h2, h3 {
-            font-size: 20px;
-            font-weight: 700;
+            font-family: Inter;
+            font-style: normal;
+            font-size: 16px;
+            line-height: 120%;
             margin: 0;
             padding: 0;
         }
