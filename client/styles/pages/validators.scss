@@ -51,16 +51,11 @@
   display: none !important;
 }
 
-.left-sidebar{
-  min-width: 12.5vw !important;
-}
-
 // avatar div
 .user-avatar{
   width: 1.5em !important;
   height: 1.5em !important;
   margin-top: 0px !important;
-
 }
 
 .Jdenticon{
@@ -150,7 +145,6 @@
   }
 }
 
-// Validator page header
 
 
 .Validators {
@@ -210,9 +204,24 @@
 
     .val-total{
       flex: 0.35 0 10% !important;
+      padding-left: 0.3vw !important;
+
     }
+    .val-stash{
+      padding-left: 0.3vw !important;
+    }
+    .val-last-hash{
+      padding-left: 0.5vw !important;
+    }
+.val-stash-waiting,.val-controller, .val-stash, .val-author{
+    padding-top: 0.8em !important;
+
+}
      .val-controller, .val-stash{
        flex: 0.5 0 10% !important;
+    }
+    th .val-controller, .val-stash{
+      padding-top: 0.8em !important;
     }
     .val-points{
       flex: 0 0 5% !important;
@@ -221,12 +230,9 @@
     td .User a.user-display-name {
         font-size: 1em;
         overflow-wrap: break-word !important;
+        // padding-bottom: 18px !important;
     }
 
-
-    .val-name {
-        font-size: 16px;
-    }
     .val-action {
         text-align: right;
     }
@@ -235,13 +241,14 @@
       //  padding-right: 5px !important;
        font-size: 1vw !important;
       //  font-weight: bold !important;
-       padding:1vw 1.2vw !important;
+       padding:1vw 0.5vw !important;
       //  text-align: center !important;
      }
       td{
         font-size: 1vw !important;
-        padding: 1vw 1.2vw !important;
+        padding: 1vw 0.5vw !important;
       }
+     
     }
     @include sm-max {
         .val-nominated {
