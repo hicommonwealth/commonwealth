@@ -1,4 +1,4 @@
-import { SubstrateEventKind } from 'events/edgeware/types';
+import { SubstrateEventKind } from 'events/substrate/types';
 
 class ChainEventType {
   public readonly id: string;

@@ -20,7 +20,7 @@ export default class extends IEventHandler {
    * Handles an event by emitting notifications as needed.
    */
   public async handle(event: CWEvent, dbEvent) {
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
+    // log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
     if (!dbEvent) {
       log.error('No db event received! Ignoring.');
       return;

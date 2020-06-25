@@ -2,19 +2,22 @@ import 'components/sidebar/notification_row.scss';
 
 import m from 'mithril';
 import moment from 'moment';
-import { ListItem } from 'construct-ui';
 
 import app from 'state';
-import { slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
-import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import { IPostNotificationData } from 'shared/types';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
+
+import { SubstrateEventChains } from '../../../../shared/events/substrate/types';
+import { MolochEventChains } from '../../../../shared/events/moloch/types';
+import labelSubstrateEvent from '../../../../shared/events/substrate/filters/labeler';
+import labelMolochEvent from '../../../../shared/events/moloch/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -158,50 +161,29 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
 
-    const notificationData = typeof notification.data === 'string'
-      ? JSON.parse(notification.data)
-      : notification.data;
-    const {
-      author,
-      createdAt,
-      notificationHeader,
-      notificationBody,
-      path,
-      pageJump
-    } = getBatchNotificationFields(category, notificationData, notifications.length);
-
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      // TODO: use different labelers depending on chain
+      // use different labelers depending on chain
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
-      if (!vnode.state.startedLabelerLoad) {
-        vnode.state.startedLabelerLoad = true;
-        import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "event-labeler" */
-          '../../../../shared/events/edgeware/filters/labeler'
-        ).then((mod) => {
-          vnode.state.Labeler = mod.default;
-          m.redraw();
-        });
+      let label;
+      if (SubstrateEventChains.includes(chainId)) {
+        label = labelSubstrateEvent(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (MolochEventChains.includes(chainId)) {
+        label = labelMolochEvent(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else {
+        throw new Error(`invalid notification chain: ${chainId}`);
       }
-      if (!vnode.state.Labeler) {
-        return m('li.NotificationRow', {
-          class: notification.isRead ? '' : 'unread',
-        }, [
-          m('.comment-body', [
-            m('.comment-body-top', 'Loading...'),
-          ]),
-        ]);
-      }
-      const label = vnode.state.Labeler(
-        notification.chainEvent.blockNumber,
-        chainId,
-        notification.chainEvent.data,
-      );
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         onclick: async () => {
@@ -220,6 +202,17 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         ]),
       ]);
     } else {
+      const notificationData = typeof notification.data === 'string'
+        ? JSON.parse(notification.data)
+        : notification.data;
+      const {
+        author,
+        createdAt,
+        notificationHeader,
+        notificationBody,
+        path,
+        pageJump
+      } = getBatchNotificationFields(category, notificationData, notifications.length);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {

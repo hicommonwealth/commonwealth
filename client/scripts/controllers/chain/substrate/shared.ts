@@ -11,7 +11,6 @@ import {
   Moment,
   Balance,
   EventRecord,
-  Event,
   BlockNumber,
   Index,
   Hash,
@@ -26,32 +25,26 @@ import {
 import { Vec, Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 
-import { formatCoin, Coin } from 'adapters/currency';
+import { formatCoin } from 'adapters/currency';
 import { formatAddressShort, BlocktimeHelper } from 'helpers';
 import {
-  Proposal,
   NodeInfo,
-  StorageModule,
   ITXModalData,
   ITransactionResult,
   TransactionStatus,
   IChainModule,
   ITXData,
-  ChainBase,
   ChainClass,
   ChainEntity,
   ChainEvent,
-  ChainEventType,
 } from 'models';
 
-import { CWEvent } from 'events/interfaces';
-import fetchSubstrateEvents from 'events/edgeware/storageFetcher';
-import EdgewareEventSubscriber from 'events/edgeware/subscriber';
-import EdgewareEventProcessor from 'events/edgeware/processor';
+import SubstrateStorageFetcher from 'events/substrate/storageFetcher';
+import SubstrateEventSubscriber from 'events/substrate/subscriber';
+import SubstrateEventProcessor from 'events/substrate/processor';
 import {
   SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-  eventToEntity, entityToFieldName
-} from 'events/edgeware/types';
+} from 'events/substrate/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -148,6 +141,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       }
     }
     default:
+      console.error('Received invalid substrate chain entity!');
       break;
   }
   // force titles to update?
@@ -314,52 +308,17 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return !!this._api;
   }
 
-  // handle a single incoming chain event emitted from client connection with node
-  private _handleCWEvent(chain: string, cwEvent: CWEvent): void {
-    // immediately return if no entity involved, event unrelated to proposals/etc
-    const entityKind = eventToEntity(cwEvent.data.kind);
-    if (!entityKind) return;
-
-    // create event type
-    const eventType = new ChainEventType(
-      `${chain}-${cwEvent.data.kind.toString()}`,
-      chain,
-      cwEvent.data.kind.toString()
-    );
-
-    // create event
-    const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-
-    // create entity
-    const fieldName = entityToFieldName(entityKind);
-    if (!fieldName) return;
-    const fieldValue = event.data[fieldName];
-    const entity = new ChainEntity(chain, entityKind, fieldValue.toString(), []);
-    this._app.chainEntities.update(entity, event);
-    this._app.chain.handleEntityUpdate(entity, event);
-  }
-
   // load existing events and subscribe to future via client node connection
-  public async initChainEntities(chain: string) {
-    // get existing events
-    const existingEvents = await fetchSubstrateEvents(this._apiPromise);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const cwEvent of existingEvents) {
-      this._handleCWEvent(chain, cwEvent);
-    }
-
-    // kick off subscription to future events
-    const subscriber = new EdgewareEventSubscriber(this._apiPromise);
-    const processor = new EdgewareEventProcessor(this._apiPromise);
-    // TODO: handle unsubscribing
-    console.log('Subscribing to chain events.');
-    subscriber.subscribe(async (block) => {
-      const incomingEvents = await processor.process(block);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const cwEvent of incomingEvents) {
-        this._handleCWEvent(chain, cwEvent);
-      }
-    });
+  public initChainEntities(): Promise<void> {
+    const fetcher = new SubstrateStorageFetcher(this._apiPromise);
+    const subscriber = new SubstrateEventSubscriber(this._apiPromise);
+    const processor = new SubstrateEventProcessor(this._apiPromise);
+    return this._app.chain.chainEntities.subscribeEntities(
+      this._app.chain,
+      fetcher,
+      subscriber,
+      processor,
+    );
   }
 
   public query<T>(fn: (api: ApiRx) => Observable<T>): Observable<T> {
