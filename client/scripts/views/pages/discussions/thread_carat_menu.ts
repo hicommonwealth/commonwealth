@@ -18,8 +18,12 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
     return m(MenuItem, {
       onclick: (e) => {
         e.preventDefault();
-        if (notificationSubscription) {
-          app.user.notifications.deleteSubscription(notificationSubscription).then(() => {
+        if (notificationSubscription && notificationSubscription.isActive) {
+          app.user.notifications.disableSubscriptions([notificationSubscription]).then(() => {
+            m.redraw();
+          });
+        } else if (notificationSubscription) { // subscription, but not active
+          app.user.notifications.enableSubscriptions([notificationSubscription]).then(() => {
             m.redraw();
           });
         } else {
@@ -28,8 +32,8 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
           });
         }
       },
-      label: notificationSubscription ? 'Turn off notifications' : 'Turn on notifications',
-      iconLeft: notificationSubscription ? Icons.VOLUME_X : Icons.VOLUME_2,
+      label: notificationSubscription?.isActive ? 'Turn off notifications' : 'Turn on notifications',
+      iconLeft: notificationSubscription?.isActive ? Icons.VOLUME_X : Icons.VOLUME_2,
     });
   },
 };
