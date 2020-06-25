@@ -5,7 +5,7 @@ import { getProposalUrl } from '../../shared/utils';
 const { Op } = Sequelize;
 const log = factory.getLogger(formatFilename(__filename));
 
-import { IPostNotificationData, NotificationCategories } from '../../shared/types';
+import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -45,7 +45,7 @@ export const createNotificationEmailObject = (notification_data: IPostNotificati
     to: 'zak@commonwealth.im',
     from: 'Commonwealth <no-reply@commonwealth.im>',
     subject: subjectLine,
-    templateId: 'd-3f30558a95664528a2427b40292fec51',
+    templateId: DynamicTemplate.ImmediateEmailNotification, // 'd-3f30558a95664528a2427b40292fec51',
     dynamic_template_data: {
       notification: {
         subject: subjectLine,
