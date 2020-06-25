@@ -1,3 +1,5 @@
+import 'pages/discussions/thread_carat_menu.scss';
+
 import m from 'mithril';
 import app from 'state';
 

@@ -350,6 +350,13 @@ td, th {
         height: $menu-item-height;
         line-height: $menu-item-height;
     }
+    // other special cases
+    > .TagEditorButton > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
 }
 
 // icon styles

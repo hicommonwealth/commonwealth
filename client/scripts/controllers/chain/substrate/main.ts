@@ -3,9 +3,9 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
-import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { IApp } from 'state';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -56,7 +56,9 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.init(async () => {
       await this.chain.resetApi(this.meta);
       await this.chain.initMetadata();
-    }, onServerLoaded, !useClientChainEntities);
+    }, onServerLoaded, useClientChainEntities
+      ? EntityRefreshOption.CompletedEntities
+      : EntityRefreshOption.AllEntities);
     await this.accounts.init(this.chain);
 
     await Promise.all([
@@ -69,7 +71,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.identities.init(this.chain, this.accounts),
     ]);
     if (useClientChainEntities) {
-      await this.chain.initChainEntities(this.meta.chain.id);
+      await this.chain.initChainEntities();
     }
     await this._postModuleLoad(!useClientChainEntities);
     await this.chain.initEventLoop();

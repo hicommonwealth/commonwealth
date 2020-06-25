@@ -8,12 +8,12 @@ import { Button, ButtonGroup, Icon, Icons, PopoverMenu, List, MenuItem, MenuDivi
 
 import app from 'state';
 
-import NotificationsDropdownMenu from 'views/components/notifications_dropdown_menu';
 import User from 'views/components/widgets/user';
 import NewProposalButton from 'views/components/new_proposal_button';
 import LoginModal from 'views/modals/login_modal';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import NotificationsMenu from './notifications_menu';
 import LoginSelector, { CurrentCommunityLabel } from './login_selector';
 
 const Header: m.Component<{}> = {
@@ -26,7 +26,7 @@ const Header: m.Component<{}> = {
         // new proposal
         m(NewProposalButton, { fluid: false }),
         // notifications menu
-        app.isLoggedIn() && m(NotificationsDropdownMenu),
+        app.isLoggedIn() && m(NotificationsMenu),
         // invites menu
         app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
           size: 'sm',

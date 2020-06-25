@@ -87,8 +87,8 @@ const CommunityLabel: m.Component<{
       ]),
     ]);
 
-    return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Select a community'),
+    return m('.CommunityLabel', [
+      m('.site-brand', 'Commonwealth'),
     ]);
   }
 };
@@ -149,9 +149,10 @@ const LoginSelector : m.Component<{}, {}> = {
             size: 'sm',
             fluid: true,
             compact: true,
-            label: (!app.chain && !app.community) ? 'No community'
-              : (app.user.activeAccounts.length === 0 || app.user.activeAccount === null) ? 'No address'
-                : m(User, { user: app.user.activeAccount }),
+            label: (!app.chain && !app.community) ? 'Select a community'
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount })
+                : app.user.activeAccounts.length === 0 ? 'No address'
+                  : 'Select an address',
             iconRight: Icons.CHEVRON_DOWN,
           }),
           content: m(Menu, { class: 'LoginSelectorMenu' }, [
@@ -169,22 +170,34 @@ const LoginSelector : m.Component<{}, {}> = {
                   compact: true
                 }),
               })),
-              m(MenuItem, {
+              !isPrivateCommunity && m(MenuItem, {
                 style: 'margin-top: 4px',
                 onclick: () => app.modals.create({
                   modal: SelectAddressModal,
                 }),
-                label: 'Connect another address',
-                disabled: isPrivateCommunity,
+                label: 'Manage addresses',
               }),
               m(MenuDivider),
             ],
             // communities list
             (getSelectableCommunities() as any).concat(['home']).map((item) => {
+              const getUnseenCount = (id) => {
+                const isNew = app.isLoggedIn() && !app.user.unseenPosts[id];
+                const unseenCount = app.user.unseenPosts[id]?.activePosts || 0;
+
+                return m('.unseen-count', [
+                  isNew && m('.pip', 'New'),
+                  unseenCount > 0 && m('.pip', unseenCount),
+                ]);
+              };
+
               if (item instanceof ChainInfo) return m(MenuItem, {
                 onclick: (e) => m.route.set(`/${item.id}`),
                 class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-                label: m(CommunityLabel, { chain: item }),
+                label: [
+                  m(CommunityLabel, { chain: item }),
+                  getUnseenCount(item.id),
+                ],
                 selected: app.activeChainId() === item.id,
                 contentRight: app.isLoggedIn() && app.user.isMember({
                   account: app.user.activeAccount,
@@ -201,7 +214,10 @@ const LoginSelector : m.Component<{}, {}> = {
               if (item instanceof CommunityInfo) return m(MenuItem, {
                 onclick: (e) => m.route.set(`/${item.id}`),
                 class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                label: m(CommunityLabel, { community: item }),
+                label: [
+                  m(CommunityLabel, { community: item }),
+                  getUnseenCount(item.id),
+                ],
                 selected: app.activeCommunityId() === item.id,
                 contentRight: app.isLoggedIn() && app.user.isMember({
                   account: app.user.activeAccount,

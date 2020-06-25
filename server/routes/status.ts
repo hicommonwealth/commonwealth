@@ -23,12 +23,6 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
           model: models.OffchainTag,
           as: 'tags',
         },
-        {
-          model: models.ChainObjectVersion,
-          as: 'ChainObjectVersion',
-          required: false,
-          attributes: ['id'],
-        }
       ]
     }),
     models.ChainNode.findAll(),
