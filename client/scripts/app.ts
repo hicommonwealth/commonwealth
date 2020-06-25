@@ -155,22 +155,46 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Initialize modules.
   if (n.chain.network === ChainNetwork.Edgeware) {
-    const Edgeware = (await import(/* webpackMode: "lazy" */'./controllers/chain/edgeware/main')).default;
+    const Edgeware = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "edgeware-main" */
+      './controllers/chain/edgeware/main'
+    )).default;
     app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Substrate = (await import(/* webpackMode: "lazy" */'./controllers/chain/substrate/main')).default;
+    const Substrate = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kusama-main" */
+      './controllers/chain/substrate/main'
+    )).default;
     app.chain = new Substrate(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
-    const Cosmos = (await import(/* webpackMode: "lazy" */'./controllers/chain/cosmos/main')).default;
+    const Cosmos = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "cosmos-main" */
+      './controllers/chain/cosmos/main'
+    )).default;
     app.chain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
-    const Ethereum = (await import(/* webpackMode: "lazy" */'./controllers/chain/ethereum/main')).default;
+    const Ethereum = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "ethereum-main" */
+      './controllers/chain/ethereum/main'
+    )).default;
     app.chain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
-    const Near = (await import(/* webpackMode: "lazy" */'./controllers/chain/near/main')).default;
+    const Near = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "near-main" */
+      './controllers/chain/near/main'
+    )).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import(/* webpackMode: "lazy" */'./controllers/chain/ethereum/moloch/adapter')).default;
+    const Moloch = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "moloch-main" */
+      './controllers/chain/ethereum/moloch/adapter'
+    )).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -297,7 +321,11 @@ $(() => {
 
   const importRoute = (path, attrs: RouteAttrs) => ({
     onmatch: () => {
-      return import(`./${path}`).then((p) => p.default);
+      return import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "route-[request]" */
+        `./${path}`
+      ).then((p) => p.default);
     },
     render: (vnode) => {
       const { scoped, wideLayout } = attrs;

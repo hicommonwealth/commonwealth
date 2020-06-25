@@ -121,7 +121,11 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           fluid: true,
           disabled: vnode.state.loading,
           onclick: async (e) => {
-            const LinkNewAddressModal = await import(/* webpackMode: "lazy" */ './link_new_address_modal');
+            const LinkNewAddressModal = await import(
+              /* webpackMode: "lazy" */
+              /* webpackChunkName: "link-new-address-modal" */
+              './link_new_address_modal'
+            );
             app.modals.create({ modal: LinkNewAddressModal });
           },
         }),

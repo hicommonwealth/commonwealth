@@ -84,9 +84,21 @@ const Sidebar: m.Component<{ activeTag: string }, {
     if (showMolochMenuOptions && !vnode.state.startedMolochImports) {
       vnode.state.startedMolochImports = true;
       Promise.all([
-        import(/* webpackMode: "lazy" */ '../../modals/update_delegate_modal'),
-        import(/* webpackMode: "lazy" */ '../../modals/ragequit_modal'),
-        import(/* webpackMode: "lazy" */ '../../modals/token_approval_modal'),
+        import(
+          /* webpackMode: "lazy" */
+          /* webpackChunkName: "moloch-delegate-modal" */
+          '../../modals/update_delegate_modal'
+        ),
+        import(
+          /* webpackMode: "lazy" */
+          /* webpackChunkName: "moloch-ragequit-modal" */
+          '../../modals/ragequit_modal'
+        ),
+        import(
+          /* webpackMode: "lazy" */
+          /* webpackChunkName: "moloch-token-modal" */
+          '../../modals/token_approval_modal'
+        ),
       ]).then(([ updateDelegateModal, ragequitModal, tokenApprovalModal ]) => {
         vnode.state.UpdateDelegateModal = updateDelegateModal;
         vnode.state.RagequitModal = ragequitModal;

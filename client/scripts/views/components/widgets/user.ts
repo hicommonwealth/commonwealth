@@ -39,7 +39,11 @@ const User : m.Component<IAttrs, IState> = {
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
       vnode.state.identityWidgetLoading = true;
-      import(/* webpackMode: "lazy" */ './substrate_identity').then((mod) => {
+      import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "substrate-identity-widget" */
+        './substrate_identity'
+      ).then((mod) => {
         vnode.state.IdentityWidget = mod.default;
         vnode.state.identityWidgetLoading = false;
       });

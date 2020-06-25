@@ -149,7 +149,11 @@ const ConfirmInviteModal = {
               href: '#',
               onclick: async (e) => {
                 e.preventDefault();
-                const LinkNewAddressModal = await import(/* webpackMode: "lazy" */ './link_new_address_modal');
+                const LinkNewAddressModal = await import(
+                  /* webpackMode: "lazy" */
+                  /* webpackChunkName: "link-new-address-modal" */
+                  './link_new_address_modal'
+                );
                 $(vnode.dom).trigger('modalexit');
                 app.modals.create({ modal: LinkNewAddressModal });
               }

@@ -179,7 +179,11 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       const chainName = app.config.chains.getById(chainId).name;
       if (!vnode.state.startedLabelerLoad) {
         vnode.state.startedLabelerLoad = true;
-        import(/* webpackMode: "lazy" */ '../../../../shared/events/edgeware/filters/labeler').then((mod) => {
+        import(
+          /* webpackMode: "lazy" */
+          /* webpackChunkName: "event-labeler" */
+          '../../../../shared/events/edgeware/filters/labeler'
+        ).then((mod) => {
           vnode.state.Labeler = mod.default;
           m.redraw();
         });
