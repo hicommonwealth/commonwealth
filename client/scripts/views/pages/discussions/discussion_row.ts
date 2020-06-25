@@ -39,44 +39,36 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       }
     };
 
+    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
+      `${slugify(proposal.title)}`;
+
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
-        m('.discussion-content', {
-          class: proposal.title === '--' ? 'no-title' : ''
-        }, [
-          m('.discussion-tags', [
-            proposal.tag && m(Tag, {
-              rounded: true,
-              intent: 'none',
-              label: proposal.tag.name,
-              size: 'xs',
-              onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-            }),
+        m('.discussion-top', [
+          m('.discussion-top-left', [
+            m('.discussion-title', link('a', discussionLink, proposal.title)),
+            m('.discussion-meta', [
+              m(User, {
+                user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+                linkify: true,
+                tooltip: true,
+                showRole: true,
+              }),
+              m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
+              proposal.tag && m(Tag, {
+                rounded: true,
+                intent: 'none',
+                label: proposal.tag.name,
+                size: 'xs',
+                onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
+              }),
+            ]),
+          ]),
+          m('.discussion-top-right', [
             m(ThreadCaratMenu, { proposal }),
           ]),
-          m('.discussion-title', [
-            link(
-              'a',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-              proposal.title,
-            ),
-            app.comments.nComments(proposal) > 0
-              && link(
-                'a.discussion-replies',
-                `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-                [ app.comments.nComments(proposal), m(Icon, { name: Icons.MESSAGE_SQUARE }) ],
-              ),
-          ]),
-          m('.discussion-meta', [
-            m(User, {
-              user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
-              linkify: true,
-              tooltip: true,
-              showRole: true,
-            }),
-            m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
-          ]),
-          // content
+        ]),
+        m('.discussion-content', [
           propType === OffchainThreadKind.Forum
             && (proposal as OffchainThread).body
             && m('.discussion-excerpt', [
@@ -111,7 +103,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               extractDomain(proposal.url),
               m.trust(' &rarr;'),
             ]),
-          // comments
+        ]),
+        m('.discussion-bottom', [
           m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
             m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
               return m(User, { user: new AddressInfo(null, address, chain, null), avatarOnly: true, tooltip: true, avatarSize: 20 });

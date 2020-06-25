@@ -105,7 +105,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         ],
         trigger: m(Icon, {
           name: Icons.CHEVRON_DOWN,
-          class: 'discussion-edit-tags',
+          class: 'ThreadCaratMenu',
           style: 'margin-right: 6px;'
         }),
       }),
