@@ -1,8 +1,6 @@
 @import 'client/styles/shared';
 
 .Modal {
-
-
     .overlay {
         top: 0;
         bottom: 0;
@@ -19,17 +17,15 @@
     .popup {
         @include popout();
         position: relative;
-        min-width: 448px;
-        // width: 448px;
-        // max-width: 448px;
-        max-height: 559px;
+        min-width: 380px;
+        max-width: 800px;
+        max-height: 96%;
         background: white;
         overflow: hidden;
         overflow-y: auto;
+        max-width: 92%;
         border-radius: 3px;
         z-index: 20;
-        box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3);
-        border-radius: 4px;
     }
     .modal-title {
         padding: 22px 28px 19px;
@@ -53,16 +49,12 @@
     }
 
     .compact-modal-title {
-        padding-top: 20px;
-        padding-left: 20px;
-        // background: #272524;
-        color: #000;
+        padding: 24px 28px 20px;
+        background: #272524;
+        color: #fff;
         h1, h2, h3 {
-            font-family: Inter;
-            font-style: normal;
-            font-size: 16px;
-            line-height: 120%;
-            letter-spacing: -0.2px;
+            font-size: 20px;
+            font-weight: 700;
             margin: 0;
             padding: 0;
         }
@@ -72,49 +64,14 @@
         }
     }
     .compact-modal-body {
-        padding: 20px 20px 0;
+        padding: 16px 28px 0;
         &:last-child {
             padding-bottom: 16px;
         }
     }
-    .compact-modal-body th{
-        font-style: normal;
-        font-weight: bold;
-        font-size: 16px;
-        line-height: 120%;
-        text-align: left ;
-        letter-spacing: -0.2px;
-        font-family: 'Inter', sans-serif !important;
-
-    }
-    .compact-modal-body td{
-        font-family: 'Inter', sans-serif !important;
-        font-style: normal;
-        font-weight: normal;
-        font-size: 16px;
-        line-height: 120%;
-        letter-spacing: -0.2px;
-    }
     .compact-modal-actions {
         padding: 6px 28px 28px;
     }
-
-td, th{
-    padding: 12px 0 !important;
-}
-
-// avatar div
-.user-avatar{
-    width: 25px !important;
-    height: 25px !important;
-    padding-right: 14px !important;
-  }
-  
-  .Jdenticon{
-    width: 25px !important;
-    height: 25px !important;
-  }
-
     @include xs-max {
         .popup {
             min-width: 310px;
@@ -151,14 +108,4 @@ td, th{
 }
 .CompactModalExitButton {
     color: #fff;
-}
-
-
-.amount,.priority{
-    text-align: right !important;
-}
-
-th .amount, .priority{
-    text-align: right !important;
-
 }
