@@ -10,6 +10,7 @@ import { OffchainThread } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
+import { initChain } from 'app';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -190,12 +191,25 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }, { }> = {
+const ProfilePage: m.Component<{ address: string, }, { chainLoaded: boolean, chain: string, }> = {
+  oninit: (vnode) => {
+    vnode.state.chainLoaded = false;
+    vnode.state.chain = m.route.param('base');
+  },
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading);
+    const loadChain = async (chain: string) => {
+      console.dir('init chain...');
+      await initChain(chain);
+      console.dir('chain init!');
+      vnode.state.chainLoaded = true;
+      m.redraw();
+    };
+    const { chainLoaded, chain } = vnode.state;
+    if (!vnode.state.chainLoaded) loadChain(chain);
+    if (!vnode.state.chainLoaded) return m(PageLoading);
     const account = app.chain.accounts.get(vnode.attrs.address);
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
