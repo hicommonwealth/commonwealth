@@ -119,13 +119,15 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             title: 'Epoch',
             total: sessionLength,
             value: sessionProgress,
-            currentBlock: formatNumber(currentIndex)
+            currentBlock: formatNumber(currentIndex),
+            cssClass: 'epoch'
           })),
         m(CardSummary, {
           title: 'Era',
           total: eraLength,
           value: eraProgress,
-          currentBlock: formatNumber(currentEra)
+          currentBlock: formatNumber(currentEra),
+          cssClass: 'era'
         }),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
@@ -182,12 +184,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominations.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominations)).then(() => {
-                // vnode.attrs.sending = false;
-                  m.redraw();
-                }, (e) => {
-                  // vnode.attrs.sending = false;
-                  m.redraw();
-                });
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  }, (e) => {
+                    // vnode.attrs.sending = false;
+                    m.redraw();
+                  });
               }
             }, 'Update nominations'),
           ]),
