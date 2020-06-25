@@ -27,7 +27,6 @@ import CharacterLimitedTextInput from 'views/components/widgets/character_limite
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
-import SubstrateChain from 'client/scripts/controllers/chain/substrate/shared';
 import AddressSwapper from '../components/addresses/address_swapper';
 
 enum LinkNewAddressSteps {
