@@ -19,8 +19,9 @@
     .popup {
         @include popout();
         position: relative;
-        min-width: 380px;
-        max-width: 440px;
+        min-width: 448px;
+        // width: 448px;
+        // max-width: 448px;
         max-height: 559px;
         background: white;
         overflow: hidden;
