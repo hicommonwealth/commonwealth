@@ -10,8 +10,7 @@
 
 // Progress Bar
 .bar-outer-era {
-  max-width: inherit;
-  min-width: 130px;
+  width: 100%;
   height: 2px;
   border: #DFE8EE 1px solid;
   margin-top: 5px;
@@ -25,8 +24,7 @@
 }
 
 .bar-outer-epoch {
-  max-width: inherit !important;
-  min-width: 118px;
+  width: 100%;
   height: 2px;
   border: #DFE8EE 1px solid;
   margin-top: 5px;
@@ -141,6 +139,7 @@
     }
     th {
         @include small-gray;
+        font-size: 0.7vw !important;
         text-align: left;
         border-bottom: none;
         padding-right: 80px;
@@ -153,7 +152,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         min-width: 0px;
-        white-space: normal;
+        white-space: nowrap;
 
     }
     tr{
@@ -172,7 +171,7 @@
       text-overflow: ellipsis;
       min-width: 0px;
       white-space: nowrap;
-      font-size: 1em;
+      font-size: 13px;
       border-bottom: 1;
       padding-top: 15px;
       padding-bottom: 14px;
@@ -198,14 +197,16 @@
     .val-action {
         text-align: right;
     }
-    @media only screen and (max-width: 991px) {
+    @media only screen and (max-width: 1000px) {
      th{
       //  padding-right: 5px !important;
-       font-size: 10px !important;
-       font-weight: bold !important;
+      //  font-size: 10px !important;
+      //  font-weight: bold !important;
+      //  margin-right: 0.7em !important;
      }
       td{
-        font-size: 8px !important;
+        font-size: 1vw !important;
+        margin-right: 0.6em !important;
       }
     }
     @include sm-max {
@@ -233,7 +234,7 @@
     margin-bottom: 30px;
     .validators-preheader-item {
     //   flex: 1;
-      max-width: 157px !important;
+      // max-width: 157px;
     //   margin-right: 20px;
     }
     .validators-preheader-item h3 {
@@ -243,7 +244,9 @@
     .validators-preheader-item .validators-preheader-item-text {
         font-size: 17px;
     }
-  
+    .validators-preheader-item-progressbox{
+        width: fit-content !important;
+    }
   }
 }
 

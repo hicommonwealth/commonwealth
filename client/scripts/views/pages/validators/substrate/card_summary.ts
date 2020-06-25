@@ -17,7 +17,7 @@ const CardSummary: m.Component<IValidatorAttrs, {}> = {
     const percentageText: number = percentage < 0 || percentage > 100
       ? null
       : percentage;
-    return percentageText && m(`.validators-preheader-item${title.toLowerCase() == 'epoch' || 'era' ? '-progressbox' : ''}`, [
+    return percentageText && m(`.validators-preheader-item${title.toLowerCase() == 'epoch' || 'era' ? '-progressbox.validators-preheader-item' : ''}`, [
       m('h3', title),
       currentBlock != undefined && m('span.preheader-item-text.bold-text', `#${currentBlock}`),
       m('span.preheader-item-text.gray-text', `${formatNumber(value)}/${formatNumber(total)}`),
