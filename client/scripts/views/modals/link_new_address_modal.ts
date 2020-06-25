@@ -193,7 +193,8 @@ const LinkNewAddressModal = {
             Object.entries(chains).map(([chain, nodeList] : [string, any]) => m('.chain-card', {
               class: (nodeList[0].chain.network === ChainNetwork.Cosmos
                       || nodeList[0].chain.network === ChainNetwork.Edgeware
-                      || nodeList[0].chain.network === ChainNetwork.Kusama) ? 'hidden-mobile' : '',
+                      || nodeList[0].chain.network === ChainNetwork.Kusama
+                      || nodeList[0].chain.network === ChainNetwork.Polkadot) ? 'hidden-mobile' : '',
               onclick: async (e) => {
                 e.preventDefault();
                 // Overwrite the current path to force a switch to another chain.

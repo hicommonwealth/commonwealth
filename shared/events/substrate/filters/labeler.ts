@@ -29,7 +29,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
   let dollar;
   if (chain.startsWith('edgeware')) {
     dollar = (new BN(10)).pow(new BN(EDG_DECIMAL));
-  } else if (chain.startsWith('kusama')) {
+  } else if (chain.startsWith('kusama') || chain.startsWith('polkadot')) {
     dollar = (new BN(10)).pow(new BN(KUSAMA_DECIMAL));
   } else {
     throw new Error('unexpected chain');

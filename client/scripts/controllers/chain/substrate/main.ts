@@ -3,8 +3,9 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
+import { IApp } from 'state';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
-import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent } from 'models';
+import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import WebWalletController from '../../app/web_wallet';
 import SubstratePhragmenElections from './phragmen_elections';
@@ -27,7 +28,12 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public get loaded() { return this._loaded; }
 
   public readonly base = ChainBase.Substrate;
-  public readonly class = ChainClass.Kusama;
+  public readonly class: ChainClass;
+
+  constructor(meta: NodeInfo, app: IApp, _class: ChainClass) {
+    super(meta, app);
+    this.class = _class;
+  }
 
   // dispatches event updates to a given entity to the appropriate module
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {

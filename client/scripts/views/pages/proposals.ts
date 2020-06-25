@@ -47,7 +47,8 @@ const ProposalsPage: m.Component<{}> = {
     const visibleTreasuryProposals = onSubstrate && (app.chain as Substrate).treasury.store.getAll();
 
     // XXX: display these
-    const visibleTechnicalCommitteeProposals = app.chain && app.chain.class === ChainClass.Kusama
+    const visibleTechnicalCommitteeProposals = app.chain
+      && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
 
     let nextReferendum;
