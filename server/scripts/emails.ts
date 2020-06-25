@@ -88,7 +88,7 @@ export const createRegularNotificationEmailObject = async (user, notifications) 
   const msg = {
     to: 'zak@commonwealth.im', // TODO user.email
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    templateId: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
+    templateId: DynamicTemplate.BatchNotifications,
     dynamic_template_data: {
       notifications: emailObjArray,
       subject,

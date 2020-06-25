@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { DynamicTemplate } from '../../shared/types';
 const sgMail = require('@sendgrid/mail');
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -71,7 +72,7 @@ const verifyAddress = async (models, req: Request, res: Response, next: NextFunc
         const msg = {
           to: user.email,
           from: 'Commonwealth <no-reply@commonwealth.im>',
-          templateId: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
+          templateId: DynamicTemplate.VerifyAddress,
           dynamic_template_data: {
             address: req.body.address,
             chain: req.body.chain,
