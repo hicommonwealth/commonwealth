@@ -47,6 +47,7 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
         user: author,
         tooltip: true,
         linkify: true,
+        hideAvatar: true,
       }),
     ]);
   }

@@ -29,6 +29,7 @@ import {
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
+import User from 'views/components/widgets/user';
 import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
@@ -39,10 +40,10 @@ import {
   ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons
 } from './header';
 import {
-  activeQuillEditorHasText, GlobalStatus, ProposalBodyAuthor, ProposalBodyCreated, ProposalBodyLastEdited,
-  ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit, ProposalBodySaveEdit,
-  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor, ProposalBodyReaction,
-  ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
+  activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
+  ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
+  ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
+  ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
 import { ThreadSubscriptionButton } from '../discussions/thread_carat_menu';
@@ -203,94 +204,99 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(),
     }, [
-      m('.comment-body-meta', [
-        m(ProposalBodyAuthor, { comment }),
-        m(ProposalBodySpacer),
-        m(ProposalBodyCreated, { item: comment, link: commentLink }),
-        comment.versionHistory?.length > 1 && m(ProposalBodySpacer),
-        m(ProposalBodyLastEdited, { item: comment }),
-
-        // !vnode.state.editing
-        //   && app.user.activeAccount
-        //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        //   && app.user.activeAccount?.chain.id === comment.authorChain
-        //   && app.user.activeAccount?.address === comment.author
-        //   && [
-        //     m(ProposalBodySpacer),
-        //     m(ProposalBodyEdit, {
-        //       item: comment,
-        //       getSetGlobalReplyStatus,
-        //       getSetGlobalEditingStatus,
-        //       parentState: vnode.state
-        //     }),
-        //     m(ProposalBodySpacer),
-        //     m(ProposalBodyDelete, { item: comment }),
-        //   ],
-
-        !vnode.state.editing
-        && app.user.activeAccount
-        && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        && app.user.activeAccount?.chain.id === comment.authorChain
-        && app.user.activeAccount?.address === comment.author
-        && [
-          m(ProposalBodySpacer),
-          m(PopoverMenu, {
-            closeOnContentClick: true,
-            content: [
-              m(ProposalBodyEditMenuItem, {
-                item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-              }),
-              m(ProposalBodyDeleteMenuItem, { item: comment }),
-              parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
-              && m(ProposalBodyReplyMenuItem, {
-                item: comment,
-                getSetGlobalReplyStatus,
-                parentType,
-                parentState: vnode.state,
-              }),
-            ],
-            transitionDuration: 0,
-            trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
-          })
-        ],
-
-        // For now, we are limiting threading to 1 level deep
-        // Comments whose parents are other comments should not display the reply option
-        // !vnode.state.editing
-        //   && app.user.activeAccount
-        //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        //   && parentType === CommentParent.Proposal
-        //   && [
-        //     m(ProposalBodySpacer),
-        //     m(ProposalBodyReply, {
-        //       item: comment,
-        //       getSetGlobalReplyStatus,
-        //       parentType,
-        //       parentState: vnode.state,
-        //     }),
-        //   ],
-
-        vnode.state.editing && [
-          m(ProposalBodySpacer),
-          m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-          m(ProposalBodySpacer),
-          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-        ],
+      m('.comment-avatar', [
+        m(ProposalBodyAvatar, { comment }),
       ]),
-      m('.comment-body-content', [
-        !vnode.state.editing
-          && m(ProposalBodyText, { item: comment }),
+      m('.comment-body', [
+        m('.comment-body-meta', [
+          m(ProposalBodyAuthor, { comment }),
+          m(ProposalBodySpacer),
+          m(ProposalBodyCreated, { item: comment, link: commentLink }),
+          comment.versionHistory?.length > 1 && m(ProposalBodySpacer),
+          m(ProposalBodyLastEdited, { item: comment }),
 
-        !vnode.state.editing
-          && comment.attachments
-          && comment.attachments.length > 0
-          && m(ProposalBodyAttachments, { item: comment }),
+          // !vnode.state.editing
+          //   && app.user.activeAccount
+          //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          //   && app.user.activeAccount?.chain.id === comment.authorChain
+          //   && app.user.activeAccount?.address === comment.author
+          //   && [
+          //     m(ProposalBodySpacer),
+          //     m(ProposalBodyEdit, {
+          //       item: comment,
+          //       getSetGlobalReplyStatus,
+          //       getSetGlobalEditingStatus,
+          //       parentState: vnode.state
+          //     }),
+          //     m(ProposalBodySpacer),
+          //     m(ProposalBodyDelete, { item: comment }),
+          //   ],
 
-        vnode.state.editing
-          && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
-      ]),
-      m('.comment-body-reactions', [
-        m(ProposalBodyReaction, { item: comment }),
+          !vnode.state.editing
+          && app.user.activeAccount
+          && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          && app.user.activeAccount?.chain.id === comment.authorChain
+          && app.user.activeAccount?.address === comment.author
+          && [
+            m(ProposalBodySpacer),
+            m(PopoverMenu, {
+              closeOnContentClick: true,
+              content: [
+                m(ProposalBodyEditMenuItem, {
+                  item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                }),
+                m(ProposalBodyDeleteMenuItem, { item: comment }),
+                parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+                && m(ProposalBodyReplyMenuItem, {
+                  item: comment,
+                  getSetGlobalReplyStatus,
+                  parentType,
+                  parentState: vnode.state,
+                }),
+              ],
+              transitionDuration: 0,
+              trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
+            })
+          ],
+
+          // For now, we are limiting threading to 1 level deep
+          // Comments whose parents are other comments should not display the reply option
+          // !vnode.state.editing
+          //   && app.user.activeAccount
+          //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
+          //   && parentType === CommentParent.Proposal
+          //   && [
+          //     m(ProposalBodySpacer),
+          //     m(ProposalBodyReply, {
+          //       item: comment,
+          //       getSetGlobalReplyStatus,
+          //       parentType,
+          //       parentState: vnode.state,
+          //     }),
+          //   ],
+
+          vnode.state.editing && [
+            m(ProposalBodySpacer),
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodySpacer),
+            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+          ],
+        ]),
+        m('.comment-body-content', [
+          !vnode.state.editing
+            && m(ProposalBodyText, { item: comment }),
+
+          !vnode.state.editing
+            && comment.attachments
+            && comment.attachments.length > 0
+            && m(ProposalBodyAttachments, { item: comment }),
+
+          vnode.state.editing
+            && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
+        ]),
+        m('.comment-body-reactions', [
+          m(ProposalBodyReaction, { item: comment }),
+        ]),
       ]),
     ]);
   }
@@ -420,7 +426,16 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
+const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
+  editing: boolean,
+  replyParent: number | boolean,
+  highlightedComment: boolean,
+  commentsPrefetchStarted: boolean,
+  comments,
+  viewCountPrefetchStarted: boolean,
+  viewCount: number,
+  profilesPrefetchStarted: boolean
+}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
@@ -605,23 +620,21 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, { edit
       class: 'ViewProposalPage',
       rightSidebar: m(ProposalSidebar, { proposal }),
     }, [
-      m('.forum-container', [
-        m(ProposalHeader, {
-          proposal,
-          commentCount,
-          viewCount,
-          getSetGlobalEditingStatus,
-          getSetGlobalReplyStatus
-        }),
-        m(ProposalComments, {
-          proposal,
-          comments,
-          createdCommentCallback,
-          replyParent,
-          getSetGlobalEditingStatus,
-          getSetGlobalReplyStatus
-        }),
-      ]),
+      m(ProposalHeader, {
+        proposal,
+        commentCount,
+        viewCount,
+        getSetGlobalEditingStatus,
+        getSetGlobalReplyStatus
+      }),
+      m(ProposalComments, {
+        proposal,
+        comments,
+        createdCommentCallback,
+        replyParent,
+        getSetGlobalEditingStatus,
+        getSetGlobalReplyStatus
+      }),
     ]);
   }
 };
