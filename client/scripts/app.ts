@@ -155,22 +155,22 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Initialize modules.
   if (n.chain.network === ChainNetwork.Edgeware) {
-    const Edgeware = (await import('./controllers/chain/edgeware/main')).default;
+    const Edgeware = (await import(/* webpackMode: "lazy" */'./controllers/chain/edgeware/main')).default;
     app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Substrate = (await import('./controllers/chain/substrate/main')).default;
+    const Substrate = (await import(/* webpackMode: "lazy" */'./controllers/chain/substrate/main')).default;
     app.chain = new Substrate(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
-    const Cosmos = (await import('./controllers/chain/cosmos/main')).default;
+    const Cosmos = (await import(/* webpackMode: "lazy" */'./controllers/chain/cosmos/main')).default;
     app.chain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
-    const Ethereum = (await import('./controllers/chain/ethereum/main')).default;
+    const Ethereum = (await import(/* webpackMode: "lazy" */'./controllers/chain/ethereum/main')).default;
     app.chain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
-    const Near = (await import('./controllers/chain/near/main')).default;
+    const Near = (await import(/* webpackMode: "lazy" */'./controllers/chain/near/main')).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
+    const Moloch = (await import(/* webpackMode: "lazy" */'./controllers/chain/ethereum/moloch/adapter')).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -297,7 +297,6 @@ $(() => {
 
   const importRoute = (path, attrs: RouteAttrs) => ({
     onmatch: () => {
-      console.log(path);
       return import(`./${path}`).then((p) => p.default);
     },
     render: (vnode) => {

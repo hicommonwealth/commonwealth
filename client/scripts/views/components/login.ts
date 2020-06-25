@@ -2,15 +2,10 @@ import 'components/login.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import mixpanel from 'mixpanel-browser';
-import { WalletAccount } from 'nearlib';
-import { Button, Input, Icons, Form, FormGroup } from 'construct-ui';
+import { Button, Input, Form, FormGroup } from 'construct-ui';
 
 import app from 'state';
 import { ChainBase } from 'models';
-import { formatAsTitleCase } from 'helpers';
-import Near from 'controllers/chain/near/main';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 interface IAttrs {
   creatingAccount?: boolean;
@@ -38,7 +33,7 @@ const Login: m.Component<IAttrs, IState> = {
         !hideHeader && m('h4', 'Log in or sign up'),
         m(Button, {
           class: 'login-button-black',
-          onclick: (e) => {
+          onclick: async (e) => {
             e.preventDefault();
             $(e.target).trigger('menuclose');
 
@@ -49,7 +44,8 @@ const Login: m.Component<IAttrs, IState> = {
             }));
 
             // redirect to NEAR page for login
-            const wallet = new WalletAccount((app.chain as Near).chain.api, null);
+            const WalletAccount = (/* webpackMode: "lazy" */ await import('nearlib')).WalletAccount;
+            const wallet = new WalletAccount((app.chain as any).chain.api, null);
             if (wallet.isSignedIn()) {
               // get rid of pre-existing wallet info to make way for new account
               wallet.signOut();
@@ -165,10 +161,11 @@ const Login: m.Component<IAttrs, IState> = {
             intent: 'primary',
             fluid: true,
             class: 'login-with-web3',
-            onclick: (e) => {
+            onclick: async (e) => {
               e.preventDefault();
+              const LinkNewAddressModal = await import(/* webpackMode: "lazy" */ '../modals/link_new_address_modal');
               $(e.target).trigger('menuclose');
-              app.modals.create({ modal: LinkNewAddressModal, data: { loggingInWithAddress: true } });
+              app.modals.create({ modal: LinkNewAddressModal.default, data: { loggingInWithAddress: true } });
             },
             label: creatingAccount
               ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`

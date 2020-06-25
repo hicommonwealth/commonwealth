@@ -1,11 +1,6 @@
 import { StorageModule, ChainBase, ChainClass } from 'models';
 import { ProposalStore } from 'stores';
-
 import app from './state';
-import Substrate from './controllers/chain/substrate/main';
-import Edgeware from './controllers/chain/edgeware/main';
-import Cosmos from './controllers/chain/cosmos/main';
-import Moloch from './controllers/chain/ethereum/moloch/adapter';
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -30,22 +25,22 @@ export const proposalSlugToClass = () => {
     ['discussion', app.threads],
   ]);
   if (app.chain.base === ChainBase.Substrate) {
-    mmap.set('referendum', (app.chain as Substrate).democracy);
-    mmap.set('democracyproposal', (app.chain as Substrate).democracyProposals);
-    mmap.set('councilmotion', (app.chain as Substrate).council);
-    mmap.set('phragmenelection', (app.chain as Substrate).phragmenElections);
-    mmap.set('treasuryproposal', (app.chain as Substrate).treasury);
+    mmap.set('referendum', (app.chain as any).democracy);
+    mmap.set('democracyproposal', (app.chain as any).democracyProposals);
+    mmap.set('councilmotion', (app.chain as any).council);
+    mmap.set('phragmenelection', (app.chain as any).phragmenElections);
+    mmap.set('treasuryproposal', (app.chain as any).treasury);
   } else if (app.chain.base === ChainBase.CosmosSDK) {
-    mmap.set('cosmosproposal', (app.chain as Cosmos).governance);
+    mmap.set('cosmosproposal', (app.chain as any).governance);
   }
   if (app.chain.class === ChainClass.Kusama) {
-    mmap.set('technicalcommitteemotion', (app.chain as Substrate).technicalCommittee);
+    mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
   if (app.chain.class === ChainClass.Edgeware) {
-    mmap.set('signalingproposal', (app.chain as Edgeware).signaling);
+    mmap.set('signalingproposal', (app.chain as any).signaling);
   }
   if (app.chain.class === ChainClass.Moloch) {
-    mmap.set('molochproposal', (app.chain as Moloch).governance);
+    mmap.set('molochproposal', (app.chain as any).governance);
   }
   return mmap;
 };

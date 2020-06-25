@@ -2,19 +2,14 @@ import 'pages/view_proposal/index.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import moment from 'moment';
 import mixpanel from 'mixpanel-browser';
-import lity from 'lity';
 import { PopoverMenu, Icon, Icons } from 'construct-ui';
 
-import Near from 'controllers/chain/near/main';
-import { WalletAccount } from 'nearlib';
-
 import { NotificationCategories } from 'types';
-import app, { LoginState } from 'state';
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import { idToProposal, ProposalType } from 'identifiers';
-import { pluralize, slugify, symbols, link, externalLink, isSameAccount } from 'helpers';
+import { slugify, isSameAccount } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';

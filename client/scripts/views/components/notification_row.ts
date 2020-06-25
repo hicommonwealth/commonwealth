@@ -15,7 +15,6 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import labelEdgewareEvent from '../../../../shared/events/edgeware/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -150,7 +149,10 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   });
 };
 
-const NotificationRow: m.Component<{ notifications: Notification[] }> = {
+const NotificationRow: m.Component<{ notifications: Notification[] }, {
+  startedLabelerLoad: boolean,
+  Labeler: any,
+}> = {
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
@@ -175,7 +177,23 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
       // TODO: use different labelers depending on chain
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
-      const label = labelEdgewareEvent(
+      if (!vnode.state.startedLabelerLoad) {
+        vnode.state.startedLabelerLoad = true;
+        import(/* webpackMode: "lazy" */ '../../../../shared/events/edgeware/filters/labeler').then((mod) => {
+          vnode.state.Labeler = mod.default;
+          m.redraw();
+        });
+      }
+      if (!vnode.state.Labeler) {
+        return m('li.NotificationRow', {
+          class: notification.isRead ? '' : 'unread',
+        }, [
+          m('.comment-body', [
+            m('.comment-body-top', 'Loading...'),
+          ]),
+        ]);
+      }
+      const label = vnode.state.Labeler(
         notification.chainEvent.blockNumber,
         chainId,
         notification.chainEvent.data,

@@ -6,11 +6,9 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { Account, RoleInfo } from 'models';
-import User, { UserBlock } from 'views/components/widgets/user';
-import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
-import { setActiveAccount } from 'controllers/app/login';
+import { UserBlock } from 'views/components/widgets/user';
+import { formatAsTitleCase, formatAddressShort } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
@@ -122,7 +120,8 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           compact: true,
           fluid: true,
           disabled: vnode.state.loading,
-          onclick: (e) => {
+          onclick: async (e) => {
+            const LinkNewAddressModal = await import(/* webpackMode: "lazy" */ './link_new_address_modal');
             app.modals.create({ modal: LinkNewAddressModal });
           },
         }),
