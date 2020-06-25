@@ -130,7 +130,7 @@
         flex-flow: row nowrap;
         flex-grow: 1;
         flex-basis: 0;
-        padding: 0.5em;
+        padding-right: 0.6em;
         word-break: break-word;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -148,7 +148,7 @@
       flex-flow: row nowrap;
       flex-grow: 1;
       flex-basis: 0;
-      padding: 0.5em;
+      padding-right: 0.5em;
       word-break: break-word;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -160,6 +160,13 @@
       padding-bottom: 14px;
       overflow-wrap: break-word;
     }
+    .val-controller, .val-stash{
+       min-width: 10vw !important;
+    }
+    .val-im-online{
+      min-width: 1vw !important;
+    }
+
     td .User a.user-display-name {
         font-size: 1em;
         overflow-wrap: break-word !important;
@@ -172,6 +179,16 @@
     }
     .val-action {
         text-align: right;
+    }
+    @media only screen and (max-width: 991px) {
+     th{
+      //  padding-right: 5px !important;
+       font-size: 10px !important;
+       font-weight: bold !important;
+     }
+      td{
+        font-size: 8px !important;
+      }
     }
     @include sm-max {
         .val-nominated {
@@ -186,6 +203,8 @@
         padding: 3px 10px;
     }
 }
+
+
 
 .ValidatorPage {
     margin: 0 auto;
@@ -209,6 +228,7 @@
   
   }
 }
+
 
 .update-nominations{
   display: block !important;
@@ -254,8 +274,3 @@
 .cui-icon-wifi{
     padding-right: 5px !important;
 }
-
-
-
-
-
