@@ -119,15 +119,13 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             title: 'Epoch',
             total: sessionLength,
             value: sessionProgress,
-            currentBlock: formatNumber(currentIndex),
-            cssClass: 'epoch'
+            currentBlock: formatNumber(currentIndex)
           })),
         m(CardSummary, {
           title: 'Era',
           total: eraLength,
           value: eraProgress,
-          currentBlock: formatNumber(currentEra),
-          cssClass: 'era'
+          currentBlock: formatNumber(currentEra)
         }),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
