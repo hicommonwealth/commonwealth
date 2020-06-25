@@ -21,7 +21,7 @@ const CardSummary: m.Component<IValidatorAttrs, {}> = {
       m('h3', title),
       currentBlock != undefined && m('span.preheader-item-text.bold-text', `#${currentBlock}`),
       m('span.preheader-item-text.gray-text', `${formatNumber(value)}/${formatNumber(total)}`),
-      //m('.preheader-item-sub-text', percentageText)
+      // m('.preheader-item-sub-text', percentageText)
       m('.bar-outer',
         m('.bar-inner', { style: `width: ${(percentageText / 100) * 100}%` }))
     ]);

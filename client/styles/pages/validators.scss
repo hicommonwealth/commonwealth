@@ -169,7 +169,9 @@
 
     td .User a.user-display-name {
         font-size: 1em;
-        overflow-wrap: break-word !important;
+        white-space: nowrap !important;
+        // overflow-wrap: break-word !important;
+        min-width: 100px !important;
         // padding-bottom: 10px;
         // margin-bottom: 10px;
     }
