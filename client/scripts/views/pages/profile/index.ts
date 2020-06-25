@@ -201,9 +201,8 @@ const ProfilePage: m.Component<{ address: string, }, { chainLoaded: boolean, cha
   },
   view: (vnode) => {
     const loadChain = async (chain: string) => {
-      console.dir('init chain...');
+      console.dir('init chain');
       await initChain(chain);
-      console.dir('chain init!');
       vnode.state.chainLoaded = true;
       m.redraw();
     };

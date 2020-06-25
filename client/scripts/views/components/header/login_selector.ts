@@ -101,11 +101,13 @@ export const CurrentCommunityLabel: m.Component<{}> = {
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
+    console.dir(selectedCommunity);
+    console.dir(selectedNode);
 
-    if (selectedNode) {
-      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
-    } else if (selectedCommunity) {
+    if (selectedCommunity) {
       return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true, link: true });
+    } else if (selectedNode) {
+      return m(CommunityLabel, { chain: selectedNode.chain, showStatus: true, link: true });
     } else {
       return m(CommunityLabel, { showStatus: true, link: true });
     }

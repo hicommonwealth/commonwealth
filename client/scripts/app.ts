@@ -151,7 +151,9 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Shut down old chain if applicable
   const oldNode = app.chain && app.chain.meta;
-  await deinitChainOrCommunity();
+
+  // 'base' param called on profile page, requires chain+community to render account
+  if (!m.route.param('base')) await deinitChainOrCommunity();
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
   // Initialize modules.
