@@ -51,6 +51,10 @@
   display: none !important;
 }
 
+.left-sidebar{
+  min-width: 12.5vw !important;
+}
+
 // avatar div
 .user-avatar{
   width: 1.5em !important;
@@ -146,6 +150,7 @@
   }
 }
 
+// Validator page header
 
 
 .Validators {
@@ -153,7 +158,7 @@
     .validators-table
     {
       table-layout: auto !important;
-      width: 70vw;
+      width: 100%;
       display: flex;
       flex-flow: column nowrap;
       flex: 1 1 auto;
@@ -204,10 +209,10 @@
     }
 
     .val-total{
-      flex: 0 0 10% !important;
+      flex: 0.35 0 10% !important;
     }
      .val-controller, .val-stash{
-       flex: 1 0 12% !important;
+       flex: 0.5 0 10% !important;
     }
     .val-points{
       flex: 0 0 5% !important;
@@ -228,13 +233,13 @@
     @media only screen and (max-width: 1300px) {
      th{
       //  padding-right: 5px !important;
-       font-size: 1.2vw !important;
+       font-size: 1vw !important;
       //  font-weight: bold !important;
        padding:1vw 1.2vw !important;
       //  text-align: center !important;
      }
       td{
-        font-size: 1.2vw !important;
+        font-size: 1vw !important;
         padding: 1vw 1.2vw !important;
       }
     }
