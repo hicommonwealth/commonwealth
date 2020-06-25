@@ -7,15 +7,33 @@
     color: #999;
     letter-spacing: 0.2px;
 }
-.bar-outer {
-  width: 125px;
+
+// Progress Bar
+.bar-outer-era {
+  max-width: inherit;
+  min-width: 130px;
   height: 2px;
   border: #DFE8EE 1px solid;
   margin-top: 5px;
   margin-right: 10px;
 }
 
-.bar-inner {
+.bar-inner-era {
+  width: 0%;
+  height: 2px;
+  background-color: #35D413;
+}
+
+.bar-outer-epoch {
+  max-width: inherit !important;
+  min-width: 118px;
+  height: 2px;
+  border: #DFE8EE 1px solid;
+  margin-top: 5px;
+  margin-right: 10px;
+}
+
+.bar-inner-epoch{
   width: 0%;
   height: 2px;
   background-color: #35D413;
