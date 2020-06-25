@@ -27,6 +27,8 @@
         overflow-y: auto;
         border-radius: 3px;
         z-index: 20;
+        box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3);
+        border-radius: 4px;
     }
     .modal-title {
         padding: 22px 28px 19px;
@@ -50,7 +52,8 @@
     }
 
     .compact-modal-title {
-        padding: 24px 28px 20px;
+        padding-top: 20px;
+        padding-left: 20px;
         // background: #272524;
         color: #000;
         h1, h2, h3 {
@@ -58,6 +61,7 @@
             font-style: normal;
             font-size: 16px;
             line-height: 120%;
+            letter-spacing: -0.2px;
             margin: 0;
             padding: 0;
         }
@@ -67,7 +71,7 @@
         }
     }
     .compact-modal-body {
-        padding: 16px 28px 0;
+        padding: 20px 20px 0;
         &:last-child {
             padding-bottom: 16px;
         }
@@ -78,6 +82,7 @@
         font-size: 16px;
         line-height: 120%;
         text-align: left ;
+        letter-spacing: -0.2px;
         font-family: 'Inter', sans-serif !important;
 
     }
@@ -92,6 +97,10 @@
     .compact-modal-actions {
         padding: 6px 28px 28px;
     }
+
+td, th{
+    padding: 12px 0 !important;
+}
 
 // avatar div
 .user-avatar{
