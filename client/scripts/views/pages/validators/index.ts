@@ -79,7 +79,9 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
                   this.trigger('modalexit');
                 }
               })),
-              m('td', vnode.attrs.waiting
+              m(`td${vnode.attrs.waiting
+                ? '.priority'
+                : '.amount'}`, vnode.attrs.waiting
                 ? n.balance
                 : formatCoin(n.balance, true)),
             ]);
