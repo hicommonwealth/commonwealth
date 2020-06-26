@@ -8,7 +8,6 @@ import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 const MembershipButton: m.Component<{
   chain?: string, community?: string, onMembershipChanged?, address?
@@ -90,7 +89,7 @@ const MembershipButton: m.Component<{
             iconLeft: Icons.PLUS,
             label: 'New address',
             onclick: (e) => {
-              app.modals.create({ modal: LinkNewAddressModal });
+              app.modals.lazyCreate('link_new_address_modal');
             }
           }),
         ],

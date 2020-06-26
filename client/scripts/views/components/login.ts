@@ -161,11 +161,10 @@ const Login: m.Component<IAttrs, IState> = {
             intent: 'primary',
             fluid: true,
             class: 'login-with-web3',
-            onclick: async (e) => {
+            onclick: (e) => {
               e.preventDefault();
-              const LinkNewAddressModal = await import(/* webpackMode: "lazy" */ '../modals/link_new_address_modal');
+              app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
               $(e.target).trigger('menuclose');
-              app.modals.create({ modal: LinkNewAddressModal.default, data: { loggingInWithAddress: true } });
             },
             label: creatingAccount
               ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`

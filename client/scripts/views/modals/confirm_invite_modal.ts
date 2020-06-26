@@ -147,15 +147,10 @@ const ConfirmInviteModal = {
             addresses.length === 0
             && m('a.btn.add-account', {
               href: '#',
-              onclick: async (e) => {
+              onclick: (e) => {
                 e.preventDefault();
-                const LinkNewAddressModal = await import(
-                  /* webpackMode: "lazy" */
-                  /* webpackChunkName: "link-new-address-modal" */
-                  './link_new_address_modal'
-                );
+                app.modals.lazyCreate('link_new_address_modal');
                 $(vnode.dom).trigger('modalexit');
-                app.modals.create({ modal: LinkNewAddressModal });
               }
             }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
           ],
