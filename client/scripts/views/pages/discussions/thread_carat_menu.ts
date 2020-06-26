@@ -58,7 +58,7 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen: boolean }> = {
+export const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
     const { openTagEditor } = vnode.attrs;
     return m('.TagEditorButton', [

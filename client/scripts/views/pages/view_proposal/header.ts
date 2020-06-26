@@ -23,7 +23,6 @@ import {
 } from 'models';
 import { NotificationCategories } from 'types';
 
-import TagEditor from 'views/components/tag_editor';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
@@ -146,14 +145,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
-    const canEdit = (app.user.activeAccount?.address === proposal.author
-                     && app.user.activeAccount?.chain.id === proposal.authorChain)
-      || app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      });
-
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
         m(Tag, {
@@ -164,11 +155,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
           label: `#${proposal.tag?.name}`
         })
       ]),
-      canEdit && proposal.tag && m(ProposalHeaderSpacer),
-      canEdit && m(TagEditor, {
-        thread: proposal,
-        onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-      }),
     ]);
   }
 };
@@ -204,35 +190,6 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   view: (vnode) => {
     const { viewCount } = vnode.attrs;
     return m('.ViewCountBlock', pluralize(viewCount, 'view'));
-  }
-};
-
-export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (!app.isLoggedIn()) return;
-
-    const subscription = app.user.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
-
-    return m(Button, {
-      class: 'ProposalHeaderSubscriptionButton',
-      disabled: !app.isLoggedIn(),
-      intent: subscription?.isActive ? 'primary' : 'none',
-      onclick: (e) => {
-        e.preventDefault();
-        if (subscription?.isActive) {
-          app.user.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
-        } else {
-          app.user.notifications.subscribe(
-            NotificationCategories.NewComment, proposal.uniqueIdentifier,
-          ).then(() => m.redraw());
-        }
-      },
-      label: subscription?.isActive
-        ? [ m('span.icon-bell'), ' Notifications on' ]
-        : [ m('span.icon-bell-off'), ' Notifications off' ]
-    });
   }
 };
 

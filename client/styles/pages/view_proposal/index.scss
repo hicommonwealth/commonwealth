@@ -30,6 +30,15 @@ $gutter: 0; // 34px;
         box-shadow: 0 0 6px rgba(0,0,0,0.07);
         padding: 20px 32px;
         border-bottom: 1px solid #eee;
+    }
+    .ProposalHeader .proposal-top {
+        border-radius: 4px 4px 0 0;
+    }
+    .ProposalHeader .proposal-bottom {
+        border-radius: 0 0 4px 4px;
+    }
+    .ProposalComment .comment-body,
+    .CreateComment .create-comment-body {
         border-radius: 4px;
     }
 }

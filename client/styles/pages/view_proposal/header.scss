@@ -2,6 +2,17 @@
 @import './index';
 
 .ProposalHeader {
+    .proposal-top {
+        display: flex;
+    }
+    .proposal-top-left {
+        flex: 1;
+    }
+    .proposal-top-right {
+        display: flex;
+        align-items: center;
+    }
+
     // proposal-tags
     .ProposalHeaderCaretMenu,
     .ProposalHeaderTags {
@@ -31,7 +42,7 @@
         .ProposalHeaderTitle,
         .ProposalHeaderComments {
             display: inline;
-            font-size: 23px;
+            font-size: 20px;
             font-weight: 600;
             flex: 1;
             line-height: 1.25;
@@ -71,6 +82,7 @@
         display: inline-block;
         color: #888;
         font-size: 14px;
+        margin-right: 12px;
         a:link,
         a:visited {
             color: #888;
