@@ -1,31 +1,7 @@
 @import 'client/styles/shared';
 @import './index';
 
-.ViewProposalPage > .page-container > .container,
-.ViewProposalPage > .page-container > .container {
-    padding: 0;
-}
-.ViewProposalPage {
-    margin-bottom: 32px;
-}
-
 .ProposalHeader {
-    .proposal-header {
-        padding: $padding-top $gutter $padding;
-    }
-    .proposal-body {
-        padding: $padding $gutter ($padding + 6px);
-        border-top: 1px solid #e7e7e7;
-        .proposal-body-meta {
-            margin-bottom: 12px;
-        }
-        .proposal-body-content {
-        }
-    }
-    .TagEditor {
-        display: inline;
-    }
-
     // proposal-tags
     .ProposalHeaderCaretMenu,
     .ProposalHeaderTags {

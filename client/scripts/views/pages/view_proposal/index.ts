@@ -34,7 +34,7 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderComments, ProposalHeaderDelete,
+  ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderDelete,
   ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderSubscriptionButton, ProposalHeaderPrivacyButtons
@@ -85,7 +85,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
     }, [
-      m('.proposal-header', [
+      m('.proposal-top', [
         m('.proposal-header-meta', [
           m(ProposalHeaderTags, { proposal }),
           proposal instanceof OffchainThread
@@ -93,7 +93,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 || (app.user.activeAccount?.address === (proposal as OffchainThread).author)
                 || app.user.isRoleOfCommunity({ role: 'admin', chain: app.activeChainId(), community: app.activeCommunityId() }))
             && m(ProposalHeaderSpacer),
-          m(ProposalHeaderViewCount, { viewCount }),
           m(ProposalHeaderSpacer),
           m(ProposalHeaderDelete, { proposal }),
           app.isLoggedIn() && m(PopoverMenu, {
@@ -107,10 +106,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             ]),
           })
         ]),
-        m('.proposal-title', [
-          m(ProposalHeaderTitle, { proposal }),
-          m(ProposalHeaderComments, { proposal, commentCount }),
-        ]),
+        m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
         proposal instanceof OffchainThread
           && proposal.kind === OffchainThreadKind.Link
           && m(ProposalHeaderExternalLink, { proposal }),
@@ -118,8 +114,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderSubscriptionButton, { proposal }),
           m(ProposalHeaderPrivacyButtons, { proposal }),
         ]),
-      ]),
-      proposal instanceof OffchainThread && m('.proposal-body', [
         m('.proposal-body-meta', proposal instanceof OffchainThread ? [
           m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderSpacer),
@@ -156,6 +150,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalHeaderAuthor, { proposal }),
           m(ProposalHeaderCreated, { proposal, link: proposalLink }),
         ]),
+      ]),
+      proposal instanceof OffchainThread && m('.proposal-content', [
         m('.proposal-body-content', [
           !vnode.state.editing
             && m(ProposalBodyText, { item: proposal }),
@@ -168,8 +164,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           vnode.state.editing
             && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
         ]),
+      ]),
+      proposal instanceof OffchainThread && m('.proposal-bottom', [
         m('.proposal-body-reactions', [
           m(ProposalBodyReaction, { item: proposal }),
+        ]),
+        m('.proposal-body-viewcount', [
+          m(ProposalHeaderViewCount, { viewCount }),
         ]),
       ]),
     ]);

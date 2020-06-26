@@ -21,8 +21,9 @@ $gutter: 0; // 34px;
         @include supports-jump-highlight();
     }
 
-    .ProposalHeader,
-    .ProposalBody,
+    .ProposalHeader .proposal-top,
+    .ProposalHeader .proposal-content,
+    .ProposalHeader .proposal-bottom,
     .ProposalComment .comment-body,
     .CreateComment .create-comment-body {
         background: #fff;

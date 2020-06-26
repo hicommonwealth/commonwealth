@@ -99,17 +99,6 @@ export const ProposalHeaderLastEdited: m.Component<{ proposal: AnyProposal | Off
   }
 };
 
-export const ProposalHeaderComments: m.Component<{ proposal: AnyProposal | OffchainThread, commentCount: number }> = {
-  view: (vnode) => {
-    const { proposal, commentCount } = vnode.attrs;
-    if (!proposal) return;
-    return m('.ProposalHeaderComments', [
-      commentCount,
-      m(Icon, { name: Icons.MESSAGE_SQUARE }),
-    ]);
-  }
-};
-
 export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
