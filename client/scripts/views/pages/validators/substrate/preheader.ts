@@ -5,6 +5,7 @@ import { makeDynamicComponent } from 'models/mithril';
 import Substrate from 'controllers/chain/substrate/main';
 import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
+import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
@@ -15,7 +16,7 @@ interface IPreHeaderState {
   dynamic: {
     validators: IValidators;
     sessionInfo: DeriveSessionProgress;
-    annualPercentRate: number;
+    annualPercentRate: ICommissionInfo;
   },
 }
 
@@ -49,8 +50,19 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   }),
   view: (vnode) => {
     const { validators, sessionInfo, annualPercentRate } = vnode.state.dynamic;
+
     const { nominations, nominationsHasChanged, sender } = vnode.attrs;
     if (!validators && !sessionInfo) return;
+
+    let totalPercentage = 0;
+    let totalValidators = 0;
+    Object.entries(annualPercentRate).forEach(([key, value]) => {
+      if (value > 0) {
+        totalPercentage += value;
+        totalValidators++;
+      }
+    });
+    const apr = (totalPercentage / (totalValidators || 1)).toFixed(2);
 
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
@@ -133,7 +145,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       m('.validators-preheader', [
         m('.validators-preheader-item', [
           m('h3', 'APR'),
-          m('.preheader-item-text', `${annualPercentRate.toFixed(3)}%`),
+          m('.preheader-item-text', `${apr}%`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Epoch / Session'),
