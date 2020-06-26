@@ -302,13 +302,15 @@ class SubstrateStaking implements StorageModule {
           const key = account.toString();
           const exposure = exposures[index];
           let stakeShare = 0;
+          let othersStake = (this._app.chain as Substrate).chain.coins(0);
 
           exposures[index].others.forEach((indv) => {
-            const nominator = indv.who.toString();
-            if (nominator === key) {
-              stakeShare = indv.value.toBn().muln(n).div(exposures[index].total.toBn()).toNumber() / n;
-            }
+            othersStake = (this._app.chain as Substrate).chain.coins(othersStake.asBN.add(indv.value.toBn()));
           });
+          othersStake = (this._app.chain as Substrate).chain.coins(othersStake.asBN.add(exposures[index].own.toBn()));
+          if (othersStake.gt((this._app.chain as Substrate).chain.coins(0))) {
+            stakeShare = exposures[index].own.toBn().muln(n).div(othersStake).toNumber() / n;
+          }
 
           const totalStake = (this._app.chain as Substrate).chain.coins(exposure?.total.toBn())
           || (this._app.chain as Substrate).chain.coins(0);
