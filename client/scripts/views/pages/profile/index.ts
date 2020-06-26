@@ -10,7 +10,7 @@ import { OffchainThread } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
-import { initChain } from 'app';
+import { initChain, deinitChainOrCommunity, selectCommunity, selectNode } from 'app';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -190,14 +190,37 @@ export enum UserContent {
   Comments = 'comments'
 }
 
+interface IProfilePageState {
+  isChain: boolean;
+  chainLoaded: boolean;
+  chain: string;
+  account: any;
+}
 
-const ProfilePage: m.Component<{ address: string, }, { chainLoaded: boolean, chain: string, }> = {
+
+const ProfilePage: m.Component<{ address: string, }, IProfilePageState> = {
   oninit: (vnode) => {
-    vnode.state.chainLoaded = false;
+    vnode.state.chainLoaded = !!(app.chain);
+    vnode.state.isChain = !!(app.chain);
     vnode.state.chain = m.route.param('base');
+    const { address } = vnode.attrs;
+    vnode.state.account = (vnode.state.chainLoaded) ? app.chain.accounts.get(address) : null;
   },
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
+  },
+  onbeforeremove: async (vnode) => {
+    const deinitChain = async () => {
+      const community = app.community.meta;
+      const chain = app.chain.meta;
+      await deinitChainOrCommunity();
+      if (vnode.state.isChain) {
+        await selectNode(chain);
+      } else {
+        await selectCommunity(community);
+      }
+    };
+    deinitChain();
   },
   view: (vnode) => {
     const loadChain = async (chain: string) => {
@@ -206,10 +229,14 @@ const ProfilePage: m.Component<{ address: string, }, { chainLoaded: boolean, cha
       vnode.state.chainLoaded = true;
       m.redraw();
     };
-    const { chainLoaded, chain } = vnode.state;
+    const getAccount = (address: string) => {
+      vnode.state.account = app.chain.accounts.get(address);
+      m.redraw();
+    };
+    const { chainLoaded, chain, account } = vnode.state;
     if (!vnode.state.chainLoaded) loadChain(chain);
-    if (!vnode.state.chainLoaded) return m(PageLoading);
-    const account = app.chain.accounts.get(vnode.attrs.address);
+    if (vnode.state.chainLoaded && !vnode.state.account) getAccount(vnode.attrs.address);
+    if (!vnode.state.chainLoaded || !vnode.state.account) return m(PageLoading);
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
