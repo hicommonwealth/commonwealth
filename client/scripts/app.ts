@@ -162,12 +162,19 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     )).default;
     app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Substrate = (await import(
+    const Kusama = (await import(
       /* webpackMode: "lazy" */
       /* webpackChunkName: "kusama-main" */
-      './controllers/chain/substrate/main'
+      './controllers/chain/kusama/main'
     )).default;
-    app.chain = new Substrate(n, app);
+    app.chain = new Kusama(n, app);
+  } else if (n.chain.network === ChainNetwork.Polkadot) {
+    const Polkadot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kusama-main" */
+      './controllers/chain/polkadot/main'
+    )).default;
+    app.chain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import(
       /* webpackMode: "lazy" */

@@ -33,7 +33,7 @@ export const proposalSlugToClass = () => {
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set('cosmosproposal', (app.chain as any).governance);
   }
-  if (app.chain.class === ChainClass.Kusama) {
+  if (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot) {
     mmap.set('technicalcommitteemotion', (app.chain as any).technicalCommittee);
   }
   if (app.chain.class === ChainClass.Edgeware) {

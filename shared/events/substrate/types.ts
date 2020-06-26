@@ -5,6 +5,8 @@ export const SubstrateEventChains = [
   // 'edgeware-local',
   'kusama',
   // 'kusama-local',
+  'polkadot',
+  // 'polkadot-local',
 ];
 
 /**

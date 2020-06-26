@@ -104,16 +104,8 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     let vComponents = [];
     switch (app.chain.class) {
       case ChainClass.Edgeware:
-        vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            nominations: vnode.state.nominations,
-            nominationsHasChanged: vnode.state.nominationsHasChanged
-          }),
-          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
-        ];
-        break;
       case ChainClass.Kusama:
+      case ChainClass.Polkadot: {
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
@@ -123,6 +115,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
+      }
       case ChainClass.CosmosHub:
         vComponents = [
           CosmosValidationViews.ValidationPreHeader(app.chain as Cosmos),
