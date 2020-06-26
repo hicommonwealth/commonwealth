@@ -53,21 +53,25 @@
 
 // avatar div
 .user-avatar{
-  width: 1.5em !important;
-  height: 1.5em !important;
-  margin-top: 0px !important;
+  margin: -3px 0!important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .Jdenticon{
-  width: 1.5em !important;
-  height: auto !important;
+  width: 1vw!important;
+  height: 1vw !important;
 }
+
 
 // removed right sidebar
 .right-sidebar{
     display: none !important;
 }
 
+.user-display-name{
+  padding-left: 0.3em !important;
+}
 
 .ViewNominatorsModal {
   position: relative !important;
@@ -165,7 +169,7 @@
         flex-flow: row nowrap;
         flex-grow: 1;
         flex-basis: 0;
-        padding: 0 1vw 0 0.6;
+        padding: 0 1vw 0 0.5;
         word-break: break-word;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -209,28 +213,15 @@
     }
     .val-stash{
       padding-left: 0.3vw !important;
-    }
-    .val-last-hash{
-      padding-left: 0.5vw !important;
-    }
-.val-stash-waiting,.val-controller, .val-stash, .val-author{
-    padding-top: 0.8em !important;
 
-}
-     .val-controller, .val-stash{
+    }
+
+    .val-controller, .val-stash{
        flex: 0.5 0 10% !important;
     }
-    th .val-controller, .val-stash{
-      padding-top: 0.8em !important;
-    }
+   
     .val-points{
       flex: 0 0 5% !important;
-    }
-
-    td .User a.user-display-name {
-        font-size: 1em;
-        overflow-wrap: break-word !important;
-        // padding-bottom: 18px !important;
     }
 
     .val-action {
