@@ -1,0 +1,11 @@
+.DS_Store
+/eth/build
+node_modules/
+.vscode
+yarn-error.log
+.nyc_output/
+coverage/
+.env
+
+# Webpack profiling
+stats.json

@@ -1,0 +1,41 @@
+{
+  "name": "commonwealth-chain-events",
+  "version": "0.1.0",
+  "description": "Listen to various chains for events.",
+  "scripts": {
+    "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts"
+  },
+  "engines": {
+    "node": "12.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicommonwealth/chain-events.git"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@polkadot/api": "1.19.1",
+    "bn.js": "^5.1.2",
+    "edgeware-node-types": "^2.3.0",
+    "ethereum-block-by-date": "^1.2.2",
+    "ethers": "^4.0.39",
+    "sleep-promise": "^8.0.1",
+    "typescript-logging": "^0.6.4",
+    "underscore": "^1.10.2",
+    "web3": "^1.2.9",
+    "web3-utils": "^1.2.9"
+  },
+  "resolutions": {
+    "**/@polkadot/wasm-crypto": "hicommonwealth/wasm-crypto#c5ee2ea5ed0edd87da792e758832edfd1d9072bd"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/polyfill": "^7.10.1",
+    "@babel/register": "^7.10.3",
+    "@types/bn.js": "^4.11.6",
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.14",
+    "@types/web3": "^1.2.2"
+  }
+}

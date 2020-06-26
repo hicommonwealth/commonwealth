@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "paths": {
+      "@polkadot/api/augment": ["./node_modules/edgeware-node-types/dist/augment-api.d.ts"],
+      "@polkadot/types/augment": ["./node_modules/edgeware-node-types/dist/augment-types.d.ts"],
+      "*": ["./*", "shared/*", "client/scripts/*", "eth/types/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": true
+  },
+  "include": [
+    "./client",
+    "./client/scripts",
+    "./shared/adapters",
+    "./test",
+    "./eth/types",
+  ],
+  "exclude": [
+    "./node_modules",
+  ]
+}
