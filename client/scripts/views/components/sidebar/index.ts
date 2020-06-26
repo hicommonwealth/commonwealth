@@ -48,12 +48,7 @@ const TagListings: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ activeTag: string }, {
-  startedMolochImports: boolean,
-  UpdateDelegateModal: any,
-  RagequitModal: any,
-  TokenModal: any,
-}> = {
+const Sidebar: m.Component<{ activeTag: string }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
@@ -88,31 +83,6 @@ const Sidebar: m.Component<{ activeTag: string }, {
         || app.chain.class === ChainClass.Moloch);
     const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as any)?.shares?.gtn(0);
-
-    if (showMolochMenuOptions && !vnode.state.startedMolochImports) {
-      vnode.state.startedMolochImports = true;
-      Promise.all([
-        import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "moloch-delegate-modal" */
-          '../../modals/update_delegate_modal'
-        ),
-        import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "moloch-ragequit-modal" */
-          '../../modals/ragequit_modal'
-        ),
-        import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "moloch-token-modal" */
-          '../../modals/token_management_modal'
-        ),
-      ]).then(([ updateDelegateModal, ragequitModal, tokenModal ]) => {
-        vnode.state.UpdateDelegateModal = updateDelegateModal;
-        vnode.state.RagequitModal = ragequitModal;
-        vnode.state.TokenModal = tokenModal;
-      });
-    }
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
@@ -201,34 +171,25 @@ const Sidebar: m.Component<{ activeTag: string }, {
             label: 'New proposal',
             contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
-          showMolochMemberOptions && vnode.state.UpdateDelegateModal && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: vnode.state.UpdateDelegateModal,
-              data: {
-                account: activeAccount,
-                delegateKey: (activeAccount as any).delegateKey,
-              },
+          showMolochMemberOptions && m(ListItem, {
+            onclick: (e) => app.modals.lazyCreate('update_delegate_modal', {
+              account: activeAccount,
+              delegateKey: (activeAccount as any).delegateKey,
             }),
             label: 'Update delegate key',
             contentLeft: m(Icon, { name: Icons.KEY }),
           }),
-          showMolochMemberOptions && vnode.state.RagequitModal && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: vnode.state.RagequitModal,
-              data: { account: activeAccount },
-            }),
+          showMolochMemberOptions && m(ListItem, {
+            onclick: (e) => app.modals.lazyCreate('ragequit_modal', { account: activeAccount }),
             label: 'Rage quit',
             contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
           }),
-          showMolochMenuOptions && vnode.state.TokenModal && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: vnode.state.TokenModal,
-              data: {
-                account: activeAccount,
-                accounts: ((activeAccount as any).app.chain as any).ethAccounts,
-                contractAddress: ((activeAccount as any).app.chain as any).governance.api.contractAddress,
-                tokenAddress: ((activeAccount as any).app.chain as any).governance.api.tokenContract.address,
-              }
+          showMolochMenuOptions && m(ListItem, {
+            onclick: (e) => app.modals.lazyCreate('token_management_modal', {
+              account: activeAccount,
+              accounts: ((activeAccount as any).app.chain as any).ethAccounts,
+              contractAddress: ((activeAccount as any).app.chain as any).governance.api.contractAddress,
+              tokenAddress: ((activeAccount as any).app.chain as any).governance.api.tokenContract.address,
             }),
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),
