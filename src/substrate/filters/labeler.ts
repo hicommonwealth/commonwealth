@@ -56,7 +56,7 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
     throw new Error('unexpected chain');
   }
   const balanceDollars = (new BN(balance, 10)).div(dollar);
-  return `${formatNumberShort(+balanceDollars) ${denom}`;
+  return `${formatNumberShort(+balanceDollars)} ${denom}`;
 };
 
 /* eslint-disable max-len */

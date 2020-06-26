@@ -575,6 +575,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/underscore@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.10.1.tgz#e37616e1013d486ee5e9a53c178becbaee2f781e"
+  integrity sha512-RRQWytGzPUhybKdf7jhfcySkdEHMDsVZ0gU3XVIxeqms1UKu3+ICaTXNaNGAkcUbIJ8SUKpmUIS1z9mDVc7seg==
+
 "@types/web3@^1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.2.2.tgz#d95a101547ce625c5ebd0470baa5dbd4b9f3c015"
@@ -1507,10 +1512,10 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-edgeware-node-types@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/edgeware-node-types/-/edgeware-node-types-2.3.0.tgz#742fd26eedf3baebecdda0899f9204dcbc9d27c9"
-  integrity sha512-8WzBf75V3YBZip3P6reqRSyvdUA2OBTSM7p5hdva645SS8CHXJhyXSoFn4d/Ux5r3fLguVoNMEInksrCcTrkZg==
+edgeware-node-types@2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/edgeware-node-types/-/edgeware-node-types-2.3.2.tgz#e51cc24668d920e0688c8e59fab660a9271b29fe"
+  integrity sha512-tlzp7n93A0llp9ksAklKPIP8teR86Zfgn4+P7Nz1bF+6lM1EBHPLw4wkRZrzYB5essJisImZTlnmda12jhUIMQ==
 
 ee-first@1.1.1:
   version "1.1.1"

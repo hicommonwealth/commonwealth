@@ -1,7 +1,7 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
 
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+import * as edgewareDefinitions from 'edgeware-node-types/interfaces/definitions';
 
 import Subscriber from './subscriber';
 import Poller from './poller';
@@ -35,7 +35,7 @@ export function createSubstrateApi(provider: WsProvider, isEdgeware: boolean): A
   const registry = new TypeRegistry();
   if (isEdgeware) {
     const edgewareTypes = Object.values(edgewareDefinitions)
-      .map((v) => v.default)
+      // .map((v) => v.default)
       .reduce((res, { types }): object => ({ ...res, ...types }), {});
     return new ApiPromise({
       provider,
