@@ -101,8 +101,6 @@ export const CurrentCommunityLabel: m.Component<{}> = {
                                        && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
     const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
     const selectedCommunity = app.community;
-    console.dir(selectedCommunity);
-    console.dir(selectedNode);
 
     if (selectedCommunity) {
       return m(CommunityLabel, { community: selectedCommunity.meta, showStatus: true, link: true });

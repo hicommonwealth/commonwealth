@@ -221,7 +221,6 @@ const ProfilePage: m.Component<{ address: string, }, IProfilePageState> = {
   },
   view: (vnode) => {
     const loadChain = async (chain: string) => {
-      console.dir('init chain');
       await initChain(chain);
       vnode.state.chainLoaded = true;
       m.redraw();
@@ -231,9 +230,9 @@ const ProfilePage: m.Component<{ address: string, }, IProfilePageState> = {
       m.redraw();
     };
     const { chainLoaded, chain, account } = vnode.state;
-    if (!vnode.state.chainLoaded) loadChain(chain);
-    if (vnode.state.chainLoaded && !vnode.state.account) getAccount(vnode.attrs.address);
-    if (!vnode.state.chainLoaded || !vnode.state.account) return m(PageLoading);
+    if (!chainLoaded) loadChain(chain);
+    if (chainLoaded && !account) getAccount(vnode.attrs.address);
+    if (!chainLoaded || !account) return m(PageLoading);
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
