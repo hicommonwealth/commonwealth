@@ -149,10 +149,17 @@ const LoginSelector : m.Component<{}, {}> = {
             size: 'sm',
             fluid: true,
             compact: true,
-            label: (!app.chain && !app.community) ? 'Select a community'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount })
-                : app.user.activeAccounts.length === 0 ? 'No address'
-                  : 'Select an address',
+            label: [
+              (!app.chain && !app.community) ? 'Select a community'
+                : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount })
+                  : app.user.activeAccounts.length === 0 ? 'No address'
+                    : 'Select an address',
+              app.isLoggedIn() && m('.unseen-count', [
+                m('.pip', (getSelectableCommunities() as any).map((item) => {
+                  return app.user.unseenPosts[item.id]?.activePosts || 0;
+                }).reduce((a, b) => { return a + b; }, 0)),
+              ]),
+            ],
             iconRight: Icons.CHEVRON_DOWN,
           }),
           content: m(Menu, { class: 'LoginSelectorMenu' }, [

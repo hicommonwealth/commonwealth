@@ -1,5 +1,18 @@
 @import 'client/styles/shared';
 
+@mixin unseen-pip {
+    .pip {
+        display: inline-block;
+        background: $badge-red;
+        font-weight: 600;
+        color: #fff;
+        border-radius: 9999px;
+        padding: 2px 6px;
+        margin: 3px 0 2px 4px;
+        font-size: 13px;
+    }
+}
+
 .CommunityLabel {
     text-align: left;
     flex: 1;
@@ -50,6 +63,11 @@
 
 .LoginSelector {
     margin-left: $header-spacing;
+    .unseen-count {
+        display: inline-block;
+        margin-left: 3px;
+        @include unseen-pip;
+    }
 }
 
 .login-selector-popover {
@@ -78,15 +96,7 @@
             padding: 2px 0;
         }
         .unseen-count {
-            .pip {
-                display: inline-block;
-                background: $badge-red;
-                color: #fff;
-                border-radius: 9999px;
-                padding: 2px 6px;
-                margin: 3px 0 2px 4px;
-                font-size: 13px;
-            }
+            @include unseen-pip;
         }
     }
     .community-star-toggle .cui-icon svg {
