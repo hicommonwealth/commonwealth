@@ -62,7 +62,7 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
       return linkify
         ? link(
           'a.user-display-name.username.onchain-username',
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           name
         )
         : m('a.user-display-name.username.onchain-username', name);
@@ -71,7 +71,7 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
     // return offchain name while identity is loading
     return linkify
       ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-        profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+        profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
         profile ? profile.displayName : '--',)
       : m('a.user-display-name.username', profile ? profile.displayName : '--');
   }
@@ -136,7 +136,7 @@ const User : m.Component<IAttrs> = {
             linkify
               ? link(`a.user-display-name${
                 (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-              profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
@@ -159,7 +159,7 @@ const User : m.Component<IAttrs> = {
           ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),

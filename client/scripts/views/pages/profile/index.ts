@@ -212,11 +212,8 @@ const ProfilePage: m.Component<{ address: string, }, IProfilePageState> = {
   onbeforeremove: async (vnode) => {
     const deinitChain = async () => {
       const community = app.community.meta;
-      const chain = app.chain.meta;
-      await deinitChainOrCommunity();
-      if (vnode.state.isChain) {
-        await selectNode(chain);
-      } else {
+      if (!vnode.state.isChain) {
+        await deinitChainOrCommunity();
         await selectCommunity(community);
       }
     };
