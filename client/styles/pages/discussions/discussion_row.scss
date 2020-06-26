@@ -1,7 +1,5 @@
 @import 'client/styles/shared';
 
-$discussion-row-color: #999;
-
 .DiscussionRow {
     display: block;
     margin-bottom: 28px;
@@ -23,6 +21,7 @@ $discussion-row-color: #999;
     }
 
     // content
+    $discussion-row-color: #999;
     .discussion-top {
         display: flex;
         .discussion-top-left {
@@ -32,6 +31,7 @@ $discussion-row-color: #999;
             display: flex;
             align-items: center;
             padding-left: 10px;
+            width: 30px;
         }
         .discussion-title {
             margin: 4px 0 2px;
@@ -60,7 +60,7 @@ $discussion-row-color: #999;
             }
             .discussion-last-updated {
                 display: inline;
-                margin-left: 10px;
+                margin-left: 12px;
             }
             a.discussion-created, a.discussion-replies {
                 text-decoration: none;

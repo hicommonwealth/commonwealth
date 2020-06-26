@@ -53,6 +53,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 linkify: true,
                 tooltip: true,
                 showRole: true,
+                hideAvatar: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
               proposal.tag && m(Tag, {

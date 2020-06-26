@@ -92,6 +92,10 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         role: 'admin',
         chain: app.activeChainId(),
         community: app.activeCommunityId()
+      }) || app.user.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+        community: app.activeCommunityId()
       });
 
     return m('.ProposalHeader', {
@@ -123,11 +127,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             menuAttrs: { size: 'default' },
             content: [
               canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
-                openTagEditor: () => vnode.state.tagEditorIsOpen = true
+                openTagEditor: () => {
+                  vnode.state.tagEditorIsOpen = true;
+                }
               }),
-              m(ProposalHeaderDelete, { proposal }),
-              m(ProposalHeaderPrivacyButtons, { proposal }),
               m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+              canEdit && m(ProposalHeaderDelete, { proposal }),
+              canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
               proposal instanceof OffchainThread
                 && !getSetGlobalEditingStatus(GlobalStatus.Get)
                 && isSameAccount(app.user.activeAccount, author)

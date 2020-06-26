@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag } from 'construct-ui';
+import { Button, Icon, Icons, Tag, MenuItem } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
@@ -102,22 +102,21 @@ export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | Offchai
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (!isSameAccount(app.user.activeAccount, proposal.author)) return;
 
-    return m('.ProposalHeaderDelete', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          const confirmed = await confirmationModalWithText('Delete this entire thread?')();
-          if (!confirmed) return;
-          app.threads.delete(proposal).then(() => {
-            m.route.set(`/${app.activeId()}/`);
-            // TODO: set notification bar for 'thread deleted'
-          });
-        },
-      }, 'Delete')
-    ]);
+    return m(MenuItem, {
+      class: 'ProposalHeaderDelete',
+      label: 'Delete thread',
+      iconLeft: Icons.DELETE,
+      onclick: async (e) => {
+        e.preventDefault();
+        const confirmed = await confirmationModalWithText('Delete this entire thread?')();
+        if (!confirmed) return;
+        app.threads.delete(proposal).then(() => {
+          m.route.set(`/${app.activeId()}/`);
+          // TODO: set notification bar for 'thread deleted'
+        });
+      },
+    });
   }
 };
 
@@ -198,32 +197,26 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
-    if (!app.isLoggedIn()) return;
 
-    const canEdit = app.user.activeAccount?.address === proposal.author
-      && app.user.activeAccount?.chain.id === proposal.authorChain;
-    if (!canEdit) return;
-
-    return m('.ProposalHeaderPrivacyButtons', [
-      // read only toggle
-      m(Button, {
+    return [
+      m(MenuItem, {
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
           app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
-        label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
+        iconLeft: proposal.readOnly ? Icons.UNLOCK : Icons.LOCK,
+        label: proposal.readOnly ? 'Enable commenting' : 'Disable commenting',
       }),
       // privacy toggle, show only if thread is private
-      (proposal as OffchainThread).privacy
-        && m(Button, {
-          class: 'privacy-to-public-toggle',
-          onclick: (e) => {
-            e.preventDefault();
-            app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
-          },
-          label: 'Make Thread Public',
-        }),
-    ]);
+      (proposal as OffchainThread).privacy && m(MenuItem, {
+        class: 'privacy-to-public-toggle',
+        onclick: (e) => {
+          e.preventDefault();
+          app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
+        },
+        label: 'Make public',
+      }),
+    ];
   }
 };
