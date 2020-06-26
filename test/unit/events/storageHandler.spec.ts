@@ -4,11 +4,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
+import { CWEvent } from 'commonwealth-chain-events/dist/src/interfaces';
+import { SubstrateEventKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
-import { CWEvent } from '../../../shared/events/interfaces';
-import { SubstrateEventKind } from '../../../shared/events/substrate/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;

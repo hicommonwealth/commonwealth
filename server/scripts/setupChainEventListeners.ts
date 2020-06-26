@@ -1,17 +1,18 @@
 import WebSocket from 'ws';
+import subscribeSubstrateEvents, {
+  createSubstrateProvider, createSubstrateApi
+} from 'commonwealth-chain-events/dist/src/substrate/index';
+import subscribeMolochEvents, { createMolochApi } from 'commonwealth-chain-events/dist/src/moloch/index';
+import {
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
+} from 'commonwealth-chain-events/dist/src/interfaces';
+import { SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
+
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import subscribeSubstrateEvents, {
-  createSubstrateProvider, createSubstrateApi
-} from '../../shared/events/substrate/index';
-import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
-import {
-  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
-} from '../../shared/events/interfaces';
-import { SubstrateEventChains } from '../../shared/events/substrate/types';
-import { MolochEventChains } from '../../shared/events/moloch/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));

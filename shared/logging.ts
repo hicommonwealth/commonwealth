@@ -18,7 +18,7 @@ export const formatFilename = (name) => {
   return t[t.length - 1];
 };
 
-export const factory = LFService.createNamedLoggerFactory('LoggerFactory', options);
+export const factory = LFService.createNamedLoggerFactory('Commonwealth', options);
 
 const control = getLogControl();
 

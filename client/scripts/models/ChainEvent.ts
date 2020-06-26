@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { IChainEventData } from 'events/interfaces';
+import { IChainEventData } from 'commonwealth-chain-events/dist/src/interfaces';
 import ChainEventType from './ChainEventType';
 
 class ChainEvent {

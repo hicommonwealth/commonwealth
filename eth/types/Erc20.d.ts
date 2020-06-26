@@ -14,22 +14,28 @@ interface Erc20Interface extends Interface {
   functions: {
     totalSupply: TypedFunctionDescription<{ encode([]: []): string }>;
 
-    balanceOf: TypedFunctionDescription<{ encode([owner]: [string]): string }>;
+    balanceOf: TypedFunctionDescription<{
+      encode([account]: [string]): string;
+    }>;
+
+    transfer: TypedFunctionDescription<{
+      encode([recipient, amount]: [string, BigNumberish]): string;
+    }>;
 
     allowance: TypedFunctionDescription<{
       encode([owner, spender]: [string, string]): string;
     }>;
 
-    transfer: TypedFunctionDescription<{
-      encode([to, value]: [string, BigNumberish]): string;
-    }>;
-
     approve: TypedFunctionDescription<{
-      encode([spender, value]: [string, BigNumberish]): string;
+      encode([spender, amount]: [string, BigNumberish]): string;
     }>;
 
     transferFrom: TypedFunctionDescription<{
-      encode([from, to, value]: [string, string, BigNumberish]): string;
+      encode([sender, recipient, amount]: [
+        string,
+        string,
+        BigNumberish
+      ]): string;
     }>;
 
     increaseAllowance: TypedFunctionDescription<{
@@ -75,64 +81,50 @@ export class Erc20 extends Contract {
 
   functions: {
     /**
-     * Total number of tokens in existence
+     * See {IERC20-totalSupply}.
      */
     totalSupply(): Promise<BigNumber>;
 
     /**
-     * Gets the balance of the specified address.
-     * @param owner The address to query the balance of.
-     * @returns An uint256 representing the amount owned by the passed address.
+     * See {IERC20-balanceOf}.
      */
-    balanceOf(owner: string): Promise<BigNumber>;
+    balanceOf(account: string): Promise<BigNumber>;
 
     /**
-     * Function to check the amount of tokens that an owner allowed to a spender.
-     * @param owner address The address which owns the funds.
-     * @param spender address The address which will spend the funds.
-     * @returns A uint256 specifying the amount of tokens still available for the spender.
+     * See {IERC20-transfer}.     * Requirements:     * - `recipient` cannot be the zero address. - the caller must have a balance of at least `amount`.
+     */
+    transfer(
+      recipient: string,
+      amount: BigNumberish,
+      overrides?: TransactionOverrides
+    ): Promise<ContractTransaction>;
+
+    /**
+     * See {IERC20-allowance}.
      */
     allowance(owner: string, spender: string): Promise<BigNumber>;
 
     /**
-     * Transfer token for a specified address
-     * @param to The address to transfer to.
-     * @param value The amount to be transferred.
-     */
-    transfer(
-      to: string,
-      value: BigNumberish,
-      overrides?: TransactionOverrides
-    ): Promise<ContractTransaction>;
-
-    /**
-     * Approve the passed address to spend the specified amount of tokens on behalf of msg.sender. Beware that changing an allowance with this method brings the risk that someone may use both the old and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     * @param spender The address which will spend the funds.
-     * @param value The amount of tokens to be spent.
+     * See {IERC20-approve}.     * Requirements:     * - `spender` cannot be the zero address.
      */
     approve(
       spender: string,
-      value: BigNumberish,
+      amount: BigNumberish,
       overrides?: TransactionOverrides
     ): Promise<ContractTransaction>;
 
     /**
-     * Transfer tokens from one address to another. Note that while this function emits an Approval event, this is not required as per the specification, and other compliant implementations may not emit the event.
-     * @param from address The address which you want to send tokens from
-     * @param to address The address which you want to transfer to
-     * @param value uint256 the amount of tokens to be transferred
+     * See {IERC20-transferFrom}.     * Emits an {Approval} event indicating the updated allowance. This is not required by the EIP. See the note at the beginning of {ERC20};     * Requirements: - `sender` and `recipient` cannot be the zero address. - `sender` must have a balance of at least `amount`. - the caller must have allowance for `sender`'s tokens of at least `amount`.
      */
     transferFrom(
-      from: string,
-      to: string,
-      value: BigNumberish,
+      sender: string,
+      recipient: string,
+      amount: BigNumberish,
       overrides?: TransactionOverrides
     ): Promise<ContractTransaction>;
 
     /**
-     * Increase the amount of tokens that an owner allowed to a spender. approve should be called when allowed_[_spender] == 0. To increment allowed value is better to use this function to avoid 2 calls (and wait until the first transaction is mined) From MonolithDAO Token.sol Emits an Approval event.
-     * @param addedValue The amount of tokens to increase the allowance by.
-     * @param spender The address which will spend the funds.
+     * Atomically increases the allowance granted to `spender` by the caller.     * This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}.     * Emits an {Approval} event indicating the updated allowance.     * Requirements:     * - `spender` cannot be the zero address.
      */
     increaseAllowance(
       spender: string,
@@ -141,9 +133,7 @@ export class Erc20 extends Contract {
     ): Promise<ContractTransaction>;
 
     /**
-     * Decrease the amount of tokens that an owner allowed to a spender. approve should be called when allowed_[_spender] == 0. To decrement allowed value is better to use this function to avoid 2 calls (and wait until the first transaction is mined) From MonolithDAO Token.sol Emits an Approval event.
-     * @param spender The address which will spend the funds.
-     * @param subtractedValue The amount of tokens to decrease the allowance by.
+     * Atomically decreases the allowance granted to `spender` by the caller.     * This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}.     * Emits an {Approval} event indicating the updated allowance.     * Requirements:     * - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`.
      */
     decreaseAllowance(
       spender: string,
@@ -153,64 +143,50 @@ export class Erc20 extends Contract {
   };
 
   /**
-   * Total number of tokens in existence
+   * See {IERC20-totalSupply}.
    */
   totalSupply(): Promise<BigNumber>;
 
   /**
-   * Gets the balance of the specified address.
-   * @param owner The address to query the balance of.
-   * @returns An uint256 representing the amount owned by the passed address.
+   * See {IERC20-balanceOf}.
    */
-  balanceOf(owner: string): Promise<BigNumber>;
+  balanceOf(account: string): Promise<BigNumber>;
 
   /**
-   * Function to check the amount of tokens that an owner allowed to a spender.
-   * @param owner address The address which owns the funds.
-   * @param spender address The address which will spend the funds.
-   * @returns A uint256 specifying the amount of tokens still available for the spender.
+   * See {IERC20-transfer}.     * Requirements:     * - `recipient` cannot be the zero address. - the caller must have a balance of at least `amount`.
+   */
+  transfer(
+    recipient: string,
+    amount: BigNumberish,
+    overrides?: TransactionOverrides
+  ): Promise<ContractTransaction>;
+
+  /**
+   * See {IERC20-allowance}.
    */
   allowance(owner: string, spender: string): Promise<BigNumber>;
 
   /**
-   * Transfer token for a specified address
-   * @param to The address to transfer to.
-   * @param value The amount to be transferred.
-   */
-  transfer(
-    to: string,
-    value: BigNumberish,
-    overrides?: TransactionOverrides
-  ): Promise<ContractTransaction>;
-
-  /**
-   * Approve the passed address to spend the specified amount of tokens on behalf of msg.sender. Beware that changing an allowance with this method brings the risk that someone may use both the old and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   * @param spender The address which will spend the funds.
-   * @param value The amount of tokens to be spent.
+   * See {IERC20-approve}.     * Requirements:     * - `spender` cannot be the zero address.
    */
   approve(
     spender: string,
-    value: BigNumberish,
+    amount: BigNumberish,
     overrides?: TransactionOverrides
   ): Promise<ContractTransaction>;
 
   /**
-   * Transfer tokens from one address to another. Note that while this function emits an Approval event, this is not required as per the specification, and other compliant implementations may not emit the event.
-   * @param from address The address which you want to send tokens from
-   * @param to address The address which you want to transfer to
-   * @param value uint256 the amount of tokens to be transferred
+   * See {IERC20-transferFrom}.     * Emits an {Approval} event indicating the updated allowance. This is not required by the EIP. See the note at the beginning of {ERC20};     * Requirements: - `sender` and `recipient` cannot be the zero address. - `sender` must have a balance of at least `amount`. - the caller must have allowance for `sender`'s tokens of at least `amount`.
    */
   transferFrom(
-    from: string,
-    to: string,
-    value: BigNumberish,
+    sender: string,
+    recipient: string,
+    amount: BigNumberish,
     overrides?: TransactionOverrides
   ): Promise<ContractTransaction>;
 
   /**
-   * Increase the amount of tokens that an owner allowed to a spender. approve should be called when allowed_[_spender] == 0. To increment allowed value is better to use this function to avoid 2 calls (and wait until the first transaction is mined) From MonolithDAO Token.sol Emits an Approval event.
-   * @param addedValue The amount of tokens to increase the allowance by.
-   * @param spender The address which will spend the funds.
+   * Atomically increases the allowance granted to `spender` by the caller.     * This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}.     * Emits an {Approval} event indicating the updated allowance.     * Requirements:     * - `spender` cannot be the zero address.
    */
   increaseAllowance(
     spender: string,
@@ -219,9 +195,7 @@ export class Erc20 extends Contract {
   ): Promise<ContractTransaction>;
 
   /**
-   * Decrease the amount of tokens that an owner allowed to a spender. approve should be called when allowed_[_spender] == 0. To decrement allowed value is better to use this function to avoid 2 calls (and wait until the first transaction is mined) From MonolithDAO Token.sol Emits an Approval event.
-   * @param spender The address which will spend the funds.
-   * @param subtractedValue The amount of tokens to decrease the allowance by.
+   * Atomically decreases the allowance granted to `spender` by the caller.     * This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}.     * Emits an {Approval} event indicating the updated allowance.     * Requirements:     * - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`.
    */
   decreaseAllowance(
     spender: string,
@@ -242,18 +216,18 @@ export class Erc20 extends Contract {
   estimate: {
     totalSupply(): Promise<BigNumber>;
 
-    balanceOf(owner: string): Promise<BigNumber>;
+    balanceOf(account: string): Promise<BigNumber>;
+
+    transfer(recipient: string, amount: BigNumberish): Promise<BigNumber>;
 
     allowance(owner: string, spender: string): Promise<BigNumber>;
 
-    transfer(to: string, value: BigNumberish): Promise<BigNumber>;
-
-    approve(spender: string, value: BigNumberish): Promise<BigNumber>;
+    approve(spender: string, amount: BigNumberish): Promise<BigNumber>;
 
     transferFrom(
-      from: string,
-      to: string,
-      value: BigNumberish
+      sender: string,
+      recipient: string,
+      amount: BigNumberish
     ): Promise<BigNumber>;
 
     increaseAllowance(

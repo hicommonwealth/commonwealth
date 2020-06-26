@@ -7,7 +7,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
-import { MolochEntityKind } from 'events/moloch/types';
+import { MolochEntityKind } from 'commonwealth-chain-events/dist/src/moloch/types';
 import { setActiveAccount } from 'controllers/app/login';
 import MolochMembers from './members';
 import MolochAPI from './api';

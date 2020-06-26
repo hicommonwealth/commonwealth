@@ -39,12 +39,12 @@ import {
   ChainEvent,
 } from 'models';
 
-import SubstrateStorageFetcher from 'events/substrate/storageFetcher';
-import SubstrateEventSubscriber from 'events/substrate/subscriber';
-import SubstrateEventProcessor from 'events/substrate/processor';
+import SubstrateStorageFetcher from 'commonwealth-chain-events/dist/src/substrate/storageFetcher';
+import SubstrateEventSubscriber from 'commonwealth-chain-events/dist/src/substrate/subscriber';
+import SubstrateEventProcessor from 'commonwealth-chain-events/dist/src/substrate/processor';
 import {
   SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-} from 'events/substrate/types';
+} from 'commonwealth-chain-events/dist/src/substrate/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -703,7 +703,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   }
 
   public get currentEra(): Observable<EraIndex> {
-    return this.query((api: ApiRx) => api.query.staking.currentEra())
+    return this.query((api: ApiRx) => api.query.staking.currentEra<EraIndex>())
       .pipe(map((era: EraIndex) => {
         if (era) {
           return era;

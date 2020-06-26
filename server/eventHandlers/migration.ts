@@ -3,7 +3,7 @@
  */
 import {
   IEventHandler, CWEvent, eventToEntity, entityToFieldName, IChainEventData
-} from '../../shared/events/interfaces';
+} from 'commonwealth-chain-events/dist/src/interfaces';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));

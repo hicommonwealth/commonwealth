@@ -6,7 +6,7 @@ import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+import * as edgewareDefinitions from 'edgeware-node-types/interfaces/definitions';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
@@ -56,7 +56,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
     await super.init(async () => {
       const edgTypes = Object.values(edgewareDefinitions)
-        .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
+        .reduce((res, { types }): object => ({ ...res, ...types }), {});
 
       await this.chain.resetApi(this.meta, {
         types: {

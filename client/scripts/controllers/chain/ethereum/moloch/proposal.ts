@@ -3,7 +3,9 @@ import moment from 'moment';
 
 import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { MolochEventKind, IMolochSubmitProposal, IMolochProcessProposal } from 'events/moloch/types';
+import {
+  MolochEventKind, IMolochSubmitProposal, IMolochProcessProposal
+} from 'commonwealth-chain-events/dist/src/moloch/types';
 
 import {
   Proposal,

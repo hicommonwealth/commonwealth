@@ -1,5 +1,5 @@
-import { SubstrateEntityKind } from '../../shared/events/substrate/types';
-import { MolochEntityKind } from '../../shared/events/moloch/types';
+import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { MolochEntityKind } from 'commonwealth-chain-events/dist/src/moloch/types';
 
 // given an "old style" identifier such as treasuryproposal_4, attempts to
 // fetch the corresponding chain entity from the database

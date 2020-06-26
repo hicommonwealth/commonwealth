@@ -109,7 +109,7 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       switchMap((api: ApiRx) => combineLatest(
         of(api),
         api.derive.staking.validators(),
-        api.query.staking.currentEra(),
+        api.query.staking.currentEra<EraIndex>(),
       )),
 
       // fetch balances alongside validators
@@ -231,7 +231,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
-        api.query.staking.currentEra(),
+        api.query.staking.currentEra<EraIndex>(),
       )),
       flatMap(([api, era]: [ApiRx, EraIndex]) => {
         // Different runtimes call for different access to stakers: old vs. new

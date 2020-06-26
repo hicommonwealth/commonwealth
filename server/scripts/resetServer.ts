@@ -1,10 +1,10 @@
 import crypto from 'crypto';
+import { SubstrateEventKinds, SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { MolochEventKinds, MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
+import { EventSupportingChains } from 'commonwealth-chain-events/dist/src/interfaces';
+
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import app from '../../server';
-import { SubstrateEventKinds, SubstrateEventChains } from '../../shared/events/substrate/types';
-import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
-import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
