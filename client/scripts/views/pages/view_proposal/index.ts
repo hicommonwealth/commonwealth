@@ -173,10 +173,10 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
       ]),
       proposal instanceof OffchainThread && m('.proposal-bottom', [
-        m('.proposal-body-reactions', [
+        m('.proposal-bottom-left', [
           m(ProposalBodyReaction, { item: proposal }),
         ]),
-        m('.proposal-body-viewcount', [
+        m('.proposal-bottom-right', [
           m(ProposalHeaderViewCount, { viewCount }),
         ]),
       ]),
@@ -216,7 +216,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         m(ProposalBodyAvatar, { comment }),
       ]),
       m('.comment-body', [
-        m('.comment-body-meta', [
+        m('.comment-body-top', [
           m(ProposalBodyAuthor, { comment }),
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
@@ -294,7 +294,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           vnode.state.editing
             && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
         ]),
-        m('.comment-body-reactions', [
+        m('.comment-body-bottom', [
           m(ProposalBodyReaction, { item: comment }),
         ]),
       ]),

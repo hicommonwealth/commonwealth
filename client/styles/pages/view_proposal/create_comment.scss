@@ -28,7 +28,7 @@
         }
     }
     .new-comment-error {
-        color: $error-red;
-        font-weight: 700;
+        @include error-text;
+        margin: 20px 0 10px;
     }
 }
