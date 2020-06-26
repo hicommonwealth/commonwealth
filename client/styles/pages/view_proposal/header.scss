@@ -1,29 +1,25 @@
 @import 'client/styles/shared';
 @import './index';
 
-.ViewProposalPage > .page-container > .container,
-.ViewProposalPage > .page-container > .container {
-    padding: 0;
-}
-.ViewProposalPage {
-    margin-bottom: 32px;
-}
-
 .ProposalHeader {
-    .proposal-header {
-        padding: $padding-top $gutter $padding;
+    .proposal-top {
+        display: flex;
     }
-    .proposal-body {
-        padding: $padding $gutter ($padding + 6px);
-        border-top: 1px solid #e7e7e7;
-        .proposal-body-meta {
-            margin-bottom: 12px;
-        }
-        .proposal-body-content {
-        }
+    .proposal-top-left {
+        flex: 1;
     }
-    .TagEditor {
-        display: inline;
+    .proposal-top-right {
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        width: 30px;
+        svg {
+            height: 20px;
+            width: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            stroke: #999;
+        }
     }
 
     // proposal-tags
@@ -51,29 +47,13 @@
 
     // proposal-title
     .proposal-title {
-        margin-top: 5px;
-        .ProposalHeaderTitle,
-        .ProposalHeaderComments {
+        margin: 4px 0 2px;
+        .ProposalHeaderTitle {
             display: inline;
-            font-size: 23px;
+            font-size: 19px;
             font-weight: 600;
             flex: 1;
-            line-height: 1.25;
-        }
-        .ProposalHeaderComments {
-            font-size: 17px;
-            margin-left: 6px;
-            color: #888;
-            position: relative;
-            top: -1px;
-            user-select: none;
-            white-space: nowrap;
-            .cui-icon {
-                position: relative;
-                top: -1px;
-                color: #888;
-                margin-left: 4px;
-            }
+            line-height: 1.15;
         }
     }
 
@@ -93,11 +73,11 @@
     .ViewCountBlock,
     .ProposalHeaderExternalLink {
         display: inline-block;
-        color: #888;
-        font-size: 14px;
+        color: #999;
+        margin-right: 12px;
         a:link,
         a:visited {
-            color: #888;
+            color: #999;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
@@ -106,7 +86,7 @@
     }
     .ProposalHeaderAuthor {
         .User .user-display-name {
-            color: #888;
+            color: #999;
         }
     }
     .ProposalHeaderExternalLink {
@@ -121,23 +101,6 @@
             text-decoration: underline;
         }
     }
-    .ProposalHeaderSpacer {
-        margin: 0 7px;
-    }
-
-    // subscription button
-    .ProposalHeaderSubscriptionButton {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-    }
-
-    .ProposalHeaderPrivacyButtons {
-        position: absolute;
-        right: 20px;
-        top: 70px;
-    }
-
     .ProposalBodyReaction {
         margin-top: 18px;
     }

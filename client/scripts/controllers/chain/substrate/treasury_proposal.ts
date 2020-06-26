@@ -8,7 +8,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ISubstrateTreasuryProposed, SubstrateEventKind } from 'events/edgeware/types';
+import { ISubstrateTreasuryProposed, SubstrateEventKind } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';

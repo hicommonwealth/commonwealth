@@ -7,8 +7,8 @@ import {
   ISubstrateTreasuryProposal,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import { ProposalModule, ChainEntity } from 'models';
-import { SubstrateEntityKind } from 'events/edgeware/types';
+import { ProposalModule } from 'models';
+import { SubstrateEntityKind } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';

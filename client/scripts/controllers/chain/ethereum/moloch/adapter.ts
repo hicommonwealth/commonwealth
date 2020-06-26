@@ -1,16 +1,20 @@
-import { MolochShares } from 'adapters/chain/ethereum/types';
+import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
-import EthereumAccounts, { EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
-import { ChainBase, ChainClass, IChainAdapter } from 'models';
+import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
+import { MolochEntityKind } from 'events/moloch/types';
 import { setActiveAccount } from 'controllers/app/login';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
+import MolochProposal from './proposal';
 
-export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount> {
+export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public readonly base = ChainBase.Ethereum;
   public readonly class = ChainClass.Moloch;
   public chain: EthereumChain;
@@ -22,16 +26,22 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }
 
-  public handleEntityUpdate(e): void {
-    throw new Error('not implemented');
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    switch (entity.type) {
+      case MolochEntityKind.Proposal: {
+        const constructorFunc = (e: ChainEntity) => new MolochProposal(this.accounts, this.governance, e);
+        this.governance.updateProposal(constructorFunc, entity, event);
+        break;
+      }
+      default: {
+        console.error('Received invalid substrate chain entity!');
+        break;
+      }
+    }
   }
 
   public async init(onServerLoaded?) {
-    const useChainProposalData = this.meta.chain.id === 'moloch-local' || !this.app.isProduction();
-    // FIXME: This is breaking for me on moloch default (not local)
-    // if (!this.meta.chain.chainObjectId && !useChainProposalData) {
-    //   throw new Error('no chain object id found');
-    // }
+    const useClientChainEntities = true;
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
     this.chain = new EthereumChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
@@ -41,13 +51,13 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     await super.init(async () => {
       await this.chain.resetApi(this.meta);
       await this.chain.initMetadata();
-    }, onServerLoaded);
+    }, onServerLoaded, EntityRefreshOption.Nothing);
     await this.ethAccounts.init(this.chain);
     await this.chain.initEventLoop();
     await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
-    const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider, activeAddress);
+    const api = new MolochAPI(this.meta.address, this.chain.api.currentProvider as any, activeAddress);
     await api.init();
 
     if (this.webWallet) {
@@ -65,8 +75,8 @@ export default class Moloch extends IChainAdapter<MolochShares, EthereumAccount>
     });
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
-    await this.governance.init(api, this.accounts, this.meta.chain.chainObjectId, useChainProposalData);
-    await this._postModuleLoad();
+    await this.governance.init(api, this.accounts, useClientChainEntities);
+    await this._postModuleLoad(!useClientChainEntities);
 
     this._loaded = true;
   }

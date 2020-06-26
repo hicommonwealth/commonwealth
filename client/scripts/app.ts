@@ -159,8 +159,11 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     const Edgeware = (await import('./controllers/chain/edgeware/main')).default;
     app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Substrate = (await import('./controllers/chain/substrate/main')).default;
-    app.chain = new Substrate(n, app);
+    const Kusama = (await import('./controllers/chain/kusama/main')).default;
+    app.chain = new Kusama(n, app);
+  } else if (n.chain.network === ChainNetwork.Polkadot) {
+    const Polkadot = (await import('./controllers/chain/polkadot/main')).default;
+    app.chain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
     const Cosmos = (await import('./controllers/chain/cosmos/main')).default;
     app.chain = new Cosmos(n, app);
@@ -193,7 +196,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
     // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain, true);
+    updateActiveAddresses(n.chain);
   });
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite

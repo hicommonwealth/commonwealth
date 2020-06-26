@@ -8,35 +8,49 @@
         margin-bottom: 20px;
     }
     .compact-modal-body {
+        width: 370px;
         padding: 24px 28px 32px !important;
     }
-}
 
-.SelectAddressOption {
-    position: relative;
-    display: block;
-    padding: 12px 20px 10px;
-    border: 1px solid #eee;
-    border-bottom: none;
-    &:last-child {
+    .select-address-options {
+        border-bottom: 1px solid #eee;
+    }
+    .select-address-option {
+        position: relative;
         border: 1px solid #eee;
-    }
-    &:hover {
-        background: #fafafa;
+        border-bottom: none;
         cursor: pointer;
-    }
-    .UserBlock span.balance {
-        display: block;
-        float: right;
-        color: #aaa;
-    }
-    .role-permission {
-        position: absolute;
-        top: 21px;
-        right: 20px;
-        color: #aaa;
-        .cui-tag {
-            font-weight: 600;
+        &:hover {
+            background: #fafafa;
         }
+        &.selected {
+            background: #e2e7ff !important;
+        }
+        &.existing {
+            cursor: initial;
+            .UserBlock {
+                opacity: 0.3;
+            }
+            .role-remove {
+                cursor: pointer;
+                position: absolute;
+                right: 16px;
+                top: 18px;
+                &:hover .cui-icon svg {
+                    stroke: $error-red;
+                }
+            }
+        }
+        > .UserBlock {
+            padding: 10px 16px;
+        }
+    }
+    .select-address-explanation {
+        font-size: 14px;
+        color: #222;
+        margin: 15px 0 18px;
+    }
+    button {
+        margin-top: 10px;
     }
 }

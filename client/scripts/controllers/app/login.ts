@@ -95,7 +95,7 @@ export function clearActiveAddresses() {
   app.user.setActiveAccount(null);
 }
 
-export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectionModal = false) {
+export function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
@@ -119,9 +119,6 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
   if (memberAddresses.length === 1) {
     // one member address - start the community with that address
     setActiveAccount(memberAddresses[0]);
-  } else if (app.user.activeAccounts.length === 1) {
-    // one non-member address - start the community with that address
-    setActiveAccount(app.user.activeAccounts[0]);
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
@@ -134,8 +131,6 @@ export function updateActiveAddresses(chain?: ChainInfo, suppressAddressSelectio
         return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
       });
       if (account) setActiveAccount(account);
-    } else if (!suppressAddressSelectionModal) {
-      app.modals.create({ modal: SelectAddressModal });
     }
   }
 }

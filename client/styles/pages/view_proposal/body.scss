@@ -1,11 +1,22 @@
 @import 'client/styles/shared';
-@import './index';
 
 .ProposalComment {
-    padding: $padding $gutter ($padding + 6px);
-    border-top: 1px solid #e7e7e7;
+    display: flex;
+    margin: 28px 0;
+    .comment-avatar {
+        padding-top: 10px;
+        padding-right: 18px;
+    }
+    .comment-body {
+        flex: 1;
+    }
     .comment-body-meta {
         margin-bottom: 12px;
+    }
+    .comment-body-reactions {
+        padding-top: 2px;
+        border-top: 1px solid #ececec;
+        margin-top: 26px;
     }
 }
 
