@@ -2,6 +2,9 @@
   "name": "commonwealth-chain-events",
   "version": "0.1.0",
   "description": "Listen to various chains for events.",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "test": "nyc ts-mocha -P test/tsconfig.json ./test/**/*.spec.ts",
     "listen": "ts-node -P ./tsconfig.json -T ./scripts/listener.ts"

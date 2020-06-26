@@ -5,24 +5,30 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "outDir": "./build",
+    "outDir": "./dist",
     "baseUrl": ".",
+    "declaration": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": true,
     "paths": {
       "@polkadot/api/augment": ["./node_modules/edgeware-node-types/dist/augment-api.d.ts"],
       "@polkadot/types/augment": ["./node_modules/edgeware-node-types/dist/augment-types.d.ts"],
       "*": ["./*", "src/*", "eth/types/*"]
     },
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": true
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "./src",
-    "./test",
-    "./eth/types",
+    "./eth/types"
   ],
   "exclude": [
+    "./dist/**/*",
     "./node_modules",
+    "./test"
   ]
 }

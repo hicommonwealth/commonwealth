@@ -6,6 +6,5 @@ yarn-error.log
 .nyc_output/
 coverage/
 .env
-
-# Webpack profiling
-stats.json
+dist/
+*.tgz
