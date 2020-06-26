@@ -95,5 +95,5 @@ export function constructFakeApi(callOverrides): ApiPromise {
         proposals: callOverrides['councilProposalsDerive'],
       }
     }
-  } as ApiPromise;
+  } as unknown as ApiPromise;
 }

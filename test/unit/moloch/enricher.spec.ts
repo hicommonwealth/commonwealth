@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { MolochEventKind, MolochRawEvent, MolochApi } from '../../../../shared/events/moloch/types';
-import MolochEnricherFunc from '../../../../shared/events/moloch/filters/enricher';
+import { MolochEventKind, MolochRawEvent, MolochApi } from '../../../src/moloch/types';
+import MolochEnricherFunc from '../../../src/moloch/filters/enricher';
 
 const { assert } = chai;
 

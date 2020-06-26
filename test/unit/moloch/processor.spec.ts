@@ -1,6 +1,6 @@
 import chai from 'chai';
-import Processor from '../../../../shared/events/moloch/processor';
-import { MolochApi, MolochRawEvent, MolochEventKind } from '../../../../shared/events/moloch/types';
+import Processor from '../../../src/moloch/processor';
+import { MolochApi, MolochRawEvent, MolochEventKind } from '../../../src/moloch/types';
 const { assert } = chai;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });

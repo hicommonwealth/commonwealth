@@ -7,9 +7,9 @@ import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types'
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist';
-import SubstrateEnricherFunc from '../../../../shared/events/substrate/filters/enricher';
+import SubstrateEnricherFunc from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
-import { SubstrateEventKind } from '../../../../shared/events/substrate/types';
+import { SubstrateEventKind } from '../../../src/substrate/types';
 
 const { assert } = chai;
 

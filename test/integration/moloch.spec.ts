@@ -1,13 +1,13 @@
 import { providers } from 'ethers';
 import chai from 'chai';
 import { EventEmitter } from 'events';
-import { Moloch1Factory } from '../../../eth/types/Moloch1Factory';
-import { Moloch1 } from '../../../eth/types/Moloch1';
-import { TokenFactory } from '../../../eth/types/TokenFactory';
-import { Token } from '../../../eth/types/Token';
-import { MolochApi, IMolochEventData, MolochEventKind } from '../../../shared/events/moloch/types';
-import subscribeMolochEvents from '../../../shared/events/moloch/index';
-import { IEventHandler, CWEvent } from '../../../shared/events/interfaces';
+import { Moloch1Factory } from '../../eth/types/Moloch1Factory';
+import { Moloch1 } from '../../eth/types/Moloch1';
+import { TokenFactory } from '../../eth/types/TokenFactory';
+import { Token } from '../../eth/types/Token';
+import { MolochApi, IMolochEventData, MolochEventKind } from '../../src/moloch/types';
+import subscribeMolochEvents from '../../src/moloch/index';
+import { IEventHandler, CWEvent } from '../../src/interfaces';
 
 const { assert } = chai;
 

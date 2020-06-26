@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import chai from 'chai';
 
-import Subscriber from '../../../../shared/events/moloch/subscriber';
-import { MolochApi, MolochRawEvent } from '../../../../shared/events/moloch/types';
+import Subscriber from '../../../src/moloch/subscriber';
+import { MolochApi, MolochRawEvent } from '../../../src/moloch/types';
 
 const { assert } = chai;
 

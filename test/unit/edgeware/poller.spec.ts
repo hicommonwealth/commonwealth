@@ -2,7 +2,7 @@ import chai from 'chai';
 import { Hash, EventRecord, Header, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { constructFakeApi } from './testUtil';
-import Poller from '../../../../shared/events/substrate/poller';
+import Poller from '../../../src/substrate/poller';
 
 const { assert } = chai;
 

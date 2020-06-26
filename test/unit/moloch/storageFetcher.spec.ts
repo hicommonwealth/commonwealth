@@ -1,8 +1,8 @@
 import chai from 'chai';
 import moment from 'moment';
-import Fetcher from '../../../../shared/events/moloch/storageFetcher';
-import { Moloch1Proposal, MolochEventKind } from '../../../../shared/events/moloch/types';
-import { Moloch1 } from '../../../../eth/types/Moloch1';
+import Fetcher from '../../../src/moloch/storageFetcher';
+import { Moloch1Proposal, MolochEventKind } from '../../../src/moloch/types';
+import { Moloch1 } from '../../../eth/types/Moloch1';
 
 const { assert } = chai;
 

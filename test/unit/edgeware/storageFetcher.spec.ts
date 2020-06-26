@@ -20,8 +20,8 @@ import {
   ISubstrateSignalingVotingStarted,
   ISubstrateSignalingVotingCompleted,
   ISubstrateCollectiveVoted
-} from '../../../../shared/events/substrate/types';
-import StorageFetcher from '../../../../shared/events/substrate/storageFetcher';
+} from '../../../src/substrate/types';
+import StorageFetcher from '../../../src/substrate/storageFetcher';
 
 const { assert } = chai;
 
