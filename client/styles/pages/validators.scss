@@ -198,6 +198,15 @@
       overflow-wrap: break-word;
       min-width: 0px;
     }
+
+    .cut-text{
+      text-overflow: ellipsis !important;   
+    }
+
+    .val-last-hash{
+      padding-left: 0.5vw !important;
+    }
+
     .val-author, .val-block-author{
       padding-left: 4vw !important;
     }
@@ -227,6 +236,12 @@
     .val-action {
         text-align: right;
     }
+
+    .cui-icon svg{
+      width: 0.938vw !important;
+      height: 0.938vw !important;
+    }
+
     @media only screen and (max-width: 1300px) {
      th{
       //  padding-right: 5px !important;
