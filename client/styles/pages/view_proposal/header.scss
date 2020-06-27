@@ -1,5 +1,4 @@
 @import 'client/styles/shared';
-@import './index';
 
 .ProposalHeader {
     .proposal-top {
@@ -21,6 +20,14 @@
             stroke: #999;
         }
     }
+    .proposal-bottom {
+        display: flex;
+    }
+    .proposal-bottom-left {
+        flex: 1;
+    }
+    .proposal-bottom-right {
+    }
 
     // proposal-tags
     .ProposalHeaderCaretMenu,
@@ -33,9 +40,9 @@
         }
         a {
             cursor: pointer;
-            color: #888;
+            color: $standard-light-text;
             text-decoration: none;
-            margin-right: 10px;
+            margin-right: $standard-meta-spacing;
             &:hover {
                 text-decoration: underline;
             }
@@ -65,7 +72,6 @@
     .ProposalBodyDelete,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,
-    .ProposalHeaderSpacer,
     .ProposalBodyEdit,
     .ProposalBodyDelete,
     .ProposalBodyCancelEdit,
@@ -100,8 +106,5 @@
         a:hover {
             text-decoration: underline;
         }
-    }
-    .ProposalBodyReaction {
-        margin-top: 18px;
     }
 }

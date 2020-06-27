@@ -5,9 +5,9 @@ import $ from 'jquery';
 import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, RoleInfo } from 'models';
-import { UserBlock } from 'views/components/widgets/user';
-import { formatAsTitleCase, formatAddressShort } from 'helpers';
+import { Account, RoleInfo, RolePermission } from 'models';
+import User, { UserBlock } from 'views/components/widgets/user';
+import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 
@@ -31,7 +31,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         m.redraw();
         vnode.state.selectedIndex = null;
         // select the address, and close the form
-        notifySuccess(`Switched to ${formatAddressShort(addressInfo.address)}`);
+        notifySuccess(`Joined with ${formatAddressShort(addressInfo.address)}`);
         app.user.setActiveAccount(account);
         $(e.target).trigger('modalexit');
       }).catch((err: any) => {
@@ -76,16 +76,20 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Manage Addresses'),
+        m('h3', 'Addresses'),
       ]),
       m('.compact-modal-body', [
         m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m(UserBlock, { user: account }),
-            m('.role-remove', {
-              onclick: deleteRole.bind(this, index)
-            }, [
-              m(Icon, { name: Icons.X }),
+            m('.role-remove', [
+              m('span.already-connected', [
+                role.permission === RolePermission.admin
+                  ? 'Admin' : role.permission === RolePermission.moderator ? 'Moderator' : 'Already joined'
+              ]),
+              m('span.icon', {
+                onclick: deleteRole.bind(this, index)
+              }, m(Icon, { name: Icons.X })),
             ]),
           ])),
           activeAccountsByRole.map(([account, role], index) => !role && m('.select-address-option', {
@@ -107,7 +111,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         //   'separate voting and staking addresses.',
         // ]),
         m(Button, {
-          label: vnode.state.selectedIndex === undefined ? 'Select an address' : 'Join community with address',
+          label: 'Join community with address',
           intent: 'primary',
           compact: true,
           fluid: true,

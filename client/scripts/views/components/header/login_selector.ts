@@ -109,7 +109,7 @@ export const CurrentCommunityLabel: m.Component<{}> = {
   }
 };
 
-const LoginSelector : m.Component<{}, {}> = {
+const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
@@ -132,138 +132,168 @@ const LoginSelector : m.Component<{}, {}> = {
       });
     });
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
+    const totalUnseenCount = app.isLoggedIn() && (getSelectableCommunities() as any).map((item) => {
+      return app.user.unseenPosts[item.id]?.activePosts || 0;
+    }).reduce((a, b) => { return a + b; }, 0);
+
+    // wrap the popover in another popover, to display address selection hint
+    // only show the onboarding hint if 1) we are in a community, 2) the user has a compatible address, and
+    // 3) no address is currently active
+    const shouldShowHint = vnode.state.showAddressSelectionHint === undefined
+      && (app.chain || app.community)
+      && app.user.activeAccount === null
+      && app.user.activeAccounts.length !== 0;
+    if (shouldShowHint) {
+      vnode.state.showAddressSelectionHint = true;
+    }
+    const wrapHint = (component) => m(Popover, {
+      class: 'login-selector-hint-popover',
+      closeOnContentClick: true,
+      closeOnOutsideClick: false,
+      transitionDuration: 0,
+      hoverCloseDelay: 0,
+      position: 'top-end',
+      onInteraction: () => {
+        vnode.state.showAddressSelectionHint = false;
+      },
+      isOpen: vnode.state.showAddressSelectionHint,
+      content: 'Select an address to start posting or commenting',
+      inline: true,
+      trigger: component
+    });
 
     return m('.LoginSelector', [
-      m(ButtonGroup, { fluid: true }, [
-        m(Popover, {
-          class: 'login-selector-popover',
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          position: 'top-end',
-          trigger: m(Button, {
-            intent: 'none',
-            size: 'sm',
-            fluid: true,
-            compact: true,
-            label: (!app.chain && !app.community) ? 'Select a community'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount })
-                : app.user.activeAccounts.length === 0 ? 'No address'
-                  : 'Select an address',
-            iconRight: Icons.CHEVRON_DOWN,
-          }),
-          content: m(Menu, { class: 'LoginSelectorMenu' }, [
-            // address selector - only shown in communities
-            (app.chain || app.community) && [
-              activeAddressesWithRole.map((account) => m(MenuItem, {
-                align: 'left',
-                basic: true,
-                onclick: (e) => {
-                  setActiveAccount(account);
-                },
-                label: m(UserBlock, {
-                  user: account,
-                  selected: isSameAccount(account, app.user.activeAccount),
-                  compact: true
-                }),
-              })),
-              !isPrivateCommunity && m(MenuItem, {
-                style: 'margin-top: 4px',
-                onclick: () => app.modals.create({
-                  modal: SelectAddressModal,
-                }),
-                label: 'Manage addresses',
+      wrapHint(m(Popover, {
+        class: 'login-selector-popover',
+        closeOnContentClick: true,
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        position: 'top-end',
+        inline: true,
+        trigger: m(Button, {
+          intent: 'none',
+          size: 'sm',
+          fluid: true,
+          compact: true,
+          onclick: (e) => {
+            vnode.state.showAddressSelectionHint = false;
+          },
+          label: [
+            (!app.chain && !app.community) ? 'Select a community'
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount }) : 'Select an address',
+            app.isLoggedIn() && totalUnseenCount > 0 && m('.unseen-count', [
+              m('.pip', totalUnseenCount),
+            ]),
+          ],
+          iconRight: Icons.CHEVRON_DOWN,
+        }),
+        content: m(Menu, { class: 'LoginSelectorMenu' }, [
+          // address list
+          (app.chain || app.community) && [
+            activeAddressesWithRole.map((account) => m(MenuItem, {
+              align: 'left',
+              basic: true,
+              onclick: (e) => {
+                setActiveAccount(account);
+              },
+              label: m(UserBlock, {
+                user: account,
+                selected: isSameAccount(account, app.user.activeAccount),
+                compact: true
               }),
-              m(MenuDivider),
-            ],
-            // communities list
-            (getSelectableCommunities() as any).concat(['home']).map((item) => {
-              const getUnseenCount = (id) => {
-                const isNew = app.isLoggedIn() && !app.user.unseenPosts[id];
-                const unseenCount = app.user.unseenPosts[id]?.activePosts || 0;
-
-                return m('.unseen-count', [
-                  isNew && m('.pip', 'New'),
-                  unseenCount > 0 && m('.pip', unseenCount),
-                ]);
-              };
-
-              if (item instanceof ChainInfo) return m(MenuItem, {
-                onclick: (e) => m.route.set(`/${item.id}`),
-                class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-                label: [
-                  m(CommunityLabel, { chain: item }),
-                  getUnseenCount(item.id),
-                ],
-                selected: app.activeChainId() === item.id,
-                contentRight: app.isLoggedIn() && app.user.isMember({
-                  account: app.user.activeAccount,
-                  chain: item.id
-                }) && m('.community-star-toggle', {
-                  onclick: (e) => {
-                    app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-                  }
-                }, [
-                  m(Icon, { name: Icons.STAR }),
-                ]),
-              });
-
-              if (item instanceof CommunityInfo) return m(MenuItem, {
-                onclick: (e) => m.route.set(`/${item.id}`),
-                class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                label: [
-                  m(CommunityLabel, { community: item }),
-                  getUnseenCount(item.id),
-                ],
-                selected: app.activeCommunityId() === item.id,
-                contentRight: app.isLoggedIn() && app.user.isMember({
-                  account: app.user.activeAccount,
-                  community: item.id
-                }) && m('.community-star-toggle', {
-                  onclick: (e) => {
-                    app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-                  },
-                }, [
-                  m(Icon, { name: Icons.STAR }),
-                ]),
-              });
-
-              return m(MenuItem, {
-                onclick: (e) => m.route.set(`/`),
-                label: 'More communities',
-              });
+            })),
+            !isPrivateCommunity && m(MenuItem, {
+              style: 'margin-top: 4px',
+              onclick: () => app.modals.create({
+                modal: SelectAddressModal,
+              }),
+              label: [ 'Add ', app.chain ? `a ${app.chain.meta.chain.symbol}` : 'an', ' address', ],
             }),
             m(MenuDivider),
-            // always shown
-            m(MenuItem, {
-              onclick: () => m.route.set('/settings'),
-              // iconLeft: Icons.SETTINGS,
-              label: 'Settings'
-            }),
-            m(MenuItem, {
-              onclick: () => app.modals.create({ modal: FeedbackModal }),
-              // iconLeft: Icons.SEND,
-              label: 'Send feedback',
-            }),
-            m(MenuItem, {
-              onclick: () => {
-                $.get(`${app.serverUrl()}/logout`).then(async () => {
-                  await initAppState();
-                  notifySuccess('Logged out');
-                  m.route.set('/');
-                  m.redraw();
-                }).catch((err) => {
-                  // eslint-disable-next-line no-restricted-globals
-                  location.reload();
-                });
-                mixpanel.reset();
-              },
-              // iconLeft: Icons.X_SQUARE,
-              label: 'Logout'
-            }),
-          ]),
-        }),
-      ]),
+          ],
+          // communities list
+          (getSelectableCommunities() as any).concat(['home']).map((item) => {
+            const getUnseenCount = (id) => {
+              const isNew = app.isLoggedIn() && !app.user.unseenPosts[id];
+              const unseenCount = app.user.unseenPosts[id]?.activePosts || 0;
+
+              return m('.unseen-count', [
+                isNew && m('.pip', 'New'),
+                unseenCount > 0 && m('.pip', unseenCount),
+              ]);
+            };
+
+            if (item instanceof ChainInfo) return m(MenuItem, {
+              onclick: (e) => m.route.set(`/${item.id}`),
+              class: app.communities.isStarred(item.id, null) ? 'starred' : '',
+              label: [
+                m(CommunityLabel, { chain: item }),
+                getUnseenCount(item.id),
+              ],
+              selected: app.activeChainId() === item.id,
+              contentRight: app.isLoggedIn() && app.user.isMember({
+                account: app.user.activeAccount,
+                chain: item.id
+              }) && m('.community-star-toggle', {
+                onclick: (e) => {
+                  app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
+                }
+              }, [
+                m(Icon, { name: Icons.STAR }),
+              ]),
+            });
+
+            if (item instanceof CommunityInfo) return m(MenuItem, {
+              onclick: (e) => m.route.set(`/${item.id}`),
+              class: app.communities.isStarred(null, item.id) ? 'starred' : '',
+              label: [
+                m(CommunityLabel, { community: item }),
+                getUnseenCount(item.id),
+              ],
+              selected: app.activeCommunityId() === item.id,
+              contentRight: app.isLoggedIn() && app.user.isMember({
+                account: app.user.activeAccount,
+                community: item.id
+              }) && m('.community-star-toggle', {
+                onclick: (e) => {
+                  app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                },
+              }, [
+                m(Icon, { name: Icons.STAR }),
+              ]),
+            });
+
+            return m(MenuItem, {
+              onclick: (e) => m.route.set('/'),
+              label: 'More communities',
+            });
+          }),
+          m(MenuDivider),
+          m(MenuItem, {
+            onclick: () => m.route.set('/settings'),
+            label: 'Settings'
+          }),
+          m(MenuItem, {
+            onclick: () => app.modals.create({ modal: FeedbackModal }),
+            label: 'Send feedback',
+          }),
+          m(MenuItem, {
+            onclick: () => {
+              $.get(`${app.serverUrl()}/logout`).then(async () => {
+                await initAppState();
+                notifySuccess('Logged out');
+                m.route.set('/');
+                m.redraw();
+              }).catch((err) => {
+                // eslint-disable-next-line no-restricted-globals
+                location.reload();
+              });
+              mixpanel.reset();
+            },
+            label: 'Logout'
+          }),
+        ]),
+      })),
     ]);
   }
 };

@@ -103,6 +103,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
           canEditThread && m(ThreadDeletionButton, { proposal }),
           m(ThreadSubscriptionButton, { proposal }),
         ],
+        inline: true,
         trigger: m(Icon, {
           name: Icons.CHEVRON_DOWN,
           class: 'ThreadCaratMenu',

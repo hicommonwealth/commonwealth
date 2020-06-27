@@ -1,6 +1,8 @@
+import 'components/new_proposal_button.scss';
+
 import m from 'mithril';
 import _ from 'lodash';
-import { Tooltip, Button, ButtonGroup, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
+import { Button, ButtonGroup, Icons, PopoverMenu, MenuItem, MenuDivider } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -18,7 +20,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
 
     // just a button for communities, or chains without governance
     if (app.community) {
-      const CommunityButton = m(Button, {
+      return m(Button, {
         class: 'NewProposalButton',
         label: 'New post',
         intent: 'primary',
@@ -27,12 +29,6 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         size: 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
-      return activeAccount
-        ? CommunityButton
-        : m(Tooltip, {
-          content: 'Link an address to post',
-          trigger: CommunityButton
-        });
     }
 
     const ProposalButtonGroup = m(ButtonGroup, [
@@ -92,12 +88,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     ]);
 
     // a button with popover menu for chains
-    return activeAccount
-      ? ProposalButtonGroup
-      : m(Tooltip, {
-        content: 'Link an address to post',
-        trigger: ProposalButtonGroup
-      });
+    return ProposalButtonGroup;
   }
 };
 

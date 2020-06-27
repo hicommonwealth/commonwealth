@@ -21,7 +21,6 @@
     }
 
     // content
-    $discussion-row-color: #999;
     .discussion-top {
         display: flex;
         .discussion-top-left {
@@ -47,14 +46,14 @@
             }
         }
         .discussion-meta {
-            color: $discussion-row-color;
+            color: $standard-light-text;
             font-size: 15px;
             .User a {
                 display: inline-block;
                 text-decoration: none;
-                color: $discussion-row-color;
+                color: $standard-light-text;
                 &:hover {
-                    color: darken($discussion-row-color, 8%);
+                    color: darken($standard-light-text, 8%);
                     text-decoration: underline;
                 }
             }
@@ -64,9 +63,9 @@
             }
             a.discussion-created, a.discussion-replies {
                 text-decoration: none;
-                color: $discussion-row-color;
+                color: $standard-light-text;
                 &:hover {
-                    color: darken($discussion-row-color, 8%);
+                    color: darken($standard-light-text, 8%);
                     text-decoration: underline;
                 }
             }
@@ -86,7 +85,7 @@
         .discussion-commenters {
             display: flex;
             a {
-                color: #aaa;
+                color: $standard-light-text;
             }
             .commenters-avatars {
                 .User {
@@ -98,7 +97,7 @@
             }
             .commenters-label,
             .no-commenters-label {
-                color: #aaa;
+                color: $standard-light-text;
             }
         }
     }
