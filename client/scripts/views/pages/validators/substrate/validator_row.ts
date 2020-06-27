@@ -83,8 +83,8 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
       m('td.val-other', [
         formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
-        nominatorsList.length > 0 && [ '(',
-          m('a.val-nominators', {
+        nominatorsList.length > 0 && [
+          m('a.val-nominators.padding-left-2', {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
@@ -93,8 +93,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
                 data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
               });
             }
-          }, nominatorsList.length),
-          ')'],
+          }, `(${nominatorsList.length})`)],
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),

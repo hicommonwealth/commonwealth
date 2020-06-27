@@ -21,8 +21,6 @@ interface IPreHeaderState {
 }
 
 interface IPreHeaderAttrs {
-  nominationsHasChanged;
-  nominations;
   sender: SubstrateAccount;
 }
 const offence = {
@@ -51,24 +49,25 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   view: (vnode) => {
     const { validators, sessionInfo, annualPercentRate } = vnode.state.dynamic;
 
-    const { nominations, nominationsHasChanged, sender } = vnode.attrs;
+    const { sender } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
     let totalPercentage = 0;
     let totalValidators = 0;
     Object.entries(annualPercentRate).forEach(([key, value]) => {
-      if (value > 0) {
+      if (value > 0 && Number.isFinite(value)) {
         totalPercentage += value;
         totalValidators++;
       }
     });
     const apr = (totalPercentage / (totalValidators || 1)).toFixed(2);
-
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
       eraProgress, isEpoch } = sessionInfo;
+
     const nominators: string[] = [];
+    const nominations: SubstrateAccount[] = [];
     let elected: number = 0;
     let waiting: number = 0;
     let totalStaked = (app.chain as Substrate).chain.coins(0);
@@ -94,6 +93,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         const nominator = indv.who.toString();
         if (!nominators.includes(nominator)) {
           nominators.push(nominator);
+          nominations.push(indv.who);
         }
       });
       // count elected and waiting validators
@@ -118,7 +118,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
-          m('.preheader-item-text', `${nominators.length}`),
+          m('.preheader-item-text', `${nominations.length}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
@@ -191,10 +191,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             }, 'Claim'),
           ]),
         ]),
-        nominationsHasChanged && m('.validators-preheader-item', [
+        m('.validators-preheader-item', [
           m('h3', 'Update nominations'),
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary.update-nominations', {
+            m('a.btn.formular-button-primary', {
               class: app.user.activeAccount ? '' : 'disabled',
               href: '#',
               onclick: (e) => {
@@ -209,7 +209,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                   m.redraw();
                 });
               }
-            }, 'Update nominations'),
+            }, 'Update'),
           ]),
         ]),
       ])

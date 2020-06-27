@@ -50,9 +50,6 @@ export interface IValidatorPageState {
     validators: IValidators | { [address: string]: ICosmosValidator };
     lastHeader: HeaderExtended
   };
-  nominations: any[];
-  originalNominations: any[];
-  nominationsHasChanged: boolean;
   results: any[];
 }
 
@@ -95,18 +92,6 @@ export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiti
 };
 
 export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
-  oninit: (vnode) => {
-    vnode.state.nominations = [];
-    vnode.state.originalNominations = [];
-    vnode.state.nominationsHasChanged = false;
-  },
-  onupdate: (vnode) => {
-    vnode.state.nominationsHasChanged = !_.isEqual(
-      vnode.state.originalNominations.sort(),
-      vnode.state.nominations.sort()
-    );
-    if (vnode.state.nominationsHasChanged) m.redraw();
-  },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
@@ -129,21 +114,13 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     switch (app.chain.class) {
       case ChainClass.Edgeware:
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            nominations: vnode.state.nominations,
-            nominationsHasChanged: vnode.state.nominationsHasChanged
-          }),
+          m(SubstratePreHeader, { sender: app.user.activeAccount as SubstrateAccount }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
       case ChainClass.Kusama:
         vComponents = [
-          m(SubstratePreHeader, {
-            sender: app.user.activeAccount as SubstrateAccount,
-            nominations: vnode.state.nominations,
-            nominationsHasChanged: vnode.state.nominationsHasChanged
-          }),
+          m(SubstratePreHeader, { sender: app.user.activeAccount as SubstrateAccount }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
