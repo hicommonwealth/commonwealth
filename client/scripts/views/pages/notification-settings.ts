@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/substrate/types';
 import SubstrateTitlerFunc from 'events/substrate/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 
 const EmailPanel: m.Component<{}, { email: string, interval: string, updateIntervalMessage: string, }> = {

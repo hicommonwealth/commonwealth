@@ -4,7 +4,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
@@ -28,6 +28,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public signaling: EdgewareSignaling;
 
   public readonly webWallet: WebWalletController = new WebWalletController();
+  public readonly chainEntities = new ChainEntityController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
 

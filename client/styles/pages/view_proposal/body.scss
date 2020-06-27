@@ -1,17 +1,27 @@
 @import 'client/styles/shared';
-@import './index';
 
 .ProposalComment {
-    padding: $padding $gutter ($padding + 6px);
-    border-top: 1px solid #e7e7e7;
-    .comment-body-meta {
-        margin-bottom: 12px;
+    display: flex;
+    margin: 28px 0;
+    .comment-avatar {
+        padding-top: 10px;
+        padding-right: 18px;
+        min-width: 54px;
+    }
+    .comment-body {
+        flex: 1;
+    }
+    .comment-body-top {
+        padding-bottom: 12px;
+    }
+    .comment-body-bottom {
+        padding: 4px 0 2px;
     }
 }
 
 .ProposalComments {
     .threading-level {
-        margin-left: 36px;
+        margin-left: 54px;
     }
     .new-comment-child {
         margin-left: 36px;
@@ -24,47 +34,26 @@
     .ProposalBodyEdit,
     .ProposalBodyDelete,
     .ProposalBodyCancelEdit,
-    .ProposalBodySaveEdit,
-    .ProposalBodySpacer {
+    .ProposalBodySaveEdit {
         display: inline-block;
-        color: #888;
-        font-size: 14px;
+        color: $standard-light-text;
+        margin-right: $standard-meta-spacing;
         a:link,
         a:visited,
         .User a.user-display-name {
-            color: #888;
+            color: $standard-light-text;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
             }
         }
     }
-    .ProposalBodySpacer {
-        margin: 0 7px;
-    }
-    .ProposalBodyText,
-    .ProposalBodyAttachments,
-    .ProposalBodyEditor {
-    }
-
     .ProposalBodyReaction {
         margin-top: 18px;
     }
 }
 
-// .new-comment-error {
-//     @include error-text();
-//     margin: 20px 0 10px;
-// }
-// .comments-error {
-//     @include error-text();
-//     margin: 30px 0;
-// }
-
-//     .proposal-comment-text {
-//         word-break: break-word;
-//     }
-//     .proposal-comment-attachments {
-//         margin: 10px 0 20px;
-//         @include attachments;
-//     }
+.comments-error {
+    @include error-text();
+    margin: 30px 0;
+}

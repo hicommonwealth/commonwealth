@@ -7,7 +7,7 @@ import sleep from 'sleep-promise';
 
 import Subscriber from './subscriber';
 import Processor from './processor';
-import { IEventHandler, IEventSubscriber, IDisconnectedRange, CWEvent, SubscribeFunc } from '../interfaces';
+import { IDisconnectedRange, CWEvent, SubscribeFunc } from '../interfaces';
 import StorageFetcher from './storageFetcher';
 
 import { factory, formatFilename } from '../../logging';

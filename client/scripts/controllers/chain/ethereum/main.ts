@@ -6,6 +6,7 @@ import { IChainAdapter, ChainBase, ChainClass } from 'models';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import { setActiveAccount } from 'controllers/app/login';
+import ethers from 'ethers';
 
 // TODO: hook up underlyung functionality of this boilerplate
 //       (e.g., EthereumChain and EthereumAccount methods, etc.)
@@ -61,7 +62,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   }
 
   public async getEthersProvider() {
-    const provider = new (await import('ethers')).providers.Web3Provider(this.chain.api.currentProvider as any);
+    const provider = new ethers.providers.Web3Provider(this.chain.api.currentProvider as any);
     return provider;
   }
 }

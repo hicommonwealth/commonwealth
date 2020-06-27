@@ -16,6 +16,7 @@ const nodes = [
   [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
+  [ 'wss://rpc.polkadot.io', 'polkadot' ],
   // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
@@ -114,6 +115,24 @@ const resetServer = (models, closeMiddleware) => {
       active: true,
       type: 'chain',
     });
+    const polkadotLocal = await models.Chain.create({
+      id: 'polkadot-local',
+      network: 'polkadot',
+      symbol: 'DOT',
+      name: 'Polkadot Local',
+      icon_url: '/static/img/protocols/dot.png',
+      active: true,
+      type: 'chain',
+    });
+    const polkadotMain = await models.Chain.create({
+      id: 'polkadot',
+      network: 'polkadot',
+      symbol: 'DOT',
+      name: 'Polkadot',
+      icon_url: '/static/img/protocols/dot.png',
+      active: true,
+      type: 'chain',
+    });
     const atomLocal = await models.Chain.create({
       id: 'cosmos-local',
       network: 'cosmos',
@@ -156,15 +175,6 @@ const resetServer = (models, closeMiddleware) => {
       symbol: 'XTZ',
       name: 'Tezos',
       icon_url: '/static/img/protocols/xtz.png',
-      active: false,
-      type: 'chain',
-    });
-    const dot = await models.Chain.create({
-      id: 'polkadot',
-      network: 'polkadot',
-      symbol: 'DOT',
-      name: 'Polkadot',
-      icon_url: '/static/img/protocols/dot.png',
       active: false,
       type: 'chain',
     });
@@ -420,7 +430,7 @@ const resetServer = (models, closeMiddleware) => {
     });
   }).catch((error) => {
     closeMiddleware().then(() => {
-      log.error(error);
+      log.error(error.message);
       log.error('Error syncing db and initializing default models');
       process.exit(1);
     });
