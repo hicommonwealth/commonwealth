@@ -71,6 +71,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       : {};
 
     const nominatorsList = vnode.attrs.nominators;
+    const commission = vnode.attrs.commission || 0;
 
     return m('tr.ValidatorRow', [
       m('td.val-stash', m(Tooltip, { content: m(Identity, { stash: vnode.attrs.stash }),
@@ -95,7 +96,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
           }, nominatorsList.length),
           ')'],
       ]),
-      m('td.val-commission', `${vnode.attrs.commission?.toFixed(2)}%` || ' '),
+      m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
