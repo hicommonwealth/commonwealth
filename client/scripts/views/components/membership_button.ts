@@ -47,7 +47,6 @@ const MembershipButton: m.Component<{
       }
       app.user.deleteRole({ address: a, chain, community })
         .then(() => {
-          if (onMembershipChanged) onMembershipChanged(false);
           vnode.state.loading = false;
           m.redraw();
           // notify
@@ -96,6 +95,7 @@ const MembershipButton: m.Component<{
           }),
         ],
         menuAttrs: { size: 'sm' },
+        inline: true,
         trigger: m(Button, {
           class: 'MembershipButton',
           disabled: vnode.state.loading,

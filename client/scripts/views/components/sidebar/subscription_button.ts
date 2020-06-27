@@ -31,6 +31,7 @@ const SubscriptionButton = {
         },
         label: communitySubscription ? 'Turn off new thread notifications' : 'Turn on new thread notifications',
       }),
+      inline: true,
       trigger: m(Icon, { name: Icons.CHEVRON_DOWN, class: 'SubscriptionButton' }),
     });
   },

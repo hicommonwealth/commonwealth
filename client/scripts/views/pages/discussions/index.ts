@@ -155,11 +155,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         }
       }
 
-      return m('.discussions-main.empty-list', [
-        m(EmptyState, {
-          icon: Icons.LAYERS,
-          content: m('p', { style: 'color: #546e7b;' }, 'No threads found'),
-        })
+      return m('.discussions-main', [
+        m(EmptyChannelPlaceholder, { tagName: tag }),
       ]);
     };
 

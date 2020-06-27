@@ -1,0 +1,30 @@
+@import 'client/styles/shared';
+
+.TokenManagementModal {
+    .header {
+        background-color: #222;
+        color: white;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 32px;
+        font-size: 19px;
+        font-weight: 700;
+    }
+
+    .token-data-label {
+        margin: 10px 0 10px;
+        width: 100%;
+        border-radius: 5px;
+        color: #888;
+    }
+
+    .error {
+        @include error-text();
+        margin-bottom: 15px;
+    }
+
+    button {
+        margin-bottom: 5px;
+    }
+}

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { NotificationCategories } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,7 +66,14 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
   });
   if (!updatedCode) return next(new Error(Errors.CodeUpdateFailure));
 
-  return res.json({ status: 'Success', result: { updatedCode, role } });
+  const subscription = await models.Subscription.create({
+    subscriber_id: req.user.id,
+    category_id: NotificationCategories.NewThread,
+    object_id: community.id,
+    is_active: true,
+  });
+
+  return res.json({ status: 'Success', result: { updatedCode, role, subscription } });
 };
 
 export default acceptInvite;

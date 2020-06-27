@@ -1,0 +1,11 @@
+$icon-size: 20px;
+
+.ThreadCaratMenu {
+    svg {
+        height: $icon-size;
+        width: $icon-size;
+        min-width: $icon-size;
+        min-height: $icon-size;
+        stroke: #999;
+    }
+}

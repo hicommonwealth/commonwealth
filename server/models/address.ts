@@ -146,7 +146,7 @@ export default (
     }
 
     let isValid;
-    if (chain.network === 'edgeware' || chain.network === 'kusama') {
+    if (chain.network === 'edgeware' || chain.network === 'kusama' || chain.network === 'polkadot') {
       const address = decodeAddress(addressModel.address);
       const keyringOptions: KeyringOptions = { type: 'sr25519' };
       if (addressModel.keytype) {
@@ -160,6 +160,8 @@ export default (
         keyringOptions.ss58Format = 2;
       } else if (chain.network === 'edgeware') {
         keyringOptions.ss58Format = 7; // edgeware chain id
+      } else if (chain.network === 'polkadot') {
+        keyringOptions.ss58Format = 0;
       } else {
         keyringOptions.ss58Format = 42; // default chain id
       }
@@ -198,8 +200,8 @@ export default (
       // the account they registered with
       const generatedAddress = getCosmosAddress(pk);
       if (generatedAddress === addressModel.address) {
-        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), 'hex');
-        isValid = secp256k1.verify(signHash, signature, pk);
+        const signHash = Buffer.from(CryptoJS.SHA256(msg).toString(), `hex`);
+        isValid = secp256k1.ecdsaVerify(signHash, signature, pk);
       } else {
         isValid = false;
       }

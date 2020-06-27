@@ -174,25 +174,29 @@ const User : m.Component<IAttrs> = {
 
 export const UserBlock: m.Component<{
   user: Account<any>,
-  avatarSize?: number,
   hideIdentityIcon?: boolean,
   tooltip?: boolean,
-  showRole?: boolean
+  showRole?: boolean,
+  selected?: boolean,
+  compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, avatarSize, hideIdentityIcon, tooltip, showRole } = vnode.attrs;
+    const { user, hideIdentityIcon, tooltip, showRole, selected, compact } = vnode.attrs;
 
-    return m('.UserBlock', [
-      m('.profile-block-left', [
+    return m('.UserBlock', {
+      class: compact ? 'compact' : ''
+    }, [
+      m('.user-block-left', [
         m(User, {
           user,
           avatarOnly: true,
-          avatarSize: avatarSize || 36,
+          avatarSize: 28,
           tooltip,
         }),
+        m('.user-block-symbol', user.chain.symbol),
       ]),
-      m('.profile-block-right', [
-        m('.profile-block-name', [
+      m('.user-block-center', [
+        m('.user-block-name', [
           m(User, {
             user,
             hideAvatar: true,
@@ -201,12 +205,14 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m('.profile-block-address', {
+        m('.user-block-address', {
           class: user.profile?.address ? '' : 'no-address',
         }, [
           user.profile?.address && formatAddressShort(user.profile.address),
-          !app.chain && ` (${user.chain.id})`,
         ]),
+      ]),
+      m('.user-block-right', [
+        m('.user-block-selected', selected ? '✓' : ''),
       ]),
     ]);
   }

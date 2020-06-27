@@ -117,7 +117,7 @@ const FinishNearLogin: m.Component<{}, IState> = {
                 const chain = app.user.selectedNode
                   ? app.user.selectedNode.chain
                   : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-                updateActiveAddresses(chain, true);
+                updateActiveAddresses(chain);
               }
               setActiveAccount(acct, true);
             })

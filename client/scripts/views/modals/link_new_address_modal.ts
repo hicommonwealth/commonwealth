@@ -16,7 +16,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { EthereumAccount } from 'controllers/chain/ethereum/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
 import { Account, ChainBase, ChainNetwork } from 'models';
 
 import { ChainIcon } from 'views/components/chain_icon';
@@ -96,18 +96,19 @@ const accountVerifiedCallback = async (account, vnode) => {
     mixpanel.people.set({
       'Last Address Created': new Date().toISOString()
     });
+    notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalexit');
   } else {
     // log in as the new user
     await initAppState(false);
     // load addresses for the current chain/community
     if (app.community) {
-      updateActiveAddresses(undefined, true);
+      updateActiveAddresses(undefined);
     } else if (app.chain) {
       const chain = app.user.selectedNode
         ? app.user.selectedNode.chain
         : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-      updateActiveAddresses(chain, true);
+      updateActiveAddresses(chain);
     } else {
       notifyError('Signed in, but no chain or community found');
     }
@@ -192,7 +193,8 @@ const LinkNewAddressModal = {
             Object.entries(chains).map(([chain, nodeList] : [string, any]) => m('.chain-card', {
               class: (nodeList[0].chain.network === ChainNetwork.Cosmos
                       || nodeList[0].chain.network === ChainNetwork.Edgeware
-                      || nodeList[0].chain.network === ChainNetwork.Kusama) ? 'hidden-mobile' : '',
+                      || nodeList[0].chain.network === ChainNetwork.Kusama
+                      || nodeList[0].chain.network === ChainNetwork.Polkadot) ? 'hidden-mobile' : '',
               onclick: async (e) => {
                 e.preventDefault();
                 // Overwrite the current path to force a switch to another chain.
@@ -852,6 +854,7 @@ const LinkNewAddressModal = {
               canExit = true;
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
+              notifySuccess('Success!!');
             }
           }, 'Close'),
         ]),

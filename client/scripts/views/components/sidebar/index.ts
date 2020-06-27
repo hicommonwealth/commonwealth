@@ -23,7 +23,6 @@ import Edgeware from 'controllers/chain/edgeware/main';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { setActiveAccount } from 'controllers/app/login';
 
-import { getSelectableCommunities } from 'views/components/header/community_selector';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import AdminPanel from 'views/components/admin_panel';
 import AccountBalance from 'views/components/widgets/account_balance';
@@ -35,9 +34,10 @@ import SubscriptionButton from 'views/components/sidebar/subscription_button';
 // Moloch specific
 import UpdateDelegateModal from 'views/modals/update_delegate_modal';
 import RagequitModal from 'views/modals/ragequit_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
+import TokenManagementModal from 'views/modals/token_management_modal';
+import Moloch from 'client/scripts/controllers/chain/ethereum/moloch/adapter';
 
-const TagListings: m.Component<{}, { showMore: boolean }> = {
+const TagListings: m.Component<{}, {}> = {
   view: (vnode) => {
     const featuredTags = {};
     const otherTags = {};
@@ -71,16 +71,7 @@ const TagListings: m.Component<{}, { showMore: boolean }> = {
 
     return [
       m(List, featuredTagListing),
-      otherTagListing.length > 0 && [
-        vnode.state.showMore && m(List, { class: 'more-tags-list' }, otherTagListing),
-        m(ListItem, {
-          class: 'more-tags-toggle',
-          label: vnode.state.showMore ? 'Show less' : pluralize(otherTagListing.length, 'more tag'),
-          onclick: () => {
-            vnode.state.showMore = !vnode.state.showMore;
-          },
-        }),
-      ],
+      otherTagListing.length > 0 && m(List, { class: 'more-tags-list' }, otherTagListing),
     ];
   }
 };
@@ -119,12 +110,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain?.base === ChainBase.CosmosSDK)
       ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
+    const molochProposals = (app.chain?.class === ChainClass.Moloch)
+      ? (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed).length : 0;
+
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.base === ChainBase.Substrate
         || app.chain.class === ChainClass.Moloch);
-    const showMolochMenuOptions = app.chain?.class === ChainClass.Moloch;
+    const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as MolochMember)?.shares?.gtn(0);
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
@@ -150,27 +145,16 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
     }, (!app.community && !app.chain) ? [
       // no community
       m(List, { interactive: true }, [
-        m('h4', 'Commonwealth'),
-        app.isLoggedIn() && getSelectableCommunities().map((c: CommunityInfo | ChainInfo) => {
-          return m(ListItem, {
-            label: c.name,
-            onclick: (e) => m.route.set(`/${c.id}`),
-          });
-        }),
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
-          label: 'Notification Settings',
-          onclick: (e) => m.route.set('/notification-settings'),
-        }),
+        m('h4', 'Settings'),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER, }),
-          label: 'User Settings',
+          label: 'Settings',
           onclick: (e) => m.route.set('/settings'),
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.CHEVRONS_LEFT }),
-          label: 'Back to home',
-          onclick: (e) => m.route.set('/'),
+          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          label: 'Notifications',
+          onclick: (e) => m.route.set('/notification-settings'),
         }),
       ]),
     ] : [
@@ -186,21 +170,21 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         m(TagListings),
       ]),
       // proposals
-      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      hasProposals
         && m(List, { interactive: true }, [
           m('h4', 'Vote & Stake'),
-          // proposals (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && m(ListItem, {
-              active: onProposalPage(m.route.get()),
-              label: 'Proposals',
-              onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-              contentRight: [
-                allSubstrateGovernanceProposals > 0
-                  && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
-                cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
-              ],
-            }),
+          // proposals (substrate, cosmos, moloch only)
+          m(ListItem, {
+            active: onProposalPage(m.route.get()),
+            label: 'Proposals',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+            contentRight: [
+              allSubstrateGovernanceProposals > 0
+                && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+              cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
+              molochProposals > 0 && m(Tag, { rounded: true, label: molochProposals }),
+            ],
+          }),
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
@@ -217,30 +201,41 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           //     label: 'Validators',
           //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
           //   }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => {
               m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
             },
             label: 'New proposal',
             contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: UpdateDelegateModal,
+              data: {
+                account: activeAccount as MolochMember,
+                delegateKey: (activeAccount as MolochMember).delegateKey,
+              },
             }),
             label: 'Update delegate key',
             contentLeft: m(Icon, { name: Icons.KEY }),
           }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
               modal: RagequitModal,
+              data: { account: activeAccount as MolochMember },
             }),
             label: 'Rage quit',
             contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
             onclick: (e) => app.modals.create({
-              modal: TokenApprovalModal,
+              modal: TokenManagementModal,
+              data: {
+                account: activeAccount as MolochMember,
+                accounts: ((activeAccount as MolochMember).app.chain as Moloch).ethAccounts,
+                contractAddress: ((activeAccount as MolochMember).app.chain as Moloch).governance.api.contractAddress,
+                tokenAddress: ((activeAccount as MolochMember).app.chain as Moloch).governance.api.tokenContract.address,
+              }
             }),
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),
