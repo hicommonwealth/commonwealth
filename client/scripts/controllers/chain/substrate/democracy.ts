@@ -39,7 +39,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
     this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
       const constructorFunc = (e) => new SubstrateDemocracyReferendum(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

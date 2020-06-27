@@ -8,9 +8,7 @@ import app from 'state';
 import { Account, RoleInfo, RolePermission } from 'models';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
-import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
@@ -127,7 +125,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           fluid: true,
           disabled: vnode.state.loading,
           onclick: (e) => {
-            app.modals.create({ modal: LinkNewAddressModal });
+            app.modals.lazyCreate('link_new_address_modal');
           },
         }),
       ]),

@@ -80,8 +80,8 @@ export default class MolochGovernance extends ProposalModule<
     // fetch all proposals
     if (!this._useClientChainEntities) {
       console.log('Fetching moloch proposals from backend.');
-      await this.app.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
-      const entities = this.app.chainEntities.store.getByType(MolochEntityKind.Proposal);
+      await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+      const entities = this.app.chain.chainEntities.store.getByType(MolochEntityKind.Proposal);
       const constructorFunc = (e: ChainEntity) => new MolochProposal(this._Members, this, e);
       entities.map((p) => this._entityConstructor(constructorFunc, p));
     } else {
@@ -89,7 +89,7 @@ export default class MolochGovernance extends ProposalModule<
       const fetcher = new MolochStorageFetcher(api.Contract, 1, new EthDater((this.app.chain as Moloch).chain.api));
       const subscriber = new MolochEventSubscriber(api.Contract, this.app.chain.id);
       const processor = new MolochEventProcessor(api.Contract, 1);
-      await this.app.chainEntities.subscribeEntities(
+      await this.app.chain.chainEntities.subscribeEntities(
         this.app.chain,
         fetcher,
         subscriber,

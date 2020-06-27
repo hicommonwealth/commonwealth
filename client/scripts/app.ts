@@ -11,8 +11,7 @@ import { FocusManager } from 'construct-ui';
 import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout, LoadingLayout } from 'views/layout';
-import { ChainInfo, CommunityInfo, NodeInfo,
-  OffchainTag, ChainClass, ChainNetwork, NotificationCategory, Notification } from 'models';
+import { ChainInfo, CommunityInfo, NodeInfo, ChainNetwork, NotificationCategory, Notification } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
@@ -156,25 +155,53 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Initialize modules.
   if (n.chain.network === ChainNetwork.Edgeware) {
-    const Edgeware = (await import('./controllers/chain/edgeware/main')).default;
+    const Edgeware = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "edgeware-main" */
+      './controllers/chain/edgeware/main'
+    )).default;
     app.chain = new Edgeware(n, app);
   } else if (n.chain.network === ChainNetwork.Kusama) {
-    const Kusama = (await import('./controllers/chain/kusama/main')).default;
+    const Kusama = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kusama-main" */
+      './controllers/chain/kusama/main'
+    )).default;
     app.chain = new Kusama(n, app);
   } else if (n.chain.network === ChainNetwork.Polkadot) {
-    const Polkadot = (await import('./controllers/chain/polkadot/main')).default;
+    const Polkadot = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "kusama-main" */
+      './controllers/chain/polkadot/main'
+    )).default;
     app.chain = new Polkadot(n, app);
   } else if (n.chain.network === ChainNetwork.Cosmos) {
-    const Cosmos = (await import('./controllers/chain/cosmos/main')).default;
+    const Cosmos = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "cosmos-main" */
+      './controllers/chain/cosmos/main'
+    )).default;
     app.chain = new Cosmos(n, app);
   } else if (n.chain.network === ChainNetwork.Ethereum) {
-    const Ethereum = (await import('./controllers/chain/ethereum/main')).default;
+    const Ethereum = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "ethereum-main" */
+      './controllers/chain/ethereum/main'
+    )).default;
     app.chain = new Ethereum(n, app);
   } else if (n.chain.network === ChainNetwork.NEAR) {
-    const Near = (await import('./controllers/chain/near/main')).default;
+    const Near = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "near-main" */
+      './controllers/chain/near/main'
+    )).default;
     app.chain = new Near(n, app);
   } else if (n.chain.network === ChainNetwork.Moloch || n.chain.network === ChainNetwork.Metacartel) {
-    const Moloch = (await import('./controllers/chain/ethereum/moloch/adapter')).default;
+    const Moloch = (await import(
+      /* webpackMode: "lazy" */
+      /* webpackChunkName: "moloch-main" */
+      './controllers/chain/ethereum/moloch/adapter'
+    )).default;
     app.chain = new Moloch(n, app);
   } else {
     throw new Error('Invalid chain');
@@ -299,9 +326,13 @@ $(() => {
     wideLayout?: boolean;
   }
 
-  const importRoute = (module, attrs: RouteAttrs) => ({
-    onmatch: (args, path) => {
-      return module.then((p) => p.default);
+  const importRoute = (path, attrs: RouteAttrs) => ({
+    onmatch: () => {
+      return import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "route-[request]" */
+        `./${path}`
+      ).then((p) => p.default);
     },
     render: (vnode) => {
       const { scoped, wideLayout } = attrs;
@@ -325,54 +356,54 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute(import('views/pages/home'), { scoped: false, wideLayout: true }),
-    '/about':                    importRoute(import('views/pages/landing/about'), { scoped: false }),
-    '/terms':                    importRoute(import('views/pages/landing/terms'), { scoped: false }),
-    '/privacy':                  importRoute(import('views/pages/landing/privacy'), { scoped: false }),
+    '/':                         importRoute('views/pages/home', { scoped: false, wideLayout: true }),
+    '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
+    '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
+    '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
 
     // Login page
-    '/login':                    importRoute(import('views/pages/login'), { scoped: false }),
-    '/settings':                 importRoute(import('views/pages/settings'), { scoped: false }),
-    '/notifications':            importRoute(import('views/pages/notifications'), { scoped: false }),
-    '/notification-settings':    importRoute(import('views/pages/notification-settings'), { scoped: false }),
+    '/login':                    importRoute('views/pages/login', { scoped: false }),
+    '/settings':                 importRoute('views/pages/settings', { scoped: false }),
+    '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
+    '/notification-settings':    importRoute('views/pages/notification-settings', { scoped: false }),
 
     // Edgeware lockdrop
-    '/edgeware/unlock':          importRoute(import('views/pages/unlock_lockdrop'), { scoped: false }),
-    '/edgeware/stats':           importRoute(import('views/stats/edgeware'), { scoped: false }),
+    '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
+    '/edgeware/stats':           importRoute('views/stats/edgeware', { scoped: false }),
 
     // Chain pages
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute(import('views/pages/discussions'), { scoped: true }),
-    '/:scope/discussions/:tag': importRoute(import('views/pages/discussions'), { scoped: true }),
-    '/:scope/tags':              importRoute(import('views/pages/tags'), { scoped: true }),
-    '/:scope/members':           importRoute(import('views/pages/members'), { scoped: true }),
-    // '/:scope/chat':              importRoute(import('views/pages/chat'), { scoped: true }),
-    '/:scope/proposals':         importRoute(import('views/pages/proposals'), { scoped: true }),
-    '/:scope/proposal/:type/:identifier': importRoute(import('views/pages/view_proposal/index'), { scoped: true }),
-    '/:scope/council':           importRoute(import('views/pages/council'), { scoped: true }),
-    '/:scope/login':             importRoute(import('views/pages/login'), { scoped: true }),
-    '/:scope/new/thread':        importRoute(import('views/pages/new_thread'), { scoped: true }),
-    '/:scope/new/signaling':     importRoute(import('views/pages/new_signaling'), { scoped: true }),
-    '/:scope/new/proposal/:type': importRoute(import('views/pages/new_proposal/index'), { scoped: true }),
-    '/:scope/admin':             importRoute(import('views/pages/admin'), { scoped: true }),
-    '/:scope/settings':          importRoute(import('views/pages/settings'), { scoped: true }),
-    '/:scope/web3login':         importRoute(import('views/pages/web3login'), { scoped: true }),
+    '/:scope':                   importRoute('views/pages/discussions', { scoped: true }),
+    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true }),
+    '/:scope/tags':              importRoute('views/pages/tags', { scoped: true }),
+    '/:scope/members':           importRoute('views/pages/members', { scoped: true }),
+    // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
+    '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
+    '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
+    '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
+    '/:scope/login':             importRoute('views/pages/login', { scoped: true }),
+    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true }),
+    '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
+    '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
+    '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
+    '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
+    '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute(import('views/pages/profile'), { scoped: true }),
+    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.user.activeAccount)
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
-    // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
-    // '/:scope/validators':        importRoute(import('views/pages/validators'), { scoped: true }),
+    // '/:scope/questions':         importRoute('views/pages/questions', { scoped: true }),
+    // '/:scope/requests':          importRoute('views/pages/requests', { scoped: true }),
+    // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login
-    '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), { scoped: true }),
+    '/:scope/finishNearLogin':    importRoute('views/pages/finish_near_login', { scoped: true }),
   });
 
   // initialize construct-ui focus manager

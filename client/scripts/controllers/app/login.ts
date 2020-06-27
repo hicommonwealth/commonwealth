@@ -1,13 +1,10 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
-import SelectAddressModal from 'views/modals/select_address_modal';
 import {
   ChainInfo,
   SocialAccount,
@@ -23,7 +20,7 @@ function createAccount(account: Account<any>) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype: account.chainBase === ChainBase.Substrate
-      && (account as SubstrateAccount).isEd25519 ? 'ed25519' : undefined,
+      && (account as any).isEd25519 ? 'ed25519' : undefined,
     chain: account.chain.id,
     jwt: app.user.jwt,
   });
@@ -173,7 +170,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
     throw new Error('User with this seed already exists');
   }
 
-  const account = (app.chain.accounts as SubstrateAccounts).fromSeed(seed);
+  const account = (app.chain.accounts as any).fromSeed(seed);
   // Look for account with the same public key
   const existingUser = app.user.activeAccounts.find((user) => user.address === account.address);
   if (existingUser) {
@@ -187,7 +184,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
 }
 
 export async function createUserWithMnemonic(mnemonic: string): Promise<Account<any>> {
-  const account = (app.chain.accounts as SubstrateAccounts).fromMnemonic(mnemonic);
+  const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
   await account.validate();

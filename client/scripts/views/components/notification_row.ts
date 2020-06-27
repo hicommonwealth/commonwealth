@@ -2,19 +2,18 @@ import 'components/sidebar/notification_row.scss';
 
 import m from 'mithril';
 import moment from 'moment';
-import { ListItem } from 'construct-ui';
 
 import app from 'state';
-import { slugify } from 'helpers';
 import { NotificationCategories } from 'types';
 import { ProposalType } from 'identifiers';
 import { Notification, AddressInfo } from 'models';
-import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import { IPostNotificationData } from 'shared/types';
 
 import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted_text';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
+
 import { SubstrateEventChains } from '../../../../shared/events/substrate/types';
 import { MolochEventChains } from '../../../../shared/events/moloch/types';
 import labelSubstrateEvent from '../../../../shared/events/substrate/filters/labeler';
@@ -153,7 +152,12 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   });
 };
 
-const NotificationRow: m.Component<{ notifications: Notification[] }> = {
+const NotificationRow: m.Component<{ notifications: Notification[] }, {
+  startedLabelerLoad: boolean,
+  Labeler: any,
+  MolochTypes: any,
+  SubstrateTypes: any,
+}> = {
   view: (vnode) => {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
@@ -163,25 +167,47 @@ const NotificationRow: m.Component<{ notifications: Notification[] }> = {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
-      // use different labelers depending on chain
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
       let label;
-      if (SubstrateEventChains.includes(chainId)) {
-        label = labelSubstrateEvent(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else if (MolochEventChains.includes(chainId)) {
-        label = labelMolochEvent(
-          notification.chainEvent.blockNumber,
-          chainId,
-          notification.chainEvent.data,
-        );
-      } else {
-        throw new Error(`invalid notification chain: ${chainId}`);
+      if (!vnode.state.startedLabelerLoad) {
+        vnode.state.startedLabelerLoad = true;
+        Promise.all([
+          import(/* webpackMode: "lazy" */ '../../../../shared/events/substrate/filters/labeler'),
+          import(/* webpackMode: "lazy" */ '../../../../shared/events/moloch/filters/labeler'),
+          import(/* webpackMode: "lazy" */ '../../../../shared/events/substrate/types'),
+          import(/* webpackMode: "lazy" */ '../../../../shared/events/moloch/types'),
+        ]).then(([ SubstrateLabeler, MolochLabeler, SubstrateTypes, MolochTypes ]) => {
+          if (SubstrateTypes.SubstrateEventChains.includes(chainId)) {
+            label = SubstrateLabeler.default(
+              notification.chainEvent.blockNumber,
+              chainId,
+              notification.chainEvent.data,
+            );
+          } else if (MolochTypes.MolochEventChains.includes(chainId)) {
+            label = MolochLabeler.default(
+              notification.chainEvent.blockNumber,
+              chainId,
+              notification.chainEvent.data,
+            );
+          } else {
+            throw new Error(`invalid notification chain: ${chainId}`);
+          }
+          m.redraw();
+        });
       }
+
+      // loading dialogue on chain event notifications while waiting for imports
+      if (!label) {
+        return m('li.NotificationRow', {
+          class: notification.isRead ? '' : 'unread',
+        }, [
+          m('.comment-body', [
+            m('.comment-body-top', 'Loading...'),
+          ]),
+        ]);
+      }
+      // use different labelers depending on chain
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         onclick: async () => {

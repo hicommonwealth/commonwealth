@@ -3,16 +3,11 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link, formatAsTitleCase } from 'helpers';
+import { formatAddressShort, link } from 'helpers';
 import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
-import { Account, Profile, AddressInfo } from 'models';
-
-import { makeDynamicComponent } from 'models/mithril';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
-import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
+import { Account, AddressInfo, ChainBase } from 'models';
 
 interface IAttrs {
   user: Account<any> | AddressInfo;
@@ -26,58 +21,12 @@ interface IAttrs {
   showRole?: boolean;
 }
 
-export interface ISubstrateIdentityAttrs {
-  account: Account<any>;
-  linkify: boolean;
-  profile: Profile;
-  hideIdentityIcon: boolean; // only applies to substrate identities
+interface IState {
+  identityWidgetLoading: boolean;
+  IdentityWidget: any;
 }
 
-export interface ISubstrateIdentityState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
-}
-
-const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount)
-      ? (app.chain as Substrate).identities.get(attrs.account)
-      : null,
-  }),
-  view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
-    // return polkadot identity if possible
-    const identity = vnode.state.dynamic.identity;
-    const displayName = identity?.exists ? identity.username : undefined;
-    const quality = identity?.exists ? identity.quality : undefined;
-    if (displayName && quality) {
-      const name = [ displayName, m(`span.identity-icon${
-        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${quality === IdentityQuality.Good
-        ? '.green' : quality === IdentityQuality.Bad
-          ? '.red' : '.gray'}`) ];
-
-      return linkify
-        ? link(
-          'a.user-display-name.username.onchain-username',
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-          name
-        )
-        : m('a.user-display-name.username.onchain-username', name);
-    }
-
-    // return offchain name while identity is loading
-    return linkify
-      ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-        profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-        profile ? profile.displayName : '--',)
-      : m('a.user-display-name.username', profile ? profile.displayName : '--');
-  }
-});
-
-const User : m.Component<IAttrs> = {
+const User : m.Component<IAttrs, IState> = {
   view: (vnode) => {
     const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
@@ -87,6 +36,18 @@ const User : m.Component<IAttrs> = {
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
+
+    if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
+      vnode.state.identityWidgetLoading = true;
+      import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "substrate-identity-widget" */
+        './substrate_identity'
+      ).then((mod) => {
+        vnode.state.IdentityWidget = mod.default;
+        vnode.state.identityWidgetLoading = false;
+      });
+    }
 
     if (vnode.attrs.user instanceof AddressInfo) {
       const chainId = vnode.attrs.user.chain;
@@ -129,9 +90,9 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && app.chain?.loaded)
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
           // substrate name
-          ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
+          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link(`a.user-display-name${
@@ -155,8 +116,8 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && app.chain?.loaded)
-          ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
+          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
