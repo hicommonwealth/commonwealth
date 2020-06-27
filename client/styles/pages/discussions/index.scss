@@ -47,4 +47,12 @@
             width: -webkit-fill-available;
         }
     }
+
+    .infinite-scroll-spinner-wrap {
+        height: 70px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
