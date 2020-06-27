@@ -56,7 +56,7 @@ export interface IValidatorPageState {
   results: any[];
 }
 
-export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
+export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
@@ -66,7 +66,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
         m('table', [
           m('tr', [
             m('th', 'Nominator'),
-            m('th', vnode.attrs.waiting
+            m(`th${vnode.attrs.waiting
+              ? '.priority'
+              : '.amount'}`, vnode.attrs.waiting
               ? 'Priority'
               : 'Amount'),
           ]),
@@ -79,7 +81,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
                   this.trigger('modalexit');
                 }
               })),
-              m('td', vnode.attrs.waiting
+              m(`td${vnode.attrs.waiting
+                ? '.priority'
+                : '.amount'}`, vnode.attrs.waiting
                 ? n.balance
                 : formatCoin(n.balance, true)),
             ]);
@@ -157,7 +161,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage : m.Component = {
+const ValidatorPage: m.Component = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

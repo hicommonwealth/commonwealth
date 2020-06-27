@@ -33,9 +33,10 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
       : null;
     const nominatorsList = nominations[vnode.attrs.stash] || [];
 
-    return m('tr.ValidatorRow', [
-      m('td.val-stash', m(Tooltip, { content: m(Identity, { stash : vnode.attrs.stash }),
-        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+    return m(`tr.ValidatorRow${vnode.attrs.toBeElected ? '.waiting' : '.nextValidator'}`, [
+      m('td.val-stash-waiting', m(Tooltip, {
+        content: m(Identity, { stash : vnode.attrs.stash }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-nominations', [
         m('a.val-nominations', {
@@ -49,7 +50,7 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
           }
         }, pluralize(nominatorsList.length, 'Nomination')),
       ]),
-      m('td.val-commission', stakingInfo?.commission || ' '),
+      m('td.val-commission-waiting', stakingInfo?.commission || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
         isOnline: vnode.attrs.isOnline,

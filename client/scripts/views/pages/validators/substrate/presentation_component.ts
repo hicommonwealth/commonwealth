@@ -53,7 +53,9 @@ const model = {
 
 const PresentationComponent = (state, chain: Substrate) => {
   const validators = state.dynamic.validators;
-  if (!validators) return m(PageLoading, { message:'Loading Validators...' });
+
+  if (!validators)
+    return m(PageLoading, { message: 'Loading Validators...' });
 
   const lastHeaders = (app.chain.base === ChainBase.Substrate)
     ? (app.chain as Substrate).staking.lastHeaders
@@ -90,11 +92,11 @@ const PresentationComponent = (state, chain: Substrate) => {
             m(Icon, { name: model.sortIcon('exposure.total'),
               size: 'lg',
               onclick: () => model.changeSort('exposure.total') })),
-          m('th.val-total', 'Own Stake',
+          m('th.val-own', 'Own Stake',
             m(Icon, { name: model.sortIcon('exposure.own'),
               size: 'lg',
               onclick: () => model.changeSort('exposure.own') })),
-          m('th.val-total', 'Other Stake',
+          m('th.val-other', 'Other Stake',
             m(Icon, { name: model.sortIcon('otherTotal'),
               size: 'lg',
               onclick: () => model.changeSort('otherTotal') })),
@@ -145,9 +147,9 @@ const PresentationComponent = (state, chain: Substrate) => {
       name: 'Waiting Validators',
       content: m('table.validators-table', [
         m('tr.validators-heading', [
-          m('th.val-stash', 'Stash'),
-          m('th.val-points', 'Nominations'),
-          m('th.val-commission', 'Commission'),
+          m('th.val-stash-waiting', 'Stash'),
+          m('th.val-nominations', 'Nominations'),
+          m('th.val-waiting-commission', 'Commission'),
           m('th.val-action', ''),
         ]),
         waitingValidators.map((validator) => {
