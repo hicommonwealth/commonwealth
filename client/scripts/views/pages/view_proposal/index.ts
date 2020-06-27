@@ -151,6 +151,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state })
                 ],
             ],
+            inline: true,
             trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
           }),
           vnode.state.tagEditorIsOpen && proposal instanceof OffchainThread && m(TagEditor, {

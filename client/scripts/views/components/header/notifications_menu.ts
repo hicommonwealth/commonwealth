@@ -51,6 +51,7 @@ const NotificationsMenu: m.Component = {
         label: m('.notification-badge', unreadNotifications),
       }),
       position: 'bottom-end',
+      inline: true,
       closeOnContentClick: true,
       menuAttrs: {
         align: 'left',

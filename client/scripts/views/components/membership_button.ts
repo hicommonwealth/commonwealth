@@ -95,6 +95,7 @@ const MembershipButton: m.Component<{
           }),
         ],
         menuAttrs: { size: 'sm' },
+        inline: true,
         trigger: m(Button, {
           class: 'MembershipButton',
           disabled: vnode.state.loading,

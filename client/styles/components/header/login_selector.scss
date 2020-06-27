@@ -70,6 +70,15 @@
     }
 }
 
+.login-selector-hint-popover {
+    .cui-popover-content {
+        padding: 11px 16px;
+        font-size: 14px;
+        max-width: 165px;
+        text-align: center;
+    }
+}
+
 .login-selector-popover {
     .cui-popover-content {
         padding: 0;
