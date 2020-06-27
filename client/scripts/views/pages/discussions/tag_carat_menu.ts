@@ -34,6 +34,7 @@ const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> =
             }
           }),
         ],
+        inline: true,
         trigger: m(Icon, {
           name: Icons.CHEVRON_DOWN,
         }),

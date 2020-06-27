@@ -41,6 +41,27 @@ export const activeQuillEditorHasText = () => {
   return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1;
 };
 
+export const ProposalBodyAvatar: m.Component<{ comment: OffchainComment<any> }> = {
+  view: (vnode) => {
+    const { comment } = vnode.attrs;
+    if (!comment) return;
+    if (!comment.author) return;
+
+    const author : Account<any> = app.community
+      ? app.community.accounts.get(comment.author, comment.authorChain)
+      : app.chain.accounts.get(comment.author);
+
+    return m('.ProposalBodyAvatar', [
+      m(User, {
+        user: author,
+        tooltip: true,
+        avatarOnly: true,
+        avatarSize: 36,
+      }),
+    ]);
+  }
+};
+
 export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> = {
   view: (vnode) => {
     const { comment } = vnode.attrs;
@@ -56,6 +77,7 @@ export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> 
         user: author,
         tooltip: true,
         linkify: true,
+        hideAvatar: true,
       }),
     ]);
   }

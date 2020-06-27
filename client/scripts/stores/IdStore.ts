@@ -28,6 +28,7 @@ class IdStore<T extends IHasId> extends Store<T> {
   }
 
   public getById(id: number | string): T {
+    if (!id) return undefined;
     return this._storeId[id.toString()];
   }
 }

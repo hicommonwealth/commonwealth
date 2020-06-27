@@ -1,40 +1,13 @@
 import 'components/sidebar/index.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import _ from 'lodash';
-import mixpanel from 'mixpanel-browser';
-import {
-  List, ListItem, Icon, Icons, PopoverMenu, MenuItem, MenuDivider,
-  SelectList, Button, ButtonGroup, Tag, Menu, MenuHeading, Popover
-} from 'construct-ui';
+import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
 
-import app, { ApiStatus } from 'state';
-import { featherIcon, link, pluralize } from 'helpers';
-import { getProposalUrl } from 'shared/utils';
-import { IPostNotificationData, ICommunityNotificationData } from 'shared/types';
+import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase, Notification, ChainInfo, CommunityInfo } from 'models';
-import { OffchainCommunitiesStore } from 'stores';
-
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Edgeware from 'controllers/chain/edgeware/main';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import { setActiveAccount } from 'controllers/app/login';
-
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import { ChainClass, ChainBase } from 'models';
 import AdminPanel from 'views/components/admin_panel';
-import AccountBalance from 'views/components/widgets/account_balance';
-import Login from 'views/components/login';
-import CreateCommunityModal from 'views/modals/create_community_modal';
-import NewProposalPage from 'views/pages/new_proposal/index';
-import SubscriptionButton from 'views/components/sidebar/subscription_button';
-
-// Moloch specific
-import UpdateDelegateModal from 'views/modals/update_delegate_modal';
-import RagequitModal from 'views/modals/ragequit_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 const TagListings: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -75,7 +48,7 @@ const TagListings: m.Component<{}, {}> = {
   }
 };
 
-const Sidebar: m.Component<{ activeTag: string }, {}> = {
+const Sidebar: m.Component<{ activeTag: string }> = {
   view: (vnode) => {
     const { activeTag } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
@@ -89,32 +62,27 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         chains[n.chain.network] = [n];
       }
     });
-    const myChains = Object.entries(chains).filter(([c, nodeList]) => app.user.isMember({
-      chain: c,
-      account: app.user.activeAccount,
-    }));
-    const myCommunities = app.config.communities.getAll().filter((c) => app.user.isMember({
-      community: c.id,
-      account: app.user.activeAccount,
-    }));
 
     // sidebar menu
     const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
-      ? ((app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
-         + (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed).length
-         + (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed).length
-         + (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
+      ? ((app.chain as any).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
+        + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
+        + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
+        + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
     const edgewareSignalingProposals = (app.chain?.class === ChainClass.Edgeware)
-      ? (app.chain as Edgeware).signaling.store.getAll().filter((p) => !p.completed).length : 0;
+      ? (app.chain as any).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
     const cosmosGovernanceProposals = (app.chain?.base === ChainBase.CosmosSDK)
-      ? (app.chain as Cosmos).governance.store.getAll().filter((p) => !p.completed).length : 0;
+      ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
+    const molochProposals = (app.chain?.class === ChainClass.Moloch)
+      ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     const hasProposals = app.chain && !app.community && (
       app.chain.base === ChainBase.CosmosSDK
         || app.chain.base === ChainBase.Substrate
         || app.chain.class === ChainClass.Moloch);
-    const showMolochMenuOptions = app.chain?.class === ChainClass.Moloch;
+    const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
+    const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as any)?.shares?.gtn(0);
 
     const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
@@ -165,21 +133,21 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
         m(TagListings),
       ]),
       // proposals
-      (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate || showMolochMenuOptions)
+      hasProposals
         && m(List, { interactive: true }, [
           m('h4', 'Vote & Stake'),
-          // proposals (substrate and cosmos only)
-          !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate)
-            && m(ListItem, {
-              active: onProposalPage(m.route.get()),
-              label: 'Proposals',
-              onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
-              contentRight: [
-                allSubstrateGovernanceProposals > 0
-                  && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
-                cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
-              ],
-            }),
+          // proposals (substrate, cosmos, moloch only)
+          m(ListItem, {
+            active: onProposalPage(m.route.get()),
+            label: 'Proposals',
+            onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+            contentRight: [
+              allSubstrateGovernanceProposals > 0
+                && m(Tag, { rounded: true, label: allSubstrateGovernanceProposals }),
+              cosmosGovernanceProposals > 0 && m(Tag, { rounded: true, label: cosmosGovernanceProposals }),
+              molochProposals > 0 && m(Tag, { rounded: true, label: molochProposals }),
+            ],
+          }),
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
             && m(ListItem, {
@@ -196,30 +164,32 @@ const Sidebar: m.Component<{ activeTag: string }, {}> = {
           //     label: 'Validators',
           //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
           //   }),
-          showMolochMenuOptions && m(ListItem, {
+          showMolochMemberOptions && m(ListItem, {
             onclick: (e) => {
               m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });
             },
             label: 'New proposal',
             contentLeft: m(Icon, { name: Icons.FILE_PLUS }),
           }),
-          showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: UpdateDelegateModal,
+          showMolochMemberOptions && m(ListItem, {
+            onclick: (e) => app.modals.lazyCreate('update_delegate_modal', {
+              account: activeAccount,
+              delegateKey: (activeAccount as any).delegateKey,
             }),
             label: 'Update delegate key',
             contentLeft: m(Icon, { name: Icons.KEY }),
           }),
-          showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: RagequitModal,
-            }),
+          showMolochMemberOptions && m(ListItem, {
+            onclick: (e) => app.modals.lazyCreate('ragequit_modal', { account: activeAccount }),
             label: 'Rage quit',
             contentLeft: m(Icon, { name: Icons.FILE_MINUS }),
           }),
           showMolochMenuOptions && m(ListItem, {
-            onclick: (e) => app.modals.create({
-              modal: TokenApprovalModal,
+            onclick: (e) => app.modals.lazyCreate('token_management_modal', {
+              account: activeAccount,
+              accounts: ((activeAccount as any).app.chain as any).ethAccounts,
+              contractAddress: ((activeAccount as any).app.chain as any).governance.api.contractAddress,
+              tokenAddress: ((activeAccount as any).app.chain as any).governance.api.tokenContract.address,
             }),
             label: 'Approve tokens',
             contentLeft: m(Icon, { name: Icons.POWER }),

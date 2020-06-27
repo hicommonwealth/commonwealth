@@ -1,28 +1,19 @@
 import { ChainStore, OffchainCommunitiesStore, NodeStore } from 'stores';
 import {
-  NodeInfo,
-  AddressInfo,
-  RoleInfo,
-  SocialAccount,
-  OffchainTag,
   ContractCategory,
-  Account,
   IChainAdapter,
   ICommunityAdapter,
   NotificationCategory,
-  StarredCommunity,
 } from 'models';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { Subject, ReplaySubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import ReactionsController from './controllers/server/reactions';
-import NotificationsController from './controllers/server/notifications';
 import WebsocketController from './controllers/server/socket';
 import TagsController from './controllers/server/tags';
-import ChainEntityController from './controllers/server/chain_entities';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 
@@ -51,7 +42,6 @@ export interface IApp {
   threads: ThreadsController;
   reactions: ReactionsController;
   tags: TagsController;
-  chainEntities: ChainEntityController;
   communities: CommunitiesController;
   user: UserController;
   // XXX: replace this with some app.chain helper
@@ -93,7 +83,6 @@ const app: IApp = {
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
   tags: new TagsController(),
-  chainEntities: new ChainEntityController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 

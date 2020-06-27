@@ -120,40 +120,45 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
     return m('.CreateComment', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
-      m(User, { user: author, tooltip: true }),
-      m(QuillEditor, {
-        contentsDoc: '',
-        oncreateBind: (state) => {
-          vnode.state.quillEditorState = state;
-        },
-        editorNamespace: `${document.location.pathname}-commenting`,
-        onkeyboardSubmit: submitComment,
-        tabindex: vnode.attrs.tabindex,
-      }),
-      m('.form-bottom', [
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          compact: true,
-          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
-          onclick: submitComment,
-          label: (uploadsInProgress > 0)
-            ? 'Uploading...'
-            : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+      m('.create-comment-avatar', [
+        m(User, { user: author, tooltip: true, avatarOnly: true, avatarSize: 36 }),
+      ]),
+      m('.create-comment-body', [
+        m(User, { user: author, tooltip: true, hideAvatar: true }),
+        m(QuillEditor, {
+          contentsDoc: '',
+          oncreateBind: (state) => {
+            vnode.state.quillEditorState = state;
+          },
+          editorNamespace: `${document.location.pathname}-commenting`,
+          onkeyboardSubmit: submitComment,
+          tabindex: vnode.attrs.tabindex,
         }),
-        cancellable
-          && m(Button, {
-            intent: 'none',
-            type: 'cancel',
+        m('.form-bottom', [
+          m(Button, {
+            intent: 'primary',
+            type: 'submit',
             compact: true,
-            onclick: (e) => {
-              e.preventDefault();
-              getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-            },
-            label: 'Cancel'
+            disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+            onclick: submitComment,
+            label: (uploadsInProgress > 0)
+              ? 'Uploading...'
+              : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
           }),
-        error
-          && m('.new-comment-error', error),
+          cancellable
+            && m(Button, {
+              intent: 'none',
+              type: 'cancel',
+              compact: true,
+              onclick: (e) => {
+                e.preventDefault();
+                getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+              },
+              label: 'Cancel'
+            }),
+          error
+            && m('.new-comment-error', error),
+        ])
       ])
     ]);
   }

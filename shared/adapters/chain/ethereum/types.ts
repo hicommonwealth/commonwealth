@@ -11,9 +11,25 @@ export class EthereumCoin extends Coin {
   }
 }
 
+export class ERC20Token extends EthereumCoin {
+  public readonly contractAddress: string;
+
+  constructor(contractAddress: string, n: number | BN | MolochShares) {
+    super(`ERC20(${contractAddress.substr(0, 6)})`, n, false);
+    this.contractAddress = contractAddress;
+  }
+
+  public toString() {
+    return this.format();
+  }
+}
+
 export class MolochShares extends EthereumCoin {
-  constructor(n: number | BN | MolochShares) {
+  public readonly contractAddress: string;
+
+  constructor(contractAddress: string, n: number | BN | MolochShares) {
     super('Shares', n, false);
+    this.contractAddress = contractAddress;
   }
 
   public toString() {

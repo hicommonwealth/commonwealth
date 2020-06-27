@@ -5,6 +5,7 @@ import { WebsocketMessageType, IWebsocketsPayload } from 'types';
 import { clearLocalStorage } from 'stores/PersistentStore';
 
 import { CommentRefreshOption } from 'controllers/server/comments';
+import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { ChainBase, ChainClass } from './types';
 import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
@@ -16,6 +17,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract loaded: boolean;
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
+  public readonly chainEntities?: ChainEntityController;
 
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
@@ -29,23 +31,25 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       this.app.socket.addListener(
         WebsocketMessageType.ChainEntity,
         (payload: IWebsocketsPayload<any>) => {
-          if (payload
-            && payload.data
-            && payload.data.chainEntity.chain === this.meta.chain.id
-          ) {
-            const { chainEntity, chainEvent, chainEventType } = payload.data;
-
-            // add fake "include" for construction purposes
-            chainEvent.ChainEventType = chainEventType;
-            const eventModel = ChainEvent.fromJSON(chainEvent);
-
-            let existingEntity = this.app.chainEntities.store.get(chainEntity);
-            if (!existingEntity) {
-              existingEntity = ChainEntity.fromJSON(chainEntity);
-            }
-            this.app.chainEntities.update(existingEntity, eventModel);
-            this.handleEntityUpdate(existingEntity, eventModel);
+          if (!this.chainEntities) {
+            return;
           }
+          if (!payload || !payload.data || payload.data.chainEntity.chain !== this.meta.chain.id) {
+            return;
+          }
+
+          const { chainEntity, chainEvent, chainEventType } = payload.data;
+
+          // add fake "include" for construction purposes
+          chainEvent.ChainEventType = chainEventType;
+          const eventModel = ChainEvent.fromJSON(chainEvent);
+
+          let existingEntity = this.chainEntities.store.get(chainEntity);
+          if (!existingEntity) {
+            existingEntity = ChainEntity.fromJSON(chainEntity);
+          }
+          this.chainEntities.update(existingEntity, eventModel);
+          this.handleEntityUpdate(existingEntity, eventModel);
         }
       );
     }
@@ -54,7 +58,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public async init(
     onServerLoaded? : () => void,
     initChainModuleFn?: () => Promise<void>,
-    loadIncompleteEntities = false,
+    entityRefresh = EntityRefreshOption.CompletedEntities,
   ): Promise<void> {
     clearLocalStorage();
     await this.app.threads.refreshAll(this.id, null, true);
@@ -64,7 +68,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     await this.meta.chain.getAdminsAndMods(this.id);
 
     // if we're loading entities from chain, only pull completed
-    await this.app.chainEntities.refresh(this.meta.chain.id, loadIncompleteEntities);
+    if (this.chainEntities) {
+      await this.chainEntities.refresh(this.meta.chain.id, entityRefresh);
+    }
     this._serverLoaded = true;
     if (onServerLoaded) await onServerLoaded();
     await initChainModuleFn();
@@ -76,7 +82,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     this.app.threads.deinit();
     this.app.comments.deinit();
     this.app.reactions.deinit();
-    this.app.chainEntities.deinit();
+    if (this.chainEntities) {
+      this.chainEntities.deinit();
+    }
   }
 
   public abstract handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void;

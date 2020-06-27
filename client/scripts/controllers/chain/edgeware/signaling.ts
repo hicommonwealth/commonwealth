@@ -3,11 +3,11 @@ import { ApiRx } from '@polkadot/api';
 import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
-import { ProposalModule, ChainEntity, } from 'models';
+import { ProposalModule } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/edgeware/types';
+import { SubstrateEntityKind } from 'events/substrate/types';
 import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<
@@ -46,7 +46,7 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
+        const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
         const constructorFunc = (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
         this._initialized = true;
