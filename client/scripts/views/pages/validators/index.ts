@@ -53,7 +53,7 @@ export interface IValidatorPageState {
   results: any[];
 }
 
-export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
+export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [

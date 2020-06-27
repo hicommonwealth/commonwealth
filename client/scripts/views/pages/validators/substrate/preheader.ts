@@ -84,7 +84,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
 
     Object.entries(validators).forEach(([_stash, { exposure, isElected }]) => {
       const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn())
-        || (app.chain as Substrate).chain.coins(0);
+      || (app.chain as Substrate).chain.coins(0);
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
 
       // count total nominators

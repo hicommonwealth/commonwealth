@@ -29,7 +29,7 @@ const deleteAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.AddressNotFound));
   }
 
-  // TODO: Rmove Membership model
+  // TODO: Membership Membership removed
   // if (req.body.chain) {
   //   const existingMemberships = await models.Membership.findAll({
   //     where: { chain: req.body.chain, user_id: req.user.id, active: true }
