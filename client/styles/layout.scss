@@ -251,6 +251,10 @@ td, th {
 // TODO: move to construct.scss
 //
 
+.cui-portal {
+    z-index: 51;
+}
+
 // Small changes to input styles
 .cui-input input,
 .cui-input textarea {
