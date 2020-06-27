@@ -193,6 +193,7 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           tooltip,
         }),
+        m('.user-block-symbol', user.chain.symbol),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [
@@ -208,7 +209,6 @@ export const UserBlock: m.Component<{
           class: user.profile?.address ? '' : 'no-address',
         }, [
           user.profile?.address && formatAddressShort(user.profile.address),
-          !app.chain && ` (${user.chain.id})`,
         ]),
       ]),
       m('.user-block-right', [
