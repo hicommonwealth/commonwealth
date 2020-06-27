@@ -325,13 +325,13 @@
 // ----------------Waiting class styles
 // Column that shows nothing on waiting validators
 
-.waiting .val-im-online{
+.nextValidator .val-im-online{
     display: none !important;
 }
 
 
 
-.waiting td{
+.nextValidator td{
     background-color: #5b7af64d !important;
     padding-left: 10px !important;
 }
