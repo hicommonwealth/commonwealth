@@ -144,10 +144,10 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           currentBlock: formatNumber(currentEra)
         }),
         m('.validators-preheader-item', [
-          m('.validators-preheader-item', [
-            m('h3', 'APR'),
-            m('.preheader-item-text', `${apr}%`),
-          ]),
+          m('h3', 'APR'),
+          m('.preheader-item-text', `${apr}%`),
+        ]),
+        m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
           m('.preheader-item-text', totalbalance.format(true)),
         ]),
