@@ -210,7 +210,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: 'Manage addresses',
+              label: 'Add an existing address',
             }),
             m(MenuDivider),
           ],
