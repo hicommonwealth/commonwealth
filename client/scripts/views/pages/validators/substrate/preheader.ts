@@ -69,7 +69,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
 
     Object.entries(validators).forEach(([_stash, { exposure, isElected }]) => {
       const valStake = (app.chain as Substrate).chain.coins(exposure?.total.toBn())
-        || (app.chain as Substrate).chain.coins(0);
+      || (app.chain as Substrate).chain.coins(0);
       totalStaked = (app.chain as Substrate).chain.coins(totalStaked.asBN.add(valStake.asBN));
 
       // count total nominators
@@ -182,12 +182,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 createTXModal((nominations.length === 0)
                   ? sender.chillTx()
                   : sender.nominateTx(nominations)).then(() => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  }, (e) => {
-                    // vnode.attrs.sending = false;
-                    m.redraw();
-                  });
+                  // vnode.attrs.sending = false;
+                  m.redraw();
+                }, (e) => {
+                  // vnode.attrs.sending = false;
+                  m.redraw();
+                });
               }
             }, 'Update nominations'),
           ]),

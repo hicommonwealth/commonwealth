@@ -53,7 +53,7 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
           }
         }, pluralize(nominatorsList.length, 'Nomination')),
       ]),
-      m(`td.val-commission-waiting`, stakingInfo?.commission || ' '),
+      m('td.val-commission-waiting', stakingInfo?.commission || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
         isOnline: vnode.attrs.isOnline,

@@ -54,7 +54,7 @@ export interface IValidatorPageState {
   results: any[];
 }
 
-export const ViewNominatorsModal: m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
+export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
   view: (vnode) => {
     return m('.ViewNominatorsModal', [
       m('.compact-modal-title', [
@@ -159,7 +159,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage: m.Component = {
+const ValidatorPage : m.Component = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },
