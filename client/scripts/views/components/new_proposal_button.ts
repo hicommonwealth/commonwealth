@@ -1,3 +1,5 @@
+import 'components/new_proposal_button.scss';
+
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
