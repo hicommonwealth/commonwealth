@@ -295,7 +295,7 @@ class SubstrateStaking implements StorageModule {
       auditTime(100),
       map(([exposures, accounts, rewards, commissions ] :
         [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
-        // coins.div doesn't support fraction points. multiply and divide the same number will give fration points.
+        // coins.div don't support fraction points. multiply and divide the same number will give fraction points.
         const n = 100000;
         const EDG = 'edgeware';
         const validatorRewards: ICommissionInfo = {};
