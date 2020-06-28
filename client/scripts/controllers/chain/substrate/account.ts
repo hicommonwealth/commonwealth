@@ -455,7 +455,14 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       `${this.address} updates nominations`,
     );
   }
-
+  public nominateTrans(nominees: string[]) {
+    return this._Chain.createTXModalData(
+      this,
+      (api: ApiRx) => api.tx.staking.nominate(nominees.map((n) => n)),
+      'nominate',
+      `${this.address} updates nominations`,
+    );
+  }
   public chillTx() {
     return this._Chain.createTXModalData(
       this,

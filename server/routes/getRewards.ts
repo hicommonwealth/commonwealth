@@ -57,13 +57,15 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   let end = rewards[rewards.length - 1].created_at;
   start = moment(start);
   end = moment(end);
+  // number of days between last reward record and latest reward record through events to ChainEvents
   const daysDiff = end.diff(start, 'days');
   const validators: IReward = {};
 
   rewards.map((reward) => {
     const event_data: IEventData = reward.dataValues.event_data;
-    validators[event_data.validator] = validators[event_data.validator] || 0;
-    validators[event_data.validator] = +event_data.amount + validators[event_data.validator];
+    const key = event_data.validator || chain;
+    validators[key] = validators[key] || 0;
+    validators[key] = +event_data.amount + validators[key];
     return event_data;
   });
   // No rewards

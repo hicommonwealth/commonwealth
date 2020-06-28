@@ -261,14 +261,14 @@ class SubstrateStaking implements StorageModule {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
-        api.derive.staking.stashes(),
+        api.derive.staking.validators(),
         api.query.staking.currentEra(),
         from(this._app.chainEvents.rewards()),
         api.derive.staking.electedInfo()
       )),
       flatMap((
-        [api, allStashes, era, rewards, electedInfo]:
-        [ApiRx, AccountId[], EraIndex, IReward, DeriveStakingElected]
+        [api, { validators: currentSet }, era, rewards, electedInfo]:
+        [ApiRx, DeriveStakingValidators, EraIndex, IReward, DeriveStakingElected]
       ) => {
         const commission: ICommissionInfo = {};
 
@@ -286,8 +286,8 @@ class SubstrateStaking implements StorageModule {
           ? account
           : [era.toString(), account];
         return combineLatest(
-          stakersCall.multi(allStashes.map((elt) => stakersCallArgs(elt.toString()))),
-          of(allStashes),
+          stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
+          of(currentSet),
           of(rewards),
           of(commission)
         );
@@ -295,26 +295,31 @@ class SubstrateStaking implements StorageModule {
       auditTime(100),
       map(([exposures, accounts, rewards, commissions ] :
         [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
+        // coins.div doesn't support fraction points. multiply and divide the same number will give fration points.
         const n = 100000;
+        const EDG = 'edgeware';
         const validatorRewards: ICommissionInfo = {};
+        let accountsTotalStake = new BN(0);
 
         accounts.forEach((account, index) => {
           const key = account.toString();
           const exposure = exposures[index];
           let stakeShare = 0;
-          let othersStake = (this._app.chain as Substrate).chain.coins(0);
+          let othersStake: BN = new BN(0);
 
-          exposures[index].others.forEach((indv) => {
-            othersStake = (this._app.chain as Substrate).chain.coins(othersStake.asBN.add(indv.value.toBn()));
+          exposure.others.forEach((indv) => {
+            othersStake = othersStake.add(indv.value.toBn());
           });
-          othersStake = (this._app.chain as Substrate).chain.coins(othersStake.asBN.add(exposures[index].own.toBn()));
-          if (othersStake.gt((this._app.chain as Substrate).chain.coins(0))) {
-            stakeShare = exposures[index].own.toBn().muln(n).div(othersStake).toNumber() / n;
+          othersStake = othersStake.add(exposure.own.toBn());
+          if (othersStake.gt(new BN(0))) {
+            stakeShare = exposure.own.toBn().muln(n).div(othersStake).toNumber() / n;
           }
 
-          const totalStake = (this._app.chain as Substrate).chain.coins(exposure?.total.toBn())
-          || (this._app.chain as Substrate).chain.coins(0);
-          const totalReward: number = rewards.validators[key] || 0;
+          const totalStake = exposure?.total.toBn() || new BN(0);
+          const totalReward = rewards.validators[key] || 0;
+
+          accountsTotalStake = accountsTotalStake.add(totalStake);
+
           const commissionPercent: number = (commissions[key] || 0) / 100;
 
           let rewardEarn = totalReward * commissionPercent;
@@ -322,15 +327,28 @@ class SubstrateStaking implements StorageModule {
           rewardEarn += stakeShare * othersReward;
           let percentage = 0;
 
-          if (totalStake.gt((this._app.chain as Substrate).chain.coins(0))) {
+          if (totalStake.gt(new BN(0))) {
             const rewardBN = (this._app.chain as Substrate).chain.coins(rewardEarn);
+            const totalStakeBN = (this._app.chain as Substrate).chain.coins(totalStake);
             // Number can only safely store up to 53 bits for toNumber function.
-            percentage = +rewardBN.muln(n).div(totalStake).toString() / n;
+            percentage = +rewardBN.muln(n).div(totalStakeBN).toString() / n;
           }
-
-          validatorRewards[key] = ((percentage / rewards.daysDiff) * 365) / 100;
+          // rewards.daysDiff
+          // number of days between last reward record and latest reward record through events to ChainEvents
+          validatorRewards[key] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
         });
 
+        if (this._app.chain.id === EDG) {
+          let percentage = 0;
+          const rewardBN = (this._app.chain as Substrate).chain.coins(rewards.validators[EDG] || 0);
+          const totalStakeBN = (this._app.chain as Substrate).chain.coins(accountsTotalStake);
+
+          if (totalStakeBN.gt(new BN(0))) {
+            // Number can only safely store up to 53 bits for toNumber function.
+            percentage = +rewardBN.muln(n).div(totalStakeBN).toString() / n;
+          }
+          validatorRewards[EDG] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
+        }
         return validatorRewards;
       }),
     );

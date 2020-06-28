@@ -2,7 +2,8 @@ import m from 'mithril';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { ChainBase } from 'models';
-import {truncate} from 'lodash';
+import { truncate } from 'lodash';
+import { externalLink } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
 import { Icons, Icon } from 'construct-ui';
@@ -56,22 +57,22 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
         info.email
           && m('p', [
             m(Icon, { name: Icons.AT_SIGN, size: 'sm' }),
-            m('label', `  ${info.email}`)
+            m('label.left-5', externalLink('a', `mailto:${info.email}`, `${info.email}`))
           ]),
         info.web
           && m('p', [
             m(Icon, { name: Icons.GLOBE, size: 'sm' }),
-            m('label', `  ${info.web}`)
+            m('label.left-5', externalLink('a', info.web, info.web))
           ]),
         info.twitter
           && m('p', [
             m(Icon, { name: Icons.TWITTER, size: 'sm' }),
-            m('label', `  ${truncate(info.twitter)}`)
+            m('label.left-5', externalLink('a', `https://twitter.com/${info.twitter}`, truncate(info.twitter)))
           ]),
         info.riot
           && m('p', [
             m(Icon, { name: Icons.FIGMA, size: 'sm' }),
-            m('label', `  ${info.riot}`)
+            m('label.left-5', externalLink('a', `https://riot.im/app/#/user/${info.riot}`, info.riot))
           ]),
         m('p.User', [
           m(`span.identity-icon${clsName}`, ''),

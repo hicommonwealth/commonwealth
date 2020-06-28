@@ -67,7 +67,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
       eraProgress, isEpoch } = sessionInfo;
 
     const nominators: string[] = [];
-    const nominations: SubstrateAccount[] = [];
     let elected: number = 0;
     let waiting: number = 0;
     let totalStaked = (app.chain as Substrate).chain.coins(0);
@@ -93,7 +92,6 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         const nominator = indv.who.toString();
         if (!nominators.includes(nominator)) {
           nominators.push(nominator);
-          nominations.push(indv.who);
         }
       });
       // count elected and waiting validators
@@ -118,7 +116,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Nominators'),
-          m('.preheader-item-text', `${nominations.length}`),
+          m('.preheader-item-text', `${nominators.length}`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Offences'),
@@ -199,12 +197,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
-                createTXModal((nominations.length === 0)
+                createTXModal((nominators.length === 0)
                   ? sender.chillTx()
-                  : sender.nominateTx(nominations)).then(() => {
+                  : sender.nominateTrans(nominators)).then(() => {
                   // vnode.attrs.sending = false;
                   m.redraw();
-                }, (e) => {
+                }, () => {
                   // vnode.attrs.sending = false;
                   m.redraw();
                 });
