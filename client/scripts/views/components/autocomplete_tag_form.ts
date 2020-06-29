@@ -26,7 +26,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     if (activeTag) (vnode.state.selectedTag as any) = activeTag;
   },
   view: (vnode) => {
-    const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
+    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
 
     const itemRender = (tag) => {
       return m(ListItem, {
