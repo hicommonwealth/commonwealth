@@ -1,5 +1,6 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
+import nearlib from 'nearlib';
 
 import app from 'state';
 import { initAppState } from 'app';
@@ -98,48 +99,46 @@ const FinishNearLogin: m.Component<{}, IState> = {
     // TODO: share one wallet account across all actual accounts and swap out
     //   login data from localStorage as needed.
       vnode.state.validating = true;
-      (import('nearlib') as any).then((nearlib) => {
-        const wallet = new nearlib.WalletAccount((app.chain as Near).chain.api, null);
-        if (wallet.isSignedIn()) {
-          const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-          acct.updateKeypair().then((gotKeypair) => {
-            if (!gotKeypair) {
-              throw new Error('unable to fetch keypair from localStorage');
-            }
-            return createUserWithAddress(acct.address);
+      const wallet = new nearlib.WalletAccount((app.chain as Near).chain.api, null);
+      if (wallet.isSignedIn()) {
+        const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+        acct.updateKeypair().then((gotKeypair) => {
+          if (!gotKeypair) {
+            throw new Error('unable to fetch keypair from localStorage');
+          }
+          return createUserWithAddress(acct.address);
+        })
+          .then(() => {
+            return acct.validate();
           })
-            .then(() => {
-              return acct.validate();
-            })
-            .then(async () => {
-              if (!app.isLoggedIn()) {
-                await initAppState();
-                const chain = app.user.selectedNode
-                  ? app.user.selectedNode.chain
-                  : app.config.nodes.getByChain(app.activeChainId())[0].chain;
-                updateActiveAddresses(chain, true);
-              }
-              setActiveAccount(acct, true);
-            })
-            .then(() => {
-              vnode.state.validationCompleted = true;
-              vnode.state.validating = false;
-              vnode.state.validatedAccount = acct;
-              m.redraw();
-            })
-            .catch((err) => {
-              vnode.state.validationCompleted = true;
-              vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
-              vnode.state.validating = false;
-              m.redraw();
-            });
-        } else {
-          vnode.state.validationError = 'Sign-in failed.';
-          vnode.state.validating = false;
-          vnode.state.validationCompleted = true;
-          m.redraw();
-        }
-      });
+          .then(async () => {
+            if (!app.isLoggedIn()) {
+              await initAppState();
+              const chain = app.user.selectedNode
+                ? app.user.selectedNode.chain
+                : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+              updateActiveAddresses(chain);
+            }
+            setActiveAccount(acct, true);
+          })
+          .then(() => {
+            vnode.state.validationCompleted = true;
+            vnode.state.validating = false;
+            vnode.state.validatedAccount = acct;
+            m.redraw();
+          })
+          .catch((err) => {
+            vnode.state.validationCompleted = true;
+            vnode.state.validationError = err.responseJSON ? err.responseJSON.error : JSON.stringify(err);
+            vnode.state.validating = false;
+            m.redraw();
+          });
+      } else {
+        vnode.state.validationError = 'Sign-in failed.';
+        vnode.state.validating = false;
+        vnode.state.validationCompleted = true;
+        m.redraw();
+      }
     } else {
       // validation in progress
     }

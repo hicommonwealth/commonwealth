@@ -16,7 +16,7 @@ class ChainInfo {
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, chainObjectVersion?, adminsAndMods?) {
+  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, adminsAndMods?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -25,9 +25,9 @@ class ChainInfo {
     this.description = description;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
-    this.chainObjectId = chainObjectVersion && chainObjectVersion.id;
     this.adminsAndMods = adminsAndMods || [];
   }
+
   public static fromJSON(json) {
     return new ChainInfo(
       json.id,
@@ -38,7 +38,6 @@ class ChainInfo {
       json.description,
       json.featured_tags,
       json.tags,
-      json.ChainObjectVersion,
       json.adminsAndMods,
     );
   }

@@ -9,7 +9,6 @@ import { orderAccountsByAddress } from 'helpers';
 
 import User from 'views/components/widgets/user';
 import { CompactModalExitButton } from 'views/modal';
-import LinkNewAddressModal from './link_new_address_modal';
 
 const SideMenu: m.Component<{invites, onChangeHandler, location}, {}> = {
   view: (vnode) => {
@@ -101,8 +100,7 @@ const ConfirmInviteModal = {
                     app.user.acceptInvite({
                       address: vnode.state.selectedAddress,
                       inviteCode: invites[vnode.state.location].id
-                    })
-                    .then(() => {
+                    }).then(() => {
                       app.config.invites = app.config.invites.filter(
                         (invite) => invite.community_name !== invites[vnode.state.location].community_name
                       );
@@ -151,8 +149,8 @@ const ConfirmInviteModal = {
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
+                app.modals.lazyCreate('link_new_address_modal');
                 $(vnode.dom).trigger('modalexit');
-                app.modals.create({ modal: LinkNewAddressModal });
               }
             }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
           ],

@@ -12,10 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import {
-  SubstrateEventKind, ISubstrateDemocracyProposed,
-  SubstrateEntityKind, ISubstratePreimageNoted,
-} from 'events/edgeware/types';
+import { SubstrateEventKind, ISubstrateDemocracyProposed } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -112,7 +109,7 @@ class SubstrateDemocracyProposal extends Proposal<
     this.hash = eventData.proposalHash;
 
     // see if preimage exists and populate data if it does
-    const preimage = this._Proposals.app.chainEntities.getPreimage(eventData.proposalHash);
+    const preimage = this._Proposals.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._method = preimage.method;
       this._section = preimage.section;
@@ -145,7 +142,7 @@ class SubstrateDemocracyProposal extends Proposal<
         break;
       }
       case SubstrateEventKind.PreimageNoted: {
-        const preimage = this._Proposals.app.chainEntities.getPreimage(this.hash);
+        const preimage = this._Proposals.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._method = preimage.method;
           this._section = preimage.section;

@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import addChainObjectQueries from './addChainObjectQueries';
 import app from '../../server';
-import { SubstrateEventKinds } from '../../shared/events/edgeware/types';
+import { SubstrateEventKinds, SubstrateEventChains } from '../../shared/events/substrate/types';
+import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
 import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -16,6 +16,7 @@ const nodes = [
   [ 'ws://mainnet2.edgewa.re:9944', 'edgeware' ],
   // [ 'localhost:9944', 'kusama-local' ],
   [ 'wss://kusama-rpc.polkadot.io', 'kusama' ],
+  [ 'wss://rpc.polkadot.io', 'polkadot' ],
   // [ 'ws://127.0.0.1:7545', 'ethereum-local' ],
   // [ 'wss://mainnet.infura.io/ws', 'ethereum' ],
   // [ '18.223.143.102:9944', 'edgeware-testnet' ],
@@ -27,7 +28,7 @@ const nodes = [
   // [ 'cosmoshub1.commonwealth.im:26657', 'cosmos' ],
   [ 'http://localhost:3030', 'near-local' ],
   [ 'https://rpc.nearprotocol.com', 'near' ],
-  // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169a4f5c59acf79d0fd5d91d1201ef1bce9f1'],
+  [ 'wss://mainnet.infura.io/ws', 'moloch', '0x1fd169A4f5c59ACf79d0Fd5d91D1201EF1Bce9f1'],
   // [ 'wss://mainnet.infura.io/ws', 'metacartel', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'wss://mainnet.infura.io/ws', 'moloch', '0x0372f3696fa7dc99801f435fd6737e57818239f2'],
   // [ 'ws://127.0.0.1:9545', 'moloch-local', '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7'],
@@ -114,6 +115,24 @@ const resetServer = (models, closeMiddleware) => {
       active: true,
       type: 'chain',
     });
+    const polkadotLocal = await models.Chain.create({
+      id: 'polkadot-local',
+      network: 'polkadot',
+      symbol: 'DOT',
+      name: 'Polkadot Local',
+      icon_url: '/static/img/protocols/dot.png',
+      active: true,
+      type: 'chain',
+    });
+    const polkadotMain = await models.Chain.create({
+      id: 'polkadot',
+      network: 'polkadot',
+      symbol: 'DOT',
+      name: 'Polkadot',
+      icon_url: '/static/img/protocols/dot.png',
+      active: true,
+      type: 'chain',
+    });
     const atomLocal = await models.Chain.create({
       id: 'cosmos-local',
       network: 'cosmos',
@@ -156,15 +175,6 @@ const resetServer = (models, closeMiddleware) => {
       symbol: 'XTZ',
       name: 'Tezos',
       icon_url: '/static/img/protocols/xtz.png',
-      active: false,
-      type: 'chain',
-    });
-    const dot = await models.Chain.create({
-      id: 'polkadot',
-      network: 'polkadot',
-      symbol: 'DOT',
-      name: 'Polkadot',
-      icon_url: '/static/img/protocols/dot.png',
       active: false,
       type: 'chain',
     });
@@ -234,18 +244,11 @@ const resetServer = (models, closeMiddleware) => {
       type: 'dao',
     });
 
-    // add queries for daos
-    const molochQueries = (await import('../queries/moloch')).default;
-    await addChainObjectQueries(molochQueries, app, models);
-
-    const metacartelQueries = (await import('../queries/metacartel')).default;
-    await addChainObjectQueries(metacartelQueries, app, models);
-
     const molochLocal = await models.Chain.create({
       id: 'moloch-local',
       network: 'moloch',
       symbol: 'Moloch',
-      name: 'Moloch',
+      name: 'Moloch Local',
       icon_url: '/static/img/protocols/molochdao.png',
       active: true,
       type: 'dao',
@@ -394,15 +397,29 @@ const resetServer = (models, closeMiddleware) => {
 
     // initialize chain event types
     const initChainEventTypes = (chain) => {
-      return Promise.all(
-        SubstrateEventKinds.map((event_name) => {
-          return models.ChainEventType.create({
-            id: `${chain}-${event_name}`,
-            chain,
-            event_name,
-          });
-        })
-      );
+      if (SubstrateEventChains.includes(chain)) {
+        return Promise.all(
+          SubstrateEventKinds.map((event_name) => {
+            return models.ChainEventType.create({
+              id: `${chain}-${event_name}`,
+              chain,
+              event_name,
+            });
+          })
+        );
+      } else if (MolochEventChains.includes(chain)) {
+        return Promise.all(
+          MolochEventKinds.map((event_name) => {
+            return models.ChainEventType.create({
+              id: `${chain}-${event_name}`,
+              chain,
+              event_name,
+            });
+          })
+        );
+      } else {
+        log.error(`Unknown event chain at reset: ${chain}.`);
+      }
     };
 
     await Promise.all(EventSupportingChains.map((chain) => initChainEventTypes(chain)));
@@ -413,7 +430,7 @@ const resetServer = (models, closeMiddleware) => {
     });
   }).catch((error) => {
     closeMiddleware().then(() => {
-      log.error(error);
+      log.error(error.message);
       log.error('Error syncing db and initializing default models');
       process.exit(1);
     });

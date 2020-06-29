@@ -503,7 +503,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public unlockTx() {
-    if (this.chainClass !== ChainClass.Kusama) {
+    if (this.chainClass !== ChainClass.Kusama && this.chainClass !== ChainClass.Polkadot) {
       throw new Error('unlock only supported on Kusama');
     }
     return this._Chain.createTXModalData(

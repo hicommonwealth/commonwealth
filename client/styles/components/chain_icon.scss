@@ -1,11 +1,8 @@
-$icon-size: 32px;
 $icon-background: #111;
 $icon-text: #fff;
 
 .ChainIcon {
     img.chain-icon {
-        width: $icon-size;
-        height: $icon-size;
         border-radius: 9999px;
         background: $icon-background;
     }
@@ -16,17 +13,19 @@ $icon-text: #fff;
 
 .CommunityIcon {
     .community-icon {
-        width: $icon-size;
-        height: $icon-size;
         border-radius: 9999px;
         background: $icon-background;
-
-        // text
-        color: $icon-text;
-        text-align: center;
-        font-weight: 600;
-        font-size: 13px;
-        padding-top: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        span {
+            color: $icon-text;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            position: relative;
+            top: -1px;
+        }
     }
     &.onclick img.community-icon {
         cursor: pointer;

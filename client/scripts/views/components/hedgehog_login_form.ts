@@ -5,7 +5,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 import { createUserWithAddress } from 'controllers/app/login';
-import { EthereumAccount } from 'client/scripts/controllers/chain/ethereum/account';
+import EthereumAccount from 'client/scripts/controllers/chain/ethereum/account';
 
 const messages = {
   // signedIn: {

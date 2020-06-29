@@ -4,9 +4,9 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
+import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
 import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
-import { SubstrateEntityKind, SubstrateEventKind } from 'events/edgeware/types';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
@@ -28,6 +28,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public signaling: EdgewareSignaling;
 
   public readonly webWallet: WebWalletController = new WebWalletController();
+  public readonly chainEntities = new ChainEntityController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
 
@@ -76,7 +77,9 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
         typesAlias: { voting: { Tally: 'VotingTally' } },
       });
       await this.chain.initMetadata();
-    }, onServerLoaded, !useClientChainEntities);
+    }, onServerLoaded, useClientChainEntities
+      ? EntityRefreshOption.CompletedEntities
+      : EntityRefreshOption.AllEntities);
     await this.accounts.init(this.chain);
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
@@ -88,7 +91,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.signaling.init(this.chain, this.accounts),
     ]);
     if (useClientChainEntities) {
-      await this.chain.initChainEntities(this.meta.chain.id);
+      await this.chain.initChainEntities();
     }
     await this._postModuleLoad(!useClientChainEntities);
     await this.chain.initEventLoop();

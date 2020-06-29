@@ -8,7 +8,7 @@ import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import { CWEvent } from '../../../shared/events/interfaces';
-import { SubstrateEventKind } from '../../../shared/events/edgeware/types';
+import { SubstrateEventKind } from '../../../shared/events/substrate/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;
