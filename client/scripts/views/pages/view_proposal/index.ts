@@ -274,11 +274,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           //       parentState: vnode.state,
           //     }),
           //   ],
-
-          vnode.state.editing && [
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-          ],
         ]),
         m('.comment-body-content', [
           !vnode.state.editing

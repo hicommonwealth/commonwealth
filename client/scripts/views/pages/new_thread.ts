@@ -224,7 +224,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || sendingThread || uploadsInProgress > 0 ? 'disabled' : '',
+            class: !author || vnode.state.sendingThread || uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
               vnode.state.sendingThread = true;
