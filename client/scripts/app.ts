@@ -326,7 +326,7 @@ $(() => {
     deferChain?: boolean;
   }
 
-  const importRoute = (path, attrs: RouteAttrs) => ({
+  const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       return import(
         /* webpackMode: "lazy" */
@@ -335,7 +335,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, wideLayout, deferChain } = attrs;
+      const { scoped, wideLayout } = attrs;
+      let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -344,6 +345,13 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
+
+      // Special case to defer chain loading specifically for viewing an offchain thread. We need
+      // a special case because OffchainThreads and on-chain proposals are all viewed through the
+      // same "/:scope/proposal/:type/:id" route.
+      if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+        deferChain = true;
+      }
       return m(Layout, { scope, wideLayout, deferChain }, [ vnode ]);
     },
   });
@@ -377,14 +385,14 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/tags':              importRoute('views/pages/tags', { scoped: true }),
-    '/:scope/members':           importRoute('views/pages/members', { scoped: true }),
+    '/:scope/tags':              importRoute('views/pages/tags', { scoped: true, deferChain: true }),
+    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
-    '/:scope/login':             importRoute('views/pages/login', { scoped: true }),
-    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true }),
+    '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
+    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
