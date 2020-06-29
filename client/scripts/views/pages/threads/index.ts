@@ -63,6 +63,8 @@ export const newThread = (
     return ({ editor: NewThreadErrors.NoBody });
   }
 
+  quillEditorState.editor.enable(false);
+
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
@@ -108,6 +110,7 @@ export const newThread = (
       );
     } catch (e) {
       console.error(e);
+      quillEditorState.editor.enable();
       return ({ thread_creation: e });
     }
 

@@ -158,20 +158,14 @@ export const NewThreadForm: m.Component<{}, IState> = {
             name: 'submission',
             onclick: () => {
               vnode.state.sendingThread = true;
-              if (vnode.state.quillEditorState?.editor) {
-                vnode.state.quillEditorState.editor.enable(false);
-              }
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
               if (!Object.values(vnode.state.error).length) {
                 newLink(vnode.state.form, vnode.state.quillEditorState, author);
               }
+              vnode.state.sendingThread = false;
               if (!vnode.state.error) {
-                vnode.state.sendingThread = false;
-                if (vnode.state.quillEditorState?.editor) {
-                  vnode.state.quillEditorState.editor.enable();
-                }
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');
@@ -234,15 +228,9 @@ export const NewThreadForm: m.Component<{}, IState> = {
             intent: 'primary',
             onclick: () => {
               vnode.state.sendingThread = true;
-              if (vnode.state.quillEditorState?.editor) {
-                vnode.state.quillEditorState.editor.enable(false);
-              }
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              vnode.state.sendingThread = false;
               if (!vnode.state.error) {
-                vnode.state.sendingThread = false;
-                if (vnode.state.quillEditorState?.editor) {
-                  vnode.state.quillEditorState.editor.enable();
-                }
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
                   $(vnode.dom).trigger('modalexit');

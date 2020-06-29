@@ -89,7 +89,6 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         const res = await app.comments.create(author.address, rootProposal.uniqueIdentifier,
           chainId, communityId, commentText, parentComment?.id, attachments, mentions);
         callback();
-        console.log(res);
         if (vnode.state.quillEditorState.editor) {
           vnode.state.quillEditorState.editor.enable();
           vnode.state.quillEditorState.editor.setContents();
