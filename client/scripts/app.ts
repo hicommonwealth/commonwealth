@@ -78,6 +78,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 export async function deinitChainOrCommunity() {
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
+    app.chain.deinitServer();
     await app.chain.deinit();
     app.chain = null;
   }
@@ -149,11 +150,10 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   }
 
   // Shut down old chain if applicable
-  const oldNode = app.chain && app.chain.meta;
   await deinitChainOrCommunity();
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
-  // Initialize modules.
+  // Import top-level chain adapter lazily, to facilitate code split.
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
@@ -207,6 +207,20 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     throw new Error('Invalid chain');
   }
 
+  // Load server data without initializing modules/chain connection.
+  await app.chain.initServer();
+
+  // Redraw with not-yet-loaded chain
+  m.redraw();
+}
+
+
+// Initializes a selected chain. Requires `app.chain` to be defined and valid
+// and not already initialized.
+export async function initChain(): Promise<void> {
+  if (!app.chain || !app.chain.meta || app.chain.loaded) return;
+  const n = app.chain.meta;
+
   // Initialize the chain, providing an m.redraw() to a callback,
   // which is called before chain initialization finishes but after
   // the server is loaded. This allows the navbar/header to be redrawn
@@ -218,7 +232,7 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   // online before others. The solution should be to have some kind of
   // locking in place before modules start working.
   //
-  app.chain.init(() => m.redraw()).then(() => {
+  app.chain.init().then(() => {
     // Emit chain as updated
     app.chainAdapterReady.next(true);
     console.log(`${n.chain.network.toUpperCase()} started.`);
@@ -243,21 +257,6 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
 
   // Redraw with chain fully loaded
   m.redraw();
-}
-
-// called by the LayoutWithChain wrapper, which is triggered when the
-// user navigates to a page scoped to a particular chain
-export function initChain(chainId: string): Promise<void> {
-  if (chainId) {
-    const chainNodes = app.config.nodes.getByChain(chainId);
-    if (chainNodes && chainNodes.length > 0) {
-      return selectNode(chainNodes[0]);
-    } else {
-      throw new Error(`No nodes found for '${chainId}'`);
-    }
-  } else {
-    throw new Error(`No nodes found for '${chainId}'`);
-  }
 }
 
 export function initCommunity(communityId: string): Promise<void> {
@@ -324,6 +323,7 @@ $(() => {
   interface RouteAttrs {
     scoped: string | boolean;
     wideLayout?: boolean;
+    deferChain?: boolean;
   }
 
   const importRoute = (path, attrs: RouteAttrs) => ({
@@ -335,7 +335,7 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, wideLayout } = attrs;
+      const { scoped, wideLayout, deferChain } = attrs;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -344,7 +344,7 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      return m(Layout, { scope, wideLayout }, [ vnode ]);
+      return m(Layout, { scope, wideLayout, deferChain }, [ vnode ]);
     },
   });
 
@@ -375,8 +375,8 @@ $(() => {
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute('views/pages/discussions', { scoped: true }),
-    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true }),
+    '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/tags':              importRoute('views/pages/tags', { scoped: true }),
     '/:scope/members':           importRoute('views/pages/members', { scoped: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),

@@ -53,9 +53,8 @@ const User : m.Component<IAttrs, IState> = {
       const chainId = vnode.attrs.user.chain;
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
-      const chain = app.config.chains.getById(chainId);
       // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId) {
+      if (app.chain?.loaded && app.chain.id === chainId) {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);

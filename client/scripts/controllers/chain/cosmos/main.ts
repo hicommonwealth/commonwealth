@@ -18,15 +18,13 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     throw new Error('not implemented');
   }
 
-  public async init(onServerLoaded?) {
+  public async init() {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);
     this.governance = new CosmosGovernance(this.app);
 
-    await super.init(async () => {
-      await this.chain.init(this.meta);
-    }, onServerLoaded);
+    await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
     await this.governance.init(this.chain, this.accounts);
     await this._postModuleLoad();
@@ -35,8 +33,6 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
 
   public async deinit(): Promise<void> {
     this._loaded = false;
-    super.deinit();
-
     await this.governance.deinit();
     await this.accounts.deinit();
     await this.chain.deinit();

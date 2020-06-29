@@ -18,6 +18,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
+  public readonly usingServerChainEntities = false;
 
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
@@ -55,29 +56,24 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
   }
 
-  public async init(
-    onServerLoaded? : () => void,
-    initChainModuleFn?: () => Promise<void>,
-    entityRefresh = EntityRefreshOption.CompletedEntities,
-  ): Promise<void> {
+  public async initServer(): Promise<void> {
     clearLocalStorage();
     await this.app.threads.refreshAll(this.id, null, true);
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.ResetAndLoadOffchainComments);
     await this.app.reactions.refreshAll(this.id, null, true);
     await this.app.tags.refreshAll(this.id, null, true);
     await this.meta.chain.getAdminsAndMods(this.id);
-
     // if we're loading entities from chain, only pull completed
     if (this.chainEntities) {
-      await this.chainEntities.refresh(this.meta.chain.id, entityRefresh);
+      const refresh = this.usingServerChainEntities
+        ? EntityRefreshOption.AllEntities
+        : EntityRefreshOption.CompletedEntities;
+      await this.chainEntities.refresh(this.meta.chain.id, refresh);
     }
     this._serverLoaded = true;
-    if (onServerLoaded) await onServerLoaded();
-    await initChainModuleFn();
-    this.app.chainModuleReady.next(true);
   }
 
-  public async deinit(): Promise<void> {
+  public deinitServer() {
     this._serverLoaded = false;
     this.app.threads.deinit();
     this.app.comments.deinit();
@@ -86,6 +82,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       this.chainEntities.deinit();
     }
   }
+
+  public abstract init(): Promise<void>;
+  public abstract deinit(): Promise<void>;
 
   public abstract handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void;
 
