@@ -226,9 +226,9 @@ export const NewThreadForm: m.Component<{}, IState> = {
           m(Button, {
             class: !author || saving || uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
-            onclick: () => {
+            onclick: async () => {
               vnode.state.saving = true;
-              vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              vnode.state.error = await newThread(vnode.state.form, vnode.state.quillEditorState, author);
               vnode.state.saving = false;
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
