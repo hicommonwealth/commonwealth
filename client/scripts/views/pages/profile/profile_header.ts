@@ -3,27 +3,25 @@ import _ from 'lodash';
 import $ from 'jquery';
 import app from 'state';
 import * as clipboard from 'clipboard-polyfill';
-import { Registration, IdentityInfo } from '@polkadot/types/interfaces';
 import { Account, ChainBase } from 'models';
-import { of } from 'rxjs';
+import {Unsubscribable } from 'rxjs';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { formatAddressShort, link } from '../../../helpers';
+import { formatAddressShort } from '../../../helpers';
 import EditProfileModal from '../../modals/edit_profile_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import EditIdentityModal from '../../modals/edit_identity_modal';
-import { makeDynamicComponent } from '../../../models/mithril';
 import User from '../../components/widgets/user';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity | null) => {
+const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
   return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
-    // wait for info to load before making it clickable, if identity exists
-    class: !currentIdentity || !currentIdentity.exists || currentIdentity.info ? '' : 'disabled',
+    // wait for info to load before making it clickable
+    class: currentIdentity ? '' : 'disabled',
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
@@ -38,23 +36,21 @@ export interface IProfileHeaderAttrs {
 }
 
 export interface IProfileHeaderState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
+  subscription: Unsubscribable | null;
+  identity: SubstrateIdentity | null;
   copied: boolean;
 }
 
-const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderState>({
-  getObservables: (attrs) => ({
-    // if attrs.account loads later than the component, we need our group key to force an update
-    // to the observed values
-    groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount)
-      ? (app.chain as Substrate).identities.get(attrs.account)
-      : null,
-  }),
+const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const account: Account<any> = vnode.attrs.account;
+    const onOwnProfile = app.user.activeAccount && account.address === app.user.activeAccount.address;
+
+    // kick off identity subscription
+    if (onOwnProfile && app.chain.loaded && app.chain.base === ChainBase.Substrate && !vnode.state.subscription) {
+      vnode.state.subscription = (app.chain as Substrate).identities.get(account as SubstrateAccount)
+        .subscribe((identity) => { vnode.state.identity = identity; });
+    }
 
     return m('.ProfileHeader', [
       m('.cover'),
@@ -92,8 +88,8 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
         ]),
         // Add in identity actions here
         m('.bio-actions', [
-          (app.user.activeAccount && account.address === app.user.activeAccount.address) ? [
-            editIdentityAction(account, vnode.state.dynamic.identity),
+          onOwnProfile ? [
+            editIdentityAction(account, vnode.state.identity),
             m('button.formular-button-primary', {
               onclick: () => {
                 app.modals.create({
@@ -109,6 +105,6 @@ const ProfileHeader = makeDynamicComponent<IProfileHeaderAttrs, IProfileHeaderSt
       ])
     ]);
   }
-});
+};
 
 export default ProfileHeader;

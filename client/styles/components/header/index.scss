@@ -10,7 +10,7 @@
     border-top: 6px solid $theme-base-color;
     border-bottom: 1px solid #eee;
     box-shadow: 0 0 4px rgba(0,0,0,0.07);
-    z-index: 2;
+    z-index: 50;
     .header-content {
         margin: 0 auto;
         max-width: $sublayout-max-width;
@@ -21,53 +21,13 @@
         .header-breadcrumb {
             flex: 1;
         }
-        > .cui-button {
-            margin-left: $header-spacing;
-        }
-        > .cui-button-group {
+        > .cui-button,
+        > .cui-button-group,
+        > .CommunitySelector {
             margin-left: $header-spacing;
         }
         .cui-button-label {
             font-size: 104%;
-        }
-    }
-}
-
-// notifications menu (outside header, displayed in a cui-portal)
-.notification-menu {
-    .notification-list {
-        height: 480px;
-        background: #fff;
-        width: 340px;
-    }
-    .cui-menu {
-        max-width: 342px;
-        margin: 0;
-        padding: 0;
-        background: none;
-        overflow: hidden;
-    }
-    .cui-popover-arrow {
-        background: white;
-    }
-    .cui-list-item {
-        padding: 11px;
-    }
-    .no-notifications {
-        list-style: none;
-        text-align: center;
-        padding-top: 230px;
-        color: #546e7d;
-        font-weight: 600;
-    }
-    .NotificationButtons {
-        .cui-button {
-            margin: 0;
-            border-radius: 0;
-            border-top: 1px #d8dee0 solid;
-        }
-        .cui-button:nth-child(1) {
-            border-right: 1px #d8dee0 solid; 
         }
     }
 }

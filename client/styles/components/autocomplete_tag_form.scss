@@ -1,6 +1,9 @@
 @import 'client/styles/shared';
 
-.AutocompleteTagForm {
+.cui-popover.AutocompleteTagForm {
+    .cui-popover-content {
+        min-width: 200px;
+    }
     .featured-tag + .other-tag {
         border-top: 1px solid $theme-focus-border;
     }

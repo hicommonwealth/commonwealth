@@ -6,7 +6,7 @@ import _ from 'lodash';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import moment from 'moment-twitter';
-import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState } from 'construct-ui';
+import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { updateRoute } from 'app';
@@ -14,6 +14,7 @@ import { link, articlize } from 'helpers';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
+import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
@@ -23,26 +24,10 @@ import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 import TagCaratMenu from './tag_carat_menu';
 
-const CommunitySidebar: m.Component<{ tag?: string }> = {
+const CommunitySidebar: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
-    const { tag } = vnode.attrs;
+    const { communityName, communityDescription, tag } = vnode.attrs;
     if (!app.chain && !app.community) return;
-
-    const activeNode = app.chain?.meta;
-    const selectedNodes = app.config.nodes.getAll().filter((n) => {
-      return activeNode
-        && n.url === activeNode.url
-        && n.chain
-        && activeNode.chain
-        && n.chain.id === activeNode.chain.id;
-    });
-    const selectedNode = selectedNodes && selectedNodes[0];
-    const selectedCommunity = app.community;
-
-    const communityName = selectedNode
-      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
-    const communityDescription = selectedNode
-      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
 
     return m('.CommunitySidebar', [
       m(TagCaratMenu, { tag }),
@@ -94,6 +79,21 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     // add chain compatibility (node info?)
     if (!activeEntity?.serverLoaded) return m(PageLoading);
 
+    const { tag } = vnode.attrs;
+    const activeAddressInfo = app.user.activeAccount && app.user.addresses
+      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
+
+    const activeNode = app.chain?.meta;
+    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
+                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
+    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
+    const selectedCommunity = app.community;
+
+    const communityName = selectedNode
+      ? selectedNode.chain.name : selectedCommunity ? selectedCommunity.meta.name : '';
+    const communityDescription = selectedNode
+      ? selectedNode.chain.description : selectedCommunity ? selectedCommunity.meta.description : '';
+
     const allLastVisited = (typeof app.user.lastVisited === 'string')
       ? JSON.parse(app.user.lastVisited)
       : app.user.lastVisited;
@@ -112,7 +112,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
-    const getSingleTagListing = (tag) => {
+    const getSingleTagListing = (tag_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
           m(ProposalsLoadingRow),
@@ -127,7 +127,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.tag && thread.tag.name === tag)
+        .filter((thread) => thread.tag && thread.tag.name === tag_)
         .sort(orderDiscussionsbyLastComment);
 
       if (sortedThreads.length > 0) {
@@ -155,11 +155,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         }
       }
 
-      return m('.discussions-main.empty-list', [
-        m(EmptyState, {
-          icon: Icons.LAYERS,
-          content: m('p', { style: 'color: #546e7b;' }, 'No threads found'),
-        })
+      return m('.discussions-main', [
+        m(EmptyChannelPlaceholder, { tagName: tag }),
       ]);
     };
 
@@ -243,28 +240,22 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         // m(InlineThreadComposer),
         allProposals.length === 0
         && [
-          m('.no-threads', 'No threads'),
+          m(EmptyChannelPlaceholder, { communityName }),
         ],
         allProposals.length !== 0
-        && getRecentPostsSortedByWeek()
+        && getRecentPostsSortedByWeek(),
+        !vnode.state.postsDepleted
+        && m('.infinite-scroll-spinner-wrap', [
+          m(Spinner, {
+            active: !vnode.state.postsDepleted,
+          })
+        ])
       ]);
     };
 
-    const { tag } = vnode.attrs;
-    const activeAddressInfo = app.user.activeAccount && app.user.addresses
-      .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
-
-    const activeNode = app.chain?.meta;
-    const selectedNodes = app.config.nodes.getAll().filter((n) => activeNode && n.url === activeNode.url
-                                       && n.chain && activeNode.chain && n.chain.id === activeNode.chain.id);
-    const selectedNode = selectedNodes.length > 0 && selectedNodes[0];
-    const selectedCommunity = app.community;
-
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      rightSidebar: (app.chain || app.community) && [
-        tag ? m(CommunitySidebar, { tag }) : m(CommunitySidebar)
-      ],
+      rightSidebar: (app.chain || app.community) && m(CommunitySidebar, { communityName, communityDescription, tag })
     }, [
       (app.chain || app.community) && [
         tag

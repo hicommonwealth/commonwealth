@@ -52,8 +52,11 @@ describe('Roles Test', () => {
           address_id: user.address_id,
         });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.address_id).to.be.equal(user.address_id);
-      expect(res.body.result.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.newRole.address_id).to.be.equal(user.address_id);
+      expect(res.body.result.newRole.offchain_community_id).to.be.equal(community);
+      expect(res.body.result.subscription).to.not.be.null;
+      expect(res.body.result.subscription.object_id).to.be.equal(community);
+      expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
     });
 
     it('should fail to create duplicate role for a public community a user is a member of', async () => {

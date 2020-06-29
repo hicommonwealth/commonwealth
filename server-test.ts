@@ -10,23 +10,19 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SESSION_SECRET, QUERY_URL_OVERRIDE } from './server/config';
+import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
-import ChainObjectFetcher from './server/util/chainObjectFetcher';
 import ViewCountCache from './server/util/viewCountCache';
-import { SubstrateEventKinds } from './shared/events/edgeware/types';
+import { SubstrateEventKinds } from './shared/events/substrate/types';
 
 require('express-async-errors');
 
-const FETCH_INTERVAL_MS = +process.env.FETCH_INTERVAL_MS || 600000; // default fetch interval is 10min
-
 const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
-const fetcher = new ChainObjectFetcher(models, FETCH_INTERVAL_MS, QUERY_URL_OVERRIDE);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
@@ -241,7 +237,7 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, fetcher, viewCountCache);
+setupAPI(app, models, viewCountCache);
 setupErrorHandlers();
 setupServer();
 

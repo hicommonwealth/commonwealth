@@ -96,7 +96,7 @@ export default class {
     this._roles.push(role);
   }
   public removeRole(predicate: (r) => boolean): void {
-    const index = this.roles.findIndex(predicate)
+    const index = this.roles.findIndex(predicate);
     if (index !== -1) this._roles.splice(index, 1);
   }
 
@@ -129,8 +129,9 @@ export default class {
       if (res.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${res.status}`);
       } else {
-        // TODO: Ensure setSelectedNode is called with the right arg
-        this.setSelectedNode(NodeInfo.fromJSON(res.result));
+        const node = app.config.nodes.getAll().find((n) => n.url === options.url && n.chain.id === options.chain);
+        if (!node) throw new Error('unexpected node');
+        this.setSelectedNode(node);
       }
     }).catch((e) => console.error('Failed to select node on server'));
   }

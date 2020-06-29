@@ -32,8 +32,6 @@ const SettingsPage: m.Component<{}> = {
           m('br'),
           m(SettingsWell),
           m('br'),
-          m(AccountsWell),
-          m('br'),
           !app.community && app.user.activeAccount && app.user.activeAccount instanceof SubstrateAccount
             && m(SendEDGWell, { sender: app.user.activeAccount }),
         ])

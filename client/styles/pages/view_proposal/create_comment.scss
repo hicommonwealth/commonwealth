@@ -2,13 +2,19 @@
 @import './index';
 
 .CreateComment {
-    padding: $padding $gutter ($padding + 6px);
-    border-top: 1px solid #e7e7e7;
-
+    display: flex;
+    margin-top: 28px;
+    .create-comment-avatar {
+        padding-top: 10px;
+        padding-right: 18px;
+    }
+    .create-comment-body {
+        flex: 1;
+    }
     .User {
         font-size: 14px;
-    }
-    .User .user-display-name {
+        .user-display-name {
+        }
     }
 
     .QuillEditor {
@@ -22,7 +28,7 @@
         }
     }
     .new-comment-error {
-        color: $error-red;
-        font-weight: 700;
+        @include error-text;
+        margin: 20px 0 10px;
     }
 }

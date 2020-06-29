@@ -19,6 +19,7 @@ export enum ChainBase {
 export enum ChainNetwork {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
+  Polkadot = 'polkadot',
   Cosmos = 'cosmos',
   Ethereum = 'ethereum',
   NEAR = 'near',
@@ -29,6 +30,7 @@ export enum ChainNetwork {
 export enum ChainClass {
   Edgeware = 'edgeware',
   Kusama = 'kusama',
+  Polkadot = 'polkadot',
   Supernova = 'supernova',
   CosmosHub = 'cosmos-hub',
   Gaia13k = 'gaia-13k',
