@@ -143,13 +143,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 transitionDuration: 0,
                 trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
               })],
-
-          vnode.state.editing && [
-            m(ProposalHeaderSpacer),
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-            m(ProposalHeaderSpacer),
-            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-          ],
         ] : [
           m(ProposalHeaderOnchainId, { proposal }),
           m(ProposalHeaderOnchainStatus, { proposal }),
@@ -168,9 +161,16 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           vnode.state.editing
             && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
         ]),
-        m('.proposal-body-reactions', [
-          m(ProposalBodyReaction, { item: proposal }),
-        ]),
+        m('.proposal-body-actions', [
+          m('.proposal-body-reactions', [
+            m(ProposalBodyReaction, { item: proposal }),
+          ]),
+          vnode.state.editing
+          && m('.proposal-body-button-group', [
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+          ]),
+        ])
       ]),
     ]);
   }
@@ -422,7 +422,18 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, { editing: boolean, replyParent: number | boolean, highlightedComment: boolean, commentsPrefetchStarted: boolean, comments, viewCountPrefetchStarted: boolean, viewCount: number, profilesPrefetchStarted: boolean }> = {
+const ViewProposalPage: m.Component<{
+  identifier: string,
+  type: string
+}, {
+  editing: boolean,
+  replyParent: number | boolean,
+  highlightedComment: boolean,
+  commentsPrefetchStarted: boolean,
+  comments, viewCountPrefetchStarted: boolean,
+  viewCount: number,
+  profilesPrefetchStarted: boolean
+} > = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
     mixpanel.track('Proposal Funnel', {
