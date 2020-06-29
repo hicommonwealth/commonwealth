@@ -27,7 +27,7 @@ interface IState {
   hasComment,
   newType,
   quillEditorState,
-  sendingThread;
+  saving;
   uploadsInProgress,
 }
 
@@ -86,7 +86,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
-    const { hasComment, newType, sendingThread, uploadsInProgress } = vnode.state;
+    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -152,19 +152,19 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || sendingThread ? 'disabled' : '',
+            class: !author || saving ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
             name: 'submission',
             onclick: () => {
-              vnode.state.sendingThread = true;
+              vnode.state.saving = true;
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
               if (!Object.values(vnode.state.error).length) {
                 newLink(vnode.state.form, vnode.state.quillEditorState, author);
               }
-              vnode.state.sendingThread = false;
+              vnode.state.saving = false;
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
@@ -224,12 +224,12 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || sendingThread || uploadsInProgress > 0 ? 'disabled' : '',
+            class: !author || saving || uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
             onclick: () => {
-              vnode.state.sendingThread = true;
+              vnode.state.saving = true;
               vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
-              vnode.state.sendingThread = false;
+              vnode.state.saving = false;
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
