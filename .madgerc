@@ -1,0 +1,10 @@
+{
+  "tsConfig": "./tsconfig.json",
+  "webpackConfig": "./webpack/webpack.config.dev.js",
+  "includeNpm": true,
+	"graphVizOptions": {
+		"G": {
+			"rankdir": "LR"
+		}
+	}
+}

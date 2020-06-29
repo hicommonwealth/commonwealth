@@ -2,6 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { SERVER_URL, SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { DynamicTemplate } from '../../shared/types';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
@@ -43,6 +44,12 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
     });
   }
 
+  const previousUser = await models.User.findOne({
+    where: {
+      email,
+    },
+  });
+
   // create and email the token
   const path = req.body.path;
   const tokenObj = await models.LoginToken.createForEmail(email, path);
@@ -50,7 +57,7 @@ const startEmailLogin = async (models, req: Request, res: Response, next: NextFu
   const msg = {
     to: email,
     from: 'Commonwealth <no-reply@commonwealth.im>',
-    templateId: 'd-2b00abbf123e4b5981784d17151e86be',
+    templateId: (previousUser) ? DynamicTemplate.SignIn : DynamicTemplate.SignUp,
     dynamic_template_data: {
       loginLink,
     },

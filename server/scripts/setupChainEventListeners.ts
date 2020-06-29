@@ -1,10 +1,17 @@
 import WebSocket from 'ws';
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
-import EdgewareMigrationHandler from '../eventHandlers/edgeware/migration';
-import EdgewareEntityArchivalHandler from '../eventHandlers/edgeware/entityArchival';
-import subscribeEdgewareEvents from '../../shared/events/edgeware/index';
-import { IDisconnectedRange, EventSupportingChains, IEventHandler } from '../../shared/events/interfaces';
+import MigrationHandler from '../eventHandlers/migration';
+import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import subscribeSubstrateEvents, {
+  createSubstrateProvider, createSubstrateApi
+} from '../../shared/events/substrate/index';
+import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
+import {
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
+} from '../../shared/events/interfaces';
+import { SubstrateEventChains } from '../../shared/events/substrate/types';
+import { MolochEventChains } from '../../shared/events/moloch/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,7 +19,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const discoverReconnectRange = async (models, chain: string): Promise<IDisconnectedRange> => {
   const lastChainEvent = await models.ChainEvent.findAll({
     limit: 1,
-    order: [ [ 'created_at', 'DESC' ]],
+    order: [ [ 'block_number', 'DESC' ]],
     // this $...$ queries the data inside the include (ChainEvents don't have `chain` but ChainEventTypes do)...
     // we might be able to replicate this behavior with where and required: true inside the include
     where: {
@@ -43,34 +50,46 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
     .filter((node) => (!migrate || migrate === 'all') ? true : node.chain === migrate)
     .map(async (node) => {
       const handlers: IEventHandler[] = [];
+      const storageHandler = new EventStorageHandler(models, node.chain);
+      const notificationHandler = new EventNotificationHandler(models, wss);
+      const migrationHandler = new MigrationHandler(models, node.chain);
+      const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+
+      // handlers are run in order, so if migrating, we run migration -> entityArchival,
+      // but normally it's storage -> notification -> entityArchival
       if (migrate) {
-        const migrationHandler = new EdgewareMigrationHandler(models, node.chain);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain);
         handlers.push(migrationHandler, entityArchivalHandler);
       } else {
-        const storageHandler = new EventStorageHandler(models, node.chain);
-        const notificationHandler = new EventNotificationHandler(models, wss);
-        const entityArchivalHandler = new EdgewareEntityArchivalHandler(models, node.chain, wss);
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
-      let url: string = node.url;
-      if (node.chain === 'edgeware') {
-        // must be ws
-        const urlNoProtocol = url.replace(/ws?s:\/\//, '');
-        url = `ws://${urlNoProtocol}`;
-      } else if (node.chain === 'kusama') {
-        // requires wss and no port
-        const urlPath = url.replace(/^ws?s:\/\//, '').replace(/:[0-9]*$/, '');
-        url = `wss://${urlPath}`;
+      let subscriber: IEventSubscriber<any, any>;
+      if (SubstrateEventChains.includes(node.chain)) {
+        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
+        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
+        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
+        const url = protocol + node.url;
+        const provider = await createSubstrateProvider(url);
+        const api = await createSubstrateApi(provider, node.chain.startsWith('edgeware')).isReady;
+        subscriber = await subscribeSubstrateEvents({
+          chain: node.chain,
+          handlers,
+          skipCatchup,
+          discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+          performMigration: !!migrate,
+          api,
+        });
+      } else if (MolochEventChains.includes(node.chain)) {
+        const contractVersion = 1;
+        const api = await createMolochApi(node.url, contractVersion, node.address);
+        subscriber = await subscribeMolochEvents({
+          chain: node.chain,
+          handlers,
+          skipCatchup,
+          discoverReconnectRange: () => discoverReconnectRange(models, node.chain),
+          api,
+          contractVersion,
+        });
       }
-      const subscriber = await subscribeEdgewareEvents(
-        node.chain,
-        url,
-        handlers,
-        skipCatchup,
-        () => discoverReconnectRange(models, node.chain),
-        !!migrate,
-      );
 
       // hook for clean exit
       process.on('SIGTERM', () => {

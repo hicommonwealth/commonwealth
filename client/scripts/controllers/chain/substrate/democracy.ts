@@ -1,9 +1,9 @@
 import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
-import { Vote as SrmlVote, BlockNumber } from '@polkadot/types/interfaces';
+import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ITXModalData, ProposalModule, ChainEntity } from 'models';
-import { SubstrateEntityKind } from 'events/edgeware/types';
+import { ITXModalData, ProposalModule } from 'models';
+import { SubstrateEntityKind } from 'events/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
@@ -39,7 +39,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
     this._useRedesignLogic = useRedesignLogic;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.DemocracyReferendum);
       const constructorFunc = (e) => new SubstrateDemocracyReferendum(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

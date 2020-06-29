@@ -5,19 +5,13 @@ import _ from 'lodash';
 import app from 'state';
 import { Button } from 'construct-ui';
 
-import { formatCoin, Coin } from 'adapters/currency';
 import { orderAccountsByAddress, link } from 'helpers';
 import { unlinkLogin } from 'controllers/app/login';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
-import { AddressInfo, ChainClass } from 'models';
+import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import RagequitModal from 'views/modals/ragequit_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import UpdateDelegateModal from 'views/modals/update_delegate_modal';
-import TokenApprovalModal from 'views/modals/token_approval_modal';
 
 const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
@@ -97,7 +91,7 @@ const AccountsWell: m.Component<{}> = {
       m(Button, {
         intent: 'primary',
         class: 'add-account',
-        onclick: () => app.modals.create({ modal: LinkNewAddressModal }),
+        onclick: () => app.modals.lazyCreate('link_new_address_modal'),
         label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
       }),
     ]);

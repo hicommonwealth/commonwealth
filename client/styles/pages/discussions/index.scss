@@ -6,9 +6,6 @@
         flex: 1;
         max-width: 800px;
         margin: 0px auto;
-        background: #fff;
-        box-shadow: 0 0 6px rgba(0,0,0,0.07);
-        border-radius: 3px;
         &.empty-list {
             height: calc(100vh - 200px);
         }
@@ -49,5 +46,13 @@
             border-bottom: 1px solid lighten(#ea7a60, 11%);
             width: -webkit-fill-available;
         }
+    }
+
+    .infinite-scroll-spinner-wrap {
+        height: 70px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }

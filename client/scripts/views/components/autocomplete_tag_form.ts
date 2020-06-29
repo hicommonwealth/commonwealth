@@ -78,6 +78,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
 
     return m(SelectList, {
       class: 'AutocompleteTagForm',
+      filterable: false,
       checkmark: false,
       emptyContent: m(EmptyContent),
       inputAttrs: {

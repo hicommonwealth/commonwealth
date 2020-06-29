@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
 
-import { Button, Icon, Icons, Tag } from 'construct-ui';
+import { Button, Icon, Icons, Tag, MenuItem } from 'construct-ui';
 
 import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
@@ -23,7 +23,6 @@ import {
 } from 'models';
 import { NotificationCategories } from 'types';
 
-import TagEditor from 'views/components/tag_editor';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
@@ -47,6 +46,7 @@ export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | Offchai
         user: author,
         tooltip: true,
         linkify: true,
+        hideAvatar: true,
       }),
     ]);
   }
@@ -98,37 +98,25 @@ export const ProposalHeaderLastEdited: m.Component<{ proposal: AnyProposal | Off
   }
 };
 
-export const ProposalHeaderComments: m.Component<{ proposal: AnyProposal | OffchainThread, commentCount: number }> = {
-  view: (vnode) => {
-    const { proposal, commentCount } = vnode.attrs;
-    if (!proposal) return;
-    return m('.ProposalHeaderComments', [
-      commentCount,
-      m(Icon, { name: Icons.MESSAGE_SQUARE }),
-    ]);
-  }
-};
-
 export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (!isSameAccount(app.user.activeAccount, proposal.author)) return;
 
-    return m('.ProposalHeaderDelete', [
-      m('a', {
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          const confirmed = await confirmationModalWithText('Delete this entire thread?')();
-          if (!confirmed) return;
-          app.threads.delete(proposal).then(() => {
-            m.route.set(`/${app.activeId()}/`);
-            // TODO: set notification bar for 'thread deleted'
-          });
-        },
-      }, 'Delete')
-    ]);
+    return m(MenuItem, {
+      class: 'ProposalHeaderDelete',
+      label: 'Delete thread',
+      iconLeft: Icons.DELETE,
+      onclick: async (e) => {
+        e.preventDefault();
+        const confirmed = await confirmationModalWithText('Delete this entire thread?')();
+        if (!confirmed) return;
+        app.threads.delete(proposal).then(() => {
+          m.route.set(`/${app.activeId()}/`);
+          // TODO: set notification bar for 'thread deleted'
+        });
+      },
+    });
   }
 };
 
@@ -156,14 +144,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
 
-    const canEdit = (app.user.activeAccount?.address === proposal.author
-                     && app.user.activeAccount?.chain.id === proposal.authorChain)
-      || app.user.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-        community: app.activeCommunityId()
-      });
-
     return m('.ProposalHeaderTags', [
       m('span.proposal-header-tags', [
         m(Tag, {
@@ -174,11 +154,6 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
           label: `#${proposal.tag?.name}`
         })
       ]),
-      canEdit && proposal.tag && m(ProposalHeaderSpacer),
-      canEdit && m(TagEditor, {
-        thread: proposal,
-        onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-      }),
     ]);
   }
 };
@@ -217,66 +192,31 @@ export const ProposalHeaderViewCount: m.Component<{ viewCount: number }> = {
   }
 };
 
-export const ProposalHeaderSubscriptionButton: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (!app.isLoggedIn()) return;
-
-    const subscription = app.user.notifications.subscriptions.find((v) => v.objectId === proposal.uniqueIdentifier);
-
-    return m(Button, {
-      class: 'ProposalHeaderSubscriptionButton',
-      disabled: !app.isLoggedIn(),
-      intent: subscription?.isActive ? 'primary' : 'none',
-      onclick: (e) => {
-        e.preventDefault();
-        if (subscription?.isActive) {
-          app.user.notifications.disableSubscriptions([subscription]).then(() => m.redraw());
-        } else {
-          app.user.notifications.subscribe(
-            NotificationCategories.NewComment, proposal.uniqueIdentifier,
-          ).then(() => m.redraw());
-        }
-      },
-      label: subscription?.isActive
-        ? [ m('span.icon-bell'), ' Notifications on' ]
-        : [ m('span.icon-bell-off'), ' Notifications off' ]
-    });
-  }
-};
-
 export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
-    if (!app.isLoggedIn()) return;
 
-    const canEdit = app.user.activeAccount?.address === proposal.author
-      && app.user.activeAccount?.chain.id === proposal.authorChain;
-    if (!canEdit) return;
-
-    return m('.ProposalHeaderPrivacyButtons', [
-      // read only toggle
-      m(Button, {
+    return [
+      m(MenuItem, {
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
           app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
-        label: proposal.readOnly ? 'Make Commentable?' : 'Make Read-Only?'
+        iconLeft: proposal.readOnly ? Icons.UNLOCK : Icons.LOCK,
+        label: proposal.readOnly ? 'Enable commenting' : 'Disable commenting',
       }),
       // privacy toggle, show only if thread is private
-      (proposal as OffchainThread).privacy
-        && m(Button, {
-          class: 'privacy-to-public-toggle',
-          onclick: (e) => {
-            e.preventDefault();
-            app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
-          },
-          label: 'Make Thread Public',
-        }),
-    ]);
+      (proposal as OffchainThread).privacy && m(MenuItem, {
+        class: 'privacy-to-public-toggle',
+        onclick: (e) => {
+          e.preventDefault();
+          app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
+        },
+        label: 'Make public',
+      }),
+    ];
   }
 };

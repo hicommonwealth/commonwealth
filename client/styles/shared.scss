@@ -24,13 +24,21 @@ $lighttextgrey: #999;
 $electricblue: #229bd6;
 
 $header-height: 60px;
-$sidebar-width: 240px;
+$left-sidebar-width: 200px;
+$right-sidebar-width: 340px;
 $sublayout-max-width: 1340px;
 
 $vertical-padding: 30px; // padding between header and content
 $horizontal-padding: 30px; // padding on sides of the page
 $gutter-width: 24px; // padding between columns
 $header-spacing: 14px; // padding between header items
+
+$standard-light-text: #999;
+$standard-meta-spacing: 12px;
+$standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
+
+// construct-ui styles
+$menu-item-height: 30px;
 
 @mixin popout {
     animation: popout 0.05s ease;
@@ -55,8 +63,8 @@ $header-spacing: 14px; // padding between header items
 }
 
 @mixin error-text {
-    font-weight: 700;
-    color: $error-red;
+    font-weight: 600;
+    color: $red600;
 }
 @mixin success-text {
     font-weight: 700;

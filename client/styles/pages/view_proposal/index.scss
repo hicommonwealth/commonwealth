@@ -1,9 +1,5 @@
 @import 'client/styles/shared';
 
-$padding-top: 12px;
-$padding: 24px;
-$gutter: 0; // 34px;
-
 @mixin supports-jump-highlight() {
     &.highlighted {
         background-color: #ffd;
@@ -19,5 +15,28 @@ $gutter: 0; // 34px;
     .ProposalBody,
     .ProposalComment {
         @include supports-jump-highlight();
+    }
+
+    .ProposalHeader .proposal-top,
+    .ProposalHeader .proposal-content,
+    .ProposalHeader .proposal-bottom,
+    .ProposalComment .comment-body,
+    .CreateComment .create-comment-body {
+        background: #fff;
+        box-shadow: $standard-box-shadow;
+        padding: 18px 26px;
+        border-bottom: 1px solid #eee;
+    }
+    .ProposalHeader .proposal-top {
+        border-radius: 4px 4px 0 0;
+    }
+    .ProposalHeader .proposal-bottom {
+        padding-top: 24px;
+        padding-bottom: 22px;
+        border-radius: 0 0 4px 4px;
+    }
+    .ProposalComment .comment-body,
+    .CreateComment .create-comment-body {
+        border-radius: 4px;
     }
 }

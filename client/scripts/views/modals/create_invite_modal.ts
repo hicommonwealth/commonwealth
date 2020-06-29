@@ -5,12 +5,9 @@ import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
 
 import app from 'state';
-import { formatAsTitleCase } from 'helpers';
-import { CreateInviteLink } from 'views/pages/admin';
+import CreateInviteLink from 'views/components/create_invite_link';
 
 import { CommunityInfo } from 'models';
-
-import { inputModalWithText } from 'views/modals/input_modal';
 import { CompactModalExitButton } from 'views/modal';
 import { DropdownFormField } from 'views/components/forms';
 

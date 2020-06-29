@@ -1,9 +1,7 @@
 import _ from 'underscore';
 import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
-import { Option, Vec } from '@polkadot/types';
-import { ITuple } from '@polkadot/types/types';
-import { AccountId } from '@polkadot/types/interfaces';
+import { Option } from '@polkadot/types';
 import { VoteRecord } from 'edgeware-node-types/dist/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import {
@@ -14,7 +12,7 @@ import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'events/edgeware/types';
+import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'events/substrate/types';
 import { VoteOutcome } from 'edgeware-node-types/dist';
 import EdgewareSignaling from './signaling';
 
