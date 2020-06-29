@@ -211,24 +211,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         m(ProposalBodyCreated, { item: comment, link: commentLink }),
         comment.versionHistory?.length > 1 && m(ProposalBodySpacer),
         m(ProposalBodyLastEdited, { item: comment }),
-
-        // !vnode.state.editing
-        //   && app.user.activeAccount
-        //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-        //   && app.user.activeAccount?.chain.id === comment.authorChain
-        //   && app.user.activeAccount?.address === comment.author
-        //   && [
-        //     m(ProposalBodySpacer),
-        //     m(ProposalBodyEdit, {
-        //       item: comment,
-        //       getSetGlobalReplyStatus,
-        //       getSetGlobalEditingStatus,
-        //       parentState: vnode.state
-        //     }),
-        //     m(ProposalBodySpacer),
-        //     m(ProposalBodyDelete, { item: comment }),
-        //   ],
-
         !vnode.state.editing
         && app.user.activeAccount
         && !getSetGlobalEditingStatus(GlobalStatus.Get)
@@ -271,13 +253,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         //       parentState: vnode.state,
         //     }),
         //   ],
-
-        vnode.state.editing && [
-          m(ProposalBodySpacer),
-          m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-          m(ProposalBodySpacer),
-          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-        ],
       ]),
       m('.comment-body-content', [
         !vnode.state.editing
@@ -291,9 +266,15 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
         vnode.state.editing
           && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
       ]),
-      m('.comment-body-reactions', [
-        m(ProposalBodyReaction, { item: comment }),
-      ]),
+      m('.comment-body-actions', [
+        m('.comment-body-reactions', [
+          m(ProposalBodyReaction, { item: comment }),
+        ]),
+        vnode.state.editing && m('.comment-body-button-group', [
+          m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+          m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+        ]),
+      ])
     ]);
   }
 };

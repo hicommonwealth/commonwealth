@@ -20,10 +20,10 @@ $gutter: 0; // 34px;
     .ProposalComment {
         @include supports-jump-highlight();
     }
-    .proposal-body-actions {
+    .proposal-body-actions, .comment-body-actions {
         display: flex;
         justify-content: space-between;
-        .proposal-body-button-group {
+        .proposal-body-button-group, .comment-body-button-group {
             margin-top: 18px;
             .cancel-editing {
                 margin-right: 15px;
