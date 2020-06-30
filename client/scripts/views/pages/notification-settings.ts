@@ -789,31 +789,22 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
     // for testing, not production
-    vnode.state.selectedCommunity = vnode.attrs.communities.find((c) => c.id === 'internal');
+    // vnode.state.selectedCommunity  = vnode.attrs.communities.find((c) => c.name === 'internal');
     // vnode.state.selectedCommunityId = vnode.state.selectedCommunity.name;
   },
   onupdate: (vnode) => {
-    if (vnode.attrs.communities.length > 0) {
-      vnode.state.communityIds = ['All communities'];
-      vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
-    }
+    // if (vnode.attrs.communities.length > 0) {
+    //   vnode.state.communityIds = ['All communities'];
+    //   vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
+    // }
   },
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
+    if (!communities || !subscriptions) return;
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
-        // m(Select, {
-        //   value: vnode.state.selectedCommunity?.name || 'All communities',
-        //   options: vnode.state.communityIds,
-        //   onchange: (e) => {
-        //     const target = (e.currentTarget as any).value;
-        //     vnode.state.selectedCommunity = communities.find((c) => c.name === target);
-        //     console.dir(vnode.state.selectedCommunity);
-        //     m.redraw();
-        //   }
-        // })
         m(SelectList, {
           class: 'CommunitySelectList',
           filterable: false,
@@ -822,23 +813,24 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
           inputAttrs: {
             class: 'CommunitySelectRow',
           },
-          itemRender: (community: CommunityInfo) => {
+          itemRender: (community: string) => {
             return m(ListItem, {
-              label: community.name,
-              selected: (vnode.state.selectedCommunity === community),
+              label: community,
+              selected: (vnode.state.selectedCommunityId === community),
             });
           },
-          items: communities,
+          items: communityIds,
           trigger: m(Button, {
             align: 'left',
             compact: true,
             iconRight: Icons.CHEVRON_DOWN,
             label: vnode.state.selectedCommunity
-              ? vnode.state.selectedCommunity.name
-              : '',
+              ? vnode.state.selectedCommunityId
+              : 'All communities',
           }),
-          onSelect: (community: CommunityInfo) => {
-            vnode.state.selectedCommunity = community;
+          onSelect: (community: string) => {
+            vnode.state.selectedCommunity = communities.find((c) => c.name === community);
+            vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || 'All communities';
             m.redraw();
           }
         }),
@@ -851,9 +843,9 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
           m('th', 'In app'),
           m('th', 'By email'),
         ]),
-        // (selectedCommunityId === 'All communities') && [
-        //   m(GeneralCommunityNotifications, { communities, subscriptions }),
-        // ],
+        (selectedCommunityId === 'All communities') && [
+          m(GeneralCommunityNotifications, { communities, subscriptions }),
+        ],
         (!!selectedCommunity)
           && m(CommunitySpecificNotifications, { subscriptions, community: selectedCommunity }),
       ]),
