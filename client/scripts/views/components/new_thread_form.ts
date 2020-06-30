@@ -17,22 +17,23 @@ import { confirmationModalWithText } from '../modals/confirm_modal';
 import { notifySuccess } from '../../controllers/app/notifications';
 
 interface IState {
-  form: IThreadForm,
   activeTag: OffchainTag | string,
-  fromDraft?: number,
-  error,
-  quillEditorState,
-  hasComment: boolean,
   autoTitleOverride,
+  error,
+  form: IThreadForm,
+  fromDraft?: number,
+  hasComment: boolean,
   newType: string,
+  quillEditorState,
+  saving: boolean,
   uploadsInProgress: number,
 }
 
 interface IThreadForm {
   tagName?: string;
   tagId?: number;
-  url?: string;
   title?: string;
+  url?: string;
 }
 
 export const checkForModifications = async (state, modalMsg) => {
@@ -140,7 +141,6 @@ export const cancelDraft = async (state) => {
 export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, IState> = {
   view: (vnode: VnodeDOM<{ header: boolean, isModal: boolean }, IState>) => {
     const author = app.user.activeAccount;
-    const activeEntity = app.community ? app.community : app.chain;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
@@ -186,6 +186,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     ]);
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
+    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -193,8 +194,10 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header && m('h2.page-title', 'New Post'),
-        vnode.state.newType === 'Link' && m(Form, [
+        vnode.attrs.header
+        && m('h2.page-title', 'New Post'),
+        vnode.state.newType === 'Link'
+        && m(Form, [
           typeSelector,
           m(FormGroup, [
             m(Input, {
@@ -238,7 +241,8 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
           m(FormGroup, [
             m(AutoCompleteTagForm, {
               tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              featuredTags: app.tags.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
@@ -283,7 +287,8 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             : m('.error-placeholder'),
         ]),
         //
-        vnode.state.newType === 'Discussion' && m(Form, [
+        vnode.state.newType === 'Discussion'
+        && m(Form, [
           typeSelector,
           m(FormGroup, [
             m(Input, {
@@ -307,7 +312,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
           ]),
           m(FormGroup, [
             m(AutoCompleteTagForm, {
-              activeTag: vnode.state.activeTag || undefined,
+              activeTag: vnode.state.activeTag,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
@@ -324,11 +329,14 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
           ]),
           m(FormGroup, [
             m(Button, {
-              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              class: !author || saving || vnode.state.uploadsInProgress > 0
+                ? 'disabled' : '',
               intent: 'primary',
               onclick: async () => {
+                vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
-                vnode.state.error = newThread(form, quillEditorState, author);
+                vnode.state.error = await newThread(form, quillEditorState, author);
+                vnode.state.saving = false;
                 if (!vnode.state.error) {
                   if (vnode.state.fromDraft) {
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
@@ -338,17 +346,21 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   }, 0);
                 }
               },
-              label: 'Create thread',
-              name: 'submit',
+              label: (vnode.state.uploadsInProgress > 0)
+                ? 'Uploading...' : 'Create thread',
+              name: 'submission',
               tabindex: 4
             }),
             m(Button, {
-              class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+              class: !author || saving || vnode.state.uploadsInProgress > 0
+                ? 'disabled' : '',
               intent: 'none',
               onclick: () => {
                 const { form, quillEditorState } = vnode.state;
                 try {
+                  vnode.state.saving = true;
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  vnode.state.saving = false;
                   if (vnode.attrs.isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
                     setTimeout(() => {
