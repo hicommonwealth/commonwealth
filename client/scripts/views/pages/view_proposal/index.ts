@@ -485,6 +485,17 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
         });
       vnode.state.commentsPrefetchStarted = true;
     }
+
+    if (vnode.state.comments?.length) {
+      const mismatchedComments = vnode.state.comments.filter((c) => {
+        return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
+      });
+      if (mismatchedComments.length) {
+        vnode.state.commentsPrefetchStarted = false;
+      }
+    }
+
+
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
       m.redraw();
