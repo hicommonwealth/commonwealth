@@ -678,37 +678,35 @@ const GeneralNewThreadsAndComments:
       vnode.state.generalStatus = null;
       vnode.state.emailStatus = null;
     },
-    onupdate: (vnode) => {
-      const { communities, subscriptions } = vnode.attrs;
-      const communityIds = communities.map((c) => c.id);
-      const someThreads = subscriptions.some((s) => communityIds.includes(s.objectId));
-      const everyThread = subscriptions.every((s) => communityIds.includes(s.objectId));
-      vnode.state.generalStatus = (everyThread) ? true : (someThreads) ? null : false;
-    },
     view: (vnode) => {
       const { communities, subscriptions } = vnode.attrs;
+      const communityIds = communities.map((c) => c.id);
+      const someThreads = subscriptions.some((s) => s.isActive && communityIds.includes(s.objectId));
+      const everyThread = subscriptions.every((s) => s.isActive && communityIds.includes(s.objectId));
+      vnode.state.generalStatus = everyThread;
+      const someEmail = subscriptions.some((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
+      const everyEmail = subscriptions.every((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
+      vnode.state.emailStatus = everyEmail;
       const { generalStatus, emailStatus } = vnode.state;
+      console.dir('indeterminate?');
+      console.dir((!everyThread && someThreads));
+
       return m('tr.GeneralNewThreadsAndComments', [
         m('td', 'New threads and comments'),
         m('td', [
           m(Checkbox, {
-            indeterminate: (generalStatus === null),
+            indeterminate: (!everyThread && someThreads),
             checked: generalStatus,
             size: 'lg',
             onchange: async (e) => {
               e.preventDefault();
-              if (generalStatus === null) {
-                console.dir('indeterminate');
-                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive
-                vnode.state.generalStatus = true;
-              } else if (generalStatus) {
-                console.dir('checked');
-                // TODO: For each NewThread subscription, mark isActive false
-                vnode.state.generalStatus = false;
+              if (generalStatus) {
+                console.dir('uncheck all false');
+                
+                // TODO: For each community, mark isactive=false;
               } else {
-                console.dir('unchecked');
-                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive
-                vnode.state.generalStatus = null;
+                console.dir('uncheck all false');
+                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive=true
               }
               m.redraw();
             }
@@ -718,7 +716,7 @@ const GeneralNewThreadsAndComments:
           m(Checkbox, {
             disabled: !generalStatus,
             checked: emailStatus,
-            indeterminate: (generalStatus === null),
+            indeterminate: (!everyEmail && someEmail),
             size: 'lg',
             onchange: async (e) => {
               e.preventDefault();
