@@ -9,6 +9,7 @@ interface ITagEditorAttrs {
   thread: OffchainThread;
   popoverMenu?: boolean;
   onChangeHandler: Function;
+  openStateHandler?: Function;
 }
 
 interface ITagEditorState {
@@ -60,15 +61,27 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
           }
         }),
         hasBackdrop: true,
-        isOpen: vnode.state.isOpen,
+        isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
         inline: false,
-        onClose: () => { vnode.state.isOpen = false; },
+        onClose: () => {
+          if (vnode.attrs.popoverMenu) {
+            vnode.attrs.openStateHandler(false);
+          } else {
+            vnode.state.isOpen = false;
+          }
+        },
         title: 'Edit Tags',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
             label: 'Close',
-            onclick: () => { vnode.state.isOpen = false; },
+            onclick: () => {
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
+            },
           }),
           m(Button, {
             label: 'Submit',
@@ -76,9 +89,20 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             onclick: async () => {
               const { tagName, tagId } = vnode.state;
               const { thread } = vnode.attrs;
-              const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
-              vnode.attrs.onChangeHandler(tag);
-              vnode.state.isOpen = false;
+              try {
+                const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
+                vnode.attrs.onChangeHandler(tag);
+              } catch (err) {
+                console.log('Failed to update tag');
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to update tag');
+              }
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
             },
           }),
         ])

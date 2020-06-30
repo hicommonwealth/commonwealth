@@ -79,6 +79,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
+
     const canEditThread = app.user.activeAccount
       && (app.user.isRoleOfCommunity({
         role: 'admin',
@@ -114,6 +115,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         thread: vnode.attrs.proposal,
         popoverMenu: true,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
       })
     ];
   },
