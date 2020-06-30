@@ -12,7 +12,7 @@
         align-items: center;
         padding-left: 10px;
         width: 30px;
-        svg {
+        > .cui-icon > svg {
             height: 20px;
             width: 20px;
             min-width: 20px;
@@ -68,7 +68,6 @@
     .ProposalHeaderAuthor,
     .ProposalHeaderCreated,
     .ProposalHeaderLastEdited,
-    .ProposalHeaderDelete,
     .ProposalBodyDelete,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,

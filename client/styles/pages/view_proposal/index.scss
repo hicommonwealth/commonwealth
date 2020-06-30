@@ -1,42 +1,51 @@
 @import 'client/styles/shared';
 
 @mixin supports-jump-highlight() {
-    &.highlighted {
-        background-color: #ffd;
-    }
-    &.highlighted.highlightAnimationComplete {
-        background-color: #fff;
-        transition: background-color 1s ease-in-out;
-    }
+  &.highlighted {
+    background-color: #ffd;
+  }
+  &.highlighted.highlightAnimationComplete {
+    background-color: #fff;
+    transition: background-color 1s ease-in-out;
+  }
 }
 
 .ViewProposalPage {
-    .ProposalHeader,
-    .ProposalBody,
-    .ProposalComment {
-        @include supports-jump-highlight();
+  .ProposalHeader,
+  .ProposalBody,
+  .ProposalComment {
+    @include supports-jump-highlight();
+  }
+  .ProposalHeader .proposal-top,
+  .ProposalHeader .proposal-content,
+  .ProposalHeader .proposal-bottom,
+  .ProposalComment .comment-body,
+  .CreateComment .create-comment-body {
+    background: #fff;
+    box-shadow: $standard-box-shadow;
+    padding: 18px 26px;
+    border-bottom: 1px solid #eee;
+  }
+  .ProposalHeader .proposal-top {
+    border-radius: 4px 4px 0 0;
+  }
+  .ProposalHeader .proposal-bottom {
+    padding-top: 24px;
+    padding-bottom: 22px;
+    border-radius: 0 0 4px 4px;
+  }
+  .ProposalComment .comment-body,
+  .CreateComment .create-comment-body {
+    border-radius: 4px;
+  }
+  .proposal-body-bottom, .comment-body-bottom {
+    display: flex;
+    justify-content: space-between;
+    .proposal-body-button-group, .comment-body-bottom-right {
+      margin-top: 18px;
+      .cancel-editing {
+        margin-right: 15px;
+      }
     }
-
-    .ProposalHeader .proposal-top,
-    .ProposalHeader .proposal-content,
-    .ProposalHeader .proposal-bottom,
-    .ProposalComment .comment-body,
-    .CreateComment .create-comment-body {
-        background: #fff;
-        box-shadow: $standard-box-shadow;
-        padding: 18px 26px;
-        border-bottom: 1px solid #eee;
-    }
-    .ProposalHeader .proposal-top {
-        border-radius: 4px 4px 0 0;
-    }
-    .ProposalHeader .proposal-bottom {
-        padding-top: 24px;
-        padding-bottom: 22px;
-        border-radius: 0 0 4px 4px;
-    }
-    .ProposalComment .comment-body,
-    .CreateComment .create-comment-body {
-        border-radius: 4px;
-    }
+  }
 }
