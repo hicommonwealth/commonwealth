@@ -229,6 +229,20 @@ const instantiateEditor = (
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
 
+  const searchMentionableAddresses = async (searchTerm: string) => {
+    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      limit: 6,
+      searchTerm,
+      order: ['name', 'ASC']
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  };
+
   let typingListener;
   const queryMentions = async (searchTerm, renderList, mentionChar) => {
     if (mentionChar !== '@') return;
@@ -524,20 +538,6 @@ const instantiateEditor = (
       const index = (quill.getSelection() || {}).index || quill.getLength();
       if (index) quill.insertEmbed(index, 'image', response, 'user');
     }
-  };
-
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
   };
 
   // const searchRoles = async () => {
