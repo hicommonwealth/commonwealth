@@ -332,18 +332,28 @@ const instantiateEditor = (
       shortKey: false,
       shiftKey: null,
       handler: (range, context) => {
-        const mentions = quill.getModule('mention');
-        if (mentions.isOpen) {
-          selectMention(mentions.getItemData());
-          mentions.escapeHandler();
-          return false;
-        }
         if (isMarkdownMode()) return true;
         const [line, offset] = quill.getLine(range.index);
         const { textContent } = line.domNode;
         const isEmbed = insertEmbeds(textContent);
         // if embed, stopPropogation; otherwise continue
         return !isEmbed;
+      }
+    },
+    // Check for mentions on return
+    'add-mention': {
+      key: 'Enter',
+      shortKey: false,
+      shiftKey: null,
+      handler: (range, context) => {
+        const mentions = quill.getModule('mention');
+        if (mentions.isOpen) {
+          selectMention(mentions.getItemData());
+          mentions.escapeHandler();
+          return false;
+        } else {
+          return true;
+        }
       }
     },
     // Submit on cmd-Enter/ctrl-Enter
