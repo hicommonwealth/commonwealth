@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/substrate/types';
 import SubstrateTitlerFunc from 'events/substrate/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect, SelectList } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
@@ -197,24 +197,6 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
         ]),
       activeSubscription && app.user.email
         && m(ImmediateEmailCheckbox, { subscription: activeSubscription }),
-      // m(Button, {
-      //   class: '',
-      //   size: 'sm',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     if (activeSubscription) {
-      //       subscriptions.deleteSubscription(activeSubscription).then(() => {
-      //         m.redraw();
-      //       });
-      //     } else {
-      //       subscriptions.subscribe(vnode.state.subscription.category, vnode.state.subscription.objectId).then(() => {
-      //         m.redraw();
-      //       });
-      //     }
-      //   },
-      //   label: activeSubscription ? 'Notifications on' : 'Notifications off',
-      //   iconLeft: activeSubscription ? Icons.BELL : Icons.BELL_OFF,
-      // }),
     ]);
   }
 };
@@ -822,16 +804,44 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     return m('.CommunityNotifications', [
       m('.header', [
         m('h2', 'Discussions Notifications'),
-        m(Select, {
-          value: vnode.state.selectedCommunity?.name || 'All communities',
-          options: vnode.state.communityIds,
-          onchange: (e) => {
-            const target = (e.currentTarget as any).value;
-            vnode.state.selectedCommunity = communities.find((c) => c.name === target);
-            console.dir(vnode.state.selectedCommunity);
+        // m(Select, {
+        //   value: vnode.state.selectedCommunity?.name || 'All communities',
+        //   options: vnode.state.communityIds,
+        //   onchange: (e) => {
+        //     const target = (e.currentTarget as any).value;
+        //     vnode.state.selectedCommunity = communities.find((c) => c.name === target);
+        //     console.dir(vnode.state.selectedCommunity);
+        //     m.redraw();
+        //   }
+        // })
+        m(SelectList, {
+          class: 'CommunitySelectList',
+          filterable: false,
+          checkmark: false,
+          emptyContent: null,
+          inputAttrs: {
+            class: 'CommunitySelectRow',
+          },
+          itemRender: (community: CommunityInfo) => {
+            return m(ListItem, {
+              label: community.name,
+              selected: (vnode.state.selectedCommunity === community),
+            });
+          },
+          items: communities,
+          trigger: m(Button, {
+            align: 'left',
+            compact: true,
+            iconRight: Icons.CHEVRON_DOWN,
+            label: vnode.state.selectedCommunity
+              ? vnode.state.selectedCommunity.name
+              : '',
+          }),
+          onSelect: (community: CommunityInfo) => {
+            vnode.state.selectedCommunity = community;
             m.redraw();
           }
-        })
+        }),
       ]),
       m(Table, {
         class: 'NotificationsTable'
