@@ -786,6 +786,7 @@ interface ICommunityNotificationsState {
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
     vnode.state.selectedCommunity = null;
+    vnode.state.selectedCommunityId = 'All communities';
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
     // for testing, not production
