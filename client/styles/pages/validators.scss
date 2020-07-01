@@ -177,7 +177,7 @@
         white-space: nowrap;
 
     }
-    tr{
+    tr,.nextValidator{
       width: 100%;
       display: flex;
       flex-flow: row nowrap;
@@ -329,14 +329,20 @@
     display: none !important;
 }
 
+//sdasdadf
 
 
 .nextValidator td{
     background-color: #5b7af64d !important;
     padding-left: 10px !important;
+
 }
-
-
+.nextValidator .val-stash-waiting{
+  flex: 0 0 24.5% !important;
+}
+.nextValidator .val-nominations{
+  flex: 0 0 25% !important;
+}
 // padding seperation around wifi
 .cui-icon-wifi{
     padding-right: 5px !important;
@@ -346,9 +352,6 @@
 
 // Modal Styles for Validator Page
 
-.popup .ViewNominatorsModal {
- 
-}
 .compact-modal-title {
   padding-top: 20px !important;
   padding-left: 20px !important;
@@ -423,4 +426,61 @@
 }
 .left-5{
   padding-left: 5px;
+}
+
+
+
+
+// Name Tooltip
+
+.legal{
+font-family: Inter !important;
+font-style: normal !important;
+font-weight: 500 !important;
+font-size: 12px !important;
+line-height: 120% !important;
+letter-spacing: -0.2px !important;
+color: #536E7C !important;
+}
+
+.identity a{
+  text-decoration: none !important;
+  font-family: Inter !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-size: 16px !important;
+  line-height: 120% !important;
+  letter-spacing: -0.2px !important;
+  color: #000000 !important;
+}
+
+.left-5{
+  padding-left: 8px !important; 
+}
+
+.User span{
+  display: none !important;
+}
+
+.cui-popover-dismiss{
+  min-width: 76px !important;
+}
+
+.User label{
+font-family: Inter !important;
+font-style: normal !important;
+font-weight: 500 !important;
+font-size: 12px !important;
+line-height: 120% !important;
+letter-spacing: -0.2px !important;
+color: #536E7C !important;
+}
+
+.cui-icon .cui-sm{
+  min-width: 15px !important;
+  min-height: 15px !important;
+}
+
+.cui-icon svg{
+  stroke: #252525 !important;
 }
