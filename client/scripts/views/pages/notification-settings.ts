@@ -498,19 +498,22 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
 
 interface IChainOrCommNotifPageAttrs {
   subscriptions: NotificationSubscription[];
-  selectedFilter: string;
+  selectedFilter?: string;
   chains?: ChainInfo[];
   communities?: CommunityInfo[];
 }
 
 const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> = {
   view: (vnode) => {
-    const { subscriptions, selectedFilter, chains } = vnode.attrs;
-    const chain = chains.find((c) => c.id === selectedFilter);
+    const { subscriptions, chains } = vnode.attrs;
     return m('ChainNotificationManagementPage', [
-      m('h2', chain.name),
-      m(ChainOrCommunitySubscriptionButton, { chain, }),
-      m(EventSubscriptions, { chain }),
+      chains.map((chain) => {
+        return [
+          m('h2', chain.name),
+          m(ChainOrCommunitySubscriptionButton, { chain, }),
+          m(EventSubscriptions, { chain }),
+        ];
+      }),
     ]);
   },
 };
@@ -844,12 +847,8 @@ interface INotificationSettingsState {
 
 const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   oninit: (vnode) => {
-    const chainIds = app.user.roles
-      .filter((role) => role.chain_id)
-      .map((r) => r.chain_id);
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()
-        .filter((c) => chainIds.includes(c.id))
     );
     vnode.state.selectedFilter = 'community-notifications';
     vnode.state.subscriptions = [];
@@ -898,7 +897,10 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
         (selectedFilter === 'community-notifications')
           && m(CommunityNotifications, { subscriptions, communities, }),
         (selectedFilter === 'chain-notifications')
-          && m(ChainNotificationManagementPage),
+          && m(ChainNotificationManagementPage, {
+            subscriptions,
+            chains,
+          }),
         // // && m(UserSubscriptions, { subscriptions }),
         // (chainIds.includes(selectedFilter))
         //   && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
