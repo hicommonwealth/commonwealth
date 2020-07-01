@@ -681,15 +681,14 @@ const GeneralNewThreadsAndComments:
     view: (vnode) => {
       const { communities, subscriptions } = vnode.attrs;
       const communityIds = communities.map((c) => c.id);
-      const someThreads = subscriptions.some((s) => s.isActive && communityIds.includes(s.objectId));
-      const everyThread = subscriptions.every((s) => s.isActive && communityIds.includes(s.objectId));
+      const threadSubs = subscriptions.filter((s) => communityIds.includes(s.objectId));
+      const someThreads = threadSubs.some((s) => s.isActive);
+      const everyThread = threadSubs.every((s) => s.isActive);
       vnode.state.generalStatus = everyThread;
-      const someEmail = subscriptions.some((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
-      const everyEmail = subscriptions.every((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
+      const someEmail = threadSubs.some((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
+      const everyEmail = threadSubs.every((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
       vnode.state.emailStatus = everyEmail;
       const { generalStatus, emailStatus } = vnode.state;
-      console.dir('indeterminate?');
-      console.dir((!everyThread && someThreads));
 
       return m('tr.GeneralNewThreadsAndComments', [
         m('td', 'New threads and comments'),
@@ -701,12 +700,9 @@ const GeneralNewThreadsAndComments:
             onchange: async (e) => {
               e.preventDefault();
               if (generalStatus) {
-                console.dir('uncheck all false');
-                
-                // TODO: For each community, mark isactive=false;
+                await app.user.notifications.disableSubscriptions(threadSubs);
               } else {
-                console.dir('uncheck all false');
-                // TODO: For each community, create New Thread/Comment subscriptions or mark isActive=true
+                await app.user.notifications.enableSubscriptions(threadSubs);
               }
               m.redraw();
             }
@@ -720,10 +716,10 @@ const GeneralNewThreadsAndComments:
             size: 'lg',
             onchange: async (e) => {
               e.preventDefault();
-              if (generalStatus) {
-                // TODO: mark all community-level subscriptions immediateEmail = false;
+              if (emailStatus) {
+                await app.user.notifications.disableImmediateEmails(threadSubs);
               } else {
-                // TODO: mark all community-level subscriptions immediateEmail = true;
+                await app.user.notifications.enableImmediateEmails(threadSubs);
               }
               m.redraw();
             }
