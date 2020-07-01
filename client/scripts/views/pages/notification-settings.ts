@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/substrate/types';
 import SubstrateTitlerFunc from 'events/substrate/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect, SelectList, Popover } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Checkbox, Table, SelectList, Popover } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
@@ -678,22 +678,44 @@ const GeneralNewThreadsAndComments:
 
       return m('tr.GeneralNewThreadsAndComments', [
         m('td', 'All New threads and comments'),
-        m('td', [
-          m(Checkbox, {
-            indeterminate: (!everyThread && someThreads),
-            checked: generalStatus,
-            size: 'lg',
-            onchange: async (e) => {
-              e.preventDefault();
-              if (generalStatus) {
-                await app.user.notifications.disableSubscriptions(threadSubs);
-              } else {
-                await app.user.notifications.enableSubscriptions(threadSubs);
+        m(Popover, {
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          content: m('div', 'hi'),
+          interactionType: 'hover',
+          trigger: m('td', [
+            m(Checkbox, {
+              indeterminate: (!everyThread && someThreads),
+              checked: generalStatus,
+              size: 'lg',
+              onchange: async (e) => {
+                e.preventDefault();
+                if (generalStatus) {
+                  await app.user.notifications.disableSubscriptions(threadSubs);
+                } else {
+                  await app.user.notifications.enableSubscriptions(threadSubs);
+                }
+                m.redraw();
               }
-              m.redraw();
-            }
-          }),
-        ]),
+            }),
+          ]),
+        }),
+        // m('td', [
+        //   m(Checkbox, {
+        //     indeterminate: (!everyThread && someThreads),
+        //     checked: generalStatus,
+        //     size: 'lg',
+        //     onchange: async (e) => {
+        //       e.preventDefault();
+        //       if (generalStatus) {
+        //         await app.user.notifications.disableSubscriptions(threadSubs);
+        //       } else {
+        //         await app.user.notifications.enableSubscriptions(threadSubs);
+        //       }
+        //       m.redraw();
+        //     }
+        //   }),
+        // ]),
         m('td', [
           m(Checkbox, {
             disabled: !generalStatus,
@@ -821,7 +843,7 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
         }),
       ]),
       m(Table, {
-        class: 'NotificationsTable'
+        class: 'NotificationsTable',
       }, [
         m('tr', [
           m('th', null),
