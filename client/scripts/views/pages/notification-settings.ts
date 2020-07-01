@@ -4,7 +4,7 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _ from 'lodash';
+import _, { capitalize } from 'lodash';
 
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
@@ -12,7 +12,7 @@ import { NotificationCategories } from 'types';
 import { SubstrateEventKinds } from 'events/substrate/types';
 import SubstrateTitlerFunc from 'events/substrate/filters/titler';
 import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect, SelectList } from 'construct-ui';
+import { Button, Icons, Select, List, ListItem, Tooltip, Icon, Input, ButtonGroup, Checkbox, Table, CustomSelect, SelectList, Popover } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
@@ -177,7 +177,7 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       vnode.state.subscription = activeSubscription;
     }
     return m('tr.SubscriptionRow', [
-      m('td', label || `${vnode.state.subscription.objectId}: ${vnode.state.subscription.category}`),
+      m('td', label || `${capitalize(vnode.state.subscription.objectId)}: ${vnode.state.subscription.category}`),
       activeSubscription
         && m('td', [
           m(Checkbox, {
@@ -274,35 +274,35 @@ const PauseButtons: m.Component = {
   }
 };
 
-interface IActiveSubscriptionsState {
-  subscriptions: NotificationSubscription[];
-}
+// interface IActiveSubscriptionsState {
+//   subscriptions: NotificationSubscription[];
+// }
 
-const ActiveSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }, IActiveSubscriptionsState> = {
-  oninit: (vnode) => {
-    vnode.state.subscriptions = vnode.attrs.subscriptions.filter(
-      (s) => s.category !== NotificationCategories.NewMention
-    );
-  },
-  view: (vnode) => {
-    const subscriptions = vnode.state.subscriptions;
-    return m('.ActiveSubscriptions', [
-      m('h1', 'Active Subscriptions'),
-      m(PauseButtons),
-      m(Table, {}, [
-        m('tr', [
-          m('th', null),
-          m('th', 'In app'),
-          m('th', 'By email'),
-        ]),
-        subscriptions.length > 0
-          ? subscriptions.sort((a, b) => a.objectId > b.objectId ? 1 : -1)
-            .map((subscription) => m(SubscriptionRow, { subscription }))
-          : m('div', 'No Active Subscriptions')
-      ]),
-    ]);
-  },
-};
+// const ActiveSubscriptions: m.Component<{ subscriptions: NotificationSubscription[] }, IActiveSubscriptionsState> = {
+//   oninit: (vnode) => {
+//     vnode.state.subscriptions = vnode.attrs.subscriptions.filter(
+//       (s) => s.category !== NotificationCategories.NewMention
+//     );
+//   },
+//   view: (vnode) => {
+//     const subscriptions = vnode.state.subscriptions;
+//     return m('.ActiveSubscriptions', [
+//       m('h1', 'Active Subscriptions'),
+//       m(PauseButtons),
+//       m(Table, {}, [
+//         m('tr', [
+//           m('th', null),
+//           m('th', 'In app'),
+//           m('th', 'By email'),
+//         ]),
+//         subscriptions.length > 0
+//           ? subscriptions.sort((a, b) => a.objectId > b.objectId ? 1 : -1)
+//             .map((subscription) => m(SubscriptionRow, { subscription }))
+//           : m('div', 'No Active Subscriptions')
+//       ]),
+//     ]);
+//   },
+// };
 
 interface IChainSubscriptionRowAttrs {
   chain: ChainInfo;
@@ -561,39 +561,18 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
     }, [
       m(List, { interactive: true, }, [
         m('h4', 'Notification Settings'),
-        m('h4', 'General'),
         m(SubscriptionSideBarListItem, {
-          label: 'User Notifications',
-          id: 'default',
+          label: 'Community Notifications',
+          id: 'community-notifications',
           selectedFilter,
           onChangeHandler,
         }),
         m(SubscriptionSideBarListItem, {
-          label: 'Active Subscriptions',
-          id: 'active',
+          label: 'Chain Notifications',
+          id: 'chain-notifications',
           selectedFilter,
           onChangeHandler,
-        }),
-        chains.length > 0
-          && m('h4', 'Chains'),
-        chains.map((chain) => {
-          return m(SubscriptionSideBarListItem, {
-            label: chain.name,
-            id: chain.id,
-            selectedFilter,
-            onChangeHandler,
-          });
-        }),
-        communities.length > 0
-          && m('h4', 'Communites'),
-        communities.map((community) => {
-          return m(SubscriptionSideBarListItem, {
-            label: community.name,
-            id: community.id,
-            selectedFilter,
-            onChangeHandler,
-          });
-        }),
+        })
       ])
     ]);
   },
@@ -670,6 +649,8 @@ interface IGeneralNewThreadsAndCommentsAttrs {
 interface IGeneralCommunityNotificationsState {
   generalStatus: boolean;
   emailStatus: boolean;
+  generalOpen: boolean;
+  emailOpen: boolean;
 }
 
 const GeneralNewThreadsAndComments:
@@ -677,6 +658,8 @@ const GeneralNewThreadsAndComments:
     oninit: (vnode) => {
       vnode.state.generalStatus = null;
       vnode.state.emailStatus = null;
+      vnode.state.generalOpen = false;
+      vnode.state.emailStatus = false;
     },
     view: (vnode) => {
       const { communities, subscriptions } = vnode.attrs;
@@ -688,10 +671,10 @@ const GeneralNewThreadsAndComments:
       const someEmail = threadSubs.some((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
       const everyEmail = threadSubs.every((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
       vnode.state.emailStatus = everyEmail;
-      const { generalStatus, emailStatus } = vnode.state;
+      const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
       return m('tr.GeneralNewThreadsAndComments', [
-        m('td', 'New threads and comments'),
+        m('td', 'All New threads and comments'),
         m('td', [
           m(Checkbox, {
             indeterminate: (!everyThread && someThreads),
@@ -738,6 +721,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
+    const chainIds = app.config.chains.getAll().map((c) => c.id);
     return [
       mentionsSubscription
         && m('tr.mentions', [
@@ -760,6 +744,9 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
           m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
         ]),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
+      subscriptions.filter((s) => !chainIds.includes(s.objectId)).map((subscription) => {
+        return m(SubscriptionRow, { subscription });
+      })
       // m(GeneralPastThreadsAndComments, { subscriptions }),
 
     ];
@@ -864,7 +851,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
       app.config.chains.getAll()
         .filter((c) => chainIds.includes(c.id))
     );
-    vnode.state.selectedFilter = 'default';
+    vnode.state.selectedFilter = 'community-notifications';
     vnode.state.subscriptions = [];
     vnode.state.communities = [];
   },
@@ -908,15 +895,15 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
       }),
     }, [
       m('.forum-container', [
-        (selectedFilter === 'default')
+        (selectedFilter === 'community-notifications')
           && m(CommunityNotifications, { subscriptions, communities, }),
-        // && m(UserSubscriptions, { subscriptions }),
-        (selectedFilter === 'active')
-          && m(ActiveSubscriptions, { subscriptions }),
-        (chainIds.includes(selectedFilter))
-          && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
-        (communityIds.includes(selectedFilter))
-          && m(CommunityNotificationManagementPage, { subscriptions, selectedFilter, communities }),
+        (selectedFilter === 'chain-notifications')
+          && m(ChainNotificationManagementPage),
+        // // && m(UserSubscriptions, { subscriptions }),
+        // (chainIds.includes(selectedFilter))
+        //   && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
+        // (communityIds.includes(selectedFilter))
+        //   && m(CommunityNotificationManagementPage, { subscriptions, selectedFilter, communities }),
       ]),
     ]);
   },
