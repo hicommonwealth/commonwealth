@@ -1,8 +1,8 @@
 import m from 'mithril';
 import app from 'state';
 import BN from 'bn.js';
-import { Tooltip } from 'construct-ui';
-import { ChainBase } from 'models';
+import { Popover } from 'construct-ui';
+import { ChainBase, ChainClass } from 'models';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
@@ -74,7 +74,9 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
     const commission = vnode.attrs.commission || 0;
 
     return m('tr.ValidatorRow', [
-      m('td.val-stash', m(Tooltip, { content: m(Identity, { stash: vnode.attrs.stash }),
+      m('td.val-stash', m(Popover, {
+        interactionType: 'hover',
+        content: m(Identity, { stash: vnode.attrs.stash }),
         trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-total', [
@@ -97,6 +99,8 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
+      app.chain.id === ChainClass.Kusama
+      && m('td.val-apr', `${vnode.attrs?.apr.toFixed(2)}%`),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,

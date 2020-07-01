@@ -1,6 +1,6 @@
 import m from 'mithril';
 import app from 'state';
-import { Tooltip } from 'construct-ui';
+import { Popover } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import { makeDynamicComponent } from 'models/mithril';
 import { AccountId } from '@polkadot/types/interfaces';
@@ -26,7 +26,9 @@ const RecentBlock = makeDynamicComponent<IRecentBlockAttrs, IRecentBlockState>({
     return m('tr.ValidatorRow', [
       m('td.val-number', number),
       m('td.val-hash.cut-text', hash),
-      m('td.val-author', m(Tooltip, { content: m(Identity, { stash: author.toString() }),
+      m('td.val-author', m(Popover, {
+        interactionType: 'hover',
+        content: m(Identity, { stash: author.toString() }),
         trigger:  m('div', m(User, { user: app.chain.accounts.get(author.toString()), linkify: true }))
       }))
     ]);

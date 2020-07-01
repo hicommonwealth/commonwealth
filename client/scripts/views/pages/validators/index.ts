@@ -16,9 +16,8 @@ import PageLoading from 'views/pages/loading';
 import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
-import Tabs from 'views/components/widgets/tabs';
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import Sublayout from 'views/sublayout';
+import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
@@ -43,12 +42,14 @@ export interface IValidatorAttrs {
   hasMessage?: boolean;
   isOnline?: boolean;
   commission?: number;
+  apr?: number;
 }
 
 export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
-    lastHeader: HeaderExtended
+    lastHeader: HeaderExtended,
+    annualPercentRate: ICommissionInfo;
   };
   results: any[];
 }
@@ -107,6 +108,9 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       : null,
     nominatedBy: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.nominatedBy
+      : null,
+    annualPercentRate: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.annualPercentRate
       : null
   }),
   view: (vnode) => {
@@ -114,13 +118,19 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
     switch (app.chain.class) {
       case ChainClass.Edgeware:
         vComponents = [
-          m(SubstratePreHeader, { sender: app.user.activeAccount as SubstrateAccount }),
+          m(SubstratePreHeader, {
+            sender: app.user.activeAccount as SubstrateAccount,
+            annualPercentRate: vnode.state.dynamic.annualPercentRate
+          }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;
       case ChainClass.Kusama:
         vComponents = [
-          m(SubstratePreHeader, { sender: app.user.activeAccount as SubstrateAccount }),
+          m(SubstratePreHeader, {
+            sender: app.user.activeAccount as SubstrateAccount,
+            annualPercentRate: vnode.state.dynamic.annualPercentRate
+          }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
         break;

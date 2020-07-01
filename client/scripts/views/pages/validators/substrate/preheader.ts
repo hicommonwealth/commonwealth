@@ -16,12 +16,12 @@ interface IPreHeaderState {
   dynamic: {
     validators: IValidators;
     sessionInfo: DeriveSessionProgress;
-    annualPercentRate: ICommissionInfo;
   },
 }
 
 interface IPreHeaderAttrs {
   sender: SubstrateAccount;
+  annualPercentRate: ICommissionInfo;
 }
 const offence = {
   count: null,
@@ -41,15 +41,12 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     validators: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.validators : null,
     sessionInfo: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.sessionInfo
-      : null,
-    annualPercentRate: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.annualPercentRate
       : null
   }),
   view: (vnode) => {
-    const { validators, sessionInfo, annualPercentRate } = vnode.state.dynamic;
+    const { validators, sessionInfo } = vnode.state.dynamic;
 
-    const { sender } = vnode.attrs;
+    const { sender, annualPercentRate } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
     let totalPercentage = 0;
@@ -142,7 +139,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           currentBlock: formatNumber(currentEra)
         }),
         m('.validators-preheader-item', [
-          m('h3', 'APR'),
+          m('h3', 'Est. APR'),
           m('.preheader-item-text', `${apr}%`),
         ]),
         m('.validators-preheader-item', [

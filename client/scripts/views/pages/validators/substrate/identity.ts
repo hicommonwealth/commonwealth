@@ -1,12 +1,12 @@
 import m from 'mithril';
 import app from 'state';
+import { Button, Classes, Icons, Icon } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import { ChainBase } from 'models';
 import { truncate } from 'lodash';
 import { externalLink } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
-import { Icons, Icon } from 'construct-ui';
 import { IAccountInfo } from 'controllers/chain/substrate/staking';
 
 export interface IValidatorState {
@@ -50,7 +50,7 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
       : 'No judgments';
 
     return m('div.identity',
-      m('span', [
+      m('div', [
         m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }),
         m('hr'),
         m('p', info.legal),
@@ -78,7 +78,12 @@ const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
           m(`span.identity-icon${clsName}`, ''),
           m('label', `  ${clsText}`)
         ])
-      ]));
+      ]),
+      m(Button, {
+        class: Classes.POPOVER_DISSMISS,
+        label: 'Dismiss',
+        size: 'xs'
+      }));
   }
 });
 

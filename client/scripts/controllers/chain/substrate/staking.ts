@@ -297,7 +297,6 @@ class SubstrateStaking implements StorageModule {
         [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
         // coins.div don't support fraction points. multiply and divide the same number will give fraction points.
         const n = 100000;
-        const EDG = 'edgeware';
         const validatorRewards: ICommissionInfo = {};
         let accountsTotalStake = new BN(0);
 
@@ -338,16 +337,16 @@ class SubstrateStaking implements StorageModule {
           validatorRewards[key] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
         });
 
-        if (this._app.chain.id === EDG) {
+        if (rewards.validators[this._app.chain.id]) {
           let percentage = 0;
-          const rewardBN = (this._app.chain as Substrate).chain.coins(rewards.validators[EDG] || 0);
+          const rewardBN = (this._app.chain as Substrate).chain.coins(rewards.validators[this._app.chain.id] || 0);
           const totalStakeBN = (this._app.chain as Substrate).chain.coins(accountsTotalStake);
 
           if (totalStakeBN.gt(new BN(0))) {
             // Number can only safely store up to 53 bits for toNumber function.
             percentage = +rewardBN.muln(n).div(totalStakeBN).toString() / n;
           }
-          validatorRewards[EDG] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
+          validatorRewards[this._app.chain.id] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
         }
         return validatorRewards;
       }),

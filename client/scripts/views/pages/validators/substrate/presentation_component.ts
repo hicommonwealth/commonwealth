@@ -2,7 +2,7 @@ import m from 'mithril';
 import app from 'state';
 import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
-import { ChainBase } from 'models';
+import { ChainBase, ChainClass } from 'models';
 import { formatNumber } from '@polkadot/util';
 import { Icon, Icons } from 'construct-ui';
 import PageLoading from 'views/pages/loading';
@@ -17,7 +17,7 @@ const model = {
   currentTab: 'current',
   show: true,
   total: { waiting: 0, current: 0 },
-  sortKey: 'exposure',
+  sortKey: 'exposure.total',
   sortAsc: true,
   sortIcon(key: string) {
     return model.sortKey === key
@@ -52,7 +52,7 @@ const model = {
 };
 
 const PresentationComponent = (state, chain: Substrate) => {
-  const validators = state.dynamic.validators;
+  const { validators, annualPercentRate } = state.dynamic;
 
   if (!validators)
     return m(PageLoading, { message: 'Loading Validators...' });
@@ -108,6 +108,8 @@ const PresentationComponent = (state, chain: Substrate) => {
             m(Icon, { name: model.sortIcon('eraPoints'),
               size: 'lg',
               onclick: () => model.changeSort('eraPoints') })),
+          app.chain.id === ChainClass.Kusama
+          && m('th.val-apr', 'Est. APR'),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
         ]),
@@ -127,6 +129,7 @@ const PresentationComponent = (state, chain: Substrate) => {
           const isOnline = validators[validator]?.isOnline;
           const otherTotal = validators[validator]?.otherTotal;
           const commission = validators[validator]?.commissionPer;
+          const apr = annualPercentRate[validator];
           return m(ValidatorRow, {
             stash: validator,
             total,
@@ -138,7 +141,8 @@ const PresentationComponent = (state, chain: Substrate) => {
             eraPoints,
             blockCount,
             hasMessage,
-            isOnline
+            isOnline,
+            apr
           });
         }),
       ])
