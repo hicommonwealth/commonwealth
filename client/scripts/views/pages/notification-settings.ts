@@ -424,6 +424,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
     vnode.state.eventKinds = SubstrateEventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
+    console.dir(vnode.state);
   },
   view: (vnode) => {
     let titler;
@@ -506,12 +507,13 @@ interface IChainOrCommNotifPageAttrs {
 const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> = {
   view: (vnode) => {
     const { subscriptions, chains } = vnode.attrs;
+    if (chains.length < 1) return;
     return m('ChainNotificationManagementPage', [
-      chains.map((chain) => {
+      chains.filter((c) => c.network === 'edgeware').map((chain) => {
         return [
-          m('h2', chain.name),
-          m(ChainOrCommunitySubscriptionButton, { chain, }),
-          m(EventSubscriptions, { chain }),
+          m(EventSubscriptions, {
+            chain,
+          }),
         ];
       }),
     ]);
@@ -640,6 +642,7 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
     const { community, subscriptions } = vnode.attrs;
     return [
       m(NewThreadRow, { community, subscriptions }),
+      // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
     ];
   },
 };
