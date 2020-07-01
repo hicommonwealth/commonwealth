@@ -678,44 +678,71 @@ const GeneralNewThreadsAndComments:
 
       return m('tr.GeneralNewThreadsAndComments', [
         m('td', 'All New threads and comments'),
-        m(Popover, {
-          closeOnEscapeKey: true,
-          closeOnContentClick: true,
-          content: m('div', 'hi'),
-          interactionType: 'hover',
-          trigger: m('td', [
-            m(Checkbox, {
-              indeterminate: (!everyThread && someThreads),
-              checked: generalStatus,
-              size: 'lg',
-              onchange: async (e) => {
-                e.preventDefault();
-                if (generalStatus) {
-                  await app.user.notifications.disableSubscriptions(threadSubs);
-                } else {
-                  await app.user.notifications.enableSubscriptions(threadSubs);
-                }
-                m.redraw();
-              }
-            }),
-          ]),
-        }),
-        // m('td', [
-        //   m(Checkbox, {
-        //     indeterminate: (!everyThread && someThreads),
-        //     checked: generalStatus,
-        //     size: 'lg',
-        //     onchange: async (e) => {
-        //       e.preventDefault();
-        //       if (generalStatus) {
-        //         await app.user.notifications.disableSubscriptions(threadSubs);
-        //       } else {
-        //         await app.user.notifications.enableSubscriptions(threadSubs);
+
+        // NOT CENTERED, BUT WORKS
+        // m(Popover, {
+        //   closeOnEscapeKey: true,
+        //   closeOnContentClick: true,
+        //   content: m('div', 'hi'),
+        //   interactionType: 'hover',
+        //   trigger: m('td', [
+        //     m(Checkbox, {
+        //       indeterminate: (!everyThread && someThreads),
+        //       checked: generalStatus,
+        //       size: 'lg',
+        //       onchange: async (e) => {
+        //         e.preventDefault();
+        //         if (generalStatus) {
+        //           await app.user.notifications.disableSubscriptions(threadSubs);
+        //         } else {
+        //           await app.user.notifications.enableSubscriptions(threadSubs);
+        //         }
+        //         m.redraw();
         //       }
-        //       m.redraw();
-        //     }
+        //     }),
+        //   ]),
+        // }),
+
+        // THIS DOESN'T WORK, BUT I EXPECT IT SHOULD. NO HOVER
+        // m('td', [
+        //   m(Popover, {
+        //     closeOnEscapeKey: true,
+        //     closeOnContentClick: true,
+        //     content: m('div', 'hi'),
+        //     interactionType: 'hover',
+        //     trigger: m(Checkbox, {
+        //       indeterminate: (!everyThread && someThreads),
+        //       checked: generalStatus,
+        //       size: 'lg',
+        //       onchange: async (e) => {
+        //         e.preventDefault();
+        //         if (generalStatus) {
+        //           await app.user.notifications.disableSubscriptions(threadSubs);
+        //         } else {
+        //           await app.user.notifications.enableSubscriptions(threadSubs);
+        //         }
+        //         m.redraw();
+        //       }
+        //     }),
         //   }),
         // ]),
+
+        m('td', [
+          m(Checkbox, {
+            indeterminate: (!everyThread && someThreads),
+            checked: generalStatus,
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (generalStatus) {
+                await app.user.notifications.disableSubscriptions(threadSubs);
+              } else {
+                await app.user.notifications.enableSubscriptions(threadSubs);
+              }
+              m.redraw();
+            }
+          }),
+        ]),
         m('td', [
           m(Checkbox, {
             disabled: !generalStatus,
