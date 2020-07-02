@@ -391,22 +391,45 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
     const subscription = app.loginStatusLoaded && app.user.notifications.subscriptions
       .find((sub) => sub.category === NotificationCategories.ChainEvent
         && sub.objectId === objectId);
-    return m('.EventSubscriptionRow', [
-      m('h3', `${title}`),
-      app.loginStatusLoaded && m(Button, {
-        label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
-        iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
-        onclick: async (e) => {
-          e.preventDefault();
-          if (subscription && subscription.isActive) {
-            await app.user.notifications.disableSubscriptions([ subscription ]);
-          } else {
-            await app.user.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
+    return m('tr.EventSubscriptionRow', [
+      m('td', `${title}`),
+      app.loginStatusLoaded && m('td', [
+        m(Checkbox, {
+          checked: subscription && subscription.isActive,
+          size: 'lg',
+          // label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
+          // iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
+          onchange: async (e) => {
+            e.preventDefault();
+            if (subscription && subscription.isActive) {
+              await app.user.notifications.disableSubscriptions([ subscription ]);
+            } else if (subscription && !subscription.isActive) {
+              await app.user.notifications.enableSubscriptions([ subscription ]);
+            } else {
+              await app.user.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
+            }
+            m.redraw();
           }
-          setTimeout(() => { m.redraw(); }, 0);
-        }
-      }),
-      m('span', description),
+        }),
+      ]),
+      m('td', [
+        m(Checkbox, {
+          disabled: !subscription?.isActive,
+          checked: subscription?.isActive && subscription?.immediateEmail,
+          size: 'lg',
+          // label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
+          // iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
+          onchange: async (e) => {
+            e.preventDefault();
+            if (subscription && subscription.immediateEmail) {
+              await app.user.notifications.disableImmediateEmails([ subscription ]);
+            } else {
+              await app.user.notifications.enableImmediateEmails([ subscription ]);
+            }
+            m.redraw();
+          }
+        }),
+      ]),
     ]);
   }
 };
@@ -416,6 +439,7 @@ interface IEventSubscriptionState {
   eventKinds: IChainEventKind[];
   allSupportedChains: string[];
   isSubscribedAll: boolean;
+  isEmailAll: boolean;
 }
 
 const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionState> = {
@@ -424,7 +448,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
     vnode.state.eventKinds = SubstrateEventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
-    console.dir(vnode.state);
+    vnode.state.isEmailAll = false;
   },
   view: (vnode) => {
     let titler;
@@ -441,6 +465,10 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
         && vnode.state.eventKinds.find((kind) => sub.objectId === `${vnode.state.chain}-${kind}`));
     const allActiveSubscriptions = allSubscriptions.filter((sub) => sub.isActive);
     vnode.state.isSubscribedAll = allActiveSubscriptions.length === vnode.state.eventKinds.length;
+    vnode.state.isEmailAll = allActiveSubscriptions.every((s) => s.immediateEmail);
+    const isSomeEmail = allActiveSubscriptions.some((s) => s.immediateEmail);
+    console.log('email', vnode.state.isEmailAll);
+    const indeterminate = (allActiveSubscriptions.length > 0 && !vnode.state.isSubscribedAll);
 
     const supportedChains = app.loginStatusLoaded
       ? app.config.chains.getAll()
@@ -448,51 +476,66 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
         .sort((a, b) => a.id.localeCompare(b.id))
       : [];
     return m('.EventSubscriptions', [
-      m('h1', 'On-Chain Events'),
-      // supportedChains.length > 0 && m(Select, {
-      //   name: 'chain',
-      //   options: supportedChains.map((c) => c.name),
-      //   onchange: (e) => {
-      //     const { value } = e.target as any;
-      //     vnode.state.chain = value;
-      //     m.redraw(); // TODO TEST THIS SELECT COMPONENT REFRESH PROPERLY
-      //     // setTimeout(() => { m.redraw(); }, 0);
-      //   }
-      // }),
-      m('h2', 'Subscribe to New Events:'),
-      m('.EventSubscriptionRow', [
-        m('h3', 'Subscribe All'),
-        app.loginStatusLoaded && m(Button, {
-          class: 'activeSubscriptionButton',
-          label: vnode.state.isSubscribedAll ? 'Notifications on' : 'Notifications off',
-          iconLeft: vnode.state.isSubscribedAll ? Icons.BELL : Icons.BELL_OFF,
-          onclick: async (e) => {
-            e.preventDefault();
-            if (vnode.state.isSubscribedAll) {
-              await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
-            } else {
-              await Promise.all(
-                vnode.state.eventKinds.map((kind) => {
-                  return app.user.notifications.subscribe(
-                    NotificationCategories.ChainEvent,
-                    `${vnode.state.chain}-${kind.toString()}`
+      m('h2', vnode.attrs.chain.name),
+      m(Table, {}, [
+        m('tr', [
+          m('th', null),
+          m('th', 'In app'),
+          m('th', 'By email'),
+        ]),
+        m('tr.EventSubscriptionRow', [
+          m('td', 'Subscribe To All Chain Notifications'),
+          app.loginStatusLoaded && m('td', [
+            m(Checkbox, {
+              class: '',
+              checked: vnode.state.isSubscribedAll,
+              indeterminate,
+              size: 'lg',
+              onchange: async (e) => {
+                e.preventDefault();
+                if (vnode.state.isSubscribedAll) {
+                  await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
+                } else {
+                  await Promise.all(
+                    vnode.state.eventKinds.map((kind) => {
+                      return app.user.notifications.subscribe(
+                        NotificationCategories.ChainEvent,
+                        `${vnode.state.chain}-${kind.toString()}`
+                      );
+                    })
                   );
-                })
-              );
-            }
-            setTimeout(() => { m.redraw(); }, 0);
-          }
-        }, vnode.state.isSubscribedAll
-          ? [ m('span.icon-bell'), ' Notifications on' ]
-          : [ m('span.icon-bell-off'), ' Notifications off' ]),
-        m('span', 'Subscribe to all notifications on chain.'),
+                }
+                m.redraw();
+              }
+            }),
+          ]),
+          m('td', [
+            m(Checkbox, {
+              class: '',
+              disabled: !vnode.state.isSubscribedAll,
+              checked: !isSomeEmail && vnode.state.isEmailAll,
+              indeterminate: isSomeEmail && !vnode.state.isEmailAll,
+              size: 'lg',
+              onchange: async (e) => {
+                e.preventDefault();
+                if (!allActiveSubscriptions) return;
+                if (vnode.state.isEmailAll) {
+                  await app.user.notifications.disableImmediateEmails(allActiveSubscriptions);
+                } else {
+                  await app.user.notifications.enableImmediateEmails(allActiveSubscriptions);
+                }
+                m.redraw();
+              }
+            }),
+          ]),
+        ]),
+        supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
+          ? vnode.state.eventKinds.map((kind) => m(
+            EventSubscriptionRow,
+            { chain: vnode.state.chain, kind, titler },
+          ))
+          : m('No events available on this chain.')
       ]),
-      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
-        ? vnode.state.eventKinds.map((kind) => m(
-          EventSubscriptionRow,
-          { chain: vnode.state.chain, kind, titler },
-        ))
-        : m('No events available on this chain.')
     ]);
   }
 };
@@ -509,6 +552,7 @@ const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> =
     const { subscriptions, chains } = vnode.attrs;
     if (chains.length < 1) return;
     return m('ChainNotificationManagementPage', [
+      m('h1', 'Subscribe to Chain Events'),
       chains.filter((c) => c.network === 'edgeware').map((chain) => {
         return [
           m(EventSubscriptions, {
@@ -803,7 +847,6 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
         return m(SubscriptionRow, { subscription });
       })
       // m(GeneralPastThreadsAndComments, { subscriptions }),
-
     ];
   },
 };
@@ -953,11 +996,6 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
             subscriptions,
             chains,
           }),
-        // // && m(UserSubscriptions, { subscriptions }),
-        // (chainIds.includes(selectedFilter))
-        //   && m(ChainNotificationManagementPage, { subscriptions, selectedFilter, chains }),
-        // (communityIds.includes(selectedFilter))
-        //   && m(CommunityNotificationManagementPage, { subscriptions, selectedFilter, communities }),
       ]),
     ]);
   },
