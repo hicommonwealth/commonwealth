@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment-twitter';
-import { ProposalStore, TagsStore } from 'stores';
+import { ProposalStore, TagStore } from 'stores';
 import { OffchainThread, OffchainAttachment, OffchainTag, CommunityInfo } from 'models';
 
 import $ from 'jquery';

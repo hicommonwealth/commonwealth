@@ -4,6 +4,7 @@ export { default as ChainInfo } from './ChainInfo';
 export { default as CommunityInfo } from './CommunityInfo';
 export { default as ContractCategory } from './ContractCategory';
 export { default as ContractItem } from './ContractItem';
+export { default as DiscussionDraft } from './DiscussionDraft';
 export { default as IChainAdapter } from './IChainAdapter';
 export { default as ICommunityAdapter } from './ICommunityAdapter';
 export { default as Identity } from './Identity';

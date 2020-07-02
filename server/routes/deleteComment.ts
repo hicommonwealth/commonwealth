@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -6,7 +7,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NoCommentId: 'Must provide comment ID',
-  AddressNotOwned: 'Not owned by this user',
+  NotOwned: 'Not owned by this user',
 };
 
 const deleteComment = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -18,13 +19,16 @@ const deleteComment = async (models, req: Request, res: Response, next: NextFunc
   }
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const comment = await models.OffchainComment.findOne({
-      where: { id: req.body.comment_id, },
+      where: {
+        id: req.body.comment_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
       include: [ models.Address ],
     });
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(comment.address_id) === -1) {
-      return next(new Error(Errors.AddressNotOwned));
+    if (!comment) {
+      return next(new Error(Errors.NotOwned))
     }
     // actually delete
     await comment.destroy();

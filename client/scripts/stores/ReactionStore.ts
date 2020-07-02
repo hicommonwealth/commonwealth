@@ -8,7 +8,7 @@ enum PostType {
   comment = 'comment'
 }
 
-class ReactionsStore extends IdStore<OffchainReaction<any>> {
+class ReactionStore extends IdStore<OffchainReaction<any>> {
   private _storePost: { [identifier: string]: Array<OffchainReaction<any>> } = {};
 
   public add(reaction: OffchainReaction<any>) {
@@ -71,4 +71,4 @@ class ReactionsStore extends IdStore<OffchainReaction<any>> {
   }
 }
 
-export default ReactionsStore;
+export default ReactionStore;

@@ -70,6 +70,10 @@ import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
 import bulkThreads from './routes/bulkThreads';
+import createDraft from './routes/drafts/createDraft';
+import deleteDraft from './routes/drafts/deleteDraft';
+import editDraft from './routes/drafts/editDraft';
+import getDrafts from './routes/drafts/getDrafts';
 import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
 import deleteChainNode from './routes/deleteChainNode';
@@ -96,7 +100,6 @@ import bulkEntities from './routes/bulkEntities';
 
 function setupRouter(app, models, viewCountCache: ViewCountCache) {
   const router = express.Router();
-
   router.get('/status', status.bind(this, models));
 
   // TODO: Change to POST /gist
@@ -140,6 +143,12 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+
+  // offchain discussion drafts
+  router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
+  router.get('/drafts', getDrafts.bind(this, models));
+  router.delete('/drafts', passport.authenticate('jwt', { session: false }), deleteDraft.bind(this, models));
+  router.patch('/drafts', passport.authenticate('jwt', { session: false }), editDraft.bind(this, models));
 
   // offchain comments
   // TODO: Change to POST /comment

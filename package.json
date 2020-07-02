@@ -13,6 +13,7 @@
     "test-events": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/events/*.spec.ts ./test/unit/events/**/*.spec.ts ./test/integration/events/*.spec.ts",
     "integration-test": "nyc ts-mocha --project test/tsconfig.node.json ./test/integration/**/*.spec.ts",
     "test": "nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
+    "test-select": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/unit/api/*.spec.ts",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
