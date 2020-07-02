@@ -52,14 +52,20 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       { model: models.ChainEventType }
     ]
   });
+  // number of days between last reward record and latest reward record through events to ChainEvents
+  let daysDiff = 0;
+  const validators: IReward = {};
+
+  // No rewards
+  if (!rewards.length)
+    return res.json({ status: 'Success', result: { daysDiff, validators } });
 
   let start = rewards[0].created_at;
   let end = rewards[rewards.length - 1].created_at;
   start = moment(start);
   end = moment(end);
-  // number of days between last reward record and latest reward record through events to ChainEvents
-  const daysDiff = end.diff(start, 'days');
-  const validators: IReward = {};
+
+  daysDiff = end.diff(start, 'days');
 
   rewards.map((reward) => {
     const event_data: IEventData = reward.dataValues.event_data;
@@ -68,8 +74,6 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     validators[key] = +event_data.amount + validators[key];
     return event_data;
   });
-  // No rewards
-  if (!rewards) return next(new Error('Failure'));
 
   return res.json({ status: 'Success', result: { daysDiff, validators } });
 };
