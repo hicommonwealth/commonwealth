@@ -27,7 +27,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem } from 'construct-ui';
+import { MenuItem, Button } from 'construct-ui';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -290,9 +290,11 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
     const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
     return m('.ProposalBodyCancelEdit', [
-      m('a', {
+      m(Button, {
         class: 'cancel-editing',
-        href: '#',
+        label: 'Cancel',
+        disabled: parentState.saving,
+        intent: 'none',
         onclick: async (e) => {
           e.preventDefault();
           let confirmed = true;
@@ -324,17 +326,24 @@ export const ProposalBodySaveEdit: m.Component<{
     const isThread = item instanceof OffchainThread;
 
     return m('.ProposalBodySaveEdit', [
-      m('a', {
-        href: '#',
+      m(Button, {
+        class: 'save-editing',
+        label: 'Save',
+        disabled: parentState.saving,
+        intent: 'primary',
         onclick: (e) => {
           e.preventDefault();
+          parentState.saving = true;
+          parentState.quillEditorState.editor.enable(false);
           const itemText = parentState.quillEditorState.markdownMode
             ? parentState.quillEditorState.editor.getText()
             : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
+              parentState.saving = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
               // TODO: set notification bar for 'thread edited' (?)
@@ -342,6 +351,7 @@ export const ProposalBodySaveEdit: m.Component<{
           } else if (item instanceof OffchainComment) {
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
+              parentState.saving = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               callback();
             });

@@ -21,20 +21,21 @@ import PageLoading from 'views/pages/loading';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 
 interface IState {
-  form: IThreadForm,
-  error,
-  quillEditorState,
-  hasComment,
   autoTitleOverride,
+  error,
+  form: IThreadForm,
+  hasComment,
   newType,
+  quillEditorState,
+  saving;
   uploadsInProgress,
 }
 
 interface IThreadForm {
   tagName?: string;
   tagId?: number;
-  url?: string;
   title?: string;
+  url?: string;
 }
 
 export const NewThreadForm: m.Component<{}, IState> = {
@@ -85,12 +86,14 @@ export const NewThreadForm: m.Component<{}, IState> = {
       ]),
     ]);
 
+    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
+
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
-      vnode.state.newType === 'Link' && m(Form, [
+      newType === 'Link' && m(Form, [
         typeSelector,
         m(FormGroup, [
           m(Input, {
@@ -117,7 +120,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           }),
         ]),
         m(FormGroup, [
-          vnode.state.hasComment ? m(QuillEditor, {
+          hasComment ? m(QuillEditor, {
             contentsDoc: '', // Prevent the editor from being filled in with previous content
             oncreateBind: (state) => {
               vnode.state.quillEditorState = state;
@@ -149,17 +152,19 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author ? 'disabled' : '',
+            class: !author || saving ? 'disabled' : '',
             intent: 'primary',
             label: 'Create link',
             name: 'submission',
             onclick: () => {
+              vnode.state.saving = true;
               if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                 vnode.state.error.url = 'Must provide a valid URL.';
               }
               if (!Object.values(vnode.state.error).length) {
                 newLink(vnode.state.form, vnode.state.quillEditorState, author);
               }
+              vnode.state.saving = false;
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {
@@ -179,7 +184,7 @@ export const NewThreadForm: m.Component<{}, IState> = {
           : m('.error-placeholder'),
       ]),
       //
-      vnode.state.newType === 'Discussion' && m(Form, [
+      newType === 'Discussion' && m(Form, [
         typeSelector,
         m(FormGroup, [
           m(Input, {
@@ -219,10 +224,12 @@ export const NewThreadForm: m.Component<{}, IState> = {
         ]),
         m(FormGroup, [
           m(Button, {
-            class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+            class: !author || saving || uploadsInProgress > 0 ? 'disabled' : '',
             intent: 'primary',
-            onclick: () => {
-              vnode.state.error = newThread(vnode.state.form, vnode.state.quillEditorState, author);
+            onclick: async () => {
+              vnode.state.saving = true;
+              vnode.state.error = await newThread(vnode.state.form, vnode.state.quillEditorState, author);
+              vnode.state.saving = false;
               if (!vnode.state.error) {
                 $(vnode.dom).trigger('modalcomplete');
                 setTimeout(() => {

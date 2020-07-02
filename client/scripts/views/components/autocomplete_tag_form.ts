@@ -21,9 +21,12 @@ interface IAutoCompleteTagFormState {
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
-  view: (vnode) => {
-    const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
+  oninit: (vnode) => {
+    const { activeTag } = vnode.attrs;
     if (activeTag) (vnode.state.selectedTag as any) = activeTag;
+  },
+  view: (vnode) => {
+    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
 
     const itemRender = (tag) => {
       return m(ListItem, {
@@ -75,6 +78,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
       class: 'AutocompleteTagForm',
       filterable: false,
       checkmark: false,
+      closeOnSelect: true,
       emptyContent: m(EmptyContent),
       inputAttrs: {
         class: 'autocomplete-tag-input',

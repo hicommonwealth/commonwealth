@@ -55,6 +55,7 @@ interface IProposalHeaderAttrs {
 
 interface IProposalHeaderState {
   editing: boolean;
+  saving: boolean;
   quillEditorState: any;
   currentText: any;
   tagEditorIsOpen: boolean;
@@ -139,12 +140,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   }),
                   m(ProposalBodyDeleteMenuItem, { item: proposal }),
                 ],
-              proposal instanceof OffchainThread
-                && vnode.state.editing
-                && [
-                  m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-                  m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state })
-                ],
             ],
             inline: true,
             trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
@@ -173,7 +168,13 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
           m(ProposalBodyReaction, { item: proposal }),
         ]),
         m('.proposal-bottom-right', [
-          m(ProposalHeaderViewCount, { viewCount }),
+          !vnode.state.editing
+          && m(ProposalHeaderViewCount, { viewCount }),
+          vnode.state.editing
+          && m('.proposal-body-button-group', [
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+          ]),
         ]),
       ]),
     ]);
@@ -182,6 +183,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
 interface IProposalCommentState {
   editing: boolean;
+  saving: boolean;
   replying: boolean;
   quillEditorState: any;
 }
@@ -272,11 +274,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           //       parentState: vnode.state,
           //     }),
           //   ],
-
-          vnode.state.editing && [
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-          ],
         ]),
         m('.comment-body-content', [
           !vnode.state.editing
@@ -291,7 +288,13 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
         ]),
         m('.comment-body-bottom', [
-          m(ProposalBodyReaction, { item: comment }),
+          m('.comment-body-bottom-left', [
+            m(ProposalBodyReaction, { item: comment }),
+          ]),
+          vnode.state.editing && m('.comment-body-bottom-right', [
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+          ]),
         ]),
       ]),
     ]);
@@ -422,7 +425,10 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
+const ViewProposalPage: m.Component<{
+  identifier: string,
+  type: string
+}, {
   editing: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
@@ -485,6 +491,17 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
         });
       vnode.state.commentsPrefetchStarted = true;
     }
+
+    if (vnode.state.comments?.length) {
+      const mismatchedComments = vnode.state.comments.filter((c) => {
+        return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
+      });
+      if (mismatchedComments.length) {
+        vnode.state.commentsPrefetchStarted = false;
+      }
+    }
+
+
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
       m.redraw();
