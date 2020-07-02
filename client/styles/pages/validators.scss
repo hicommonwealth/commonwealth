@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import "client/styles/shared";
 
 @mixin small-gray {
     font-size: 13px;
@@ -10,156 +10,154 @@
 
 // Progress Bar
 .bar-outer-era {
-  width: 100%;
-  height: 2px;
-  border: #DFE8EE 1px solid;
-  margin-top: 5px;
-  margin-right: 10px;
+    width: 100%;
+    height: 2px;
+    border: #dfe8ee 1px solid;
+    margin-top: 5px;
+    margin-right: 10px;
 }
 
 .bar-inner-era {
-  width: 0%;
-  height: 2px;
-  background-color: #35D413;
+    width: 0%;
+    height: 2px;
+    background-color: #35d413;
 }
 
 .bar-outer-epoch {
-  width: 100%;
-  height: 2px;
-  border: #DFE8EE 1px solid;
-  margin-top: 5px;
-  margin-right: 10px;
+    width: 100%;
+    height: 2px;
+    border: #dfe8ee 1px solid;
+    margin-top: 5px;
+    margin-right: 10px;
 }
 
-.bar-inner-epoch{
-  width: 0%;
-  height: 2px;
-  background-color: #35D413;
+.bar-inner-epoch {
+    width: 0%;
+    height: 2px;
+    background-color: #35d413;
 }
 
 .NewStashForm {
-  margin: 16px 0 10px;
-  .form-group {
-    margin-bottom: 16px;
-  }
-  button {
-    margin: 6px 0;
-  }
+    margin: 16px 0 10px;
+    .form-group {
+        margin-bottom: 16px;
+    }
+    button {
+        margin: 6px 0;
+    }
 }
 
-.LoadingPage .left-sidebar{
-  display: none !important;
-}
-
-// avatar div
-.user-avatar{
-  margin: -3px 0!important;
-  width: auto !important;
-  height: auto !important;
-}
-
-.Jdenticon{
-  width: 1vw!important;
-  height: 1vw !important;
-}
-
-
-// removed right sidebar
-.right-sidebar{
+.LoadingPage .left-sidebar {
     display: none !important;
 }
 
-.user-display-name{
-  padding-left: 0.3em !important;
+// avatar div
+.user-avatar {
+    margin: -3px 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.Jdenticon {
+    width: 1vw !important;
+    height: 1vw !important;
+}
+
+// removed right sidebar
+.right-sidebar {
+    display: none !important;
+}
+
+.user-display-name {
+    padding-left: 0.3em !important;
 }
 
 .ViewNominatorsModal {
-  position: relative !important;
-  width: 440px !important;
-  box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3) !important;
-  border-radius: 4px !important;
-  @include xs-max {
-    .popup {
-        min-width: 310px;
-    }
-    .compact-modal-title {
-        padding: 14px 20px 12px;
-        h1, h2, h3 {
-            font-size: 16px;
+    position: relative !important;
+    width: 440px !important;
+    box-shadow: 0px 16px 24px rgba(67, 90, 111, 0.3) !important;
+    border-radius: 4px !important;
+    @include xs-max {
+        .popup {
+            min-width: 310px;
+        }
+        .compact-modal-title {
+            padding: 14px 20px 12px;
+            h1,
+            h2,
+            h3 {
+                font-size: 16px;
+            }
+        }
+        .compact-modal-body,
+        .compact-modal-actions {
+            padding-left: 20px;
+            padding-right: 20px;
         }
     }
-    .compact-modal-body,
-    .compact-modal-actions {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-}
 }
 
 .ManageStakingModal {
-  min-width: 780px;
-  .compact-modal-title h3 .User .user-avatar {
-    margin-left: 4px;
-  }
-  .compact-modal-title h3 .User a.user-display-name {
-    color: #fff;
-    font-weight: 700;
-    margin-right: 10px;
-  }
-  h4 {
-    font-weight: 700;
-    font-size: 18px;
-    margin: 40px 0 8px;
-  }
-  h4:first-child {
-    margin-top: 12px;
-  }
-  p {
-    margin: 4px 0 20px;
-  }
-  h5 {
-    font-size: 13px;
-    text-transform: uppercase;
-    color: #aaa;
-    letter-spacing: 0.3px;
-    margin: 0 0 5px;
-  }
-  .well {
-    margin: 12px 0;
-    padding: 18px 24px;
-    background: #f8f8f8;
-    &.not-available {
-      color: #999;
+    min-width: 780px;
+    .compact-modal-title h3 .User .user-avatar {
+        margin-left: 4px;
     }
-  }
-  .stash-stat {
-    float: left;
-    margin-right: 42px;
-    .stash-stat-text {
-      font-size: 17px;
+    .compact-modal-title h3 .User a.user-display-name {
+        color: #fff;
+        font-weight: 700;
+        margin-right: 10px;
     }
-    .stash-balance {
-      font-family: iA Writer Quattro;
+    h4 {
+        font-weight: 700;
+        font-size: 18px;
+        margin: 40px 0 8px;
     }
-  }
+    h4:first-child {
+        margin-top: 12px;
+    }
+    p {
+        margin: 4px 0 20px;
+    }
+    h5 {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: #aaa;
+        letter-spacing: 0.3px;
+        margin: 0 0 5px;
+    }
+    .well {
+        margin: 12px 0;
+        padding: 18px 24px;
+        background: #f8f8f8;
+        &.not-available {
+            color: #999;
+        }
+    }
+    .stash-stat {
+        float: left;
+        margin-right: 42px;
+        .stash-stat-text {
+            font-size: 17px;
+        }
+        .stash-balance {
+            font-family: iA Writer Quattro;
+        }
+    }
 
-  .chill-button {
-    display: inline-block;
-    margin-top: 6px;
-  }
+    .chill-button {
+        display: inline-block;
+        margin-top: 6px;
+    }
 }
-
-
 
 .Validators {
     width: 100%;
-    .validators-table
-    {
-      table-layout: auto !important;
-      width: 100%;
-      display: flex;
-      flex-flow: column nowrap;
-      flex: 1 1 auto;
+    .validators-table {
+        table-layout: auto !important;
+        width: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 1 1 auto;
     }
     th {
         @include small-gray;
@@ -175,89 +173,89 @@
         text-overflow: ellipsis;
         min-width: 0px;
         white-space: nowrap;
-
     }
-    tr,.nextValidator{
-      width: 100%;
-      display: flex;
-      flex-flow: row nowrap;
+    tr,
+    .nextValidator {
+        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
     }
     td {
-      display: flex;
-      flex-flow: row nowrap;
-      flex-grow: 1;
-      flex-basis: 0;
-      word-break: break-word;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 15px;
-      border-bottom: 1;
-      padding-top: 15px;
-      padding-bottom: 14px;
-      overflow-wrap: break-word;
-      min-width: 0px;
+        display: flex;
+        flex-flow: row nowrap;
+        flex-grow: 1;
+        flex-basis: 0;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 15px;
+        border-bottom: 1;
+        padding-top: 15px;
+        padding-bottom: 14px;
+        overflow-wrap: break-word;
+        min-width: 0px;
     }
 
-    .cut-text{
-      display: inline-block !important;
+    .cut-text {
+        display: inline-block !important;
     }
 
-    .val-last-hash{
-      padding-left: 0.5vw !important;
+    .val-last-hash {
+        padding-left: 0.5vw !important;
     }
 
-    .val-author, .val-block-author{
-      padding-left: 4vw !important;
+    .val-author,
+    .val-block-author {
+        padding-left: 4vw !important;
     }
 
-    .val-block-number, .val-number{
-      flex: 0 0 10% !important;
+    .val-block-number,
+    .val-number {
+        flex: 0 0 10% !important;
     }
 
-    .val-total{
-      flex: 0.35 0 10% !important;
-      padding-left: 0.3vw !important;
-
+    .val-total {
+        flex: 0.35 0 10% !important;
+        padding-left: 0.3vw !important;
     }
-    .val-stash{
-      padding-left: 0.3vw !important;
-
+    .val-stash {
+        padding-left: 0.3vw !important;
     }
 
-    .val-controller, .val-stash{
-       flex: 0.5 0 10% !important;
-    }
-   
-    .val-points{
-      flex: 0 0 7% !important;
+    .val-controller,
+    .val-stash {
+        flex: 0.5 0 10% !important;
     }
 
-    .val-commission{
-      padding-left: 0.5vw !important;
+    .val-points {
+        flex: 0 0 7% !important;
+    }
+
+    .val-commission {
+        padding-left: 0.5vw !important;
     }
     .val-action {
         text-align: right;
     }
 
-    .cui-icon svg{
-      width: 0.938vw !important;
-      height: 0.938vw !important;
+    .cui-icon svg {
+        width: 0.938vw !important;
+        height: 0.938vw !important;
     }
 
     @media only screen and (max-width: 1300px) {
-     th{
-      //  padding-right: 5px !important;
-       font-size: 1vw !important;
-      //  font-weight: bold !important;
-       padding:1vw 0.5vw !important;
-      //  text-align: center !important;
-     }
-      td{
-        font-size: 1vw !important;
-        padding: 1vw 0.5vw !important;
-      }
-     
+        th {
+            //  padding-right: 5px !important;
+            font-size: 1vw !important;
+            //  font-weight: bold !important;
+            padding: 1vw 0.5vw !important;
+            //  text-align: center !important;
+        }
+        td {
+            font-size: 1vw !important;
+            padding: 1vw 0.5vw !important;
+       }
     }
     @include sm-max {
         .val-nominated {
@@ -275,240 +273,231 @@
 
 .ValidatorPage {
     margin: 0 auto;
-  .validators-preheader {
-    display: grid;
-    grid-row-gap: 30px;
-    grid-template-columns: auto auto auto auto auto auto auto;
-    margin-bottom: 30px;
-    // .validators-preheader-item {
-  
-    // }
-    .validators-preheader-item h3 {
-        @include small-gray;
-        margin: 0 0 6px;
+    .validators-preheader {
+        display: grid;
+        grid-row-gap: 30px;
+        grid-template-columns: auto auto auto auto auto auto auto;
+        margin-bottom: 30px;
+        // .validators-preheader-item {
+
+        // }
+        .validators-preheader-item h3 {
+            @include small-gray;
+            margin: 0 0 6px;
+        }
+        .validators-preheader-item .validators-preheader-item-text {
+            font-size: 17px;
+        }
+        .validators-preheader-item-progressbox {
+            width: fit-content !important;
+        }
     }
-    .validators-preheader-item .validators-preheader-item-text {
-        font-size: 17px;
-    }
-    .validators-preheader-item-progressbox{
-        width: fit-content !important;
-    }
-  }
 }
 
-
-.update-nominations{
-  display: block !important;
-  width: auto !important;
-  min-width: 200px !important;
+.update-nominations {
+    display: block !important;
+    width: auto !important;
+    min-width: 200px !important;
 }
 
 @media only screen and (max-width: 1000px) {
-    .validators-preheader{
+    .validators-preheader {
         grid-template-columns: auto auto auto !important;
-    }    
+    }
 }
 
 @media only screen and (max-width: 767px) {
-    .validators-preheader{
-        grid-template-columns: auto auto!important;
-    }    
+    .validators-preheader {
+        grid-template-columns: auto auto !important;
+    }
 }
 
-
-.gray-text{
-    color: #536E7C !important;
+.gray-text {
+    color: #536e7c !important;
     padding-left: 5px !important;
 }
-
 
 // ----------------Waiting class styles
 // Column that shows nothing on waiting validators
 
-.nextValidator .val-im-online{
+.nextValidator .val-im-online {
     display: none !important;
 }
 
-//sdasdadf
-
-
-.nextValidator td{
+.nextValidator td {
     background-color: #5b7af64d !important;
     padding-left: 10px !important;
-
 }
-.nextValidator .val-stash-waiting{
-  flex: 0 0 24.5% !important;
+.nextValidator .val-stash-waiting {
+    flex: 0 0 24.5% !important;
 }
-.nextValidator .val-nominations{
-  flex: 0 0 25% !important;
+.nextValidator .val-nominations {
+    flex: 0 0 25% !important;
 }
 // padding seperation around wifi
-.cui-icon-wifi{
+.cui-icon-wifi {
     padding-right: 5px !important;
 }
-
-
 
 // Modal Styles for Validator Page
 
 .compact-modal-title {
-  padding-top: 20px !important;
-  padding-left: 20px !important;
-  background: #fff !important; 
-  color: #000 !important;
-  padding-bottom: 0 !important;
-  h1, h2, h3 {
-      font-family: Inter !important;
-      font-style: normal !important;
-      font-size: 16px!important;
-      line-height: 120%!important;
-      letter-spacing: -0.2px!important;
-      margin: 0!important;
-      padding: 0!important;
-  }
-  .subtitle {
-      margin-top: 1px!important;
-      margin-bottom: 2px!important;
-  }
+    padding-top: 20px !important;
+    padding-left: 20px !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding-bottom: 0 !important;
+    h1,
+    h2,
+    h3 {
+        font-family: Inter !important;
+        font-style: normal !important;
+        font-size: 16px !important;
+        line-height: 120% !important;
+        letter-spacing: -0.2px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .subtitle {
+        margin-top: 1px !important;
+        margin-bottom: 2px !important;
+    }
 }
 .compact-modal-body {
-  padding: 20px 20px 0!important;
-  &:last-child {
-      padding-bottom: 16px!important;
-  }
-  td, th{
-    padding: 12px 0 !important;
+    padding: 20px 20px 0 !important;
+    &:last-child {
+        padding-bottom: 16px !important;
+    }
+    td,
+    th {
+        padding: 12px 0 !important;
     }
 
-   .amount, .priority{
-    text-align: right !important;
-  
-  }
-    
-// avatar div
-.user-avatar{
-  width: 25px !important;
-  height: 25px !important;
-  padding-right: 14px !important;
-}
-.Jdenticon{
-  width: 25px !important;
-  height: 25px !important;
-}
-}
-.compact-modal-body th{
-  font-style: normal!important;
-  font-weight: bold!important;
-  font-size: 16px!important;
-  line-height: 120%!important;
-  text-align: left !important;
-  letter-spacing: -0.2px!important;
-  font-family: 'Inter', sans-serif !important;
+    .amount,
+    .priority {
+        text-align: right !important;
+    }
 
+    // avatar div
+    .user-avatar {
+        width: 25px !important;
+        height: 25px !important;
+        padding-right: 14px !important;
+    }
+    .Jdenticon {
+        width: 25px !important;
+        height: 25px !important;
+    }
 }
-.compact-modal-body td{
-  font-family: 'Inter', sans-serif !important;
-  font-style: normal!important;
-  font-weight: normal!important;
-  font-size: 16px!important;
-  line-height: 120%!important;
-  letter-spacing: -0.2px!important;
+.compact-modal-body th {
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    line-height: 120% !important;
+    text-align: left !important;
+    letter-spacing: -0.2px !important;
+    font-family: "Inter", sans-serif !important;
+}
+.compact-modal-body td {
+    font-family: "Inter", sans-serif !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-size: 16px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
 }
 .compact-modal-actions {
-  padding: 6px 28px 28px!important;
+    padding: 6px 28px 28px !important;
 }
-.amount,.priority{
-  text-align: right !important;
+.amount,
+.priority {
+    text-align: right !important;
 }
-.padding-left-2{
-  padding-left: 2px;
+.padding-left-2 {
+    padding-left: 2px;
 }
-.left-5{
-  padding-left: 5px;
+.left-5 {
+    padding-left: 5px;
 }
-
-
-
 
 // Name Tooltip
 
-.legal{
-font-family: Inter !important;
-font-style: normal !important;
-font-weight: 500 !important;
-font-size: 12px !important;
-line-height: 120% !important;
-letter-spacing: -0.2px !important;
-color: #536E7C !important;
+.legal {
+    font-family: Inter !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
+    color: #536e7c !important;
+    margin-top: 17px !important;
+    margin-bottom: 15px !important;
 }
 
-.identity a{
-  text-decoration: none !important;
-  font-family: Inter !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-size: 16px !important;
-  line-height: 120% !important;
-  letter-spacing: -0.2px !important;
-  color: #000000 !important;
+.identity a {
+    text-decoration: none !important;
+    font-family: Inter !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-size: 16px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
+    color: #000000 !important;
 }
 
-.identity hr{
-  margin: 0px !important;
-  width: 180px !important;
-  border: 1px solid #E4E4E4;
+.identity hr {
+    margin: 0px !important;
+    width: 189px !important;
+    border: 0.2px solid #e4e4e4 !important;
 }
 
-
-.identity .user-display-name{
-font-family: Inter !important;
-font-style: normal !important;
-font-weight: bold !important;
-font-size: 16px !important;
-line-height: 120% !important;
-letter-spacing: -0.2px !important;
-color: #000000 !important;
+.identity .user-display-name {
+    font-family: Inter !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
+    color: #000000 !important;
 }
 
-.left-5{
-  padding-left: 8px !important; 
+.left-5 {
+    padding-left: 8px !important;
 }
 
-.User span{
-  display: none !important;
+.User span {
+    display: none !important;
 }
 
-.cui-popover-dismiss{
-min-width: 76px !important;
-font-family: Inter !important;
-font-style: normal !important;
-font-weight: 500 !important;
-font-size: 12px !important;
-line-height: 120% !important;
-letter-spacing: -0.2px !important;
+.cui-popover-dismiss {
+    min-width: 76px !important;
+    font-family: Inter !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
 
-/* Gray 2 */
-color: #536E7C;
+    /* Gray 2 */
+    color: #536e7c;
 }
 
-.User label{
-font-family: Inter !important;
-font-style: normal !important;
-font-weight: 500 !important;
-font-size: 12px !important;
-line-height: 120% !important;
-letter-spacing: -0.2px !important;
-color: #536E7C !important;
+.User label {
+    font-family: Inter !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 120% !important;
+    letter-spacing: -0.2px !important;
+    color: #536e7c !important;
 }
 
-.cui-icon .cui-sm{
-  min-width: 15px !important;
-  min-height: 15px !important;
+.cui-icon .cui-sm {
+    min-width: 15px !important;
+    min-height: 15px !important;
 }
 
-.cui-icon svg{
-  stroke: #252525 !important;
-  margin-left: 5px !important;
-
+.cui-icon svg {
+    stroke: #252525 !important;
+    margin-left: 5px !important;
 }
