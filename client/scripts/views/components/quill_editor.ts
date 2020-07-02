@@ -228,6 +228,111 @@ const instantiateEditor = (
   Quill.register('modules/clipboard', CustomClipboard, true);
   Quill.register('formats/twitter', TwitterBlot, true);
   Quill.register('formats/video', VideoBlot, true);
+
+  const searchMentionableAddresses = async (searchTerm: string) => {
+    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      chain: app.activeChainId(),
+      community: app.activeCommunityId(),
+      limit: 6,
+      searchTerm,
+      order: ['name', 'ASC']
+    });
+    if (response.status !== 'Success') {
+      throw new Error(`got unsuccessful status: ${response.status}`);
+    }
+    return response.result;
+  };
+
+  let typingListener;
+  const queryMentions = async (searchTerm, renderList, mentionChar) => {
+    if (mentionChar !== '@') return;
+    // Optional code for tagging roles:
+    // if (app.activeCommunityId()) roleData = await searchRoles();
+    // const truncRoles = roleData.filter(
+    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
+
+    let members = [];
+    let formattedMatches;
+    if (searchTerm.length === 0) {
+      typingListener = setTimeout(() => {
+        const node = document.createElement('div');
+        const tip = document.createElement('span');
+        tip.innerText = 'Type to tag a member';
+        node.appendChild(tip);
+        formattedMatches = [{
+          link: '#',
+          name: '',
+          component: node.outerHTML,
+        }];
+        renderList(formattedMatches, searchTerm);
+      }, 300);
+    } else if (searchTerm.length > 0) {
+      if (typingListener) clearTimeout(typingListener);
+      members = await searchMentionableAddresses(searchTerm);
+      formattedMatches = members.map((addr) => {
+        const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
+        const node = document.createElement('div');
+
+        let avatar;
+        if (profile.avatarUrl) {
+          avatar = document.createElement('img');
+          (avatar as HTMLImageElement).src = profile.avatarUrl;
+          avatar.className = 'ql-mention-avatar';
+          node.appendChild(avatar);
+        } else {
+          avatar = document.createElement('div');
+          avatar.className = 'ql-mention-avatar';
+          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
+        }
+
+        const nameSpan = document.createElement('span');
+        nameSpan.innerText = addr.name;
+        nameSpan.className = 'ql-mention-name';
+
+        const addrSpan = document.createElement('span');
+        addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
+        addrSpan.className = 'ql-mention-addr';
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'ql-mention-text-wrap';
+
+        node.appendChild(avatar);
+        textWrap.appendChild(nameSpan);
+        textWrap.appendChild(addrSpan);
+        node.appendChild(textWrap);
+
+        return ({
+          link: `/${addr.chain}/account/${addr.address}`,
+          name: addr.name,
+          component: node.outerHTML,
+        });
+      });
+    }
+    renderList(formattedMatches, searchTerm);
+  };
+
+  const selectMention = (item) => {
+    if (item.link === '#' && item.name === '') return;
+    const text = quill.getText();
+    const cursorIdx = quill.selection.savedRange.index;
+    const mentionLength = text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+    const beforeText = text.slice(0, cursorIdx - mentionLength);
+    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
+    if (isMarkdownMode()) {
+      const fullText = `${beforeText}[@${item.name}](${item.link}) ${afterText.replace(/^ /, '')}`;
+      quill.setText(fullText);
+      quill.setSelection(fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0));
+    } else {
+      const delta = new Delta()
+        .retain(beforeText.length)
+        .delete(mentionLength)
+        .insert(`@${item.name}`, { link: item.link });
+      if (!afterText.startsWith(' ')) delta.insert(' ');
+      quill.updateContents(delta);
+      quill.setSelection(quill.getLength() - afterText.length - (afterText.startsWith(' ') ? 0 : 1), 0);
+    }
+  };
+
   // Setup custom keyboard bindings, override Quill default bindings where necessary
   const bindings = {
     // Don't insert hard tabs
@@ -247,6 +352,22 @@ const instantiateEditor = (
         const isEmbed = insertEmbeds(textContent);
         // if embed, stopPropogation; otherwise continue
         return !isEmbed;
+      }
+    },
+    // Check for mentions on return
+    'add-mention': {
+      key: 'Enter',
+      shortKey: false,
+      shiftKey: null,
+      handler: (range, context) => {
+        const mentions = quill.getModule('mention');
+        if (mentions.isOpen) {
+          selectMention(mentions.getItemData());
+          mentions.escapeHandler();
+          return false;
+        } else {
+          return true;
+        }
       }
     },
     // Submit on cmd-Enter/ctrl-Enter
@@ -419,20 +540,6 @@ const instantiateEditor = (
     }
   };
 
-  const searchMentionableAddresses = async (searchTerm: string) => {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
-      chain: app.activeChainId(),
-      community: app.activeCommunityId(),
-      limit: 6,
-      searchTerm,
-      order: ['name', 'ASC']
-    });
-    if (response.status !== 'Success') {
-      throw new Error(`got unsuccessful status: ${response.status}`);
-    }
-    return response.result;
-  };
-
   // const searchRoles = async () => {
   //   if (!app.activeCommunityId) return [];
   //   const response = await $.get(`${app.serverUrl()}/bulkMembers`, {
@@ -449,96 +556,6 @@ const instantiateEditor = (
   //   }));
   //   return res;
   // };
-
-  let typingListener;
-  const queryMentions = async (searchTerm, renderList, mentionChar) => {
-    if (mentionChar !== '@') return;
-    // Optional code for tagging roles:
-    // if (app.activeCommunityId()) roleData = await searchRoles();
-    // const truncRoles = roleData.filter(
-    //   (role) => role.name.includes(searchTerm) || role.address.includes(searchTerm));
-
-    let members = [];
-    let formattedMatches;
-    if (searchTerm.length === 0) {
-      typingListener = setTimeout(() => {
-        const node = document.createElement('div');
-        const tip = document.createElement('span');
-        tip.innerText = 'Type to tag a member';
-        node.appendChild(tip);
-        formattedMatches = [{
-          link: '#',
-          name: '',
-          component: node.outerHTML,
-        }];
-        renderList(formattedMatches, searchTerm);
-      }, 300);
-    } else if (searchTerm.length > 0) {
-      if (typingListener) clearTimeout(typingListener);
-      members = await searchMentionableAddresses(searchTerm);
-      formattedMatches = members.map((addr) => {
-        const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
-        const node = document.createElement('div');
-
-        let avatar;
-        if (profile.avatarUrl) {
-          avatar = document.createElement('img');
-          (avatar as HTMLImageElement).src = profile.avatarUrl;
-          avatar.className = 'ql-mention-avatar';
-          node.appendChild(avatar);
-        } else {
-          avatar = document.createElement('div');
-          avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 16);
-        }
-
-        const nameSpan = document.createElement('span');
-        nameSpan.innerText = addr.name;
-        nameSpan.className = 'ql-mention-name';
-
-        const addrSpan = document.createElement('span');
-        addrSpan.innerText = addr.chain === 'near' ? addr.address : `${addr.address.slice(0, 6)}...`;
-        addrSpan.className = 'ql-mention-addr';
-
-        const textWrap = document.createElement('div');
-        textWrap.className = 'ql-mention-text-wrap';
-
-        node.appendChild(avatar);
-        textWrap.appendChild(nameSpan);
-        textWrap.appendChild(addrSpan);
-        node.appendChild(textWrap);
-
-        return ({
-          link: `/${addr.chain}/account/${addr.address}`,
-          name: addr.name,
-          component: node.outerHTML,
-        });
-      });
-    }
-    renderList(formattedMatches, searchTerm);
-  };
-
-  const selectMention = (item) => {
-    if (item.link === '#' && item.name === '') return;
-    const text = quill.getText();
-    const cursorIdx = quill.selection.savedRange.index;
-    const mentionLength = text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
-    const beforeText = text.slice(0, cursorIdx - mentionLength);
-    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
-    if (isMarkdownMode()) {
-      const fullText = `${beforeText}[@${item.name}](${item.link}) ${afterText.replace(/^ /, '')}`;
-      quill.setText(fullText);
-      quill.setSelection(fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0));
-    } else {
-      const delta = new Delta()
-        .retain(beforeText.length)
-        .delete(mentionLength)
-        .insert(`@${item.name}`, { link: item.link });
-      if (!afterText.startsWith(' ')) delta.insert(' ');
-      quill.updateContents(delta);
-      quill.setSelection(quill.getLength() - afterText.length - (afterText.startsWith(' ') ? 0 : 1), 0);
-    }
-  };
 
   quill = new Quill($editor[0], {
     debug: 'error',

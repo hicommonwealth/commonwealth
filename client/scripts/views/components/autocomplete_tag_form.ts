@@ -20,8 +20,12 @@ interface IAutoCompleteTagFormState {
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
+  oninit: (vnode) => {
+    const { activeTag } = vnode.attrs;
+    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
+  },
   view: (vnode) => {
-    const { featuredTags, activeTag, tabindex, tags, updateFormData } = vnode.attrs;
+    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
 
     const itemRender = (tag) => {
       return m(ListItem, {
@@ -68,18 +72,12 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
         }, 'No matches found. Add tag?');
       }
     };
-    if ((activeTag as OffchainTag)?.id) {
-      (vnode.state.selectedTag as any) = activeTag;
-    } else if (typeof activeTag === 'string') {
-      addTag(activeTag);
-    } else if (!activeTag) {
-      vnode.state.selectedTag = null;
-    }
 
     return m(SelectList, {
       class: 'AutocompleteTagForm',
       filterable: false,
       checkmark: false,
+      closeOnSelect: true,
       emptyContent: m(EmptyContent),
       inputAttrs: {
         class: 'autocomplete-tag-input',
