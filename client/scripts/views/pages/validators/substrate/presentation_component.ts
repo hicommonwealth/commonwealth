@@ -108,8 +108,7 @@ const PresentationComponent = (state, chain: Substrate) => {
             m(Icon, { name: model.sortIcon('eraPoints'),
               size: 'lg',
               onclick: () => model.changeSort('eraPoints') })),
-          app.chain.id === ChainClass.Kusama
-          && m('th.val-apr', 'Est. APR'),
+          m('th.val-apr', 'Est. APR'),
           m('th.val-last-hash', 'last #'),
           m('th.val-action', ''),
         ]),

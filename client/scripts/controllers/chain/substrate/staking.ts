@@ -315,7 +315,11 @@ class SubstrateStaking implements StorageModule {
           }
 
           const totalStake = exposure?.total.toBn() || new BN(0);
-          const totalReward = rewards.validators[key] || 0;
+          let totalReward = rewards.validators[key] || 0;
+
+          // if rewards have rewards for chain id, split with every validator equally.
+          if (rewards.validators[this._app.chain.id])
+            totalReward += rewards.validators[this._app.chain.id] / accounts.length;
 
           accountsTotalStake = accountsTotalStake.add(totalStake);
 
@@ -336,18 +340,6 @@ class SubstrateStaking implements StorageModule {
           // number of days between last reward record and latest reward record through events to ChainEvents
           validatorRewards[key] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
         });
-
-        if (rewards.validators[this._app.chain.id]) {
-          let percentage = 0;
-          const rewardBN = (this._app.chain as Substrate).chain.coins(rewards.validators[this._app.chain.id] || 0);
-          const totalStakeBN = (this._app.chain as Substrate).chain.coins(accountsTotalStake);
-
-          if (totalStakeBN.gt(new BN(0))) {
-            // Number can only safely store up to 53 bits for toNumber function.
-            percentage = +rewardBN.muln(n).div(totalStakeBN).toString() / n;
-          }
-          validatorRewards[this._app.chain.id] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
-        }
         return validatorRewards;
       }),
     );

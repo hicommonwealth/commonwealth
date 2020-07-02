@@ -99,8 +99,7 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
       ]),
       m('td.val-commission', `${commission.toFixed(2)}%`),
       m('td.val-points', vnode.attrs.eraPoints || '0'),
-      app.chain.id === ChainClass.Kusama
-      && m('td.val-apr', `${vnode.attrs?.apr.toFixed(2)}%`),
+      m('td.val-apr', `${vnode.attrs?.apr.toFixed(2)}%`),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
