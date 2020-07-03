@@ -1,5 +1,3 @@
-import 'pages/view_proposal/header.scss';
-
 import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
@@ -28,97 +26,6 @@ import User from 'views/components/widgets/user';
 import { getStatusClass, getStatusText, getSupportText } from 'views/components/proposal_row';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-
-export const ProposalHeaderAuthor: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (!proposal.author) return;
-
-    const author : Account<any> = proposal instanceof OffchainThread
-      ? (!app.community
-        ? app.chain.accounts.get(proposal.author)
-        : app.community.accounts.get(proposal.author, proposal.authorChain))
-      : proposal.author;
-
-    return m('.ProposalHeaderAuthor', [
-      m(User, {
-        user: author,
-        tooltip: true,
-        linkify: true,
-        hideAvatar: true,
-      }),
-    ]);
-  }
-};
-
-export const ProposalHeaderCreated: m.Component<{ proposal: AnyProposal | OffchainThread, link: string }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    const proposalLink = vnode.attrs.link;
-    if (!proposal) return;
-    if (!proposal.createdAt) return;
-
-    return m('.ProposalHeaderCreated', [
-      m('a', {
-        href: `${proposalLink}?comment=body`,
-        onclick: (e) => {
-          e.preventDefault();
-          updateRoute(`${proposalLink}?comment=body`);
-          jumpHighlightComment('body', false, 500);
-        }
-      }, proposal.createdAt.format('MMM D, YYYY'))
-    ]);
-  }
-};
-
-export const ProposalHeaderLastEdited: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (!(proposal instanceof OffchainThread)) return;
-    if (proposal.versionHistory?.length <= 1) return;
-    const lastEdit = JSON.parse(proposal.versionHistory[0]);
-
-    return m('.ProposalHeaderLastEdited', [
-      m('a', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: VersionHistoryModal,
-            data: { proposal },
-          });
-        }
-      }, [
-        'Edited ',
-        moment(lastEdit.timestamp).fromNow()
-      ])
-    ]);
-  }
-};
-
-export const ProposalHeaderDelete: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
-  view: (vnode) => {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-
-    return m(MenuItem, {
-      class: 'ProposalHeaderDelete',
-      label: 'Delete thread',
-      iconLeft: Icons.DELETE,
-      onclick: async (e) => {
-        e.preventDefault();
-        const confirmed = await confirmationModalWithText('Delete this entire thread?')();
-        if (!confirmed) return;
-        app.threads.delete(proposal).then(() => {
-          m.route.set(`/${app.activeId()}/`);
-          // TODO: set notification bar for 'thread deleted'
-        });
-      },
-    });
-  }
-};
 
 export const ProposalHeaderExternalLink: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
@@ -205,8 +112,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
-        iconLeft: proposal.readOnly ? Icons.UNLOCK : Icons.LOCK,
-        label: proposal.readOnly ? 'Enable commenting' : 'Disable commenting',
+        label: proposal.readOnly ? 'Turn on commenting' : 'Turn off commenting',
       }),
       // privacy toggle, show only if thread is private
       (proposal as OffchainThread).privacy && m(MenuItem, {
@@ -215,7 +121,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
         },
-        label: 'Make public',
+        label: 'Reveal to public',
       }),
     ];
   }

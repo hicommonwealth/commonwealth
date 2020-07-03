@@ -7,6 +7,7 @@ import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
+import Subheader from 'views/components/subheader';
 import AdminPanel from 'views/components/admin_panel';
 
 const TagListings: m.Component<{}, {}> = {
@@ -17,7 +18,7 @@ const TagListings: m.Component<{}, {}> = {
 
     const getTagRow = (name, id) => m(ListItem, {
       key: id,
-      contentLeft: m(Icon, { name: Icons.HASH }),
+      contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
       label: name.toLowerCase(),
       selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
       onclick: (e) => {
@@ -108,7 +109,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
     }, (!app.community && !app.chain) ? [
       // no community
       m(List, { interactive: true }, [
-        m('h4', 'Settings'),
+        m(Subheader, { text: 'Settings' }),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER, }),
           label: 'Settings',
@@ -123,9 +124,8 @@ const Sidebar: m.Component<{ activeTag: string }> = {
     ] : [
       // discussions
       m(List, { interactive: true }, [
-        m('h4', 'Discuss'),
+        m(Subheader, { text: 'Discuss' }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.HOME }),
           active: onDiscussionsPage(m.route.get()),
           label: 'Home',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
@@ -135,7 +135,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
       // proposals
       hasProposals
         && m(List, { interactive: true }, [
-          m('h4', 'Vote & Stake'),
+          m(Subheader, { text: 'Vote & Stake' }),
           // proposals (substrate, cosmos, moloch only)
           m(ListItem, {
             active: onProposalPage(m.route.get()),
@@ -197,7 +197,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
         ]),
       // manage
       m(List, { interactive: true }, [
-        m('h4', 'Manage'),
+        m(Subheader, { text: 'Manage' }),
         m(ListItem, {
           active: onMembersPage(m.route.get()),
           label: 'Members',

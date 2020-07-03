@@ -4,15 +4,18 @@
     display: block;
     .sublayout-main {
         display: flex;
-        max-width: $sublayout-max-width;
         margin: 0 auto;
         > .left-sidebar {
             width: $left-sidebar-width;
-            margin-right: $gutter-width;
+            border-right: 1px solid #eee;
+            padding-left: $horizontal-padding;
+            padding-right: $horizontal-gutter;
         }
         > .right-sidebar {
             width: $right-sidebar-width;
-            margin-left: $gutter-width;
+            padding-left: $horizontal-gutter;
+            padding-right: $horizontal-padding;
+            background: #f8f8f8;
         }
         > .sublayout-content {
             flex: 1;
