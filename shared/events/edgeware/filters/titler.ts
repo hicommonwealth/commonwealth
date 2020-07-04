@@ -61,6 +61,12 @@ const titlerFunc: TitlerFilter = (kind: SubstrateEventKind): IEventTitle => {
         description: 'At the end of the session, no offence was committed.',
       };
     }
+    case SubstrateEventKind.HeartbeatReceived: {
+      return {
+        title: 'imOnline HeartbeatReceived',
+        description: 'Heart beat received',
+      };
+    }
     /**
      * Democracy Events
      */

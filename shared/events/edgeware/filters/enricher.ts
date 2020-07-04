@@ -10,6 +10,7 @@ import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { Kind, OpaqueTimeSlot } from '@polkadot/types/interfaces/offences';
+import { AuthorityId } from '@polkadot/types/interfaces/consensus';
 import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
 import { CWEvent } from '../../interfaces';
 
@@ -531,6 +532,15 @@ export default async function (
             kind,
             sessionIndex,
             validators
+          }
+        };
+      }
+      case SubstrateEventKind.HeartbeatReceived: {
+        const [ authorityId ] = event.data as unknown as [ AuthorityId ];
+        return {
+          data: {
+            kind,
+            authorityId
           }
         };
       }

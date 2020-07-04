@@ -6,10 +6,9 @@ import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import Subscriber from './subscriber';
 import Poller from './poller';
 import Processor from './processor';
-import { SubstrateBlock } from './types';
+import { SubstrateBlock, SubstrateEventKind } from './types';
 import { IEventHandler, IBlockSubscriber, IDisconnectedRange, CWEvent } from '../interfaces';
 import fetchFromStorage from './storageFetcher';
-
 import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -95,7 +94,16 @@ export default async function (
   const processBlockFn = async (block: SubstrateBlock) => {
     // retrieve events from block
     const events: CWEvent[] = await processor.process(block);
-
+    const authorityId = api.createType('AuthorityId');
+    events.push({
+      blockNumber: 25100,
+      data: {
+        kind: SubstrateEventKind.HeartbeatReceived,
+        authorityId
+      }
+    });
+    console.log('------');
+    console.log(events);
     // send all events through event-handlers in sequence
     await Promise.all(events.map((event) => handleEventFn(event)));
   };

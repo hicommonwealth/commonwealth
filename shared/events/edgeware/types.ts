@@ -1,6 +1,7 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 import { IdentificationTuple } from '@polkadot/types/interfaces/session';
 import { Vec } from '@polkadot/types';
+import { AuthorityId } from '@polkadot/types/interfaces/consensus';
 /**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).
@@ -96,7 +97,8 @@ export enum SubstrateEventKind {
 
   // imOnline events
   AllGood = 'im-online-all-good',
-  SomeOffline = 'im-online-some-offline'
+  SomeOffline = 'im-online-some-offline',
+  HeartbeatReceived = 'im-online-heartbeat-received'
 }
 
 interface ISubstrateEvent {
@@ -406,6 +408,12 @@ export interface ISubstrateSomeOffline extends ISubstrateEvent {
   validators: Vec<IdentificationTuple>;
 }
 
+export interface ISubstrateHeartbeatReceived extends ISubstrateEvent {
+  kind: SubstrateEventKind.HeartbeatReceived;
+  authorityId: AuthorityId;
+}
+
+
 export type ISubstrateEventData =
   ISubstrateSlash
   | ISubstrateReward
@@ -447,6 +455,7 @@ export type ISubstrateEventData =
   | ISubstrateOffence
   | ISubstrateSomeOffline
   | ISubstrateAllGood
+  | ISubstrateHeartbeatReceived
 // eslint-disable-next-line semi-style
 ;
 

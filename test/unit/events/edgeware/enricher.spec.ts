@@ -749,6 +749,21 @@ describe('Edgeware Event Enricher Filter Tests', () => {
       }
     });
   });
+
+  it('should enrich new heartbeat-received event', async () => {
+    const kind = SubstrateEventKind.HeartbeatReceived;
+    const authorityId = api.createType('AuthorityId');
+    const event = constructEvent([ ]);
+    const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        authorityId
+      }
+    });
+  });
+
   /** other */
   it('should not enrich invalid event', (done) => {
     const kind = 'invalid-event' as SubstrateEventKind;

@@ -127,7 +127,16 @@ const labelEdgewareEvent: LabelerFilter = (
           : null,
       };
     }
-
+    case SubstrateEventKind.HeartbeatReceived: {
+      const { authorityId } = data;
+      return {
+        heading: 'Offence',
+        label: `Heart beat received for authority ${authorityId}.`,
+        linkUrl: chainId
+          ? `/${chainId}/account/${authorityId}`
+          : null,
+      };
+    }
     /**
      * Democracy Events
      */

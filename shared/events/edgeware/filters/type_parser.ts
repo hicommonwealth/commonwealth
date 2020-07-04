@@ -96,6 +96,7 @@ export default function (
       switch (method) {
         case 'AllGood': return SubstrateEventKind.AllGood;
         case 'SomeOffline': return SubstrateEventKind.SomeOffline;
+        case 'HeartbeatReceived': return SubstrateEventKind.HeartbeatReceived;
         default: return null;
       }
     default:
