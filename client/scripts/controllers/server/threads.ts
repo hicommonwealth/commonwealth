@@ -152,6 +152,7 @@ class ThreadsController {
       data: {
         'thread_id': proposal.id,
         'address_id': address_id,
+        'jwt': app.user.jwt,
       },
       success: (response) => {
         const result = modelFromServer(response.result);
