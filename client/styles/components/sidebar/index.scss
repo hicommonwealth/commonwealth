@@ -1,10 +1,9 @@
 @import 'client/styles/shared';
 
-$sidebar-padding: 19px;
 $active-color: #ececec;
 
 .Sidebar {
-    padding-top: $vertical-padding;
+    padding-top: 8px;
     .tag-icon {
         width: 10px;
         height: 10px;
@@ -18,13 +17,13 @@ $active-color: #ececec;
         overflow-x: hidden;
         max-height: 100%;
         user-select: none;
-        padding-bottom: 20px;
+        padding: 12px 0;
         .cui-list-item {
             color: #111;
             font-size: 15px;
             font-weight: 500;
             border: none;
-            padding: 5px $sidebar-padding 4px;
+            padding: 4px 12px 3px;
             > .cui-list-item-content-left > .cui-icon svg {
                 height: 14px;
                 width: 14px;
