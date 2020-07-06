@@ -1,23 +1,22 @@
 @import 'client/styles/shared';
 
+$discussion-vertical-padding: 40px;
+$discussion-horizontal-padding: 60px;
+
 .DiscussionRow {
     display: block;
-    margin-bottom: 28px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.07);
-    border-radius: 4px;
+    padding: 0 $discussion-horizontal-padding;
 
     // layout
-    .discussion-top, .discussion-content, .discussion-bottom {
-        padding: 18px 26px;
-        border-bottom: 1px solid #eee;
-        background: #fff;
-    }
     .discussion-top {
-        border-radius: 4px 4px 0 0;
+        padding-top: $discussion-vertical-padding;
+    }
+    .discussion-content {
+        padding: 20px 0;
     }
     .discussion-bottom {
-        padding-top: 22px;
-        border-radius: 0 0 4px 4px;
+        padding-bottom: $discussion-vertical-padding;
+        border-bottom: 1px solid #eee;
     }
 
     // content
@@ -47,7 +46,13 @@
         }
         .discussion-meta {
             color: $standard-light-text;
-            font-size: 15px;
+            font-size: 14px;
+            $discussion-meta-padding: 18px;
+            a.proposal-tag {
+                margin-right: $discussion-meta-padding;
+                @include proposal-tag-inline;
+                color: #999;
+            }
             .User a {
                 display: inline-block;
                 text-decoration: none;
@@ -59,7 +64,7 @@
             }
             .discussion-last-updated {
                 display: inline;
-                margin-left: 16px;
+                margin-left: $discussion-meta-padding;
             }
             a.discussion-created, a.discussion-replies {
                 text-decoration: none;

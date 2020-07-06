@@ -39,6 +39,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       }
     };
 
+    const tagColor = '#72b483';
+
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
       `${slugify(proposal.title)}`;
 
@@ -48,6 +50,10 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           m('.discussion-top-left', [
             m('.discussion-title', link('a', discussionLink, proposal.title)),
             m('.discussion-meta', [
+              proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
+                m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+                m('span.proposal-tag-name', `${proposal.tag.name}`),
+              ]),
               m(User, {
                 user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
                 linkify: true,
@@ -56,13 +62,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 hideAvatar: true,
               }),
               m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
-              proposal.tag && m(Tag, {
-                rounded: true,
-                intent: 'none',
-                label: proposal.tag.name,
-                size: 'xs',
-                onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-              }),
             ]),
           ]),
           m('.discussion-top-right', [

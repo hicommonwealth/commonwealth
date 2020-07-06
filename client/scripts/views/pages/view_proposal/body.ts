@@ -1,5 +1,3 @@
-import 'pages/view_proposal/body.scss';
-
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
@@ -41,15 +39,15 @@ export const activeQuillEditorHasText = () => {
   return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1;
 };
 
-export const ProposalBodyAvatar: m.Component<{ comment: OffchainComment<any> }> = {
+export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
-    const { comment } = vnode.attrs;
-    if (!comment) return;
-    if (!comment.author) return;
+    const { item } = vnode.attrs;
+    if (!item) return;
+    if (!item.author) return;
 
     const author : Account<any> = app.community
-      ? app.community.accounts.get(comment.author, comment.authorChain)
-      : app.chain.accounts.get(comment.author);
+      ? app.community.accounts.get(item.author, item.authorChain)
+      : app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
       m(User, {
@@ -62,15 +60,17 @@ export const ProposalBodyAvatar: m.Component<{ comment: OffchainComment<any> }> 
   }
 };
 
-export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> = {
+export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
-    const { comment } = vnode.attrs;
-    if (!comment) return;
-    if (!comment.author) return;
+    const { item } = vnode.attrs;
+    if (!item) return;
+    if (!item.author) return;
 
-    const author : Account<any> = app.community
-      ? app.community.accounts.get(comment.author, comment.authorChain)
-      : app.chain.accounts.get(comment.author);
+    const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
+      ? (app.community
+         ? app.community.accounts.get(item.author, item.authorChain)
+         : app.chain.accounts.get(item.author))
+      : item.author;
 
     return m('.ProposalBodyAuthor', [
       m(User, {
@@ -83,50 +83,61 @@ export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> 
   }
 };
 
-export const ProposalBodyCreated: m.Component<{ item: OffchainThread | OffchainComment<any>, link: string }> = {
+export const ProposalBodyCreated: m.Component<{
+  item: AnyProposal | OffchainThread | OffchainComment<any>, link: string
+}> = {
   view: (vnode) => {
     const { item, link } = vnode.attrs;
     if (!item) return;
     if (!item.createdAt) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('.ProposalBodyCreated', [
-      m('a', {
-        href: isThread ? `${link}?comment=body` : link,
-        onclick: (e) => {
-          e.preventDefault();
-          updateRoute(isThread ? `${link}?comment=body` : link);
-          jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
-        }
-      }, item.createdAt.fromNow())
-    ]);
+    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+      return m('.ProposalBodyCreated', [
+        m('a', {
+          href: isThread ? `${link}?comment=body` : link,
+          onclick: (e) => {
+            e.preventDefault();
+            updateRoute(isThread ? `${link}?comment=body` : link);
+            jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
+          }
+        }, item.createdAt.fromNow())
+      ]);
+    } else {
+      return null;
+    }
   }
 };
 
-export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-    if (item.versionHistory.length === 0) return;
-    const isThread = item instanceof OffchainThread;
-    const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
-    if (!lastEdit) return;
 
-    return m('.ProposalBodyLastEdited', [
-      m('a', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: VersionHistoryModal,
-            data: isThread ? { proposal: item } : { comment: item }
-          });
-        }
-      }, [
-        'Edited ',
-        moment(lastEdit.timestamp).fromNow()
-      ])
-    ]);
+    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+      if (item.versionHistory.length === 0) return;
+      const isThread = item instanceof OffchainThread;
+      const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
+      if (!lastEdit) return;
+
+      return m('.ProposalBodyLastEdited', [
+        m('a', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: VersionHistoryModal,
+              data: isThread ? { proposal: item } : { comment: item }
+            });
+          }
+        }, [
+          'Edited ',
+          moment(lastEdit.timestamp).fromNow()
+        ])
+      ]);
+    } else {
+      return null;
+    }
   }
 };
 
@@ -149,7 +160,7 @@ export const ProposalBodyReply: m.Component<{
           }
           getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
         },
-      }, 'Reply'),
+      }, 'Comment on this reply'),
     ]);
   }
 };
