@@ -4,7 +4,7 @@ module.exports = {
   up: (queryInterface, DataTypes) => {
     return queryInterface.createTable('DiscussionDrafts', {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Addresses', key: 'id' } },
+      author_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Addresses', key: 'id' } },
       title: { type: DataTypes.TEXT, allowNull: true },
       body: { type: DataTypes.TEXT, allowNull: true },
       tag: { type: DataTypes.STRING, allowNull: true },

@@ -750,8 +750,13 @@ const instantiateEditor = (
     if (state.unsavedChanges.length() > 0) {
       // Save the entire updated text to localStorage
       const data = JSON.stringify(quill.getContents());
-      localStorage.setItem(`${editorNamespace}-storedText`, data);
       localStorage.setItem(`${editorNamespace}-markdownMode`, state.markdownMode);
+      localStorage.setItem(`${editorNamespace}-storedText`, data);
+      const titleInput = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
+      if (titleInput) {
+        debugger
+        localStorage.setItem(`${editorNamespace}-storedTitle`, titleInput.value);
+      }
       state.unsavedChanges = new Delta();
     }
   }, 2500);
@@ -761,6 +766,7 @@ const instantiateEditor = (
 
 interface IQuillEditorAttrs {
   contentsDoc?;
+  contentsTitle?;
   imageUploader?;
   oncreateBind;
   placeholder?: string;
@@ -783,7 +789,7 @@ interface IQuillEditorState {
 const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
   oncreate: (vnode) => {
     // Only bind the alert if we are actually trying to persist the user's changes
-    if (vnode.attrs.contentsDoc === undefined) {
+    if (!vnode.attrs.contentsDoc) {
       vnode.state.beforeunloadHandler = () => {
         if (vnode.state.unsavedChanges && vnode.state.unsavedChanges.length() > 0) {
           return 'There are unsaved changes. Are you sure you want to leave?';
@@ -793,7 +799,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    if (vnode.attrs.contentsDoc === undefined)
+    if (!vnode.attrs.contentsDoc)
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
   },
   view: (vnode: m.VnodeDOM<IQuillEditorAttrs, IQuillEditorState>) => {
@@ -803,23 +809,25 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    if (vnode.state.markdownMode === undefined
-        && contentsDoc === undefined
-        && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
-      try {
-        contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
-        if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-          vnode.state.markdownMode = true;
-        } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
-          vnode.state.markdownMode = false;
-        }
-      } catch (e) {
-        return;
-      } // do nothing if text fails to parse
-    }
-    // Otherwise, just set vnode.state.markdownMode based on the app setting
+    let contentsTitle;
     if (vnode.state.markdownMode === undefined) {
-      vnode.state.markdownMode = !!(app.user?.disableRichText);
+      // Grab stored title
+      contentsTitle = localStorage.getItem(`${editorNamespace}-storedTitle`);
+      if (!contentsDoc && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
+        try {
+          contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
+          if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+            vnode.state.markdownMode = true;
+          } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
+            vnode.state.markdownMode = false;
+          }
+        } catch (e) {
+          return;
+        } // do nothing if text fails to parse
+      } else {
+        // Otherwise, just set vnode.state.markdownMode based on the app setting
+        vnode.state.markdownMode = !!(app.user?.disableRichText);
+      }
     }
 
     // Set vnode.state.clearUnsavedChanges on first initialization
@@ -840,6 +848,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         );
         // once editor is instantiated, it can be updated with a tabindex
         $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+        debugger
+        if (contentsTitle.value.length()) {
+          $(vnode.dom).find('input[name=\'title\']').val(contentsTitle.value);
+        }
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
