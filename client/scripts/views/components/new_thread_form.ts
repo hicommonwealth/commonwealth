@@ -337,6 +337,9 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               onclick: async () => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
+                if (!vnode.state.form.title) {
+                  vnode.state.form.title = ($(vnode.dom).find('input[name=\'title\'').val() as string);
+                }
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
                 if (!vnode.state.error) {

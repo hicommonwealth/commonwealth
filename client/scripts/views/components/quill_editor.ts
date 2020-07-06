@@ -824,8 +824,9 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // Set vnode.state.clearUnsavedChanges on first initialization
     if (vnode.state.clearUnsavedChanges === undefined) {
       vnode.state.clearUnsavedChanges = () => {
-        localStorage.removeItem(`${editorNamespace}-storedText`);
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
+        localStorage.removeItem(`${editorNamespace}-storedText`);
+        localStorage.removeItem(`${editorNamespace}-storedTitle`);
       };
     }
 
