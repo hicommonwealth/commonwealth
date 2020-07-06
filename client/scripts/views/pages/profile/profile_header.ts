@@ -4,7 +4,7 @@ import $ from 'jquery';
 import app from 'state';
 import * as clipboard from 'clipboard-polyfill';
 import { Account, ChainBase } from 'models';
-import {Unsubscribable } from 'rxjs';
+import { Unsubscribable } from 'rxjs';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { formatAddressShort } from '../../../helpers';
@@ -12,6 +12,7 @@ import EditProfileModal from '../../modals/edit_profile_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import User from '../../components/widgets/user';
+import ValidatorStat from './profile_header_stats';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -61,6 +62,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         m('.bio-right', [
           m('.name-row', [
             m(User, { user: account, hideAvatar: true }),
+            m(ValidatorStat, { address: account.address })
             // TODO: Badges for identity verification, etc.
           ]),
           m('.info-row', [

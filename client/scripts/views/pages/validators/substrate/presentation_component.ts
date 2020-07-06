@@ -52,19 +52,16 @@ const model = {
 };
 
 const PresentationComponent = (state, chain: Substrate) => {
-  const { validators, annualPercentRate } = state.dynamic;
+  const { validators, annualPercentRate, lastHeaders } = state.dynamic;
 
   if (!validators)
     return m(PageLoading, { message: 'Loading Validators...' });
 
-  const lastHeaders = (app.chain.base === ChainBase.Substrate)
-    ? (app.chain as Substrate).staking.lastHeaders
-    : [];
-
+  // counting total current
   model.total.current = Object.keys(validators).filter(
     (validator) => (validators[validator].isElected === true)
   ).length;
-
+  // counting total waiting
   model.total.waiting = Object.keys(validators).filter(
     (validator) => (validators[validator].isElected === false)
   ).length;
@@ -184,7 +181,7 @@ const PresentationComponent = (state, chain: Substrate) => {
           m('th.val-block-hash', 'Hash'),
           m('th.val-block-author', 'Author')
         ]),
-        lastHeaders.map((lastHeader) => {
+        lastHeaders && lastHeaders.map((lastHeader) => {
           if (!lastHeader)
             return null;
           return m(RecentBlock, {
