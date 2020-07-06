@@ -70,7 +70,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit Tags',
+        title: 'Edit tags',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {

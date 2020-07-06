@@ -60,19 +60,6 @@ $discussion-meta-color: #999;
         .proposal-top-left {
             flex: 1;
         }
-        .proposal-top-right {
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            width: 30px;
-            > .cui-icon > svg {
-                height: 20px;
-                width: 20px;
-                min-width: 20px;
-                min-height: 20px;
-                stroke: $discussion-meta-color;
-            }
-        }
         .proposal-content {
             display: flex;
             padding-top: $discussion-separator-padding;
@@ -221,6 +208,12 @@ $discussion-meta-color: #999;
             &:hover {
                 text-decoration: underline;
             }
+        }
+    }
+    .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
+        stroke: #999;
+        &:hover {
+            stroke: #777;
         }
     }
 
