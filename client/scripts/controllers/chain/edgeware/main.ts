@@ -54,9 +54,6 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async init() {
-    // if set to true, loads chain entity data from the node directly on the client
-    // if set to false, chain entity data is loaded from the server
-    // in both cases, archived proposals (no longer on chain) are loaded from the server
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     const edgTypes = Object.values(edgewareDefinitions)
       .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
