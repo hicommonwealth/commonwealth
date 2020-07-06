@@ -27,7 +27,7 @@ export interface IdentityAttrs {
 const Identity = makeDynamicComponent<IdentityAttrs, IValidatorState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
-    groupKey: app.chain.class.toString(),
+    groupKey: attrs.stash,
     info: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.info(attrs.stash)
       : null

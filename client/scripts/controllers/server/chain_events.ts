@@ -7,8 +7,10 @@ class ChainEventsController {
     // do nothing
   }
 
-  public offences(callback) {
-    return get('/getOffences', { chain: app.chain.id }, callback);
+  public offences() {
+    return new Promise((resolve) => {
+      return get('/getOffences', { chain: app.chain.id }, resolve);
+    });
   }
 
   public rewards() {

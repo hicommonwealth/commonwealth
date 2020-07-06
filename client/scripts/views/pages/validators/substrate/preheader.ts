@@ -33,7 +33,8 @@ const offence = {
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async () => {
-    await app.chainEvents.offences(offence.setCount);
+    const offences = await app.chainEvents.offences();
+    offence.setCount(offences);
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
@@ -196,7 +197,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
                 e.preventDefault();
                 createTXModal((nominators.length === 0)
                   ? sender.chillTx()
-                  : sender.nominateTrans(nominators)).then(() => {
+                  : sender.nominateTx(nominators)).then(() => {
                   // vnode.attrs.sending = false;
                   m.redraw();
                 }, () => {

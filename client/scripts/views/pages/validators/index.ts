@@ -51,7 +51,6 @@ export interface IValidatorPageState {
     lastHeader: HeaderExtended,
     annualPercentRate: ICommissionInfo;
   };
-  results: any[];
 }
 
 export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
