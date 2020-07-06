@@ -156,12 +156,10 @@ class ThreadsController {
         'jwt': app.user.jwt,
       },
       success: (response) => {
-        console.dir(response.result);
         result = modelFromServer(response.result);
         if (this._store.getByIdentifier(result.id)) {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
-        console.dir(result);
         this._store.add(result);
       },
       error: (err) => {

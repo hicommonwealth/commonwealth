@@ -137,7 +137,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 && [
                   m(ProposalBodyChangeOwner, {
                     item: proposal,
-                    onChangeHandler: (item: OffchainThread) => { console.dir(item); proposal.author = item.author; proposal.authorChain = item.authorChain; m.redraw(); },
+                    onChangeHandler: (item: OffchainThread) => { proposal.author = item.author; proposal.authorChain = item.authorChain; m.redraw(); },
                   }),
                   m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
