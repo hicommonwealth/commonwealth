@@ -34,7 +34,6 @@ $horizontal-gutter: 24px; // padding on inside of sidebars
 $header-spacing: 14px; // padding between header items
 
 $standard-light-text: #999;
-$standard-meta-spacing: 12px;
 $standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
 
 // construct-ui styles
@@ -318,5 +317,17 @@ $menu-item-height: 30px;
         opacity: 0.5;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
         filter: alpha(opacity=20);
+    }
+}
+
+@mixin proposal-tag-inline {
+    .proposal-tag-icon {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        background: #eee;
+        margin-left: 1px;
+        margin-right: 8px;
     }
 }

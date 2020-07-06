@@ -75,31 +75,6 @@ $discussion-meta-color: #999;
                 font-size: $discussion-meta-font-size;
             }
         }
-
-        // proposal-tags
-        .ProposalHeaderCaretMenu,
-        .ProposalHeaderTags {
-            display: inline-block;
-            font-size: $discussion-meta-font-size;
-            .cui-icon {
-                position: relative;
-                top: -1px;
-            }
-            a {
-                cursor: pointer;
-                color: $standard-light-text;
-                text-decoration: none;
-                margin-right: $standard-meta-spacing;
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-            a:last-child {
-                margin-right: 0;
-            }
-        }
-
-        // proposal-title
         .proposal-title {
             margin: 4px 0 6px;
             .ProposalHeaderTitle {
@@ -108,38 +83,6 @@ $discussion-meta-color: #999;
                 font-weight: 600;
                 flex: 1;
                 line-height: 1.15;
-            }
-        }
-
-        // proposal-meta
-        .ProposalHeaderAuthor,
-        .ProposalHeaderCreated,
-        .ProposalHeaderLastEdited,
-        .ProposalBodyDelete,
-        .ProposalHeaderOnchainId,
-        .ProposalHeaderOnchainStatus,
-        .ProposalBodyEdit,
-        .ProposalBodyDelete,
-        .ProposalBodyCancelEdit,
-        .ProposalBodySaveEdit,
-        .ViewCountBlock,
-        .ProposalHeaderExternalLink {
-            font-size: $discussion-meta-font-size;
-            display: inline-block;
-            color: $discussion-meta-color;
-            margin-right: 22px;
-            a:link,
-            a:visited {
-                color: $discussion-meta-color;
-                text-decoration: none;
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-        }
-        .ProposalHeaderAuthor {
-            .User .user-display-name {
-                color: $discussion-meta-color;
             }
         }
         .ProposalHeaderExternalLink {
@@ -189,21 +132,34 @@ $discussion-meta-color: #999;
         }
     }
 
+    .ProposalHeaderTags {
+        .proposal-tag {
+            @include proposal-tag-inline;
+        }
+    }
+
+    // proposal-meta
+    .ProposalHeaderTags,
+    .ProposalHeaderOnchainId,
+    .ProposalHeaderOnchainStatus,
     .ProposalBodyAuthor,
     .ProposalBodyCreated,
     .ProposalBodyLastEdited,
-    .ProposalBodyReply,
+    .ProposalBodyDelete,
     .ProposalBodyEdit,
     .ProposalBodyDelete,
     .ProposalBodyCancelEdit,
-    .ProposalBodySaveEdit {
+    .ProposalBodySaveEdit,
+    .ViewCountBlock,
+    .ProposalHeaderExternalLink {
+        font-size: $discussion-meta-font-size;
         display: inline-block;
-        color: $standard-light-text;
-        margin-right: $standard-meta-spacing;
+        color: $discussion-meta-color;
+        margin-right: 17px;
         a:link,
         a:visited,
         .User a.user-display-name {
-            color: $standard-light-text;
+            color: $discussion-meta-color;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;

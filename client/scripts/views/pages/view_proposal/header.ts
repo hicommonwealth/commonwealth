@@ -50,16 +50,14 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
+    if (!proposal.tag) return;
+
+    const tagColor = '#72b483';
 
     return m('.ProposalHeaderTags', [
-      m('span.proposal-header-tags', [
-        m(Tag, {
-          rounded: true,
-          intent: 'none',
-          size: 'xs',
-          onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-          label: `#${proposal.tag?.name}`
-        })
+      link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
+        m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+        m('span.proposal-tag-name', `${proposal.tag?.name}`),
       ]),
     ]);
   }

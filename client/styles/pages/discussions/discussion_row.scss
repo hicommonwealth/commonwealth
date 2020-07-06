@@ -46,7 +46,13 @@ $discussion-horizontal-padding: 60px;
         }
         .discussion-meta {
             color: $standard-light-text;
-            font-size: 15px;
+            font-size: 14px;
+            $discussion-meta-padding: 18px;
+            a.proposal-tag {
+                margin-right: $discussion-meta-padding;
+                @include proposal-tag-inline;
+                color: #999;
+            }
             .User a {
                 display: inline-block;
                 text-decoration: none;
@@ -58,7 +64,7 @@ $discussion-horizontal-padding: 60px;
             }
             .discussion-last-updated {
                 display: inline;
-                margin-left: 16px;
+                margin-left: $discussion-meta-padding;
             }
             a.discussion-created, a.discussion-replies {
                 text-decoration: none;
