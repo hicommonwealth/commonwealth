@@ -343,6 +343,9 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
                 if (!vnode.state.error) {
+                  const editorNamespace = vnode.state.newType === 'Discussion' ? 'new-discussion' : 'new-link';
+                  localStorage.removeItem(`${editorNamespace}-storedText`);
+                  localStorage.removeItem(`${editorNamespace}-storedTitle`);
                   if (vnode.state.fromDraft) {
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }

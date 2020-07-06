@@ -110,7 +110,6 @@ export const newThread = async (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
-  console.log(form);
   if (!form.title) {
     return ({ title: NewThreadErrors.NoTitle });
   }
@@ -128,7 +127,6 @@ export const newThread = async (
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-  console.log(quillEditorState)
   const bodyText = !quillEditorState ? ''
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
