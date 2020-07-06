@@ -5,8 +5,8 @@ import OffchainAttachment from './OffchainAttachment';
 import OffchainTag from './OffchainTag';
 
 class OffchainThread implements IUniqueId {
-  public readonly author: string;
-  public readonly authorChain: string;
+  public author: string;
+  public authorChain: string;
   public readonly title: string;
   public readonly body: string;
   public readonly pinned: boolean;

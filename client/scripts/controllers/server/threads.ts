@@ -146,6 +146,7 @@ class ThreadsController {
     proposal: OffchainThread,
     address_id: number,
   ) {
+    let result;
     await $.ajax({
       url: `${app.serverUrl()}/changeThreadOwner`,
       type: 'POST',
@@ -155,12 +156,13 @@ class ThreadsController {
         'jwt': app.user.jwt,
       },
       success: (response) => {
-        const result = modelFromServer(response.result);
+        console.dir(response.result);
+        result = modelFromServer(response.result);
         if (this._store.getByIdentifier(result.id)) {
           this._store.remove(this._store.getByIdentifier(result.id));
         }
+        console.dir(result);
         this._store.add(result);
-        return result;
       },
       error: (err) => {
         console.log('Failed to change thread owner');
@@ -168,6 +170,7 @@ class ThreadsController {
           : 'Failed to change thread owner');
       }
     });
+    return result;
   }
 
   public async delete(proposal) {

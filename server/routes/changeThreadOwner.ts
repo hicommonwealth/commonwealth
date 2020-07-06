@@ -19,8 +19,7 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
   if (!thread_id) return next(new Error(Errors.NoThreadId));
 
   // get all user addresses
-  const userAddresses = req.user.getAddresses();
-  console.dir(userAddresses);
+  const userAddresses = await req.user.getAddresses();
   if (!userAddresses) return next(new Error('Cannot find user addresses'));
   const userAddressIds = userAddresses.map((a) => a.id);
 
@@ -31,7 +30,6 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
       id: address_id,
     }
   });
-  console.dir(newAddress);
   if (!newAddress) return next(new Error(Errors.AddressNotOwned));
 
   // find thread by user addresses and thread id
@@ -41,16 +39,16 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
       address_id: {
         [Op.in]: userAddressIds,
       }
-    }
+    },
+    include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
   });
-  console.dir(thread);
   if (!thread) return next(new Error(Errors.NoThread));
 
   // update thread to new address id
   thread.address_id = newAddress.id;
   await thread.save();
 
-  return res.json({ status: 'Success', result: thread });
+  return res.json({ status: 'Success', result: thread.toJSON() });
 };
 
 export default ChangeThreadOwner;
