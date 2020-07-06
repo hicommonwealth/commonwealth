@@ -14,9 +14,9 @@ export const Errors = {
 
 const ChangeThreadOwner = async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  const { address, threadId } = req.body;
-  if (!address) return next(new Error(Errors.NoNewAddress));
-  if (!threadId) return next(new Error(Errors.NoThreadId));
+  const { address_id, thread_id } = req.body;
+  if (!address_id) return next(new Error(Errors.NoNewAddress));
+  if (!thread_id) return next(new Error(Errors.NoThreadId));
 
   // get all user addresses
   const userAddresses = req.user.getAddresses();
@@ -28,7 +28,7 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
   const newAddress = await models.Address.findOne({
     where: {
       user_id: req.user.id,
-      address,
+      id: address_id,
     }
   });
   console.dir(newAddress);
@@ -37,7 +37,7 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
   // find thread by user addresses and thread id
   const thread = await models.OffchainThread.findOne({
     where: {
-      id: threadId,
+      id: thread_id,
       address_id: {
         [Op.in]: userAddressIds,
       }

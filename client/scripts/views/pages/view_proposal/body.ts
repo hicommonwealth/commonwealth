@@ -464,3 +464,39 @@ export const ProposalBodyReaction: m.Component<{ item: OffchainThread | Offchain
     ]);
   }
 };
+
+export const ProposalBodyChangeOwner: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+  view: (vnode) => {
+    const { item } = vnode.attrs;
+    if (!item) return;
+    const isThread = item instanceof OffchainThread;
+    const isComment = item instanceof OffchainComment;
+
+    const roles = app.user.roles.filter((r) => {
+      return r.offchain_community_id === app.activeCommunityId();
+    });
+
+    const submenu = roles.map((r) => {
+      const address = app.user.addresses.find((a) => a.id === r.address_id);
+      const profile = app.profiles.getProfile(r.chain_id, address.address);
+      return m(MenuItem, {
+        label: `${profile.displayName}: ${address.address.slice(0, 7)}...`,
+        onclick: () => {
+          console.dir(r.address_id);
+          if (isThread) {
+            app.threads.changeOwner(item as OffchainThread, r.address_id);
+          } else if (isComment) {
+            console.dir('TODO: COMMENT');
+          }
+        }
+      });
+    });
+
+    return m(MenuItem, {
+      class: '.ProposalBodyChangeOwner',
+      label: 'Change Author',
+      submenu,
+      closeOnSubmenuClick: true,
+    });
+  }
+};

@@ -142,6 +142,33 @@ class ThreadsController {
     });
   }
 
+  public async changeOwner(
+    proposal: OffchainThread,
+    address_id: number,
+  ) {
+    await $.ajax({
+      url: `${app.serverUrl()}/changeThreadOwner`,
+      type: 'POST',
+      data: {
+        'thread_id': proposal.id,
+        'address_id': address_id,
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
+      },
+      error: (err) => {
+        console.log('Failed to change thread owner');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to change thread owner');
+      }
+    });
+  }
+
   public async delete(proposal) {
     const _this = this;
     return new Promise((resolve, reject) => {
