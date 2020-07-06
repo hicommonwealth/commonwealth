@@ -296,7 +296,9 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               placeholder: 'Title',
               onchange: (e) => {
                 vnode.state.form.title = (e as any).target.value;
+                localStorage.setItem('new-discussion-storedTitle', vnode.state.form.title);
               },
+              value: localStorage.getItem('new-discussion-storedTitle'),
               tabindex: 1,
             }),
           ]),

@@ -752,11 +752,6 @@ const instantiateEditor = (
       const data = JSON.stringify(quill.getContents());
       localStorage.setItem(`${editorNamespace}-markdownMode`, state.markdownMode);
       localStorage.setItem(`${editorNamespace}-storedText`, data);
-      const titleInput = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
-      if (titleInput) {
-        debugger
-        localStorage.setItem(`${editorNamespace}-storedTitle`, titleInput.value);
-      }
       state.unsavedChanges = new Delta();
     }
   }, 2500);
@@ -766,7 +761,6 @@ const instantiateEditor = (
 
 interface IQuillEditorAttrs {
   contentsDoc?;
-  contentsTitle?;
   imageUploader?;
   oncreateBind;
   placeholder?: string;
@@ -809,10 +803,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    let contentsTitle;
     if (vnode.state.markdownMode === undefined) {
-      // Grab stored title
-      contentsTitle = localStorage.getItem(`${editorNamespace}-storedTitle`);
       if (!contentsDoc && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
         try {
           contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
@@ -848,10 +839,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         );
         // once editor is instantiated, it can be updated with a tabindex
         $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
-        debugger
-        if (contentsTitle.value.length()) {
-          $(vnode.dom).find('input[name=\'title\']').val(contentsTitle.value);
-        }
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
