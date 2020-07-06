@@ -88,6 +88,7 @@ import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
 import deleteTag from './routes/deleteTag';
 import bulkTags from './routes/bulkTags';
+import changeThreadOwner from './routes/changeThreadOwner';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -143,6 +144,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+
+  router.post('/changeThreadOwner', passport.authenticate('jwt', { session: false }), changeThreadOwner.bind(this, models));
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
