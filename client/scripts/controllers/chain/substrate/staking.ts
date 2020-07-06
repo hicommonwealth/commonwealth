@@ -139,6 +139,20 @@ class SubstrateStaking implements StorageModule {
       return info;
     }));
   }
+
+  private mapCommission(electedInfo: DeriveStakingElected) : ICommissionInfo {
+    const commissionInfo: ICommissionInfo = {};
+    electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+      let commissionPer = new BN(0);
+      if (validatorPrefs.commission)
+        commissionPer = validatorPrefs.commission.unwrap();
+      const commissionPercent = commissionPer.toNumber() / 10_000_000;
+      const key = accountId.toString();
+      commissionInfo[key] = commissionPercent;
+    });
+    return commissionInfo;
+  }
+
   public get validators(): Observable<IValidators> {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
@@ -164,16 +178,8 @@ class SubstrateStaking implements StorageModule {
         entries.forEach(([accountId, points]): void => {
           eraPoints[accountId] = points;
         });
-        const commissionInfo: ICommissionInfo = {};
+        const commissionInfo: ICommissionInfo = this.mapCommission(electedInfo);
 
-        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-          let commissionPer = new BN(0);
-          if (validatorPrefs.commission)
-            commissionPer = validatorPrefs.commission.unwrap();
-          const commissionPercent = commissionPer.toNumber() / 10_000_000;
-          const key = accountId.toString();
-          commissionInfo[key] = commissionPercent;
-        });
         // set of not yet but future validators
         const waiting = allStashes.filter((v) => !currentSet.includes(v));
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
@@ -207,7 +213,6 @@ class SubstrateStaking implements StorageModule {
       ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
-
           let total = new BN(0);
           let own = new BN(0);
           if (exposures[i]?.total)
@@ -231,7 +236,6 @@ class SubstrateStaking implements StorageModule {
         }
         // add set of next elected
         for (let i = 0; i < toBeElected.length; ++i) {
-
           let total = new BN(0);
           let own = new BN(0);
           if (exposures[i]?.total)
@@ -288,13 +292,7 @@ class SubstrateStaking implements StorageModule {
         [api, { validators: currentSet }, era, rewards, electedInfo]:
         [ApiRx, DeriveStakingValidators, EraIndex, IReward, DeriveStakingElected]
       ) => {
-        const commission: ICommissionInfo = {};
-
-        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-          const key = accountId.toString();
-          commission[key] = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
-          return commission[key];
-        });
+        const commission: ICommissionInfo = this.mapCommission(electedInfo);
         // Different runtimes call for different access to stakers: old vs. new
         const stakersCall = (api.query.staking.stakers)
           ? api.query.staking.stakers
