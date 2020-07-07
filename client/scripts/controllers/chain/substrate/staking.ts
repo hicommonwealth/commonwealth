@@ -291,7 +291,7 @@ class SubstrateStaking implements StorageModule {
         return combineLatest(
           stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
           of(currentSet),
-          from(this._app.chainEvents.rewards(currentSet)),
+          from(this._app.chainEvents.rewards()),
           of(commission)
         );
       }),
@@ -301,38 +301,47 @@ class SubstrateStaking implements StorageModule {
         const data = {};
         const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
+        console.log(rewards.validators);
         accounts.forEach((account, index) => {
           let key = account.toString();
           const exposure = exposures[index];
           const totalStake = exposure.total.toBn();
-          const fraction = exposure.own.toBn().mul(new BN(n));
           const comm = commissions[key] || 0;
 
-          if (!(key in rewards.validators)) {
+          if (Object.keys(rewards.validators).length === 1) {
             key = this._app.chain.id;
           }
-          const valRewards = rewards.validators[key];
-          const amount = valRewards[valRewards.length - 1].event_data.amount;
-          const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
-          const secondReward = exposure.own.toBn()
-            .mul((new BN(amount.toString())).sub(firstReward))
-            .div(totalStake);
-          const totalReward = firstReward.add(secondReward);
-          const length = rewards.validators[key].length;
-          if (valRewards.length > 1) {
-            const last = rewards.validators[key][length - 1];
-            const secondLast = rewards.validators[key][length - 2];
-            const start = moment(secondLast.created_at);
-            const end = moment(last.created_at);
-            const eventDiff = end.diff(start, 'minutes');
 
-            const periodsInYear = (60 * 24 * 7 * 52) / eventDiff;
-            const percentage = (new BN(totalReward))
-              .mul(new BN(n))
-              .div(new BN(totalStake))
-              .toNumber() / n;
-            const apr = percentage * periodsInYear;
-            validatorRewards[account.toString()] = apr;
+          const valRewards = rewards.validators[key];
+          if (valRewards) {
+            const amount = valRewards[valRewards.length - 1].event_data.amount;
+            const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
+            const secondReward = exposure.own.toBn()
+              .mul((new BN(amount.toString())).sub(firstReward))
+              .div(totalStake);
+            const totalReward = firstReward.add(secondReward);
+            const length = rewards.validators[key].length;
+            if (valRewards.length > 1) {
+              const last = rewards.validators[key][length - 1];
+              const secondLast = rewards.validators[key][length - 2];
+              const start = moment(secondLast.created_at);
+              const end = moment(last.created_at);
+              const startBlock = secondLast.block_number;
+              const endBlock = last.block_number;
+              console.log(endBlock - startBlock);
+              const eventDiff = end.diff(start, 'minutes');
+
+              const periodsInYear = (60 * 24 * 7 * 52) / eventDiff;
+              const percentage = (new BN(totalReward))
+                .mul(new BN(n))
+                .div(new BN(totalStake))
+                .toNumber() / n;
+              console.log(eventDiff, percentage, length);
+              const apr = percentage * periodsInYear;
+              validatorRewards[account.toString()] = apr;
+            }
+          } else {
+            validatorRewards[account.toString()] = -1.0;
           }
         });
 

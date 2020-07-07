@@ -14,11 +14,10 @@ class ChainEventsController {
     });
   }
 
-  public rewards(accounts: AccountId[]) {
+  public rewards() {
     return new Promise((resolve) => {
       return get('/getRewards', {
         chain: app.chain.id,
-        accounts: accounts.map((a) => a.toHuman()),
       }, resolve);
     });
   }

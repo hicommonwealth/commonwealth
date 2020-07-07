@@ -51,14 +51,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const { sender, annualPercentRate } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
-    let totalPercentage = new BN(0);
+    let totalPercentage = 0.0;
     if (annualPercentRate) {
       Object.entries(annualPercentRate).forEach(([key, value]) => {
-        totalPercentage = totalPercentage.add(new BN(value));
+        totalPercentage += Number(value);
       });
     }
 
-    const apr = (totalPercentage.toNumber() / Object.keys(annualPercentRate).length).toFixed(2);
+    const apr = (totalPercentage / Object.keys(annualPercentRate).length).toFixed(2);
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,

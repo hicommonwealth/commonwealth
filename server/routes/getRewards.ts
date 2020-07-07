@@ -17,7 +17,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain, accounts } = req.query;
+  const { chain } = req.query;
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
