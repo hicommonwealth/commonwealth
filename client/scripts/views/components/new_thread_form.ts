@@ -113,10 +113,10 @@ export const loadDraft = async (dom, state, draft) => {
   } else if (newDraftMarkdown) {
     state.quillEditorState.editor.setText(newDraftMarkdown);
   }
-  debugger
   titleInput.val(draft.title);
   state.form.title = draft.title;
   state.activeTag = draft.tag;
+  state.form.tagName = draft.tag;
   state.fromDraft = draft.id;
   m.redraw();
 };

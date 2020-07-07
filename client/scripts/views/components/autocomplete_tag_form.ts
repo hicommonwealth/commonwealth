@@ -6,26 +6,27 @@ import { OffchainTag } from '../../models';
 import { symbols } from '../../helpers';
 
 interface IAutoCompleteTagFormAttrs {
-  tags: OffchainTag[];
-  featuredTags: OffchainTag[];
   activeTag?: OffchainTag | string;
+  featuredTags: OffchainTag[];
+  // overwriteActiveTag?: boolean;
   tabindex?: number;
+  tags: OffchainTag[];
   updateFormData: Function;
   updateParentErrors?: Function;
 }
 
 interface IAutoCompleteTagFormState {
   error: string;
+  // activeTagOverwritten: boolean;
   selectedTag: OffchainTag | string;
 }
 
 const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
-  oninit: (vnode) => {
-    const { activeTag } = vnode.attrs;
-    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
-  },
   view: (vnode) => {
-    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
+    const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
+    if (activeTag && !vnode.state.selectedTag) {
+      (vnode.state.selectedTag as any) = activeTag;
+    }
 
     const itemRender = (tag) => {
       return m(ListItem, {

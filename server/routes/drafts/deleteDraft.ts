@@ -28,12 +28,10 @@ const deleteDraft = async (models, req: Request, res: Response, next: NextFuncti
         address_id: { [Op.in]: userOwnedAddressIds },
       },
     });
-    console.log(draft);
     if (!draft) {
       return next(new Error(Errors.NotFound));
     }
     await draft.destroy();
-    console.log('draft destroyed?');
     return res.json({ status: 'Success' });
   } catch (e) {
     return next(e);
