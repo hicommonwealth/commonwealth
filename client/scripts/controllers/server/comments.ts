@@ -158,7 +158,7 @@ class CommentsController {
   ) {
     let result;
     await $.ajax({
-      url: `${app.serverUrl()}/changeThreadOwner`,
+      url: `${app.serverUrl()}/changeOwner`,
       type: 'POST',
       data: {
         'comment_id': comment.id,

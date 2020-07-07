@@ -88,7 +88,7 @@ import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
 import deleteTag from './routes/deleteTag';
 import bulkTags from './routes/bulkTags';
-import changeThreadOwner from './routes/changeThreadOwner';
+import changeOwner from './routes/changeOwner';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -145,7 +145,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
-  router.post('/changeThreadOwner', passport.authenticate('jwt', { session: false }), changeThreadOwner.bind(this, models));
+  router.post('/changeOwner', passport.authenticate('jwt', { session: false }), changeOwner.bind(this, models));
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));

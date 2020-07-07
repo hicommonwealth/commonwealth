@@ -148,7 +148,7 @@ class ThreadsController {
   ) {
     let result;
     await $.ajax({
-      url: `${app.serverUrl()}/changeThreadOwner`,
+      url: `${app.serverUrl()}/changeOwner`,
       type: 'POST',
       data: {
         'thread_id': proposal.id,
