@@ -799,9 +799,9 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const body = markdownMode
       ? editor.getText()
       : editor.getContents();
-    const title = ($(vnode.dom).find('input[name=\'title\'').val() as string);
+    const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
     localStorage.setItem(`${editorNamespace}-storedText`, body);
-    localStorage.setItem(`${editorNamespace}-storedTitle`, title);
+    if (title) localStorage.setItem(`${editorNamespace}-storedTitle`, title.value);
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
