@@ -82,9 +82,8 @@ export const checkForModifications = async (state, modalMsg) => {
   return confirmed;
 };
 
-export const loadDraft = async (state, draft) => {
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
-
+export const loadDraft = async (dom, state, draft) => {
+  const titleInput = $(dom).find('div.new-thread-form-body input[name=\'title\']');
   // First we check if the form has been updated, to avoid
   // losing any unsaved form data
   const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
@@ -101,6 +100,8 @@ export const loadDraft = async (state, draft) => {
       newDraftMarkdown = draft.body;
     }
   }
+  // If the text format of the loaded draft differs from the current editor's mode,
+  // we update the current editor's mode accordingly, to preserve formatting
   if (newDraftDelta && state.quillEditorState.markdownMode) {
     state.quillEditorState.markdownMode = false;
   } else if (newDraftMarkdown && !state.quillEditorState.markdownMode) {
@@ -112,7 +113,8 @@ export const loadDraft = async (state, draft) => {
   } else if (newDraftMarkdown) {
     state.quillEditorState.editor.setText(newDraftMarkdown);
   }
-  (titleInput as HTMLInputElement).value = draft.title;
+  debugger
+  titleInput.val(draft.title);
   state.form.title = draft.title;
   state.activeTag = draft.tag;
   state.fromDraft = draft.id;
@@ -342,6 +344,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 }
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
+                debugger
                 if (!vnode.state.error) {
                   const editorNamespace = vnode.state.newType === 'Discussion' ? 'new-discussion' : 'new-link';
                   localStorage.removeItem(`${editorNamespace}-storedText`);
@@ -367,10 +370,14 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 const { form, quillEditorState } = vnode.state;
                 try {
                   vnode.state.saving = true;
+                  console.log(form);
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   vnode.state.saving = false;
                   if (vnode.attrs.isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
+                    const editorNamespace = 'new-discussion';
+                    localStorage.removeItem(`${editorNamespace}-storedText`);
+                    localStorage.removeItem(`${editorNamespace}-storedTitle`);
                     setTimeout(() => {
                       $(vnode.dom).trigger('modalexit');
                     }, 0);
@@ -427,7 +434,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 ? bodyComponent
                 : '')
             ],
-            onclick: () => loadDraft(vnode.state, draft),
+            onclick: () => loadDraft(vnode.dom, vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
           });
         })),

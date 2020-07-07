@@ -109,6 +109,8 @@ class DraftsController {
           'jwt': app.user.jwt,
         }
       });
+      console.log(response);
+      console.log(response.status);
       if (response.status !== 200) {
         throw new Error(`${response.status} error: Failed to delete draft`);
       }
