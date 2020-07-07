@@ -258,6 +258,10 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                   parentType,
                   parentState: vnode.state,
                 }),
+                m(ProposalBodyChangeOwner, {
+                  item: comment,
+                  onChangeHandler: (c) => { console.dir(c); },
+                })
               ],
               transitionDuration: 0,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })

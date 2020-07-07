@@ -488,10 +488,11 @@ export const ProposalBodyChangeOwner: m.Component<IProposalBodyChangeOwnerAttrs>
         label: `${profile.displayName}: ${address.address.slice(0, 7)}...`,
         onclick: async () => {
           if (isThread) {
-            const result = await app.threads.changeOwner(item as OffchainThread, r.address_id);
-            vnode.attrs.onChangeHandler(result);
+            const resultThread = await app.threads.changeOwner(item as OffchainThread, r.address_id);
+            vnode.attrs.onChangeHandler(resultThread);
           } else if (isComment) {
-            console.dir('TODO: COMMENT');
+            const resultComment = await app.comments.changeOwner(item as OffchainComment<any>, r.address_id);
+            vnode.attrs.onChangeHandler(resultComment);
           }
         }
       });

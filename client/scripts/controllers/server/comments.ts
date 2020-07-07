@@ -152,6 +152,35 @@ class CommentsController {
     }
   }
 
+  public async changeOwner(
+    comment: OffchainComment<any>,
+    address_id: number,
+  ) {
+    let result;
+    await $.ajax({
+      url: `${app.serverUrl()}/changeThreadOwner`,
+      type: 'POST',
+      data: {
+        'comment_id': comment.id,
+        'address_id': address_id,
+        'jwt': app.user.jwt,
+      },
+      success: (response) => {
+        result = modelFromServer(response.result);
+        if (this._store.getById(result.id)) {
+          this._store.remove(this._store.getById(result.id));
+        }
+        this._store.add(result);
+      },
+      error: (err) => {
+        console.log('Failed to change comment owner');
+        throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+          : 'Failed to change comment owner');
+      }
+    });
+    return result;
+  }
+
   public async refresh(proposal, chainId: string, communityId: string) {
     return new Promise(async (resolve, reject) => {
       try {
