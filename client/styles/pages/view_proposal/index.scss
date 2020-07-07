@@ -99,6 +99,7 @@ $discussion-meta-color: #999;
         }
         .ProposalBodyReaction {
             margin-top: $discussion-reaction-padding;
+            display: inline-block;
         }
     }
 
