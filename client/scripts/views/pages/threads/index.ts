@@ -14,6 +14,10 @@ enum NewThreadErrors {
   NoUrl = 'URL cannot be blank',
 }
 
+enum NewDraftErrors {
+  InsufficientData = 'Draft must have a title, body, or attachment'
+}
+
 export const formDataIncomplete = (state) : string => {
   if (!state.form.title) return NewThreadErrors.NoTitle;
   if (!state.form.tag) return NewThreadErrors.NoTag;
@@ -42,7 +46,63 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   }
 };
 
-export const newThread = (
+export const saveDraft = (
+  form,
+  quillEditorState,
+  author,
+  existingDraft?
+) => {
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const { title, tagName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !title) {
+    return ({ draft: NewDraftErrors.InsufficientData });
+  }
+  const attachments = [];
+  if (existingDraft) {
+    (async () => {
+      let result;
+      try {
+        result = await app.user.discussionDrafts.edit(
+          existingDraft,
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+      }
+      mixpanel.track('Update discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
+  } else {
+    (async () => {
+      let result;
+      try {
+        result = await app.user.discussionDrafts.create(
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+        return ({ draft: e });
+      }
+      mixpanel.track('Save discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
+  }
+};
+
+export const newThread = async (
   form,
   quillEditorState,
   author,
@@ -62,6 +122,8 @@ export const newThread = (
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
     return ({ editor: NewThreadErrors.NoBody });
   }
+
+  quillEditorState.editor.enable(false);
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
@@ -88,53 +150,51 @@ export const newThread = (
   const chainId = app.activeCommunityId() ? null : app.activeChainId();
   const communityId = app.activeCommunityId();
 
-  (async () => {
-    let result;
-    try {
-      result = await app.threads.create(
-        author.address,
-        kind,
-        chainId,
-        communityId,
-        title,
-        tagName,
-        tagId,
-        bodyText,
-        url,
-        attachments,
-        mentions,
-        privacy,
-        readOnly,
-      );
-    } catch (e) {
-      console.error(e);
-      return ({ thread_creation: e });
+  let result;
+  try {
+    result = await app.threads.create(
+      author.address,
+      kind,
+      chainId,
+      communityId,
+      title,
+      tagName,
+      tagId,
+      bodyText,
+      url,
+      attachments,
+      mentions,
+      privacy,
+      readOnly,
+    );
+  } catch (e) {
+    console.error(e);
+    quillEditorState.editor.enable();
+    return ({ thread_creation: e });
+  }
+  const activeEntity = app.activeCommunityId() ? app.community : app.chain;
+  updateLastVisited(app.activeCommunityId()
+    ? (activeEntity.meta as CommunityInfo)
+    : (activeEntity.meta as NodeInfo).chain, true);
+  await app.user.notifications.refresh();
+  m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
+
+  try {
+    const tagNames = Array.isArray(activeEntity?.meta?.tags)
+      ? activeEntity.meta.tags.map((t) => t.name)
+      : [];
+    if (!tagNames.includes(result.tag.name)) {
+      activeEntity.meta.tags.push(result.tag);
     }
+  } catch (e) {
+    console.log(`Error adding new tag to ${activeEntity}.`);
+  }
 
-    const activeEntity = app.activeCommunityId() ? app.community : app.chain;
-    updateLastVisited(app.activeCommunityId()
-      ? (activeEntity.meta as CommunityInfo)
-      : (activeEntity.meta as NodeInfo).chain, true);
-    await app.user.notifications.refresh();
-    m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
-
-    try {
-      const tagNames = Array.isArray(activeEntity?.meta?.tags)
-        ? activeEntity.meta.tags.map((t) => t.name)
-        : [];
-      if (!tagNames.includes(result.tag.name)) {
-        activeEntity.meta.tags.push(result.tag);
-      }
-    } catch (e) {
-      console.log(`Error adding new tag to ${activeEntity}.`);
-    }
-
-    mixpanel.track('Create Thread', {
-      'Step No': 2,
-      Step: 'Filled in Proposal and Discussion',
-      'Thread Type': kind,
-    });
-  })();
+  mixpanel.track('Create Thread', {
+    'Step No': 2,
+    Step: 'Filled in Proposal and Discussion',
+    'Thread Type': kind,
+  });
 };
 
 export function detectURL(str: string) {

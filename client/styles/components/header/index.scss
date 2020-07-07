@@ -1,19 +1,15 @@
 @import 'client/styles/shared';
 
 .Header {
-    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    padding: 0 $horizontal-padding;
-    background: #fff;
-    border-top: 6px solid $theme-base-color;
-    border-bottom: 1px solid #eee;
+    padding: 0 $right-horizontal-padding;
+    background: #1f1f1f;
     box-shadow: 0 0 4px rgba(0,0,0,0.07);
     z-index: 50;
     .header-content {
         margin: 0 auto;
-        max-width: $sublayout-max-width;
         display: flex;
         align-items: center;
         height: $header-height;
@@ -25,6 +21,13 @@
         > .cui-button-group,
         > .CommunitySelector {
             margin-left: $header-spacing;
+        }
+        > .placeholder > .CommunityLabel {
+            color: #fff;
+        }
+        > .cui-button,
+        > .LoginSelector > .cui-button {
+            border: none !important;
         }
         .cui-button-label {
             font-size: 104%;

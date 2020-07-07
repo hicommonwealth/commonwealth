@@ -1,0 +1,29 @@
+.NewThreadForm {
+  display: flex;
+  .new-thread-form-body {
+    flex: 9;
+    button[name="submit"], button[name="submission"] {
+      margin-right: 12px;
+    }
+  }
+  .new-thread-form-sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+    margin-left: 15px;
+    .cui-list {
+      height: 90%;
+      .cui-list-item {
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+    }
+    button {
+        margin-bottom: 15px;
+    }
+  }
+  .discussion-draft-title {
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+}

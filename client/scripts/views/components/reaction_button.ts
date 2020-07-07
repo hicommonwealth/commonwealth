@@ -52,7 +52,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
       const diff = (likes || dislikes).length - reactors.length;
       reactors.push(m('.reacting-user .truncated-reacting-users', `and ${diff} more`));
     }
-    const tooltipPopover = m('.ReactionButtonTooltip', reactors);
+    const tooltipPopover = m('.reaction-button-tooltip', reactors);
 
     const rxnButton = m('.ReactionButton', {
       class: `${(disabled ? 'disabled' : type === hasReactedType ? 'active' : '')
@@ -99,15 +99,20 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         });
       }
     }, (type === ReactionType.Dislike) && [
-      m('span.upvote-count', dislikes.length),
-      m('span.upvote-icon', m.trust('&#x2193;'))
+      m('.upvote-icon', '👎'),
+      m('.upvote-count', dislikes.length),
     ], (type === ReactionType.Like) && [
-      m('span.reactions-count', likes.length),
-      m('span.reactions-icon', m.trust('&#x2191;')),
+      m('.reactions-icon', '👍'),
+      m('.reactions-count', likes.length),
     ]);
 
     return (tooltip && reactors.length)
-      ? m(Tooltip, { content: tooltipPopover, trigger: rxnButton, hoverOpenDelay: 1000 })
+      ? m(Tooltip, {
+        class: 'ReactionButtonTooltip',
+        content: tooltipPopover,
+        trigger: rxnButton,
+        hoverOpenDelay: 1000
+      })
       : rxnButton;
   }
 };

@@ -15,7 +15,7 @@ const EmptyChannelPlaceholder: m.Component<{ tagName?: string, communityName?: s
         ? `Welcome to #${tagName}!`
         : `Welcome to the ${communityName} community!`
        ),
-      m('p', `There are no posts yet.`),
+      m('p', 'Nobody has posted in this channel yet.'),
     ]);
   }
 };

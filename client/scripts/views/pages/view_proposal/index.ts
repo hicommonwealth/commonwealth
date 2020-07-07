@@ -3,7 +3,7 @@ import 'pages/view_proposal/index.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { PopoverMenu, Icon, Icons } from 'construct-ui';
+import { PopoverMenu, MenuDivider, Icon, Icons } from 'construct-ui';
 
 import { NotificationCategories } from 'types';
 import app from 'state';
@@ -32,8 +32,7 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderAuthor, ProposalHeaderCreated, ProposalHeaderDelete,
-  ProposalHeaderExternalLink, ProposalHeaderLastEdited, ProposalHeaderTags, ProposalHeaderTitle,
+  ProposalHeaderExternalLink, ProposalHeaderTags, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons
 } from './header';
@@ -55,6 +54,7 @@ interface IProposalHeaderAttrs {
 
 interface IProposalHeaderState {
   editing: boolean;
+  saving: boolean;
   quillEditorState: any;
   currentText: any;
   tagEditorIsOpen: boolean;
@@ -83,7 +83,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
     const canEdit = (proposal instanceof OffchainThread
                      && app.user.activeAccount?.address === proposal.author
                      && app.user.activeAccount?.chain.id === proposal.authorChain)
-      || app.user.isRoleOfCommunity({
+      || (app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
         community: app.activeCommunityId()
@@ -91,7 +91,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         role: 'moderator',
         chain: app.activeChainId(),
         community: app.activeCommunityId()
-      });
+      }));
 
     return m('.ProposalHeader', {
       class: `proposal-${proposal.slug}`
@@ -100,80 +100,79 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         m('.proposal-top-left', [
           m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
-            m(ProposalHeaderAuthor, { proposal }),
-            m(ProposalHeaderCreated, { proposal, link: proposalLink }),
-            m(ProposalHeaderLastEdited, { proposal }),
             m(ProposalHeaderTags, { proposal }),
+            m(ProposalBodyAuthor, { item: proposal }),
+            m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
+            m(ProposalHeaderViewCount, { viewCount }),
           ] : [
             m(ProposalHeaderOnchainId, { proposal }),
             m(ProposalHeaderOnchainStatus, { proposal }),
-            m(ProposalHeaderAuthor, { proposal }),
-            m(ProposalHeaderCreated, { proposal, link: proposalLink }),
+            m(ProposalBodyAuthor, { item: proposal }),
+            m(ProposalHeaderViewCount, { viewCount }),
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
             && m('.proposal-body-link', m(ProposalHeaderExternalLink, { proposal })),
         ]),
-        m('.proposal-top-right', [
-          app.isLoggedIn() && m(PopoverMenu, {
-            transitionDuration: 0,
-            closeOnOutsideClick: true,
-            closeOnContentClick: true,
-            menuAttrs: { size: 'default' },
-            content: [
-              canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
-                openTagEditor: () => {
-                  vnode.state.tagEditorIsOpen = true;
-                }
-              }),
-              m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
-              canEdit && m(ProposalHeaderDelete, { proposal }),
-              canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
-              proposal instanceof OffchainThread
-                && !getSetGlobalEditingStatus(GlobalStatus.Get)
-                && isSameAccount(app.user.activeAccount, author)
-                && !vnode.state.editing
-                && [
-                  m(ProposalBodyEditMenuItem, {
-                    item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
-                  }),
-                  m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                ],
-              proposal instanceof OffchainThread
-                && vnode.state.editing
-                && [
-                  m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-                  m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state })
-                ],
-            ],
-            inline: true,
-            trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-          }),
-          vnode.state.tagEditorIsOpen && proposal instanceof OffchainThread && m(TagEditor, {
-            thread: vnode.attrs.proposal as OffchainThread,
-            popoverMenu: true,
-            onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-          })
-        ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
-        !vnode.state.editing
-          && m(ProposalBodyText, { item: proposal }),
-
-        !vnode.state.editing
-          && attachments
-          && attachments.length > 0
-          && m(ProposalBodyAttachments, { item: proposal }),
-
-        vnode.state.editing
-          && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
-      ]),
-      proposal instanceof OffchainThread && m('.proposal-bottom', [
-        m('.proposal-bottom-left', [
-          m(ProposalBodyReaction, { item: proposal }),
+        m('.proposal-content-left', [
+          m(ProposalBodyAvatar, { item: proposal }),
         ]),
-        m('.proposal-bottom-right', [
-          m(ProposalHeaderViewCount, { viewCount }),
+        m('.proposal-content-right', [
+          m('.proposal-content-meta', [
+            m(ProposalBodyAuthor, { item: proposal }),
+            m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
+            m(ProposalBodyLastEdited, { item: proposal }),
+            app.isLoggedIn() && !getSetGlobalEditingStatus(GlobalStatus.Get) && m(PopoverMenu, {
+              transitionDuration: 0,
+              closeOnOutsideClick: true,
+              closeOnContentClick: true,
+              menuAttrs: { size: 'default' },
+              content: [
+                canEdit && m(ProposalBodyEditMenuItem, {
+                  item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
+                }),
+                canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
+                m(MenuDivider),
+                canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
+                  openTagEditor: () => {
+                    vnode.state.tagEditorIsOpen = true;
+                  }
+                }),
+                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
+                canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
+              ],
+              inline: true,
+              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+            }),
+            vnode.state.tagEditorIsOpen && proposal instanceof OffchainThread && m(TagEditor, {
+              thread: vnode.attrs.proposal as OffchainThread,
+              popoverMenu: true,
+              onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+              openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
+            })
+          ]),
+
+          !vnode.state.editing
+            && m(ProposalBodyText, { item: proposal }),
+
+          !vnode.state.editing
+            && attachments
+            && attachments.length > 0
+            && m(ProposalBodyAttachments, { item: proposal }),
+
+          vnode.state.editing
+            && m(ProposalBodyEditor, { item: proposal, parentState: vnode.state }),
+
+          vnode.state.editing
+            && m('.proposal-body-button-group', [
+              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+            ]),
+
+          !vnode.state.editing
+            && m(ProposalBodyReaction, { item: proposal }),
         ]),
       ]),
     ]);
@@ -182,6 +181,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
 interface IProposalCommentState {
   editing: boolean;
+  saving: boolean;
   replying: boolean;
   quillEditorState: any;
 }
@@ -209,11 +209,11 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
       onchange: () => m.redraw(),
     }, [
       m('.comment-avatar', [
-        m(ProposalBodyAvatar, { comment }),
+        m(ProposalBodyAvatar, { item: comment }),
       ]),
       m('.comment-body', [
         m('.comment-body-top', [
-          m(ProposalBodyAuthor, { comment }),
+          m(ProposalBodyAuthor, { item: comment }),
           m(ProposalBodyCreated, { item: comment, link: commentLink }),
           m(ProposalBodyLastEdited, { item: comment }),
 
@@ -272,11 +272,6 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           //       parentState: vnode.state,
           //     }),
           //   ],
-
-          vnode.state.editing && [
-            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
-            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
-          ],
         ]),
         m('.comment-body-content', [
           !vnode.state.editing
@@ -291,7 +286,13 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
             && m(ProposalBodyEditor, { item: comment, parentState: vnode.state }),
         ]),
         m('.comment-body-bottom', [
-          m(ProposalBodyReaction, { item: comment }),
+          m('.comment-body-bottom-left', [
+            m(ProposalBodyReaction, { item: comment }),
+          ]),
+          vnode.state.editing && m('.comment-body-bottom-right', [
+            m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
+            m(ProposalBodySaveEdit, { item: comment, getSetGlobalEditingStatus, parentState: vnode.state, callback }),
+          ]),
         ]),
       ]),
     ]);
@@ -422,7 +423,10 @@ const ProposalSidebar: m.Component<{ proposal: AnyProposal }> = {
   }
 };
 
-const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
+const ViewProposalPage: m.Component<{
+  identifier: string,
+  type: string
+}, {
   editing: boolean,
   replyParent: number | boolean,
   highlightedComment: boolean,
@@ -485,6 +489,17 @@ const ViewProposalPage: m.Component<{ identifier: string, type: string }, {
         });
       vnode.state.commentsPrefetchStarted = true;
     }
+
+    if (vnode.state.comments?.length) {
+      const mismatchedComments = vnode.state.comments.filter((c) => {
+        return c.rootProposal !== `${vnode.attrs.type}_${vnode.attrs.identifier.split('-')[0]}`;
+      });
+      if (mismatchedComments.length) {
+        vnode.state.commentsPrefetchStarted = false;
+      }
+    }
+
+
     const createdCommentCallback = () => {
       vnode.state.comments = app.comments.getByProposal(proposal).filter((c) => c.parentComment === null);
       m.redraw();

@@ -101,7 +101,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     await parentComment.save();
   }
 
-  // To-do: attachments can likely be handled like mentions (see lines 10 & 11)
+  // TODO: attachments can likely be handled like mentions (see lines 10 & 11)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({

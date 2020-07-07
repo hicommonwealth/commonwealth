@@ -17,6 +17,7 @@ import User from 'views/components/widgets/user';
 import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
+import Subheader from 'views/components/subheader';
 import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 import { updateLastVisited } from '../../../controllers/app/login';
 // import InlineThreadComposer from '../../components/inline_thread_composer';
@@ -32,17 +33,17 @@ const CommunitySidebar: m.Component<{ communityName: string, communityDescriptio
     return m('.CommunitySidebar', [
       m(TagCaratMenu, { tag }),
       tag && [
-        m('h4', `About #${tag}`),
+        m(Subheader, { text: `About #${tag}` }),
         m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
       ],
-      m('h4', `About ${communityName}`),
+      m(Subheader, { text: `About ${communityName}` }),
       m('p', communityDescription),
-      m('h4', 'Admins & Mods'),
-      (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
+      m(Subheader, { text: 'Admins & Mods' }),
+      m('p', (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {
         return m('.community-admin', [
           m(User, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
         ]);
-      }),
+      })),
     ]);
   }
 };

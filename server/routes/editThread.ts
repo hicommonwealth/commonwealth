@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories, ProposalType } from '../../shared/types';
@@ -43,14 +44,14 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
   };
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const thread = await models.OffchainThread.findOne({
-      where: { id: thread_id },
+      where: {
+        id: thread_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
     });
     if (!thread) return next(new Error('No thread with that id found'));
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(thread.author_id) === -1) {
-      return next(new Error(Errors.IncorrectOwner));
-    }
     const arr = thread.version_history;
     arr.unshift(version_history);
     thread.version_history = arr;
@@ -59,7 +60,7 @@ const editThread = async (models, req: Request, res: Response, next: NextFunctio
     // threads can be changed from private to public, but not the other way around
     if (thread.private) thread.private = privacy;
     await thread.save();
-    attachFiles();
+    await attachFiles();
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],

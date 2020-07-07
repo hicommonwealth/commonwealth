@@ -33,7 +33,6 @@ export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }>
         }
       },
       label: notificationSubscription?.isActive ? 'Turn off notifications' : 'Turn on notifications',
-      iconLeft: notificationSubscription?.isActive ? Icons.VOLUME_X : Icons.VOLUME_2,
     });
   },
 };
@@ -52,8 +51,7 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
           m.route.set(`/${app.activeId()}/`);
         });
       },
-      label: 'Delete thread',
-      iconLeft: Icons.DELETE
+      label: 'Delete',
     });
   }
 };
@@ -63,9 +61,8 @@ export const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen:
     const { openTagEditor } = vnode.attrs;
     return m('.TagEditorButton', [
       m(MenuItem, {
-        iconLeft: Icons.TAG,
         fluid: true,
-        label: 'Edit Tags',
+        label: 'Edit tags',
         onclick: (e) => {
           e.preventDefault();
           openTagEditor();
@@ -79,6 +76,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
+
     const canEditThread = app.user.activeAccount
       && (app.user.isRoleOfCommunity({
         role: 'admin',
@@ -114,6 +112,7 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         thread: vnode.attrs.proposal,
         popoverMenu: true,
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
       })
     ];
   },
