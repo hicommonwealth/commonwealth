@@ -793,8 +793,18 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    if (!vnode.attrs.contentsDoc)
+    const { editor, markdownMode } = vnode.state;
+    const { editorNamespace } = vnode.attrs;
+    debugger
+    const body = markdownMode
+      ? editor.getText()
+      : editor.getContents();
+    const title = ($(vnode.dom).find('input[name=\'title\'').val() as string);
+    localStorage.setItem(`${editorNamespace}-storedText`, body);
+    localStorage.setItem(`${editorNamespace}-storedTitle`, title);
+    if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
+    }
   },
   view: (vnode: m.VnodeDOM<IQuillEditorAttrs, IQuillEditorState>) => {
     const theme = vnode.attrs.theme || 'snow';

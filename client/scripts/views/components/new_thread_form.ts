@@ -192,19 +192,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { saving } = vnode.state;
 
-    const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion'; 
-
-    if (isModal) {
-      $(vnode.dom).on('modalexit modalforceexit', () => {
-        debugger;
-        const body = vnode.state.quillEditorState.markdownMode
-          ? vnode.state.quillEditorState.getContents()
-          : vnode.state.quillEditorState.getText();
-        const title = ($(vnode.dom).find('input[name=\'title\'').val() as string);
-        localStorage.setItem(`${editorNamespace}-storedText`, body);
-        localStorage.setItem(`${editorNamespace}-new-link`, title);
-      });
-    }
+    const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
