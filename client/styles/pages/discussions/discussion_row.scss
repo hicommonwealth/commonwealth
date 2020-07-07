@@ -30,15 +30,10 @@ $discussion-horizontal-padding: 60px;
                 &:hover {
                     text-decoration: underline;
                 }
-            }
-            a.discussion-link {
-                display: inline-block;
-                color: $primary-green;
-                text-decoration: none;
-                font-weight: 600;
-                margin: 10px 0;
-                &:hover {
-                    text-decoration: underline;
+                .cui-icon svg {
+                    margin-left: 8px;
+                    position: relative;
+                    top: -2px;
                 }
             }
             .discussion-meta {
@@ -59,9 +54,14 @@ $discussion-horizontal-padding: 60px;
                         text-decoration: underline;
                     }
                 }
+                .discussion-link {
+                    display: inline;
+                    margin-right: $discussion-meta-padding;
+                }
                 .discussion-last-updated {
                     display: inline;
                     margin-left: $discussion-meta-padding;
+                    color: $standard-light-text;
                 }
                 a.discussion-created, a.discussion-replies {
                     text-decoration: none;

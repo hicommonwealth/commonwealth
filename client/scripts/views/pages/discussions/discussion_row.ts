@@ -50,18 +50,17 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
         m('.discussion-top', [
           m('.discussion-top-left', [
             m('.discussion-title', [
-              link('a', discussionLink, proposal.title),
-              propType === OffchainThreadKind.Link
-                && proposal.url
-                && externalLink('a.discussion-link', proposal.url, [
-                  extractDomain(proposal.url),
-                  m.trust(' &rarr;'),
-                ]),
+              (propType === OffchainThreadKind.Link && proposal.url)
+                ? externalLink('a.discussion-link', proposal.url, [ proposal.title, m(Icon, { name: Icons.EXTERNAL_LINK }) ])
+                : link('a', discussionLink, proposal.title),
             ]),
             m('.discussion-meta', [
               proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
                 m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
                 m('span.proposal-tag-name', `${proposal.tag.name}`),
+              ]),
+              (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
+                `Link: ${extractDomain(proposal.url)}`
               ]),
               m(User, {
                 user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
@@ -70,7 +69,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 showRole: true,
                 hideAvatar: true,
               }),
-              m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
+              link('a.discussion-last-updated', discussionLink, formatLastUpdated(lastUpdated)),
               m(ThreadCaratMenu, { proposal }),
             ]),
           ]),
