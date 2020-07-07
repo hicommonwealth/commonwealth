@@ -315,10 +315,10 @@ class SubstrateStaking implements StorageModule {
         const n = 100000;
         const validatorRewards: ICommissionInfo = {};
         // The only difference between edgeware and kusama is reward event for edgeware doesn't
-        // save validator address ChainEvents ->> event_data.
+        // save validator address to ChainEvents ->> event_data.
         // So edgware distribute rewards between every validator equally for a given interval.
         // The backend API returns rewards for a given interval from /getRewards for chain-id.
-        // The /getRewards API sum all rewards to chain-id key if ChainEvents ->> event_data has no validator.
+        // The /getRewards API sum all rewards to chain-id key if ChainEvents ->> event_data has no validator address.
         accounts.forEach((account, index) => {
           const key = account.toString();
           const exposure = exposures[index];
@@ -404,6 +404,10 @@ class SubstrateStaking implements StorageModule {
   public init(ChainInfo: SubstrateChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;
+    this._app.chainEvents.rewards()
+    .then((rewards)=>{
+      this.rewards = rewards;
+    })
     return Promise.resolve();
   }
 }
