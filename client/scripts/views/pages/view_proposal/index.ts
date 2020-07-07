@@ -38,7 +38,7 @@ import {
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
+  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
@@ -116,6 +116,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
+        m('.proposal-connector'),
         m('.proposal-content-left', [
           m(ProposalBodyAvatar, { item: proposal }),
         ]),
@@ -207,6 +208,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(),
     }, [
+      m('.comment-connector'),
       m('.comment-avatar', [
         m(ProposalBodyAvatar, { item: comment }),
       ]),
@@ -243,14 +245,14 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 m(ProposalBodyEditMenuItem, {
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                m(ProposalBodyDeleteMenuItem, { item: comment }),
-                parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
-                && m(ProposalBodyReplyMenuItem, {
-                  item: comment,
-                  getSetGlobalReplyStatus,
-                  parentType,
-                  parentState: vnode.state,
-                }),
+                // m(ProposalBodyDeleteMenuItem, { item: comment }),
+                // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+                // && m(ProposalBodyReplyMenuItem, {
+                //   item: comment,
+                //   getSetGlobalReplyStatus,
+                //   parentType,
+                //   parentState: vnode.state,
+                // }),
               ],
               transitionDuration: 0,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
@@ -388,6 +390,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     };
 
     return m('.ProposalComments', {
+      class: app.user.activeAccount ? '' : 'no-active-account',
       oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; },
     }, [
       // show comments

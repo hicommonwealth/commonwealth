@@ -23,6 +23,9 @@ $discussion-meta-color: #999;
 .ViewProposalPage {
     .ProposalHeader {
         padding-top: $discussion-horizontal-padding;
+        .proposal-content {
+            position: relative;
+        }
     }
     .ProposalHeader,
     .ProposalComment {
@@ -34,24 +37,16 @@ $discussion-meta-color: #999;
         margin: 0 $discussion-horizontal-padding;
         padding-top: $discussion-vertical-padding;
     }
+    .ProposalComments.no-active-account,
     .CreateComment {
         padding-bottom: $discussion-vertical-padding * 2;
-    }
-    .proposal-body-bottom, .comment-body-bottom {
-        display: flex;
-        justify-content: space-between;
-        .proposal-body-button-group, .comment-body-bottom-right {
-            margin-top: 18px;
-            .cancel-editing {
-                margin-right: 15px;
-            }
-        }
     }
 
     //
     // header
     //
     .ProposalHeader {
+        position: relative;
         .proposal-top {
             display: flex;
             padding-bottom: $discussion-separator-padding;
@@ -97,16 +92,13 @@ $discussion-meta-color: #999;
                 text-decoration: underline;
             }
         }
-        .ProposalBodyReaction {
-            margin-top: $discussion-reaction-padding;
-            display: inline-block;
-        }
     }
 
     //
     // body
     //
     .ProposalComment {
+        position: relative;
         display: flex;
         .comment-body {
             flex: 1;
@@ -173,9 +165,28 @@ $discussion-meta-color: #999;
             stroke: #777;
         }
     }
+    .ProposalBodyReaction {
+        margin-top: $discussion-reaction-padding;
+        display: inline-block;
+    }
 
     .comments-error {
         @include error-text();
         margin: 30px 0;
+    }
+
+    .proposal-connector,
+    .comment-connector {
+        border-left: 2px solid #f4f4f4;
+        position: absolute;
+        top: 48px;
+        left: 17px;
+        bottom: -48px;
+        z-index: -1;
+    }
+    .ProposalComments.no-active-account .ProposalComment:last-child {
+        .comment-connector {
+            display: none;
+        }
     }
 }

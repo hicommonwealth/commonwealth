@@ -144,30 +144,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
   }
 };
 
-export const ProposalBodyReply: m.Component<{
-  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
-}> = {
-  view: (vnode) => {
-    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
-    if (!item) return;
-
-    return m('.ProposalBodyReply', [
-      m('a', {
-        class: 'reply',
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-            if (!confirmed) return;
-          }
-          getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
-        },
-      }, 'Comment on this reply'),
-    ]);
-  }
-};
-
 export const ProposalBodyReplyMenuItem: m.Component<{
   item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
 }> = {
