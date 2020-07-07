@@ -93,6 +93,7 @@ export const loadDraft = async (dom, state, draft) => {
   // Now we populate the form with its new contents
   let newDraftMarkdown;
   let newDraftDelta;
+  console.log(draft.body);
   if (draft.body) {
     try {
       newDraftDelta = JSON.parse(draft.body);
@@ -107,7 +108,7 @@ export const loadDraft = async (dom, state, draft) => {
   } else if (newDraftMarkdown && !state.quillEditorState.markdownMode) {
     state.quillEditorState.markdownMode = true;
   }
-
+  console.log({newDraftDelta, newDraftMarkdown});
   if (newDraftDelta) {
     state.quillEditorState.editor.setContents(newDraftDelta);
   } else if (newDraftMarkdown) {
@@ -144,6 +145,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
   view: (vnode: VnodeDOM<{ header: boolean, isModal: boolean }, IState>) => {
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
+    const { isModal } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
     // init
@@ -188,7 +190,21 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     ]);
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
+    const { saving } = vnode.state;
+
+    const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion'; 
+
+    if (isModal) {
+      $(vnode.dom).on('modalexit modalforceexit', () => {
+        debugger;
+        const body = vnode.state.quillEditorState.markdownMode
+          ? vnode.state.quillEditorState.getContents()
+          : vnode.state.quillEditorState.getText();
+        const title = ($(vnode.dom).find('input[name=\'title\'').val() as string);
+        localStorage.setItem(`${editorNamespace}-storedText`, body);
+        localStorage.setItem(`${editorNamespace}-new-link`, title);
+      });
+    }
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -270,7 +286,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 if (!Object.values(vnode.state.error).length) {
                   newLink(vnode.state.form, vnode.state.quillEditorState, author);
                 }
-                if (vnode.attrs.isModal && !vnode.state.error) {
+                if (isModal && !vnode.state.error) {
                   $(vnode.dom).trigger('modalcomplete');
                   setTimeout(() => {
                     $(vnode.dom).trigger('modalexit');
@@ -344,9 +360,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                 }
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
-                debugger
                 if (!vnode.state.error) {
-                  const editorNamespace = vnode.state.newType === 'Discussion' ? 'new-discussion' : 'new-link';
                   localStorage.removeItem(`${editorNamespace}-storedText`);
                   localStorage.removeItem(`${editorNamespace}-storedTitle`);
                   if (vnode.state.fromDraft) {
@@ -373,9 +387,8 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   console.log(form);
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   vnode.state.saving = false;
-                  if (vnode.attrs.isModal && !vnode.state.error?.draft) {
+                  if (isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
-                    const editorNamespace = 'new-discussion';
                     localStorage.removeItem(`${editorNamespace}-storedText`);
                     localStorage.removeItem(`${editorNamespace}-storedTitle`);
                     setTimeout(() => {

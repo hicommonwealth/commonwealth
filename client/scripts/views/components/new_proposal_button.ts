@@ -27,7 +27,13 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         fluid,
         disabled: !activeAccount,
         size: 'sm',
-        onclick: () => app.modals.create({ modal: NewThreadModal }),
+        onclick: () => app.modals.create({
+          modal: NewThreadModal,
+          exitCallback: (e) => {
+            console.log(e);
+            // localStorage.addItem('new-discussion-storedText');
+          }
+        }),
       });
     }
 
