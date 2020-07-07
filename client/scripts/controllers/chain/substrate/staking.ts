@@ -404,10 +404,6 @@ class SubstrateStaking implements StorageModule {
   public init(ChainInfo: SubstrateChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;
-    this._app.chainEvents.rewards()
-    .then((rewards)=>{
-      this.rewards = rewards;
-    })
     return Promise.resolve();
   }
 }
