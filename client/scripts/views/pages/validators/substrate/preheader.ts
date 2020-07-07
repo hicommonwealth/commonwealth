@@ -52,12 +52,15 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
 
     let totalPercentage = 0;
     let totalValidators = 0;
-    Object.entries(annualPercentRate).forEach(([key, value]) => {
-      if (value > 0 && Number.isFinite(value)) {
-        totalPercentage += value;
-        totalValidators++;
-      }
-    });
+    if (annualPercentRate) {
+      Object.entries(annualPercentRate).forEach(([key, value]) => {
+        if (value > 0 && Number.isFinite(value)) {
+          totalPercentage += value;
+          totalValidators++;
+        }
+      });
+    }
+
     const apr = (totalPercentage / (totalValidators || 1)).toFixed(2);
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
