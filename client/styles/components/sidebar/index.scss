@@ -1,36 +1,29 @@
 @import 'client/styles/shared';
 
-$sidebar-padding: 16px;
 $active-color: #ececec;
 
 .Sidebar {
+    padding-top: 8px;
+    .tag-icon {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background: #eee;
+        margin-left: 1px;
+        margin-right: 2px;
+    }
     > .cui-list {
         // reset list styles
         overflow-x: hidden;
         max-height: 100%;
         user-select: none;
-        // set up visual styles
-        background: #fff;
-        box-shadow: 0 0 6px rgba(0,0,0,0.07);
-        border-radius: 3px;
-        padding: 10px 0;
-        margin-bottom: 20px;
-        > h4 {
-            color: #555;
-            opacity: 0.6;
-            margin: 0;
-            padding: 6px $sidebar-padding;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.15px;
-            border: none;
-        }
+        padding: 12px 0;
         .cui-list-item {
             color: #111;
             font-size: 15px;
+            font-weight: 500;
             border: none;
-            padding: 4px $sidebar-padding;
+            padding: 4px 12px 3px;
             > .cui-list-item-content-left > .cui-icon svg {
                 height: 14px;
                 width: 14px;
@@ -46,9 +39,10 @@ $active-color: #ececec;
             }
             &.cui-selected,
             &.cui-active {
-                font-weight: 400;
-                background: $theme-base-color;
-                color: #fff;
+                background: desaturate(lighten($theme-base-color, 29%), 24%);
+                color: desaturate(darken($theme-base-color, 4%), 30%);
+                border-radius: 3px;
+
                 .cui-icon svg {
                     color: #fff !important;
                 }

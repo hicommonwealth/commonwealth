@@ -2,8 +2,8 @@
   display: flex;
   .new-thread-form-body {
     flex: 9;
-    button[name="submit"] {
-      margin-right: 15px;
+    button[name="submit"], button[name="submission"] {
+      margin-right: 12px;
     }
   }
   .new-thread-form-sidebar {
@@ -19,7 +19,7 @@
       }
     }
     button {
-      margin-bottom: 15px;
+        margin-bottom: 15px;
     }
   }
   .discussion-draft-title {

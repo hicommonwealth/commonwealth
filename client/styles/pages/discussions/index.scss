@@ -4,8 +4,8 @@
     .discussions-main {
         position: relative;
         flex: 1;
-        max-width: 800px;
         margin: 0px auto;
+        padding: 23px 0;
         &.empty-list {
             height: calc(100vh - 200px);
         }
@@ -13,7 +13,8 @@
 
     // sidebar
     .CommunitySidebar {
-        padding-left: 12px;
+        padding-top: $vertical-padding;
+        padding-left: 8px; // extra padding
         h4 {
             font-size: 16px;
             font-weight: 600;

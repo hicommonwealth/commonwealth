@@ -1,23 +1,16 @@
 @import 'client/styles/shared';
 
+$discussion-vertical-padding: 30px;
+$discussion-horizontal-padding: 60px;
+
 .DiscussionRow {
     display: block;
-    margin-bottom: 28px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.07);
-    border-radius: 4px;
+    padding: 0 $discussion-horizontal-padding;
 
     // layout
-    .discussion-top, .discussion-content, .discussion-bottom {
-        padding: 18px 26px;
-        border-bottom: 1px solid #eee;
-        background: #fff;
-    }
     .discussion-top {
-        border-radius: 4px 4px 0 0;
-    }
-    .discussion-bottom {
-        padding-top: 22px;
-        border-radius: 0 0 4px 4px;
+        padding: 16px 0;
+        border-bottom: 1px solid #eee;
     }
 
     // content
@@ -25,79 +18,85 @@
         display: flex;
         .discussion-top-left {
             flex: 1;
+            .discussion-title {
+                margin: 4px 0 2px;
+            }
+            .discussion-title a {
+                color: #111;
+                font-size: 16px;
+                text-decoration: none;
+                font-weight: 600;
+                line-height: 1.15;
+                &:hover {
+                    text-decoration: underline;
+                }
+                .cui-icon svg {
+                    margin-left: 8px;
+                    position: relative;
+                    top: -2px;
+                }
+            }
+            .discussion-meta {
+                color: $standard-light-text;
+                font-size: 14px;
+                $discussion-meta-padding: 18px;
+                a.proposal-tag {
+                    margin-right: $discussion-meta-padding;
+                    @include proposal-tag-inline;
+                    color: #999;
+                }
+                .User a {
+                    display: inline-block;
+                    text-decoration: none;
+                    color: $standard-light-text;
+                    &:hover {
+                        color: darken($standard-light-text, 8%);
+                        text-decoration: underline;
+                    }
+                }
+                .discussion-link {
+                    display: inline;
+                    margin-right: $discussion-meta-padding;
+                }
+                .discussion-last-updated {
+                    display: inline;
+                    margin-left: $discussion-meta-padding;
+                    color: $standard-light-text;
+                }
+                a.discussion-created, a.discussion-replies {
+                    text-decoration: none;
+                    color: $standard-light-text;
+                    &:hover {
+                        color: darken($standard-light-text, 8%);
+                        text-decoration: underline;
+                    }
+                }
+                .ThreadCaratMenu {
+                    margin-left: 16px;
+                    svg {
+                        cursor: pointer;
+                        stroke: #bbb;
+                        &:hover {
+                            stroke: #888;
+                        }
+                    }
+                }
+            }
         }
         .discussion-top-right {
             display: flex;
             align-items: center;
             padding-left: 10px;
-            width: 30px;
-        }
-        .discussion-title {
-            margin: 4px 0 2px;
-        }
-        .discussion-title a {
-            color: #111;
-            font-size: 19px;
-            text-decoration: none;
-            font-weight: 600;
-            line-height: 1.15;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-        .discussion-meta {
-            color: $standard-light-text;
-            font-size: 15px;
-            .User a {
-                display: inline-block;
-                text-decoration: none;
-                color: $standard-light-text;
-                &:hover {
-                    color: darken($standard-light-text, 8%);
-                    text-decoration: underline;
+            .discussion-commenters {
+                min-width: 100px;
+                text-align: right;
+                .commenters-avatars .User {
+                    margin-top: 5px;
+                    margin-right: -12px;
                 }
             }
-            .discussion-last-updated {
-                display: inline;
-                margin-left: 16px;
-            }
-            a.discussion-created, a.discussion-replies {
-                text-decoration: none;
-                color: $standard-light-text;
-                &:hover {
-                    color: darken($standard-light-text, 8%);
-                    text-decoration: underline;
-                }
-            }
-        }
-        a.discussion-link {
-            display: inline-block;
-            color: $primary-green;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 10px 0;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-    }
-    .discussion-bottom {
-        .discussion-commenters {
-            display: flex;
-            a {
-                color: $standard-light-text;
-            }
-            .commenters-avatars {
-                .User {
-                    margin-right: -8px;
-                }
-            }
-            .commenters-label {
-                margin-left: 20px;
-            }
-            .commenters-label,
-            .no-commenters-label {
-                color: $standard-light-text;
+            .ReactionButton {
+                margin-left: 36px;
             }
         }
     }

@@ -24,17 +24,16 @@ $lighttextgrey: #999;
 $electricblue: #229bd6;
 
 $header-height: 60px;
-$left-sidebar-width: 200px;
+$left-sidebar-width: 240px;
 $right-sidebar-width: 340px;
 $sublayout-max-width: 1340px;
 
-$vertical-padding: 30px; // padding between header and content
-$horizontal-padding: 30px; // padding on sides of the page
-$gutter-width: 24px; // padding between columns
+$vertical-padding: 24px; // padding between header and content
+$left-horizontal-padding: 18px; // padding on sides of the page
+$right-horizontal-padding: 24px; // padding on inside of sidebars
 $header-spacing: 14px; // padding between header items
 
 $standard-light-text: #999;
-$standard-meta-spacing: 12px;
 $standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
 
 // construct-ui styles
@@ -318,5 +317,17 @@ $menu-item-height: 30px;
         opacity: 0.5;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
         filter: alpha(opacity=20);
+    }
+}
+
+@mixin proposal-tag-inline {
+    .proposal-tag-icon {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        background: #eee;
+        margin-left: 1px;
+        margin-right: 8px;
     }
 }

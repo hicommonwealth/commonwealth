@@ -1,5 +1,15 @@
 @import 'client/styles/shared';
 
+$discussion-vertical-padding: 37px;
+$discussion-horizontal-padding: 60px;
+$discussion-separator-padding: 30px; // padding around horizontal rule between header and body
+$discussion-meta-padding: 12px; // padding between comment meta & comment content
+$discussion-reaction-padding: 18px; // padding between comment content & comment reaction
+$discussion-comment-padding: 28px; // padding between comment content & avatar
+
+$discussion-meta-font-size: 14px;
+$discussion-meta-color: #999;
+
 @mixin supports-jump-highlight() {
   &.highlighted {
     background-color: #ffd;
@@ -11,41 +21,161 @@
 }
 
 .ViewProposalPage {
-  .ProposalHeader,
-  .ProposalBody,
-  .ProposalComment {
-    @include supports-jump-highlight();
-  }
-  .ProposalHeader .proposal-top,
-  .ProposalHeader .proposal-content,
-  .ProposalHeader .proposal-bottom,
-  .ProposalComment .comment-body,
-  .CreateComment .create-comment-body {
-    background: #fff;
-    box-shadow: $standard-box-shadow;
-    padding: 18px 26px;
-    border-bottom: 1px solid #eee;
-  }
-  .ProposalHeader .proposal-top {
-    border-radius: 4px 4px 0 0;
-  }
-  .ProposalHeader .proposal-bottom {
-    padding-top: 24px;
-    padding-bottom: 22px;
-    border-radius: 0 0 4px 4px;
-  }
-  .ProposalComment .comment-body,
-  .CreateComment .create-comment-body {
-    border-radius: 4px;
-  }
-  .proposal-body-bottom, .comment-body-bottom {
-    display: flex;
-    justify-content: space-between;
-    .proposal-body-button-group, .comment-body-bottom-right {
-      margin-top: 18px;
-      .cancel-editing {
-        margin-right: 15px;
-      }
+    .ProposalHeader {
+        padding-top: $discussion-horizontal-padding;
     }
-  }
+    .ProposalHeader,
+    .ProposalComment {
+        @include supports-jump-highlight();
+    }
+    .ProposalHeader,
+    .ProposalComment,
+    .CreateComment {
+        margin: 0 $discussion-horizontal-padding;
+        padding-top: $discussion-vertical-padding;
+    }
+    .CreateComment {
+        padding-bottom: $discussion-vertical-padding * 2;
+    }
+    .proposal-body-bottom, .comment-body-bottom {
+        display: flex;
+        justify-content: space-between;
+        .proposal-body-button-group, .comment-body-bottom-right {
+            margin-top: 18px;
+            .cancel-editing {
+                margin-right: 15px;
+            }
+        }
+    }
+
+    //
+    // header
+    //
+    .ProposalHeader {
+        .proposal-top {
+            display: flex;
+            padding-bottom: $discussion-separator-padding;
+            border-bottom: 1px solid #eee;
+        }
+        .proposal-top-left {
+            flex: 1;
+        }
+        .proposal-content {
+            display: flex;
+            padding-top: $discussion-separator-padding;
+        }
+        .proposal-content-left {
+
+        }
+        .proposal-content-right {
+            flex: 1;
+            margin-left: $discussion-comment-padding;
+            .proposal-content-meta {
+                padding-bottom: $discussion-meta-padding;
+                font-size: $discussion-meta-font-size;
+            }
+        }
+        .proposal-title {
+            margin: 4px 0 6px;
+            .ProposalHeaderTitle {
+                display: inline;
+                font-size: 25px;
+                font-weight: 600;
+                flex: 1;
+                line-height: 1.15;
+            }
+        }
+        .ProposalHeaderExternalLink {
+            margin-top: 5px;
+            font-weight: 600;
+            a:link,
+            a:visited {
+                color: $primary-green;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        }
+        .ProposalBodyReaction {
+            margin-top: $discussion-reaction-padding;
+            display: inline-block;
+        }
+    }
+
+    //
+    // body
+    //
+    .ProposalComment {
+        display: flex;
+        .comment-body {
+            flex: 1;
+            padding-left: $discussion-comment-padding;
+        }
+        .comment-body-top {
+            padding-bottom: $discussion-meta-padding;
+            font-size: $discussion-meta-font-size;
+        }
+        .comment-body-bottom {
+            padding: 4px 0 2px;
+        }
+    }
+
+    .ProposalComments {
+        .threading-level {
+            margin-left: 54px;
+        }
+        .new-comment-child {
+            margin-left: 36px;
+        }
+        .ProposalBodyReaction {
+            margin-top: $discussion-reaction-padding;
+        }
+    }
+
+    .ProposalHeaderTags {
+        .proposal-tag {
+            @include proposal-tag-inline;
+        }
+    }
+
+    // proposal-meta
+    .ProposalHeaderTags,
+    .ProposalHeaderOnchainId,
+    .ProposalHeaderOnchainStatus,
+    .ProposalBodyAuthor,
+    .ProposalBodyCreated,
+    .ProposalBodyLastEdited,
+    .ProposalBodyDelete,
+    .ProposalBodyEdit,
+    .ProposalBodyDelete,
+    .ProposalBodyCancelEdit,
+    .ProposalBodySaveEdit,
+    .ViewCountBlock,
+    .ProposalHeaderExternalLink {
+        font-size: $discussion-meta-font-size;
+        display: inline-block;
+        color: $discussion-meta-color;
+        margin-right: 17px;
+        a:link,
+        a:visited,
+        .User a.user-display-name {
+            color: $discussion-meta-color;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
+        stroke: #999;
+        &:hover {
+            stroke: #777;
+        }
+    }
+
+    .comments-error {
+        @include error-text();
+        margin: 30px 0;
+    }
 }
