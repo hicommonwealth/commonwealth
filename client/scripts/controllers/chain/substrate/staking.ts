@@ -2,6 +2,8 @@
 import BN from 'bn.js';
 import { IApp } from 'state';
 import { ApiRx } from '@polkadot/api';
+import { ISubstrateReward } from 'shared/events/edgeware/types';
+import moment from 'moment';
 import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
 import { Option, StorageKey, Vec } from '@polkadot/types';
@@ -32,12 +34,12 @@ interface IReward {
   avgReward: string;
   daysDiff: number;
   validators: {
-    [key: string]: number
+    [key: string]: ISubstrateReward[] | any[];
   };
 }
 
 export interface ICommissionInfo {
-  [key: string]: number
+  [key: string]: number | string
 }
 
 export interface IAccountInfo extends DeriveAccountRegistration{
@@ -218,7 +220,7 @@ class SubstrateStaking implements StorageModule {
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
             isOnline: imOnline[key]?.isOnline,
-            commissionPer: commissionInfo[key]
+            commissionPer: Number(commissionInfo[key])
           };
         }
         // add set of next elected
@@ -234,7 +236,7 @@ class SubstrateStaking implements StorageModule {
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
             isOnline: imOnline[key]?.isOnline,
-            commissionPer: commissionInfo[key]
+            commissionPer: Number(commissionInfo[key])
           };
         }
         // add set of waiting validators
@@ -265,12 +267,11 @@ class SubstrateStaking implements StorageModule {
         of(api),
         api.derive.staking.validators(),
         api.query.staking.currentEra(),
-        from(this._app.chainEvents.rewards()),
         api.derive.staking.electedInfo()
       )),
       flatMap((
-        [api, { validators: currentSet }, era, rewards, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, IReward, DeriveStakingElected]
+        [api, { validators: currentSet }, era, electedInfo]:
+        [ApiRx, DeriveStakingValidators, EraIndex, DeriveStakingElected]
       ) => {
         const commission: ICommissionInfo = {};
 
@@ -290,39 +291,51 @@ class SubstrateStaking implements StorageModule {
         return combineLatest(
           stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
           of(currentSet),
-          of(rewards),
+          from(this._app.chainEvents.rewards(currentSet)),
           of(commission)
         );
       }),
       auditTime(100),
       map(([exposures, accounts, rewards, commissions ] :
         [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
-        // coins.div don't support fraction points. multiply and divide the same number will give fraction points.
-        const n = 100000;
+        const data = {};
+        const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
-        const avgReward = new BN(rewards.avgReward);
-        const totals = accounts.map((account, index) => {
-          return {
-            totalStake: exposures[index].total.toBn(),
-            commission: commissions[account.toString()] || 0,
-          };
-        }).reduce((prev, curr) => {
-          return {
-            total: prev.total.add(curr.totalStake),
-            comm: prev.comm + curr.commission,
-          };
-        }, {
-          total: new BN(0),
-          comm: 0.0,
+        accounts.forEach((account, index) => {
+          let key = account.toString();
+          const exposure = exposures[index];
+          const totalStake = exposure.total.toBn();
+          const fraction = exposure.own.toBn().mul(new BN(n));
+          const comm = commissions[key] || 0;
+
+          if (!(key in rewards.validators)) {
+            key = this._app.chain.id;
+          }
+          const valRewards = rewards.validators[key];
+          const amount = valRewards[valRewards.length - 1].event_data.amount;
+          const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
+          const secondReward = exposure.own.toBn()
+            .mul((new BN(amount.toString())).sub(firstReward))
+            .div(totalStake);
+          const totalReward = firstReward.add(secondReward);
+          const length = rewards.validators[key].length;
+          if (valRewards.length > 1) {
+            const last = rewards.validators[key][length - 1];
+            const secondLast = rewards.validators[key][length - 2];
+            const start = moment(secondLast.created_at);
+            const end = moment(last.created_at);
+            const eventDiff = end.diff(start, 'minutes');
+
+            const periodsInYear = (60 * 24 * 7 * 52) / eventDiff;
+            const percentage = (new BN(totalReward))
+              .mul(new BN(n))
+              .div(new BN(totalStake))
+              .toNumber() / n;
+            const apr = percentage * periodsInYear;
+            validatorRewards[account.toString()] = apr;
+          }
         });
-        const temp = 1000000;
-        const avgTotalStake = totals.total.divn(accounts.length);
-        const avgCommission = totals.comm / (accounts.length);
-        const percentageScaled = avgReward.muln(temp).div(avgTotalStake);
-        const percentage = percentageScaled.toNumber() / temp;
-        const erasPerYear = ((365 * 24) / rewards.eraLengthInHours);
-        const annualised = percentage * erasPerYear;
-        console.log(avgTotalStake.toString(), avgReward.toString(), avgCommission, annualised);
+
         return validatorRewards;
       }),
     );

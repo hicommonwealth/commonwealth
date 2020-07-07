@@ -115,7 +115,12 @@ export interface ISubstrateSlash extends ISubstrateEvent {
 export interface ISubstrateReward extends ISubstrateEvent {
   kind: SubstrateEventKind.Reward;
   validator?: SubstrateAccountId;
+  validators?: SubstrateAccountId[];
   amount: SubstrateBalanceString;
+  stats?: {
+    totalReward: string;
+    totalStake: string;
+  }[];
 }
 
 export interface ISubstrateBonded extends ISubstrateEvent {

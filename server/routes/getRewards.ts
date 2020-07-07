@@ -1,9 +1,11 @@
+/* eslint-disable guard-for-in */
 import Sequelize from 'sequelize';
 import BN from 'bn.js';
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
+import { SubstrateEventKind, SubstrateAccountId, SubstrateBalanceString } from 'shared/events/edgeware/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 const Op = Sequelize.Op;
@@ -15,7 +17,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain } = req.query;
+  const { chain, accounts } = req.query;
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
@@ -57,6 +59,8 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     ]
   });
 
+  const validators = {};
+
   let start = rewards[0].created_at;
   let end = rewards[rewards.length - 1].created_at;
   start = moment(start);
@@ -66,16 +70,21 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   if (!rewards.length)
     return next(new Error(Errors.NoRecordsFound));
 
-  const total: BN = rewards.reduce((prev, curr) => {
-    const event_data: IEventData = curr.dataValues.event_data;
-    return prev.add(new BN(event_data.amount));
-  }, new BN(0));
+  rewards.forEach((reward) => {
+    const event_data: IEventData = reward.dataValues.event_data;
+    const key = event_data.validator || chain;
+    if (key in validators) {
+      validators[key].push(reward);
+    } else {
+      validators[key] = [reward];
+    }
+  });
 
   return res.json({
     status: 'Success',
     result: {
       diff,
-      avgReward: total.div(new BN(diff)).toString(),
+      validators,
     }
   });
 };
