@@ -4,7 +4,6 @@ import app from 'state';
 
 import { Button, Icon, Icons, Tag, MenuItem } from 'construct-ui';
 
-import { updateRoute } from 'app';
 import { pluralize, link, externalLink, isSameAccount, extractDomain } from 'helpers';
 import { proposalSlugToFriendlyName } from 'identifiers';
 
