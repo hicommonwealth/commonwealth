@@ -59,11 +59,16 @@ interface IProposalHeaderState {
   quillEditorState: any;
   currentText: any;
   tagEditorIsOpen: boolean;
+  proposal: AnyProposal | OffchainThread;
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
+  oninit: (vnode) => {
+    vnode.state.proposal = vnode.attrs.proposal;
+  },
   view: (vnode) => {
-    const { commentCount, proposal, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
+    const { commentCount, getSetGlobalEditingStatus, getSetGlobalReplyStatus, viewCount } = vnode.attrs;
+    const { proposal } = vnode.state;
     const isThread = proposal instanceof OffchainThread;
     const description = isThread ? false : (proposal as AnyProposal).description;
     const body = isThread ? (proposal as OffchainThread).body : false;
@@ -137,7 +142,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                 && [
                   m(ProposalBodyChangeOwner, {
                     item: proposal,
-                    onChangeHandler: (item: OffchainThread) => { proposal.author = item.author; proposal.authorChain = item.authorChain; m.redraw(); },
+                    onChangeHandler: (item: OffchainThread) => { vnode.state.proposal = item; m.redraw(); },
                   }),
                   m(ProposalBodyEditMenuItem, {
                     item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
@@ -190,6 +195,7 @@ interface IProposalCommentState {
   saving: boolean;
   replying: boolean;
   quillEditorState: any;
+  comment: OffchainComment<any>;
 }
 
 interface IProposalCommentAttrs {
@@ -202,8 +208,12 @@ interface IProposalCommentAttrs {
 }
 
 const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
+  oninit: (vnode) =>{
+    vnode.state.comment = vnode.attrs.comment;
+  },
   view: (vnode) => {
-    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal, callback } = vnode.attrs;
+    const { getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal, callback } = vnode.attrs;
+    const { comment } = vnode.state;
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
@@ -246,6 +256,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
           && [
             m(PopoverMenu, {
               closeOnContentClick: true,
+              onClose: () => m.redraw(),
               content: [
                 m(ProposalBodyEditMenuItem, {
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
@@ -260,7 +271,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 }),
                 m(ProposalBodyChangeOwner, {
                   item: comment,
-                  onChangeHandler: (c) => { console.dir(c); },
+                  onChangeHandler: (c) => { vnode.state.comment = c; m.redraw(); },
                 })
               ],
               transitionDuration: 0,

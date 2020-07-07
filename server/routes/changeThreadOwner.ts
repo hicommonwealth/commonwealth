@@ -49,7 +49,15 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
     // update thread with new address id
     thread.address_id = newAddress.id;
     await thread.save();
-    return res.json({ status: 'Success', result: thread.toJSON() });
+
+    const finalThread = await models.OffchainThread.findOne({
+      where: {
+        id: thread.id,
+        address_id: thread.address_id,
+      },
+      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
+    });
+    return res.json({ status: 'Success', result: finalThread.toJSON() });
   } else if (comment_id) {
     // find comment by user addresses and comment id
     const comment = await models.OffchainComment.findOne({
@@ -59,14 +67,21 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
           [Op.in]: userAddressIds,
         }
       },
-      include: [models.Address, models.OffchainAttachment],
     });
     if (!comment) return next(new Error(Errors.NoComment));
 
     // update comment with new address id
     comment.address_id = newAddress.id;
     await comment.save();
-    return res.json({ status: 'Success', result: comment.toJSON() });
+
+    const finalComment = await models.OffchainComment.findOne({
+      where: {
+        id: comment.id,
+        address_id: comment.address_id,
+      },
+      include: [models.Address, models.OffchainAttachment],
+    });
+    return res.json({ status: 'Success', result: finalComment.toJSON() });
   } else {
     return res.status(500).json({ error: 'Failed and circumvented checks' });
   }
