@@ -78,6 +78,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 showRole: true,
                 hideAvatar: true,
               }),
+              m(ThreadCaratMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [
@@ -98,7 +99,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             }, [
               link('a', discussionLink, formatLastUpdated(lastUpdated)),
             ]),
-            m(ThreadCaratMenu, { proposal }),
           ]),
         ]),
       ]),

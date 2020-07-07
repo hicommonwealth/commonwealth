@@ -64,6 +64,16 @@ $discussion-horizontal-padding: 48px;
                         text-decoration: underline;
                     }
                 }
+                .ThreadCaratMenu {
+                    margin-left: 12px;
+                    svg {
+                        cursor: pointer;
+                        stroke: #bbb;
+                        &:hover {
+                            stroke: #888;
+                        }
+                    }
+                }
             }
         }
         .discussion-top-right {
@@ -91,16 +101,6 @@ $discussion-horizontal-padding: 48px;
                 }
                 a {
                     color: #999;
-                }
-            }
-            .ThreadCaratMenu {
-                margin-left: 14px;
-                svg {
-                    cursor: pointer;
-                    stroke: #bbb;
-                    &:hover {
-                        stroke: #888;
-                    }
                 }
             }
         }
