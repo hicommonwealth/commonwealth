@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
-$discussion-vertical-padding: 30px;
-$discussion-horizontal-padding: 60px;
+$discussion-vertical-padding: 32px;
+$discussion-horizontal-padding: 48px;
 
 .DiscussionRow {
     display: block;
@@ -9,7 +9,7 @@ $discussion-horizontal-padding: 60px;
 
     // layout
     .discussion-top {
-        padding: 16px 0;
+        padding: 16px 0 14px;
         border-bottom: 1px solid #eee;
     }
 
@@ -18,22 +18,20 @@ $discussion-horizontal-padding: 60px;
         display: flex;
         .discussion-top-left {
             flex: 1;
-            .discussion-title {
-                margin: 4px 0 2px;
-            }
             .discussion-title a {
                 color: #111;
                 font-size: 16px;
                 text-decoration: none;
                 font-weight: 600;
-                line-height: 1.15;
+                line-height: 1.1;
                 &:hover {
                     text-decoration: underline;
                 }
                 .cui-icon svg {
-                    margin-left: 8px;
                     position: relative;
+                    margin-left: 2px;
                     top: -2px;
+                    stroke: #999;
                 }
             }
             .discussion-meta {
@@ -58,27 +56,12 @@ $discussion-horizontal-padding: 60px;
                     display: inline;
                     margin-right: $discussion-meta-padding;
                 }
-                .discussion-last-updated {
-                    display: inline;
-                    margin-left: $discussion-meta-padding;
-                    color: $standard-light-text;
-                }
                 a.discussion-created, a.discussion-replies {
                     text-decoration: none;
                     color: $standard-light-text;
                     &:hover {
                         color: darken($standard-light-text, 8%);
                         text-decoration: underline;
-                    }
-                }
-                .ThreadCaratMenu {
-                    margin-left: 16px;
-                    svg {
-                        cursor: pointer;
-                        stroke: #bbb;
-                        &:hover {
-                            stroke: #888;
-                        }
                     }
                 }
             }
@@ -88,7 +71,7 @@ $discussion-horizontal-padding: 60px;
             align-items: center;
             padding-left: 10px;
             .discussion-commenters {
-                min-width: 100px;
+                padding-left: 20px;
                 text-align: right;
                 .commenters-avatars .User {
                     margin-top: 5px;
@@ -96,7 +79,29 @@ $discussion-horizontal-padding: 60px;
                 }
             }
             .ReactionButton {
-                margin-left: 36px;
+                margin-left: 48px;
+            }
+            .discussion-last-updated {
+                min-width: 80px;
+                padding-left: 14px;
+                text-align: right;
+                font-size: 14px;
+                &.older {
+                    min-width: 116px;
+                }
+                a {
+                    color: #999;
+                }
+            }
+            .ThreadCaratMenu {
+                margin-left: 14px;
+                svg {
+                    cursor: pointer;
+                    stroke: #bbb;
+                    &:hover {
+                        stroke: #888;
+                    }
+                }
             }
         }
     }

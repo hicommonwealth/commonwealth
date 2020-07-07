@@ -19,7 +19,12 @@ import ThreadCaratMenu from './thread_carat_menu';
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
-  return timestamp.fromNow();
+  const formatted = timestamp.fromNow(true);
+  if (formatted.indexOf(' month') !== -1) {
+    return timestamp.format('MMM D');
+  } else {
+    return formatted.replace(' days', 'd').replace(' hours', 'h');
+  }
 };
 
 const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boolean }> = {
@@ -42,8 +47,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
 
     const tagColor = '#72b483';
 
-    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
-      `${slugify(proposal.title)}`;
+    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+      + `${slugify(proposal.title)}`;
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
@@ -51,7 +56,11 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           m('.discussion-top-left', [
             m('.discussion-title', [
               (propType === OffchainThreadKind.Link && proposal.url)
-                ? externalLink('a.discussion-link', proposal.url, [ proposal.title, m(Icon, { name: Icons.EXTERNAL_LINK }) ])
+                ? externalLink(
+                  'a.discussion-link',
+                  proposal.url,
+                  [ proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
+                )
                 : link('a', discussionLink, proposal.title),
             ]),
             m('.discussion-meta', [
@@ -69,22 +78,27 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 showRole: true,
                 hideAvatar: true,
               }),
-              link('a.discussion-last-updated', discussionLink, formatLastUpdated(lastUpdated)),
-              m(ThreadCaratMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [
             m('.discussion-commenters', [
-              m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
-                return m(User, {
-                  user: new AddressInfo(null, address, chain, null),
-                  avatarOnly: true,
-                  tooltip: true,
-                  avatarSize: 24,
-                });
-              })),
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal)
+                .map(([chain, address]) => {
+                  return m(User, {
+                    user: new AddressInfo(null, address, chain, null),
+                    avatarOnly: true,
+                    tooltip: true,
+                    avatarSize: 24,
+                  });
+                })),
             ]),
-            m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true })
+            m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true }),
+            m('.discussion-last-updated', {
+              class: lastUpdated.isBefore(moment().subtract(365, 'days')) ? 'older' : '',
+            }, [
+              link('a', discussionLink, formatLastUpdated(lastUpdated)),
+            ]),
+            m(ThreadCaratMenu, { proposal }),
           ]),
         ]),
       ]),

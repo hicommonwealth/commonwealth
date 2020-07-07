@@ -1,43 +1,37 @@
+@import 'client/styles/shared';
+
 .ReactionButton {
     display: flex;
     cursor: pointer;
     color: #555;
     user-select: none;
     // border
-    border: 1px solid #eee;
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.04);
+    border: 1px solid #ddd;
     border-radius: 5px;
     &:hover, &.active {
-        color: #4bae6b;
-        border-color: #4bae6b;
+        color: $theme-base-color;
+        border-color: $theme-base-color;
         span {
             color: inherit;
         }
     }
     &.disabled {
-        cursor: initial !important;
         background: initial !important;
+        color: #555 !important;
         border-color: #ddd !important;
-        color: #aaa !important;
     }
     .reactions-icon {
-        padding: 4px 0;
-        padding-left: 8px;
+        padding: 4px 0 3px;
+        padding-left: 9px;
     }
     .reactions-count {
-        padding: 4px 6px 4px 5px;
-        min-width: 30px;
+        padding: 4px 6px 3px 2px;
+        min-width: 26px;
         font-weight: 600;
         text-align: center;
     }
 }
 
-.reaction .tippy-content .ReactionButtonTooltip {
-    font-weight: 400;
-    font-size: 15px;
-    padding: 6px 6px 7px;
-    .User a {
-        color: #111;
-        text-decoration: none;
-    }
+.cui-popover.cui-tooltip.ReactionButtonTooltip .cui-popover-content .reaction-button-tooltip {
+    // TODO
 }
