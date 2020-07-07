@@ -17,7 +17,7 @@ const ChangeThreadOwner = async (models, req: Request, res: Response, next: Next
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   const { address_id, thread_id, comment_id } = req.body;
   if (!address_id) return next(new Error(Errors.NoNewAddress));
-  if (!thread_id || !comment_id) return next(new Error(Errors.NoObjId));
+  if (!thread_id && !comment_id) return next(new Error(Errors.NoObjId));
 
   // get all user addresses
   const userAddresses = await req.user.getAddresses();

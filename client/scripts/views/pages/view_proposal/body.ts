@@ -465,7 +465,12 @@ export const ProposalBodyReaction: m.Component<{ item: OffchainThread | Offchain
   }
 };
 
-export const ProposalBodyChangeOwner: m.Component<{ item: OffchainThread | OffchainComment<any>, onChangeHandler: Function }> = {
+interface IProposalBodyChangeOwnerAttrs {
+  item: OffchainThread | OffchainComment<any>;
+  onChangeHandler: Function;
+}
+
+export const ProposalBodyChangeOwner: m.Component<IProposalBodyChangeOwnerAttrs> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
@@ -482,7 +487,6 @@ export const ProposalBodyChangeOwner: m.Component<{ item: OffchainThread | Offch
       return m(MenuItem, {
         label: `${profile.displayName}: ${address.address.slice(0, 7)}...`,
         onclick: async () => {
-          console.dir(r.address_id);
           if (isThread) {
             const result = await app.threads.changeOwner(item as OffchainThread, r.address_id);
             vnode.attrs.onChangeHandler(result);
