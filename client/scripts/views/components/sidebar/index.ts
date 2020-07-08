@@ -3,7 +3,7 @@ import 'components/sidebar/index.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import dragula from 'dragula';
-import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
+import { List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -23,19 +23,28 @@ const TagListings: m.Component<{}, { dragulaInitialized: boolean }> = {
       key: id,
       contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
       contentRight: [
-        m(Icon, {
-          name: Icons.SETTINGS,
+        m(PopoverMenu, {
           class: 'sidebar-edit-tag',
-          onclick: (e) => {
-            app.modals.create({
-              modal: EditTagModal,
-              data: {
-                description,
-                id,
-                name,
-              }
-            });
-          }
+          position: 'bottom',
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          closeOnContentClick: true,
+          trigger: m(Icon, {
+            name: Icons.CHEVRON_DOWN,
+          }),
+          content: m(MenuItem, {
+            label: 'Edit channel',
+            onclick: (e) => {
+              app.modals.create({
+                modal: EditTagModal,
+                data: {
+                  description,
+                  id,
+                  name,
+                }
+              });
+            }
+          })
         }),
       ],
       label: name,
@@ -68,14 +77,24 @@ const TagListings: m.Component<{}, { dragulaInitialized: boolean }> = {
           label: 'Home',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
           contentRight: [
-            app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() }) && m(Icon, {
-              name: Icons.PLUS_CIRCLE,
-              class: 'sidebar-add-tags',
-              onclick: (e) => {
-                e.preventDefault();
-                app.modals.create({ modal: NewTagModal });
-              }
-            }),
+            app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+              && m(PopoverMenu, {
+                class: 'sidebar-add-tag',
+                position: 'bottom',
+                transitionDuration: 0,
+                hoverCloseDelay: 0,
+                closeOnContentClick: true,
+                trigger: m(Icon, {
+                  name: Icons.PLUS_CIRCLE,
+                }),
+                content: m(MenuItem, {
+                  label: 'New channel',
+                  onclick: (e) => {
+                    e.preventDefault();
+                    app.modals.create({ modal: NewTagModal });
+                  }
+                }),
+              }),
           ],
         }),
       ]),

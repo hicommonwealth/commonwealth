@@ -24,11 +24,19 @@ $active-color: #ececec;
             border: none;
             padding: 4px 12px 3px;
             .cui-icon svg {
+                opacity: 0;
                 position: relative;
                 top: -1px;
+                stroke: #bbb;
+                &:hover {
+                    stroke: #777;
+                }
             }
             &:hover {
                 background: lighten($active-color, 3%);
+                .cui-icon svg {
+                    opacity: 1;
+                }
             }
             &.cui-selected,
             &.cui-active {
@@ -36,9 +44,13 @@ $active-color: #ececec;
                 color: desaturate(darken($theme-base-color, 4%), 24%);
                 border-radius: 3px;
                 .cui-icon svg {
-                    stroke: desaturate($theme-base-color, 30%);
+                    stroke: desaturate(lighten($theme-base-color, 7%), 24%);
+                }
+                .cui-icon svg:hover {
+                    stroke: desaturate(darken($theme-base-color, 4%), 24%);
                 }
             }
+
         }
         .cui-list.more-tags-list {
             border-top: 1px solid #eee;
@@ -57,4 +69,9 @@ $active-color: #ececec;
             margin-bottom: -10px;
         }
     }
+}
+
+.cui-popover.sidebar-edit-tag .cui-menu,
+.cui-popover.sidebar-add-tag .cui-menu {
+    padding: 4px 0;
 }
