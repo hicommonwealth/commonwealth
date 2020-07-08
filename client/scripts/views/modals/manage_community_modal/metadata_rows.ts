@@ -1,11 +1,9 @@
 import m from 'mithril';
 import $ from 'jquery';
-
 import { Input, Icon, Icons, Switch } from 'construct-ui';
 
 import app from 'state';
-import User from '../widgets/user';
-
+import User from 'views/components/widgets/user';
 
 export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }> = {
   view: (vnode) => {

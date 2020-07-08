@@ -8,7 +8,6 @@ import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
-import AdminPanel from 'views/components/admin_panel';
 import NewTagModal from 'views/modals/new_tag_modal';
 import EditTagModal from 'views/modals/edit_tag_modal';
 
@@ -230,31 +229,6 @@ const Sidebar: m.Component<{ activeTag: string }> = {
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
         ]),
-      // manage
-      m(List, { interactive: true }, [
-        m(ListItem, {
-          active: onMembersPage(m.route.get()),
-          label: 'Members',
-          onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-        }),
-        m(ListItem, {
-          class: 'TagRow',
-          active: m.route.get() === `/${app.activeId()}/tags/`,
-          label: 'Tags',
-          onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-        }),
-        app.user.isRoleOfCommunity({
-          role: 'admin',
-          chain: app.activeChainId(),
-          community: app.activeCommunityId()
-        }) && m(AdminPanel),
-      ]),
-      // // chat (all communities)
-      // m(ListItem, {
-      //   active: onChatPage(m.route.get()),
-      //   label: 'Chat',
-      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      // }),
     ]);
   },
 };

@@ -1,7 +1,7 @@
 import m from 'mithril';
-import { ChainNetwork } from 'client/scripts/models';
 import { Button, Table } from 'construct-ui';
 
+import { ChainNetwork } from 'client/scripts/models';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -89,7 +89,6 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         intent: 'primary',
         onclick: () => {
           vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
-          vnode.attrs.onChangeHandler(false);
         },
       }),
     ]);

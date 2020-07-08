@@ -1,6 +1,7 @@
 import m from 'mithril';
-import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { Table, Button } from 'construct-ui';
+
+import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
@@ -14,7 +15,6 @@ interface ICommunityMetadataManagementState {
 export interface IChainOrCommMetadataManagementAttrs {
   community?: CommunityInfo;
   chain?: ChainInfo;
-  onChangeHandler: Function;
   onRoleUpdate: Function;
   admins;
   mods;
@@ -86,7 +86,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           vnode.state.privacyValue,
           vnode.state.invitesValue,
         );
-        vnode.attrs.onChangeHandler(false);
       },
     }),
     ]);
