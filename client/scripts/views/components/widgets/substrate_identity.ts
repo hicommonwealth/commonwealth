@@ -48,11 +48,11 @@ const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, IS
 
       return linkify
         ? link(
-          'a.user-display-name.username.onchain-username',
+          `a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`,
           profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
           name
         )
-        : m('a.user-display-name.username.onchain-username', name);
+        : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
     }
 
     // return offchain name while identity is loading
