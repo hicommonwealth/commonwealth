@@ -198,7 +198,7 @@ export default (
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.Notification);
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
