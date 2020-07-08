@@ -1,7 +1,8 @@
+/* eslint-disable quotes */
 'use strict';
 
 module.exports = {
-  up: (queryInterface, DataTypes) => {
+  up: async (queryInterface, DataTypes) => {
   // add columns
     await queryInterface.addColumn('Subscriptions', 'chain_id', { type: dataTypes.STRING, allowNull: true });
     await queryInterface.addColumn('Subscriptions', 'community_id', { type: dataTypes.STRING, allowNull: true });
@@ -62,28 +63,44 @@ module.exports = {
           await queryInterface.sequelize.query(query);
           break;
         case 'new-reaction':  // object_id "comment-923" / "discussion_442" (hyphen or underscore)
-          if (entity === 'comment') {
-            // query associate offchain_comment
-            // associate chain or community
-          } else if (entity === 'discussion') {
+          if (entity === 'discussion') {
             // query associate offchain_thread
+            query = `UPDATE "Subscriptions" SET offchain_thread_id=${p_object_id} WHERE id=${id};`;
             // associate chain or community
+            const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${p_object_id};`);
+            if (thread.chain) {
+              query += `UPDATE "Subscriptions" SET chain_id=${thread.chain} WHERE id=${id};`;
+            } else if (thread.community) {
+              query += `UPDATE "Subscriptions" SET community_id=${thread.community} WHERE id=${id};`;
+            }
+          } else if (entity === 'comment') {
+            // query associate offchain_comment
+            query = `UPDATE "Subscriptions" SET offchain_comment_id=${p_object_id} WHERE id=${id};`;
+            // associate chain or community
+            const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${p_object_id};`);
+            if (comment.chain) {
+              query += `UPDATE "Subscriptions" SET chain_id=${comment.chain} WHERE id=${id};`;
+            } else if (comment.community) {
+              query += `UPDATE "Subscriptions" SET community_id=${comment.community} WHERE id=${id};`;
+            }
           } else {
-            // query association ChainEntity
-            // associate chain
+            // There are no new-reaction subscriptions for chain entities in our db
           }
           await queryInterface.sequelize.query(query);
           break;
         case 'chain-event': // object_id: "edgeware-reward" / "edgeware-treasury-awarded" / "edgeware-treasury-rejected"
-          query = `UPDATE "Subscriptions" SET chain_id=${entity} where id=${id};`;
+          query = `UPDATE "Subscriptions" SET chain_id=${entity} WHERE id=${id};`;
+          query += `UPDATE "Subscriptions" SET chain_event_type_id=${object_id} WHERE id=${id};`;
+          await queryInterface.sequelize.query(query);
           break;
         default:
+          // all cases should be detailed above.
           break;
       }
     })); // end of loop
   },
 
-  down: (queryInterface, DataTypes) => {
+  down: async (queryInterface, DataTypes) => {
     await Promise.all([
       queryInterface.removeColumn('Subscriptions', 'chain_id', { type: dataTypes.STRING, allowNull: true }),
       queryInterface.removeColumn('Subscriptions', 'community_id', { type: dataTypes.STRING, allowNull: true }),
@@ -91,7 +108,6 @@ module.exports = {
       queryInterface.removeColumn('Subscriptions', 'offchain_comment_id', { type: dataTypes.INTEGER, allowNull: true }),
       queryInterface.removeColumn('Subscriptions', 'chain_event_type_id', { type: dataTypes.STRING, allowNull: true }),
       queryInterface.removeColumn('Subscriptions', 'chain_entity_id', { type: dataTypes.STRING, allowNull: true }),
-
     ]);
   }
 };
