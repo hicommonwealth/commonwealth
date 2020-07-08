@@ -244,7 +244,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         ],
         allProposals.length !== 0
         && getRecentPostsSortedByWeek(),
-        !vnode.state.postsDepleted
+        allProposals.length !== 0 && !vnode.state.postsDepleted
         && m('.infinite-scroll-spinner-wrap', [
           m(Spinner, {
             active: !vnode.state.postsDepleted,
