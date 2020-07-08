@@ -20,37 +20,23 @@ $active-color: #ececec;
         padding: 12px 0;
         .cui-list-item {
             color: #111;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             border: none;
             padding: 4px 12px 3px;
-            > .cui-list-item-content-left > .cui-icon svg {
-                height: 14px;
-                width: 14px;
-                min-height: 14px;
-                min-width: 14px;
-                margin-right: -2px;
-                color: #444;
-                position: relative;
-                top: -1px;
-            }
             &:hover {
                 background: lighten($active-color, 3%);
             }
             &.cui-selected,
             &.cui-active {
                 background: desaturate(lighten($theme-base-color, 29%), 24%);
-                color: desaturate(darken($theme-base-color, 4%), 30%);
+                color: desaturate(darken($theme-base-color, 4%), 24%);
                 border-radius: 3px;
-
                 .cui-icon svg {
-                    color: #fff !important;
+                    position: relative;
+                    top: -1px;
+                    stroke: desaturate($theme-base-color, 30%);
                 }
-            }
-            .cui-tag {
-                margin: -3px 0;
-                position: relative;
-                top: -2px;
             }
         }
         .cui-list.more-tags-list {
