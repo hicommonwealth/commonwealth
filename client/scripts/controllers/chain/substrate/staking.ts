@@ -2,7 +2,6 @@
 import BN from 'bn.js';
 import { IApp } from 'state';
 import { ApiRx } from '@polkadot/api';
-import { ISubstrateReward } from 'shared/events/edgeware/types';
 import moment from 'moment';
 import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
@@ -34,7 +33,7 @@ interface IReward {
   avgReward: string;
   daysDiff: number;
   validators: {
-    [key: string]: ISubstrateReward[] | any[];
+    [key: string]: any[];
   };
 }
 
@@ -301,7 +300,6 @@ class SubstrateStaking implements StorageModule {
         const data = {};
         const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
-        console.log(rewards.validators);
         accounts.forEach((account, index) => {
           let key = account.toString();
           const exposure = exposures[index];
@@ -328,15 +326,13 @@ class SubstrateStaking implements StorageModule {
               const end = moment(last.created_at);
               const startBlock = secondLast.block_number;
               const endBlock = last.block_number;
-              console.log(endBlock - startBlock);
-              const eventDiff = end.diff(start, 'minutes');
+              const eventDiff = end.diff(start, 'seconds');
 
-              const periodsInYear = (60 * 24 * 7 * 52) / eventDiff;
+              const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
               const percentage = (new BN(totalReward))
                 .mul(new BN(n))
                 .div(new BN(totalStake))
                 .toNumber() / n;
-              console.log(eventDiff, percentage, length);
               const apr = percentage * periodsInYear;
               validatorRewards[account.toString()] = apr;
             }

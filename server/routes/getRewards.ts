@@ -1,11 +1,12 @@
 /* eslint-disable guard-for-in */
 import Sequelize from 'sequelize';
 import BN from 'bn.js';
+// import _ from 'lodash';
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
-import { SubstrateEventKind, SubstrateAccountId, SubstrateBalanceString } from 'shared/events/edgeware/types';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 const Op = Sequelize.Op;
@@ -59,7 +60,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     ]
   });
 
-  const validators = {};
+  const validators: { [key: string]: any[] } = {};
 
   let start = rewards[0].created_at;
   let end = rewards[rewards.length - 1].created_at;
@@ -74,7 +75,9 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     const event_data: IEventData = reward.dataValues.event_data;
     const key = event_data.validator || chain;
     if (key in validators) {
-      validators[key].push(reward);
+      if (validators[key].findIndex((elt) => (elt.block_number === reward.block_number)) === -1) {
+        validators[key].push(reward);
+      }
     } else {
       validators[key] = [reward];
     }

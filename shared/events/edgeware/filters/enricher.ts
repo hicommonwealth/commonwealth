@@ -40,57 +40,23 @@ export default async function (
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
           const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
-          const { validators } = await api.derive.staking.validators();
-          const exposures: Exposure[] = await api.query.staking.stakers.multi(validators.map((v) => v.toString()));
-          const electedInfo = await api.derive.staking.electedInfo();
-          const commission: { [key: string]: number } = {};
-
-          electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-            commission[accountId.toString()] = (validatorPrefs.commission.unwrap()
-              || new BN(0)).toNumber() / 10_000_000;
-          });
-
-          const stats = validators.map((v, inx) => {
-            const key = v.toString();
-            const expo = exposures[inx];
-            const totalStake = expo.total.toBn();
-            const fraction = expo.own.toBn().muln(1e27).div(totalStake);
-            const comm = commission[key] || 0;
-            const firstReward = new BN(amount.toString()).muln(comm);
-            const secondReward = fraction
-              .mul((new BN(amount.toString())).sub(firstReward))
-              .divn(1e27);
-            const totalReward = firstReward.add(secondReward);
-
-            return {
-              totalReward: totalReward.toString(),
-              totalStake: totalStake.toString(),
-            };
-          });
 
           return {
             data: {
               kind,
               amount: amount.toString(),
-              validators: validators.map((v) => v.toString()),
-              stats,
             }
           };
         } else {
           // kusama/new event
           const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
           const era = await api.query.staking.currentEra();
-          const exposure: Exposure = (await api.derive.staking.ownExposure(validator.toString(), era)).exposure;
           return {
             includeAddresses: [ validator.toString() ],
             data: {
               kind,
               validator: validator.toString(),
               amount: amount.toString(),
-              stats: [{
-                totalReward: amount.toString(),
-                totalStake: exposure.total.toBn().toString(),
-              }]
             }
           };
         }
