@@ -13,7 +13,9 @@ module.exports = {
 
     // for each subscription, create relevant associations
     const chains = await queryInterface.sequelize.query(`SELECT * FROM "Chains"`);
+    console.dir(chains);
     const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions";`);
+    console.dir(subscriptions);
     await Promise.All(subscriptions.forEach(async (s) => {
       const { object_id, category_id, id } = s;
       const object_id_split = object_id.split(/-|_/); // hyphen or underscore
@@ -34,13 +36,28 @@ module.exports = {
           // referendum_0
           if (entity === 'discussion') {
             // query associate OffchainThread
+            query = `UPDATE "Subscriptions" SET offchain_thread_id=${p_object_id} WHERE id=${id};`;
             // associate chain or community
+            const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${p_object_id};`);
+            if (thread.chain) {
+              query += `UPDATE "Subscriptions" SET chain_id=${thread.chain} WHERE id=${id};`;
+            } else if (thread.community) {
+              query += `UPDATE "Subscriptions" SET community_id=${thread.community} WHERE id=${id};`;
+            }
           } else if (entity === 'comment') {
             // query associate OffchainComment
+            query = `UPDATE "Subscriptions" SET offchain_comment_id=${p_object_id} WHERE id=${id};`;
             // associate chain or community
+            const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${p_object_id};`);
+            if (comment.chain) {
+              query += `UPDATE "Subscriptions" SET chain_id=${comment.chain} WHERE id=${id};`;
+            } else if (comment.community) {
+              query += `UPDATE "Subscriptions" SET community_id=${comment.community} WHERE id=${id};`;
+            }
           } else {
             // query associate ChainEntity
             // associate chain
+            // TODO: I THINK THIS IS NOT POSSIBLE GIVEN CURRENT ISSUE IN FINDING CHAIN FROM SUBSCRIPTION
           }
           await queryInterface.sequelize.query(query);
           break;
