@@ -54,7 +54,7 @@ const EditTagModal : m.Component<{
 
     return m('.EditTagModal', [
       m('.compact-modal-title', [
-        m('h3', 'Edit Tag'),
+        m('h3', 'Edit channel'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -94,7 +94,7 @@ const EditTagModal : m.Component<{
               if (!vnode.state.error) $(e.target).trigger('modalexit');
               vnode.state.saving = false;
             },
-            label: 'Save Changes',
+            label: 'Save changes',
           }),
           m(Button, {
             intent: 'negative',
@@ -108,7 +108,7 @@ const EditTagModal : m.Component<{
               vnode.state.saving = false;
               m.redraw();
             },
-            label: 'Delete Tag',
+            label: 'Delete channel',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),

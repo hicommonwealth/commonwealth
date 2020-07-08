@@ -3,7 +3,7 @@
 $active-color: #ececec;
 
 .Sidebar {
-    padding-top: 8px;
+    padding-top: 30px;
     .tag-icon {
         width: 10px;
         height: 10px;
@@ -17,7 +17,6 @@ $active-color: #ececec;
         overflow-x: hidden;
         max-height: 100%;
         user-select: none;
-        padding: 12px 0;
         .cui-list-item {
             color: #111;
             font-size: 15px;

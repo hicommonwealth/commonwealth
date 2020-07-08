@@ -15,7 +15,7 @@ interface INewTagModalForm {
   name: string,
 }
 
-const NewTagModal : m.Component<{
+const NewTagModal: m.Component<{
   description: string,
   id: number,
   name: string,
@@ -33,7 +33,7 @@ const NewTagModal : m.Component<{
 
     return m('.NewTagModal', [
       m('.compact-modal-title', [
-        m('h3', 'Edit Tag'),
+        m('h3', 'New channel'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -76,12 +76,12 @@ const NewTagModal : m.Component<{
                 m.redraw();
                 $(e.target).trigger('modalexit');
               }).catch(() => {
-                vnode.state.error = 'Error creating tag';
+                vnode.state.error = 'Error creating channel';
                 vnode.state.saving = false;
                 m.redraw();
               });
             },
-            label: 'Create Tag',
+            label: 'Create channel',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),
