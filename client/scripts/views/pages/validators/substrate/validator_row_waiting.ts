@@ -17,16 +17,13 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
-    groupKey: app.chain.class.toString(),
+    groupKey: attrs.stash,
     query: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.query(attrs.stash)
-      : null,
-    info: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.info(attrs.stash)
       : null
   }),
   view: (vnode) => {
-    const { query, info } = vnode.state.dynamic;
+    const { query } = vnode.state.dynamic;
 
     const nominations = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.nominations
@@ -36,9 +33,10 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
       : null;
     const nominatorsList = nominations[vnode.attrs.stash] || [];
 
-    return m('tr.ValidatorRow', [
-      m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
-        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+    return m(`tr.ValidatorRow${vnode.attrs.toBeElected ? '.nextValidator' : '.waiting'}`, [
+      m('td.val-stash-waiting', m(Tooltip, {
+        content: m(Identity, { stash : vnode.attrs.stash }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-nominations', [
         m('a.val-nominations', {
@@ -52,7 +50,7 @@ const ValidatorRowWaiting = makeDynamicComponent<IValidatorAttrs, IValidatorStat
           }
         }, pluralize(nominatorsList.length, 'Nomination')),
       ]),
-      m('td.val-commission', stakingInfo?.commission || ' '),
+      m('td.val-commission-waiting', stakingInfo?.commission || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
         isOnline: vnode.attrs.isOnline,

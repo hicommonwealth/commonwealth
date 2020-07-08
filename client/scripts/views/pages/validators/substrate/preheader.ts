@@ -5,11 +5,13 @@ import { makeDynamicComponent } from 'models/mithril';
 import Substrate from 'controllers/chain/substrate/main';
 import { DeriveSessionProgress } from '@polkadot/api-derive/types';
 import { SubstrateAccount, IValidators } from 'controllers/chain/substrate/account';
+import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
+import BN from 'bn.js';
 
 interface IPreHeaderState {
   dynamic: {
@@ -19,9 +21,8 @@ interface IPreHeaderState {
 }
 
 interface IPreHeaderAttrs {
-  nominationsHasChanged;
-  nominations;
   sender: SubstrateAccount;
+  annualPercentRate: ICommissionInfo;
 }
 const offence = {
   count: null,
@@ -33,7 +34,8 @@ const offence = {
 
 export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHeaderState>({
   oncreate: async () => {
-    await app.chainEvents.offences(offence.setCount);
+    const offences = await app.chainEvents.offences();
+    offence.setCount(offences);
   },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
@@ -45,13 +47,23 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
   }),
   view: (vnode) => {
     const { validators, sessionInfo } = vnode.state.dynamic;
-    const { nominations, nominationsHasChanged, sender } = vnode.attrs;
+
+    const { sender, annualPercentRate } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
+    let totalPercentage = 0.0;
+    if (annualPercentRate) {
+      Object.entries(annualPercentRate).forEach(([key, value]) => {
+        totalPercentage += Number(value);
+      });
+    }
+
+    const apr = (totalPercentage / Object.keys(annualPercentRate).length).toFixed(2);
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,
       eraProgress, isEpoch } = sessionInfo;
+
     const nominators: string[] = [];
     let elected: number = 0;
     let waiting: number = 0;
@@ -118,22 +130,18 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
           && m(CardSummary, {
             title: 'Epoch',
             total: sessionLength,
-            value: sessionProgress
+            value: sessionProgress,
+            currentBlock: formatNumber(currentIndex)
           })),
         m(CardSummary, {
           title: 'Era',
           total: eraLength,
-          value: eraProgress
+          value: eraProgress,
+          currentBlock: formatNumber(currentEra)
         }),
-      ]),
-      m('.validators-preheader', [
         m('.validators-preheader-item', [
-          m('h3', 'Epoch / Session'),
-          m('.preheader-item-text', `#${formatNumber(currentIndex)}`),
-        ]),
-        m('.validators-preheader-item', [
-          m('h3', 'Era'),
-          m('.preheader-item-text', `#${formatNumber(currentEra)}`),
+          m('h3', 'Est. APR'),
+          m('.preheader-item-text', `${apr}%`),
         ]),
         m('.validators-preheader-item', [
           m('h3', 'Total Supply'),
@@ -179,7 +187,7 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
             }, 'Claim'),
           ]),
         ]),
-        nominationsHasChanged && m('.validators-preheader-item', [
+        m('.validators-preheader-item', [
           m('h3', 'Update nominations'),
           m('.preheader-item-text', [
             m('a.btn.formular-button-primary', {
@@ -187,17 +195,17 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
-                createTXModal((nominations.length === 0)
+                createTXModal((nominators.length === 0)
                   ? sender.chillTx()
-                  : sender.nominateTx(nominations)).then(() => {
-                // vnode.attrs.sending = false;
+                  : sender.nominateTx(nominators)).then(() => {
+                  // vnode.attrs.sending = false;
                   m.redraw();
-                }, (e) => {
-                // vnode.attrs.sending = false;
+                }, () => {
+                  // vnode.attrs.sending = false;
                   m.redraw();
                 });
               }
-            }, 'Update nominations'),
+            }, 'Update'),
           ]),
         ]),
       ])

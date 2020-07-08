@@ -1,14 +1,13 @@
 import m from 'mithril';
 import app from 'state';
 import BN from 'bn.js';
-import { Tooltip } from 'construct-ui';
-import { ChainBase } from 'models';
+import { Popover } from 'construct-ui';
+import { ChainBase, ChainClass } from 'models';
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
 import { Balance } from '@polkadot/types/interfaces';
 import Substrate from 'controllers/chain/substrate/main';
 import { makeDynamicComponent } from 'models/mithril';
-import { IAccountInfo } from 'controllers/chain/substrate/staking';
 import { DeriveStakingQuery } from '@polkadot/api-derive/types';
 import { IValidatorAttrs, ViewNominatorsModal } from '..';
 import ImOnline from './im_online';
@@ -18,7 +17,6 @@ const PERBILL_PERCENT = 10_000_000;
 
 export interface IValidatorState {
   dynamic: {
-    info: IAccountInfo;
     query: DeriveStakingQuery;
     byAuthor: Record<string, string>;
   },
@@ -66,32 +64,29 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
-    // info: (app.chain.base === ChainBase.Substrate) ? (app.chain as Substrate).staking.info(attrs.stash) : null,
-    query: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.query(attrs.stash)
-      : null,
-    info: (app.chain.base === ChainBase.Substrate)
-      ? (app.chain as Substrate).staking.info(attrs.stash)
-      : null
   }),
   view: (vnode) => {
-    const { query, info } = vnode.state.dynamic;
     const byAuthor = (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.byAuthor
       : {};
-    const stakingInfo = query
-      ? expandInfo(query)
-      : null;
+
     const nominatorsList = vnode.attrs.nominators;
+    const commission = vnode.attrs.commission || 0;
+
     return m('tr.ValidatorRow', [
-      m('td.val-controller', m(User, { user: app.chain.accounts.get(vnode.attrs.controller), linkify: true })),
-      m('td.val-stash', m(Tooltip, { content: m(Identity, { ...info }),
-        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true })) 
+      m('td.val-stash', m(Popover, {
+        interactionType: 'hover',
+        content: m(Identity, { stash: vnode.attrs.stash }),
+        trigger: m('div', m(User, { user: app.chain.accounts.get(vnode.attrs.stash), linkify: true }))
       })),
       m('td.val-total', [
-        formatCoin(app.chain.chain.coins(stakingInfo?.stakeTotal), true), ' ',
-        nominatorsList.length > 0 && [ '(',
-          m('a.val-nominators', {
+        formatCoin(app.chain.chain.coins(vnode.attrs.total), true), ' '
+      ]),
+      m('td.val-own', formatCoin(app.chain.chain.coins(vnode.attrs.bonded), true)),
+      m('td.val-other', [
+        formatCoin(app.chain.chain.coins(vnode.attrs.otherTotal), true),
+        nominatorsList.length > 0 && [
+          m('a.val-nominators.padding-left-2', {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
@@ -100,13 +95,11 @@ const ValidatorRow = makeDynamicComponent<IValidatorAttrs, IValidatorState>({
                 data: { nominators: nominatorsList, validatorAddr: vnode.attrs.stash }
               });
             }
-          }, nominatorsList.length),
-          ')'],
+          }, `(${nominatorsList.length})`)],
       ]),
-      m('td.val-own', formatCoin(app.chain.chain.coins(stakingInfo?.stakeOwn), true)),
-      m('td.val-other', formatCoin(app.chain.chain.coins(stakingInfo?.stakeOther), true)),
-      m('td.val-commission', stakingInfo?.commission || ' '),
-      m('td.val-points', vnode.attrs.eraPoints || ' '),
+      m('td.val-commission', `${commission.toFixed(2)}%`),
+      m('td.val-points', vnode.attrs.eraPoints || '0'),
+      m('td.val-apr', `${vnode.attrs?.apr.toFixed(2)}%`),
       m('td.val-last-hash', byAuthor[vnode.attrs.stash] || ' '),
       m(ImOnline, {
         toBeElected: vnode.attrs.toBeElected,
