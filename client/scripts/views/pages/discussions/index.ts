@@ -30,7 +30,7 @@ const DiscussionRowHeader = {
     return m('.DiscussionRowHeader', [
       m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
       m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
-      m('.discussion-row-header-col', 'Reactions'),
+      m('.discussion-row-header-col', 'Likes'),
       m('.discussion-row-header-col', 'Activity'),
     ]);
   }
