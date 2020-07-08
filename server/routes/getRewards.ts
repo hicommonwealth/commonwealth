@@ -60,13 +60,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     ]
   });
 
-  const validators: { [key: string]: any[] } = {};
-
-  let start = rewards[0].created_at;
-  let end = rewards[rewards.length - 1].created_at;
-  start = moment(start);
-  end = moment(end);
-  const diff = end.diff(start, 'days');
+  const validators: { [key: string]: any[] } = {}
   // No rewards
   if (!rewards.length)
     return next(new Error(Errors.NoRecordsFound));
@@ -86,7 +80,6 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   return res.json({
     status: 'Success',
     result: {
-      diff,
       validators,
     }
   });
