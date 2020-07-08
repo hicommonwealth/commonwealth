@@ -151,6 +151,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               thread: vnode.attrs.proposal as OffchainThread,
               popoverMenu: true,
               onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
+              openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
             })
           ]),
 

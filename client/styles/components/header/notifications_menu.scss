@@ -29,8 +29,10 @@
             margin: 0;
             border-radius: 0;
             border-top: 1px #d8dee0 solid;
+            height: 44px;
             .cui-button-label {
                 text-align: center;
+                color: #333;
             }
         }
         .cui-button:nth-child(1) {

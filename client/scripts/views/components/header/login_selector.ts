@@ -114,7 +114,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
         m(Button, {
-          intent: 'primary',
+          class: 'cui-button-dark',
           iconLeft: Icons.USER,
           size: 'sm',
           fluid: true,
@@ -171,6 +171,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
         position: 'top-end',
         inline: true,
         trigger: m(Button, {
+          class: 'cui-button-dark',
           intent: 'none',
           size: 'sm',
           fluid: true,

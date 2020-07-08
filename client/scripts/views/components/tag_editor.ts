@@ -9,7 +9,7 @@ interface ITagEditorAttrs {
   thread: OffchainThread;
   popoverMenu?: boolean;
   onChangeHandler: Function;
-  openStateHandler?: Function;
+  openStateHandler: Function;
 }
 
 interface ITagEditorState {

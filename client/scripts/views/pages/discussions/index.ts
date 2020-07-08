@@ -25,6 +25,17 @@ import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 import TagCaratMenu from './tag_carat_menu';
 
+const DiscussionRowHeader = {
+  view: (vnode) => {
+    return m('.DiscussionRowHeader', [
+      m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
+      m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
+      m('.discussion-row-header-col', 'Reactions'),
+      m('.discussion-row-header-col', 'Activity'),
+    ]);
+  }
+};
+
 const CommunitySidebar: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
     const { communityName, communityDescription, tag } = vnode.attrs;
@@ -152,7 +163,10 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           });
         }
         if (list.length > 0) {
-          return m('.discussions-main', list);
+          return m('.discussions-main', [
+            m(DiscussionRowHeader),
+            list
+          ]);
         }
       }
 
@@ -240,17 +254,15 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return m('.discussions-main', [
         // m(InlineThreadComposer),
         allProposals.length === 0
-        && [
-          m(EmptyChannelPlaceholder, { communityName }),
-        ],
-        allProposals.length !== 0
-        && getRecentPostsSortedByWeek(),
+          ? m(EmptyChannelPlaceholder, { communityName })
+          : [
+            m(DiscussionRowHeader),
+            getRecentPostsSortedByWeek(),
+          ],
         !vnode.state.postsDepleted
-        && m('.infinite-scroll-spinner-wrap', [
-          m(Spinner, {
-            active: !vnode.state.postsDepleted,
-          })
-        ])
+          && m('.infinite-scroll-spinner-wrap', [
+            m(Spinner, { active: !vnode.state.postsDepleted })
+          ])
       ]);
     };
 

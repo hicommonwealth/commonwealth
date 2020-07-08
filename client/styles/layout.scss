@@ -371,3 +371,23 @@ td, th {
 .cui-spinner.cui-spinner-fill {
     z-index: initial;
 }
+
+// dark button for header
+.cui-button.cui-button-dark {
+    background: #444;
+    border: none !important;
+    box-shadow: none !important;
+    color: #fff;
+    .User a.user-display-name {
+        color: #fff;
+    }
+    svg {
+        stroke: #fff;
+    }
+    &:hover, &:active, &.cui-active {
+        background: #555;
+    }
+    &.cui-disabled {
+        background: #555 !important;
+    }
+}
