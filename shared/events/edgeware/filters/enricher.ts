@@ -3,7 +3,7 @@ import { ApiPromise } from '@polkadot/api';
 import {
   Event, ReferendumInfoTo239, AccountId, TreasuryProposal, Balance, PropIndex, Proposal,
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
-  ReferendumInfo
+  ReferendumInfo, Exposure
 } from '@polkadot/types/interfaces';
 import { IdentificationTuple } from '@polkadot/types/interfaces/session';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';

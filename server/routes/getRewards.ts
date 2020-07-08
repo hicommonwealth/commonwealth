@@ -1,15 +1,15 @@
+/* eslint-disable guard-for-in */
 import Sequelize from 'sequelize';
+import BN from 'bn.js';
+// import _ from 'lodash';
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
 import { Errors } from './getOffences';
 
+
 const log = factory.getLogger(formatFilename(__filename));
 const Op = Sequelize.Op;
-
-interface IReward {
-  [key: string]: number
-}
 
 interface IEventData {
   kind?: string;
@@ -22,6 +22,13 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
+
+  let eraLengthInHours;
+  if (chain === 'edgeware') {
+    eraLengthInHours = 6;
+  } else if (chain === 'kusama') {
+    eraLengthInHours = 6;
+  }
 
   const chainInfo = await models.Chain.findOne({
     where: { id: chain }
@@ -52,30 +59,37 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
       { model: models.ChainEventType }
     ]
   });
-  // number of days between last reward record and latest reward record through events to ChainEvents
-  let daysDiff = 0;
-  const validators: IReward = {};
 
-  // No rewards
-  if (!rewards.length)
-    return res.json({ status: 'Success', result: { daysDiff, validators } });
+  const validators: { [key: string]: any[] } = {};
 
   let start = rewards[0].created_at;
   let end = rewards[rewards.length - 1].created_at;
   start = moment(start);
   end = moment(end);
+  const diff = end.diff(start, 'days');
+  // No rewards
+  if (!rewards.length)
+    return next(new Error(Errors.NoRecordsFound));
 
-  daysDiff = end.diff(start, 'days');
-
-  rewards.map((reward) => {
+  rewards.forEach((reward) => {
     const event_data: IEventData = reward.dataValues.event_data;
     const key = event_data.validator || chain;
-    validators[key] = validators[key] || 0;
-    validators[key] = +event_data.amount + validators[key];
-    return event_data;
+    if (key in validators) {
+      if (validators[key].findIndex((elt) => (elt.block_number === reward.block_number)) === -1) {
+        validators[key].push(reward);
+      }
+    } else {
+      validators[key] = [reward];
+    }
   });
 
-  return res.json({ status: 'Success', result: { daysDiff, validators } });
+  return res.json({
+    status: 'Success',
+    result: {
+      diff,
+      validators,
+    }
+  });
 };
 
 export default getRewards;

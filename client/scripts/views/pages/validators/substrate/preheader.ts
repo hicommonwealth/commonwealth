@@ -11,6 +11,7 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
+import BN from 'bn.js';
 
 interface IPreHeaderState {
   dynamic: {
@@ -50,15 +51,14 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     const { sender, annualPercentRate } = vnode.attrs;
     if (!validators && !sessionInfo) return;
 
-    let totalPercentage = 0;
-    let totalValidators = 0;
-    Object.entries(annualPercentRate).forEach(([key, value]) => {
-      if (value > 0 && Number.isFinite(value)) {
-        totalPercentage += value;
-        totalValidators++;
-      }
-    });
-    const apr = (totalPercentage / (totalValidators || 1)).toFixed(2);
+    let totalPercentage = 0.0;
+    if (annualPercentRate) {
+      Object.entries(annualPercentRate).forEach(([key, value]) => {
+        totalPercentage += Number(value);
+      });
+    }
+
+    const apr = (totalPercentage / Object.keys(annualPercentRate).length).toFixed(2);
     const { validatorCount, currentEra,
       currentIndex, sessionLength,
       sessionProgress, eraLength,

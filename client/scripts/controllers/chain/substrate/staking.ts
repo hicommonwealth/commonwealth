@@ -2,6 +2,7 @@
 import BN from 'bn.js';
 import { IApp } from 'state';
 import { ApiRx } from '@polkadot/api';
+import moment from 'moment';
 import { StorageModule } from 'models';
 import { StakingStore } from 'stores';
 import { Option, StorageKey, Vec } from '@polkadot/types';
@@ -28,14 +29,16 @@ interface iInfo {
 }
 
 interface IReward {
+  diff: number;
+  avgReward: string;
   daysDiff: number;
   validators: {
-    [key: string]: number
+    [key: string]: any[];
   };
 }
 
 export interface ICommissionInfo {
-  [key: string]: number
+  [key: string]: number | string
 }
 
 export interface IAccountInfo extends DeriveAccountRegistration{
@@ -139,20 +142,6 @@ class SubstrateStaking implements StorageModule {
       return info;
     }));
   }
-
-  private mapCommission(electedInfo: DeriveStakingElected) : ICommissionInfo {
-    const commissionInfo: ICommissionInfo = {};
-    electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-      let commissionPer = new BN(0);
-      if (validatorPrefs.commission)
-        commissionPer = validatorPrefs.commission.unwrap();
-      const commissionPercent = commissionPer.toNumber() / 10_000_000;
-      const key = accountId.toString();
-      commissionInfo[key] = commissionPercent;
-    });
-    return commissionInfo;
-  }
-
   public get validators(): Observable<IValidators> {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
@@ -178,8 +167,14 @@ class SubstrateStaking implements StorageModule {
         entries.forEach(([accountId, points]): void => {
           eraPoints[accountId] = points;
         });
-        const commissionInfo: ICommissionInfo = this.mapCommission(electedInfo);
+        const commissionInfo: ICommissionInfo = {};
 
+        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          const key = accountId.toString();
+          commissionInfo[key] = commissionPer;
+          return commissionPer;
+        });
         // set of not yet but future validators
         const waiting = allStashes.filter((v) => !currentSet.includes(v));
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
@@ -213,17 +208,10 @@ class SubstrateStaking implements StorageModule {
       ]) => {
         const result: IValidators = {};
         for (let i = 0; i < currentSet.length; ++i) {
-          let total = new BN(0);
-          let own = new BN(0);
-          if (exposures[i]?.total)
-            total = exposures[i]?.total.unwrap();
-          if (exposures[i]?.own)
-            own = exposures[i]?.own.unwrap();
-
           const key = currentSet[i].toString();
           result[key] = {
             exposure: exposures[i],
-            otherTotal: total.sub(own),
+            otherTotal: exposures[i]?.total.unwrap().sub(exposures[i]?.own.unwrap()),
             controller: controllers[i].toString(),
             isElected: true,
             toBeElected: false,
@@ -231,22 +219,15 @@ class SubstrateStaking implements StorageModule {
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
             isOnline: imOnline[key]?.isOnline,
-            commissionPer: commissionInfo[key]
+            commissionPer: Number(commissionInfo[key])
           };
         }
         // add set of next elected
         for (let i = 0; i < toBeElected.length; ++i) {
-          let total = new BN(0);
-          let own = new BN(0);
-          if (exposures[i]?.total)
-            total = exposures[i]?.total.unwrap();
-          if (exposures[i]?.own)
-            own = exposures[i]?.own.unwrap();
-
           const key = toBeElected[i].toString();
           result[key] = {
             exposure: nextUpExposures[i],
-            otherTotal: total.sub(own),
+            otherTotal: exposures[i]?.total.unwrap().sub(exposures[i]?.own.unwrap()),
             controller: nextUpControllers[i].toString(),
             isElected: false,
             toBeElected: true,
@@ -254,7 +235,7 @@ class SubstrateStaking implements StorageModule {
             blockCount: imOnline[key]?.blockCount,
             hasMessage: imOnline[key]?.hasMessage,
             isOnline: imOnline[key]?.isOnline,
-            commissionPer: commissionInfo[key]
+            commissionPer: Number(commissionInfo[key])
           };
         }
         // add set of waiting validators
@@ -285,14 +266,19 @@ class SubstrateStaking implements StorageModule {
         of(api),
         api.derive.staking.validators(),
         api.query.staking.currentEra(),
-        from(this._app.chainEvents.rewards()),
         api.derive.staking.electedInfo()
       )),
       flatMap((
-        [api, { validators: currentSet }, era, rewards, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, IReward, DeriveStakingElected]
+        [api, { validators: currentSet }, era, electedInfo]:
+        [ApiRx, DeriveStakingValidators, EraIndex, DeriveStakingElected]
       ) => {
-        const commission: ICommissionInfo = this.mapCommission(electedInfo);
+        const commission: ICommissionInfo = {};
+
+        electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
+          const key = accountId.toString();
+          commission[key] = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          return commission[key];
+        });
         // Different runtimes call for different access to stakers: old vs. new
         const stakersCall = (api.query.staking.stakers)
           ? api.query.staking.stakers
@@ -304,71 +290,57 @@ class SubstrateStaking implements StorageModule {
         return combineLatest(
           stakersCall.multi(currentSet.map((elt) => stakersCallArgs(elt.toString()))),
           of(currentSet),
-          of(rewards),
+          from(this._app.chainEvents.rewards()),
           of(commission)
         );
       }),
       auditTime(100),
       map(([exposures, accounts, rewards, commissions ] :
         [Exposure[], AccountId[], IReward, ICommissionInfo ]) => {
-        // coins.div don't support fraction points. multiply and divide the same number will give fraction points.
-        const n = 100000;
+        const data = {};
+        const n = 1000000000;
         const validatorRewards: ICommissionInfo = {};
-        // The only difference between edgeware and kusama is reward event for edgeware doesn't
-        // save validator address to ChainEvents ->> event_data.
-        // So edgware distribute rewards between every validator equally for a given interval.
-        // The backend API returns rewards for a given interval from /getRewards for chain-id.
-        // The /getRewards API sum all rewards to chain-id key if ChainEvents ->> event_data has no validator address.
         accounts.forEach((account, index) => {
-          const key = account.toString();
+          let key = account.toString();
           const exposure = exposures[index];
-          // validator's share in percent from the staked amount
-          let stakeShare = 0;
-          // nominators amount from the staked amount
-          let othersStake: BN = new BN(0);
+          const totalStake = exposure.total.toBn();
+          const comm = commissions[key] || 0;
 
-          exposure.others.forEach((indv) => {
-            othersStake = othersStake.add(indv.value.toBn());
-          });
-          othersStake = othersStake.add(exposure.own.toBn());
-          if (othersStake.gt(new BN(0))) {
-            stakeShare = exposure.own.toBn().muln(n).div(othersStake).toNumber() / n;
+          if (Object.keys(rewards.validators).length === 1) {
+            key = this._app.chain.id;
           }
-          // validator total stake.
-          const totalStake = exposure?.total.toBn() || new BN(0);
-          // validator total reward.
-          let totalReward = rewards.validators[key] || 0;
 
-          // if rewards event has key for chain id, split with every validator equally.
-          if (rewards.validators[this._app.chain.id]) {
-            // The sum reward to chain-id key is distributed to every validator
-            totalReward += rewards.validators[this._app.chain.id] / accounts.length;
+          const valRewards = rewards.validators[key];
+          if (valRewards) {
+            const amount = valRewards[valRewards.length - 1].event_data.amount;
+            const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
+            const secondReward = exposure.own.toBn()
+              .mul((new BN(amount.toString())).sub(firstReward))
+              .div(totalStake);
+            const totalReward = firstReward.add(secondReward);
+            const length = rewards.validators[key].length;
+            if (valRewards.length > 1) {
+              const last = rewards.validators[key][length - 1];
+              const secondLast = rewards.validators[key][length - 2];
+              const start = moment(secondLast.created_at);
+              const end = moment(last.created_at);
+              const startBlock = secondLast.block_number;
+              const endBlock = last.block_number;
+              const eventDiff = end.diff(start, 'seconds');
+
+              const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
+              const percentage = (new BN(totalReward))
+                .mul(new BN(n))
+                .div(new BN(totalStake))
+                .toNumber() / n;
+              const apr = percentage * periodsInYear;
+              validatorRewards[account.toString()] = apr;
+            }
+          } else {
+            validatorRewards[account.toString()] = -1.0;
           }
-          // calculate commission for current validator.
-          const commissionPercent: number = (commissions[key] || 0) / 100;
-          // calculate reward for the validator for given commission
-          let rewardEarn = totalReward * commissionPercent;
-          // calculate nominators reward
-          const othersReward = totalReward - rewardEarn;
-          // Number too large error on converting to BN
-          // rewardEarn is the share of validator in rewards from event "reward".
-          rewardEarn += stakeShare * othersReward;
-
-          // percent of validato reward and validatot stake
-          let percentage = 0;
-
-          if (totalStake.gt(new BN(0))) {
-            const rewardBN = (this._app.chain as Substrate).chain.coins(rewardEarn);
-            const totalStakeBN = (this._app.chain as Substrate).chain.coins(totalStake);
-            // Number can only safely store up to 53 bits for toNumber function.
-            percentage = +rewardBN.muln(n).div(totalStakeBN).toString() / n;
-          }
-          // rewards.daysDiff
-          // number of days between last reward record and latest reward record through events to ChainEvents
-          // calculating APR - Annual Percentage Rate for a validator.
-          // ( ( ( total earnings / total stake ) / total days of rewards recorded) * one year) / 100
-          validatorRewards[key] = ((percentage / (rewards.daysDiff || 1)) * 365) / 100;
         });
+
         return validatorRewards;
       }),
     );

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import app from 'state';
 import { get } from 'lib/util';
+import { AccountId } from '@polkadot/types/interfaces';
 
 class ChainEventsController {
   public constructor() {
@@ -15,7 +16,9 @@ class ChainEventsController {
 
   public rewards() {
     return new Promise((resolve) => {
-      return get('/getRewards', { chain: app.chain.id }, resolve);
+      return get('/getRewards', {
+        chain: app.chain.id,
+      }, resolve);
     });
   }
 }
