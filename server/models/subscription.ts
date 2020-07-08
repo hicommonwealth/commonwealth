@@ -31,6 +31,12 @@ export interface SubscriptionAttributes {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   Notifications?: NotificationAttributes[];
+  chain_id?: string;
+  community_id?: string;
+  offchain_thread_id?: number;
+  offchain_comment_id?: number;
+  chain_event_type_id?: string;
+  chain_entity_id?: string;
 }
 
 export interface SubscriptionInstance
@@ -55,6 +61,12 @@ export default (
       object_id: { type: dataTypes.STRING, allowNull: false },
       is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
       immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: true },
+      community_id: { type: dataTypes.STRING, allowNull: true },
+      offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
+      chain_entity_id: { type: dataTypes.STRING, allowNull: true },
     }, {
       underscored: true,
       paranoid: true,
@@ -185,6 +197,12 @@ export default (
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.Notification);
+    models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Community, { foreignKey: 'community_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
   };
 
   return Subscription;
