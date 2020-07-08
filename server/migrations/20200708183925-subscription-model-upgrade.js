@@ -16,7 +16,7 @@ module.exports = {
     const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions";`);
     await Promise.All(subscriptions.forEach(async (s) => {
       const { object_id, category_id, id } = s;
-      const object_id_split = object_id.split(/- | /_);
+      const object_id_split = object_id.split(/-|_/); // hyphen or underscore
       const p_object_id = object_id_split[1];
       const entity = object_id_split[0];
       let query;
