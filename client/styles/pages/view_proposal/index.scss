@@ -34,8 +34,8 @@ $discussion-meta-color: #999;
         margin: 0 $discussion-horizontal-padding;
         padding-top: $discussion-vertical-padding;
     }
-    .CreateComment {
-        padding-bottom: $discussion-vertical-padding * 2;
+    .ProposalComments {
+        padding-bottom: $discussion-horizontal-padding;
     }
     .proposal-body-bottom, .comment-body-bottom {
         display: flex;
@@ -177,5 +177,20 @@ $discussion-meta-color: #999;
     .comments-error {
         @include error-text();
         margin: 30px 0;
+    }
+
+
+    .proposal-content,
+    .ProposalComment {
+        position: relative;
+    }
+    .thread-connector {
+        position: absolute;
+        top: 48px;
+        bottom: -40px;
+        background: #efefef;
+        left: 17px;
+        width: 2px;
+        z-index: -1;
     }
 }
