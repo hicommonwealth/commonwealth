@@ -40,7 +40,6 @@ export default async function (
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
           const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
-
           return {
             data: {
               kind,
@@ -50,7 +49,6 @@ export default async function (
         } else {
           // kusama/new event
           const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
-          const era = await api.query.staking.currentEra();
           return {
             includeAddresses: [ validator.toString() ],
             data: {
