@@ -85,6 +85,7 @@ const TagListings: m.Component<{}, { dragulaInitialized: boolean }> = {
                 hoverCloseDelay: 0,
                 closeOnContentClick: true,
                 trigger: m(Icon, {
+                  class: 'discussions-home',
                   name: Icons.PLUS_CIRCLE,
                 }),
                 content: m(MenuItem, {

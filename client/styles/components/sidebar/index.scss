@@ -38,6 +38,9 @@ $active-color: #ececec;
                     opacity: 1;
                 }
             }
+            .cui-icon.discussions-home svg {
+                opacity: 1;
+            }
             &.cui-selected,
             &.cui-active {
                 background: desaturate(lighten($theme-base-color, 29%), 24%);

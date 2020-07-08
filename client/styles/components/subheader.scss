@@ -17,5 +17,13 @@
     .subheader-content-right {
         float: right;
         margin-left: 20px;
+        position: relative;
+        top: -1px;
+        .cui-icon svg {
+            stroke: #9b9b9b;
+            &:hover {
+                stroke: #777;
+            }
+        }
     }
 }
