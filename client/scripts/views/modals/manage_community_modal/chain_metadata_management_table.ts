@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
@@ -87,8 +88,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         class: 'save-changes-button',
         label: 'Save changes',
         intent: 'primary',
-        onclick: () => {
-          vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
+        onclick: async (e) => {
+          await vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
+          $(e.target).trigger('modalexit');
         },
       }),
     ]);

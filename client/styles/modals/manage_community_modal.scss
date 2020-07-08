@@ -1,4 +1,5 @@
 .ManageCommunityModal {
+    width: 800px;
     .modal-contents {
         display: flex;
         flex-direction: column;
@@ -10,7 +11,7 @@
 
     .cui-table.metadata-management-table {
         td {
-            padding: 10px 20px 0;
+            padding: 10px 28px 0;
             border-bottom: none !important;
         }
         tr:first-child td {
@@ -18,7 +19,7 @@
         }
     }
     .cui-button.save-changes-button {
-        margin: 24px 20px;
+        margin: 24px 28px;
     }
     .cui-tabs {
         margin-top: 2px;
@@ -63,7 +64,7 @@
             padding: 11px 20px;
         }
         .cui-button {
-            margin: 16px 20px;
+            margin: 16px 28px;
         }
         .cui-tabs {
             margin-top: 4px;

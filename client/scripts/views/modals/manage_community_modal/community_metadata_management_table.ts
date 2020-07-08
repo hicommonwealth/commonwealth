@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
@@ -79,13 +80,14 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     m(Button, {
       label: 'Save changes',
       intent: 'primary',
-      onclick: () => {
-        vnode.attrs.community.updateCommunityData(
+      onclick: async (e) => {
+        await vnode.attrs.community.updateCommunityData(
           vnode.state.name,
           vnode.state.description,
           vnode.state.privacyValue,
           vnode.state.invitesValue,
         );
+        $(e.target).trigger('modalexit');
       },
     }),
     ]);
