@@ -29,12 +29,13 @@ const deleteAddress = async (models, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.AddressNotFound));
   }
 
-  if (req.body.chain) {
-    const existingMemberships = await models.Membership.findAll({
-      where: { chain: req.body.chain, user_id: req.user.id, active: true }
-    });
-    if (existingMemberships.length > 0) return next(new Error(Errors.LastAddress));
-  }
+  // TODO: Membership Membership removed
+  // if (req.body.chain) {
+  //   const existingMemberships = await models.Membership.findAll({
+  //     where: { chain: req.body.chain, user_id: req.user.id, active: true }
+  //   });
+  //   if (existingMemberships.length > 0) return next(new Error(Errors.LastAddress));
+  // }
 
   try {
     addressObj.user_id = null;

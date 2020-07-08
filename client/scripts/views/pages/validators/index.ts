@@ -17,9 +17,8 @@ import PageLoading from 'views/pages/loading';
 import { ChainBase, Account, ChainClass } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
-import Tabs from 'views/components/widgets/tabs';
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import Sublayout from 'views/sublayout';
+import { ICommissionInfo } from 'controllers/chain/substrate/staking';
 
 import * as CosmosValidationViews from './cosmos';
 import { SubstratePreHeader, SubstratePresentationComponent } from './substrate';
@@ -27,6 +26,7 @@ import { SubstratePreHeader, SubstratePresentationComponent } from './substrate'
 export interface IValidatorAttrs {
   stash: string;
   total?: Coin;
+  otherTotal?: Coin;
   nominators?: any;
   error?: any;
   sending?: boolean;
@@ -42,17 +42,16 @@ export interface IValidatorAttrs {
   blockCount?: u32;
   hasMessage?: boolean;
   isOnline?: boolean;
+  commission?: number;
+  apr?: number;
 }
 
 export interface IValidatorPageState {
   dynamic: {
     validators: IValidators | { [address: string]: ICosmosValidator };
-    lastHeader: HeaderExtended
+    lastHeader: HeaderExtended,
+    annualPercentRate: ICommissionInfo;
   };
-  nominations: any[];
-  originalNominations: any[];
-  nominationsHasChanged: boolean;
-  results: any[];
 }
 
 export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, waiting: boolean }> = {
@@ -65,7 +64,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
         m('table', [
           m('tr', [
             m('th', 'Nominator'),
-            m('th', vnode.attrs.waiting
+            m(`th${vnode.attrs.waiting
+              ? '.priority'
+              : '.amount'}`, vnode.attrs.waiting
               ? 'Priority'
               : 'Amount'),
           ]),
@@ -78,7 +79,9 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
                   this.trigger('modalexit');
                 }
               })),
-              m('td', vnode.attrs.waiting
+              m(`td${vnode.attrs.waiting
+                ? '.priority'
+                : '.amount'}`, vnode.attrs.waiting
                 ? n.balance
                 : formatCoin(n.balance, true)),
             ]);
@@ -90,18 +93,6 @@ export const ViewNominatorsModal : m.Component<{ nominators, validatorAddr, wait
 };
 
 export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
-  oninit: (vnode) => {
-    vnode.state.nominations = [];
-    vnode.state.originalNominations = [];
-    vnode.state.nominationsHasChanged = false;
-  },
-  onupdate: (vnode) => {
-    vnode.state.nominationsHasChanged = !_.isEqual(
-      vnode.state.originalNominations.sort(),
-      vnode.state.nominations.sort()
-    );
-    if (vnode.state.nominationsHasChanged) m.redraw();
-  },
   getObservables: (attrs) => ({
     // we need a group key to satisfy the dynamic object constraints, so here we use the chain class
     groupKey: app.chain.class.toString(),
@@ -117,19 +108,29 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
       : null,
     nominatedBy: (app.chain.base === ChainBase.Substrate)
       ? (app.chain as Substrate).staking.nominatedBy
+      : null,
+    annualPercentRate: (app.chain.base === ChainBase.Substrate)
+      ? (app.chain as Substrate).staking.annualPercentRate
       : null
   }),
   view: (vnode) => {
     let vComponents = [];
     switch (app.chain.class) {
       case ChainClass.Edgeware:
+        vComponents = [
+          m(SubstratePreHeader, {
+            sender: app.user.activeAccount as SubstrateAccount,
+            annualPercentRate: vnode.state.dynamic.annualPercentRate
+          }),
+          SubstratePresentationComponent(vnode.state, app.chain as Substrate),
+        ];
+        break;
       case ChainClass.Kusama:
       case ChainClass.Polkadot: {
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
-            nominations: vnode.state.nominations,
-            nominationsHasChanged: vnode.state.nominationsHasChanged
+            annualPercentRate: vnode.state.dynamic.annualPercentRate
           }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
@@ -149,7 +150,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
   }
 });
 
-const ValidatorPage : m.Component = {
+const ValidatorPage: m.Component = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ValidatorPage' });
   },

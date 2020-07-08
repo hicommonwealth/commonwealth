@@ -53,6 +53,7 @@ import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
 import getInvites from './routes/getInvites';
 import getOffences from './routes/getOffences';
+import getRewards from './routes/getRewards';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
@@ -207,6 +208,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /invites
   router.get('/getInvites', passport.authenticate('jwt', { session: false }), getInvites.bind(this, models));
   router.get('/getOffences', getOffences.bind(this, models));
+  router.get('/getRewards', getRewards.bind(this, models));
   // TODO: Change to PUT /invite
   router.post('/acceptInvite', passport.authenticate('jwt', { session: false }), acceptInvite.bind(this, models));
   // TODO: Change to POST /member

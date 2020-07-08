@@ -47,6 +47,7 @@ export interface IValidatorValue {
   blockCount?: u32,
   hasMessage?: boolean,
   isOnline?: boolean,
+  otherTotal?: BN,
 }
 export interface IValidators {
   [address: string]: IValidatorValue;
@@ -131,11 +132,14 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
         const toBeElected = nextElected.filter((v) => !currentSet.includes(v));
         const validatorsInfo: IValidatorInfo = {};
         electedInfo.info.forEach(({ accountId, validatorPrefs }) => {
-          const commissionPer = (validatorPrefs.commission.unwrap() || new BN(0)).toNumber() / 10_000_000;
+          let commissionPer = new BN(0);
+          if (validatorPrefs.commission)
+            commissionPer = validatorPrefs.commission.unwrap();
+          const commissionPercent = commissionPer.toNumber() / 10_000_000;
           const isCommission = !!validatorPrefs.commission;
           const key = accountId.toString();
           const details = {
-            commissionPer,
+            commissionPer: commissionPercent,
             isCommission
           };
           validatorsInfo[key] = details;
@@ -447,15 +451,14 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
     );
   }
 
-  public nominateTx(nominees: SubstrateAccount[]) {
+  public nominateTx(nominees: string[]) {
     return this._Chain.createTXModalData(
       this,
-      (api: ApiRx) => api.tx.staking.nominate(nominees.map((n) => n.address)),
+      (api: ApiRx) => api.tx.staking.nominate(nominees),
       'nominate',
       `${this.address} updates nominations`,
     );
   }
-
   public chillTx() {
     return this._Chain.createTXModalData(
       this,
