@@ -66,12 +66,15 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     where: {
       address_id: { [Op.in]: myAddressIds },
     },
+    include: [
+      models.Address
+    ]
   });
   const discussionDrafts = await models.DiscussionDraft.findAll({
     where: {
       address_id: { [Op.in]: myAddressIds }
     },
-    includes: [
+    include: [
       models.Address,
       models.OffchainAttachment,
     ]
