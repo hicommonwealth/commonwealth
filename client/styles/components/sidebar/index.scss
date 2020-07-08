@@ -24,6 +24,10 @@ $active-color: #ececec;
             font-weight: 500;
             border: none;
             padding: 4px 12px 3px;
+            .cui-icon svg {
+                position: relative;
+                top: -1px;
+            }
             &:hover {
                 background: lighten($active-color, 3%);
             }
@@ -33,8 +37,6 @@ $active-color: #ececec;
                 color: desaturate(darken($theme-base-color, 4%), 24%);
                 border-radius: 3px;
                 .cui-icon svg {
-                    position: relative;
-                    top: -1px;
                     stroke: desaturate($theme-base-color, 30%);
                 }
             }

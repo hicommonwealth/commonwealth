@@ -43,6 +43,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           title: 'Description',
           defaultValue: vnode.state.description,
           onChangeHandler: (v) => { vnode.state.description = v; },
+          textarea: true,
         }),
         m(InputPropertyRow, {
           title: 'URL',

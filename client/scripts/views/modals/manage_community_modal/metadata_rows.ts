@@ -1,6 +1,6 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { Input, Icon, Icons, Switch } from 'construct-ui';
+import { Input, TextArea, Icon, Icons, Switch } from 'construct-ui';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
@@ -45,43 +45,36 @@ export const ManageRolesRow: m.Component<{ roledata?, onRoleUpdate?: Function }>
   }
 };
 
-
-interface IInputPropertyRowAttrs {
-  title: string;
-  defaultValue: string;
-  disabled?: boolean;
-  onChangeHandler: Function;
-}
-
-export const InputPropertyRow: m.Component<IInputPropertyRowAttrs> = {
+export const InputPropertyRow: m.Component<{
+  title: string,
+  defaultValue: string,
+  disabled?: boolean,
+  onChangeHandler: Function,
+  textarea?: boolean,
+}> = {
   view: (vnode) => {
+    const { title, defaultValue, disabled, onChangeHandler, textarea } = vnode.attrs;
+
     return m('tr.InputPropertyRow', [
-      m('td', { class: 'title-column', }, vnode.attrs.title),
+      m('td', { class: 'title-column', }, title),
       m('td', [
-        m(Input, {
-          defaultValue: vnode.attrs.defaultValue,
+        m((textarea ? TextArea : Input), {
+          defaultValue,
           fluid: true,
-          disabled: vnode.attrs.disabled || false,
-          onkeyup: (e) => { vnode.attrs.onChangeHandler((e.target as any).value); },
+          disabled: disabled || false,
+          onkeyup: (e) => { onChangeHandler((e.target as any).value); },
         }),
       ]),
     ]);
   }
 };
 
-
-interface ITogglePropertyRowAttrs {
-  title: string;
-  defaultValue: boolean;
-  disabled?: boolean;
-  onToggle: Function;
-}
-
-interface ITogglePropertyRowState {
-  checked: boolean;
-}
-
-export const TogglePropertyRow: m.Component<ITogglePropertyRowAttrs, ITogglePropertyRowState> = {
+export const TogglePropertyRow: m.Component<{
+  title: string,
+  defaultValue: boolean,
+  disabled?: boolean,
+  onToggle: Function,
+}, { checked: boolean }> = {
   oninit: (vnode) => {
     vnode.state.checked = vnode.attrs.defaultValue;
   },
