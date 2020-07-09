@@ -1,9 +1,10 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { OffchainThread, OffchainTag } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
+
 import app from 'state';
-import AutoCompleteTagForm from './autocomplete_tag_form';
+import { OffchainThread, OffchainTag } from 'models';
+import TagSelector from './tag_selector';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
@@ -25,7 +26,7 @@ const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function
     const featuredTags = activeMeta.featuredTags.map((t) => {
       return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
-    return m(AutoCompleteTagForm, {
+    return m(TagSelector, {
       featuredTags,
       activeTag: vnode.attrs.thread.tag,
       tags: app.tags.getByCommunity(app.activeId()),

@@ -1,6 +1,6 @@
 import 'components/new_thread_form.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
@@ -10,14 +10,15 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
+import { OffchainTag } from 'models';
+import { notifySuccess } from 'controllers/app/notifications';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
-import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
+import TagSelector from 'views/components/tag_selector';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
-import { OffchainTag } from 'client/scripts/models';
+
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import { confirmationModalWithText } from '../modals/confirm_modal';
-import { notifySuccess } from '../../controllers/app/notifications';
 
 interface IThreadForm {
   tagName?: string;
@@ -234,7 +235,7 @@ export const NewThreadForm: m.Component<{
             })
           ]),
           m(FormGroup, [
-            m(AutoCompleteTagForm, {
+            m(TagSelector, {
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
@@ -304,7 +305,7 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
           m(FormGroup, [
-            m(AutoCompleteTagForm, {
+            m(TagSelector, {
               activeTag: vnode.state.activeTag,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
