@@ -44,7 +44,6 @@ const instantiateEditor = (
   let quill;
 
   // Set up markdown mode helper
-  // TODO: Avoid using jquery to inspect
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
   // Remove existing editor, if there is one
@@ -795,18 +794,17 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
   onremove: (vnode) => {
     const { editor, markdownMode } = vnode.state;
     const { editorNamespace } = vnode.attrs;
-    debugger
     const body = markdownMode
-      ? editor.getText()
-      : editor.getContents();
+      ? editor?.getText()
+      : editor?.getContents();
     const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
-    localStorage.setItem(`${editorNamespace}-storedText`, body);
+    if (body) localStorage.setItem(`${editorNamespace}-storedText`, body);
     if (title) localStorage.setItem(`${editorNamespace}-storedTitle`, title.value);
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
     }
   },
-  view: (vnode: m.VnodeDOM<IQuillEditorAttrs, IQuillEditorState>) => {
+  view: (vnode) => {
     const theme = vnode.attrs.theme || 'snow';
     const { imageUploader, placeholder, tabindex, editorNamespace, onkeyboardSubmit } = vnode.attrs;
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
@@ -843,13 +841,13 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     return m('.QuillEditor', {
       class: vnode.state.markdownMode ? 'markdown-mode' : 'richtext-mode',
       oncreate: (childVnode) => {
-        const $editor = $(vnode.dom).find('.quill-editor');
+        const $editor = $(childVnode.dom).find('.quill-editor');
         vnode.state.editor = instantiateEditor(
           $editor, theme, true, imageUploader, placeholder, editorNamespace,
           vnode.state, onkeyboardSubmit
         );
         // once editor is instantiated, it can be updated with a tabindex
-        $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+        $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
           const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
@@ -872,14 +870,14 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 const cachedContents = vnode.state.editor.getContents();
                 // switch editor to rich text
                 vnode.state.markdownMode = false;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
                 vnode.state.editor.focus();
@@ -919,13 +917,13 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
                 cachedContents = vnode.state.editor.getContents();
                 vnode.state.markdownMode = true;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
