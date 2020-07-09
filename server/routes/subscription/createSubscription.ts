@@ -24,6 +24,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     category_id: req.body.category,
     object_id: req.body.object_id,
     is_active: !!req.body.is_active,
+    chain_id: req.body.chain_id || null,
+    community_id: req.body.community_id || null,
+    offchain_thread_id: Number(req.body.offchain_thread_id) || null,
+    offchain_comment_id: Number(req.body.offchain_comment_id) || null,
+    chain_event_type_id: req.body.chain_event_type_id || null,
+    chain_entity_id: req.body.chain_event_type_id || null,
   });
 
   return res.json({ status: 'Success', result: subscription.toJSON() });
