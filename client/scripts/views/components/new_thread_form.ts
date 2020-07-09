@@ -408,7 +408,16 @@ export const NewThreadForm: m.Component<{
               m('.discussion-draft-title', draft.title || 'Untitled'),
               m('.discussion-draft-body', draft.body.length
                 ? bodyComponent
-                : '')
+                : ''),
+              m('.discussion-draft-actions', [
+                m('a', {
+                  href: '#',
+                  onclick: (e) => {
+                    e.preventDefault();
+                    // TODO
+                  }
+                }, 'Delete')
+              ]),
             ],
             onclick: () => loadDraft(vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
