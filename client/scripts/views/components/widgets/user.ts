@@ -28,6 +28,7 @@ interface IState {
 
 const User : m.Component<IAttrs, IState> = {
   view: (vnode) => {
+    // TODO: Fix showRole logic to fetch the role from chain
     const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
@@ -65,12 +66,12 @@ const User : m.Component<IAttrs, IState> = {
       profile = app.profiles.getProfile(account.chain.id, account.address);
       role = app.user.isAdminOrMod({ account });
     }
-    const roleTag = role ? m(Tag, {
-      class: 'roleTag',
-      label: role.permission,
-      rounded: true,
-      size: 'sm',
-    }) : null;
+    // const roleTag = role ? m(Tag, {
+    //   class: 'roleTag',
+    //   label: role.permission,
+    //   rounded: true,
+    //   size: 'sm',
+    // }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -101,7 +102,7 @@ const User : m.Component<IAttrs, IState> = {
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
-        showRole && roleTag,
+        // showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -124,7 +125,7 @@ const User : m.Component<IAttrs, IState> = {
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
-      roleTag,
+      // roleTag,
     ]);
 
     return tooltip

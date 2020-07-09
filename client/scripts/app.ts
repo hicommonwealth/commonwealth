@@ -377,8 +377,6 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true }),
     '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true }),
-    '/:scope/tags':              importRoute('views/pages/tags', { scoped: true }),
-    '/:scope/members':           importRoute('views/pages/members', { scoped: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),

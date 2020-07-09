@@ -5,7 +5,7 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 
 import { Button, ButtonGroup, Icon, Icons, List, Menu, MenuItem, MenuDivider,
-  Popover, PopoverMenu } from 'construct-ui';
+  Popover } from 'construct-ui';
 
 import app from 'state';
 import { ChainInfo, CommunityInfo } from 'models';

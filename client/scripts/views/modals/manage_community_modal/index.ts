@@ -1,23 +1,22 @@
+import 'modals/manage_community_modal.scss';
+
 import m from 'mithril';
 import $ from 'jquery';
 import { Dialog, Icon, Icons, ListItem } from 'construct-ui';
 
-import 'components/admin_panel.scss';
-import { RoleInfo, RolePermission } from 'models';
 import app from 'state';
+import { RoleInfo, RolePermission } from 'models';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
 import AdminPanelTabs from './admin_panel_tabs';
 
-interface IAdminPanelContentsState {
+const ManageCommunityModal: m.Component<{}, {
   roleData: RoleInfo[];
   webhooks;
   loadingFinished: boolean;
   loadingStarted: boolean;
-}
-
-const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelContentsState> = {
+}> = {
   view: (vnode) => {
     const chainOrCommObj = app.chain ? { chain: app.activeChainId() } : { community: app.activeCommunityId() };
     const isCommunity = !!app.activeCommunityId();
@@ -64,72 +63,40 @@ const AdminPanelContents: m.Component<{onChangeHandler: Function}, IAdminPanelCo
       m.redraw();
     };
 
-    return m('.AdminPanelContents', [
-      m('.panel-left', [
-        isCommunity
-          ? vnode.state.loadingFinished
-            && m(CommunityMetadataManagementTable, {
-              admins,
-              community: app.community.meta,
-              mods,
-              onChangeHandler: vnode.attrs.onChangeHandler,
-              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
-            })
-          : vnode.state.loadingFinished
-            && m(ChainMetadataManagementTable, {
-              admins,
-              chain: app.config.chains.getById(app.activeChainId()),
-              mods,
-              onChangeHandler: vnode.attrs.onChangeHandler,
-              onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
-            }),
+    return m('.ManageCommunityModal', [
+      m('.modal-title', [
+        m('h3', 'Manage Community'),
       ]),
-      m('.panel-right', [
-        vnode.state.loadingFinished
-          && m(AdminPanelTabs, {
-            defaultTab: 1,
-            onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
-            roleData: vnode.state.roleData,
-            webhooks: vnode.state.webhooks,
-          }),
+      m('.modal-contents', [
+        m('.panel-left', [
+          isCommunity
+            ? vnode.state.loadingFinished
+              && m(CommunityMetadataManagementTable, {
+                admins,
+                community: app.community.meta,
+                mods,
+                onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+              })
+            : vnode.state.loadingFinished
+              && m(ChainMetadataManagementTable, {
+                admins,
+                chain: app.config.chains.getById(app.activeChainId()),
+                mods,
+                onRoleUpdate: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+              }),
+        ]),
+        m('.panel-right', [
+          vnode.state.loadingFinished
+            && m(AdminPanelTabs, {
+              defaultTab: 1,
+              onRoleUpgrade: (oldRole, newRole) => onRoleUpdate(oldRole, newRole),
+              roleData: vnode.state.roleData,
+              webhooks: vnode.state.webhooks,
+            }),
+        ]),
       ]),
     ]);
-  }
-};
-
-const AdminPanel: m.Component<{}, { isOpen: boolean }> = {
-  oninit: (vnode) => {
-    vnode.state.isOpen = false;
-  },
-  view: (vnode) => {
-    return [
-      m(ListItem, {
-        class: 'AdminPanel',
-        onclick: (e) => {
-          e.preventDefault();
-          vnode.state.isOpen = true;
-        },
-        label: 'Configuration',
-      }),
-      m(Dialog, {
-        autofocus: true,
-        basic: false,
-        closeOnEscapeKey: true,
-        closeOnOutsideClick: true,
-        class: 'AdminPanelDialog',
-        content: m(AdminPanelContents, {
-          onChangeHandler: (v) => { vnode.state.isOpen = v; },
-        }),
-        hasBackdrop: true,
-        isOpen: vnode.state.isOpen,
-        inline: false,
-        onClose: () => { vnode.state.isOpen = false; },
-        title: 'Manage Community',
-        transitionDuration: 200,
-        footer: null,
-      })
-    ];
   },
 };
 
-export default AdminPanel;
+export default ManageCommunityModal;
