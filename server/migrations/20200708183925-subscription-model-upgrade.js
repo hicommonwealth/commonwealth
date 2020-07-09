@@ -35,7 +35,7 @@ module.exports = {
           // councilmotion_0x3dd9c8b50b896089ddf9db75d231bd23d6596822ba6d5480697ed0833b64f077
           // referendum_0
           if (entity === 'discussion') {
-            // query associate OffchainThread
+            // associate OffchainThread
             query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id};`;
             // await queryInterface.sequelize.query(query);
             // associate chain or community
@@ -59,15 +59,14 @@ module.exports = {
             }
             await queryInterface.sequelize.query(query);
           } else {
-          // query associate ChainEntity
+          // associate ChainEntity
           // associate chain
           // TODO: I THINK THIS IS NOT POSSIBLE GIVEN CURRENT ISSUE IN FINDING CHAIN FROM SUBSCRIPTION
           }
-          // await queryInterface.sequelize.query(query);
           break;
         case 'new-reaction':  // object_id "comment-923" / "discussion_442" (hyphen or underscore)
           if (entity === 'discussion') {
-            // query associate offchain_thread
+            // associate offchain_thread
             query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id};`;
             await queryInterface.sequelize.query(query);
             // associate chain or community
@@ -81,7 +80,7 @@ module.exports = {
               await queryInterface.sequelize.query(query);
             }
           } else if (entity === 'comment') {
-            // query associate offchain_comment
+            // associate offchain_comment
             query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(p_object_id)} WHERE id=${id};`;
             // // associate chain or community
             const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${Number(p_object_id)};`);
