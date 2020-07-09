@@ -44,10 +44,51 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.object_id).to.equal(object_id);
       expect(res.body.result.is_active).to.be.equal(true);
     });
-    it('should make new-comment subscription on thread', async () => {
+    it('should create new-thread subscription on chain', async () => {
+      const object_id = chain;
+      const is_active = true;
+      const category = NotificationCategories.NewThread;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(object_id);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
+    it('should make new-comment subscription on thread in community', async () => {
       let res = await modelUtils.createThread({
         chainId: chain,
         communityId: community,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        title: 't',
+        body: 't',
+        kind: 'forum',
+        tagName: 't',
+        tagId: undefined
+      });
+      const object_id = `discussion_${res.result.id}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(`${object_id}`);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
+    it('should make new-comment subscription on thread in chain', async () => {
+      let res = await modelUtils.createThread({
+        chainId: chain,
+        communityId: null,
         address: loggedInAddr,
         jwt: jwtToken,
         title: 't',

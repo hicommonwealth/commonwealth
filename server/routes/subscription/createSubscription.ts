@@ -36,7 +36,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       break;
     }
     case 'new-comment-creation' || 'new-reaction': {
-      console.dir(p_entity);
       if (p_entity === 'discussion') {
         const thread = await models.OffchainThread.findOne({ where: { id: Number(p_id), } });
         if (!thread) return next(new Error(Errors.NoThread));
