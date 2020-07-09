@@ -96,9 +96,9 @@ module.exports = {
           }
           break;
         case 'chain-event': // object_id: "edgeware-reward" / "edgeware-treasury-awarded" / "edgeware-treasury-rejected"
-          // query = `UPDATE "Subscriptions" SET chain_id='${entity}' WHERE id=${id};`;
-          // query += `UPDATE "Subscriptions" SET chain_event_type_id='${object_id}' WHERE id=${id};`;
-          // await queryInterface.sequelize.query(query);
+          query = `UPDATE "Subscriptions" SET chain_id='${entity}' WHERE id=${id};`;
+          query += `UPDATE "Subscriptions" SET chain_event_type_id='${object_id}' WHERE id=${id};`;
+          await queryInterface.sequelize.query(query);
           break;
         default:
           // all cases should be detailed above.
