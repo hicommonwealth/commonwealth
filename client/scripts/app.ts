@@ -209,10 +209,11 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
-  await app.chain.initServer();
-
-  // Load basic API data immediately (connected/disconnected, etc)
-  await app.chain.initApi();
+  // Also, load basic API data immediately (connected/disconnected, etc)
+  await Promise.all([
+    app.chain.initServer(),
+    app.chain.initApi(),
+  ]);
 
   // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
