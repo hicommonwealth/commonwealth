@@ -39,7 +39,7 @@ export interface SubscriptionAttributes {
   offchain_thread_id?: number;
   offchain_comment_id?: number;
   chain_event_type_id?: string;
-  chain_entity_id?: string;
+  chain_entity_id?: number;
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
