@@ -79,7 +79,7 @@ export default (
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
-      chain_entity_id: { type: dataTypes.STRING, allowNull: true },
+      chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
       underscored: true,
       paranoid: true,
