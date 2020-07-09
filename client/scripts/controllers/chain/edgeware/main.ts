@@ -1,15 +1,17 @@
-import { IApp } from 'state';
+import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent, NodeInfo } from 'models';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { IApp } from 'state';
+
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identities';
@@ -33,9 +35,6 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
 
-  private _loaded: boolean = false;
-  get loaded() { return this._loaded; }
-
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     handleSubstrateEntityUpdate(this, entity, event);
   }
@@ -53,8 +52,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.signaling = new EdgewareSignaling(this.app);
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  public async initApi() {
     const edgTypes = Object.values(edgewareDefinitions)
       .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
     await this.chain.resetApi(this.meta, {
@@ -76,6 +74,10 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     });
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await super.initApi();
+  }
+
+  public async initData() {
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
       this.council.init(this.chain, this.accounts),
@@ -88,16 +90,14 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     if (!this.usingServerChainEntities) {
       await this.chain.initChainEntities();
     }
-    await this._postModuleLoad(this.usingServerChainEntities);
-    this.chain.initEventLoop();
 
-    this.app.chainModuleReady.next(true);
-    this._loaded = true;
+    // TODO: Verify that re-ordering this is OK -- we can move the event loop up
+    this.chain.initEventLoop();
+    await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit(): Promise<void> {
-    this._loaded = false;
-    // this.server.proposals.deinit();
+    await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

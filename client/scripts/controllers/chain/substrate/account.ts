@@ -160,10 +160,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     this.store.clear();
   }
 
-  public init(ChainInfo: SubstrateChain): Promise<void> {
+  public async init(ChainInfo: SubstrateChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;
-    return Promise.resolve();
   }
 }
 
@@ -317,7 +316,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // CONSTRUCTORS
   constructor(app: IApp, ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, address: string, isEd25519: boolean = false) {
-    if (!ChainInfo) {
+    if (!ChainInfo?.metadataInitialized) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
       app.chainModuleReady.pipe(first()).subscribe(() => {

@@ -128,7 +128,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 }
 
 // called by the user, when clicking on the chain/node switcher menu
-export async function selectNode(n?: NodeInfo): Promise<void> {
+export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> {
   // Select the default node, if one wasn't provided
   if (!n) {
     if (app.user.selectedNode) {
@@ -206,45 +206,16 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   } else {
     throw new Error('Invalid chain');
   }
+  app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
-  await app.chain.initServer();
+  // Also, load basic API data immediately (connected/disconnected, etc)
+  await Promise.all([
+    app.chain.initServer(),
+    app.chain.initApi(),
+  ]);
 
-  // Redraw with not-yet-loaded chain
-  m.redraw();
-}
-
-
-// Initializes a selected chain. Requires `app.chain` to be defined and valid
-// and not already initialized.
-export async function initChain(): Promise<void> {
-  if (!app.chain || !app.chain.meta || app.chain.loaded) return;
-  const n = app.chain.meta;
-
-  // Initialize the chain, providing an m.redraw() to a callback,
-  // which is called before chain initialization finishes but after
-  // the server is loaded. This allows the navbar/header to be redrawn
-  // to show progress, before all modules are loaded.
-  //
-  // NOTE: While awaiting app.chain.init() to complete, the chain may
-  // be uninitialized, but app.chain is set, so there may be subtle
-  // race conditions that appear at this point if certain modules come
-  // online before others. The solution should be to have some kind of
-  // locking in place before modules start working.
-  //
-  app.chain.init().then(() => {
-    // Emit chain as updated
-    app.chainAdapterReady.next(true);
-    console.log(`${n.chain.network.toUpperCase()} started.`);
-    // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
-  });
-
-  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
-
-  // Try to instantiate Account<> objects for the new chain. However, app.chain.accounts.get() may not be able to
-  // create the Account object, so we also call this again in the callback that runs after the chain initializes
+  // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
@@ -255,7 +226,29 @@ export async function initChain(): Promise<void> {
     });
   }
 
-  // Redraw with chain fully loaded
+  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
+  handleInviteLinkRedirect();
+
+  // Redraw with not-yet-loaded chain
+  m.redraw();
+}
+
+// Initializes a selected chain. Requires `app.chain` to be defined and valid
+// and not already initialized.
+export async function initChain(): Promise<void> {
+  if (!app.chain || !app.chain.meta || app.chain.loaded) return;
+  app.chain.deferred = false;
+  const n = app.chain.meta;
+  await app.chain.initData();
+
+  // Emit chain as updated
+  app.chainAdapterReady.next(true);
+  console.log(`${n.chain.network.toUpperCase()} started.`);
+
+  // Instantiate (again) to create chain-specific Account<> objects
+  updateActiveAddresses(n.chain);
+
+  // Finish redraw to remove loading dialog
   m.redraw();
 }
 

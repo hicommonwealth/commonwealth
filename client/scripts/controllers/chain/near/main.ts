@@ -1,4 +1,5 @@
-import { IChainAdapter, ChainBase, ChainClass } from 'models';
+import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';
 import NearChain from './chain';
@@ -10,26 +11,24 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public chain: NearChain;
   public accounts: NearAccounts;
 
-  private _loaded: boolean = false;
-  get loaded() { return this._loaded; }
-
-  public handleEntityUpdate(e): void {
-    throw new Error('not implemented');
-  }
-
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  constructor(meta: NodeInfo, app: IApp) {
+    super(meta, app);
     this.chain = new NearChain(this.app);
     this.accounts = new NearAccounts(this.app);
+  }
 
+  public async initApi() {
     await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
-    await this._postModuleLoad();
-
-    this._loaded = true;
+    await super.initApi();
   }
+
+  public async initData() {
+    await super.initData();
+  }
+
   public async deinit() {
-    this._loaded = false;
+    await super.deinit();
     await this.accounts.deinit();
     await this.chain.deinit();
     console.log('NEAR stopped.');

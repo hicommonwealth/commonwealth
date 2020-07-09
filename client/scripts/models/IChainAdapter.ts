@@ -14,16 +14,23 @@ import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
-  public abstract loaded: boolean;
+  protected _apiInitialized: boolean = false;
+  public get apiInitialized() { return this._apiInitialized; }
+
+  protected _loaded: boolean = false;
+  public get loaded() { return this._loaded; }
+
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
 
-  protected _serverLoaded: boolean;
-  get serverLoaded() { return this._serverLoaded; }
+  public deferred: boolean;
 
-  protected async _postModuleLoad(listenEvents = false): Promise<void> {
+  protected _serverLoaded: boolean;
+  public get serverLoaded() { return this._serverLoaded; }
+
+  private async _postModuleLoad(listenEvents = false): Promise<void> {
     await this.app.comments.refreshAll(this.id, null, CommentRefreshOption.LoadProposalComments);
     // await this.app.reactions.refreshAll(this.id, null, false);
 
@@ -83,10 +90,27 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     }
   }
 
-  public abstract init(): Promise<void>;
-  public abstract deinit(): Promise<void>;
+  public async initApi(): Promise<void> {
+    this._apiInitialized = true;
+    console.log(`Started API for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+  }
 
-  public abstract handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void;
+  public async initData(listenEvents = false): Promise<void> {
+    await this._postModuleLoad(listenEvents);
+    this._loaded = true;
+    this.app.chainModuleReady.next(true);
+    console.log(`Loaded data for ${this.meta.chain.id} on node: ${this.meta.url}.`);
+  }
+
+  public async deinit(): Promise<void> {
+    this._apiInitialized = false;
+    this._loaded = false;
+    console.log(`Stopping ${this.meta.chain.id}...`);
+  }
+
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    throw new Error('not implemented');
+  }
 
   public abstract base: ChainBase;
   public abstract class: ChainClass;
