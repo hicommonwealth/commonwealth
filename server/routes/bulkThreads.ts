@@ -46,7 +46,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   const filteredThreads = await allThreads.filter((thread) => {
     if (thread.private === false) {
       return true;
-    } else if (userAddressIds.includes(thread.author_id)) {
+    } else if (userAddressIds.includes(thread.address_id)) {
       return true;
     } else if (adminRoles.length > 0) {
       return true;

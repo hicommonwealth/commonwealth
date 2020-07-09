@@ -8,7 +8,7 @@ import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainThreadAttributes {
   id?: number;
-  author_id: number;
+  address_id: number;
   title: string;
   body?: string;
   kind: string;
@@ -45,7 +45,7 @@ export default (
 ): OffchainThreadModel => {
   const OffchainThread = sequelize.define<OffchainThreadInstance, OffchainThreadAttributes>('OffchainThread', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    author_id: { type: dataTypes.INTEGER, allowNull: false },
+    address_id: { type: dataTypes.INTEGER, allowNull: false },
     title: { type: dataTypes.TEXT, allowNull: false },
     body: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
@@ -64,14 +64,14 @@ export default (
     underscored: true,
     paranoid: true,
     indexes: [
-      { fields: ['author_id'] },
+      { fields: ['address_id'] },
     ],
   });
 
   OffchainThread.associate = (models) => {
     models.OffchainThread.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.OffchainThread.belongsTo(models.OffchainCommunity, { foreignKey: 'community', targetKey: 'id' });
-    models.OffchainThread.belongsTo(models.Address, { foreignKey: 'author_id', targetKey: 'id' });
+    models.OffchainThread.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.OffchainThread.hasMany(models.OffchainAttachment, {
       foreignKey: 'attachment_id',
       constraints: false,

@@ -11,11 +11,13 @@ const EmptyChannelPlaceholder: m.Component<{ tagName?: string, communityName?: s
       m('.icon-circle', [
         m(Icon, { name: Icons.HASH, size: 'xl' }),
       ]),
-      m('h1', tagName
-        ? `Welcome to #${tagName}!`
-        : `Welcome to the ${communityName} community!`
-       ),
-      m('p', `There are no posts yet.`),
+      m('h1', [
+        'Welcome to the ',
+        tagName
+          ? [ m('strong', tagName), ' channel!' ]
+          : [ m('strong', communityName), ' community!' ]
+      ]),
+      m('p', 'There are no threads here yet.'),
     ]);
   }
 };

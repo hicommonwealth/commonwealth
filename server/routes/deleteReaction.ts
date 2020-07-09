@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,14 +19,14 @@ const deleteReaction = async (models, req: Request, res: Response, next: NextFun
   }
 
   try {
-    const userOwnedAddresses = await req.user.getAddresses();
+    const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
     const reaction = await models.OffchainReaction.findOne({
-      where: { id: req.body.reaction_id, },
+      where: {
+        id: req.body.reaction_id,
+        address_id: { [Op.in]: userOwnedAddressIds },
+      },
       include: [ models.Address ],
     });
-    if (userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id).indexOf(reaction.address_id) === -1) {
-      return next(new Error(Errors.AddressNotOwned));
-    }
     // actually delete
     await reaction.destroy();
     return res.json({ status: 'Success' });

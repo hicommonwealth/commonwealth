@@ -377,8 +377,6 @@ $(() => {
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/tags':              importRoute('views/pages/tags', { scoped: true, deferChain: true }),
-    '/:scope/members':           importRoute('views/pages/members', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
@@ -476,6 +474,10 @@ $(() => {
       if (app.loginState === LoginState.LoggedIn) {
         app.user.notifications.refresh().then(() => m.redraw());
         jwt = app.user.jwt;
+      }
+      // grab discussion drafts
+      if (app.loginState === LoginState.LoggedIn) {
+        app.user.discussionDrafts.refreshAll().then(() => m.redraw());
       }
 
       let wsUrl = app.serverUrl();
