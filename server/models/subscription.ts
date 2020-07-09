@@ -12,6 +12,12 @@ import {
 } from '../../shared/types';
 import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+import { OffchainThreadAttributes } from './offchain_thread';
+import { OffchainCommentAttributes } from './offchain_comment';
+import { ChainEventTypeAttributes } from './chain_event_type';
+import { ChainEntityAttributes } from './chain_entity';
 const sgMail = require('@sendgrid/mail');
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -28,15 +34,22 @@ export interface SubscriptionAttributes {
   immediate_email?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  User?: UserAttributes;
-  NotificationCategory?: NotificationCategoryAttributes;
-  Notifications?: NotificationAttributes[];
   chain_id?: string;
   community_id?: string;
   offchain_thread_id?: number;
   offchain_comment_id?: number;
   chain_event_type_id?: string;
   chain_entity_id?: string;
+
+  User?: UserAttributes;
+  NotificationCategory?: NotificationCategoryAttributes;
+  Notifications?: NotificationAttributes[];
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+  OffchainThread?: OffchainThreadAttributes;
+  OffchainComment?: OffchainCommentAttributes;
+  ChainEventType?: ChainEventTypeAttributes;
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface SubscriptionInstance
