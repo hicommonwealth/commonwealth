@@ -6,13 +6,15 @@ import { NewThreadForm } from 'views/components/new_thread_form';
 const NewThreadModal = {
   view: (vnode) => {
     return m('.NewThreadModal', [
-      m('.modal-header', [
+      m('.compact-modal-title', [
         m('h3', 'New thread')
       ]),
-      m(NewThreadForm, {
-        isModal: true,
-        header: false,
-      }),
+      m('.compact-modal-body-max', [
+        m(NewThreadForm, {
+          isModal: true,
+          header: false,
+        }),
+      ]),
     ]);
   }
 };

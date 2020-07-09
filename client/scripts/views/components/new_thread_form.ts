@@ -109,24 +109,24 @@ export const loadDraft = async (state, draft) => {
   m.redraw();
 };
 
-export const cancelDraft = async (state) => {
-  if (!state.fromDraft) {
-    return;
-  }
-  // First we check if the form has been updated, to avoid
-  // losing any unsaved form data
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
-  const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
-  const confirmed = await checkForModifications(state, cancelDraftMessage);
-  if (!confirmed) return;
-  state.form.body = '';
-  state.form.title = '';
-  state.activeTag = undefined;
-  state.fromDraft = NaN;
-  (titleInput as HTMLInputElement).value = '';
-  state.quillEditorState.editor.setText('\n');
-  m.redraw();
-};
+// export const cancelDraft = async (state) => {
+//   if (!state.fromDraft) {
+//     return;
+//   }
+//   // First we check if the form has been updated, to avoid
+//   // losing any unsaved form data
+//   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+//   const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
+//   const confirmed = await checkForModifications(state, cancelDraftMessage);
+//   if (!confirmed) return;
+//   state.form.body = '';
+//   state.form.title = '';
+//   state.activeTag = undefined;
+//   state.fromDraft = NaN;
+//   (titleInput as HTMLInputElement).value = '';
+//   state.quillEditorState.editor.setText('\n');
+//   m.redraw();
+// };
 
 export const NewThreadForm: m.Component<{
   header: boolean,
@@ -165,43 +165,40 @@ export const NewThreadForm: m.Component<{
       m.redraw();
     }, 750);
 
-    const typeSelector = m(FormGroup, [
-      m(Tabs, {
-        align: 'left',
-        bordered: true,
-        fluid: true,
-      }, [
-        m(TabItem, {
-          label: 'Discussion',
-          onclick: (e) => {
-            vnode.state.newType = 'Discussion';
-          },
-          active: vnode.state.newType === 'Discussion',
-        }),
-        m(TabItem, {
-          label: 'Link',
-          onclick: (e) => {
-            vnode.state.newType = 'Link';
-          },
-          active: vnode.state.newType === 'Link',
-        }),
-      ]),
-    ]);
-
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { newType, saving, uploadsInProgress } = vnode.state;
 
     return m('.NewThreadForm', {
+      class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header
-        && m('h2.page-title', 'New Thread'),
-        vnode.state.newType === 'Link'
-        && m(Form, [
-          typeSelector,
+        vnode.attrs.header && m('h2.page-title', 'New Thread'),
+        m(FormGroup, [
+          m(Tabs, {
+            align: 'left',
+            bordered: true,
+            fluid: true,
+          }, [
+            m(TabItem, {
+              label: 'Discussion',
+              onclick: (e) => {
+                vnode.state.newType = 'Discussion';
+              },
+              active: vnode.state.newType === 'Discussion',
+            }),
+            m(TabItem, {
+              label: 'Link',
+              onclick: (e) => {
+                vnode.state.newType = 'Link';
+              },
+              active: vnode.state.newType === 'Link',
+            }),
+          ]),
+        ]),
+        vnode.state.newType === 'Link' && m(Form, [
           m(FormGroup, [
             m(Input, {
               placeholder: 'https://',
@@ -286,9 +283,7 @@ export const NewThreadForm: m.Component<{
             : m('.error-placeholder'),
         ]),
         //
-        vnode.state.newType === 'Discussion'
-        && m(Form, [
-          typeSelector,
+        vnode.state.newType === 'Discussion' && m(Form, [
           m(FormGroup, [
             m(Input, {
               name: 'title',
@@ -368,8 +363,8 @@ export const NewThreadForm: m.Component<{
                   } else if (!vnode.state.error?.draft) {
                     m.route.set(`/${app.activeId()}`);
                   }
-                } catch (e) {
-                  console.error(e);
+                } catch (err) {
+                  console.error(err);
                 }
               },
               label: 'Save as draft',
@@ -387,9 +382,7 @@ export const NewThreadForm: m.Component<{
             : m('.error-placeholder'),
         ]),
       ]),
-      !!discussionDrafts.length
-      && m('.new-thread-form-sidebar', [
-        m('h2', 'Saved drafts'),
+      !!discussionDrafts.length && m('.new-thread-form-sidebar', [
         m(List, { interactive: true }, discussionDrafts.map((draft) => {
           const { body } = draft;
           let bodyComponent;
@@ -422,12 +415,12 @@ export const NewThreadForm: m.Component<{
             selected: vnode.state.fromDraft === draft.id
           });
         })),
-        m(Button, {
-          class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-          intent: 'none',
-          onclick: () => cancelDraft(vnode.state),
-          label: 'Cancel draft',
-        }),
+        // m(Button, {
+        //   class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+        //   intent: 'none',
+        //   onclick: () => cancelDraft(vnode.state),
+        //   label: 'Cancel editing draft',
+        // }),
       ])
     ]);
   }
