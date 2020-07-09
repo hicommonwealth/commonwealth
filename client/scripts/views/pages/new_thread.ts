@@ -28,10 +28,8 @@ const NewThreadPage: m.Component = {
       class: 'NewThreadPage',
     }, [
       m('.forum-container', [
-        m(NewThreadForm, {
-          isModal: false,
-          header: true
-        }),
+        m('h2.page-title', 'New Thread'),
+        m(NewThreadForm, { isModal: false }),
       ]),
     ]);
   },

@@ -16,12 +16,13 @@
     }
 
     .new-thread-form-body {
+        padding-right: 30px;
         padding-bottom: 10px;
         flex: 9;
         .cui-tabs {
             margin-top: 4px;
             margin-bottom: 16px;
-            padding: 0 28px;
+            padding: 0;
             border-bottom: 1px solid #eee;
             .cui-tabs-item {
                 padding: 12px 0;
@@ -29,7 +30,7 @@
             }
         }
         .cui-form {
-            margin: 0 28px;
+            margin: 0;
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
@@ -37,6 +38,15 @@
         .error-message {
             @include error-text;
             margin: 10px 0 20px;
+        }
+    }
+    &.is-modal .new-thread-form-body {
+        padding-right: 0;
+        .cui-tabs {
+            padding: 0 28px;
+        }
+        .cui-form {
+            margin: 0 28px;
         }
     }
     .new-thread-form-sidebar {

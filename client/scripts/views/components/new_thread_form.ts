@@ -128,7 +128,6 @@ export const loadDraft = async (state, draft) => {
 // };
 
 export const NewThreadForm: m.Component<{
-  header: boolean,
   isModal: boolean
 }, {
   activeTag: OffchainTag | string,
@@ -151,7 +150,6 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.error === undefined) vnode.state.error = {};
     if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
     if (vnode.state.newType === undefined) vnode.state.newType = 'Discussion';
-    const { error } = vnode.state;
 
     const getUrlForLinkPost = _.debounce(async () => {
       const res = await getLinkTitle(vnode.state.form.url);
@@ -165,16 +163,16 @@ export const NewThreadForm: m.Component<{
     }, 750);
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { newType, saving, uploadsInProgress } = vnode.state;
+    const { newType, saving, uploadsInProgress, error } = vnode.state;
 
     return m('.NewThreadForm', {
-      class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
+      class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`
+        + ` ${vnode.attrs.isModal ? 'is-modal' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header && m('h2.page-title', 'New Thread'),
         m(FormGroup, [
           m(Tabs, {
             align: 'left',
@@ -360,7 +358,8 @@ export const NewThreadForm: m.Component<{
                       $(e.target).trigger('modalexit');
                     }, 0);
                   } else if (!vnode.state.error?.draft) {
-                    m.route.set(`/${app.activeId()}`);
+                    notifySuccess('Draft saved');
+                    // TODO: clear the editor
                   }
                 } catch (err) {
                   console.error(err);
