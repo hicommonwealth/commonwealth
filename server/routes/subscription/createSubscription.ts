@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
+import proposalIdToEntity from 'server/util/proposalIdToEntity';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +19,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   if (!category) {
     return next(new Error(Errors.InvalidNotificationCategory));
   }
-
 
   let obj;
   const parsed_object_id = req.body.object_id.split(/-|_/);
@@ -54,7 +54,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
           obj = { offchain_comment_id: Number(p_id), community_id: comment.community, };
         }
       } else {
-        return next(new Error(Errors.NoCommentOrReactionEntity));
+        if (!req.body.chain_id) return next(new Error(Errors.ChainRequiredForEntity));
+        // TODO: Associate with ChainEntity and Chain
+        const chainEntity = await proposalIdToEntity(models, req.body.chain_id, req.body.object_id);
+        if (!chainEntity) return next(new Error(Errors.NoChainEntity));
+        obj = { chain_id: chainEntity.chain, chain_entity_id: chainEntity.id, };
       }
       break;
     }

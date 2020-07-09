@@ -9,7 +9,9 @@ const Errors = {
   NoMentions: 'Cannot make New Mention Subscription from this route',
   NoComment: 'Cannot find comment model for new subscription',
   NoThread: 'Cannot find thread model for new subscription',
-  NoCommentOrReactionEntity: 'No entity to associate subscription found'
+  NoCommentOrReactionEntity: 'No entity to associate subscription found',
+  ChainRequiredForEntity: 'Chain id required for ChainEntity association',
+  NoChainEntity: 'Cannot find ChainEntity',
 };
 
 export default Errors;
