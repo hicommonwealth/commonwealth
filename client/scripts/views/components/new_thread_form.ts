@@ -75,9 +75,8 @@ export const checkForModifications = async (state, modalMsg) => {
 export const loadDraft = async (state, draft) => {
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
 
-  // First we check if the form has been updated, to avoid
-  // losing any unsaved form data
-  const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
+  // First we check if the form has been updated, to avoid losing any unsaved form data
+  const overwriteDraftMsg = 'Load this draft? Your current work will will not be saved.';
   const confirmed = await checkForModifications(state, overwriteDraftMsg);
   if (!confirmed) return;
 
@@ -116,7 +115,7 @@ export const loadDraft = async (state, draft) => {
 //   // First we check if the form has been updated, to avoid
 //   // losing any unsaved form data
 //   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
-//   const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
+//   const cancelDraftMessage = 'Discard edits? Your current work will not be saved.';
 //   const confirmed = await checkForModifications(state, cancelDraftMessage);
 //   if (!confirmed) return;
 //   state.form.body = '';

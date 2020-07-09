@@ -1,6 +1,6 @@
 .ManageCommunityModal {
     width: 800px;
-    .modal-contents {
+    .compact-modal-body-max {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -23,6 +23,7 @@
     }
     .cui-tabs {
         margin-top: 2px;
+        border-bottom-color: #eee;
         > :first-child {
             margin-left: 15px;
         }

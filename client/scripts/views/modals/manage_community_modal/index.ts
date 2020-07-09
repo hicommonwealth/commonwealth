@@ -6,6 +6,7 @@ import { Dialog, Icon, Icons, ListItem } from 'construct-ui';
 
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
+import { CompactModalExitButton } from 'views/modal';
 import { sortAdminsAndModsFirst } from 'views/pages/discussions/roles';
 import CommunityMetadataManagementTable from './community_metadata_management_table';
 import ChainMetadataManagementTable from './chain_metadata_management_table';
@@ -64,10 +65,11 @@ const ManageCommunityModal: m.Component<{}, {
     };
 
     return m('.ManageCommunityModal', [
-      m('.modal-title', [
+      m('.compact-modal-title', [
         m('h3', 'Manage Community'),
+        m(CompactModalExitButton),
       ]),
-      m('.modal-contents', [
+      m('.compact-modal-body-max', [
         m('.panel-left', [
           isCommunity
             ? vnode.state.loadingFinished
