@@ -317,7 +317,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
 
   // CONSTRUCTORS
   constructor(app: IApp, ChainInfo: SubstrateChain, Accounts: SubstrateAccounts, address: string, isEd25519: boolean = false) {
-    if (!ChainInfo) {
+    if (!ChainInfo?.metadataInitialized) {
       // defer chain initialization
       super(app, app.chain.meta.chain, address, null);
       app.chainModuleReady.pipe(first()).subscribe(() => {

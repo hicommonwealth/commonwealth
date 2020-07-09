@@ -1,4 +1,5 @@
-import { IChainAdapter, ChainBase, ChainClass } from 'models';
+import { IChainAdapter, ChainBase, ChainClass, NodeInfo } from 'models';
+import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';
 import NearChain from './chain';
@@ -10,8 +11,11 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public chain: NearChain;
   public accounts: NearAccounts;
 
-  private _loaded: boolean = false;
-  get loaded() { return this._loaded; }
+  constructor(meta: NodeInfo, app: IApp) {
+    super(meta, app);
+    this.chain = new NearChain(this.app);
+    this.accounts = new NearAccounts(this.app);
+  }
 
   public handleEntityUpdate(e): void {
     throw new Error('not implemented');
@@ -19,15 +23,15 @@ export default class Near extends IChainAdapter<NearToken, any> {
 
   public async init() {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
-    this.chain = new NearChain(this.app);
-    this.accounts = new NearAccounts(this.app);
 
     await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
     await this._postModuleLoad();
 
+    this.app.chainModuleReady.next(true);
     this._loaded = true;
   }
+
   public async deinit() {
     this._loaded = false;
     await this.accounts.deinit();

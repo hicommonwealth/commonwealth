@@ -1,15 +1,17 @@
-import { IApp } from 'state';
+import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent, NodeInfo } from 'models';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { IApp } from 'state';
+
 import EdgewareSignaling from './signaling';
 import WebWalletController from '../../app/web_wallet';
 import SubstrateIdentities from '../substrate/identities';
@@ -32,9 +34,6 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly chainEntities = new ChainEntityController();
   public readonly base = ChainBase.Substrate;
   public readonly class = ChainClass.Edgeware;
-
-  private _loaded: boolean = false;
-  get loaded() { return this._loaded; }
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     handleSubstrateEntityUpdate(this, entity, event);

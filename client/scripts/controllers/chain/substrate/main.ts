@@ -25,24 +25,12 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
-  private _loaded: boolean = false;
-  public get loaded() { return this._loaded; }
-
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
   constructor(meta: NodeInfo, app: IApp, _class: ChainClass) {
     super(meta, app);
     this.class = _class;
-  }
-
-  // dispatches event updates to a given entity to the appropriate module
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    handleSubstrateEntityUpdate(this, entity, event);
-  }
-
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
@@ -52,7 +40,15 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
+  }
 
+  // dispatches event updates to a given entity to the appropriate module
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    handleSubstrateEntityUpdate(this, entity, event);
+  }
+
+  public async init() {
+    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
@@ -72,6 +68,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await this._postModuleLoad(this.usingServerChainEntities);
     await this.chain.initEventLoop();
 
+    this.app.chainModuleReady.next(true);
     this._loaded = true;
   }
 

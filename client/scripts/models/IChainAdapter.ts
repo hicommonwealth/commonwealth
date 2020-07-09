@@ -14,12 +14,15 @@ import { Account, NodeInfo, ChainEntity, ChainEvent } from '.';
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
 abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
-  public abstract loaded: boolean;
+  protected _loaded: boolean = false;
+  public get loaded() { return this._loaded; }
+
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
 
+  public deferred: boolean;
   protected _serverLoaded: boolean;
   get serverLoaded() { return this._serverLoaded; }
 

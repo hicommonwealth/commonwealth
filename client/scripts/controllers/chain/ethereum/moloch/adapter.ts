@@ -1,14 +1,15 @@
 import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
+import { setActiveAccount } from 'controllers/app/login';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
-
-import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { MolochEntityKind } from 'events/moloch/types';
-import { setActiveAccount } from 'controllers/app/login';
+import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+import { IApp } from 'state';
+
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
@@ -24,8 +25,13 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
-  private _loaded: boolean = false;
-  get loaded() { return this._loaded; }
+  constructor(meta: NodeInfo, app: IApp) {
+    super(meta, app);
+    this.chain = new EthereumChain(this.app);
+    this.ethAccounts = new EthereumAccounts(this.app);
+    this.accounts = new MolochMembers(this.app);
+    this.governance = new MolochGovernance(this.app);
+  }
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     switch (entity.type) {
@@ -43,11 +49,6 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   public async init() {
     console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
-    this.chain = new EthereumChain(this.app);
-    this.ethAccounts = new EthereumAccounts(this.app);
-    this.accounts = new MolochMembers(this.app);
-    this.governance = new MolochGovernance(this.app);
-
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
@@ -76,6 +77,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.governance.init(api, this.accounts, !this.usingServerChainEntities);
     await this._postModuleLoad(this.usingServerChainEntities);
 
+    this.app.chainModuleReady.next(true);
     this._loaded = true;
   }
 
