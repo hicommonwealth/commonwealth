@@ -14,20 +14,16 @@ module.exports = {
 
     // for each subscription, create relevant associations
     const chains = await queryInterface.sequelize.query(`SELECT * FROM "Chains"`);
-    // console.dir(chains[0].length);
     const chainIds = chains[0].map((c) => c.id);
     const subscriptions = await queryInterface.sequelize.query(`SELECT * FROM "Subscriptions";`);
-    // console.dir(subscriptions[0].length);
     await Promise.all(subscriptions[0].map(async (s) => {
       const { object_id, category_id, id } = s;
-      // console.dir(s);
       const object_id_split = object_id.split(/-|_/); // hyphen or underscore
       const p_object_id = object_id_split[1];
       const entity = object_id_split[0];
       let query;
       switch (category_id)  {
         case 'new-thread-creation': // object_id: "kusama"/"edgeware"
-          // console.dir('new-thread-creation');
           if (chainIds.includes(object_id)) {
             query = `UPDATE "Subscriptions" SET chain_id='${object_id}' WHERE id=${id}`;
           } else {
@@ -38,31 +34,30 @@ module.exports = {
         case 'new-comment-creation':  // object_id: "discussion_123"
           // councilmotion_0x3dd9c8b50b896089ddf9db75d231bd23d6596822ba6d5480697ed0833b64f077
           // referendum_0
-          // console.dir('new-comment-creation');
           if (entity === 'discussion') {
             // query associate OffchainThread
-            query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id}`;
-            await queryInterface.sequelize.query(query);
+            query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id};`;
+            // await queryInterface.sequelize.query(query);
             // associate chain or community
-            // const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)}`);
-            // if (thread[0][0].chain) {
-            //   // query += `UPDATE "Subscriptions" SET chain_id='${thread.chain}' WHERE id=${id};`;
-            // } else if (thread[0][0].community) {
-            //   // query += `UPDATE "Subscriptions" SET community_id='${thread.community}' WHERE id=${id};`;
-            // }
+            const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)};`);
+            if (thread[0].length === 0) break;
+            if (thread[0][0].chain) {
+              query += `UPDATE "Subscriptions" SET chain_id='${thread.chain}' WHERE id=${id};`;
+            } else if (thread[0][0].community) {
+              query += `UPDATE "Subscriptions" SET community_id='${thread.community}' WHERE id=${id};`;
+            }
+            await queryInterface.sequelize.query(query);
           } else if (entity === 'comment') {
             // query associate OffchainComment
             query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(p_object_id)} WHERE id=${id};`;
-            await queryInterface.sequelize.query(query);
             // // associate chain or community
             const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${Number(p_object_id)};`);
             if (comment[0][0].chain) {
-              query = `UPDATE "Subscriptions" SET chain_id='${comment[0][0].chain}' WHERE id=${id};`;
-              await queryInterface.sequelize.query(query);
+              query += `UPDATE "Subscriptions" SET chain_id='${comment[0][0].chain}' WHERE id=${id};`;
             } else if (comment[0][0].community) {
-              query = `UPDATE "Subscriptions" SET community_id='${comment[0][0].community}' WHERE id=${id};`;
-              await queryInterface.sequelize.query(query);
+              query += `UPDATE "Subscriptions" SET community_id='${comment[0][0].community}' WHERE id=${id};`;
             }
+            await queryInterface.sequelize.query(query);
           } else {
           // query associate ChainEntity
           // associate chain
@@ -71,36 +66,39 @@ module.exports = {
           // await queryInterface.sequelize.query(query);
           break;
         case 'new-reaction':  // object_id "comment-923" / "discussion_442" (hyphen or underscore)
-          console.dir('new-reaction');
-          // if (entity === 'discussion') {
-          //   // query associate offchain_thread
-          //   query = `UPDATE "Subscriptions" SET offchain_thread_id=${p_object_id} WHERE id=${id};`;
-          //   // associate chain or community
-          //   const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${p_object_id};`);
-          //   if (thread.chain) {
-          //     query += `UPDATE "Subscriptions" SET chain_id=${thread.chain} WHERE id=${id};`;
-          //   } else if (thread.community) {
-          //     query += `UPDATE "Subscriptions" SET community_id=${thread.community} WHERE id=${id};`;
-          //   }
-          // } else if (entity === 'comment') {
-          //   // query associate offchain_comment
-          //   query = `UPDATE "Subscriptions" SET offchain_comment_id=${p_object_id} WHERE id=${id};`;
-          //   // associate chain or community
-          //   const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${p_object_id};`);
-          //   if (comment.chain) {
-          //     query += `UPDATE "Subscriptions" SET chain_id=${comment.chain} WHERE id=${id};`;
-          //   } else if (comment.community) {
-          //     query += `UPDATE "Subscriptions" SET community_id=${comment.community} WHERE id=${id};`;
-          //   }
-          // } else {
-          //   // There are no new-reaction subscriptions for chain entities in our db
-          // }
-          // await queryInterface.sequelize.query(query);
+          if (entity === 'discussion') {
+            // query associate offchain_thread
+            query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id};`;
+            await queryInterface.sequelize.query(query);
+            // associate chain or community
+            const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)};`);
+            if (thread[0].length === 0) break;
+            if (thread[0][0].chain) {
+              query = `UPDATE "Subscriptions" SET chain_id='${thread[0][0].chain}' WHERE id=${id};`;
+              await queryInterface.sequelize.query(query);
+            } else if (thread[0][0].community) {
+              query = `UPDATE "Subscriptions" SET community_id='${thread[0][0].community}' WHERE id=${id};`;
+              await queryInterface.sequelize.query(query);
+            }
+          } else if (entity === 'comment') {
+            // query associate offchain_comment
+            query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(p_object_id)} WHERE id=${id};`;
+            // // associate chain or community
+            const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${Number(p_object_id)};`);
+            if (comment[0].length === 0) break;
+            if (comment[0][0].chain) {
+              query += `UPDATE "Subscriptions" SET chain_id='${comment[0][0].chain}' WHERE id=${id};`;
+            } else if (comment[0][0].community) {
+              query += `UPDATE "Subscriptions" SET community_id='${comment[0][0].community}' WHERE id=${id};`;
+            }
+            await queryInterface.sequelize.query(query);
+          } else {
+            // There are no new-reaction subscriptions for chain entities in our db
+          }
           break;
         case 'chain-event': // object_id: "edgeware-reward" / "edgeware-treasury-awarded" / "edgeware-treasury-rejected"
-          console.dir('chain-event');
-          // query = `UPDATE "Subscriptions" SET chain_id=${entity} WHERE id=${id};`;
-          // query += `UPDATE "Subscriptions" SET chain_event_type_id=${object_id} WHERE id=${id};`;
+          // query = `UPDATE "Subscriptions" SET chain_id='${entity}' WHERE id=${id};`;
+          // query += `UPDATE "Subscriptions" SET chain_event_type_id='${object_id}' WHERE id=${id};`;
           // await queryInterface.sequelize.query(query);
           break;
         default:
