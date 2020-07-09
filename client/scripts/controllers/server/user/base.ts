@@ -92,8 +92,10 @@ export default class {
   public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
   public setJWT(JWT: string): void { this._setJWT(JWT); }
 
-  public setRoles(roles: RoleInfo[] = []): void {
+  public setRoles(roles = []): void {
     roles.forEach((role) => {
+      role.address = role.Address.address;
+      delete role.Address;
       this._roles.push(role);
     });
   }

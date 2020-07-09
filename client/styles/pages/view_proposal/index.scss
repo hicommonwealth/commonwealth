@@ -175,18 +175,17 @@ $discussion-meta-color: #999;
         margin: 30px 0;
     }
 
-    .proposal-connector,
-    .comment-connector {
-        border-left: 2px solid #f4f4f4;
+    .proposal-content,
+    .ProposalComment {
+        position: relative;
+    }
+    .thread-connector {
         position: absolute;
         top: 48px;
+        bottom: -40px;
+        background: #efefef;
         left: 17px;
-        bottom: -48px;
+        width: 2px;
         z-index: -1;
-    }
-    .ProposalComments.no-active-account .ProposalComment:last-child {
-        .comment-connector {
-            display: none;
-        }
     }
 }

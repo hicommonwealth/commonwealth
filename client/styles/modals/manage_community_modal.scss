@@ -1,43 +1,100 @@
-@import 'client/styles/shared';
-
 .ManageCommunityModal {
-    .form-field {
-        margin: 12px 0;
-    }
-    button {
-        margin: 6px 0;
-    }
-    h3 {
-        font-size: 15px;
-        margin: 10px 0 16px;
-    }
-    .webhook {
-        padding: 12px 16px;
-        margin-bottom: 16px;
-        background: #f8f8f8;
-        border-radius: 5px;
-        width: 400px;
-        overflow-wrap: break-word;
-        @include xs-max {
-            width: initial;
+    width: 800px;
+    .compact-modal-body-max {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        @media (min-width: 800px) {
+            flex-direction: row;
         }
     }
-    .no-webhooks {
-        margin: 16px 0;
-        color: #aaa;
+
+    .cui-table.metadata-management-table {
+        td {
+            padding: 10px 28px 0;
+            border-bottom: none !important;
+        }
+        tr:first-child td {
+            padding-top: 18px;
+        }
     }
-    label {
-        margin-top: 20px;
+    .cui-button.save-changes-button {
+        margin: 24px 28px;
+    }
+    .cui-tabs {
+        margin-top: 2px;
+        border-bottom-color: #eee;
+        > :first-child {
+            margin-left: 15px;
+        }
+    }
+    .ManageRoleRow {
+        padding: 8px 0;
     }
 
-    .error-message {
-        margin: 10px 0;
-        font-weight: 700;
-        color: $error-red;
+    .panel-left {
+        width: 100%;
+        border-right: 1px solid #eee;
+        min-height: 450px;
+        max-height: 600px;
+        overflow-y: scroll;
+
+        @media (min-width: 800px) {
+            width: 60%;
+        }
+        .RoleChild {
+            display: inline-block;
+            padding-right: 6px;
+
+            .role-x-icon {
+                padding-left: 2px;
+            }
+        }
+        .metadata-management-table {
+            table-layout: fixed;
+        }
+        .InputPropertyRow {
+            .title-column {
+                width: 110px;
+            }
+        }
     }
-    .success-message {
-        margin: 10px 0;
-        font-weight: 700;
-        color: $success-green;
+
+    .CommunityMetadataManagementTable {
+        td {
+            padding: 11px 20px;
+        }
+        .cui-button {
+            margin: 16px 28px;
+        }
+        .cui-tabs {
+            margin-top: 4px;
+        }
+    }
+
+    .panel-right {
+        width: 100%;
+        @media (min-width: 800px) {
+            width: 40%;
+        }
+
+        .AdminPanelTabs {
+            .UpgradeRolesForm, .WebhooksForm {
+                padding: 0 20px 10px;
+            }
+            .members-list {
+                min-height: 160px;
+                max-height: 160px;
+                overflow-y: scroll;
+            }
+            .admin-panel-tab-button {
+                margin-top: 20px;
+            }
+            .active-webhooks {
+                min-height: 160px;
+                max-height: 160px;
+                overflow-y: scroll;
+            }
+        }
     }
 }

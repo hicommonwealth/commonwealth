@@ -23,7 +23,11 @@ const formatLastUpdated = (timestamp) => {
   if (formatted.indexOf(' month') !== -1) {
     return timestamp.format('MMM D');
   } else {
-    return formatted.replace(' days', 'd').replace(' hours', 'h');
+    return formatted
+      .replace(' days', 'd')
+      .replace(' day', 'd')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h');
   }
 };
 

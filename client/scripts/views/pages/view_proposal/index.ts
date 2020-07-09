@@ -116,7 +116,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         ]),
       ]),
       proposal instanceof OffchainThread && m('.proposal-content', [
-        m('.proposal-connector'),
+        (commentCount > 0 || app.user.activeAccount) && m('.thread-connector'),
         m('.proposal-content-left', [
           m(ProposalBodyAvatar, { item: proposal }),
         ]),
@@ -194,11 +194,20 @@ interface IProposalCommentAttrs {
   parent: AnyProposal | OffchainComment<any> | OffchainThread;
   proposal: AnyProposal | OffchainThread;
   callback?: Function;
+  isLast: boolean,
 }
 
 const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState> = {
   view: (vnode) => {
-    const { comment, getSetGlobalEditingStatus, getSetGlobalReplyStatus, parent, proposal, callback } = vnode.attrs;
+    const {
+      comment,
+      getSetGlobalEditingStatus,
+      getSetGlobalReplyStatus,
+      parent,
+      proposal,
+      callback,
+      isLast
+    } = vnode.attrs;
     if (!comment) return;
     const parentType = comment.parentComment ? CommentParent.Comment : CommentParent.Proposal;
 
@@ -362,6 +371,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             parent: comment,
             proposal,
             callback: createdCommentCallback,
+            isLast: false, // TODO: implement isLast
           }),
           !!child.childComments.length
             && m('.child-comments-wrap', recursivelyGatherChildComments(child, replyParent2))
@@ -370,7 +380,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     };
 
     const AllComments = (comments, replyParent2) => {
-      return comments.map((comment) => {
+      return comments.map((comment, index) => {
         return ([
           m(ProposalComment, {
             comment,
@@ -379,6 +389,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
             parent: proposal,
             proposal,
             callback: createdCommentCallback,
+            isLast: index === comments.length - 1,
           }),
           // if comment has children, they are fetched & rendered
           !!comment.childComments.length

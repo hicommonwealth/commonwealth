@@ -11,6 +11,9 @@ import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState, S
 import app from 'state';
 import { updateRoute } from 'app';
 import { link, articlize } from 'helpers';
+import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
+
+import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import User from 'views/components/widgets/user';
@@ -18,9 +21,8 @@ import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder'
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 import Subheader from 'views/components/subheader';
-import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
-import { updateLastVisited } from '../../../controllers/app/login';
-// import InlineThreadComposer from '../../components/inline_thread_composer';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
+
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import ChainOrCommunityRoles from './roles';
 import TagCaratMenu from './tag_carat_menu';
@@ -30,7 +32,7 @@ const DiscussionRowHeader = {
     return m('.DiscussionRowHeader', [
       m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
       m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
-      m('.discussion-row-header-col', 'Reactions'),
+      m('.discussion-row-header-col', 'Likes'),
       m('.discussion-row-header-col', 'Activity'),
     ]);
   }
@@ -47,7 +49,22 @@ const CommunitySidebar: m.Component<{ communityName: string, communityDescriptio
         m(Subheader, { text: `About #${tag}` }),
         m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
       ],
-      m(Subheader, { text: `About ${communityName}` }),
+      m(Subheader, {
+        text: `About ${communityName}`,
+        contentRight: [
+          app.user.isRoleOfCommunity({
+            role: 'admin',
+            chain: app.activeChainId(),
+            community: app.activeCommunityId()
+          }) && m(Icon, {
+            name: Icons.SETTINGS,
+            onclick: (e) => {
+              e.preventDefault();
+              app.modals.create({ modal: ManageCommunityModal });
+            }
+          }),
+        ],
+      }),
       m('p', communityDescription),
       m(Subheader, { text: 'Admins & Mods' }),
       m('p', (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods.map((r) => {

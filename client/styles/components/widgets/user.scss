@@ -64,8 +64,8 @@
     span.identity-icon {
         @include identityIcon();
     }
-    a.user-display-name &.anonymous {
-            color: #999;
+    a.user-display-name.verified {
+        color: $theme-base-color !important;
     }
     &.linkified a.user-display-name {
         cursor: pointer;

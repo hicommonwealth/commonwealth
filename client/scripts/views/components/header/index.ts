@@ -8,14 +8,15 @@ import app from 'state';
 import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from './notifications_menu';
-import LoginSelector, { CurrentCommunityLabel } from './login_selector';
+import LoginSelector from './login_selector';
+import CommunitySelector from './community_selector';
 
 const Header: m.Component<{}> = {
   view: (vnode) => {
     return m('.Header', [
       m('.header-content', [
         m('.placeholder', [
-          m(CurrentCommunityLabel),
+          m(CommunitySelector),
         ]),
         // new proposal
         m(NewProposalButton, { fluid: false, dark: true }),

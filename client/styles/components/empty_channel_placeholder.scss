@@ -19,8 +19,11 @@ $size: 46px;
     }
     h1 {
         font-size: 25px;
-        font-weight: 600;
-        margin: 10px 0 0;
+        font-weight: 400;
+        margin: 12px 0 0;
+        strong {
+            font-weight: 600;
+        }
     }
     p {
         margin: 6px 0 0;

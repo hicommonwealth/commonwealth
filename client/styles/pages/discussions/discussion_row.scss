@@ -51,6 +51,9 @@ $discussion-horizontal-padding: 48px;
                         color: darken($standard-light-text, 8%);
                         text-decoration: underline;
                     }
+                    a.user-display-name {
+                        color: $theme-base-color;
+                    }
                 }
                 .discussion-link {
                     display: inline;

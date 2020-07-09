@@ -2,23 +2,52 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
+import dragula from 'dragula';
+import { List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
-import AdminPanel from 'views/components/admin_panel';
+import NewTagModal from 'views/modals/new_tag_modal';
+import EditTagModal from 'views/modals/edit_tag_modal';
 
-const TagListings: m.Component<{}, {}> = {
+const TagListings: m.Component<{}, { dragulaInitialized: boolean }> = {
   view: (vnode) => {
     const featuredTags = {};
     const otherTags = {};
     const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
 
-    const getTagRow = (name, id) => m(ListItem, {
+    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
+
+    const getTagRow = (id, name, description) => m(ListItem, {
       key: id,
       contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
-      label: name.toLowerCase(),
+      contentRight: [
+        m(PopoverMenu, {
+          class: 'sidebar-edit-tag',
+          position: 'bottom',
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          closeOnContentClick: true,
+          trigger: m(Icon, {
+            name: Icons.CHEVRON_DOWN,
+          }),
+          content: m(MenuItem, {
+            label: 'Edit channel',
+            onclick: (e) => {
+              app.modals.create({
+                modal: EditTagModal,
+                data: {
+                  description,
+                  id,
+                  name,
+                }
+              });
+            }
+          })
+        }),
+      ],
+      label: name,
       selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
       onclick: (e) => {
         e.preventDefault();
@@ -27,23 +56,66 @@ const TagListings: m.Component<{}, {}> = {
     });
 
     app.tags.getByCommunity(app.activeId()).forEach((tag) => {
-      const { id, name } = tag;
+      const { id, name, description } = tag;
       if (featuredTagIds.includes(`${tag.id}`)) {
-        featuredTags[tag.name] = { id, name, featured_order: featuredTagIds.indexOf(`${id}`) };
+        featuredTags[tag.name] = { id, name, description, featured_order: featuredTagIds.indexOf(`${id}`) };
       } else {
-        otherTags[tag.name] = { id, name };
+        otherTags[tag.name] = { id, name, description };
       }
     });
-    const otherTagListing = Object.keys(otherTags)
+    const otherTagListItems = Object.keys(otherTags)
       .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
-      .map((name, idx) => getTagRow(name, otherTags[name].id));
-    const featuredTagListing = Object.keys(featuredTags)
+      .map((name, idx) => getTagRow(otherTags[name].id, name, otherTags[name].description));
+    const featuredTagListItems = Object.keys(featuredTags)
       .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
-      .map((name, idx) => getTagRow(name, featuredTags[name].id));
+      .map((name, idx) => getTagRow(featuredTags[name].id, name, featuredTags[name].description));
 
     return [
-      m(List, featuredTagListing),
-      otherTagListing.length > 0 && m(List, { class: 'more-tags-list' }, otherTagListing),
+      m(List, { interactive: true }, [
+        m(ListItem, {
+          active: onDiscussionsPage(m.route.get()),
+          label: 'Home',
+          onclick: (e) => m.route.set(`/${app.activeId()}`),
+          contentRight: [
+            app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+              && m(PopoverMenu, {
+                class: 'sidebar-add-tag',
+                position: 'bottom',
+                transitionDuration: 0,
+                hoverCloseDelay: 0,
+                closeOnContentClick: true,
+                trigger: m(Icon, {
+                  class: 'discussions-home',
+                  name: Icons.PLUS_CIRCLE,
+                }),
+                content: m(MenuItem, {
+                  label: 'New channel',
+                  onclick: (e) => {
+                    e.preventDefault();
+                    app.modals.create({ modal: NewTagModal });
+                  }
+                }),
+              }),
+          ],
+        }),
+      ]),
+      m(List, {
+        class: 'featured-tags-list',
+        interactive: true,
+        onupdate: (vnode2) => {
+          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+              && !vnode.state.dragulaInitialized) {
+            vnode.state.dragulaInitialized = true;
+            dragula([vnode2.dom]).on('drop', async (el, target, source) => {
+              const reorder = Array.from(source.children).map((child) => {
+                return (child as HTMLElement).id;
+              });
+              await app.community.meta.updateFeaturedTags(reorder);
+            });
+          }
+        }
+      }, featuredTagListItems),
+      m(List, { class: 'more-tags-list' }, otherTagListItems),
     ];
   }
 };
@@ -84,7 +156,6 @@ const Sidebar: m.Component<{ activeTag: string }> = {
     const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as any)?.shares?.gtn(0);
 
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
     const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
     const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
     const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
@@ -121,14 +192,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
       ]),
     ] : [
       // discussions
-      m(List, { interactive: true }, [
-        m(ListItem, {
-          active: onDiscussionsPage(m.route.get()),
-          label: 'Home',
-          onclick: (e) => m.route.set(`/${app.activeId()}`),
-        }),
-        m(TagListings),
-      ]),
+      m(TagListings),
       // proposals
       hasProposals
         && m(List, { interactive: true }, [
@@ -185,31 +249,6 @@ const Sidebar: m.Component<{ activeTag: string }> = {
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
         ]),
-      // manage
-      m(List, { interactive: true }, [
-        m(ListItem, {
-          active: onMembersPage(m.route.get()),
-          label: 'Members',
-          onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
-        }),
-        m(ListItem, {
-          class: 'TagRow',
-          active: m.route.get() === `/${app.activeId()}/tags/`,
-          label: 'Tags',
-          onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
-        }),
-        app.user.isRoleOfCommunity({
-          role: 'admin',
-          chain: app.activeChainId(),
-          community: app.activeCommunityId()
-        }) && m(AdminPanel),
-      ]),
-      // // chat (all communities)
-      // m(ListItem, {
-      //   active: onChatPage(m.route.get()),
-      //   label: 'Chat',
-      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      // }),
     ]);
   },
 };

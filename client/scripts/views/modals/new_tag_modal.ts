@@ -1,48 +1,91 @@
 import 'modals/new_tag_modal.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import app from 'state';
-import { Button, Input, Form, FormLabel, FormGroup } from 'construct-ui';
+import $ from 'jquery';
+import { Button } from 'construct-ui';
 
-const NewTagModal = {
-  confirmExit: async () => true,
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import { CompactModalExitButton } from 'views/modal';
+import { TextInputFormField, CheckboxFormField, TextareaFormField } from 'views/components/forms';
+
+interface INewTagModalForm {
+  description: string,
+  id: number,
+  name: string,
+}
+
+const NewTagModal: m.Component<{
+  description: string,
+  id: number,
+  name: string,
+}, {
+  error: any,
+  form: INewTagModalForm,
+  saving: boolean,
+}> = {
   view: (vnode) => {
+    if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
+    const { id, description, name } = vnode.attrs;
+    if (!vnode.state.form) {
+      vnode.state.form = { description, id, name };
+    }
+
     return m('.NewTagModal', [
-      m(Form, { class: 'compact-modal-body' }, [
-        m(FormGroup, [
-          m(FormLabel, 'Tag name'),
-          m(Input, { class: 'new-tag-name', autofocus: true }),
-        ]),
-        m(FormGroup, [
-          m(FormLabel, 'Description'),
-          m(Input, { class: 'new-tag-description', autofocus: true }),
-        ]),
-        m(FormGroup, [
-          m(Button, {
-            label: 'Create tag',
-            type: 'submit',
-            intent: 'primary',
-            onclick: (e) => {
-              e.preventDefault();
-              const $parent = $(vnode.dom).closest('.NewTagModal');
-              const name = $parent.find('.new-tag-name input').val().toString();
-              const description = $parent.find('.new-tag-description input').val().toString();
-              if (!name.trim()) return;
-              app.tags.add(name, description).then(() => { m.redraw(); });
-              $(vnode.dom).trigger('modalexit');
-            }
+      m('.compact-modal-title', [
+        m('h3', 'New channel'),
+        m(CompactModalExitButton),
+      ]),
+      m('.compact-modal-body', [
+        m('.metadata', [
+          m(TextInputFormField, {
+            title: 'Name',
+            options: {
+              class: 'tag-form-name',
+              tabindex: 1,
+              value: vnode.state?.form?.name,
+            },
+            callback: (value) => {
+              vnode.state.form.name = value;
+            },
           }),
-          m(Button, {
-            label: 'Cancel',
-            intent: 'none',
-            onclick: (e) => {
-              e.preventDefault();
-              $(vnode.dom).trigger('modalexit');
+          m(TextareaFormField, {
+            title: 'Description',
+            options: {
+              class: 'tag-form-description',
+              tabindex: 2,
+              value: vnode.state.form.description,
+            },
+            callback: (value) => {
+              vnode.state.form.description = value;
             }
           }),
         ]),
       ]),
+      m('.compact-modal-actions', [
+        m('.buttons', [
+          m(Button, {
+            intent: 'primary',
+            class: vnode.state.saving ? 'disabled' : '',
+            onclick: async (e) => {
+              e.preventDefault();
+              const { name, description } = vnode.state.form;
+              if (!name.trim()) return;
+              app.tags.add(name, description).then(() => {
+                vnode.state.saving = false;
+                m.redraw();
+                $(e.target).trigger('modalexit');
+              }).catch(() => {
+                vnode.state.error = 'Error creating channel';
+                vnode.state.saving = false;
+                m.redraw();
+              });
+            },
+            label: 'Create channel',
+          }),
+        ]),
+        vnode.state.error && m('.error-message', vnode.state.error),
+      ])
     ]);
   }
 };

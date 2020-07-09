@@ -22,7 +22,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
     if (app.community) {
       return m(Button, {
         class: dark ? 'NewProposalButton cui-button-dark' : 'NewProposalButton',
-        label: 'New post',
+        label: 'New thread',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
@@ -36,7 +36,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
         class: dark ? 'cui-button-dark' : '',
         disabled: !activeAccount,
         intent: 'primary',
-        label: 'New post',
+        label: 'New thread',
         fluid,
         size: 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
@@ -60,7 +60,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
         content: [
           m(MenuItem, {
             onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
-            label: 'New post',
+            label: 'New thread',
           }),
           (app.chain.base === ChainBase.CosmosSDK || app.chain.base === ChainBase.Substrate)
             && m(MenuDivider),
