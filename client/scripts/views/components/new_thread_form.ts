@@ -4,7 +4,10 @@ import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
-import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem } from 'construct-ui';
+import {
+  Tabs, TabItem, Form, FormGroup, Input, Button,
+  ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem
+} from 'construct-ui';
 
 import app from 'state';
 import QuillEditor from 'views/components/quill_editor';
@@ -15,19 +18,6 @@ import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 import { confirmationModalWithText } from '../modals/confirm_modal';
 import { notifySuccess } from '../../controllers/app/notifications';
-
-interface IState {
-  activeTag: OffchainTag | string,
-  autoTitleOverride,
-  error,
-  form: IThreadForm,
-  fromDraft?: number,
-  hasComment: boolean,
-  newType: string,
-  quillEditorState,
-  saving: boolean,
-  uploadsInProgress: number,
-}
 
 interface IThreadForm {
   tagName?: string;
@@ -138,8 +128,21 @@ export const cancelDraft = async (state) => {
   m.redraw();
 };
 
-export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, IState> = {
-  view: (vnode: VnodeDOM<{ header: boolean, isModal: boolean }, IState>) => {
+export const NewThreadForm: m.Component<{
+  header: boolean,
+  isModal: boolean
+}, {
+  activeTag: OffchainTag | string,
+  autoTitleOverride,
+  error,
+  form: IThreadForm,
+  fromDraft?: number,
+  newType: string,
+  quillEditorState,
+  saving: boolean,
+  uploadsInProgress: number,
+}> = {
+  view: (vnode) => {
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
@@ -163,30 +166,30 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     }, 750);
 
     const typeSelector = m(FormGroup, [
-      m(ButtonGroup, { fluid: true, outlined: true }, [
-        m(Button, {
-          iconLeft: Icons.FEATHER,
+      m(Tabs, {
+        align: 'left',
+        bordered: true,
+        fluid: true,
+      }, [
+        m(TabItem, {
           label: 'Discussion',
-          onclick: () => {
+          onclick: (e) => {
             vnode.state.newType = 'Discussion';
           },
           active: vnode.state.newType === 'Discussion',
-          intent: vnode.state.newType === 'Discussion' ? 'primary' : 'none',
         }),
-        m(Button, {
-          iconLeft: Icons.LINK,
+        m(TabItem, {
           label: 'Link',
-          onclick: () => {
+          onclick: (e) => {
             vnode.state.newType = 'Link';
           },
           active: vnode.state.newType === 'Link',
-          intent: vnode.state.newType === 'Link' ? 'primary' : 'none',
         }),
       ]),
     ]);
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
+    const { newType, saving, uploadsInProgress } = vnode.state;
 
     return m('.NewThreadForm', {
       oncreate: (vvnode) => {
@@ -195,7 +198,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
     }, [
       m('.new-thread-form-body', [
         vnode.attrs.header
-        && m('h2.page-title', 'New Post'),
+        && m('h2.page-title', 'New Thread'),
         vnode.state.newType === 'Link'
         && m(Form, [
           typeSelector,
@@ -224,7 +227,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             }),
           ]),
           m(FormGroup, [
-            vnode.state.hasComment ? m(QuillEditor, {
+            m(QuillEditor, {
               contentsDoc: '', // Prevent the editor from being filled in with previous content
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
@@ -232,11 +235,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
               tabindex: 3,
-            }) : m('a.add-comment', {
-              href: '#',
-              onclick: (e) => { vnode.state.hasComment = true; },
-              tabindex: 2,
-            }, 'Add comment'),
+            })
           ]),
           m(FormGroup, [
             m(AutoCompleteTagForm, {
@@ -261,7 +260,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               intent: 'primary',
               label: 'Create link',
               name: 'submit',
-              onclick: () => {
+              onclick: (e) => {
                 if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                   vnode.state.error.url = 'Must provide a valid URL.';
                 }
@@ -269,9 +268,9 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   newLink(vnode.state.form, vnode.state.quillEditorState, author);
                 }
                 if (vnode.attrs.isModal && !vnode.state.error) {
-                  $(vnode.dom).trigger('modalcomplete');
+                  $(e.target).trigger('modalcomplete');
                   setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
+                    $(e.target).trigger('modalexit');
                   }, 0);
                 }
               },
@@ -332,7 +331,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
               intent: 'primary',
-              onclick: async () => {
+              onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.error = await newThread(form, quillEditorState, author);
@@ -342,7 +341,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
                   setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
+                    $(e.target).trigger('modalexit');
                   }, 0);
                 }
               },
@@ -355,7 +354,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
               intent: 'none',
-              onclick: () => {
+              onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
                 try {
                   vnode.state.saving = true;
@@ -364,7 +363,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   if (vnode.attrs.isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
                     setTimeout(() => {
-                      $(vnode.dom).trigger('modalexit');
+                      $(e.target).trigger('modalexit');
                     }, 0);
                   } else if (!vnode.state.error?.draft) {
                     m.route.set(`/${app.activeId()}`);
