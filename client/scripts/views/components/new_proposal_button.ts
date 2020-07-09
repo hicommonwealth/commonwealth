@@ -9,10 +9,10 @@ import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 
-const NewProposalButton: m.Component<{ fluid: boolean }> = {
+const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
   view: (vnode) => {
+    const { fluid, dark } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
-    const fluid = !!vnode.attrs.fluid;
 
     if (!app.isLoggedIn()) return;
     if (!app.chain && !app.community) return;
@@ -21,8 +21,8 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
     // just a button for communities, or chains without governance
     if (app.community) {
       return m(Button, {
-        class: 'NewProposalButton',
-        label: 'New post',
+        class: dark ? 'NewProposalButton cui-button-dark' : 'NewProposalButton',
+        label: 'New thread',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
@@ -33,9 +33,10 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
 
     const ProposalButtonGroup = m(ButtonGroup, [
       m(Button, {
+        class: dark ? 'cui-button-dark' : '',
         disabled: !activeAccount,
         intent: 'primary',
-        label: 'New post',
+        label: 'New thread',
         fluid,
         size: 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
@@ -45,6 +46,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         transitionDuration: 0,
         hoverCloseDelay: 0,
         trigger: m(Button, {
+          class: dark ? 'cui-button-dark' : '',
           disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
@@ -58,7 +60,7 @@ const NewProposalButton: m.Component<{ fluid: boolean }> = {
         content: [
           m(MenuItem, {
             onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
-            label: 'New post',
+            label: 'New thread',
           }),
           (app.chain.base === ChainBase.CosmosSDK || app.chain.base === ChainBase.Substrate)
             && m(MenuDivider),

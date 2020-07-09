@@ -14,6 +14,10 @@ enum NewThreadErrors {
   NoUrl = 'URL cannot be blank',
 }
 
+enum NewDraftErrors {
+  InsufficientData = 'Draft must have a title, body, or attachment'
+}
+
 export const formDataIncomplete = (state) : string => {
   if (!state.form.title) return NewThreadErrors.NoTitle;
   if (!state.form.tag) return NewThreadErrors.NoTag;
@@ -39,6 +43,62 @@ export const parseMentionsForServer = (text, isMarkdown) => {
         const refIdx = chunks.indexOf('account');
         return [chunks[refIdx - 1], chunks[refIdx + 1]];
       });
+  }
+};
+
+export const saveDraft = (
+  form,
+  quillEditorState,
+  author,
+  existingDraft?
+) => {
+  const bodyText = !quillEditorState ? ''
+    : quillEditorState.markdownMode
+      ? quillEditorState.editor.getText()
+      : JSON.stringify(quillEditorState.editor.getContents());
+  const { title, tagName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !title) {
+    return ({ draft: NewDraftErrors.InsufficientData });
+  }
+  const attachments = [];
+  if (existingDraft) {
+    (async () => {
+      let result;
+      try {
+        result = await app.user.discussionDrafts.edit(
+          existingDraft,
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+      }
+      mixpanel.track('Update discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
+  } else {
+    (async () => {
+      let result;
+      try {
+        result = await app.user.discussionDrafts.create(
+          title,
+          bodyText,
+          tagName,
+          attachments
+        );
+      } catch (e) {
+        console.error(e);
+        return ({ draft: e });
+      }
+      mixpanel.track('Save discussion draft', {
+        'Step No': 2,
+        Step: 'Filled in Proposal and Discussion',
+      });
+    })();
   }
 };
 

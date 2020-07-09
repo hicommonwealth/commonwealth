@@ -9,9 +9,9 @@ import { Button } from 'construct-ui';
 import app from 'state';
 import { RolePermission } from 'models';
 import User from 'views/components/widgets/user';
-import CreateInviteModal from '../../modals/create_invite_modal';
-import UpgradeMemberModal from '../../modals/upgrade_member_modal';
-import ManageCommunityModal from '../../modals/manage_community_modal';
+import CreateInviteModal from 'views/modals/create_invite_modal';
+import UpgradeMemberModal from 'views/modals/upgrade_member_modal';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission) return a.Address.address.localeCompare(b.Address.address);

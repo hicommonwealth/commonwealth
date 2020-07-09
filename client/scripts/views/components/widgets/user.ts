@@ -28,6 +28,7 @@ interface IState {
 
 const User : m.Component<IAttrs, IState> = {
   view: (vnode) => {
+    // TODO: Fix showRole logic to fetch the role from chain
     const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
@@ -64,12 +65,12 @@ const User : m.Component<IAttrs, IState> = {
       profile = app.profiles.getProfile(account.chain.id, account.address);
       role = app.user.isAdminOrMod({ account });
     }
-    const roleTag = role ? m(Tag, {
-      class: 'roleTag',
-      label: role.permission,
-      rounded: true,
-      size: 'sm',
-    }) : null;
+    // const roleTag = role ? m(Tag, {
+    //   class: 'roleTag',
+    //   label: role.permission,
+    //   rounded: true,
+    //   size: 'sm',
+    // }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -89,7 +90,7 @@ const User : m.Component<IAttrs, IState> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
           // substrate name
           ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
@@ -100,7 +101,7 @@ const User : m.Component<IAttrs, IState> = {
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
-        showRole && roleTag,
+        // showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -115,7 +116,7 @@ const User : m.Component<IAttrs, IState> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget)
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
@@ -123,7 +124,7 @@ const User : m.Component<IAttrs, IState> = {
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
-      roleTag,
+      // roleTag,
     ]);
 
     return tooltip

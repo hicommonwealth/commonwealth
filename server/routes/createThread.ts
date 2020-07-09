@@ -67,7 +67,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
 
   const threadContent = community ? {
     community: community.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     version_history: versionHistory,
@@ -77,7 +77,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     read_only: readOnly,
   } : {
     chain: chain.id,
-    author_id: author.id,
+    address_id: author.id,
     title,
     body,
     version_history: versionHistory,
@@ -115,7 +115,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(err));
   }
 
-  // To-do: attachments can likely be handled like tags & mentions (see lines 11-14)
+  // TODO: attachments can likely be handled like tags & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({

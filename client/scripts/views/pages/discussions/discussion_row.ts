@@ -9,6 +9,7 @@ import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, OffchainTag, AddressInfo } from 'models';
+import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
@@ -18,7 +19,16 @@ import ThreadCaratMenu from './thread_carat_menu';
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
   if (timestamp.isBefore(moment().subtract(30, 'days'))) return timestamp.format('MMM D');
-  return timestamp.fromNow();
+  const formatted = timestamp.fromNow(true);
+  if (formatted.indexOf(' month') !== -1) {
+    return timestamp.format('MMM D');
+  } else {
+    return formatted
+      .replace(' days', 'd')
+      .replace(' day', 'd')
+      .replace(' hours', 'h')
+      .replace(' hour', 'h');
+  }
 };
 
 const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boolean }> = {
@@ -39,15 +49,32 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       }
     };
 
-    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-` +
-      `${slugify(proposal.title)}`;
+    const tagColor = '#72b483';
+
+    const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
+      + `${slugify(proposal.title)}`;
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
       m('.discussion-row', [
         m('.discussion-top', [
           m('.discussion-top-left', [
-            m('.discussion-title', link('a', discussionLink, proposal.title)),
+            m('.discussion-title', [
+              (propType === OffchainThreadKind.Link && proposal.url)
+                ? externalLink(
+                  'a.discussion-link',
+                  proposal.url,
+                  [ proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
+                )
+                : link('a', discussionLink, proposal.title),
+            ]),
             m('.discussion-meta', [
+              proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
+                m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+                m('span.proposal-tag-name', `${proposal.tag.name}`),
+              ]),
+              (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
+                `Link: ${extractDomain(proposal.url)}`
+              ]),
               m(User, {
                 user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
                 linkify: true,
@@ -55,72 +82,27 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 showRole: true,
                 hideAvatar: true,
               }),
-              m('.discussion-last-updated', formatLastUpdated(lastUpdated)),
-              proposal.tag && m(Tag, {
-                rounded: true,
-                intent: 'none',
-                label: proposal.tag.name,
-                size: 'xs',
-                onclick: (e) => m.route.set(`/${app.activeId()}/discussions/${proposal.tag.name}`),
-              }),
+              m(ThreadCaratMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [
-            m(ThreadCaratMenu, { proposal }),
-          ]),
-        ]),
-        m('.discussion-content', [
-          propType === OffchainThreadKind.Forum
-            && (proposal as OffchainThread).body
-            && m('.discussion-excerpt', [
-              (() => {
-                const body = (proposal as OffchainThread).body;
-                try {
-                  const doc = JSON.parse(body);
-                  return m(QuillFormattedText, {
-                    doc,
-                    collapse: !vnode.state.expanded,
-                    hideFormatting: true,
+            m('.discussion-commenters', [
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal)
+                .map(([chain, address]) => {
+                  return m(User, {
+                    user: new AddressInfo(null, address, chain, null),
+                    avatarOnly: true,
+                    tooltip: true,
+                    avatarSize: 24,
                   });
-                } catch (e) {
-                  return m(MarkdownFormattedText, {
-                    doc: body,
-                    collapse: !vnode.state.expanded,
-                    hideFormatting: true,
-                  });
-                }
-              })(),
-              !vnode.state.expanded && m('a', {
-                href: '#',
-                onclick: (e) => {
-                  e.preventDefault();
-                  vnode.state.expanded = true;
-                }
-              }, 'See more'),
+                })),
             ]),
-          propType === OffchainThreadKind.Link
-            && proposal.url
-            && externalLink('a.discussion-link', proposal.url, [
-              extractDomain(proposal.url),
-              m.trust(' &rarr;'),
+            m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true }),
+            m('.discussion-last-updated', {
+              class: lastUpdated.isBefore(moment().subtract(365, 'days')) ? 'older' : '',
+            }, [
+              link('a', discussionLink, formatLastUpdated(lastUpdated)),
             ]),
-        ]),
-        m('.discussion-bottom', [
-          m('.discussion-commenters', app.comments.nComments(proposal) > 0 ? [
-            m('.commenters-avatars', app.comments.uniqueCommenters(proposal).map(([chain, address]) => {
-              return m(User, { user: new AddressInfo(null, address, chain, null), avatarOnly: true, tooltip: true, avatarSize: 20 });
-            })),
-            link(
-              'a.commenters-label',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-              pluralize(app.comments.nComments(proposal), 'reply'),
-            ),
-          ] : [
-            link(
-              'a.no-commenters-label',
-              `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`,
-              'No replies',
-            ),
           ]),
         ]),
       ]),
