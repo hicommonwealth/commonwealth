@@ -52,6 +52,7 @@ module.exports = {
             query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(p_object_id)} WHERE id=${id};`;
             // // associate chain or community
             const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${Number(p_object_id)};`);
+            if (comment[0].length === 0) break;
             if (comment[0][0].chain) {
               query += `UPDATE "Subscriptions" SET chain_id='${comment[0][0].chain}' WHERE id=${id};`;
             } else if (comment[0][0].community) {
@@ -68,21 +69,19 @@ module.exports = {
           if (entity === 'discussion') {
             // associate offchain_thread
             query = `UPDATE "Subscriptions" SET offchain_thread_id=${Number(p_object_id)} WHERE id=${id};`;
-            await queryInterface.sequelize.query(query);
             // associate chain or community
             const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)};`);
             if (thread[0].length === 0) break;
             if (thread[0][0].chain) {
               query = `UPDATE "Subscriptions" SET chain_id='${thread[0][0].chain}' WHERE id=${id};`;
-              await queryInterface.sequelize.query(query);
             } else if (thread[0][0].community) {
               query = `UPDATE "Subscriptions" SET community_id='${thread[0][0].community}' WHERE id=${id};`;
-              await queryInterface.sequelize.query(query);
             }
+            await queryInterface.sequelize.query(query);
           } else if (entity === 'comment') {
             // associate offchain_comment
             query = `UPDATE "Subscriptions" SET offchain_comment_id=${Number(p_object_id)} WHERE id=${id};`;
-            // // associate chain or community
+            // associate chain or community
             const comment = await queryInterface.sequelize.query(`SELECT * FROM "OffchainComments" WHERE id=${Number(p_object_id)};`);
             if (comment[0].length === 0) break;
             if (comment[0][0].chain) {
@@ -109,12 +108,12 @@ module.exports = {
 
   down: async (queryInterface, DataTypes) => {
     await Promise.all([
-      queryInterface.removeColumn('Subscriptions', 'chain_id', { type: DataTypes.STRING, allowNull: true }),
-      queryInterface.removeColumn('Subscriptions', 'community_id', { type: DataTypes.STRING, allowNull: true }),
-      queryInterface.removeColumn('Subscriptions', 'offchain_thread_id', { type: DataTypes.INTEGER, allowNull: true }),
-      queryInterface.removeColumn('Subscriptions', 'offchain_comment_id', { type: DataTypes.INTEGER, allowNull: true }),
-      queryInterface.removeColumn('Subscriptions', 'chain_event_type_id', { type: DataTypes.STRING, allowNull: true }),
-      queryInterface.removeColumn('Subscriptions', 'chain_entity_id', { type: DataTypes.STRING, allowNull: true }),
+      queryInterface.removeColumn('Subscriptions', 'chain_id'),
+      queryInterface.removeColumn('Subscriptions', 'community_id'),
+      queryInterface.removeColumn('Subscriptions', 'offchain_thread_id'),
+      queryInterface.removeColumn('Subscriptions', 'offchain_comment_id'),
+      queryInterface.removeColumn('Subscriptions', 'chain_event_type_id'),
+      queryInterface.removeColumn('Subscriptions', 'chain_entity_id'),
     ]);
   }
 };
