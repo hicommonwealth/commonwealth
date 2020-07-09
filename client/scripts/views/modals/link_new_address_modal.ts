@@ -219,8 +219,6 @@ const LinkNewAddressModal = {
           ]),
         ]),
       ]);
-    } else if (!app.chain.loaded) {
-      // if we have selected a chain but it isn't loaded, then force it to load
     }
 
     if (vnode.state.step === undefined) {

@@ -47,12 +47,10 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     }
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url} at address ${this.meta.address}`);
+  public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    await this.chain.initEventLoop();
     await this.webWallet.enable();
 
     const activeAddress: string = this.webWallet.accounts && this.webWallet.accounts[0];
@@ -74,14 +72,17 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     });
 
     await this.accounts.init(api, this.chain, this.ethAccounts);
-    await this.governance.init(api, this.accounts, !this.usingServerChainEntities);
-    await this._postModuleLoad(this.usingServerChainEntities);
+    await super.initApi();
+  }
 
-    this.app.chainModuleReady.next(true);
-    this._loaded = true;
+  public async initData() {
+    await this.chain.initEventLoop();
+    await this.governance.init(this.accounts.api, this.accounts, !this.usingServerChainEntities);
+    await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit() {
+    await super.deinit();
     this.governance.deinit();
     this.ethAccounts.deinit();
     this.accounts.deinit();
@@ -89,7 +90,5 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
     console.log('Ethereum/Moloch stopped.');
-
-    return Promise.resolve();
   }
 }

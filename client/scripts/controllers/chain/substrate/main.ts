@@ -47,12 +47,14 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     handleSubstrateEntityUpdate(this, entity, event);
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await super.initApi();
+  }
 
+  public async initData() {
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
@@ -65,15 +67,12 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     if (!this.usingServerChainEntities) {
       await this.chain.initChainEntities();
     }
-    await this._postModuleLoad(this.usingServerChainEntities);
     await this.chain.initEventLoop();
-
-    this.app.chainModuleReady.next(true);
-    this._loaded = true;
+    await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit(): Promise<void> {
-    this._loaded = false;
+    await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

@@ -52,8 +52,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.signaling = new EdgewareSignaling(this.app);
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  public async initApi() {
     const edgTypes = Object.values(edgewareDefinitions)
       .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
     await this.chain.resetApi(this.meta, {
@@ -75,6 +74,10 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     });
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await super.initApi();
+  }
+
+  public async initData() {
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts, 'elections'),
       this.council.init(this.chain, this.accounts),
@@ -87,16 +90,14 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     if (!this.usingServerChainEntities) {
       await this.chain.initChainEntities();
     }
-    await this._postModuleLoad(this.usingServerChainEntities);
-    this.chain.initEventLoop();
 
-    this.app.chainModuleReady.next(true);
-    this._loaded = true;
+    // TODO: Verify that re-ordering this is OK -- we can move the event loop up
+    this.chain.initEventLoop();
+    await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit(): Promise<void> {
-    this._loaded = false;
-    // this.server.proposals.deinit();
+    await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

@@ -12,10 +12,6 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public readonly base = ChainBase.CosmosSDK;
   public readonly class = ChainClass.CosmosHub;
 
-  public handleEntityUpdate(e): void {
-    throw new Error('not implemented');
-  }
-
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new CosmosChain(this.app);
@@ -23,17 +19,19 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     this.governance = new CosmosGovernance(this.app);
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  public async initApi() {
     await this.chain.init(this.meta);
     await this.accounts.init(this.chain);
+    await super.initApi();
+  }
+
+  public async initData() {
     await this.governance.init(this.chain, this.accounts);
-    await this._postModuleLoad();
-    this._loaded = true;
+    await super.initData();
   }
 
   public async deinit(): Promise<void> {
-    this._loaded = false;
+    await super.deinit();
     await this.governance.deinit();
     await this.accounts.deinit();
     await this.chain.deinit();

@@ -18,23 +18,16 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public accounts: EthereumAccounts;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
 
-  public handleEntityUpdate(e): void {
-    throw new Error('not implemented');
-  }
-
   constructor(meta: NodeInfo, app: IApp) {
     super(meta, app);
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
   }
 
-  public async init() {
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
+  public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    await this._postModuleLoad();
-    await this.chain.initEventLoop();
 
     if (this.webWallet) {
       await this.webWallet.enable();
@@ -43,20 +36,16 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
         setActiveAccount(updatedAddress);
       });
     }
-
-    this._loaded = true;
+    await this.chain.initEventLoop();
+    await super.initApi();
   }
 
   public async deinit() {
-    this._loaded = false;
+    await super.deinit();
     this.accounts.deinit();
     this.chain.deinitMetadata();
     this.chain.deinitEventLoop();
     this.chain.deinitApi();
-
-    console.log('Ethereum stopped.');
-
-    return Promise.resolve();
   }
 
   public async getEthersProvider() {

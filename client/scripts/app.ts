@@ -211,6 +211,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   // Load server data without initializing modules/chain connection.
   await app.chain.initServer();
 
+  // Load basic API data immediately (connected/disconnected, etc)
+  await app.chain.initApi();
+
   // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
 
@@ -235,7 +238,7 @@ export async function initChain(): Promise<void> {
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
   app.chain.deferred = false;
   const n = app.chain.meta;
-  await app.chain.init();
+  await app.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.next(true);

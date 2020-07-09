@@ -160,10 +160,9 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
     this.store.clear();
   }
 
-  public init(ChainInfo: SubstrateChain): Promise<void> {
+  public async init(ChainInfo: SubstrateChain): Promise<void> {
     this._Chain = ChainInfo;
     this._initialized = true;
-    return Promise.resolve();
   }
 }
 
