@@ -56,8 +56,7 @@ describe('Subscriptions Tests', () => {
         tagName: 't',
         tagId: undefined
       });
-
-      const object_id = res.result.id;
+      const object_id = `discussion_${res.result.id}`;
       const is_active = true;
       const category = NotificationCategories.NewComment;
       res = await chai.request(app)

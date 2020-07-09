@@ -35,7 +35,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       }
       break;
     }
-    case 'new-comment-creation' || 'new-reaction':
+    case 'new-comment-creation' || 'new-reaction': {
+      console.dir(p_entity);
       if (p_entity === 'discussion') {
         const thread = await models.OffchainThread.findOne({ where: { id: Number(p_id), } });
         if (!thread) return next(new Error(Errors.NoThread));
@@ -56,6 +57,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
         return next(new Error(Errors.NoCommentOrReactionEntity));
       }
       break;
+    }
     case 'new-mention':
       return next(new Error(Errors.NoMentions));
     case 'chain-event':
@@ -64,7 +66,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     default:
       return next(new Error(Errors.InvalidNotificationCategory));
   }
-  console.dir(obj);
 
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,
