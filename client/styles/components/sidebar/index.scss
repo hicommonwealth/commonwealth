@@ -34,7 +34,7 @@ $active-color: #ececec;
                 }
             }
             &:hover {
-                background: lighten($active-color, 3%);
+                background: desaturate(lighten($theme-base-color, 29%), 24%);
                 .cui-icon svg {
                     opacity: 1;
                 }
@@ -44,14 +44,14 @@ $active-color: #ececec;
             }
             &.cui-selected,
             &.cui-active {
-                background: desaturate(lighten($theme-base-color, 29%), 24%);
-                color: desaturate(darken($theme-base-color, 4%), 24%);
+                background: $theme-base-color;
+                color: #fff;
                 border-radius: 3px;
                 .cui-icon svg {
-                    stroke: desaturate(lighten($theme-base-color, 7%), 24%);
+                    stroke: #fff;
                 }
                 .cui-icon svg:hover {
-                    stroke: desaturate(darken($theme-base-color, 4%), 24%);
+                    stroke: #fff;
                 }
             }
 
