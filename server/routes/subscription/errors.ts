@@ -12,6 +12,8 @@ const Errors = {
   NoCommentOrReactionEntity: 'No entity to associate subscription found',
   ChainRequiredForEntity: 'Chain id required for ChainEntity association',
   NoChainEntity: 'Cannot find ChainEntity',
+  InvalidChain: 'Invalid chain',
+  InvalidChainEventId: 'Invalid ChainEvent id'
 };
 
 export default Errors;
