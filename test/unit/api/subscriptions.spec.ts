@@ -126,7 +126,7 @@ describe('Subscriptions Tests', () => {
       });
       let res = await modelUtils.createComment({
         chain,
-        // community: null,
+        community: null,
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'cw4eva',
@@ -146,8 +146,9 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.is_active).to.be.equal(true);
     });
 
+    // TODO: JSON error throws when posting comment on community
     it('should make new-comment subscription on comment on thread in community', async () => {
-      const res1 = await modelUtils.createThread({
+      let res = await modelUtils.createThread({
         chainId: chain,
         communityId: community,
         address: loggedInAddr,
@@ -158,13 +159,13 @@ describe('Subscriptions Tests', () => {
         tagName: 't',
         tagId: undefined
       });
-      let res = await modelUtils.createComment({
+      res = await modelUtils.createComment({
         chain,
         community,
         address: loggedInAddr,
         jwt: jwtToken,
         text: 'hi',
-        root_id: `discussion_${res1.result.id}`,
+        root_id: `discussion_${res.result.id}`,
       });
       const object_id = `comment-${res.result.id}`;
       const is_active = true;
