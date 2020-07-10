@@ -113,6 +113,7 @@ export const createComment = async (args: CommentArgs) => {
       'jwt': jwt,
       'mentions[]': mentions,
     });
+  console.dir(res.body);
   return res.body;
 };
 
