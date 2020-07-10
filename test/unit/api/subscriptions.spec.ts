@@ -258,8 +258,30 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoThread);
     });
 
-    xit('should fail to make new-mention subscription generally', async () => {});
-    xit('should make chain-event subscription ', async () => {});
+
+    it('should make chain-event subscription', async () => {
+      const object_id = 'edgeware-democracy-proposed';
+      const is_active = true;
+      const category = NotificationCategories.ChainEvent;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      console.dir(res.body);
+    });
+
+    it('should fail to make new-mention subscription generally', async () => {
+      const object_id = 'user-2020';
+      const is_active = true;
+      const category = NotificationCategories.NewMention;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoMentions);
+    });
+
     xit('should fail to make chain-event subscription with invalid type', async () => {});
     xit('should fail to make chain-event subscription with invalid chain', async () => {});
     it('should fail to make subscription with nonexistent category_id', async () => {
