@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import proposalIdToEntity from 'server/util/proposalIdToEntity';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
-import proposalIdToEntity from 'server/util/proposalIdToEntity';
 
 const log = factory.getLogger(formatFilename(__filename));
 
