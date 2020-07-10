@@ -267,7 +267,36 @@ describe('Subscriptions Tests', () => {
         .post('/api/createSubscription')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, category, is_active, object_id, });
-      console.dir(res.body);
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(`${object_id}`);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
+
+    it('should fail to make chain-event subscription with invalid type', async () => {
+      const object_id = 'edgeware-onchain-party';
+      const is_active = true;
+      const category = NotificationCategories.ChainEvent;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.InvalidChainEventId);
+    });
+
+    it('should fail to make chain-event subscription with invalid chain', async () => {
+      const object_id = 'zakchain-treasury-proposal';
+      const is_active = true;
+      const category = NotificationCategories.ChainEvent;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.InvalidChain);
     });
 
     it('should fail to make new-mention subscription generally', async () => {
@@ -282,8 +311,6 @@ describe('Subscriptions Tests', () => {
       expect(res.body.error).to.be.equal(Errors.NoMentions);
     });
 
-    xit('should fail to make chain-event subscription with invalid type', async () => {});
-    xit('should fail to make chain-event subscription with invalid chain', async () => {});
     it('should fail to make subscription with nonexistent category_id', async () => {
       const object_id = 'treasuryproposal_6';
       const is_active = true;
