@@ -86,9 +86,33 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.is_active).to.be.equal(true);
     });
 
-    // TODO: not touching line 43 in /createSubscription as expected :/
-    // touching line 45
     it('should make new-comment subscription on thread in chain', async () => {
+      let res = await modelUtils.createThread({
+        chainId: chain,
+        communityId: null,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        title: 't2',
+        body: 't2',
+        kind: 'forum',
+        tagName: 't',
+        tagId: undefined
+      });
+      const object_id = `discussion_${res.result.id}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(`${object_id}`);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
+    it('should make new-comment subscription on comment on thread in chain', async () => {
       const res1 = await modelUtils.createThread({
         chainId: chain,
         communityId: null,
@@ -122,7 +146,40 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.is_active).to.be.equal(true);
     });
 
-    xit('should make new-comment subscription on comment on thread in community', async () => {});
+    it('should make new-comment subscription on comment on thread in community', async () => {
+      const res1 = await modelUtils.createThread({
+        chainId: chain,
+        communityId: community,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        title: 't3',
+        body: 't3',
+        kind: 'forum',
+        tagName: 't',
+        tagId: undefined
+      });
+      let res = await modelUtils.createComment({
+        chain,
+        community,
+        address: loggedInAddr,
+        jwt: jwtToken,
+        text: 'hi',
+        root_id: `discussion_${res1.result.id}`,
+      });
+      const object_id = `comment-${res.result.id}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(`${object_id}`);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
     xit('should make new-comment subscription on comment on thread in chain', async () => {});
     xit('should make new-comment subscription on comment on chainEntity', async () => {});
     xit('should make new-comment subscription on chainEntity', async () => {});
