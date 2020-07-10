@@ -69,7 +69,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
       chains = await models.Chain.findAll();
       chainsIds = chains.map((c) => c.id);
       if (!chainsIds.includes(p_entity)) return next(new Error(Errors.InvalidChain));
-      const chainEventTypes = await models.chainEventTypes.findAll();
+      const chainEventTypes = await models.ChainEventTypes.findAll();
       const chainEventTypesIds = chainEventTypes.map((cet) => cet.id);
       if (!chainEventTypesIds.includes(req.body.object_id)) return next(new Error(Errors.InvalidChainEventId));
       obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
