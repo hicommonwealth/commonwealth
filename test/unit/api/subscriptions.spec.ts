@@ -9,6 +9,7 @@ import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import models from '../../../server/database';
 import Errors from '../../../server/routes/subscription/errors';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
 
@@ -146,7 +147,6 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.is_active).to.be.equal(true);
     });
 
-    // TODO: JSON error throws when posting comment on community
     it('should make new-comment subscription on comment on thread in community', async () => {
       let res = await modelUtils.createThread({
         chainId: chain,
@@ -181,14 +181,89 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.is_active).to.be.equal(true);
     });
 
-    xit('should make new-comment subscription on comment on thread in chain', async () => {});
-    xit('should make new-comment subscription on comment on chainEntity', async () => {});
-    xit('should make new-comment subscription on chainEntity', async () => {});
-    xit('should fail to make new-comment subscription on chainEntity, without passing in chain', async () => {});
+    it('should make new-comment subscription on chainEntity', async () => {
+      let res = await models['ChainEntity'].create({
+        chain: 'edgeware',
+        type: 'treasury-proposal',
+        type_id: '6',
+        completed: false,
+      });
+      const object_id = `treasuryproposal_${res.type_id}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, chain_id: 'edgeware' });
+      expect(res.body).to.not.be.null;
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.category_id).to.be.equal(category);
+      expect(res.body.result.object_id).to.equal(`${object_id}`);
+      expect(res.body.result.is_active).to.be.equal(true);
+    });
+
+    it('should fail to make new-comment subscription on chainEntity without chain', async () => {
+      let res = await models['ChainEntity'].create({
+        chain: 'edgeware',
+        type: 'treasury-proposal',
+        type_id: '6',
+        completed: false,
+      });
+      const object_id = `treasuryproposal_${res.type_id}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.ChainRequiredForEntity);
+    });
+
+    it('should fail to make new-comment subscription on nonexistent chainEntity', async () => {
+      const object_id = `treasuryproposal_${10}`;
+      const is_active = true;
+      const category = NotificationCategories.NewComment;
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, chain_id: 'edgeware' });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoChainEntity);
+    });
+
+    // createComment failing on ChainEntity, unknown cause. ChainEntity being created fine.
+    xit('should make new-comment subscription on comment on chainEntity', async () => {
+      const res = await models['ChainEntity'].create({
+        chain: 'edgeware',
+        type: 'treasury-proposal',
+        type_id: '6',
+        completed: false,
+      });
+      const res2 = await modelUtils.createComment({
+        chain: 'edgeware',
+        address: loggedInAddr,
+        jwt: jwtToken,
+        text: 'helloooo',
+        root_id: `treasuryproposal_${res.type_id}`,
+      });
+    });
+
     xit('should fail to make new-mention subscription generally', async () => {});
     xit('should make chain-event subscription ', async () => {});
     xit('should fail to make chain-event subscription with invalid type', async () => {});
     xit('should fail to make chain-event subscription with invalid chain', async () => {});
+    xit('should fail to make subscription with nonexistent category_id', async () => {
+      const object_id = 'treasuryproposal_6';
+      const is_active = true;
+      const category = 'offchain-event';
+      const res = await chai.request(app)
+        .post('/api/createSubscription')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, category, is_active, object_id, });
+      expect(res.body.error).to.not.be.null;
+      expect(res.body.error).to.be.equal(Errors.NoChainEntity);
+    });
 
 
     it('should check /viewSubscriptions for all', async () => {
