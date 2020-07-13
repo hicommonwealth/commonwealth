@@ -419,7 +419,6 @@ export const NewThreadForm: m.Component<{
                     try {
                       await app.user.discussionDrafts.delete(draft.id);
                     } catch (err) {
-                      console.log(err);
                       vnode.state.error.draft = err;
                     }
                     m.redraw();
