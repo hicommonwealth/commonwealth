@@ -304,6 +304,7 @@ export const NewThreadForm: m.Component<{
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
+                console.log('creating');
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
