@@ -295,7 +295,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.form.title = (e as any).target.value;
                 localStorage.setItem('new-discussion-storedTitle', vnode.state.form.title);
               },
-              value: localStorage.getItem('new-discussion-storedTitle'),
+              defaultValue: localStorage.getItem('new-discussion-storedTitle'),
               tabindex: 1,
             }),
           ]),
@@ -340,8 +340,8 @@ export const NewThreadForm: m.Component<{
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
                 if (!vnode.state.error) {
-                  localStorage.removeItem(`${editorNamespace}-storedText`);
-                  localStorage.removeItem(`${editorNamespace}-storedTitle`);
+                  localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
+                  localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
                   if (vnode.state.fromDraft) {
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
@@ -370,8 +370,8 @@ export const NewThreadForm: m.Component<{
                   vnode.state.saving = false;
                   if (isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
-                    localStorage.removeItem(`${editorNamespace}-storedText`);
-                    localStorage.removeItem(`${editorNamespace}-storedTitle`);
+                    localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
+                    localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
                     setTimeout(() => {
                       $(e.target).trigger('modalexit');
                     }, 0);

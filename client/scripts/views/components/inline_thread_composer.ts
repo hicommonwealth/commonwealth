@@ -90,7 +90,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         placeholder: 'Add a description (optional)',
         tabindex: 2,
         theme: 'bubble',
-        editorNamespace: 'new-link-inline',
+        editorNamespace: `${app.activeId()}new-link-inline`,
         onkeyboardSubmit: createLink,
       }),
       m(AutoCompleteTagForm, {

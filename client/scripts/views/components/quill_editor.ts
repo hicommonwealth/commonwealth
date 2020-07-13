@@ -746,12 +746,11 @@ const instantiateEditor = (
   });
 
   setInterval(() => {
-    debugger
     if (state.unsavedChanges.length() > 0) {
       // Save the entire updated text to localStorage
       const data = JSON.stringify(quill.getContents());
       localStorage.setItem(`${editorNamespace}-markdownMode`, state.markdownMode);
-      localStorage.setItem(`${editorNamespace}-storedText`, data);
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
       state.unsavedChanges = new Delta();
     }
   }, 2500);
@@ -799,11 +798,11 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       ? editor?.getText()
       : JSON.stringify(editor?.getContents());
     const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
-    if (body && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
-      localStorage.setItem(`${editorNamespace}-storedText`, body);
+    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
     } 
-    if (title && localStorage.getItem(`${editorNamespace}-storedTitle`) !== null) {
-      localStorage.setItem(`${editorNamespace}-storedTitle`, title.value);
+    if (title && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedTitle`) !== null) {
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, title.value);
     }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
@@ -816,11 +815,10 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    debugger
     if (vnode.state.markdownMode === undefined) {
-      if (!contentsDoc && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
+      if (!contentsDoc && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
         try {
-          contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
+          contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
           if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
             vnode.state.markdownMode = true;
           } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
@@ -838,8 +836,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     if (vnode.state.clearUnsavedChanges === undefined) {
       vnode.state.clearUnsavedChanges = () => {
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
-        localStorage.removeItem(`${editorNamespace}-storedText`);
-        localStorage.removeItem(`${editorNamespace}-storedTitle`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
       };
     }
     return m('.QuillEditor', {
