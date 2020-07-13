@@ -3,7 +3,6 @@
 .DiscussionRowHeader {
     display: flex;
     border-bottom: 1px solid #eee;
-    margin: 0 48px;
 
     color: #999;
     .discussion-row-header-col {
@@ -30,23 +29,6 @@
         padding: 24px 0 36px;
         &.empty-list {
             height: calc(100vh - 200px);
-        }
-    }
-
-    // sidebar
-    .CommunitySidebar {
-        padding-top: $vertical-padding;
-        padding-left: 8px; // extra padding
-        h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 26px 0 12px;
-            &:first-child {
-                margin-top: 12px;
-            }
-        }
-        p {
-            margin: 12px 0;
         }
     }
 
