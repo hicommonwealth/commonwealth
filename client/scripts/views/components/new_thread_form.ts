@@ -97,7 +97,6 @@ export const loadDraft = async (dom, state, draft) => {
   } else if (newDraftMarkdown && !state.quillEditorState.markdownMode) {
     state.quillEditorState.markdownMode = true;
   }
-  console.log({newDraftDelta, newDraftMarkdown});
   if (newDraftDelta) {
     state.quillEditorState.editor.setContents(newDraftDelta);
   } else if (newDraftMarkdown) {
@@ -364,7 +363,9 @@ export const NewThreadForm: m.Component<{
                 const { form, quillEditorState } = vnode.state;
                 try {
                   vnode.state.saving = true;
-                  console.log(form);
+                  if (!vnode.state.form.title) {
+                    vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
+                  }
                   vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
                   vnode.state.saving = false;
                   if (isModal && !vnode.state.error?.draft) {
