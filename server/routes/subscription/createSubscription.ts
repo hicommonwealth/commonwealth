@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import proposalIdToEntity from 'server/util/proposalIdToEntity';
+import proposalIdToEntity from '../../util/proposalIdToEntity';
 import Errors from './errors';
 import { factory, formatFilename } from '../../../shared/logging';
 
