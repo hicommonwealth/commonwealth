@@ -24,7 +24,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   const parsed_object_id = req.body.object_id.split(/-|_/);
   const p_id = parsed_object_id[1];
   const p_entity = parsed_object_id[0];
-  let chain,
+  let chain;
 
   switch (category.name) {
     case 'new-thread-creation': {
