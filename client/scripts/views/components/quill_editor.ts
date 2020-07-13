@@ -796,7 +796,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const { editorNamespace } = vnode.attrs;
     const body = markdownMode
       ? editor?.getText()
-      : editor?.getContents();
+      : JSON.stringify(editor?.getContents());
     const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
     if (body) localStorage.setItem(`${editorNamespace}-storedText`, body);
     if (title) localStorage.setItem(`${editorNamespace}-storedTitle`, title.value);
@@ -821,7 +821,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
             vnode.state.markdownMode = false;
           }
         } catch (e) {
-          return;
         } // do nothing if text fails to parse
       } else {
         // Otherwise, just set vnode.state.markdownMode based on the app setting
@@ -837,7 +836,6 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         localStorage.removeItem(`${editorNamespace}-storedTitle`);
       };
     }
-
     return m('.QuillEditor', {
       class: vnode.state.markdownMode ? 'markdown-mode' : 'richtext-mode',
       oncreate: (childVnode) => {

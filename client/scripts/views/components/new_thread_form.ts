@@ -304,7 +304,6 @@ export const NewThreadForm: m.Component<{
             m(QuillEditor, {
               contentsDoc: '',
               oncreateBind: (state) => {
-                console.log('creating');
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
@@ -337,7 +336,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 if (!vnode.state.form.title) {
-                  vnode.state.form.title = ($(e.target).find('input[name=\'title\'').val() as string);
+                  vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
                 }
                 vnode.state.error = await newThread(form, quillEditorState, author);
                 vnode.state.saving = false;
