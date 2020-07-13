@@ -1,27 +1,22 @@
-import 'components/autocomplete_tag_form.scss';
+import 'components/tag_selector.scss';
 
 import m from 'mithril';
 import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
-import { OffchainTag } from '../../models';
-import { symbols } from '../../helpers';
 
-interface IAutoCompleteTagFormAttrs {
+import { OffchainTag } from 'models';
+import { symbols } from 'helpers';
+
+const TagSelector: m.Component<{
   activeTag?: OffchainTag | string;
   featuredTags: OffchainTag[];
-  // overwriteActiveTag?: boolean;
   tabindex?: number;
   tags: OffchainTag[];
   updateFormData: Function;
   updateParentErrors?: Function;
-}
-
-interface IAutoCompleteTagFormState {
+}, {
   error: string;
-  // activeTagOverwritten: boolean;
   selectedTag: OffchainTag | string;
-}
-
-const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteTagFormState> = {
+}> = {
   view: (vnode) => {
     const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
     if (activeTag && !vnode.state.selectedTag) {
@@ -75,7 +70,7 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
     };
 
     return m(SelectList, {
-      class: 'AutocompleteTagForm',
+      class: 'TagSelector',
       filterable: false,
       checkmark: false,
       closeOnSelect: true,
@@ -103,4 +98,4 @@ const AutoCompleteTagForm: m.Component<IAutoCompleteTagFormAttrs, IAutoCompleteT
   },
 };
 
-export default AutoCompleteTagForm;
+export default TagSelector;
