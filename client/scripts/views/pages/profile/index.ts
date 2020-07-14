@@ -239,8 +239,8 @@ export enum UserContent {
 
 interface IProfilePageState {
   account: any;
-  // threads: OffchainThread[];
-  // comments: OffchainComment<any>[];
+  threads: OffchainThread[];
+  comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
 }
@@ -250,6 +250,8 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     vnode.state.account = null;
     vnode.state.loaded = false;
     vnode.state.loading = false;
+    vnode.state.threads = [];
+    vnode.state.comments = [];
   },
   oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
@@ -264,6 +266,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         data: {
           address,
           chain,
+          jwt: app.user.jwt,
         },
         success: (response) => {
           const { result } = response;
@@ -274,17 +277,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           vnode.state.account = (app.chain)
             ? app.chain.accounts.get(vnode.attrs.address)
             : app.community.accounts.get(vnode.attrs.address);
-          result.threads.forEach((t) => {
-            console.dir(t);
-            if (!app.threads.store.getByIdentifier(t.id)) app.threads.store.add(threadModelFromServer(t));
-          });
+          vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
           console.dir('done with threads');
-          console.dir(app.threads.store.getAll());
-          result.comments.forEach((c) => {
-            console.dir(c);
-            if (!app.comments.store.getById(c.id)) app.comments.store.add(commentModelFromServer(c));
-          });
-          console.dir(app.comments.store.getAll());
+          // vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
           m.redraw();
         },
         error: (err) => {
@@ -308,7 +303,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
-
     // TODO: search for cosmos proposals, if ChainClass is Cosmos
     // TODO: search for signaling proposals ->
     // Commented-out lines from previous version which included signaling proposals in proposals var:
@@ -317,17 +311,17 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     // const signaling = (app.chain as Edgeware).signaling.store.getAll()
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
-    const proposals = app.threads.store.getAll()
-      .filter((p) => p instanceof OffchainThread && p.author === vnode.attrs.address)
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    const allContent = [].concat(proposals || []).concat(comments || [])
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    // const proposals = vnode.state.threads;
-    // const comments = vnode.state.comments;
+    // const proposals = app.threads.store.getAll()
+    //   .filter((p) => p instanceof OffchainThread && p.author === vnode.attrs.address)
+    //   .sort((a, b) => +b.createdAt - +a.createdAt);
+    // const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
+    //   .sort((a, b) => +b.createdAt - +a.createdAt);
     // const allContent = [].concat(proposals || []).concat(comments || [])
     //   .sort((a, b) => +b.createdAt - +a.createdAt);
+    const proposals = vnode.state.threads;
+    const comments = vnode.state.comments;
+    const allContent = [].concat(proposals || []).concat(comments || [])
+      .sort((a, b) => +b.createdAt - +a.createdAt);
 
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
