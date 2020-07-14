@@ -1,11 +1,7 @@
 @import 'client/styles/shared';
 
-$discussion-vertical-padding: 32px;
-$discussion-horizontal-padding: 48px;
-
 .DiscussionRow {
     display: block;
-    padding: 0 $discussion-horizontal-padding;
 
     // layout
     .discussion-top {
