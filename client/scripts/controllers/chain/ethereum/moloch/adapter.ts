@@ -4,7 +4,7 @@ import EthWebWalletController from 'controllers/app/eth_web_wallet';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent } from 'models';
 import { MolochEntityKind } from 'commonwealth-chain-events/dist/src/moloch/types';
@@ -22,6 +22,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public accounts: MolochMembers;
   public governance: MolochGovernance;
   public readonly webWallet: EthWebWalletController = new EthWebWalletController();
+  public readonly chainEntities = new ChainEntityController();
 
   private _loaded: boolean = false;
   get loaded() { return this._loaded; }

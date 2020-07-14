@@ -20,18 +20,22 @@ $form-border-radius: 3px;
 $form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
+// default styles
 $lighttextgrey: #999;
 $electricblue: #229bd6;
+$standard-light-text: #999;
+$standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
 
-$header-height: 60px;
-$left-sidebar-width: 200px;
+// widths and heights
+$left-sidebar-width: 300px;
 $right-sidebar-width: 340px;
 $sublayout-max-width: 1340px;
+$header-height: 60px;
 
-$vertical-padding: 30px; // padding between header and content
-$horizontal-padding: 30px; // padding on sides of the page
-$gutter-width: 24px; // padding between columns
-$header-spacing: 14px; // padding between header items
+// paddings
+$vertical-padding: 24px;
+$sidebar-padding: 32px;
+$header-spacing: 14px;
 
 // construct-ui styles
 $menu-item-height: 30px;
@@ -59,8 +63,8 @@ $menu-item-height: 30px;
 }
 
 @mixin error-text {
-    font-weight: 700;
-    color: $error-red;
+    font-weight: 600;
+    color: $red600;
 }
 @mixin success-text {
     font-weight: 700;
@@ -314,5 +318,17 @@ $menu-item-height: 30px;
         opacity: 0.5;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
         filter: alpha(opacity=20);
+    }
+}
+
+@mixin proposal-tag-inline {
+    .proposal-tag-icon {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        background: #eee;
+        margin-left: 1px;
+        margin-right: 8px;
     }
 }

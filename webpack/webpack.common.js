@@ -76,7 +76,8 @@ module.exports = {
         ],
       },
       {
-        test: /\.tsx?$/,
+        // ignore ".spec.ts" test files in build
+        test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
         include: [
           path.resolve(__dirname, '../client'),
           path.resolve(__dirname, '../shared'),

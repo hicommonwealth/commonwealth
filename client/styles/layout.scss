@@ -4,17 +4,17 @@
     box-sizing: border-box;
 }
 html, body {
-    height: 100%;
     box-sizing: border-box;
-    width: 100%;
 }
 html {
+    height: 100%;
+    width: 100%;
     font-family: $fonts;
     font-size: 15px;
     line-height: 1.4;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #fafafa;
+    background: #fff;
     overflow-y: scroll;
     &.modal-open {
         overflow-y: hidden;
@@ -34,17 +34,8 @@ html {
         padding: 0 1rem;
     }
 }
-.layout-container {
-    padding-top: $header-height + $vertical-padding;
-    padding-bottom: $vertical-padding;
-    margin-left: $horizontal-padding;
-    margin-right: $horizontal-padding;
-}
 .forum-container {
-    background: #fff;
-    padding: 20px 32px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.07);
-    margin-bottom: 16px;
+    padding: 20px 60px;
 }
 
 //
@@ -251,6 +242,10 @@ td, th {
 // TODO: move to construct.scss
 //
 
+.cui-portal {
+    z-index: 51;
+}
+
 // Small changes to input styles
 .cui-input input,
 .cui-input textarea {
@@ -375,4 +370,24 @@ td, th {
 }
 .cui-spinner.cui-spinner-fill {
     z-index: initial;
+}
+
+// dark button for header
+.cui-button.cui-button-dark {
+    background: #444;
+    border: none !important;
+    box-shadow: none !important;
+    color: #fff;
+    .User a.user-display-name {
+        color: #fff;
+    }
+    svg {
+        stroke: #fff;
+    }
+    &:hover, &:active, &.cui-active {
+        background: #555;
+    }
+    &.cui-disabled {
+        background: #555 !important;
+    }
 }

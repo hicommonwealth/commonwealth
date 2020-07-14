@@ -64,8 +64,8 @@
     span.identity-icon {
         @include identityIcon();
     }
-    a.user-display-name &.anonymous {
-            color: #999;
+    a.user-display-name.verified {
+        color: $theme-base-color !important;
     }
     &.linkified a.user-display-name {
         cursor: pointer;
@@ -122,6 +122,19 @@
         padding-right: 13px;
         position: relative;
         top: 5px;
+        .user-block-symbol {
+            text-align: center;
+            padding: 0 4px;
+            line-height: 1.5;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: #333;
+            color: #fff;
+
+            position: absolute;
+            bottom: 0;
+        }
     }
     .user-block-center {
         flex: 1;

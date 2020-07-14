@@ -8,7 +8,7 @@
         right: 0;
         position: fixed;
         background: rgba(0,0,0,0.3);
-        z-index: 19;
+        z-index: 51;
 
         display: flex;
         align-items: center;
@@ -28,14 +28,14 @@
         z-index: 20;
     }
     .modal-title {
-        padding: 22px 28px 19px;
+        padding: 20px 28px 19px;
         border-bottom: 1px solid #eee;
     }
     .modal-title h1,
     .modal-title h2,
     .modal-title h3 {
-        font-size: 20px;
-        font-weight: 400;
+        font-size: 19px;
+        font-weight: 600;
         margin: 0;
         padding: 0;
     }
@@ -49,12 +49,13 @@
     }
 
     .compact-modal-title {
-        padding: 21px 28px 20px;
+        padding: 18px 27px;
         background: #272524;
         color: #fff;
+        line-height: 1.2;
         h1, h2, h3 {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 17px;
+            font-weight: 600;
             margin: 0;
             padding: 0;
         }
@@ -93,8 +94,8 @@
 .ModalExitButton,
 .CompactModalExitButton {
     position: absolute;
-    top: 8px;
-    right: 17px;
+    top: 13px;
+    right: 22px;
     font-size: 22px;
     cursor: pointer;
     opacity: 0.4;

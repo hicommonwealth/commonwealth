@@ -46,7 +46,7 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
+        const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
         const constructorFunc = (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
         this._initialized = true;

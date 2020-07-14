@@ -11,7 +11,7 @@ import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, Off
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
-import AutoCompleteTagForm from './autocomplete_tag_form';
+import TagSelector from './tag_selector';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -93,7 +93,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         editorNamespace: 'new-link-inline',
         onkeyboardSubmit: createLink,
       }),
-      m(AutoCompleteTagForm, {
+      m(TagSelector, {
         tags: app.tags.getByCommunity(app.activeId()),
         featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
         updateFormData: (tagName: string, tagId?: number) => {
@@ -187,7 +187,7 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         editorNamespace: 'new-thread-inline',
         onkeyboardSubmit: createThread,
       }),
-      m(AutoCompleteTagForm, {
+      m(TagSelector, {
         tags: app.tags.getByCommunity(app.activeId()),
         featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
         updateFormData: (tagName: string, tagId?: number) => {

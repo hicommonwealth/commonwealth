@@ -169,7 +169,7 @@ export class SubstrateDemocracyReferendum
     this.hash = eventData.proposalHash;
 
     // see if preimage exists and populate data if it does
-    const preimage = this._Democracy.app.chainEntities.getPreimage(eventData.proposalHash);
+    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {
       this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
     } else {
@@ -216,7 +216,7 @@ export class SubstrateDemocracyReferendum
         break;
       }
       case SubstrateEventKind.PreimageNoted: {
-        const preimage = this._Democracy.app.chainEntities.getPreimage(this.hash);
+        const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
         }

@@ -2,20 +2,14 @@
 
 .Sublayout {
     display: block;
+    padding: 0 32px;
     .sublayout-main {
         display: flex;
-        max-width: $sublayout-max-width;
         margin: 0 auto;
-        > .left-sidebar {
-            width: $left-sidebar-width;
-            margin-right: $gutter-width;
-        }
-        > .right-sidebar {
-            width: $right-sidebar-width;
-            margin-left: $gutter-width;
-        }
-        > .sublayout-content {
-            flex: 1;
-        }
+        min-height: calc(100vh - 60px);
+        max-width: 1100px;
+    }
+    .left-sidebar {
+        padding-right: 45px;
     }
 }

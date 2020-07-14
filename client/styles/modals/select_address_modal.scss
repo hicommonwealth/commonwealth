@@ -8,7 +8,7 @@
         margin-bottom: 20px;
     }
     .compact-modal-body {
-        width: 370px;
+        width: 480px;
         padding: 24px 28px 32px !important;
     }
 
@@ -27,16 +27,26 @@
             background: #e2e7ff !important;
         }
         &.existing {
+            background: initial !important;
             cursor: initial;
             .UserBlock {
-                opacity: 0.3;
+                opacity: 0.4;
             }
             .role-remove {
-                cursor: pointer;
                 position: absolute;
                 right: 16px;
                 top: 18px;
-                &:hover .cui-icon svg {
+                .already-connected {
+                    position: relative;
+                    margin-right: 11px;
+                    font-size: 13.5px;
+                    color: #888;
+                }
+                .cui-icon svg {
+                    cursor: pointer;
+                    stroke: #888;
+                }
+                .cui-icon:hover svg {
                     stroke: $error-red;
                 }
             }

@@ -38,7 +38,7 @@ const updateTags = async (models, req, res: Response, next: NextFunction) => {
     },
   });
   const isAdminOrMod = roles.length > 0;
-  const isAuthor = (thread.author_id === userAddress.id);
+  const isAuthor = (thread.address_id === userAddress.id);
   if (!isAdminOrMod && !isAuthor) {
     return next(new Error(UpdateTagsErrors.NoPermission));
   }

@@ -76,7 +76,7 @@ class SubstrateTreasury extends ProposalModule<
           this._pot.next(this._Chain.coins(pot));
         });
         */
-        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
+        const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
         const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

@@ -34,7 +34,7 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
       const constructorFunc = (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

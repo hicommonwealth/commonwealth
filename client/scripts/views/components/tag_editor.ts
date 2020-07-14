@@ -1,14 +1,16 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { OffchainThread, OffchainTag } from 'models';
 import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
+
 import app from 'state';
-import AutoCompleteTagForm from './autocomplete_tag_form';
+import { OffchainThread, OffchainTag } from 'models';
+import TagSelector from './tag_selector';
 
 interface ITagEditorAttrs {
   thread: OffchainThread;
   popoverMenu?: boolean;
   onChangeHandler: Function;
+  openStateHandler: Function;
 }
 
 interface ITagEditorState {
@@ -24,7 +26,7 @@ const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function
     const featuredTags = activeMeta.featuredTags.map((t) => {
       return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
-    return m(AutoCompleteTagForm, {
+    return m(TagSelector, {
       featuredTags,
       activeTag: vnode.attrs.thread.tag,
       tags: app.tags.getByCommunity(app.activeId()),
@@ -60,15 +62,27 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
           }
         }),
         hasBackdrop: true,
-        isOpen: vnode.state.isOpen,
+        isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
         inline: false,
-        onClose: () => { vnode.state.isOpen = false; },
-        title: 'Edit Tags',
+        onClose: () => {
+          if (vnode.attrs.popoverMenu) {
+            vnode.attrs.openStateHandler(false);
+          } else {
+            vnode.state.isOpen = false;
+          }
+        },
+        title: 'Edit tags',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
             label: 'Close',
-            onclick: () => { vnode.state.isOpen = false; },
+            onclick: () => {
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
+            },
           }),
           m(Button, {
             label: 'Submit',
@@ -76,9 +90,20 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             onclick: async () => {
               const { tagName, tagId } = vnode.state;
               const { thread } = vnode.attrs;
-              const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
-              vnode.attrs.onChangeHandler(tag);
-              vnode.state.isOpen = false;
+              try {
+                const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
+                vnode.attrs.onChangeHandler(tag);
+              } catch (err) {
+                console.log('Failed to update tag');
+                throw new Error((err.responseJSON && err.responseJSON.error)
+                  ? err.responseJSON.error
+                  : 'Failed to update tag');
+              }
+              if (vnode.attrs.popoverMenu) {
+                vnode.attrs.openStateHandler(false);
+              } else {
+                vnode.state.isOpen = false;
+              }
             },
           }),
         ])

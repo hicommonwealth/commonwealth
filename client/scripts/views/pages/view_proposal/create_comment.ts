@@ -28,6 +28,7 @@ interface ICreateCommentState {
   quillEditorState: any;
   uploadsInProgress;
   error;
+  saving: boolean;
   sendingComment;
 }
 
@@ -60,10 +61,11 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         return;
       }
 
+      const { quillEditorState } = vnode.state;
+
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-      const { quillEditorState } = vnode.state;
 
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
@@ -80,6 +82,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;
+      quillEditorState.editor.enable(false);
       const chainId = app.activeCommunityId() ? null : app.activeChainId();
       const communityId = app.activeCommunityId();
       try {
@@ -87,6 +90,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
           chainId, communityId, commentText, parentComment?.id, attachments, mentions);
         callback();
         if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
           vnode.state.quillEditorState.editor.setContents();
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
@@ -96,11 +100,14 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
+        if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
+        }
         vnode.state.error = err.message;
         vnode.state.sendingComment = false;
         m.redraw();
       }
-
+      vnode.state.saving = false;
       mixpanel.track('Proposal Funnel', {
         'Step No': 2,
         'Step': 'Create Comment',

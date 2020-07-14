@@ -66,7 +66,20 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     where: {
       address_id: { [Op.in]: myAddressIds },
     },
+    include: [
+      models.Address
+    ]
   });
+  const discussionDrafts = await models.DiscussionDraft.findAll({
+    where: {
+      address_id: { [Op.in]: myAddressIds }
+    },
+    include: [
+      models.Address,
+      models.OffchainAttachment,
+    ]
+  });
+
   const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
   const privateCommunities = await models.OffchainCommunity.findAll({
     where: {
@@ -83,13 +96,13 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
-    where: { user_id: req.user.id }
+    where: { user_id: user.id }
   });
 
   // get invites for user
   const invites = await models.InviteCode.findAll({
     where: {
-      invited_email: req.user.email,
+      invited_email: user.email,
       used: false,
     },
   });
@@ -162,6 +175,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
       starredCommunities,
+      discussionDrafts,
       unseenPosts
     }
   });

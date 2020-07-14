@@ -316,7 +316,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const fetcher = new SubstrateStorageFetcher(this._apiPromise);
     const subscriber = new SubstrateEventSubscriber(this._apiPromise);
     const processor = new SubstrateEventProcessor(this._apiPromise);
-    return this._app.chainEntities.subscribeEntities(
+    return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain,
       fetcher,
       subscriber,

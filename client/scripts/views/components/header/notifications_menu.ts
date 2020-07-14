@@ -46,11 +46,13 @@ const NotificationsMenu: m.Component = {
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: m(Button, {
+        class: 'cui-button-dark',
         iconLeft: Icons.BELL,
         size: 'sm',
         label: m('.notification-badge', unreadNotifications),
       }),
       position: 'bottom-end',
+      inline: true,
       closeOnContentClick: true,
       menuAttrs: {
         align: 'left',

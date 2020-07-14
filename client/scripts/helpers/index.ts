@@ -26,7 +26,11 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       e.preventDefault();
       e.stopPropagation();
-      m.route.set(target);
+      if (window.location.href.split('?')[0] === target.split('?')[0]) {
+        m.route.set(target, {}, { replace: true });
+      } else {
+        m.route.set(target);
+      }
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);

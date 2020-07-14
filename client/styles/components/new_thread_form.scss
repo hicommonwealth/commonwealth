@@ -1,0 +1,85 @@
+@import 'client/styles/shared';
+
+.NewThreadForm {
+    display: flex;
+    max-width: 600px;
+    min-height: 410px;
+    &.has-drafts {
+        max-width: 810px;
+    }
+
+    .ql-editor {
+        min-height: 160px;
+    }
+    &.link-post .ql-editor {
+        min-height: 105px;
+    }
+
+    .new-thread-form-body {
+        padding-bottom: 10px;
+        flex: 9;
+        .cui-tabs {
+            margin-top: 4px;
+            margin-bottom: 16px;
+            padding: 0 28px;
+            border-bottom: 1px solid #eee;
+            .cui-tabs-item {
+                padding: 12px 0;
+                margin-right: 24px;
+            }
+        }
+        .cui-form {
+            margin: 0 28px;
+        }
+        button[name="submit"], button[name="submission"] {
+            margin-right: 12px;
+        }
+        .error-message {
+            @include error-text;
+            margin: 10px 0 20px;
+        }
+    }
+    .new-thread-form-sidebar {
+        display: flex;
+        flex-direction: column;
+        flex: 3;
+        border-left: 1px solid #eee;
+        padding-bottom: 10px;
+        .cui-list {
+            .cui-list-item {
+                display: block;
+                padding: 16px 20px;
+                border-bottom-color: #eee;
+                max-height: 140px;
+                overflow: hidden;
+                .discussion-draft-title {
+                    margin-bottom: 8px;
+                }
+                .discussion-draft-body {
+                    font-weight: 400 !important;
+                    .QuillFormattedText {
+                        line-height: 1.4;
+                        opacity: 0.4;
+                    }
+                }
+                .discussion-draft-actions {
+                    margin-top: 7px;
+                    a {
+                        font-size: 12px;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        opacity: 0.4;
+                        text-decoration: none;
+                        &:hover {
+                            opacity: 1;
+                            color: $error-red;
+                        }
+                    }
+                }
+            }
+        }
+        button {
+            margin-bottom: 15px;
+        }
+    }
+}
