@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",
-    "listen": "ts-node -P ./tsconfig.json -T ./scripts/listener.ts"
+    "listen": "ts-node -T ./scripts/listener.ts"
   },
   "engines": {
     "node": "12.3.1"
