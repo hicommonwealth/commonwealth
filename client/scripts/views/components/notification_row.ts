@@ -15,8 +15,8 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import { SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
 import { MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
-import labelSubstrateEvent from 'commonwealth-chain-events/dist/src/substrate/filters/labeler';
-import labelMolochEvent from 'commonwealth-chain-events/dist/src/moloch/filters/labeler';
+import SubstrateLabeler from 'commonwealth-chain-events/dist/src/substrate/filters/labeler';
+import MolochLabeler from 'commonwealth-chain-events/dist/src/moloch/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -171,29 +171,22 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       let label;
       if (!vnode.state.startedLabelerLoad) {
         vnode.state.startedLabelerLoad = true;
-        Promise.all([
-          import(/* webpackMode: "lazy" */ '../../../../shared/events/substrate/filters/labeler'),
-          import(/* webpackMode: "lazy" */ '../../../../shared/events/moloch/filters/labeler'),
-          import(/* webpackMode: "lazy" */ '../../../../shared/events/substrate/types'),
-          import(/* webpackMode: "lazy" */ '../../../../shared/events/moloch/types'),
-        ]).then(([ SubstrateLabeler, MolochLabeler, SubstrateTypes, MolochTypes ]) => {
-          if (SubstrateTypes.SubstrateEventChains.includes(chainId)) {
-            label = SubstrateLabeler.default(
-              notification.chainEvent.blockNumber,
-              chainId,
-              notification.chainEvent.data,
-            );
-          } else if (MolochTypes.MolochEventChains.includes(chainId)) {
-            label = MolochLabeler.default(
-              notification.chainEvent.blockNumber,
-              chainId,
-              notification.chainEvent.data,
-            );
-          } else {
-            throw new Error(`invalid notification chain: ${chainId}`);
-          }
-          m.redraw();
-        });
+        if (SubstrateEventChains.includes(chainId)) {
+          label = SubstrateLabeler(
+            notification.chainEvent.blockNumber,
+            chainId,
+            notification.chainEvent.data,
+          );
+        } else if (MolochEventChains.includes(chainId)) {
+          label = MolochLabeler(
+            notification.chainEvent.blockNumber,
+            chainId,
+            notification.chainEvent.data,
+          );
+        } else {
+          throw new Error(`invalid notification chain: ${chainId}`);
+        }
+        m.redraw();
       }
 
       // loading dialogue on chain event notifications while waiting for imports
