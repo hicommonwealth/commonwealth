@@ -53,7 +53,9 @@
     "jsdom-global": "^3.0.2",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
+    "ts-mocha": "^7.0.0",
     "ts-node": "^8.10.2",
-    "typechain": "^2.0.0"
+    "typechain": "^2.0.0",
+    "typescript": "^3.8.2"
   }
 }
