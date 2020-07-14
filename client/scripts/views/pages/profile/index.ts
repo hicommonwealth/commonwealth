@@ -3,6 +3,7 @@ import 'pages/profile.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
+import $ from 'jquery';
 
 import app from 'state';
 import { OffchainThread } from 'models';
@@ -190,13 +191,51 @@ export enum UserContent {
 }
 
 
-const ProfilePage: m.Component<{ address: string }, { }> = {
-  oncreate: (vnode) => {
+const ProfilePage: m.Component<{ address: string }, { account: any, loaded: boolean, loading: boolean, }> = {
+  oninit: (vnode) => {
+    vnode.state.account = null;
+    vnode.state.loaded = false;
+    vnode.state.loading = false;
+  },
+  oncreate: async (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading);
-    const account = app.chain.accounts.get(vnode.attrs.address);
+    const loadProfile = async () => {
+      const chain = m.route.param('base');
+      const { address } = vnode.attrs;
+      await $.ajax({
+        url: `${app.serverUrl()}/getProfile`,
+        type: 'GET',
+        data: {
+          address,
+          chain,
+        },
+        success: (response) => {
+          const { result } = response;
+          console.dir(result);
+          vnode.state.loaded = true;
+          vnode.state.loading = false;
+          m.redraw();
+        },
+        error: (err) => {
+          console.log('Failed to find profile');
+          console.error(err);
+          vnode.state.loaded = true;
+          m.redraw();
+          throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
+            : 'Failed to find profile');
+        }
+      });
+    };
+
+    const { account, loaded, loading } = vnode.state;
+    if (!account && !loaded && !loading) {
+      vnode.state.loading = true;
+      loadProfile();
+      m.redraw();
+    }
+    if (loading) return m(PageLoading);
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
     }
