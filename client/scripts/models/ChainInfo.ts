@@ -11,18 +11,22 @@ class ChainInfo {
   public readonly network: ChainNetwork;
   public readonly iconUrl: string;
   public description: string;
+  public website: string;
+  public chat: string;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, featuredTags, tags, adminsAndMods?) {
+  constructor(id, network, symbol, name, iconUrl, description, website, chat, featuredTags, tags, adminsAndMods?) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
+    this.website = website;
+    this.chat = chat;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -36,6 +40,8 @@ class ChainInfo {
       json.name,
       json.icon_url,
       json.description,
+      json.website,
+      json.chat,
       json.featured_tags,
       json.tags,
       json.adminsAndMods,

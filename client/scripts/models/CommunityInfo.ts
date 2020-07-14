@@ -3,6 +3,7 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTag from './OffchainTag';
+import { update } from 'jdenticon';
 
 interface CommunityData {
   name: string,
@@ -94,6 +95,8 @@ class CommunityInfo {
       website,
     } = communityData;
     // TODO: Change to PUT /community
+    console.log('updateCommunityData:');
+    console.log({website, chat});
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
@@ -107,6 +110,8 @@ class CommunityInfo {
     const updatedCommunity: CommunityInfo = r.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
+    this.website = updatedCommunity.website;
+    this.chat = updatedCommunity.chat;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

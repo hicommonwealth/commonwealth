@@ -102,6 +102,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           privacyValue,
           website,
         } = vnode.state;
+        if (chat.length && !urlHasValidPrefix(chat)) {
+          // Error handling
+        }
+        if (website.length && !urlHasValidPrefix(website)) {
+          // Error handling
+        }
         await vnode.attrs.community.updateCommunityData({
           name,
           description,

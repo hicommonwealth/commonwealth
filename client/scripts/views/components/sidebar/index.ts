@@ -312,13 +312,17 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
         m('div', [
-          m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
+          m('a', {
+            href: app.chain ? app.chain.meta.chain.website : app.community.meta.website
+          }, app.chain ? app.chain.meta.chain.website : app.community.meta.website ),
         ]),
       ]),
       m('.community-info', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         m('div', [
-          m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
+          m('a', {
+            href: app.chain ? app.chain.meta.chain.chat : app.community.meta.chat
+          }, app.chain ? app.chain.meta.chain.chat : app.community.meta.chat),
         ]),
       ]),
     ]);
