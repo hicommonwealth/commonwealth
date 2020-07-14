@@ -92,6 +92,8 @@ class CommunityInfo {
       'id': app.activeCommunityId(),
       'name': name,
       'description': description,
+      'chat': chat,
+      'website': website,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
