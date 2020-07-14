@@ -10,7 +10,7 @@ import { Button, Callout, Icon, Icons, Breadcrumb, BreadcrumbItem, EmptyState, S
 
 import app from 'state';
 import { updateRoute } from 'app';
-import { link, articlize } from 'helpers';
+import { link, articlize, pluralize } from 'helpers';
 import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models';
 
 import { updateLastVisited } from 'controllers/app/login';
@@ -235,8 +235,11 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
             m(DiscussionRowHeader),
             getRecentPostsSortedByWeek(),
           ],
-        !vnode.state.postsDepleted
-          && m('.infinite-scroll-spinner-wrap', [
+        vnode.state.postsDepleted
+          ? m('.infinite-scroll-reached-end', [
+            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+          ])
+          : m('.infinite-scroll-spinner-wrap', [
             m(Spinner, { active: !vnode.state.postsDepleted })
           ])
       ]);

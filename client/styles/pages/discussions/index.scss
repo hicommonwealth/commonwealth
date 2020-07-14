@@ -53,6 +53,12 @@
         }
     }
 
+    .infinite-scroll-reached-end {
+        color: #aaa;
+        font-size: 14px;
+        margin: 20px 0;
+        text-align: center;
+    }
     .infinite-scroll-spinner-wrap {
         height: 70px;
         width: 100%;
