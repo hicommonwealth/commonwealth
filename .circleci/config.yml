@@ -1,0 +1,30 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # Service container image
+      - image: circleci/node:12.3.1
+
+    working_directory: ~/chain-events
+
+    steps:
+      # inital checkout
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+      - run:
+          name: update dependencies
+          command: yarn
+      - save_cache:
+          key: dependency-cache-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: run tests
+          command: yarn test
+      - store_artifacts:
+          path: coverage
