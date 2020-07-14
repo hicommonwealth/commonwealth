@@ -23,7 +23,7 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
   const visibleCommunityIds = publicCommunities.map((c) => c.id);
 
   if (req.user) {
-    const addresses = req.user.getAddresses().filter((a) => !!a.verified);
+    const addresses = await req.user.getAddresses().filter((a) => !!a.verified);
     const addressIds = addresses.map((a) => a.id);
     const roles = await models.Role.findAll({
       where: {
