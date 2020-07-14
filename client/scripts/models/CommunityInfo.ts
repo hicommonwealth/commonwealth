@@ -4,6 +4,15 @@ import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTag from './OffchainTag';
 
+interface CommunityData {
+  name: string,
+  description: string,
+  invitesEnabled: boolean,
+  privacyEnabled: boolean,
+  website: string,
+  chat: string,
+}
+
 class CommunityInfo {
   public readonly id: string;
   public name: string;
@@ -69,12 +78,15 @@ class CommunityInfo {
     });
   }
 
-  public async updateCommunityData(
-    name: string,
-    description: string,
-    privacyEnabled: boolean,
-    invitesEnabled: boolean
-  ) {
+  public async updateCommunityData(communityData) {
+    const {
+      chat,
+      description,
+      invitesEnabled,
+      name,
+      privacyEnabled,
+      website,
+    } = communityData;
     // TODO: Change to PUT /community
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
