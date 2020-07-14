@@ -23,7 +23,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.chain.name;
     vnode.state.description = vnode.attrs.chain.description;
-    vnode.state.website = vnode.attrs.chain.id;
+    vnode.state.website = vnode.attrs.chain.website;
     vnode.state.chat = vnode.attrs.chain.chat;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;

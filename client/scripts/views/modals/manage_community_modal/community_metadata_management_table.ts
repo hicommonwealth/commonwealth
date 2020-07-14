@@ -35,7 +35,6 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.chat = vnode.attrs.community.chat;
   },
   view: (vnode) => {
-    console.log(vnode.attrs.community);
     return m('.CommunityMetadataManagementTable', [m(Table, {
       bordered: false,
       interactive: false,

@@ -39,6 +39,8 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   if (req.body.active !== undefined) chain.active = req.body.active;
   if (req.body.type) chain.type = req.body.type;
   if (req.body.description) chain.description = req.body.description;
+  if (req.body.website) chain.website = req.body.website;
+  if (req.body.chat) chain.chat = req.body.chat;
   if (req.body['featured_tags[]']) chain.featured_tags = req.body['featured_tags[]'];
 
   await chain.save();
