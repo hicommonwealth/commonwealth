@@ -9,9 +9,9 @@ import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 
-const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
+const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, dark?: boolean, large?: boolean }> = {
   view: (vnode) => {
-    const { fluid, dark } = vnode.attrs;
+    const { fluid, threadOnly, dark, large } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
 
     if (!app.isLoggedIn()) return;
@@ -19,14 +19,14 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
     if (!app.activeId()) return;
 
     // just a button for communities, or chains without governance
-    if (app.community) {
+    if (app.community || threadOnly) {
       return m(Button, {
         class: dark ? 'NewProposalButton cui-button-dark' : 'NewProposalButton',
-        label: 'New post',
+        label: 'New thread',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        size: 'sm',
+        size: large ? 'default' : 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
@@ -36,9 +36,9 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
         class: dark ? 'cui-button-dark' : '',
         disabled: !activeAccount,
         intent: 'primary',
-        label: 'New post',
+        label: 'New thread',
         fluid,
-        size: 'sm',
+        size: large ? 'default' : 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
       m(PopoverMenu, {
@@ -50,7 +50,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
           disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
-          size: 'sm',
+          size: large ? 'default' : 'sm',
         }),
         position: 'bottom-end',
         closeOnContentClick: true,
@@ -60,7 +60,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, dark?: boolean }> = {
         content: [
           m(MenuItem, {
             onclick: () => { m.route.set(`/${app.activeId()}/new/thread`); },
-            label: 'New post',
+            label: 'New thread',
           }),
           (app.chain.base === ChainBase.CosmosSDK || app.chain.base === ChainBase.Substrate)
             && m(MenuDivider),
