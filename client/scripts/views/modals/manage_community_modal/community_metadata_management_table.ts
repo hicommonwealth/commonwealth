@@ -3,7 +3,7 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
-import { urlHasValidHTTPPrefix } from 'client/scripts/helpers';
+import { urlHasValidHTTPPrefix } from 'helpers';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {

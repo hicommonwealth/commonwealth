@@ -13,7 +13,7 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
-import { extractDomain } from 'client/scripts/helpers';
+import { extractDomain } from 'helpers';
 
 const MembersModule: m.Component<{}> = {
   view: (vnode) => {
@@ -313,7 +313,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           }
         }),
       }),
-      m('.community-info', [
+      website && m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
         m('div', [
           m('a', {
@@ -322,7 +322,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           }, extractDomain(website)),
         ]),
       ]),
-      m('.community-info', [
+      website && m('.community-info', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         m('div', [
           m('a', {

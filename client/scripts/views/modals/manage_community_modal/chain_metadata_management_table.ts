@@ -3,8 +3,8 @@ import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
-import { urlHasValidHTTPPrefix } from 'client/scripts/helpers';
-import { IChainOrCommMetadataManagementAttrs, urlHasValidPrefix } from './community_metadata_management_table';
+import { urlHasValidHTTPPrefix } from 'helpers';
+import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface IChainMetadataManagementState {
