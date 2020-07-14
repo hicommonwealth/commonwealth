@@ -59,7 +59,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         onChangeHandler: (v) => { vnode.state.website = v; },
       }),
       m(InputPropertyRow, {
-        title: 'Website',
+        title: 'Chat',
         defaultValue: 'https://discord.gg',
         disabled: true,
         onChangeHandler: (v) => { vnode.state.chat = v; },
