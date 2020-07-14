@@ -189,14 +189,19 @@ const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
     ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
     : [];
-  // const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  let proposal;
+  try {
+    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  } catch (e) {
+    proposal = null;
+  }
   return new OffchainComment(
     comment.chain,
     comment?.Address?.address || comment.author,
     decodeURIComponent(comment.text),
     comment.version_history,
     attachments,
-    null,
+    proposal,
     comment.id,
     moment(comment.created_at),
     comment.child_comments,
@@ -278,7 +283,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
             ? app.chain.accounts.get(vnode.attrs.address)
             : app.community.accounts.get(vnode.attrs.address);
           vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-          console.dir('done with threads');
           // vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
           m.redraw();
         },
@@ -325,7 +329,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
 
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    // const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
@@ -348,14 +352,16 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
                 type: UserContent.Threads,
                 content: { proposals }
               }),
-            }, {
-              name: commentsTabTitle,
-              content: m(ProfileContent, {
-                account,
-                type: UserContent.Comments,
-                content: { comments }
-              }),
-            }]),
+            },
+            // {
+            //   name: commentsTabTitle,
+            //   content: m(ProfileContent, {
+            //     account,
+            //     type: UserContent.Comments,
+            //     content: { comments }
+            //   }),
+            // }
+            ]),
           ]),
           m('.col-xs-4', [
             m(ProfileBio, { account }),

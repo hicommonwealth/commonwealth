@@ -11,6 +11,7 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: Array<OffchainComment<any>> } > = {
   view: (vnode) => {
     const { proposal, comments } = vnode.attrs;
+    if (!proposal) return;
     const { author, createdAt, body, slug, identifier, title } = proposal;
 
     return m('.ProfileCommentGroup', [
