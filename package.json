@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "nyc ts-mocha -P test/tsconfig.json ./test/**/*.spec.ts",
+    "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",
     "listen": "ts-node -P ./tsconfig.json -T ./scripts/listener.ts"
   },
   "engines": {
