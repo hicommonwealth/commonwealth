@@ -17,6 +17,8 @@ class CommunityInfo {
   public readonly id: string;
   public name: string;
   public description: string;
+  public chat: string;
+  public website: string;
   public readonly defaultChain: ChainInfo;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
@@ -24,10 +26,12 @@ class CommunityInfo {
   public readonly tags: OffchainTag[];
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, name, description, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
+  constructor(id, name, description, website, chat, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
     this.id = id;
     this.name = name;
     this.description = description;
+    this.website = website;
+    this.chat = chat;
     this.defaultChain = defaultChain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
@@ -41,6 +45,8 @@ class CommunityInfo {
       json.id,
       json.name,
       json.description,
+      json.website,
+      json.chat,
       json.default_chain,
       json.invitesEnabled,
       json.privacyEnabled,
@@ -92,8 +98,8 @@ class CommunityInfo {
       'id': app.activeCommunityId(),
       'name': name,
       'description': description,
-      'chat': chat,
       'website': website,
+      'chat': chat,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
