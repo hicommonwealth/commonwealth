@@ -2,7 +2,7 @@
   "name": "commonwealth-chain-events",
   "version": "0.1.1",
   "description": "Listen to various chains for events.",
-  "license": "GPL-3",
+  "license": "GPL-3.0",
   "files": [
     "dist/"
   ],
@@ -53,6 +53,7 @@
     "jsdom-global": "^3.0.2",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
+    "ts-node": "^8.10.2",
     "typechain": "^2.0.0"
   }
 }
