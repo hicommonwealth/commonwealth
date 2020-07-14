@@ -54,14 +54,14 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       }),
       m(InputPropertyRow, {
         title: 'Website',
-        defaultValue: 'https://example.com',
-        disabled: true,
+        defaultValue: vnode.attrs.community.website,
+        placeholder: 'https://example.com',
         onChangeHandler: (v) => { vnode.state.website = v; },
       }),
       m(InputPropertyRow, {
         title: 'Chat',
-        defaultValue: 'https://discord.gg',
-        disabled: true,
+        defaultValue: vnode.attrs.community.chat,
+        placeholder: 'https://discord.gg',
         onChangeHandler: (v) => { vnode.state.chat = v; },
       }),
       m(TogglePropertyRow, {
