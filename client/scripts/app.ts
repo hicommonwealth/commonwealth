@@ -44,6 +44,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           id: community.id,
           name: community.name,
           description: community.description,
+          website: community.website,
+          chat: community.chat,
           default_chain: app.config.chains.getById(community.default_chain),
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,

@@ -3,15 +3,14 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
 import OffchainTag from './OffchainTag';
-import { update } from 'jdenticon';
 
 interface CommunityData {
   name: string,
   description: string,
-  invitesEnabled: boolean,
-  privacyEnabled: boolean,
   website: string,
   chat: string,
+  invitesEnabled: boolean,
+  privacyEnabled: boolean,
 }
 
 class CommunityInfo {

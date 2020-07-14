@@ -313,6 +313,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         m(Icon, { name: Icons.GLOBE }),
         m('div', [
           m('a', {
+            target: '_blank',
             href: app.chain ? app.chain.meta.chain.website : app.community.meta.website
           }, app.chain ? app.chain.meta.chain.website : app.community.meta.website ),
         ]),
@@ -321,6 +322,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
         m('div', [
           m('a', {
+            target: '_blank',
             href: app.chain ? app.chain.meta.chain.chat : app.community.meta.chat
           }, app.chain ? app.chain.meta.chain.chat : app.community.meta.chat),
         ]),

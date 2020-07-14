@@ -31,10 +31,11 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
     vnode.state.description = vnode.attrs.community.description;
-    // vnode.state.website = vnode.attrs.community.website;
-    // vnode.state.chat = vnode.attrs.community.chat;
+    vnode.state.website = vnode.attrs.community.website;
+    vnode.state.chat = vnode.attrs.community.chat;
   },
   view: (vnode) => {
+    console.log(vnode.attrs.community);
     return m('.CommunityMetadataManagementTable', [m(Table, {
       bordered: false,
       interactive: false,
@@ -54,13 +55,13 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       }),
       m(InputPropertyRow, {
         title: 'Website',
-        defaultValue: vnode.attrs.community.website,
+        defaultValue: vnode.state.website,
         placeholder: 'https://example.com',
         onChangeHandler: (v) => { vnode.state.website = v; },
       }),
       m(InputPropertyRow, {
         title: 'Chat',
-        defaultValue: vnode.attrs.community.chat,
+        defaultValue: vnode.state.chat,
         placeholder: 'https://discord.gg',
         onChangeHandler: (v) => { vnode.state.chat = v; },
       }),
