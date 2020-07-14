@@ -40,6 +40,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
   community.invitesEnabled = req.body.invites || false;
   community.privacyEnabled = req.body.privacy || false;
+  await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
   if (req.body['attachments[]']) {
@@ -57,8 +58,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
 
     return res.json({ status: 'Success', result: finalCommunity.toJSON() });
   }
-
-  await community.save();
+  console.log(community);
 
   return res.json({ status: 'Success', result: community.toJSON() });
 };

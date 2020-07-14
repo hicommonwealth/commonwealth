@@ -12,6 +12,8 @@ export interface ChainAttributes {
   id?: string;
   name: string;
   description?: string;
+  chat?: string;
+  website?: string;
   featured_tags: string[];
   symbol: string;
   network: string;
@@ -47,6 +49,8 @@ export default (
     id: { type: dataTypes.STRING, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.STRING, allowNull: true },
+    website: { type: dataTypes.STRING, allowNull: true },
+    chat: { type: dataTypes.STRING, allowNull: true },
     featured_tags: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: dataTypes.STRING, allowNull: false },
     network: { type: dataTypes.STRING, allowNull: false },
