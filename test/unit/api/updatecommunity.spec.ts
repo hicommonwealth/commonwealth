@@ -72,6 +72,26 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.description).to.be.equal(description);
     });
 
+    it('should update website', async () => {
+      const website = 'http://edgewa.re';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, website, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.website).to.be.equal(website);
+    });
+
+    it('should update chat', async () => {
+      const chat = 'http://discord.gg';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, chat, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.chat).to.be.equal(chat);
+    });
+
     it('should update symbol', async () => {
       const symbol = 'CWL';
       const res = await chai.request(app)
@@ -174,6 +194,26 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: offchainCommunity.id, description, });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.description).to.be.equal(description);
+    });
+
+    it('should update website', async () => {
+      const website = 'http://edgewa.re';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, website, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.website).to.be.equal(website);
+    });
+
+    it('should update chat', async () => {
+      const chat = 'http://discord.gg';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, chat, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.chat).to.be.equal(chat);
     });
 
     it('should fail without a community id', async () => {
