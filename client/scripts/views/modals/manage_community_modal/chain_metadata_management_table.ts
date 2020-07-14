@@ -3,6 +3,7 @@ import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
+import { urlHasValidHTTPPrefix } from 'client/scripts/helpers';
 import { IChainOrCommMetadataManagementAttrs, urlHasValidPrefix } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -100,10 +101,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         intent: 'primary',
         onclick: async (e) => {
           const { name, description, website, chat } = vnode.state;
-          if (chat.length && !urlHasValidPrefix(chat)) {
+          if (chat.length && !urlHasValidHTTPPrefix(chat)) {
             // Error handling
           }
-          if (website.length && !urlHasValidPrefix(website)) {
+          if (website.length && !urlHasValidHTTPPrefix(website)) {
             // Error handling
           }
           await vnode.attrs.chain.updateChainData(name, description, website, chat);

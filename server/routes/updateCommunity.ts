@@ -58,7 +58,6 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
 
     return res.json({ status: 'Success', result: finalCommunity.toJSON() });
   }
-  console.log(community);
 
   return res.json({ status: 'Success', result: community.toJSON() });
 };

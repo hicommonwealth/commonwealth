@@ -37,9 +37,17 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
   return m(selector, attrs, children);
 }
 
+/*
+ * general links
+ */
+
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
   return re.exec(url)[1];
+}
+
+export function urlHasValidHTTPPrefix(url: string) {
+  return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
 }
 
 /*

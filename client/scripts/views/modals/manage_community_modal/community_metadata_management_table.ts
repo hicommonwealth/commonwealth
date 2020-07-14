@@ -3,6 +3,7 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
+import { urlHasValidHTTPPrefix } from 'client/scripts/helpers';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
@@ -21,10 +22,6 @@ export interface IChainOrCommMetadataManagementAttrs {
   admins;
   mods;
 }
-
-export const urlHasValidPrefix = (url: string) => {
-  return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
-};
 
 const CommunityMetadataManagementTable:
 m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementState> = {
@@ -102,10 +99,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           invitesValue,
           privacyValue,
         } = vnode.state;
-        if (chat.length && !urlHasValidPrefix(chat)) {
+        if (chat.length && !urlHasValidHTTPPrefix(chat)) {
           // Error handling
         }
-        if (website.length && !urlHasValidPrefix(website)) {
+        if (website.length && !urlHasValidHTTPPrefix(website)) {
           // Error handling
         }
         await vnode.attrs.community.updateCommunityData({
