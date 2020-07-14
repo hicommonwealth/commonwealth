@@ -13,6 +13,7 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
+import { extractDomain } from 'client/scripts/helpers';
 
 const MembersModule: m.Component<{}> = {
   view: (vnode) => {
@@ -281,6 +282,9 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       community: app.activeCommunityId()
     });
 
+    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const { chat, description, name, website } = meta;
+
     return m('.CommunityInfoModule.SidebarModule', [
       // m(TagCaratMenu, { tag }),
       // tag && [
@@ -292,8 +296,8 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
         app.community && m(CommunityIcon, { community: app.community.meta }),
       ]),
-      m('.community-name', app.chain ? app.chain.meta.chain.name : app.community.meta.name),
-      m('.community-description', app.chain ? app.chain.meta.chain.description : app.community.meta.description),
+      m('.community-name', name),
+      m('.community-description', description),
       isAdmin && m(PopoverMenu, {
         class: 'community-config-menu',
         position: 'bottom',
@@ -314,8 +318,8 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         m('div', [
           m('a', {
             target: '_blank',
-            href: app.chain ? app.chain.meta.chain.website : app.community.meta.website
-          }, app.chain ? app.chain.meta.chain.website : app.community.meta.website ),
+            href: website
+          }, extractDomain(website)),
         ]),
       ]),
       m('.community-info', [
@@ -323,8 +327,8 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         m('div', [
           m('a', {
             target: '_blank',
-            href: app.chain ? app.chain.meta.chain.chat : app.community.meta.chat
-          }, app.chain ? app.chain.meta.chain.chat : app.community.meta.chat),
+            href: chat
+          }, extractDomain(chat)),
         ]),
       ]),
     ]);
