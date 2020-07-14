@@ -87,7 +87,6 @@ class ChainInfo {
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
-    console.log(updatedChain);
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;

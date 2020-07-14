@@ -5,6 +5,7 @@ import { Table, Button } from 'construct-ui';
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { urlHasValidHTTPPrefix } from 'helpers';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
+import { notifyError } from 'controllers/app/notifications';
 
 interface ICommunityMetadataManagementState {
   name: string;
@@ -99,21 +100,21 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           invitesValue,
           privacyValue,
         } = vnode.state;
-        if (chat.length && !urlHasValidHTTPPrefix(chat)) {
-          // Error handling
-        }
         if (website.length && !urlHasValidHTTPPrefix(website)) {
-          // Error handling
+          notifyError('Website must have a valid http prefix');
+        } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+          notifyError('Chat must have a valid http prefix');
+        } else {
+          await vnode.attrs.community.updateCommunityData({
+            name,
+            description,
+            website,
+            chat,
+            privacyValue,
+            invitesValue,
+          });
+          $(e.target).trigger('modalexit');
         }
-        await vnode.attrs.community.updateCommunityData({
-          name,
-          description,
-          website,
-          chat,
-          privacyValue,
-          invitesValue,
-        });
-        $(e.target).trigger('modalexit');
       },
     }),
     ]);

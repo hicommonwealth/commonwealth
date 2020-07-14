@@ -4,6 +4,7 @@ import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
 import { urlHasValidHTTPPrefix } from 'helpers';
+import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -101,11 +102,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         intent: 'primary',
         onclick: async (e) => {
           const { name, description, website, chat } = vnode.state;
-          if (chat.length && !urlHasValidHTTPPrefix(chat)) {
-            // Error handling
-          }
           if (website.length && !urlHasValidHTTPPrefix(website)) {
-            // Error handling
+            notifyError('Website must have a valid http prefix');
+          } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+            notifyError('Chat must have a valid http prefix');
           }
           await vnode.attrs.chain.updateChainData(name, description, website, chat);
           $(e.target).trigger('modalexit');
