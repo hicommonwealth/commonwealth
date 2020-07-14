@@ -28,13 +28,14 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
   const threads = await models.OffchainThread.findAll({
     where: {
       address_id: addressModel.id,
-    }
+    },
+    include: [ models.Address, ],
   });
 
   const comments = await models.OffchainComment.findAll({
     where: {
       address_id: addressModel.id,
-    }
+    },
   });
 
   return res.json({ status: 'Success', result: { account: addressModel, threads, comments } });

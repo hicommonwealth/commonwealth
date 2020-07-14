@@ -6,11 +6,13 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { OffchainThread } from 'models';
+import { OffchainThread, OffchainComment, OffchainAttachment } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
+import { uniqueIdToProposal } from 'identifiers';
+import moment from 'moment';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -183,6 +185,51 @@ import PageNotFound from '../404';
 //   }
 // });
 
+const commentModelFromServer = (comment) => {
+  const attachments = comment.OffchainAttachments
+    ? comment.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+    : [];
+  // const proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+  return new OffchainComment(
+    comment.chain,
+    comment?.Address?.address || comment.author,
+    decodeURIComponent(comment.text),
+    comment.version_history,
+    attachments,
+    null,
+    comment.id,
+    moment(comment.created_at),
+    comment.child_comments,
+    comment.root_id,
+    comment.parent_id,
+    comment.community,
+    comment?.Address?.chain || comment.authorChain,
+  );
+};
+
+const threadModelFromServer = (thread) => {
+  const attachments = thread.OffchainAttachments
+    ? thread.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+    : [];
+  return new OffchainThread(
+    thread.Address.address,
+    decodeURIComponent(thread.title),
+    attachments,
+    thread.id,
+    moment(thread.created_at),
+    thread.tag,
+    thread.kind,
+    thread.version_history,
+    thread.community,
+    thread.chain,
+    thread.private,
+    thread.read_only,
+    decodeURIComponent(thread.body),
+    thread.url,
+    thread.Address.chain,
+    thread.pinned,
+  );
+};
 
 export enum UserContent {
   All = 'all',
@@ -190,8 +237,15 @@ export enum UserContent {
   Comments = 'comments'
 }
 
+interface IProfilePageState {
+  account: any;
+  // threads: OffchainThread[];
+  // comments: OffchainComment<any>[];
+  loaded: boolean;
+  loading: boolean;
+}
 
-const ProfilePage: m.Component<{ address: string }, { account: any, loaded: boolean, loading: boolean, }> = {
+const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.loaded = false;
@@ -216,6 +270,21 @@ const ProfilePage: m.Component<{ address: string }, { account: any, loaded: bool
           console.dir(result);
           vnode.state.loaded = true;
           vnode.state.loading = false;
+          // vnode.state.account = result.account;
+          vnode.state.account = (app.chain)
+            ? app.chain.accounts.get(vnode.attrs.address)
+            : app.community.accounts.get(vnode.attrs.address);
+          result.threads.forEach((t) => {
+            console.dir(t);
+            if (!app.threads.store.getByIdentifier(t.id)) app.threads.store.add(threadModelFromServer(t));
+          });
+          console.dir('done with threads');
+          console.dir(app.threads.store.getAll());
+          result.comments.forEach((c) => {
+            console.dir(c);
+            if (!app.comments.store.getById(c.id)) app.comments.store.add(commentModelFromServer(c));
+          });
+          console.dir(app.comments.store.getAll());
           m.redraw();
         },
         error: (err) => {
@@ -248,7 +317,6 @@ const ProfilePage: m.Component<{ address: string }, { account: any, loaded: bool
     // const signaling = (app.chain as Edgeware).signaling.store.getAll()
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
-
     const proposals = app.threads.store.getAll()
       .filter((p) => p instanceof OffchainThread && p.author === vnode.attrs.address)
       .sort((a, b) => +b.createdAt - +a.createdAt);
@@ -256,6 +324,10 @@ const ProfilePage: m.Component<{ address: string }, { account: any, loaded: bool
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
+    // const proposals = vnode.state.threads;
+    // const comments = vnode.state.comments;
+    // const allContent = [].concat(proposals || []).concat(comments || [])
+    //   .sort((a, b) => +b.createdAt - +a.createdAt);
 
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
