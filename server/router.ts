@@ -59,6 +59,8 @@ import createInviteLink from './routes/createInviteLink';
 import acceptInviteLink from './routes/acceptInviteLink';
 import getInviteLinks from './routes/getInviteLinks';
 import deleteGithubAccount from './routes/deleteGithubAccount';
+import getProfile from './routes/getProfile';
+
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -143,6 +145,10 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
   router.post('/deleteThread', passport.authenticate('jwt', { session: false }), deleteThread.bind(this, models));
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
+
+  // TODO: GET /profile
+  router.get('/getProfile', getProfile.bind(this, models));
+
 
   // offchain discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), createDraft.bind(this, models));
