@@ -76,12 +76,14 @@ class ChainInfo {
     });
   }
 
-  public async updateChainData(name: string, description: string,) {
+  public async updateChainData(name: string, description: string, website: string, chat: string) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
       'name': name,
       'description': description,
+      'website': website,
+      'chat': chat,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;

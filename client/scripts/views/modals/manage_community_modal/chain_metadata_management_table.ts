@@ -3,12 +3,14 @@ import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
-import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
+import { IChainOrCommMetadataManagementAttrs, urlHasValidPrefix } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface IChainMetadataManagementState {
   name: string;
   description: string;
+  website: string;
+  chat: string;
   url: string;
   loadingFinished: boolean;
   loadingStarted: boolean;
@@ -21,7 +23,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.chain.name;
     vnode.state.description = vnode.attrs.chain.description;
-    vnode.state.url = vnode.attrs.chain.id;
+    vnode.state.website = vnode.attrs.chain.id;
+    vnode.state.chat = vnode.attrs.chain.chat;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -46,10 +49,16 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           textarea: true,
         }),
         m(InputPropertyRow, {
-          title: 'URL',
-          defaultValue: `commonwealth.im/${vnode.state.url}`,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.url = v; },
+          title: 'Website',
+          defaultValue: vnode.state.website,
+          placeholder: 'https://example.com',
+          onChangeHandler: (v) => { vnode.state.website = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Chat',
+          defaultValue: vnode.state.chat,
+          placeholder: 'https://discord.gg',
+          onChangeHandler: (v) => { vnode.state.chat = v; },
         }),
         m(InputPropertyRow, {
           title: 'Network',
@@ -90,7 +99,14 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          await vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
+          const { name, description, website, chat } = vnode.state;
+          if (chat.length && !urlHasValidPrefix(chat)) {
+            // Error handling
+          }
+          if (website.length && !urlHasValidPrefix(website)) {
+            // Error handling
+          }
+          await vnode.attrs.chain.updateChainData(name, description, website, chat);
           $(e.target).trigger('modalexit');
         },
       }),

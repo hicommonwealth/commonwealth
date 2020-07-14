@@ -22,7 +22,7 @@ export interface IChainOrCommMetadataManagementAttrs {
   mods;
 }
 
-const urlHasValidPrefix = (url: string) => {
+export const urlHasValidPrefix = (url: string) => {
   return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
 };
 
@@ -96,12 +96,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       intent: 'primary',
       onclick: async (e) => {
         const {
-          chat,
-          description,
-          invitesValue,
           name,
-          privacyValue,
+          description,
           website,
+          chat,
+          invitesValue,
+          privacyValue,
         } = vnode.state;
         if (chat.length && !urlHasValidPrefix(chat)) {
           // Error handling
@@ -112,10 +112,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         await vnode.attrs.community.updateCommunityData({
           name,
           description,
-          privacyValue,
-          invitesValue,
           website,
           chat,
+          privacyValue,
+          invitesValue,
         });
         $(e.target).trigger('modalexit');
       },
