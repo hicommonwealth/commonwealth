@@ -6,7 +6,7 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, OffchainAttachment } from 'models';
+import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
@@ -275,13 +275,21 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         },
         success: (response) => {
           const { result } = response;
-          console.dir(result);
           vnode.state.loaded = true;
           vnode.state.loading = false;
-          // vnode.state.account = result.account;
-          vnode.state.account = (app.chain)
-            ? app.chain.accounts.get(vnode.attrs.address)
-            : app.community.accounts.get(vnode.attrs.address);
+          const a = result.account;
+          const profile = new Profile(a.chain, a.address);
+          const profileData = JSON.parse(a.OffchainProfile.data);
+          profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+          const account = {
+            profile,
+            chain: a.chain,
+            address: a.address,
+            id: a.id,
+            name: a.name,
+            user_id: a.user_id,
+          };
+          vnode.state.account = account;
           vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
           // vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
           m.redraw();
@@ -318,18 +326,18 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     // const proposals = app.threads.store.getAll()
     //   .filter((p) => p instanceof OffchainThread && p.author === vnode.attrs.address)
     //   .sort((a, b) => +b.createdAt - +a.createdAt);
-    // const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
-    //   .sort((a, b) => +b.createdAt - +a.createdAt);
+    const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
+      .sort((a, b) => +b.createdAt - +a.createdAt);
     // const allContent = [].concat(proposals || []).concat(comments || [])
     //   .sort((a, b) => +b.createdAt - +a.createdAt);
     const proposals = vnode.state.threads;
-    const comments = vnode.state.comments;
+    // const comments = vnode.state.comments;
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
-    // const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
+    const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
 
     return m(Sublayout, {
       class: 'ProfilePage',
@@ -353,14 +361,14 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
                 content: { proposals }
               }),
             },
-            // {
-            //   name: commentsTabTitle,
-            //   content: m(ProfileContent, {
-            //     account,
-            //     type: UserContent.Comments,
-            //     content: { comments }
-            //   }),
-            // }
+            {
+              name: commentsTabTitle,
+              content: m(ProfileContent, {
+                account,
+                type: UserContent.Comments,
+                content: { comments }
+              }),
+            }
             ]),
           ]),
           m('.col-xs-4', [
