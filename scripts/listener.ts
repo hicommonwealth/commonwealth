@@ -1,8 +1,11 @@
+import { IEventHandler, CWEvent } from '../src/interfaces';
+
 import subscribeMolochEvents, { createMolochApi } from '../src/moloch/index';
 import { MolochEventChains } from '../src/moloch/types';
+
 import subscribeSubstrateEvents, { createSubstrateApi, createSubstrateProvider } from '../src/substrate/index';
 import { SubstrateEventChains } from '../src/substrate/types';
-import { IEventHandler, CWEvent } from '../src/interfaces';
+import storageFetcher from '../src/substrate/storageFetcher';
 
 import { factory, formatFilename } from '../src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -14,7 +17,7 @@ log.info(`Listening to events on ${chain}.`);
 const networks = {
   'edgeware': 'ws://mainnet1.edgewa.re:9944',
   'edgeware-local': 'ws://localhost:9944',
-  'kusama': 'ws://kusama-rpc.polkadot.io:9944',
+  'kusama': 'wss://kusama-rpc.polkadot.io',
   'polkadot': 'wss://rpc.polkadot.io',
 
   'moloch': 'wss://mainnet.infura.io/ws',
@@ -38,7 +41,10 @@ const url = networks[chain];
 if (!url) throw new Error(`no url for chain ${chain}`);
 if (SubstrateEventChains.includes(chain)) {
   createSubstrateProvider(url).then((provider) => {
-    return createSubstrateApi(provider, true).isReady;
+    return createSubstrateApi(provider, chain).isReady;
+  }).then((api) => {
+    const fetcher = new storageFetcher(api);
+    return fetcher.fetch().then(() => api);
   }).then((api) => {
     subscribeSubstrateEvents({
       chain,
@@ -47,7 +53,7 @@ if (SubstrateEventChains.includes(chain)) {
       skipCatchup,
       verbose: true,
     });
-  })
+  });
 } else if (MolochEventChains.includes(chain)) {
   const contract = contracts[chain];
   const contractVersion = 1;

@@ -31,9 +31,9 @@ export async function createSubstrateProvider(url: string): Promise<WsProvider> 
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createSubstrateApi(provider: WsProvider, isEdgeware: boolean): ApiPromise {
+export function createSubstrateApi(provider: WsProvider, chain: string): ApiPromise {
   const registry = new TypeRegistry();
-  if (isEdgeware) {
+  if (chain.startsWith('edgeware')) {
     const edgewareTypes = Object.values(edgewareDefinitions)
       // .map((v) => v.default)
       .reduce((res, { types }): object => ({ ...res, ...types }), {});
@@ -50,6 +50,7 @@ export function createSubstrateApi(provider: WsProvider, isEdgeware: boolean): A
         Votes: 'VotesTo230',
         ReferendumInfo: 'ReferendumInfoTo239',
         Weight: 'u32',
+        OpenTip: 'OpenTipTo225'
       },
       registry
     });
