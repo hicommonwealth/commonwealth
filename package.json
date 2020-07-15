@@ -8,7 +8,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publish": "npm publish --access public",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",
     "listen": "ts-node -T ./scripts/listener.ts"
   },
