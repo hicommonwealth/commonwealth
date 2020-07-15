@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
-$discussion-vertical-padding: 37px;
-$discussion-horizontal-padding: 60px;
+$discussion-inner-padding: 37px;
+$discussion-outer-padding: 60px;
 $discussion-separator-padding: 30px; // padding around horizontal rule between header and body
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
 $discussion-reaction-padding: 18px; // padding between comment content & comment reaction
@@ -22,7 +22,6 @@ $discussion-meta-color: #999;
 
 .ViewProposalPage {
     .ProposalHeader {
-        padding-top: $discussion-horizontal-padding;
         .proposal-content {
             position: relative;
         }
@@ -34,12 +33,21 @@ $discussion-meta-color: #999;
     .ProposalHeader,
     .ProposalComment,
     .CreateComment {
-        margin: 0 $discussion-horizontal-padding;
-        padding-top: $discussion-vertical-padding;
+        padding-top: $discussion-inner-padding;
     }
     .ProposalComments.no-active-account,
     .CreateComment {
-        padding-bottom: $discussion-vertical-padding * 2;
+        padding-bottom: $discussion-outer-padding;
+    }
+    .proposal-body-bottom, .comment-body-bottom {
+        display: flex;
+        justify-content: space-between;
+        .proposal-body-button-group, .comment-body-bottom-right {
+            margin-top: 18px;
+            .cancel-editing {
+                margin-right: 15px;
+            }
+        }
     }
 
     //
@@ -65,6 +73,7 @@ $discussion-meta-color: #999;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
+            margin-right: $discussion-outer-padding;
             .proposal-content-meta {
                 padding-bottom: $discussion-meta-padding;
                 font-size: $discussion-meta-font-size;

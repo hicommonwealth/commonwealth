@@ -6,7 +6,7 @@ import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
 import {
   Tabs, TabItem, Form, FormGroup, Input, Button,
-  ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem
+  ButtonGroup, Icon, Icons, Grid, Col, Tooltip, List, ListItem
 } from 'construct-ui';
 
 import app from 'state';
@@ -145,6 +145,7 @@ export const NewThreadForm: m.Component<{
   uploadsInProgress: number,
 }> = {
   view: (vnode) => {
+    if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     const { isModal } = vnode.attrs;
@@ -199,6 +200,19 @@ export const NewThreadForm: m.Component<{
                 vnode.state.newType = 'Link';
               },
               active: vnode.state.newType === 'Link',
+            }),
+            m('.tab-spacer', { style: 'flex: 1' }),
+            isModal && m.route.get() !== `${app.activeId()}/new/thread` && m(TabItem, {
+              class: 'tab-right',
+              label: [
+                'Full editor',
+                m(Icon, { name: Icons.ARROW_UP_RIGHT, style: 'margin-left: 5px;' }),
+              ],
+              onclick: (e) => {
+                m.route.set(`/${app.activeId()}/new/thread`);
+                $(e.target).trigger('modalexit');
+                // TODO: transfer any discussion or link into the page editor
+              },
             }),
           ]),
         ]),
@@ -433,9 +447,15 @@ export const NewThreadForm: m.Component<{
               m('.discussion-draft-actions', [
                 m('a', {
                   href: '#',
-                  onclick: (e) => {
+                  onclick: async (e) => {
                     e.preventDefault();
-                    // TODO
+                    e.stopPropagation();
+                    try {
+                      await app.user.discussionDrafts.delete(draft.id);
+                    } catch (err) {
+                      vnode.state.error.draft = err;
+                    }
+                    m.redraw();
                   }
                 }, 'Delete')
               ]),
