@@ -7,10 +7,10 @@ import { ERC20Token } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
-import MolochStorageFetcher from 'commonwealth-chain-events/dist/src/moloch/storageFetcher';
-import MolochEventSubscriber from 'commonwealth-chain-events/dist/src/moloch/subscriber';
-import MolochEventProcessor from 'commonwealth-chain-events/dist/src/moloch/processor';
-import { MolochEntityKind } from 'commonwealth-chain-events/dist/src/moloch/types';
+import MolochStorageFetcher from '@commonwealth/chain-events/dist/src/moloch/storageFetcher';
+import MolochEventSubscriber from '@commonwealth/chain-events/dist/src/moloch/subscriber';
+import MolochEventProcessor from '@commonwealth/chain-events/dist/src/moloch/processor';
+import { MolochEntityKind } from '@commonwealth/chain-events/dist/src/moloch/types';
 
 import MolochProposal from './proposal';
 import MolochMembers from './members';

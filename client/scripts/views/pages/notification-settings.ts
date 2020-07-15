@@ -9,9 +9,9 @@ import _ from 'lodash';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'commonwealth-chain-events/dist/src/substrate/types';
-import SubstrateTitlerFunc from 'commonwealth-chain-events/dist/src/substrate/filters/titler';
-import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'commonwealth-chain-events/dist/src/interfaces';
+import { SubstrateEventKinds } from '@commonwealth/chain-events/dist/src/substrate/types';
+import SubstrateTitlerFunc from '@commonwealth/chain-events/dist/src/substrate/filters/titler';
+import { IChainEventKind, EventSupportingChains, TitlerFilter } from '@commonwealth/chain-events/dist/src/interfaces';
 import { Button, Icons, Select, List, ListItem, Tooltip, Icon } from 'construct-ui';
 import Sublayout from 'views/sublayout';
 

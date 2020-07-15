@@ -13,10 +13,10 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
-import { MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
-import SubstrateLabeler from 'commonwealth-chain-events/dist/src/substrate/filters/labeler';
-import MolochLabeler from 'commonwealth-chain-events/dist/src/moloch/filters/labeler';
+import { SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
+import SubstrateLabeler from '@commonwealth/chain-events/dist/src/substrate/filters/labeler';
+import MolochLabeler from '@commonwealth/chain-events/dist/src/moloch/filters/labeler';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {

@@ -4,10 +4,10 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
-import { CWEvent } from 'commonwealth-chain-events/dist/src/interfaces';
+import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
 import {
   SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData
-} from 'commonwealth-chain-events/dist/src/substrate/types';
+} from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';

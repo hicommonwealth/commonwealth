@@ -3,7 +3,7 @@ import { ApiRx } from '@polkadot/api';
 import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { ITXModalData, ProposalModule } from 'models';
-import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';

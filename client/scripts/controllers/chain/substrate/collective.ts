@@ -2,7 +2,7 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';

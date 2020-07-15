@@ -9,7 +9,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ISubstrateCollectiveProposed, SubstrateEventKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { ISubstrateCollectiveProposed, SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';

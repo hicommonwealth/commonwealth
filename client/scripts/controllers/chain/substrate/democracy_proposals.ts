@@ -5,7 +5,7 @@ import { BlockNumber, Call, Balance, VoteThreshold, Hash } from '@polkadot/types
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';

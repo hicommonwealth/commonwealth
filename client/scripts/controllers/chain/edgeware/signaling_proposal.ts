@@ -11,7 +11,7 @@ import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { ISubstrateSignalingNewProposal, SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { VoteOutcome, VoteRecord } from 'edgeware-node-types/interfaces';
 import EdgewareSignaling from './signaling';
 

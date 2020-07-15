@@ -39,12 +39,12 @@ import {
   ChainEvent,
 } from 'models';
 
-import SubstrateStorageFetcher from 'commonwealth-chain-events/dist/src/substrate/storageFetcher';
-import SubstrateEventSubscriber from 'commonwealth-chain-events/dist/src/substrate/subscriber';
-import SubstrateEventProcessor from 'commonwealth-chain-events/dist/src/substrate/processor';
+import SubstrateStorageFetcher from '@commonwealth/chain-events/dist/src/substrate/storageFetcher';
+import SubstrateEventSubscriber from '@commonwealth/chain-events/dist/src/substrate/subscriber';
+import SubstrateEventProcessor from '@commonwealth/chain-events/dist/src/substrate/processor';
 import {
   SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-} from 'commonwealth-chain-events/dist/src/substrate/types';
+} from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';

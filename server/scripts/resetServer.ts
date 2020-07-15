@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import { SubstrateEventKinds, SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
-import { MolochEventKinds, MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
-import { EventSupportingChains } from 'commonwealth-chain-events/dist/src/interfaces';
+import { SubstrateEventKinds, SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { MolochEventKinds, MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
+import { EventSupportingChains } from '@commonwealth/chain-events/dist/src/interfaces';
 
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';

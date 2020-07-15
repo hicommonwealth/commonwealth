@@ -8,7 +8,7 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { ProposalModule } from 'models';
-import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';

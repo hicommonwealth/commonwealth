@@ -4,8 +4,8 @@
 import WebSocket from 'ws';
 import {
   IEventHandler, CWEvent, eventToEntity, entityToFieldName, EntityEventKind, IChainEntityKind, IChainEventData
-} from 'commonwealth-chain-events/dist/src/interfaces';
-import { SubstrateEntityKind } from 'commonwealth-chain-events/dist/src/substrate/types';
+} from '@commonwealth/chain-events/dist/src/interfaces';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';

@@ -1,6 +1,6 @@
 import moment from 'moment-twitter';
 
-import { IChainEntityKind } from 'commonwealth-chain-events/dist/src/interfaces';
+import { IChainEntityKind } from '@commonwealth/chain-events/dist/src/interfaces';
 import ChainEvent from './ChainEvent';
 
 class ChainEntity {

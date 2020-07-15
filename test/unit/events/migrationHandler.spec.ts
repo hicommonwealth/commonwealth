@@ -4,8 +4,8 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { CWEvent } from 'commonwealth-chain-events/dist/src/interfaces';
-import { SubstrateEventKind, ISubstrateEventData } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
+import { SubstrateEventKind, ISubstrateEventData } from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';

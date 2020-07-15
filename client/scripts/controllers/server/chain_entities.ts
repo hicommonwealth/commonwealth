@@ -12,10 +12,10 @@ import {
   IStorageFetcher,
   IEventProcessor,
   IEventSubscriber
-} from 'commonwealth-chain-events/dist/src/interfaces';
+} from '@commonwealth/chain-events/dist/src/interfaces';
 import {
   SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted
-} from 'commonwealth-chain-events/dist/src/substrate/types';
+} from '@commonwealth/chain-events/dist/src/substrate/types';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',

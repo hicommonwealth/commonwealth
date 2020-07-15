@@ -777,6 +777,22 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@commonwealth/chain-events@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.1.1.tgz#80fa0df3a3d8d4edd92221c0be98f3aa71916cdf"
+  integrity sha512-wyP+fVQI0g+T4lsCusm+0qag56f/F7Kx0tqc5ieTI3Q4DjyEjQTy7CyLdCLlaOVaLS+lUEnYu26ZmIGG2sYTuw==
+  dependencies:
+    "@polkadot/api" "1.19.1"
+    bn.js "^5.1.2"
+    edgeware-node-types "2.3.2"
+    ethereum-block-by-date "^1.2.2"
+    ethers "^4.0.39"
+    sleep-promise "^8.0.1"
+    typescript-logging "^0.6.4"
+    underscore "^1.10.2"
+    web3 "^1.2.9"
+    web3-utils "^1.2.9"
+
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"
@@ -3852,22 +3868,6 @@ commondir@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
-
-commonwealth-chain-events@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/commonwealth-chain-events/-/commonwealth-chain-events-0.1.1.tgz#a4d5ad77d4baf842c6c756a6e8e4e8db8460e807"
-  integrity sha512-5hShS4+eovK5eO3AVNEgjzaOeOC1huoyndFvJbS7AgNs/kgYwhcvJ8wtHFh9ZkZB8wF8UfPhtc/wbJEsNgTBkg==
-  dependencies:
-    "@polkadot/api" "1.19.1"
-    bn.js "^5.1.2"
-    edgeware-node-types "2.3.2"
-    ethereum-block-by-date "^1.2.2"
-    ethers "^4.0.39"
-    sleep-promise "^8.0.1"
-    typescript-logging "^0.6.4"
-    underscore "^1.10.2"
-    web3 "^1.2.9"
-    web3-utils "^1.2.9"
 
 component-emitter@^1.2.0, component-emitter@^1.2.1, component-emitter@^1.3.0:
   version "1.3.0"

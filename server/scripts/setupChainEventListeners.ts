@@ -1,13 +1,13 @@
 import WebSocket from 'ws';
 import subscribeSubstrateEvents, {
   createSubstrateProvider, createSubstrateApi
-} from 'commonwealth-chain-events/dist/src/substrate/index';
-import subscribeMolochEvents, { createMolochApi } from 'commonwealth-chain-events/dist/src/moloch/index';
+} from '@commonwealth/chain-events/dist/src/substrate/index';
+import subscribeMolochEvents, { createMolochApi } from '@commonwealth/chain-events/dist/src/moloch/index';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
-} from 'commonwealth-chain-events/dist/src/interfaces';
-import { SubstrateEventChains } from 'commonwealth-chain-events/dist/src/substrate/types';
-import { MolochEventChains } from 'commonwealth-chain-events/dist/src/moloch/types';
+} from '@commonwealth/chain-events/dist/src/interfaces';
+import { SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';

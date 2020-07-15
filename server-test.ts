@@ -10,7 +10,7 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SubstrateEventKinds } from 'commonwealth-chain-events/dist/src/substrate/types';
+import { SubstrateEventKinds } from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
