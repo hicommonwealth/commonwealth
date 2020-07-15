@@ -1,7 +1,7 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
 
-import * as edgewareDefinitions from 'edgeware-node-types/interfaces/definitions';
+import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
 
 import Subscriber from './subscriber';
 import Poller from './poller';

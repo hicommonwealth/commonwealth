@@ -4,7 +4,7 @@ import {
   ReferendumIndex, ProposalIndex, VoteThreshold, Hash, BlockNumber, Votes, Extrinsic,
   ReferendumInfo
 } from '@polkadot/types/interfaces';
-import { ProposalRecord, VoteRecord } from 'edgeware-node-types/interfaces/types';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';

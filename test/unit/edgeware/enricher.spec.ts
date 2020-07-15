@@ -6,7 +6,7 @@ import {
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
-import { ProposalRecord, VoteRecord } from 'edgeware-node-types/interfaces';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces';
 import SubstrateEnricherFunc from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
 import { SubstrateEventKind } from '../../../src/substrate/types';

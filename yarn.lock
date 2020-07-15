@@ -203,6 +203,11 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@edgeware/node-types@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-2.3.5.tgz#2d7f9e4da9238dcfcd666b64e1bcb91d666abb2f"
+  integrity sha512-pCpv0iNCrPww2GmykPHX6NKn8VbO17m9Fw6kFdqNXPvHG81BapcCEUJVdDINFp38fBaoaA9vNA6F15j/+CNQfw==
+
 "@ethersproject/abi@5.0.0-beta.153":
   version "5.0.0-beta.153"
   resolved "https://registry.yarnpkg.com/@ethersproject/abi/-/abi-5.0.0-beta.153.tgz#43a37172b33794e4562999f6e2d555b7599a8eee"
@@ -1523,11 +1528,6 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
-
-edgeware-node-types@2.3.4:
-  version "2.3.4"
-  resolved "https://registry.yarnpkg.com/edgeware-node-types/-/edgeware-node-types-2.3.4.tgz#cfe53bba0d3d9e13ee8bc8d6f43f3d38527cdc15"
-  integrity sha512-ELRQozPYqDrryACzr2LSoFdltFD8bsV3YGvEJ2itW3FndtGZhkPMjbi1FQ3dyLR6g8pc5n/ee7ISqkopAQLLLw==
 
 ee-first@1.1.1:
   version "1.1.1"
