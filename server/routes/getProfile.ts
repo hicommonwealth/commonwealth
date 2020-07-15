@@ -70,6 +70,11 @@ const getProfile = async (models, req: Request, res: Response, next: NextFunctio
   const comments = await models.OffchainComment.findAll({
     where: {
       address_id: addressModel.id,
+      [Op.or]: [{
+        community: { [Op.in]: visibleCommunityIds }
+      }, {
+        chain: { [Op.in]: visibleChainIds }
+      }]
     },
   });
 
