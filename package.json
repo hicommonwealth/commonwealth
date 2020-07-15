@@ -1,5 +1,5 @@
 {
-  "name": "commonwealth-chain-events",
+  "name": "@commonwealth/chain-events",
   "version": "0.1.1",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "publish": "npm publish --access public",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",
     "listen": "ts-node -T ./scripts/listener.ts"
   },
@@ -18,7 +19,10 @@
     "type": "git",
     "url": "git+https://github.com/hicommonwealth/chain-events.git"
   },
-  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/hicommonwealth/chain-events/issues"
+  },
+  "homepage": "https://github.com/hicommonwealth/chain-events#readme",
   "dependencies": {
     "@polkadot/api": "1.19.1",
     "bn.js": "^5.1.2",
