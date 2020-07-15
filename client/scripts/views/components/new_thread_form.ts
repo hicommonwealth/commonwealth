@@ -209,8 +209,10 @@ export const NewThreadForm: m.Component<{
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
+                localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
                 if (detectURL(value)) getUrlForLinkPost();
               },
+              defaultValue: localStorage.getItem(`${app.activeId()}-new-link-storedLink`),
               tabindex: 1,
             }),
           ]),
@@ -223,7 +225,9 @@ export const NewThreadForm: m.Component<{
                 vnode.state.autoTitleOverride = true;
                 if (vnode.state.error.title) delete vnode.state.error.title;
                 vnode.state.form.title = value;
+                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.title);
               },
+              defaultValue: localStorage.getItem(`${app.activeId()}-new-link-storedTitle`),
               tabindex: 1,
             }),
           ]),
