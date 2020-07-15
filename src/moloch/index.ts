@@ -82,7 +82,7 @@ export async function createMolochApi(
  * @returns An active block subscriber.
  */
 const subscribe: SubscribeFunc<MolochApi, MolochRawEvent, IMolochSubscribeOptions> = async (options) => {
-  const { chain, api, handlers, skipCatchup, discoverReconnectRange, contractVersion } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, contractVersion, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IMolochEventData>) => {
     let prevResult = null;
@@ -113,7 +113,7 @@ const subscribe: SubscribeFunc<MolochApi, MolochRawEvent, IMolochSubscribeOption
     }
   };
 
-  const subscriber = new Subscriber(api, chain);
+  const subscriber = new Subscriber(api, chain, verbose);
 
   // helper function that runs after we've been offline/the server's been down,
   // and attempts to fetch skipped events

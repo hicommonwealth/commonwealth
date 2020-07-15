@@ -41,7 +41,8 @@ export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
           versionNumber: this._versionNumber,
           versionName: this._versionName,
         };
-        log.trace(`Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`);
+        const logStr = `Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`;
+        this._verbose ? log.info(logStr) : log.trace(logStr);
         cb(block);
       });
     });

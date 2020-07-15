@@ -70,7 +70,7 @@ export function createSubstrateApi(provider: WsProvider, isEdgeware: boolean): A
  * @returns An active block subscriber.
  */
 const subscribe: SubscribeFunc<ApiPromise, SubstrateBlock, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, discoverReconnectRange, performMigration } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, performMigration, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<ISubstrateEventData>) => {
     let prevResult = null;
@@ -109,7 +109,7 @@ const subscribe: SubscribeFunc<ApiPromise, SubstrateBlock, ISubscribeOptions<Api
     return;
   }
 
-  const subscriber = new Subscriber(api);
+  const subscriber = new Subscriber(api, verbose);
   const poller = new Poller(api);
 
   // helper function that runs after we've been offline/the server's been down,

@@ -58,6 +58,7 @@ export abstract class IEventProcessor<Api, RawEvent> {
 export abstract class IEventSubscriber<Api, RawEvent> {
   constructor(
     protected _api: Api,
+    protected _verbose = false,
   ) { }
 
   // throws on error
@@ -73,6 +74,7 @@ export interface ISubscribeOptions<Api> {
   skipCatchup?: boolean;
   discoverReconnectRange?: () => Promise<IDisconnectedRange>;
   performMigration?: boolean;
+  verbose?: boolean;
 }
 
 export type SubscribeFunc<
