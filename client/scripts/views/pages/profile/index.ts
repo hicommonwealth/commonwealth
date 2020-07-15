@@ -323,15 +323,12 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     // const signaling = (app.chain as Edgeware).signaling.store.getAll()
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
-    // const proposals = app.threads.store.getAll()
-    //   .filter((p) => p instanceof OffchainThread && p.author === vnode.attrs.address)
-    //   .sort((a, b) => +b.createdAt - +a.createdAt);
+
     const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
       .sort((a, b) => +b.createdAt - +a.createdAt);
-    // const allContent = [].concat(proposals || []).concat(comments || [])
-    //   .sort((a, b) => +b.createdAt - +a.createdAt);
-    const proposals = vnode.state.threads;
     // const comments = vnode.state.comments;
+
+    const proposals = vnode.state.threads;
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
 
