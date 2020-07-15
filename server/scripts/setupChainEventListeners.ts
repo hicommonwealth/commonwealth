@@ -70,7 +70,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
         const url = protocol + node.url;
         const provider = await createSubstrateProvider(url);
-        const api = await createSubstrateApi(provider, node.chain.startsWith('edgeware')).isReady;
+        const api = await createSubstrateApi(provider, node.chain).isReady;
         subscriber = await subscribeSubstrateEvents({
           chain: node.chain,
           handlers,

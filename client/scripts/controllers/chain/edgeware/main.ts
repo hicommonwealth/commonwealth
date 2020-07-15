@@ -72,6 +72,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
           Votes: 'VotesTo230',
           ReferendumInfo: 'ReferendumInfoTo239',
           Weight: 'u32',
+          OpenTip: 'OpenTipTo225',
         },
         // override duplicate type name
         typesAlias: { voting: { Tally: 'VotingTally' } },

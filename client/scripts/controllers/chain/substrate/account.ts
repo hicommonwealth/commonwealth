@@ -269,6 +269,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
       }));
   }
 
+  /*
   // Accounts may set a proxy that can take council and democracy actions on behalf of their account
   public get proxyFor(): Observable<SubstrateAccount> {
     if (!this._Chain?.apiInitialized) return;
@@ -281,6 +282,7 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
         }
       }));
   }
+  */
 
   // Accounts may delegate their voting power for democracy referenda. This always incurs the maximum locktime
   public get delegation(): Observable<[ SubstrateAccount, number ]> {
