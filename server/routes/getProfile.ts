@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { } from '../../shared/types';
 
 import { Op } from 'sequelize';
 import _ from 'lodash';
