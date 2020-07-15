@@ -1,7 +1,7 @@
 import 'components/proposals/voting_results.scss';
 
 import m from 'mithril';
-import { VoteOutcome } from 'edgeware-node-types/interfaces';
+import { VoteOutcome } from '@edgeware/node-types/interfaces';
 import { u8aToString } from '@polkadot/util';
 
 import { formatCoin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()

@@ -1,3 +1,4 @@
+import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
@@ -6,7 +7,6 @@ import { SubstrateCouncil } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
 import SubstratePhragmenElections from 'controllers/chain/substrate/phragmen_elections';
-import * as edgewareDefinitions from 'edgeware-node-types/interfaces/definitions';
 import { ChainClass, IChainAdapter, ChainBase, ChainEntity, ChainEvent } from 'models';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareSignaling from './signaling';
