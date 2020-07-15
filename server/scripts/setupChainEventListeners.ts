@@ -65,11 +65,17 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       }
       let subscriber: IEventSubscriber<any, any>;
       if (SubstrateEventChains.includes(node.chain)) {
-        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
-        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
-        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-        const url = protocol + node.url;
-        const provider = await createSubstrateProvider(url);
+        let nodeUrl = node.url;
+        const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
+        nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
+        const isInsecureProtocol = nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1
+          && nodeUrl.indexOf('rpc.polkadot.io') === -1;
+        const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
+        if (nodeUrl.indexOf(':9944') !== -1) {
+          nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
+        }
+        nodeUrl = protocol + nodeUrl;
+        const provider = await createSubstrateProvider(nodeUrl);
         const api = await createSubstrateApi(provider, node.chain).isReady;
         subscriber = await subscribeSubstrateEvents({
           chain: node.chain,
