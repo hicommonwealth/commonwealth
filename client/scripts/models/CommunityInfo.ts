@@ -94,8 +94,7 @@ class CommunityInfo {
       website,
     } = communityData;
     // TODO: Change to PUT /community
-    console.log('updateCommunityData:');
-    console.log({website, chat});
+
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,
