@@ -266,7 +266,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       const chain = m.route.param('base');
       const { address } = vnode.attrs;
       await $.ajax({
-        url: `${app.serverUrl()}/getProfile`,
+        url: `${app.serverUrl()}/profile`,
         type: 'GET',
         data: {
           address,
@@ -298,6 +298,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           console.log('Failed to find profile');
           console.error(err);
           vnode.state.loaded = true;
+          vnode.state.loading = false;
           m.redraw();
           throw new Error((err.responseJSON && err.responseJSON.error) ? err.responseJSON.error
             : 'Failed to find profile');
@@ -309,7 +310,6 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     if (!account && !loaded && !loading) {
       vnode.state.loading = true;
       loadProfile();
-      m.redraw();
     }
     if (loading) return m(PageLoading);
     if (!account) {
