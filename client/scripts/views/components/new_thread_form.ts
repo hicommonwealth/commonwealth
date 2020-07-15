@@ -413,9 +413,15 @@ export const NewThreadForm: m.Component<{
               m('.discussion-draft-actions', [
                 m('a', {
                   href: '#',
-                  onclick: (e) => {
+                  onclick: async (e) => {
                     e.preventDefault();
-                    // TODO
+                    e.stopPropagation();
+                    try {
+                      await app.user.discussionDrafts.delete(draft.id);
+                    } catch (err) {
+                      vnode.state.error.draft = err;
+                    }
+                    m.redraw();
                   }
                 }, 'Delete')
               ]),

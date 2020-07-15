@@ -109,7 +109,7 @@ class DraftsController {
           'jwt': app.user.jwt,
         }
       });
-      if (response.status !== 200) {
+      if (response.status !== 'Success') {
         throw new Error(`${response.status} error: Failed to delete draft`);
       }
       const draft = this._store.getById(id);
