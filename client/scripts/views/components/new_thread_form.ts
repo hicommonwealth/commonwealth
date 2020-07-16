@@ -188,7 +188,8 @@ export const NewThreadForm: m.Component<{
     const getUrlForLinkPost = _.debounce(async () => {
       try {
         const title = await getLinkTitle(vnode.state.form.url);
-        if (!vnode.state.autoTitleOverride) {
+        if (!vnode.state.autoTitleOverride && title) {
+          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, title);
           vnode.state.form.linkTitle = title;
         }
       } catch (err) {

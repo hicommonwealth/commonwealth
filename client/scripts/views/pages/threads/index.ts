@@ -214,8 +214,11 @@ export const getLinkTitle = async (url: string) => {
   const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
   if (response.status === 404) throw new Error(`404: ${url} Not Found`);
   if (response.status === 500) throw new Error(`500: ${url} Server Error`);
-  const html = await response.text();
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const title = doc.querySelectorAll('title')[0].innerText;
-  return title;
+  if (response.status === 200) {
+    const html = await response.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    console.log(doc);
+    const title = doc.querySelectorAll('title')[0];
+    if (title) return title.innerText;
+  }
 };
