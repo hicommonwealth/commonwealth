@@ -9,6 +9,8 @@ interface CommunityData {
   description: string,
   website: string,
   chat: string,
+  telegram: string,
+  github: string,
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -19,6 +21,8 @@ class CommunityInfo {
   public description: string;
   public chat: string;
   public website: string;
+  public telegram: string;
+  public github: string;
   public readonly defaultChain: ChainInfo;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
@@ -26,12 +30,17 @@ class CommunityInfo {
   public readonly tags: OffchainTag[];
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, name, description, website, chat, defaultChain, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?) {
+  constructor(
+    id, name, description, website, chat, telegram, github, defaultChain,
+    invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?
+  ) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.website = website;
     this.chat = chat;
+    this.telegram = telegram;
+    this.github = github;
     this.defaultChain = defaultChain;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
@@ -47,6 +56,8 @@ class CommunityInfo {
       json.description,
       json.website,
       json.chat,
+      json.telegram,
+      json.github,
       json.default_chain,
       json.invitesEnabled,
       json.privacyEnabled,
@@ -86,12 +97,14 @@ class CommunityInfo {
 
   public async updateCommunityData(communityData) {
     const {
-      chat,
       description,
       invitesEnabled,
       name,
       privacyEnabled,
       website,
+      chat,
+      telegram,
+      github,
     } = communityData;
     // TODO: Change to PUT /community
 
@@ -101,6 +114,8 @@ class CommunityInfo {
       'description': description,
       'website': website,
       'chat': chat,
+      'telegram': telegram,
+      'github': github,
       'privacy': privacyEnabled,
       'invites': invitesEnabled,
       'jwt': app.user.jwt,
@@ -110,6 +125,8 @@ class CommunityInfo {
     this.description = updatedCommunity.description;
     this.website = updatedCommunity.website;
     this.chat = updatedCommunity.chat;
+    this.telegram = updatedCommunity.telegram;
+    this.github = updatedCommunity.github;
     this.privacyEnabled = updatedCommunity.privacyEnabled;
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }

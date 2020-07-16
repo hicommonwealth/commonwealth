@@ -22,6 +22,24 @@ module.exports = {
         { transaction: t }
       );
       await queryInterface.addColumn(
+        'OffchainCommunities',
+        'telegram',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
+        'OffchainCommunities',
+        'github',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
         'Chains',
         'website',
         {
@@ -33,6 +51,24 @@ module.exports = {
       await queryInterface.addColumn(
         'Chains',
         'chat',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
+        'Chains',
+        'telegram',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
+        'Chains',
+        'github',
         {
           type: DataTypes.STRING,
           allowNull: true,
@@ -62,7 +98,25 @@ module.exports = {
         },
         { transaction: t }
       );
-      await queryInterface.addColumn(
+      await queryInterface.removeColumn(
+        'OffchainCommunities',
+        'telegram',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.removeColumn(
+        'OffchainCommunities',
+        'github',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.removeColumn(
         'Chains',
         'website',
         {
@@ -71,9 +125,27 @@ module.exports = {
         },
         { transaction: t }
       );
-      await queryInterface.addColumn(
+      await queryInterface.removeColumn(
         'Chains',
         'chat',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.removeColumn(
+        'Chains',
+        'telegram',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.removeColumn(
+        'Chains',
+        'github',
         {
           type: DataTypes.STRING,
           allowNull: true,

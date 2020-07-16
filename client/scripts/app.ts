@@ -46,6 +46,8 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           description: community.description,
           website: community.website,
           chat: community.chat,
+          telegram: community.telegram,
+          github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
