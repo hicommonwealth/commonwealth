@@ -800,7 +800,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
     if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    } 
+    }
     if (title && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedTitle`) !== null) {
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, title.value);
     }
@@ -825,7 +825,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
             vnode.state.markdownMode = false;
           }
         } catch (e) {
-        } // do nothing if text fails to parse
+          // do nothing if text fails to parse
+        }
       } else {
         // Otherwise, just set vnode.state.markdownMode based on the app setting
         vnode.state.markdownMode = !!(app.user?.disableRichText);
@@ -838,6 +839,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
         localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
         localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+        localStorage.removeItem(`${app.activeId()}-post-type`);
       };
     }
     return m('.QuillEditor', {

@@ -155,7 +155,10 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.form === undefined) vnode.state.form = {};
     if (vnode.state.error === undefined) vnode.state.error = {};
     if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
-    if (vnode.state.newType === undefined) vnode.state.newType = 'Discussion';
+    if (vnode.state.newType === undefined) {
+      vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
+      if (vnode.state.newType) vnode.state.newType = 'Discussion';
+    }
     const { error } = vnode.state;
 
     const getUrlForLinkPost = _.debounce(async () => {
@@ -191,6 +194,7 @@ export const NewThreadForm: m.Component<{
               label: 'Discussion',
               onclick: (e) => {
                 vnode.state.newType = 'Discussion';
+                localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
               },
               active: vnode.state.newType === 'Discussion',
             }),
@@ -198,6 +202,7 @@ export const NewThreadForm: m.Component<{
               label: 'Link',
               onclick: (e) => {
                 vnode.state.newType = 'Link';
+                localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
               },
               active: vnode.state.newType === 'Link',
             }),
@@ -361,6 +366,7 @@ export const NewThreadForm: m.Component<{
                 if (!vnode.state.error) {
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+                  localStorage.removeItem(`${app.activeId()}-post-type`);
                   if (vnode.state.fromDraft) {
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
@@ -391,6 +397,7 @@ export const NewThreadForm: m.Component<{
                     notifySuccess('Draft saved');
                     localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
                     localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+                    localStorage.removeItem(`${app.activeId()}-post-type`);
                     setTimeout(() => {
                       $(e.target).trigger('modalexit');
                     }, 0);
