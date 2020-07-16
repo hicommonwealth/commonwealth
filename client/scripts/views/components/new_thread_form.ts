@@ -150,8 +150,7 @@ export const NewThreadForm: m.Component<{
     vnode_.state.recentlySaved = [];
     vnode_.state.uploadsInProgress = 0;
     if (vnode_.state.newType === undefined) {
-      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
-      if (!vnode_.state.newType) vnode_.state.newType = 'Discussion';
+      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || 'Discussion';
     }
     const editorNamespace = vnode_.state.newType === 'Link' ? 'new-link' : 'new-discussion';
     if (!vnode_.state.form.title) {
@@ -204,6 +203,28 @@ export const NewThreadForm: m.Component<{
       }
     };
 
+    const populateFromLocalStorage = () => {
+      const editorNamespace_ = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
+      if (!vnode.state.form.title) {
+        vnode.state.form.title = localStorage.getItem(`${app.activeId()}-${editorNamespace_}-storedTitle`);
+      }
+      if (editorNamespace_ === 'new-link') {
+        vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
+      }
+    };
+
+    const clearLocalStorage = () => {
+      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+        localStorage.removeItem(`${app.activeId()}-new-link-storedText`);
+        localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
+        localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Discussion') {
+        localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
+        localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
+      }
+      localStorage.removeItem(`${app.activeId()}-post-type`);
+    };
+
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { newType, saving } = vnode.state;
 
@@ -227,6 +248,7 @@ export const NewThreadForm: m.Component<{
                 saveToLocalStorage();
                 vnode.state.newType = 'Discussion';
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
+                populateFromLocalStorage();
               },
               active: newType === 'Discussion',
             }),
@@ -236,6 +258,7 @@ export const NewThreadForm: m.Component<{
                 saveToLocalStorage();
                 vnode.state.newType = 'Link';
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
+                populateFromLocalStorage();
               },
               active: newType === 'Link',
             }),
@@ -320,6 +343,7 @@ export const NewThreadForm: m.Component<{
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
                     vnode.state.saving = false;
+                    clearLocalStorage();
                     if (isModal) {
                       $(e.target).trigger('modalcomplete');
                       setTimeout(() => {
@@ -393,9 +417,7 @@ export const NewThreadForm: m.Component<{
                 try {
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
-                  localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
-                  localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
-                  localStorage.removeItem(`${app.activeId()}-post-type`);
+                  clearLocalStorage();
                   const { fromDraft } = vnode.state;
                   if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
