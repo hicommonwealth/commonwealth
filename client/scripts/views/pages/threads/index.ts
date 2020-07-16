@@ -56,8 +56,8 @@ export const saveDraft = (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const { title, tagName } = form;
-  if (quillEditorState.editor.getText().length <= 1 && !title) {
+  const { threadTitle, tagName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
     throw new Error(NewDraftErrors.InsufficientData);
   }
   const attachments = [];
@@ -67,7 +67,7 @@ export const saveDraft = (
       try {
         result = await app.user.discussionDrafts.edit(
           existingDraft,
-          title,
+          threadTitle,
           bodyText,
           tagName,
           attachments
@@ -85,7 +85,7 @@ export const saveDraft = (
       let result;
       try {
         result = await app.user.discussionDrafts.create(
-          title,
+          threadTitle,
           bodyText,
           tagName,
           attachments
@@ -143,7 +143,8 @@ export const newThread = async (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tagName, tagId, title, url } = form;
+  const { tagName, tagId, threadTitle, linkTitle, url } = form;
+  const title = threadTitle || linkTitle;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();

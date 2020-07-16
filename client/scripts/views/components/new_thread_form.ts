@@ -437,6 +437,7 @@ export const NewThreadForm: m.Component<{
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
                   const { fromDraft } = vnode.state;
+                  console.log(vnode.state.recentlySaved);
                   if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
@@ -461,12 +462,14 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
-                debugger
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
                 }
                 try {
-                  saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
+                    ? undefined
+                    : vnode.state.fromDraft;
+                  saveDraft(form, quillEditorState, author, fromDraft);
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
@@ -533,6 +536,7 @@ export const NewThreadForm: m.Component<{
                     try {
                       await app.user.discussionDrafts.delete(draft.id);
                       vnode.state.recentlySaved.push(draft.id);
+                      console.log(vnode.state.recentlySaved);
                     } catch (err) {
                       notifyError(err.message);
                     }
