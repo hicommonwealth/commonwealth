@@ -195,14 +195,14 @@ export const NewThreadForm: m.Component<{
       m.redraw();
     }, 750);
 
-    const editorNamespace = vnode.state.newType === PostType.Link ? 'new-link' : 'new-discussion';
+    const updateTagState = (tagName: string, tagId?: number) => {
+      localStorage.setItem(`${app.activeId()}-active-tag`, tagName);
+      vnode.state.activeTag = tagName;
+      vnode.state.form.tagName = tagName;
+      vnode.state.form.tagId = tagId;
+    };
 
     const saveToLocalStorage = (type: PostType) => {
-      // start commenting out selectively to avoid redundancy
-      // localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
-      //   vnode.state.quillEditorState.markdownMode
-      //     ? vnode.state.quillEditorState.editor.getText()
-      //     : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
       if (type === PostType.Discussion) {
         if (vnode.state.form.threadTitle) {
           localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
@@ -333,15 +333,11 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, [
             m(TagSelector, {
-              activeTag: vnode.state.form.tagName,
+              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tagName: string, tagId?: number) => {
-                vnode.state.activeTag = tagName;
-                vnode.state.form.tagName = tagName;
-                vnode.state.form.tagId = tagId;
-              },
+              updateFormData: updateTagState,
               tabindex: 4,
             }),
           ]),
@@ -416,14 +412,10 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, [
             m(TagSelector, {
-              activeTag: vnode.state.activeTag,
+              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tagName: string, tagId?: number) => {
-                vnode.state.activeTag = tagName;
-                vnode.state.form.tagName = tagName;
-                vnode.state.form.tagId = tagId;
-              },
+              updateFormData: updateTagState,
               tabindex: 3,
             }),
           ]),
