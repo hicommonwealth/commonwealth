@@ -111,7 +111,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
             intent: 'primary',
             onclick: createLink,
             tabindex: 4,
-            label: 'Create link'
+            label: 'Create thread'
           }),
           m(Button, {
             class: !author ? 'disabled' : '',

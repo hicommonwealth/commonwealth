@@ -159,7 +159,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? 'Select a community'
+            (!app.chain && !app.community) ? 'Logged in'
               : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount }) : 'Select an address',
           ],
           iconRight: Icons.CHEVRON_DOWN,
