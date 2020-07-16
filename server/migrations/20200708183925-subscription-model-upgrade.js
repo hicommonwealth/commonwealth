@@ -41,11 +41,12 @@ module.exports = {
               // await queryInterface.sequelize.query(query);
               // associate chain or community
               const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)};`, { transaction: t });
+              console.dir(thread);
               if (thread[0].length === 0) break;
               if (thread[0][0].chain) {
-                query += `UPDATE "Subscriptions" SET chain_id='${thread.chain}' WHERE id=${id};`;
+                query += `UPDATE "Subscriptions" SET chain_id='${thread[0][0].chain}' WHERE id=${id};`;
               } else if (thread[0][0].community) {
-                query += `UPDATE "Subscriptions" SET community_id='${thread.community}' WHERE id=${id};`;
+                query += `UPDATE "Subscriptions" SET community_id='${thread[0][0].community}' WHERE id=${id};`;
               }
               await queryInterface.sequelize.query(query, { transaction: t });
             } else if (entity === 'comment') {
