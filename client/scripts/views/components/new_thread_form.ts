@@ -157,7 +157,7 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
     if (vnode.state.newType === undefined) {
       vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
-      if (vnode.state.newType) vnode.state.newType = 'Discussion';
+      if (!vnode.state.newType) vnode.state.newType = 'Discussion';
     }
     const { error } = vnode.state;
 
@@ -194,6 +194,12 @@ export const NewThreadForm: m.Component<{
               label: 'Discussion',
               onclick: (e) => {
                 vnode.state.newType = 'Discussion';
+                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
+                  vnode.state.quillEditorState.markdownMode
+                    ? vnode.state.quillEditorState.editor.getText()
+                    : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
+                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
+                localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
               },
               active: vnode.state.newType === 'Discussion',
@@ -202,6 +208,11 @@ export const NewThreadForm: m.Component<{
               label: 'Link',
               onclick: (e) => {
                 vnode.state.newType = 'Link';
+                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
+                  vnode.state.quillEditorState.markdownMode
+                    ? vnode.state.quillEditorState.editor.getText()
+                    : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
+                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
               },
               active: vnode.state.newType === 'Link',
