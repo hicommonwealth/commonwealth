@@ -218,7 +218,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
       class: `${parentType}-child comment-${comment.id}`,
       onchange: () => m.redraw(),
     }, [
-      m('.comment-connector'),
+      (!isLast || app.user.activeAccount) && m('.thread-connector'),
       m('.comment-avatar', [
         m(ProposalBodyAvatar, { item: comment }),
       ]),
@@ -255,14 +255,14 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 m(ProposalBodyEditMenuItem, {
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                // m(ProposalBodyDeleteMenuItem, { item: comment }),
-                // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
-                // && m(ProposalBodyReplyMenuItem, {
-                //   item: comment,
-                //   getSetGlobalReplyStatus,
-                //   parentType,
-                //   parentState: vnode.state,
-                // }),
+                m(ProposalBodyDeleteMenuItem, { item: comment }),
+                parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+                && m(ProposalBodyReplyMenuItem, {
+                  item: comment,
+                  getSetGlobalReplyStatus,
+                  parentType,
+                  parentState: vnode.state,
+                }),
               ],
               transitionDuration: 0,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
