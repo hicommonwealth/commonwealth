@@ -41,7 +41,7 @@ export const checkForModifications = async (state, modalMsg) => {
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+  const titleInput = document.querySelector("div.new-thread-form-body input[name='new-thread-title']");
   let confirmed = true;
   if (fromDraft) {
     let formBodyDelta;
@@ -79,7 +79,7 @@ export const checkForModifications = async (state, modalMsg) => {
 };
 
 export const loadDraft = async (dom, state, draft) => {
-  const titleInput = $(dom).find('div.new-thread-form-body input[name=\'title\']');
+  const titleInput = $(dom).find('div.new-thread-form-body input[name=\'new-thread-title\']');
 
   // First we check if the form has been updated, to avoid losing any unsaved form data
   const overwriteDraftMsg = 'Load this draft? Your current work will will not be saved.';
@@ -124,7 +124,7 @@ export const loadDraft = async (dom, state, draft) => {
 //   }
 //   // First we check if the form has been updated, to avoid
 //   // losing any unsaved form data
-//   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+//   const titleInput = document.querySelector("div.new-thread-form-body input[name='new-thread-title']");
 //   const cancelDraftMessage = 'Discard edits? Your current work will not be saved.';
 //   const confirmed = await checkForModifications(state, cancelDraftMessage);
 //   if (!confirmed) return;
@@ -235,6 +235,7 @@ export const NewThreadForm: m.Component<{
         localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
       }
+      localStorage.removeItem(`${app.activeId()}-active-tag`);
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
 
@@ -309,7 +310,7 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               class: 'new-thread-title',
               placeholder: 'Title',
-              name: 'title',
+              name: 'new-link-title',
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
@@ -353,7 +354,7 @@ export const NewThreadForm: m.Component<{
                   notifyError('Must provide a valid URL.');
                 } else {
                   if (!vnode.state.form.linkTitle) {
-                    vnode.state.form.linkTitle = ($(document).find('input[name=\'title\'').val() as string);
+                    vnode.state.form.linkTitle = ($(document).find('input[name=\'new-link-title\'').val() as string);
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
@@ -388,7 +389,7 @@ export const NewThreadForm: m.Component<{
         newType === PostType.Discussion && m(Form, [
           m(FormGroup, [
             m(Input, {
-              name: 'title',
+              name: 'new-thread-title',
               placeholder: 'Title',
               onchange: (e) => {
                 const { value } = (e as any).target;
@@ -428,7 +429,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(document).find('input[name=\'new-thread-title\'').val() as string);
                 }
                 try {
                   await newThread(form, quillEditorState, author);
@@ -464,7 +465,7 @@ export const NewThreadForm: m.Component<{
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(document).find('input[name=\'new-thread-title\'').val() as string);
                 }
                 const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
                   ? undefined
