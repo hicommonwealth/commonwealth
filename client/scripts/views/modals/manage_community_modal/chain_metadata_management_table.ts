@@ -63,38 +63,20 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         m(InputPropertyRow, {
           title: 'Chat',
           defaultValue: vnode.state.chat,
-          placeholder: 'https://discord.gg/...',
+          placeholder: 'https://discord.gg',
           onChangeHandler: (v) => { vnode.state.chat = v; },
         }),
         m(InputPropertyRow, {
           title: 'Telegram',
           defaultValue: vnode.state.telegram,
-          placeholder: 'https://t.me/...',
+          placeholder: 'https://t.me',
           onChangeHandler: (v) => { vnode.state.telegram = v; },
         }),
         m(InputPropertyRow, {
           title: 'Github',
           defaultValue: vnode.state.github,
-          placeholder: 'https://github.com/...',
+          placeholder: 'https://github.com',
           onChangeHandler: (v) => { vnode.state.github = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Network',
-          defaultValue: vnode.state.network,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.network = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Symbol',
-          defaultValue: vnode.state.symbol,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.symbol = v; },
-        }),
-        m(InputPropertyRow, {
-          title: 'Icon',
-          defaultValue: vnode.state.iconUrl,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.iconUrl = v; },
         }),
         m('tr', [
           m('td', 'Admins'),
