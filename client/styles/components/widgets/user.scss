@@ -65,7 +65,7 @@
         @include identityIcon();
     }
     a.user-display-name.verified {
-        color: $theme-base-color !important;
+        // color: $theme-base-color !important;
     }
     &.linkified a.user-display-name {
         cursor: pointer;
