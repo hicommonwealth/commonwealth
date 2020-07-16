@@ -313,6 +313,7 @@ export const NewThreadForm: m.Component<{
               label: 'Create link',
               name: 'submit',
               onclick: async (e) => {
+                vnode.state.saving = true;
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
                 } else {
@@ -326,7 +327,8 @@ export const NewThreadForm: m.Component<{
                       }, 0);
                     }
                   } catch (err) {
-                    notifyError(err);
+                    vnode.state.saving = false;
+                    notifyError(err.message);
                   }
                 }
               },
@@ -402,7 +404,8 @@ export const NewThreadForm: m.Component<{
                     $(e.target).trigger('modalexit');
                   }, 0);
                 } catch (err) {
-                  notifyError(err);
+                  vnode.state.saving = false;
+                  notifyError(err.message);
                 }
               },
               label: (vnode.state.uploadsInProgress > 0)
@@ -422,6 +425,7 @@ export const NewThreadForm: m.Component<{
                 }
                 try {
                   saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
                     localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
@@ -433,7 +437,8 @@ export const NewThreadForm: m.Component<{
                   }
                   m.route.set(`/${app.activeId()}`);
                 } catch (err) {
-                  notifyError(err);
+                  vnode.state.saving = false;
+                  notifyError(err.message);
                 }
               },
               label: 'Save as draft',
@@ -489,7 +494,7 @@ export const NewThreadForm: m.Component<{
                       await app.user.discussionDrafts.delete(draft.id);
                       vnode.state.recentlySaved.push(draft.id);
                     } catch (err) {
-                      notifyError(err);
+                      notifyError(err.message);
                     }
                     m.redraw();
                   }

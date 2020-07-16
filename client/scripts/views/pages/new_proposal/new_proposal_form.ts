@@ -342,11 +342,6 @@ const NewProposalForm = {
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
-              updateParentErrors: (err: string) => {
-                if (err) vnode.state.error = err;
-                else delete vnode.state.error;
-                m.redraw();
-              },
               tabindex: 3,
             }),
           hasTitleAndDescription && [

@@ -100,11 +100,6 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
           vnode.state.form.tagName = tagName;
           vnode.state.form.tagId = tagId;
         },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
-        },
         tabindex: 3,
       }),
       m('.bottom-panel', [
@@ -193,11 +188,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         updateFormData: (tagName: string, tagId?: number) => {
           vnode.state.form.tagName = tagName;
           vnode.state.form.tagId = tagId;
-        },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
         },
         tabindex: 3,
       }),
