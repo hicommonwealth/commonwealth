@@ -255,7 +255,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
 
   // notifications
   // TODO: Change to GET /subscriptions
-  router.get('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
+  router.post('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
     viewSubscriptions.bind(this, models));
   // TODO: Change to POST /subscription
   router.post('/createSubscription', passport.authenticate('jwt', { session: false }),

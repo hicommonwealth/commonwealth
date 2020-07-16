@@ -601,7 +601,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
-    $.get(`${app.serverUrl()}/viewSubscriptions`, {
+    $.post(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
       console.dir(result.result);
