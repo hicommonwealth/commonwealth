@@ -338,10 +338,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
 
-    // const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
-    //   .sort((a, b) => +b.createdAt - +a.createdAt);
     const comments = vnode.state.comments;
-
     const proposals = vnode.state.threads;
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
