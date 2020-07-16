@@ -6,7 +6,7 @@ import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoChain: 'No Base Chain provided in query',
+  NoChain: 'No base chain provided in query',
   NoAddress: 'No address provided in query',
   NoAddressFound: 'No address found',
 };
