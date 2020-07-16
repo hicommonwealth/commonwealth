@@ -178,11 +178,13 @@ export const NewThreadForm: m.Component<{
     //   if (!vnode.state.newType) vnode.state.newType = 'Discussion';
     // }
     const getUrlForLinkPost = _.debounce(async () => {
-      const res = await getLinkTitle(vnode.state.form.url);
-      if (res === '404: Not Found' || res === '500: Server Error') {
-        notifyError(res);
-      } else {
-        if (!vnode.state.autoTitleOverride) vnode.state.form.title = res;
+      try {
+        const title = await getLinkTitle(vnode.state.form.url);
+        if (!vnode.state.autoTitleOverride) {
+          vnode.state.form.title = title;
+        }
+      } catch (err) {
+        notifyError(err.message);
       }
       m.redraw();
     }, 750);
