@@ -14,40 +14,57 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
 
-const MembersModule: m.Component<{}> = {
+const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
-    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
-    if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
+    const { communityName, communityDescription, tag } = vnode.attrs;
+    if (!app.chain && !app.community) return;
 
-    return m('.MembersModule.SidebarModule', [
-      m(List, { interactive: false }, [
-        m(ListItem, {
-          label: 'Admins & Mods',
-          // contentRight: m(PopoverMenu, {
-          //   class: 'sidebar-add-tag',
-          //   position: 'bottom',
-          //   transitionDuration: 0,
-          //   hoverCloseDelay: 0,
-          //   closeOnContentClick: true,
-          //   trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-          //   content: m(MenuItem, {
-          //     label: 'New channel',
-          //     onclick: (e) => {
-          //       e.preventDefault();
-          //       app.modals.create({ modal: NewTagModal });
-          //     }
-          //   }),
-          // }),
-        }),
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
+
+    return m('.CommunityInfoModule.SidebarModule', [
+      // m(TagCaratMenu, { tag }),
+      // tag && [
+      //   m(Subheader, { text: `About #${tag}` }),
+      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      // ],
+
+      m('.community-icon', [
+        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
+        app.community && m(CommunityIcon, { community: app.community.meta }),
       ]),
-      adminsAndMods.length > 0 && m(List, { class: 'community-admins' }, adminsAndMods.map((r) => {
-        return m(ListItem, {
-          class: 'community-admin',
-          label: m(UserBlock, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
-        });
-      })),
-      // m('h3', 'Most active members'),
-      // TODO
+      m('.community-name', app.chain ? app.chain.meta.chain.name : app.community.meta.name),
+      m('.community-description', app.chain ? app.chain.meta.chain.description : app.community.meta.description),
+      isAdmin && m(PopoverMenu, {
+        class: 'community-config-menu',
+        position: 'bottom',
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        closeOnContentClick: true,
+        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
+        content: m(MenuItem, {
+          label: 'Edit community',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: ManageCommunityModal });
+          }
+        }),
+      }),
+      m('.community-info', [
+        m(Icon, { name: Icons.GLOBE }),
+        m('.community-info-text', [
+          m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
+        ]),
+      ]),
+      m('.community-info', [
+        m(Icon, { name: Icons.MESSAGE_SQUARE }),
+        m('.community-info-text', [
+          m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
+        ]),
+      ]),
     ]);
   }
 };
@@ -270,57 +287,23 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
   }
 };
 
-const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
+const AdminsModule: m.Component<{}> = {
   view: (vnode) => {
-    const { communityName, communityDescription, tag } = vnode.attrs;
-    if (!app.chain && !app.community) return;
+    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
+    if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
 
-    const isAdmin = app.user.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    });
-
-    return m('.CommunityInfoModule.SidebarModule', [
-      // m(TagCaratMenu, { tag }),
-      // tag && [
-      //   m(Subheader, { text: `About #${tag}` }),
-      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-      // ],
-
-      m('.community-icon', [
-        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
-        app.community && m(CommunityIcon, { community: app.community.meta }),
-      ]),
-      m('.community-name', app.chain ? app.chain.meta.chain.name : app.community.meta.name),
-      m('.community-description', app.chain ? app.chain.meta.chain.description : app.community.meta.description),
-      isAdmin && m(PopoverMenu, {
-        class: 'community-config-menu',
-        position: 'bottom',
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        closeOnContentClick: true,
-        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
-        content: m(MenuItem, {
-          label: 'Edit community',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({ modal: ManageCommunityModal });
-          }
+    return m('.AdminsModule.SidebarModule', [
+      m(List, { interactive: false }, [
+        m(ListItem, {
+          label: 'Admins & Mods',
         }),
-      }),
-      m('.community-info', [
-        m(Icon, { name: Icons.GLOBE }),
-        m('.community-info-text', [
-          m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
-        ]),
       ]),
-      m('.community-info', [
-        m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        m('.community-info-text', [
-          m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
-        ]),
-      ]),
+      adminsAndMods.length > 0 && m(List, { class: 'community-admins' }, adminsAndMods.map((r) => {
+        return m(ListItem, {
+          class: 'community-admin',
+          label: m(UserBlock, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
+        });
+      })),
     ]);
   }
 };
@@ -350,7 +333,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
       m(CommunityInfoModule),
       app.chain && m(NavigationModule),
       m(TagsModule),
-      m(MembersModule),
+      m(AdminsModule),
     ]);
   },
 };
