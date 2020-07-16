@@ -1,189 +1,23 @@
 import 'pages/profile.scss';
 
 import m from 'mithril';
+import moment from 'moment';
 import _ from 'lodash';
 import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
+import { uniqueIdToProposal } from 'identifiers';
 import { OffchainThread, OffchainComment, OffchainAttachment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
+import PageNotFound from 'views/pages/404';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
-import { uniqueIdToProposal } from 'identifiers';
-import moment from 'moment';
+
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
-import PageNotFound from '../404';
-
-// const SetProxyButton = {
-//   view: (vnode) => {
-//     const account = vnode.attrs.account;
-//     return m('button.SetProxyButton', {
-//       onclick: async (e) => {
-//         const address = await inputModalWithText('Address of proxy?')();
-//         if (!address) return;
-//         const proxy = app.chain.accounts.get(address);
-//         if (!proxy) return notifyError('Could not find address');
-//         if (proxy.proxyFor) return notifyError('This address is already a proxy');
-//         createTXModal(account.setProxyTx(proxy));
-//       }
-//     }, 'Set Proxy');
-//   }
-// };
-
-// const RemoveProxyButton = {
-//   view: (vnode) => {
-//     const account = vnode.attrs.account;
-//     return m('button.RemoveProxyButton', {
-//       onclick: async (e) => {
-//         const address = await inputModalWithText('Address of proxy to remove?')();
-//         if (!address) return;
-//         const proxy = app.chain.accounts.get(address);
-//         if (!proxy) return notifyError('Could not find address');
-//         if (!proxy.proxyFor) return notifyError('This address is not a proxy');
-//         if (!proxy.proxyFor.address !== account.address)
-//           return notifyError('This address is a proxy for another account');
-//         createTXModal(account.removeProxyTx(proxy));
-//       }
-//     }, 'Remove Proxy');
-//   }
-// };
-
-// const ResignProxyButton = {
-//   view: (vnode) => {
-//     const account = vnode.attrs.account;
-//     return m('button.ResignProxyButton', {
-//       onclick: async (e) => {
-//         createTXModal(account.resignProxyTx());
-//       }
-//     }, 'Resign Proxy');
-//   }
-// };
-
-// const DelegateButton = {
-//   view: (vnode) => {
-//     const account = vnode.attrs.account;
-//     return m('button.DelegateButton', {
-//       onclick: async (e) => {
-//         const address = await inputModalWithText('Address to delegate to?')();
-//         if (!address) return;
-//         const delegate = app.chain.accounts.get(address);
-//         if (!delegate) return notifyError('Could not find address');
-//         // XXX: This should be a dropdown with various conviction amounts rather than a free text input
-//         const conviction = await inputModalWithText('Conviction?')();
-//         if (!conviction) return;
-//         createTXModal(account.delegateTx(delegate, conviction));
-//       }
-//     }, 'Set Delegate');
-//   }
-// };
-
-// const UndelegateButton = {
-//   view: (vnode) => {
-//     const account = vnode.attrs.account;
-//     return m('button.SetDelegateButton', {
-//       onclick: async (e) => {
-//         createTXModal(account.undelegateTx());
-//       }
-//     }, 'Undelegate');
-//   }
-// };
-
-// interface IProfileSummaryAttrs {
-//   account: Account<any>;
-// }
-
-// interface IProfileSummaryState {
-//   dynamic: {
-//     balance: Coin;
-//     stakedBalance?: SubstrateCoin;
-//     lockedBalance?: SubstrateCoin;
-//     proxyFor?: SubstrateAccount;
-//     delegation?: [SubstrateAccount, number];
-//   };
-// }
-
-// const ProfileSummary = makeDynamicComponent<IProfileSummaryAttrs, IProfileSummaryState>({
-//   getObservables: (attrs) => ({
-//     balance: attrs.account.balance,
-//     stakedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.getStakedBalance() : null,
-//     lockedBalance: attrs.account instanceof SubstrateAccount ? attrs.account.getLockedBalance() : null,
-//     proxyFor: attrs.account instanceof SubstrateAccount ? attrs.account.proxyFor : null,
-//     delegation: attrs.account instanceof SubstrateAccount ? attrs.account.delegation : null,
-//   }),
-//   view: (vnode) => {
-//     const account: Account<any> = vnode.attrs.account;
-//     const isSubstrate = (account.chainBase === ChainBase.Substrate);
-
-//     return m('.ProfileSummary', [
-//       m('.summary-row', [
-//         m('.summary-row-item', [
-//           m('.summary-row-item-header', 'Balance'),
-//           m('.summary-row-item-text',
-//             vnode.state.dynamic.balance !== undefined ? formatCoin(vnode.state.dynamic.balance) : '--'),
-//         ]),
-//         isSubstrate && m('.summary-row-item', [
-//           m('.summary-row-item-header', 'Staked'),
-//           m('.summary-row-item-text',
-//             vnode.state.dynamic.stakedBalance !== undefined ? formatCoin(vnode.state.dynamic.stakedBalance) : '--'),
-//         ]),
-//         isSubstrate && m('.summary-row-item', [
-//           m('.summary-row-item-header', 'Locked'),
-//           m('.summary-row-item-text',
-//             vnode.state.dynamic.lockedBalance !== undefined ? formatCoin(vnode.state.dynamic.lockedBalance) : '--'),
-//         ]),
-//       ]),
-//       m('.summary-row', [
-//         (app.user.activeAccount && account.address === app.user.activeAccount.address) ? [
-//           // for your account
-//           isSubstrate && vnode.state.dynamic.proxyFor && m(ResignProxyButton, { account }),
-//           isSubstrate && m(SetProxyButton, { account }),
-//           isSubstrate && m(RemoveProxyButton, { account }),
-//           isSubstrate && (
-//             vnode.state.dynamic.delegation ?
-//               m(UndelegateButton, { account }) : m(DelegateButton, { account })
-//           ),
-//         ] : [
-//           // for other accounts
-//           m('button.SendEDGButton', {
-//             disabled: !account
-//               || !app.user.activeAccount
-//               || account.address === app.user.activeAccount.address,
-//             onclick: async (e) => {
-//               const sender: Account<Coin> = app.user.activeAccount;
-//               const amount = await inputModalWithText(`How much ${app.chain.currency}?`)();
-//               if (!amount || isNaN(parseInt(amount, 10))) return;
-//               const recipient = account;
-//               const coinAmount = app.chain.chain.coins(parseInt(amount, 10), true);
-//               // TODO: figure out a better solution for handling denoms
-//               createTXModal(sender.sendBalanceTx(recipient, coinAmount)).then(() => {
-//                 m.redraw();
-//               });
-//             }
-//           }, `Send ${app.chain.chain.denom}`),
-//         ]
-//       ]),
-//       isSubstrate && vnode.state.dynamic.proxyFor && m('.summary-row',  [
-//         m('p', [
-//           m('span', 'This account is a proxy for: '),
-//           m(User, { user: [vnode.state.dynamic.proxyFor, app.chain.meta.chain.id],
-//                     showSecondaryName: true, linkify: true }),
-//           // TODO: resign proxy button
-//         ]),
-//       ]),
-//       isSubstrate && vnode.state.dynamic.delegation && m('.summary-row',  [
-//         m('p', [
-//           m('span', 'This account has assigned a delegate: '),
-//           m(User, { user: [vnode.state.dynamic.delegation[0], app.chain.meta.chain.id]
-//                     showSecondaryName: true, linkify: true }),
-//         ]),
-//       ]),
-//     ]);
-//   }
-// });
 
 const commentModelFromServer = (comment) => {
   const attachments = comment.OffchainAttachments
