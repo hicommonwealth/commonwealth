@@ -356,7 +356,7 @@ export const NewThreadForm: m.Component<{
                   notifyError('Must provide a valid URL.');
                 } else {
                   if (!vnode.state.form.linkTitle) {
-                    vnode.state.form.linkTitle = ($(vnode.dom).find('input[name=\'new-link-title\'').val() as string);
+                    vnode.state.form.linkTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string);
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
@@ -431,7 +431,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(vnode.dom).find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string);
                 }
                 try {
                   await newThread(form, quillEditorState, author);
