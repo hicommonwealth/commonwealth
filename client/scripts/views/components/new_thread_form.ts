@@ -333,10 +333,12 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, [
             m(TagSelector, {
+              activeTag: vnode.state.form.tagName,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.activeTag = tagName;
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
@@ -366,6 +368,8 @@ export const NewThreadForm: m.Component<{
                         $(e.target).trigger('modalexit');
                         clearLocalStorage(PostType.Link);
                       }, 0);
+                    } else {
+                      clearLocalStorage(PostType.Discussion);
                     }
                   } catch (err) {
                     vnode.state.saving = false;
@@ -416,6 +420,7 @@ export const NewThreadForm: m.Component<{
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {
+                vnode.state.activeTag = tagName;
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
@@ -441,10 +446,14 @@ export const NewThreadForm: m.Component<{
                   if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
-                  setTimeout(() => {
-                    $(e.target).trigger('modalexit');
+                  if (isModal) {
+                    setTimeout(() => {
+                      $(e.target).trigger('modalexit');
+                      clearLocalStorage(PostType.Discussion);
+                    }, 0);
+                  } else {
                     clearLocalStorage(PostType.Discussion);
-                  }, 0);
+                  }
                 } catch (err) {
                   vnode.state.saving = false;
                   notifyError(err.message);
@@ -459,17 +468,17 @@ export const NewThreadForm: m.Component<{
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
               intent: 'none',
-              onclick: (e) => {
+              onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
                 }
+                const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
+                  ? undefined
+                  : vnode.state.fromDraft;
                 try {
-                  const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
-                    ? undefined
-                    : vnode.state.fromDraft;
-                  saveDraft(form, quillEditorState, author, fromDraft);
+                  await saveDraft(form, quillEditorState, author, fromDraft);
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
@@ -477,8 +486,10 @@ export const NewThreadForm: m.Component<{
                       $(e.target).trigger('modalexit');
                       clearLocalStorage(PostType.Discussion);
                     }, 0);
+                  } else {
+                    m.route.set(`/${app.activeId()}`);
+                    clearLocalStorage(PostType.Discussion);
                   }
-                  m.route.set(`/${app.activeId()}`);
                 } catch (err) {
                   vnode.state.saving = false;
                   notifyError(err.message);

@@ -46,7 +46,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   }
 };
 
-export const saveDraft = (
+export const saveDraft = async (
   form,
   quillEditorState,
   author,
@@ -62,43 +62,38 @@ export const saveDraft = (
   }
   const attachments = [];
   if (existingDraft) {
-    (async () => {
-      let result;
-      try {
-        result = await app.user.discussionDrafts.edit(
-          existingDraft,
-          threadTitle,
-          bodyText,
-          tagName,
-          attachments
-        );
-      } catch (e) {
-        console.error(e);
-      }
-      mixpanel.track('Update discussion draft', {
-        'Step No': 2,
-        Step: 'Filled in Proposal and Discussion',
-      });
-    })();
+    let result;
+    try {
+      result = await app.user.discussionDrafts.edit(
+        existingDraft,
+        threadTitle,
+        bodyText,
+        tagName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Update discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
   } else {
-    (async () => {
-      let result;
-      try {
-        result = await app.user.discussionDrafts.create(
-          threadTitle,
-          bodyText,
-          tagName,
-          attachments
-        );
-      } catch (e) {
-        console.error(e);
-        return ({ draft: e });
-      }
-      mixpanel.track('Save discussion draft', {
-        'Step No': 2,
-        Step: 'Filled in Proposal and Discussion',
-      });
-    })();
+    let result;
+    try {
+      result = await app.user.discussionDrafts.create(
+        threadTitle,
+        bodyText,
+        tagName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Save discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
   }
 };
 
