@@ -1,5 +1,7 @@
 @import 'shared.scss';
 
+$cui-base-border-color: #dadada;
+
 $cui-primary-bg-color: $theme-base-color;
 $cui-primary-bg-color-hover:      darken($cui-primary-bg-color, 7%) !default;
 $cui-primary-bg-color-active:     darken($cui-primary-bg-color, 11%) !default;
