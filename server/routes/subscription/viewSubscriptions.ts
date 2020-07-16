@@ -25,7 +25,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
         required: false,
         as: 'ChainEventType',
       }, ],
-    },]
+    }, ]
   };
 
   const associationParams: any = [
