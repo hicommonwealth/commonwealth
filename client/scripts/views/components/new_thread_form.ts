@@ -105,6 +105,7 @@ export const loadDraft = async (dom, state, draft) => {
   }
   titleInput.val(draft.title);
   state.form.title = draft.title;
+  localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.title);
   state.activeTag = draft.tag;
   state.form.tagName = draft.tag;
   state.fromDraft = draft.id;
@@ -141,6 +142,7 @@ export const NewThreadForm: m.Component<{
   fromDraft?: number,
   newType: string,
   quillEditorState,
+  recentlySaved: number[],
   saving: boolean,
   uploadsInProgress: number,
 }> = {
@@ -152,6 +154,7 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
     // init
+    if (!vnode.state.recentlySaved) vnode.state.recentlySaved = [];
     if (vnode.state.form === undefined) vnode.state.form = {};
     if (vnode.state.error === undefined) vnode.state.error = {};
     if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
@@ -172,8 +175,6 @@ export const NewThreadForm: m.Component<{
       m.redraw();
     }, 750);
 
-    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { newType, saving, uploadsInProgress } = vnode.state;
     const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
 
     const saveToLocalStorage = () => {
@@ -186,13 +187,16 @@ export const NewThreadForm: m.Component<{
       if (vnode.state.form.title) {
         localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
       }
-      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link' && vnode.state.form.url) {
         localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
       }
     };
 
+    const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
+    const { newType, saving } = vnode.state;
+
     return m('.NewThreadForm', {
-      class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
+      class: `${newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
@@ -208,20 +212,20 @@ export const NewThreadForm: m.Component<{
             m(TabItem, {
               label: 'Discussion',
               onclick: (e) => {
+                saveToLocalStorage();
                 vnode.state.newType = 'Discussion';
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
-                saveToLocalStorage();
               },
-              active: vnode.state.newType === 'Discussion',
+              active: newType === 'Discussion',
             }),
             m(TabItem, {
               label: 'Link',
               onclick: (e) => {
+                saveToLocalStorage();
                 vnode.state.newType = 'Link';
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
-                saveToLocalStorage();
               },
-              active: vnode.state.newType === 'Link',
+              active: newType === 'Link',
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
             isModal && m.route.get() !== `${app.activeId()}/new/thread` && m(TabItem, {
@@ -238,7 +242,7 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
         ]),
-        vnode.state.newType === 'Link' && m(Form, [
+        newType === 'Link' && m(Form, [
           m(FormGroup, [
             m(Input, {
               placeholder: 'https://',
@@ -327,7 +331,7 @@ export const NewThreadForm: m.Component<{
             : m('.error-placeholder'),
         ]),
         //
-        vnode.state.newType === 'Discussion' && m(Form, [
+        newType === 'Discussion' && m(Form, [
           m(FormGroup, [
             m(Input, {
               name: 'title',
@@ -384,8 +388,9 @@ export const NewThreadForm: m.Component<{
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
                   localStorage.removeItem(`${app.activeId()}-post-type`);
-                  if (vnode.state.fromDraft) {
-                    await app.user.discussionDrafts.delete(vnode.state.fromDraft);
+                  const { fromDraft } = vnode.state;
+                  if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
+                    await app.user.discussionDrafts.delete(fromDraft);
                   }
                   setTimeout(() => {
                     $(e.target).trigger('modalexit');
@@ -476,6 +481,7 @@ export const NewThreadForm: m.Component<{
                     e.stopPropagation();
                     try {
                       await app.user.discussionDrafts.delete(draft.id);
+                      vnode.state.recentlyDeleted.push(draft.id);
                     } catch (err) {
                       vnode.state.error.draft = err;
                     }
