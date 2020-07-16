@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { urlHasValidHTTPPrefix } from '../../shared/helpers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,6 +10,8 @@ export const Errors = {
   CantChangeNetwork: 'Cannot change chain network',
   NotAdmin: 'Not an admin',
   NoChainFound: 'Chain not found',
+  InvalidWebsite: 'Website must have valid http prefix',
+  InvalidChat: 'Chat must have valid http prefix',
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -33,14 +36,22 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     }
   }
 
-  if (req.body.name) chain.name = req.body.name;
-  if (req.body.symbol) chain.symbol = req.body.symbol;
-  if (req.body.icon_url) chain.icon_url = req.body.icon_url;
-  if (req.body.active !== undefined) chain.active = req.body.active;
-  if (req.body.type) chain.type = req.body.type;
-  chain.description = req.body.description;
-  chain.website = req.body.website;
-  chain.chat = req.body.chat;
+  const { active, chat, description, icon_url, name, symbol, type, website } = req.body;
+
+  if (website.length && !urlHasValidHTTPPrefix(website)) {
+    return next(new Error(Errors.InvalidWebsite));
+  } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+    return next(new Error(Errors.InvalidChat));
+  }
+
+  if (name) chain.name = name;
+  if (symbol) chain.symbol = symbol;
+  if (icon_url) chain.icon_url = icon_url;
+  if (active !== undefined) chain.active = active;
+  if (type) chain.type = type;
+  chain.description = description;
+  chain.website = website;
+  chain.chat = chat;
   if (req.body['featured_tags[]']) chain.featured_tags = req.body['featured_tags[]'];
 
   await chain.save();

@@ -11,7 +11,7 @@ export const Errors = {
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
   InvalidWebsite: 'Website must have valid http prefix',
-  InvalidChat: 'Chat must have valid http prefix'
+  InvalidChat: 'Chat must have valid http prefix',
 };
 
 const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
