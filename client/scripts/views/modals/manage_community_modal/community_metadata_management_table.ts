@@ -100,9 +100,9 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           invitesValue,
           privacyValue,
         } = vnode.state;
-        if (website.length && !urlHasValidHTTPPrefix(website)) {
+        if (website?.length && !urlHasValidHTTPPrefix(website)) {
           notifyError('Website must have a valid http prefix');
-        } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+        } else if (chat?.length && !urlHasValidHTTPPrefix(chat)) {
           notifyError('Chat must have a valid http prefix');
         } else {
           await vnode.attrs.community.updateCommunityData({

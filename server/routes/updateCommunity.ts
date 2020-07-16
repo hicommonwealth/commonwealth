@@ -34,10 +34,10 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   if (req.body.name) community.name = req.body.name;
-  if (req.body.description) community.description = req.body.description;
-  if (req.body.website) community.website = req.body.website;
-  if (req.body.chat) community.chat = req.body.chat;
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
+  community.description = req.body.description;
+  community.website = req.body.website;
+  community.chat = req.body.chat;
   community.invitesEnabled = req.body.invites || false;
   community.privacyEnabled = req.body.privacy || false;
   await community.save();
