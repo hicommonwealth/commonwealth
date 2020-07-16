@@ -152,8 +152,6 @@ export const NewThreadForm: m.Component<{
   uploadsInProgress: number,
 }> = {
   oninit: (vnode_) => {
-    console.log('initing');
-    console.log(vnode_.state.form);
     vnode_.state.form = {};
     vnode_.state.recentlySaved = [];
     vnode_.state.uploadsInProgress = 0;
@@ -187,15 +185,6 @@ export const NewThreadForm: m.Component<{
     const { isModal } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
-    // init
-    // if (!vnode.state.recentlySaved) vnode.state.recentlySaved = [];
-    // if (vnode.state.form === undefined) vnode.state.form = {};
-    // if (vnode.state.error === undefined) vnode.state.error = {};
-    // if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
-    // if (vnode.state.newType === undefined) {
-    //   vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
-    //   if (!vnode.state.newType) vnode.state.newType = PostType.Discussion;
-    // }
     const getUrlForLinkPost = _.debounce(async () => {
       try {
         const title = await getLinkTitle(vnode.state.form.url);
@@ -254,7 +243,7 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { newType, saving } = vnode.state;
-    console.log(vnode.state.form);
+
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
@@ -448,7 +437,6 @@ export const NewThreadForm: m.Component<{
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
                   const { fromDraft } = vnode.state;
-                  console.log(vnode.state.recentlySaved);
                   if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
@@ -555,7 +543,6 @@ export const NewThreadForm: m.Component<{
                     try {
                       await app.user.discussionDrafts.delete(draft.id);
                       vnode.state.recentlySaved.push(draft.id);
-                      console.log(vnode.state.recentlySaved);
                     } catch (err) {
                       notifyError(err.message);
                     }
