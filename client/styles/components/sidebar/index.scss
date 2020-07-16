@@ -85,6 +85,11 @@ $active-color: #ececec;
         .community-info {
             display: flex;
             margin: 3px 0;
+            .community-info-text {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
             .cui-icon {
                 margin-right: 10px;
                 svg {

@@ -311,13 +311,13 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       }),
       m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
-        m('div', [
+        m('.community-info-text', [
           m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
         ]),
       ]),
       m('.community-info', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        m('div', [
+        m('.community-info-text', [
           m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
         ]),
       ]),
