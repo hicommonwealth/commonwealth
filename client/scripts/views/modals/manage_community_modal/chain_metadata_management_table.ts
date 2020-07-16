@@ -103,7 +103,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
             await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
             $(e.target).trigger('modalexit');
           } catch (err) {
-            notifyError(err.message);
+            notifyError(err.responseJSON?.error || 'Chain update failed');
           }
         },
       }),

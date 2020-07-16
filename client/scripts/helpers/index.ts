@@ -2,7 +2,6 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
