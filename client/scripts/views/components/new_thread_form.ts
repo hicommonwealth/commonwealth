@@ -466,7 +466,7 @@ export const NewThreadForm: m.Component<{
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(vnode.dom).find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string);
                 }
                 const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
                   ? undefined
