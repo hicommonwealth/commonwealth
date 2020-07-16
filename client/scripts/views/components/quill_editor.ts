@@ -797,13 +797,8 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const body = markdownMode
       ? editor?.getText()
       : JSON.stringify(editor?.getContents());
-    console.log('removed');
-    const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
     if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
-    }
-    if (title && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedTitle`) !== null) {
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, title.value);
     }
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);

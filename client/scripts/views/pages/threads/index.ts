@@ -110,14 +110,21 @@ export const newThread = async (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
-  if (!form.title) {
-    throw new Error(NewThreadErrors.NoTitle);
+  if (kind === OffchainThreadKind.Forum) {
+    if (!form.threadTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+  }
+  if (kind === OffchainThreadKind.Link) {
+    if (!form.linkTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+    if (!form.url) {
+      throw new Error(NewThreadErrors.NoUrl);
+    }
   }
   if (!form.tagName) {
     throw new Error(NewThreadErrors.NoTag);
-  }
-  if (kind === OffchainThreadKind.Link && !form.url) {
-    throw new Error(NewThreadErrors.NoUrl);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
     throw new Error(NewThreadErrors.NoBody);

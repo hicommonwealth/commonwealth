@@ -41,7 +41,6 @@ export const checkForModifications = async (state, modalMsg) => {
   // If overwritten form body comes from a previous draft, we check whether
   // there have been changes made to the draft, and prompt with a confirmation
   // modal if there have been.
-
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
   let confirmed = true;
   if (fromDraft) {
@@ -111,6 +110,7 @@ export const loadDraft = async (dom, state, draft) => {
   }
   titleInput.val(draft.title);
   state.form.threadTitle = draft.title;
+
   localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
   state.activeTag = draft.tag;
   state.form.tagName = draft.tag;
@@ -160,11 +160,11 @@ export const NewThreadForm: m.Component<{
     if (vnode_.state.newType === undefined) {
       vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
-    if (vnode_.state.newType === PostType.Link) {
+    if (vnode_.state.newType === PostType.Discussion) {
+      vnode_.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
+    } else {
       vnode_.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
       vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
-    } else {
-      vnode_.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
     }
   },
   view: (vnode) => {
@@ -199,10 +199,10 @@ export const NewThreadForm: m.Component<{
 
     const saveToLocalStorage = (type: PostType) => {
       // start commenting out selectively to avoid redundancy
-      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
-        vnode.state.quillEditorState.markdownMode
-          ? vnode.state.quillEditorState.editor.getText()
-          : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
+      // localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
+      //   vnode.state.quillEditorState.markdownMode
+      //     ? vnode.state.quillEditorState.editor.getText()
+      //     : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
       if (type === PostType.Discussion) {
         if (vnode.state.form.threadTitle) {
           localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
@@ -268,10 +268,11 @@ export const NewThreadForm: m.Component<{
             m(TabItem, {
               label: PostType.Link,
               onclick: (e) => {
+
                 saveToLocalStorage(PostType.Discussion);
                 vnode.state.newType = PostType.Link;
                 localStorage.setItem(`${app.activeId()}-post-type`, PostType.Link);
-                populateFromLocalStorage(PostType.Discussion);
+                populateFromLocalStorage(PostType.Link);
               },
               active: newType === PostType.Link,
             }),
@@ -353,6 +354,9 @@ export const NewThreadForm: m.Component<{
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
                 } else {
+                  if (!vnode.state.form.linkTitle) {
+                    vnode.state.form.linkTitle = ($(document).find('input[name=\'title\'').val() as string);
+                  }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
                     vnode.state.saving = false;
@@ -389,6 +393,7 @@ export const NewThreadForm: m.Component<{
               onchange: (e) => {
                 const { value } = (e as any).target;
                 vnode.state.form.threadTitle = value;
+
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
@@ -464,8 +469,8 @@ export const NewThreadForm: m.Component<{
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
-                    localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
-                    localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+                    localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
+                    localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
                     localStorage.removeItem(`${app.activeId()}-post-type`);
                     setTimeout(() => {
                       $(e.target).trigger('modalexit');
