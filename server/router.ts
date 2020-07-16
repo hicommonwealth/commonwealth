@@ -146,8 +146,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
   // TODO: Change to GET /threads
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
-  // TODO: GET /profile
-  router.get('/getProfile', getProfile.bind(this, models));
+  router.get('/profile', getProfile.bind(this, models));
 
 
   // offchain discussion drafts

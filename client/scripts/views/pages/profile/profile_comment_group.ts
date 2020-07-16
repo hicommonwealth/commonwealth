@@ -11,7 +11,8 @@ import MarkdownFormattedText from '../../components/markdown_formatted_text';
 const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: Array<OffchainComment<any>> } > = {
   view: (vnode) => {
     const { proposal, comments } = vnode.attrs;
-    const { author, createdAt, body, slug, identifier, title } = proposal;
+    if (!proposal) return;
+    const { author, createdAt, body, slug, identifier, title, } = proposal;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
@@ -22,8 +23,8 @@ const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: A
           tooltip: true
         }),
         ' commented on ',
-        link('a', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title),
-        createdAt ? ` ${createdAt.fromNow()}` : '',
+        link('a', `/${(proposal.chain || proposal.community)}/proposal/${slug}/${identifier}-${slugify(title)}`, 'Loading...'),
+        // createdAt ? ` ${createdAt}` : '',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [
