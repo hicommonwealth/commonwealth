@@ -12,7 +12,6 @@ const TagSelector: m.Component<{
   tabindex?: number;
   tags: OffchainTag[];
   updateFormData: Function;
-  updateParentErrors?: Function;
 }, {
   error: string;
   selectedTag: OffchainTag | string;

@@ -137,7 +137,6 @@ export const NewThreadForm: m.Component<{
 }, {
   activeTag: OffchainTag | string,
   autoTitleOverride,
-  error,
   form: IThreadForm,
   fromDraft?: number,
   newType: string,
@@ -148,7 +147,6 @@ export const NewThreadForm: m.Component<{
 }> = {
   oninit: (vnode_) => {
     vnode_.state.form = {};
-    vnode_.state.error = {};
     vnode_.state.recentlySaved = [];
     vnode_.state.uploadsInProgress = 0;
     if (vnode_.state.newType === undefined) {
@@ -180,15 +178,11 @@ export const NewThreadForm: m.Component<{
     //   vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
     //   if (!vnode.state.newType) vnode.state.newType = 'Discussion';
     // }
-    const { error } = vnode.state;
-
     const getUrlForLinkPost = _.debounce(async () => {
       const res = await getLinkTitle(vnode.state.form.url);
       if (res === '404: Not Found' || res === '500: Server Error') {
-        vnode.state.error.url = res;
         notifyError(res);
       } else {
-        delete vnode.state.error.url;
         if (!vnode.state.autoTitleOverride) vnode.state.form.title = res;
       }
       m.redraw();
@@ -282,7 +276,6 @@ export const NewThreadForm: m.Component<{
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
-                if (vnode.state.error.title) delete vnode.state.error.title;
                 vnode.state.form.title = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.title);
               },
@@ -310,15 +303,6 @@ export const NewThreadForm: m.Component<{
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
-              updateParentErrors: (err: string) => {
-                if (err) {
-                  vnode.state.error = err;
-                  notifyError(err);
-                } else {
-                  delete vnode.state.error;
-                }
-                m.redraw();
-              },
               tabindex: 4,
             }),
           ]),
@@ -332,16 +316,17 @@ export const NewThreadForm: m.Component<{
                 if (!detectURL(vnode.state.form.url)) {
                   notifyError('Must provide a valid URL.');
                 } else {
-                  if (!Object.values(vnode.state.error).length) {
-                    vnode.state.error = await newLink(vnode.state.form, vnode.state.quillEditorState, author);
-                  }
-                  if (vnode.state.error) {
-                    notifyError(Object.keys(vnode.state.error)[0]);
-                  } else if (isModal) {
-                    $(e.target).trigger('modalcomplete');
-                    setTimeout(() => {
-                      $(e.target).trigger('modalexit');
-                    }, 0);
+                  try {
+                    await newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                    vnode.state.saving = false;
+                    if (isModal) {
+                      $(e.target).trigger('modalcomplete');
+                      setTimeout(() => {
+                        $(e.target).trigger('modalexit');
+                      }, 0);
+                    }
+                  } catch (err) {
+                    notifyError(err);
                   }
                 }
               },
@@ -389,15 +374,6 @@ export const NewThreadForm: m.Component<{
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
-              updateParentErrors: (err: string) => {
-                if (err) {
-                  vnode.state.error = err;
-                  notifyError(err);
-                } else {
-                  delete vnode.state.error;
-                }
-                m.redraw();
-              },
               tabindex: 3,
             }),
           ]),
@@ -412,11 +388,9 @@ export const NewThreadForm: m.Component<{
                 if (!vnode.state.form.title) {
                   vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
                 }
-                vnode.state.error = await newThread(form, quillEditorState, author);
-                vnode.state.saving = false;
-                if (vnode.state.error) {
-                  notifyError(Object.values(vnode.state.error)[0] as string);
-                } else {
+                try {
+                  await newThread(form, quillEditorState, author);
+                  vnode.state.saving = false;
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
                   localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
                   localStorage.removeItem(`${app.activeId()}-post-type`);
@@ -427,6 +401,8 @@ export const NewThreadForm: m.Component<{
                   setTimeout(() => {
                     $(e.target).trigger('modalexit');
                   }, 0);
+                } catch (err) {
+                  notifyError(err);
                 }
               },
               label: (vnode.state.uploadsInProgress > 0)
@@ -440,14 +416,13 @@ export const NewThreadForm: m.Component<{
               intent: 'none',
               onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
+                vnode.state.saving = true;
+                if (!vnode.state.form.title) {
+                  vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
+                }
                 try {
-                  vnode.state.saving = true;
-                  if (!vnode.state.form.title) {
-                    vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
-                  }
-                  vnode.state.error = saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
-                  vnode.state.saving = false;
-                  if (isModal && !vnode.state.error?.draft) {
+                  saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
+                  if (isModal) {
                     notifySuccess('Draft saved');
                     localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
                     localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
@@ -455,12 +430,10 @@ export const NewThreadForm: m.Component<{
                     setTimeout(() => {
                       $(e.target).trigger('modalexit');
                     }, 0);
-                  } else if (!vnode.state.error?.draft) {
-                    notifyError(vnode.state.error.draft);
-                    m.route.set(`/${app.activeId()}`);
                   }
+                  m.route.set(`/${app.activeId()}`);
                 } catch (err) {
-                  console.error(err);
+                  notifyError(err);
                 }
               },
               label: 'Save as draft',
@@ -516,7 +489,6 @@ export const NewThreadForm: m.Component<{
                       await app.user.discussionDrafts.delete(draft.id);
                       vnode.state.recentlySaved.push(draft.id);
                     } catch (err) {
-                      vnode.state.error.draft = err;
                       notifyError(err);
                     }
                     m.redraw();

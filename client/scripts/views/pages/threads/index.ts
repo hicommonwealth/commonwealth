@@ -58,7 +58,7 @@ export const saveDraft = (
       : JSON.stringify(quillEditorState.editor.getContents());
   const { title, tagName } = form;
   if (quillEditorState.editor.getText().length <= 1 && !title) {
-    return ({ draft: NewDraftErrors.InsufficientData });
+    throw new Error(NewDraftErrors.InsufficientData);
   }
   const attachments = [];
   if (existingDraft) {
@@ -111,16 +111,16 @@ export const newThread = async (
   readOnly?: boolean
 ) => {
   if (!form.title) {
-    return ({ title: NewThreadErrors.NoTitle });
+    throw new Error(NewThreadErrors.NoTitle);
   }
   if (!form.tagName) {
-    return ({ tag: NewThreadErrors.NoTag });
+    throw new Error(NewThreadErrors.NoTag);
   }
   if (kind === OffchainThreadKind.Link && !form.url) {
-    return ({ url: NewThreadErrors.NoUrl });
+    throw new Error(NewThreadErrors.NoUrl);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
-    return ({ editor: NewThreadErrors.NoBody });
+    throw new Error(NewThreadErrors.NoBody);
   }
 
   quillEditorState.editor.enable(false);
@@ -169,7 +169,7 @@ export const newThread = async (
   } catch (e) {
     console.error(e);
     quillEditorState.editor.enable();
-    return ({ thread_creation: e });
+    throw new Error(e);
   }
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
