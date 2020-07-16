@@ -13,6 +13,8 @@ interface IChainMetadataManagementState {
   description: string;
   website: string;
   chat: string;
+  telegram: string;
+  github: string;
   url: string;
   loadingFinished: boolean;
   loadingStarted: boolean;
@@ -27,6 +29,8 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
     vnode.state.description = vnode.attrs.chain.description;
     vnode.state.website = vnode.attrs.chain.website;
     vnode.state.chat = vnode.attrs.chain.chat;
+    vnode.state.telegram = vnode.attrs.chain.telegram;
+    vnode.state.github = vnode.attrs.chain.github;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -59,8 +63,20 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         m(InputPropertyRow, {
           title: 'Chat',
           defaultValue: vnode.state.chat,
-          placeholder: 'https://discord.gg',
+          placeholder: 'https://discord.gg/...',
           onChangeHandler: (v) => { vnode.state.chat = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Telegram',
+          defaultValue: vnode.state.telegram,
+          placeholder: 'https://t.me/...',
+          onChangeHandler: (v) => { vnode.state.telegram = v; },
+        }),
+        m(InputPropertyRow, {
+          title: 'Github',
+          defaultValue: vnode.state.github,
+          placeholder: 'https://github.com/...',
+          onChangeHandler: (v) => { vnode.state.github = v; },
         }),
         m(InputPropertyRow, {
           title: 'Network',
@@ -101,13 +117,13 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          const { name, description, website, chat } = vnode.state;
+          const { name, description, website, chat, telegram, github } = vnode.state;
           if (website.length && !urlHasValidHTTPPrefix(website)) {
             notifyError('Website must have a valid http prefix');
           } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
             notifyError('Chat must have a valid http prefix');
           }
-          await vnode.attrs.chain.updateChainData(name, description, website, chat);
+          await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
           $(e.target).trigger('modalexit');
         },
       }),

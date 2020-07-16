@@ -13,12 +13,17 @@ class ChainInfo {
   public description: string;
   public website: string;
   public chat: string;
+  public telegram: string;
+  public github: string;
   public readonly featuredTags: string[];
   public readonly tags: OffchainTag[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
 
-  constructor(id, network, symbol, name, iconUrl, description, website, chat, featuredTags, tags, adminsAndMods?) {
+  constructor(
+    id, network, symbol, name, iconUrl, description, website, chat, telegram,
+    github, featuredTags, tags, adminsAndMods?
+  ) {
     this.id = id;
     this.network = network;
     this.symbol = symbol;
@@ -27,6 +32,8 @@ class ChainInfo {
     this.description = description;
     this.website = website;
     this.chat = chat;
+    this.telegram = telegram;
+    this.github = github;
     this.featuredTags = featuredTags || [];
     this.tags = tags || [];
     this.adminsAndMods = adminsAndMods || [];
@@ -42,6 +49,8 @@ class ChainInfo {
       json.description,
       json.website,
       json.chat,
+      json.telegram,
+      json.github,
       json.featured_tags,
       json.tags,
       json.adminsAndMods,
@@ -76,7 +85,9 @@ class ChainInfo {
     });
   }
 
-  public async updateChainData(name: string, description: string, website: string, chat: string) {
+  public async updateChainData(
+    name: string, description: string, website: string, chat: string, telegram: string, github: string
+  ) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
       'id': app.activeChainId(),
@@ -84,6 +95,8 @@ class ChainInfo {
       'description': description,
       'website': website,
       'chat': chat,
+      'telegram': telegram,
+      'github': github,
       'jwt': app.user.jwt,
     });
     const updatedChain: ChainInfo = r.result;
@@ -91,6 +104,8 @@ class ChainInfo {
     this.description = updatedChain.description;
     this.website = updatedChain.website;
     this.chat = updatedChain.chat;
+    this.telegram = telegram;
+    this.github = github;
   }
 
   public addFeaturedTag(tag: string) {

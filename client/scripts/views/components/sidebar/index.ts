@@ -27,7 +27,7 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
     });
 
     const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { chat, description, name, website } = meta;
+    const { name, description, website, chat, telegram, github } = meta;
 
     return m('.CommunityInfoModule.SidebarModule', [
       // m(TagCaratMenu, { tag }),
@@ -73,6 +73,24 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
             target: '_blank',
             href: chat
           }, extractDomain(chat)),
+        ]),
+      ]),
+      telegram && m('.community-info', [
+        m(Icon, { name: Icons.SEND }),
+        m('.community-info-text', [
+          m('a', {
+            target: '_blank',
+            href: telegram
+          }, extractDomain(telegram)),
+        ]),
+      ]),
+      github && m('.community-info', [
+        m(Icon, { name: Icons.GITHUB }),
+        m('.community-info-text', [
+          m('a', {
+            target: '_blank',
+            href: github
+          }, extractDomain(github)),
         ]),
       ]),
     ]);

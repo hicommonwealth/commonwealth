@@ -19,6 +19,22 @@ module.exports = {
       }
     );
     await queryInterface.addColumn(
+      'OffchainCommunities',
+      'telegram',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
+      'OffchainCommunities',
+      'github',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
       'Chains',
       'website',
       {
@@ -29,6 +45,22 @@ module.exports = {
     await queryInterface.addColumn(
       'Chains',
       'chat',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
+      'Chains',
+      'telegram',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
+      'Chains',
+      'github',
       {
         type: DataTypes.STRING,
         allowNull: true,
@@ -53,6 +85,22 @@ module.exports = {
         allowNull: true,
       }
     );
+    await queryInterface.removeColumn(
+      'OffchainCommunities',
+      'telegram',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.removeColumn(
+      'OffchainCommunities',
+      'github',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
     await queryInterface.addColumn(
       'Chains',
       'website',
@@ -64,6 +112,22 @@ module.exports = {
     await queryInterface.addColumn(
       'Chains',
       'chat',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
+      'Chains',
+      'telegram',
+      {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+    );
+    await queryInterface.addColumn(
+      'Chains',
+      'github',
       {
         type: DataTypes.STRING,
         allowNull: true,
