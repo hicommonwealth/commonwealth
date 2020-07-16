@@ -191,7 +191,21 @@ const commentModelFromServer = (comment) => {
     : [];
   let proposal;
   try {
-    proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
+    const proposalSplit = decodeURIComponent(comment.root_id).split(/-|_/);
+    proposal = new OffchainThread(
+      '',
+      '',
+      null,
+      Number(proposalSplit[1]),
+      comment.created_at,
+      null,
+      null,
+      null,
+      comment.community,
+      comment.chain,
+      null,
+      null
+    );
   } catch (e) {
     proposal = null;
   }
@@ -291,7 +305,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           };
           vnode.state.account = account;
           vnode.state.threads = result.threads.map((t) => threadModelFromServer(t));
-          // vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
+          vnode.state.comments = result.comments.map((c) => commentModelFromServer(c));
           m.redraw();
         },
         error: (err) => {
@@ -324,9 +338,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
     //   .filter((p) => p instanceof EdgewareSignalingProposal && p.data.author === account.address);
     // return [].concat(signaling, discussions);
 
-    const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
-      .sort((a, b) => +b.createdAt - +a.createdAt);
-    // const comments = vnode.state.comments;
+    // const comments = app.comments.getByAuthor(vnode.attrs.address, account.chain)
+    //   .sort((a, b) => +b.createdAt - +a.createdAt);
+    const comments = vnode.state.comments;
 
     const proposals = vnode.state.threads;
     const allContent = [].concat(proposals || []).concat(comments || [])
