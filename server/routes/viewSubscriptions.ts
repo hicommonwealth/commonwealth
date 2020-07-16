@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -49,9 +50,16 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     // //   as: 'ChainEntity',
     }];
 
+  const searchParams: any[] = [
+    { subscriber_id: req.user.id },
+  ];
+
   const subscriptions = await models.Subscription.findAll({
-    where: { subscriber_id: req.user.id },
+    where: {
+      [Op.and]: searchParams
+    },
     include: [ ...associationParams ],
   });
+
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
 };

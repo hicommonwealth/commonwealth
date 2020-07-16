@@ -65,7 +65,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     }, {
       model: models.ChainEventType,
       as: 'ChainEventType',
-    // }, {
+    // }, { // breaks query for some reason
     //   model: models.ChainEntity,
     //   as: 'ChainEntity',
     }];
