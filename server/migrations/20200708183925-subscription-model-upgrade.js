@@ -41,7 +41,6 @@ module.exports = {
               // await queryInterface.sequelize.query(query);
               // associate chain or community
               const thread = await queryInterface.sequelize.query(`SELECT * FROM "OffchainThreads" WHERE id=${Number(p_object_id)};`, { transaction: t });
-              console.dir(thread);
               if (thread[0].length === 0) break;
               if (thread[0][0].chain) {
                 query += `UPDATE "Subscriptions" SET chain_id='${thread[0][0].chain}' WHERE id=${id};`;
