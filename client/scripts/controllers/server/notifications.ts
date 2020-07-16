@@ -130,6 +130,7 @@ class NotificationsController {
     }
     // TODO: Change to GET /notifications
     return post('/viewNotifications', { }, (result) => {
+      console.dir(result);
       this._store.clear();
       this._subscriptions = [];
       for (const subscriptionJSON of result) {
