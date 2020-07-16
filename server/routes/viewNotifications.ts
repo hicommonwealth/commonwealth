@@ -48,34 +48,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     notificationParams.where = { is_read: false };
   }
 
-  const associationParams: any = [
-    notificationParams,
-    {
-      model: models.Chain,
-      as: 'Chain',
-    }, {
-      model: models.OffchainCommunity,
-      as: 'OffchainCommunity',
-    }, {
-      model: models.OffchainThread,
-      as: 'OffchainThread',
-    }, {
-      model: models.OffchainComment,
-      as: 'OffchainComment',
-    }, {
-      model: models.ChainEventType,
-      as: 'ChainEventType',
-    // }, { // breaks query for some reason
-    //   model: models.ChainEntity,
-    //   as: 'ChainEntity',
-    }];
-
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
       [Op.and]: searchParams
     },
-    include: [ ...associationParams ],
+    include: [ notificationParams ],
   });
 
   // TODO: flatten? sort by date?
