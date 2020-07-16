@@ -3,9 +3,8 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
-import { urlHasValidHTTPPrefix } from 'helpers';
-import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 import { notifyError } from 'controllers/app/notifications';
+import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
   name: string;
@@ -100,11 +99,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           invitesValue,
           privacyValue,
         } = vnode.state;
-        if (website?.length && !urlHasValidHTTPPrefix(website)) {
-          notifyError('Website must have a valid http prefix');
-        } else if (chat?.length && !urlHasValidHTTPPrefix(chat)) {
-          notifyError('Chat must have a valid http prefix');
-        } else {
+        try {
           await vnode.attrs.community.updateCommunityData({
             name,
             description,
@@ -114,6 +109,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             invitesValue,
           });
           $(e.target).trigger('modalexit');
+        } catch (err) {
+          notifyError(err.message);
         }
       },
     }),

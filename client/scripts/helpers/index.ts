@@ -46,10 +46,6 @@ export function extractDomain(url) {
   return re.exec(url)[1];
 }
 
-export function urlHasValidHTTPPrefix(url: string) {
-  return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
-}
-
 /*
  * icons
  */

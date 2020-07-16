@@ -3,7 +3,6 @@ import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
-import { urlHasValidHTTPPrefix } from 'helpers';
 import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
