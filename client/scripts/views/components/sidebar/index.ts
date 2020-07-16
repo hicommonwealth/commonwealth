@@ -20,7 +20,7 @@ const MembersModule: m.Component<{}> = {
     if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
 
     return m('.MembersModule.SidebarModule', [
-      m(List, [
+      m(List, { interactive: false }, [
         m(ListItem, {
           label: 'Admins & Mods',
           // contentRight: m(PopoverMenu, {
@@ -230,7 +230,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       .map((name, idx) => getTagRow(featuredTags[name].id, name, featuredTags[name].description));
 
     return m('.TagsModule.SidebarModule', [
-      m(List, [
+      m(List, { interactive: false }, [
         m(ListItem, {
           label: 'Channels',
           contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })

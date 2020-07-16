@@ -26,9 +26,6 @@ $active-color: #ececec;
                 .cui-icon svg {
                     stroke: #111;
                 }
-                &:hover {
-                    background: #eee;
-                }
                 &.cui-selected,
                 &.cui-active {
                     background: #eee;
@@ -47,12 +44,16 @@ $active-color: #ececec;
                     .cui-icon svg {
                         opacity: 0.6;
                     }
-                    &:hover {
-                        background: #ececec;
-                        .cui-icon svg {
-                            opacity: 1;
-                        }
-                    }
+                }
+            }
+        }
+        > .cui-list.cui-interactive {
+            .cui-list-item:hover {
+                background: #eee;
+            }
+            .cui-icon-action:hover {
+                .cui-icon svg {
+                    opacity: 1;
                 }
             }
         }
