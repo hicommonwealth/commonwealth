@@ -2,25 +2,14 @@
 
 .Sublayout {
     display: block;
+    padding: 0 32px;
     .sublayout-main {
         display: flex;
         margin: 0 auto;
         min-height: calc(100vh - 60px);
-        > .left-sidebar {
-            width: $left-sidebar-width;
-            border-right: 1px solid #eee;
-            box-shadow: 0 0 4px rgba(0,0,0,0.07);
-            padding-left: $left-horizontal-padding;
-            padding-right: $left-horizontal-padding;
-        }
-        > .right-sidebar {
-            width: $right-sidebar-width;
-            padding-left: $right-horizontal-padding;
-            padding-right: $right-horizontal-padding;
-            background: #f8f8f8;
-        }
-        > .sublayout-content {
-            flex: 1;
-        }
+        max-width: 1100px;
+    }
+    .left-sidebar {
+        padding-right: 45px;
     }
 }

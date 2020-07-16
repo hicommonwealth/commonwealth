@@ -1,37 +1,41 @@
 @import 'client/styles/shared';
 
+.DiscussionRowHeader {
+    display: flex;
+    border-bottom: 1px solid #eee;
+
+    color: #999;
+    .discussion-row-header-col {
+        font-size: 14px;
+        text-align: right;
+        width: 82px;
+        padding: 10px 0;
+        &.discussion-row-header-replies {
+            padding-right: 6px;
+        }
+        &.discussion-row-header-title {
+            flex: 1;
+            width: initial;
+            text-align: left;
+        }
+    }
+}
+
 .DiscussionsPage {
     .discussions-main {
         position: relative;
         flex: 1;
         margin: 0px auto;
-        padding: 24px 0;
+        padding: 24px 0 36px;
         &.empty-list {
             height: calc(100vh - 200px);
-        }
-    }
-
-    // sidebar
-    .CommunitySidebar {
-        padding-top: $vertical-padding;
-        padding-left: 8px; // extra padding
-        h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 26px 0 12px;
-            &:first-child {
-                margin-top: 12px;
-            }
-        }
-        p {
-            margin: 12px 0;
         }
     }
 
     // content
     .LastSeenDivider {
         display: flex;
-        padding: 12px 0 10px;
+        padding: 12px 48px 10px;
         span {
             color: #ea7a60;
             font-size: 14px;
@@ -49,6 +53,12 @@
         }
     }
 
+    .infinite-scroll-reached-end {
+        color: #aaa;
+        font-size: 14px;
+        margin: 20px 0;
+        text-align: center;
+    }
     .infinite-scroll-spinner-wrap {
         height: 70px;
         width: 100%;

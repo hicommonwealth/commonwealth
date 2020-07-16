@@ -1,6 +1,8 @@
+import $ from 'jquery';
 import m from 'mithril';
-import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { Table, Button } from 'construct-ui';
+
+import { CommunityInfo, ChainInfo } from 'client/scripts/models';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
@@ -14,7 +16,6 @@ interface ICommunityMetadataManagementState {
 export interface IChainOrCommMetadataManagementAttrs {
   community?: CommunityInfo;
   chain?: ChainInfo;
-  onChangeHandler: Function;
   onRoleUpdate: Function;
   admins;
   mods;
@@ -43,6 +44,7 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         title: 'Description',
         defaultValue: vnode.state.description,
         onChangeHandler: (v) => { vnode.state.description = v; },
+        textarea: true,
       }),
       m(InputPropertyRow, {
         title: 'URL',
@@ -79,14 +81,14 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     m(Button, {
       label: 'Save changes',
       intent: 'primary',
-      onclick: () => {
-        vnode.attrs.community.updateCommunityData(
+      onclick: async (e) => {
+        await vnode.attrs.community.updateCommunityData(
           vnode.state.name,
           vnode.state.description,
           vnode.state.privacyValue,
           vnode.state.invitesValue,
         );
-        vnode.attrs.onChangeHandler(false);
+        $(e.target).trigger('modalexit');
       },
     }),
     ]);

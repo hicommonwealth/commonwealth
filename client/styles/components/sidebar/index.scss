@@ -3,71 +3,131 @@
 $active-color: #ececec;
 
 .Sidebar {
-    padding-top: 8px;
-    .tag-icon {
-        width: 10px;
-        height: 10px;
-        border-radius: 2px;
-        background: #eee;
-        margin-left: 1px;
-        margin-right: 2px;
-    }
-    > .cui-list {
-        // reset list styles
-        overflow-x: hidden;
-        max-height: 100%;
-        user-select: none;
-        padding: 12px 0;
-        .cui-list-item {
-            color: #111;
-            font-size: 15px;
-            font-weight: 500;
-            border: none;
-            padding: 4px 12px 3px;
-            > .cui-list-item-content-left > .cui-icon svg {
-                height: 14px;
-                width: 14px;
-                min-height: 14px;
-                min-width: 14px;
-                margin-right: -2px;
-                color: #444;
-                position: relative;
-                top: -1px;
-            }
-            &:hover {
-                background: lighten($active-color, 3%);
-            }
-            &.cui-selected,
-            &.cui-active {
-                background: desaturate(lighten($theme-base-color, 29%), 24%);
-                color: desaturate(darken($theme-base-color, 4%), 30%);
+    margin: 36px 0 48px;
+    .SidebarModule {
+        background: #f8f8f8;
+        border-radius: 4px;
+        padding: 14px 12px;
+        margin-bottom: 18px;
+        > .cui-list {
+            // reset list styles
+            overflow-x: hidden;
+            max-height: 100%;
+            user-select: none;
+            background: transparent;
+            .cui-list-item {
+                color: #111;
+                font-size: 15px;
+                font-weight: 500;
+                border: none;
                 border-radius: 3px;
-
+                padding: 5px 12px;
+                line-height: 1.25;
                 .cui-icon svg {
-                    color: #fff !important;
+                    stroke: #111;
+                }
+                &:hover {
+                    background: #eee;
+                }
+                &.cui-selected,
+                &.cui-active {
+                    background: #eee;
+                }
+                .cui-icon-action {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 36px;
+                    // center the icon
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 0 4px 4px 0;
+                    .cui-icon svg {
+                        opacity: 0.6;
+                    }
+                    &:hover {
+                        background: #ececec;
+                        .cui-icon svg {
+                            opacity: 1;
+                        }
+                    }
                 }
             }
-            .cui-tag {
-                margin: -3px 0;
-                position: relative;
-                top: -2px;
-            }
-        }
-        .cui-list.more-tags-list {
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-            padding: 10px 0;
-            max-height: 230px;
-            margin-bottom: -10px;
-        }
-        .cui-list-item.more-tags-toggle {
-            display: block;
-            color: #888;
-            border-top: 1px solid #eee;
-            width: 100%;
-            padding: 10px 15px;
-            margin-top: 10px;
-            margin-bottom: -10px;
         }
     }
+
+    .CommunityInfoModule {
+        position: relative;
+        padding: 22px 26px;
+        .ChainIcon, .CommunityIcon {
+            margin-top: 6px;
+            margin-bottom: 10px;
+        }
+        .community-config {
+            position: absolute;
+            top: 30px;
+            right: 24px;
+            svg {
+                stroke: #333;
+            }
+        }
+        .community-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .community-description {
+            margin-bottom: 14px;
+        }
+        .community-info {
+            display: flex;
+            margin: 3px 0;
+            .cui-icon {
+                margin-right: 10px;
+                svg {
+                    stroke: #111;
+                    position: relative;
+                    top: 3px;
+                    // icon size
+                    height: 14px;
+                    width: 14px;
+                    min-width: 14px;
+                    min-height: 14px;
+                }
+            }
+        }
+    }
+
+    .NavigationModule {
+    }
+    .TagsModule {
+        .tag-icon {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background: #eee;
+            margin: 1px 3px;
+        }
+        > .cui-list {
+            .cui-list.more-tags-list {
+                border-top: 1px solid #eee;
+                margin-top: 10px;
+                padding: 10px 0;
+                max-height: 230px;
+                margin-bottom: -10px;
+            }
+        }
+    }
+    .MembersModule {
+        .community-admins {
+            margin: 6px 0;
+        }
+    }
+}
+
+.cui-popover.sidebar-edit-tag .cui-menu,
+.cui-popover.sidebar-add-tag .cui-menu {
+    padding: 4px 0;
 }

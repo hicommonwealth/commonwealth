@@ -1,7 +1,8 @@
+import $ from 'jquery';
 import m from 'mithril';
-import { ChainNetwork } from 'client/scripts/models';
 import { Button, Table } from 'construct-ui';
 
+import { ChainNetwork } from 'client/scripts/models';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
@@ -42,6 +43,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           title: 'Description',
           defaultValue: vnode.state.description,
           onChangeHandler: (v) => { vnode.state.description = v; },
+          textarea: true,
         }),
         m(InputPropertyRow, {
           title: 'URL',
@@ -87,9 +89,9 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         class: 'save-changes-button',
         label: 'Save changes',
         intent: 'primary',
-        onclick: () => {
-          vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
-          vnode.attrs.onChangeHandler(false);
+        onclick: async (e) => {
+          await vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
+          $(e.target).trigger('modalexit');
         },
       }),
     ]);

@@ -1,11 +1,7 @@
 @import 'client/styles/shared';
 
-$discussion-vertical-padding: 32px;
-$discussion-horizontal-padding: 48px;
-
 .DiscussionRow {
     display: block;
-    padding: 0 $discussion-horizontal-padding;
 
     // layout
     .discussion-top {
@@ -50,6 +46,9 @@ $discussion-horizontal-padding: 48px;
                     &:hover {
                         color: darken($standard-light-text, 8%);
                         text-decoration: underline;
+                    }
+                    a.user-display-name {
+                        color: $theme-base-color;
                     }
                 }
                 .discussion-link {

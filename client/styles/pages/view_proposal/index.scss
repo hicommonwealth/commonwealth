@@ -1,7 +1,7 @@
 @import 'client/styles/shared';
 
-$discussion-vertical-padding: 37px;
-$discussion-horizontal-padding: 60px;
+$discussion-inner-padding: 37px;
+$discussion-outer-padding: 60px;
 $discussion-separator-padding: 30px; // padding around horizontal rule between header and body
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
 $discussion-reaction-padding: 18px; // padding between comment content & comment reaction
@@ -21,9 +21,6 @@ $discussion-meta-color: #999;
 }
 
 .ViewProposalPage {
-    .ProposalHeader {
-        padding-top: $discussion-horizontal-padding;
-    }
     .ProposalHeader,
     .ProposalComment {
         @include supports-jump-highlight();
@@ -31,11 +28,10 @@ $discussion-meta-color: #999;
     .ProposalHeader,
     .ProposalComment,
     .CreateComment {
-        margin: 0 $discussion-horizontal-padding;
-        padding-top: $discussion-vertical-padding;
+        padding-top: $discussion-inner-padding;
     }
-    .CreateComment {
-        padding-bottom: $discussion-vertical-padding * 2;
+    .ProposalComments {
+        padding-bottom: $discussion-outer-padding;
     }
     .proposal-body-bottom, .comment-body-bottom {
         display: flex;
@@ -70,6 +66,7 @@ $discussion-meta-color: #999;
         .proposal-content-right {
             flex: 1;
             margin-left: $discussion-comment-padding;
+            margin-right: $discussion-outer-padding;
             .proposal-content-meta {
                 padding-bottom: $discussion-meta-padding;
                 font-size: $discussion-meta-font-size;
@@ -177,5 +174,20 @@ $discussion-meta-color: #999;
     .comments-error {
         @include error-text();
         margin: 30px 0;
+    }
+
+
+    .proposal-content,
+    .ProposalComment {
+        position: relative;
+    }
+    .thread-connector {
+        position: absolute;
+        top: 48px;
+        bottom: -40px;
+        background: #efefef;
+        left: 17px;
+        width: 2px;
+        z-index: -1;
     }
 }

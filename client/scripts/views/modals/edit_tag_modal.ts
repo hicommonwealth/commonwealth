@@ -9,26 +9,22 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from '../modal';
 import { TextInputFormField, CheckboxFormField, TextareaFormField } from '../components/forms';
 
-interface IEditTagModalAttrs {
-  description: string,
-  id: number,
-  name: string;
-}
-
-interface IEditTagModalState {
-  error: any;
-  form: IEditTagModalForm
-  saving: boolean;
-}
-
 interface IEditTagModalForm {
   description: string,
   id: number,
   name: string,
 }
 
-const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
-  view: (vnode: m.VnodeDOM<IEditTagModalAttrs, IEditTagModalState>) => {
+const EditTagModal : m.Component<{
+  description: string,
+  id: number,
+  name: string,
+}, {
+  error: any,
+  form: IEditTagModalForm,
+  saving: boolean,
+}> = {
+  view: (vnode) => {
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return null;
     const { id, description, name } = vnode.attrs;
     if (!vnode.state.form) {
@@ -58,7 +54,7 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
 
     return m('.EditTagModal', [
       m('.compact-modal-title', [
-        m('h3', 'Edit Tag'),
+        m('h3', 'Edit channel'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -66,6 +62,9 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
           m(TextInputFormField, {
             title: 'Name',
             options: {
+              oncreate: (vvnode) => {
+                $(vvnode.dom).focus().select();
+              },
               class: 'tag-form-name',
               tabindex: 1,
               value: vnode.state?.form?.name,
@@ -73,7 +72,6 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
             callback: (value) => {
               vnode.state.form.name = value;
             },
-            oncreate: (vvnode) => $(vvnode.dom).find('input[type="text"]').focus().select(),
           }),
           m(TextareaFormField, {
             title: 'Description',
@@ -96,10 +94,10 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
             onclick: async (e) => {
               e.preventDefault();
               await updateTag(vnode.state.form);
-              if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
+              if (!vnode.state.error) $(e.target).trigger('modalexit');
               vnode.state.saving = false;
             },
-            label: 'Save Changes',
+            label: 'Save changes',
           }),
           m(Button, {
             intent: 'negative',
@@ -109,11 +107,11 @@ const EditTagModal : m.Component<IEditTagModalAttrs, IEditTagModalState> = {
               const confirmed = await confirmationModalWithText('Delete this tag?')();
               if (!confirmed) return;
               await deleteTag(id);
-              if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
+              if (!vnode.state.error) $(e.target).trigger('modalexit');
               vnode.state.saving = false;
               m.redraw();
             },
-            label: 'Delete Tag',
+            label: 'Delete channel',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),

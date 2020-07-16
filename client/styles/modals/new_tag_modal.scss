@@ -1,15 +1,6 @@
 .NewTagModal {
-    .compact-modal-actions {
-        padding-bottom: 24px;
-    }
-    h3 {
-        margin: 10px 0;
-        font-weight: 700;
-    }
-    input {
-        margin: 10px 0;
-    }
-    button {
-        margin-right: 8px;
+    min-width: 500px;
+    .buttons .cui-button {
+        margin-right: 10px;
     }
 }

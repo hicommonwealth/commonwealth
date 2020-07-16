@@ -384,7 +384,7 @@ td, th {
     svg {
         stroke: #fff;
     }
-    &:hover, &:active {
+    &:hover, &:active, &.cui-active {
         background: #555;
     }
     &.cui-disabled {

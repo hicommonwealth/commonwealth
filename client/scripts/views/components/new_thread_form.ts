@@ -1,33 +1,24 @@
 import 'components/new_thread_form.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
-import { Form, FormGroup, Input, Button, ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem } from 'construct-ui';
+import {
+  Tabs, TabItem, Form, FormGroup, Input, Button,
+  ButtonGroup, Icons, Grid, Col, Tooltip, List, ListItem
+} from 'construct-ui';
 
 import app from 'state';
+import { OffchainTag } from 'models';
+import { notifySuccess } from 'controllers/app/notifications';
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
-import AutoCompleteTagForm from 'views/components/autocomplete_tag_form';
+import TagSelector from 'views/components/tag_selector';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
-import { OffchainTag } from 'client/scripts/models';
+
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
-import { confirmationModalWithText } from '../modals/confirm_modal';
-import { notifySuccess } from '../../controllers/app/notifications';
-
-interface IState {
-  activeTag: OffchainTag | string,
-  autoTitleOverride,
-  error,
-  form: IThreadForm,
-  fromDraft?: number,
-  hasComment: boolean,
-  newType: string,
-  quillEditorState,
-  saving: boolean,
-  uploadsInProgress: number,
-}
 
 interface IThreadForm {
   tagName?: string;
@@ -85,9 +76,8 @@ export const checkForModifications = async (state, modalMsg) => {
 export const loadDraft = async (state, draft) => {
   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
 
-  // First we check if the form has been updated, to avoid
-  // losing any unsaved form data
-  const overwriteDraftMsg = 'Load draft? Current form will not be saved.';
+  // First we check if the form has been updated, to avoid losing any unsaved form data
+  const overwriteDraftMsg = 'Load this draft? Your current work will will not be saved.';
   const confirmed = await checkForModifications(state, overwriteDraftMsg);
   if (!confirmed) return;
 
@@ -119,27 +109,40 @@ export const loadDraft = async (state, draft) => {
   m.redraw();
 };
 
-export const cancelDraft = async (state) => {
-  if (!state.fromDraft) {
-    return;
-  }
-  // First we check if the form has been updated, to avoid
-  // losing any unsaved form data
-  const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
-  const cancelDraftMessage = 'Cancel editing draft? Current form will not be saved.';
-  const confirmed = await checkForModifications(state, cancelDraftMessage);
-  if (!confirmed) return;
-  state.form.body = '';
-  state.form.title = '';
-  state.activeTag = undefined;
-  state.fromDraft = NaN;
-  (titleInput as HTMLInputElement).value = '';
-  state.quillEditorState.editor.setText('\n');
-  m.redraw();
-};
+// export const cancelDraft = async (state) => {
+//   if (!state.fromDraft) {
+//     return;
+//   }
+//   // First we check if the form has been updated, to avoid
+//   // losing any unsaved form data
+//   const titleInput = document.querySelector("div.new-thread-form-body input[name='title']");
+//   const cancelDraftMessage = 'Discard edits? Your current work will not be saved.';
+//   const confirmed = await checkForModifications(state, cancelDraftMessage);
+//   if (!confirmed) return;
+//   state.form.body = '';
+//   state.form.title = '';
+//   state.activeTag = undefined;
+//   state.fromDraft = NaN;
+//   (titleInput as HTMLInputElement).value = '';
+//   state.quillEditorState.editor.setText('\n');
+//   m.redraw();
+// };
 
-export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, IState> = {
-  view: (vnode: VnodeDOM<{ header: boolean, isModal: boolean }, IState>) => {
+export const NewThreadForm: m.Component<{
+  header: boolean,
+  isModal: boolean
+}, {
+  activeTag: OffchainTag | string,
+  autoTitleOverride,
+  error,
+  form: IThreadForm,
+  fromDraft?: number,
+  newType: string,
+  quillEditorState,
+  saving: boolean,
+  uploadsInProgress: number,
+}> = {
+  view: (vnode) => {
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
@@ -162,43 +165,40 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
       m.redraw();
     }, 750);
 
-    const typeSelector = m(FormGroup, [
-      m(ButtonGroup, { fluid: true, outlined: true }, [
-        m(Button, {
-          iconLeft: Icons.FEATHER,
-          label: 'Discussion',
-          onclick: () => {
-            vnode.state.newType = 'Discussion';
-          },
-          active: vnode.state.newType === 'Discussion',
-          intent: vnode.state.newType === 'Discussion' ? 'primary' : 'none',
-        }),
-        m(Button, {
-          iconLeft: Icons.LINK,
-          label: 'Link',
-          onclick: () => {
-            vnode.state.newType = 'Link';
-          },
-          active: vnode.state.newType === 'Link',
-          intent: vnode.state.newType === 'Link' ? 'primary' : 'none',
-        }),
-      ]),
-    ]);
-
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { hasComment, newType, saving, uploadsInProgress } = vnode.state;
+    const { newType, saving, uploadsInProgress } = vnode.state;
 
     return m('.NewThreadForm', {
+      class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header
-        && m('h2.page-title', 'New Post'),
-        vnode.state.newType === 'Link'
-        && m(Form, [
-          typeSelector,
+        vnode.attrs.header && m('h2.page-title', 'New Thread'),
+        m(FormGroup, [
+          m(Tabs, {
+            align: 'left',
+            bordered: true,
+            fluid: true,
+          }, [
+            m(TabItem, {
+              label: 'Discussion',
+              onclick: (e) => {
+                vnode.state.newType = 'Discussion';
+              },
+              active: vnode.state.newType === 'Discussion',
+            }),
+            m(TabItem, {
+              label: 'Link',
+              onclick: (e) => {
+                vnode.state.newType = 'Link';
+              },
+              active: vnode.state.newType === 'Link',
+            }),
+          ]),
+        ]),
+        vnode.state.newType === 'Link' && m(Form, [
           m(FormGroup, [
             m(Input, {
               placeholder: 'https://',
@@ -224,7 +224,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             }),
           ]),
           m(FormGroup, [
-            vnode.state.hasComment ? m(QuillEditor, {
+            m(QuillEditor, {
               contentsDoc: '', // Prevent the editor from being filled in with previous content
               oncreateBind: (state) => {
                 vnode.state.quillEditorState = state;
@@ -232,14 +232,10 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
               tabindex: 3,
-            }) : m('a.add-comment', {
-              href: '#',
-              onclick: (e) => { vnode.state.hasComment = true; },
-              tabindex: 2,
-            }, 'Add comment'),
+            })
           ]),
           m(FormGroup, [
-            m(AutoCompleteTagForm, {
+            m(TagSelector, {
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
@@ -261,7 +257,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               intent: 'primary',
               label: 'Create link',
               name: 'submit',
-              onclick: () => {
+              onclick: (e) => {
                 if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
                   vnode.state.error.url = 'Must provide a valid URL.';
                 }
@@ -269,9 +265,9 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   newLink(vnode.state.form, vnode.state.quillEditorState, author);
                 }
                 if (vnode.attrs.isModal && !vnode.state.error) {
-                  $(vnode.dom).trigger('modalcomplete');
+                  $(e.target).trigger('modalcomplete');
                   setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
+                    $(e.target).trigger('modalexit');
                   }, 0);
                 }
               },
@@ -287,9 +283,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             : m('.error-placeholder'),
         ]),
         //
-        vnode.state.newType === 'Discussion'
-        && m(Form, [
-          typeSelector,
+        vnode.state.newType === 'Discussion' && m(Form, [
           m(FormGroup, [
             m(Input, {
               name: 'title',
@@ -311,7 +305,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             }),
           ]),
           m(FormGroup, [
-            m(AutoCompleteTagForm, {
+            m(TagSelector, {
               activeTag: vnode.state.activeTag,
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
@@ -332,7 +326,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
               intent: 'primary',
-              onclick: async () => {
+              onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.error = await newThread(form, quillEditorState, author);
@@ -342,7 +336,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                     await app.user.discussionDrafts.delete(vnode.state.fromDraft);
                   }
                   setTimeout(() => {
-                    $(vnode.dom).trigger('modalexit');
+                    $(e.target).trigger('modalexit');
                   }, 0);
                 }
               },
@@ -355,7 +349,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               class: !author || saving || vnode.state.uploadsInProgress > 0
                 ? 'disabled' : '',
               intent: 'none',
-              onclick: () => {
+              onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
                 try {
                   vnode.state.saving = true;
@@ -364,13 +358,13 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
                   if (vnode.attrs.isModal && !vnode.state.error?.draft) {
                     notifySuccess('Draft saved');
                     setTimeout(() => {
-                      $(vnode.dom).trigger('modalexit');
+                      $(e.target).trigger('modalexit');
                     }, 0);
                   } else if (!vnode.state.error?.draft) {
                     m.route.set(`/${app.activeId()}`);
                   }
-                } catch (e) {
-                  console.error(e);
+                } catch (err) {
+                  console.error(err);
                 }
               },
               label: 'Save as draft',
@@ -388,9 +382,7 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
             : m('.error-placeholder'),
         ]),
       ]),
-      !!discussionDrafts.length
-      && m('.new-thread-form-sidebar', [
-        m('h2', 'Saved drafts'),
+      !!discussionDrafts.length && m('.new-thread-form-sidebar', [
         m(List, { interactive: true }, discussionDrafts.map((draft) => {
           const { body } = draft;
           let bodyComponent;
@@ -417,18 +409,33 @@ export const NewThreadForm: m.Component<{ header: boolean, isModal: boolean }, I
               m('.discussion-draft-title', draft.title || 'Untitled'),
               m('.discussion-draft-body', draft.body.length
                 ? bodyComponent
-                : '')
+                : ''),
+              m('.discussion-draft-actions', [
+                m('a', {
+                  href: '#',
+                  onclick: async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                      await app.user.discussionDrafts.delete(draft.id);
+                    } catch (err) {
+                      vnode.state.error.draft = err;
+                    }
+                    m.redraw();
+                  }
+                }, 'Delete')
+              ]),
             ],
             onclick: () => loadDraft(vnode.state, draft),
             selected: vnode.state.fromDraft === draft.id
           });
         })),
-        m(Button, {
-          class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
-          intent: 'none',
-          onclick: () => cancelDraft(vnode.state),
-          label: 'Cancel draft',
-        }),
+        // m(Button, {
+        //   class: !author || vnode.state.uploadsInProgress > 0 ? 'disabled' : '',
+        //   intent: 'none',
+        //   onclick: () => cancelDraft(vnode.state),
+        //   label: 'Cancel editing draft',
+        // }),
       ])
     ]);
   }

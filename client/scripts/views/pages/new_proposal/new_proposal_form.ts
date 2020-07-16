@@ -3,31 +3,33 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import app from 'state';
+import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { notifyError } from 'controllers/app/notifications';
+
+import app from 'state';
+import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
 import { ProposalType, proposalSlugToClass, proposalSlugToFriendlyName } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
+import { CosmosToken } from 'adapters/chain/cosmos/types';
+
+import { notifyError } from 'controllers/app/notifications';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import Substrate from 'controllers/chain/substrate/main';
+import Cosmos from 'controllers/chain/cosmos/main';
+import Moloch from 'controllers/chain/ethereum/moloch/adapter';
+
 import {
   TextInputFormField,
   TextareaFormField,
   DropdownFormField,
   RadioSelectorFormField
 } from 'views/components/forms';
-import { CosmosToken } from 'adapters/chain/cosmos/types';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import Substrate from 'controllers/chain/substrate/main';
-import { ITXModalData, ProposalModule, ChainBase, OffchainThreadKind } from 'models';
-import Cosmos from 'controllers/chain/cosmos/main';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { FormGroup, Button, Grid, Col, Spinner } from 'construct-ui';
-import AutoCompleteTagForm from '../../components/autocomplete_tag_form';
-import MolochMember from 'client/scripts/controllers/chain/ethereum/moloch/member';
-
+import TagSelector from 'views/components/tag_selector';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -333,7 +335,7 @@ const NewProposalForm = {
           // actions
           hasAction && m(EdgewareFunctionPicker),
           hasTags
-            && m(AutoCompleteTagForm, {
+            && m(TagSelector, {
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
               updateFormData: (tagName: string, tagId?: number) => {

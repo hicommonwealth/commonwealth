@@ -2,55 +2,58 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { List, ListItem, Icon, Icons, Tag } from 'construct-ui';
+import dragula from 'dragula';
+import { List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
-import { ChainClass, ChainBase } from 'models';
-import AdminPanel from 'views/components/admin_panel';
+import { ChainClass, ChainBase, AddressInfo } from 'models';
+import NewTagModal from 'views/modals/new_tag_modal';
+import EditTagModal from 'views/modals/edit_tag_modal';
+import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import ManageCommunityModal from 'views/modals/manage_community_modal';
+import { UserBlock } from 'views/components/widgets/user';
 
-const TagListings: m.Component<{}, {}> = {
+const MembersModule: m.Component<{}> = {
   view: (vnode) => {
-    const featuredTags = {};
-    const otherTags = {};
-    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
+    if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
 
-    const getTagRow = (name, id) => m(ListItem, {
-      key: id,
-      contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
-      label: name.toLowerCase(),
-      selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeId()}/discussions/${name}`);
-      },
-    });
-
-    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
-      const { id, name } = tag;
-      if (featuredTagIds.includes(`${tag.id}`)) {
-        featuredTags[tag.name] = { id, name, featured_order: featuredTagIds.indexOf(`${id}`) };
-      } else {
-        otherTags[tag.name] = { id, name };
-      }
-    });
-    const otherTagListing = Object.keys(otherTags)
-      .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
-      .map((name, idx) => getTagRow(name, otherTags[name].id));
-    const featuredTagListing = Object.keys(featuredTags)
-      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
-      .map((name, idx) => getTagRow(name, featuredTags[name].id));
-
-    return [
-      m(List, featuredTagListing),
-      otherTagListing.length > 0 && m(List, { class: 'more-tags-list' }, otherTagListing),
-    ];
+    return m('.MembersModule.SidebarModule', [
+      m(List, [
+        m(ListItem, {
+          label: 'Admins & Mods',
+          // contentRight: m(PopoverMenu, {
+          //   class: 'sidebar-add-tag',
+          //   position: 'bottom',
+          //   transitionDuration: 0,
+          //   hoverCloseDelay: 0,
+          //   closeOnContentClick: true,
+          //   trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+          //   content: m(MenuItem, {
+          //     label: 'New channel',
+          //     onclick: (e) => {
+          //       e.preventDefault();
+          //       app.modals.create({ modal: NewTagModal });
+          //     }
+          //   }),
+          // }),
+        }),
+      ]),
+      adminsAndMods.length > 0 && m(List, { class: 'community-admins' }, adminsAndMods.map((r) => {
+        return m(ListItem, {
+          class: 'community-admin',
+          label: m(UserBlock, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
+        });
+      })),
+      // m('h3', 'Most active members'),
+      // TODO
+    ]);
   }
 };
 
-const Sidebar: m.Component<{ activeTag: string }> = {
+const NavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
-    const { activeTag } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
 
     // chain menu
@@ -84,11 +87,8 @@ const Sidebar: m.Component<{ activeTag: string }> = {
     const showMolochMenuOptions = activeAccount && app.chain?.class === ChainClass.Moloch;
     const showMolochMemberOptions = showMolochMenuOptions && (activeAccount as any)?.shares?.gtn(0);
 
-    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`;
-    const onMembersPage = (p) => p.startsWith(`/${app.activeId()}/members`);
-    const onTagsPage = (p) => p.startsWith(`/${app.activeId()}/tags`);
-    const onChatPage = (p) => p.startsWith(`/${app.activeId()}/chat`);
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onDiscussionsPage = (p) => p === `/${app.activeId()}` || p === `/${app.activeId()}/`
+      || p.startsWith(`/${app.activeId()}/proposal/discussion/`);
     const onProposalPage = (p) => (
       p.startsWith(`/${app.activeChainId()}/proposals`)
         || p.startsWith(`/${app.activeChainId()}/signaling`)
@@ -99,43 +99,29 @@ const Sidebar: m.Component<{ activeTag: string }> = {
         || p.startsWith(`/${app.activeChainId()}/proposal/signalingproposal`)
         || p.startsWith(`/${app.activeChainId()}/proposal/treasuryproposal`));
     const onCouncilPage = (p) => p.startsWith(`/${app.activeChainId()}/council`);
+
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
     if (onNotificationsPage(m.route.get())) return;
 
-    return m('.Sidebar', {
-      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
-        + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, (!app.community && !app.chain) ? [
-      // no community
-      m(List, { interactive: true }, [
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.USER, }),
-          label: 'Settings',
-          onclick: (e) => m.route.set('/settings'),
-        }),
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
-          label: 'Notifications',
-          onclick: (e) => m.route.set('/notification-settings'),
-        }),
-      ]),
-    ] : [
+    return m('.NavigationModule.SidebarModule', [
       // discussions
-      m(List, { interactive: true }, [
+      m(List, [
         m(ListItem, {
           active: onDiscussionsPage(m.route.get()),
-          label: 'Home',
+          label: 'Discussions',
           onclick: (e) => m.route.set(`/${app.activeId()}`),
+          contentLeft: m(Icon, { name: Icons.MESSAGE_CIRCLE }),
         }),
-        m(TagListings),
       ]),
       // proposals
       hasProposals
-        && m(List, { interactive: true }, [
+        && m(List, [
           // proposals (substrate, cosmos, moloch only)
           m(ListItem, {
             active: onProposalPage(m.route.get()),
             label: 'Proposals',
+            contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
             onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
           }),
           // council (substrate only)
@@ -143,6 +129,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
             && m(ListItem, {
               active: onCouncilPage(m.route.get()),
               label: 'Council',
+              contentLeft: m(Icon, { name: Icons.AWARD }),
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
               contentRight: [], // TODO
             }),
@@ -185,31 +172,185 @@ const Sidebar: m.Component<{ activeTag: string }> = {
             contentLeft: m(Icon, { name: Icons.POWER }),
           }),
         ]),
-      // manage
-      m(List, { interactive: true }, [
-        m(ListItem, {
-          active: onMembersPage(m.route.get()),
-          label: 'Members',
-          onclick: (e) => m.route.set(`/${app.activeId()}/members/`),
+    ]);
+  }
+};
+
+const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
+  view: (vnode) => {
+    const featuredTags = {};
+    const otherTags = {};
+    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+
+    const getTagRow = (id, name, description) => m(ListItem, {
+      key: id,
+      contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
+      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}` && [
+        m(PopoverMenu, {
+          class: 'sidebar-edit-tag',
+          position: 'bottom',
+          transitionDuration: 0,
+          hoverCloseDelay: 0,
+          closeOnContentClick: true,
+          trigger: m(Icon, {
+            name: Icons.CHEVRON_DOWN,
+          }),
+          content: m(MenuItem, {
+            label: 'Edit channel',
+            onclick: (e) => {
+              app.modals.create({
+                modal: EditTagModal,
+                data: { description, id, name }
+              });
+            }
+          })
         }),
+      ],
+      label: name,
+      selected: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${app.activeId()}/discussions/${name}`);
+      },
+    });
+
+    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
+      const { id, name, description } = tag;
+      if (featuredTagIds.includes(`${tag.id}`)) {
+        featuredTags[tag.name] = { id, name, description, featured_order: featuredTagIds.indexOf(`${id}`) };
+      } else {
+        otherTags[tag.name] = { id, name, description };
+      }
+    });
+    const otherTagListItems = Object.keys(otherTags)
+      .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
+      .map((name, idx) => getTagRow(otherTags[name].id, name, otherTags[name].description));
+    const featuredTagListItems = Object.keys(featuredTags)
+      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
+      .map((name, idx) => getTagRow(featuredTags[name].id, name, featuredTags[name].description));
+
+    return m('.TagsModule.SidebarModule', [
+      m(List, [
         m(ListItem, {
-          class: 'TagRow',
-          active: m.route.get() === `/${app.activeId()}/tags/`,
-          label: 'Tags',
-          onclick: (e) => m.route.set(`/${app.activeId()}/tags/`),
+          label: 'Channels',
+          contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+            && m(PopoverMenu, {
+              class: 'sidebar-add-tag',
+              position: 'bottom',
+              transitionDuration: 0,
+              hoverCloseDelay: 0,
+              closeOnContentClick: true,
+              trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+              content: m(MenuItem, {
+                label: 'New channel',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({ modal: NewTagModal });
+                }
+              }),
+            }),
         }),
-        app.user.isRoleOfCommunity({
-          role: 'admin',
-          chain: app.activeChainId(),
-          community: app.activeCommunityId()
-        }) && m(AdminPanel),
       ]),
-      // // chat (all communities)
-      // m(ListItem, {
-      //   active: onChatPage(m.route.get()),
-      //   label: 'Chat',
-      //   onclick: (e) => m.route.set(`/${app.activeId()}/chat`),
-      // }),
+      m(List, {
+        onupdate: (vnode2) => {
+          if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+              && !vnode.state.dragulaInitialized) {
+            vnode.state.dragulaInitialized = true;
+            dragula([vnode2.dom]).on('drop', async (el, target, source) => {
+              const reorder = Array.from(source.children).map((child) => {
+                return (child as HTMLElement).id;
+              });
+              await app.community.meta.updateFeaturedTags(reorder);
+            });
+          }
+        }
+      }, featuredTagListItems),
+      m(List, { class: 'more-tags-list' }, otherTagListItems),
+    ]);
+  }
+};
+
+const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
+  view: (vnode) => {
+    const { communityName, communityDescription, tag } = vnode.attrs;
+    if (!app.chain && !app.community) return;
+
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
+
+    return m('.CommunityInfoModule.SidebarModule', [
+      // m(TagCaratMenu, { tag }),
+      // tag && [
+      //   m(Subheader, { text: `About #${tag}` }),
+      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      // ],
+
+      m('.community-icon', [
+        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
+        app.community && m(CommunityIcon, { community: app.community.meta }),
+      ]),
+      m('.community-name', app.chain ? app.chain.meta.chain.name : app.community.meta.name),
+      m('.community-description', app.chain ? app.chain.meta.chain.description : app.community.meta.description),
+      isAdmin && m(PopoverMenu, {
+        class: 'community-config-menu',
+        position: 'bottom',
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        closeOnContentClick: true,
+        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
+        content: m(MenuItem, {
+          label: 'Edit community',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: ManageCommunityModal });
+          }
+        }),
+      }),
+      m('.community-info', [
+        m(Icon, { name: Icons.GLOBE }),
+        m('div', [
+          m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
+        ]),
+      ]),
+      m('.community-info', [
+        m(Icon, { name: Icons.MESSAGE_SQUARE }),
+        m('div', [
+          m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
+        ]),
+      ]),
+    ]);
+  }
+};
+
+const Sidebar: m.Component<{ activeTag: string }> = {
+  view: (vnode) => {
+    const { activeTag } = vnode.attrs;
+
+    return m('.Sidebar', {
+      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
+        + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
+    }, (!app.community && !app.chain) ? [
+      // no community
+      m(List, [
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.USER }),
+          label: 'Settings',
+          onclick: (e) => m.route.set('/settings'),
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          label: 'Notifications',
+          onclick: (e) => m.route.set('/notification-settings'),
+        }),
+      ]),
+    ] : [
+      m(CommunityInfoModule),
+      app.chain && m(NavigationModule),
+      m(TagsModule),
+      m(MembersModule),
     ]);
   },
 };

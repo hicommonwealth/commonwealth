@@ -2,6 +2,7 @@ import 'components/empty_channel_placeholder.scss';
 
 import m from 'mithril';
 import { Button, Icon, Icons } from 'construct-ui';
+import NewProposalButton from 'views/components/new_proposal_button';
 
 const EmptyChannelPlaceholder: m.Component<{ tagName?: string, communityName?: string }> = {
   view: (vnode) => {
@@ -11,11 +12,14 @@ const EmptyChannelPlaceholder: m.Component<{ tagName?: string, communityName?: s
       m('.icon-circle', [
         m(Icon, { name: Icons.HASH, size: 'xl' }),
       ]),
-      m('h1', tagName
-        ? `Welcome to #${tagName}!`
-        : `Welcome to the ${communityName} community!`
-       ),
-      m('p', 'Nobody has posted in this channel yet.'),
+      m('h1', [
+        'Welcome to the ',
+        tagName
+          ? [ m('strong', tagName), ' channel!' ]
+          : [ m('strong', communityName), ' community!' ]
+      ]),
+      m('p', 'There are no threads here yet.'),
+      m(NewProposalButton, { fluid: false, threadOnly: true, large: true }),
     ]);
   }
 };

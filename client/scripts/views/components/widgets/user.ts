@@ -7,9 +7,9 @@ import { formatAddressShort, link } from 'helpers';
 import { Tooltip, Tag } from 'construct-ui';
 
 import app from 'state';
-import { Account, AddressInfo, ChainBase } from 'models';
+import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
 
-interface IAttrs {
+const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
   avatarOnly?: boolean; // avatarOnly overrides most other properties
@@ -19,15 +19,12 @@ interface IAttrs {
   onclick?: any;
   tooltip?: boolean;
   showRole?: boolean;
-}
-
-interface IState {
+}, {
   identityWidgetLoading: boolean;
   IdentityWidget: any;
-}
-
-const User : m.Component<IAttrs, IState> = {
+}> = {
   view: (vnode) => {
+    // TODO: Fix showRole logic to fetch the role from chain
     const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
@@ -65,12 +62,12 @@ const User : m.Component<IAttrs, IState> = {
       profile = app.profiles.getProfile(account.chain.id, account.address);
       role = app.user.isAdminOrMod({ account });
     }
-    const roleTag = role ? m(Tag, {
-      class: 'roleTag',
-      label: role.permission,
-      rounded: true,
-      size: 'sm',
-    }) : null;
+    // const roleTag = role ? m(Tag, {
+    //   class: 'roleTag',
+    //   label: role.permission,
+    //   rounded: true,
+    //   size: 'sm',
+    // }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -101,7 +98,7 @@ const User : m.Component<IAttrs, IState> = {
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
-        showRole && roleTag,
+        // showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
@@ -124,7 +121,7 @@ const User : m.Component<IAttrs, IState> = {
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
-      roleTag,
+      // roleTag,
     ]);
 
     return tooltip
@@ -134,7 +131,7 @@ const User : m.Component<IAttrs, IState> = {
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any>,
+  user: Account<any> | AddressInfo,
   hideIdentityIcon?: boolean,
   tooltip?: boolean,
   showRole?: boolean,
@@ -143,6 +140,14 @@ export const UserBlock: m.Component<{
 }> = {
   view: (vnode) => {
     const { user, hideIdentityIcon, tooltip, showRole, selected, compact } = vnode.attrs;
+
+    let profile;
+    if (user instanceof AddressInfo) {
+      if (!user.chain || !user.address) return;
+      profile = app.profiles.getProfile(user.chain, user.address);
+    } else {
+      profile = app.profiles.getProfile(user.chain.id, user.address);
+    }
 
     return m('.UserBlock', {
       class: compact ? 'compact' : ''
@@ -154,7 +159,8 @@ export const UserBlock: m.Component<{
           avatarSize: 28,
           tooltip,
         }),
-        m('.user-block-symbol', user.chain.symbol),
+        // TODO: this is weird...symbol display should not depend on user being an Account
+        user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
       ]),
       m('.user-block-center', [
         m('.user-block-name', [
@@ -167,9 +173,9 @@ export const UserBlock: m.Component<{
           }),
         ]),
         m('.user-block-address', {
-          class: user.profile?.address ? '' : 'no-address',
+          class: profile?.address ? '' : 'no-address',
         }, [
-          user.profile?.address && formatAddressShort(user.profile.address),
+          profile?.address && formatAddressShort(profile.address),
         ]),
       ]),
       m('.user-block-right', [

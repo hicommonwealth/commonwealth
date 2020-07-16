@@ -51,6 +51,7 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewThread,
+    community_id: community.id,
     object_id: (chain) ? chain.id : community.id,
     is_active: true,
   });
