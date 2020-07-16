@@ -11,6 +11,7 @@ import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, Off
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
+import { notifyError } from 'controllers/app/notifications';
 import TagSelector from './tag_selector';
 
 interface ILinkPostAttrs {
@@ -280,9 +281,13 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
     if (!author) return null;
 
     const getTitleForLinkPost = _.debounce(async () => {
-      vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
-      if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
-      vnode.state.textTitle = null;
+      try {
+        vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
+        if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
+        vnode.state.textTitle = null;
+      } catch (err) {
+        notifyError(err.message);
+      }
       m.redraw();
     }, 750);
     const closeComposer = (e, clear) => {

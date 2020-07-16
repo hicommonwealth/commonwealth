@@ -209,7 +209,7 @@ export const newLink = async (form, quillEditorState, author, kind = OffchainThr
 export const getLinkTitle = async (url: string) => {
   if (url.slice(0, 4) !== 'http') url = `http://${url}`;
   const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
-  if (response.status === 404) throw new Error('404: Not Found');
-  if (response.status === 500) throw new Error('500: Server Error');
+  if (response.status === 404) throw new Error(`404: ${url} Not Found`);
+  if (response.status === 500) throw new Error(`500: ${url} Server Error`);
   return (document.querySelector('input[name=\'title\']') as HTMLInputElement).innerText;
 };

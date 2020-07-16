@@ -28,6 +28,11 @@ interface IThreadForm {
   url?: string;
 }
 
+enum PostType {
+  Discussion = 'Discussion',
+  Link = 'Link',
+}
+
 export const checkForModifications = async (state, modalMsg) => {
   const { fromDraft } = state;
   const quill = state.quillEditorState.editor;
@@ -147,13 +152,15 @@ export const NewThreadForm: m.Component<{
   uploadsInProgress: number,
 }> = {
   oninit: (vnode_) => {
+    console.log('initing');
+    console.log(vnode_.state.form);
     vnode_.state.form = {};
     vnode_.state.recentlySaved = [];
     vnode_.state.uploadsInProgress = 0;
     if (vnode_.state.newType === undefined) {
-      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || 'Discussion';
+      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
-    if (vnode_.state.newType === 'Link') {
+    if (vnode_.state.newType === PostType.Link) {
       vnode_.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
       vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
     } else {
@@ -174,7 +181,7 @@ export const NewThreadForm: m.Component<{
     // if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
     // if (vnode.state.newType === undefined) {
     //   vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
-    //   if (!vnode.state.newType) vnode.state.newType = 'Discussion';
+    //   if (!vnode.state.newType) vnode.state.newType = PostType.Discussion;
     // }
     const getUrlForLinkPost = _.debounce(async () => {
       try {
@@ -188,19 +195,19 @@ export const NewThreadForm: m.Component<{
       m.redraw();
     }, 750);
 
-    const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
+    const editorNamespace = vnode.state.newType === PostType.Link ? 'new-link' : 'new-discussion';
 
-    const saveToLocalStorage = () => {
+    const saveToLocalStorage = (type: PostType) => {
       // start commenting out selectively to avoid redundancy
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
         vnode.state.quillEditorState.markdownMode
           ? vnode.state.quillEditorState.editor.getText()
           : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
-      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Discussion') {
+      if (type === PostType.Discussion) {
         if (vnode.state.form.threadTitle) {
           localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
         }
-      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+      } else {
         if (vnode.state.form.url) {
           localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
         }
@@ -210,21 +217,21 @@ export const NewThreadForm: m.Component<{
       }
     };
 
-    const populateFromLocalStorage = () => {
-      if (vnode.state.newType === 'Link') {
+    const populateFromLocalStorage = (type: PostType) => {
+      if (type === PostType.Discussion) {
+        vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
+      } else {
         vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
         vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
-      } else {
-        vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
       }
     };
 
     const clearLocalStorage = () => {
-      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+      if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Link) {
         localStorage.removeItem(`${app.activeId()}-new-link-storedText`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
-      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Discussion') {
+      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Discussion) {
         localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
         localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       }
@@ -233,9 +240,9 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { newType, saving } = vnode.state;
-
+    console.log(vnode.state.form);
     return m('.NewThreadForm', {
-      class: `${newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
+      class: `${newType === PostType.Link ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
@@ -249,24 +256,24 @@ export const NewThreadForm: m.Component<{
             fluid: true,
           }, [
             m(TabItem, {
-              label: 'Discussion',
+              label: PostType.Discussion,
               onclick: (e) => {
-                saveToLocalStorage();
-                vnode.state.newType = 'Discussion';
-                localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
-                populateFromLocalStorage();
+                saveToLocalStorage(PostType.Link);
+                vnode.state.newType = PostType.Discussion;
+                localStorage.setItem(`${app.activeId()}-post-type`, PostType.Discussion);
+                populateFromLocalStorage(PostType.Discussion);
               },
-              active: newType === 'Discussion',
+              active: newType === PostType.Discussion,
             }),
             m(TabItem, {
-              label: 'Link',
+              label: PostType.Link,
               onclick: (e) => {
-                saveToLocalStorage();
-                vnode.state.newType = 'Link';
-                localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
-                populateFromLocalStorage();
+                saveToLocalStorage(PostType.Discussion);
+                vnode.state.newType = PostType.Link;
+                localStorage.setItem(`${app.activeId()}-post-type`, PostType.Link);
+                populateFromLocalStorage(PostType.Discussion);
               },
-              active: newType === 'Link',
+              active: newType === PostType.Link,
             }),
             m('.tab-spacer', { style: 'flex: 1' }),
             isModal && m.route.get() !== `${app.activeId()}/new/thread` && m(TabItem, {
@@ -283,7 +290,7 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
         ]),
-        newType === 'Link' && m(Form, [
+        newType === PostType.Link && m(Form, [
           m(FormGroup, [
             m(Input, {
               placeholder: 'https://',
@@ -293,7 +300,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
                 if (detectURL(value)) getUrlForLinkPost();
               },
-              value: vnode.state.form.url,
+              defaultValue: vnode.state.form.url,
               tabindex: 1,
             }),
           ]),
@@ -305,10 +312,10 @@ export const NewThreadForm: m.Component<{
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
-                vnode.state.form.threadTitle = value;
-                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.threadTitle);
+                vnode.state.form.linkTitle = value;
+                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
               },
-              defaultValue: vnode.state.form.threadTitle,
+              defaultValue: vnode.state.form.linkTitle,
               tabindex: 1,
             }),
           ]),
@@ -374,16 +381,17 @@ export const NewThreadForm: m.Component<{
           //   : m('.error-placeholder'),
         ]),
         //
-        newType === 'Discussion' && m(Form, [
+        newType === PostType.Discussion && m(Form, [
           m(FormGroup, [
             m(Input, {
               name: 'title',
               placeholder: 'Title',
               onchange: (e) => {
-                vnode.state.form.threadTitle = (e as any).target.value;
+                const { value } = (e as any).target;
+                vnode.state.form.threadTitle = value;
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
-              defaultValue: localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`),
+              defaultValue: vnode.state.form.threadTitle,
               tabindex: 1,
             }),
           ]),
