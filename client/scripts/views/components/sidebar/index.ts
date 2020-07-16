@@ -15,40 +15,66 @@ import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
 import { extractDomain } from 'helpers';
 
-const MembersModule: m.Component<{}> = {
+const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
-    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
-    if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
+    const { communityName, communityDescription, tag } = vnode.attrs;
+    if (!app.chain && !app.community) return;
 
-    return m('.MembersModule.SidebarModule', [
-      m(List, [
-        m(ListItem, {
-          label: 'Admins & Mods',
-          // contentRight: m(PopoverMenu, {
-          //   class: 'sidebar-add-tag',
-          //   position: 'bottom',
-          //   transitionDuration: 0,
-          //   hoverCloseDelay: 0,
-          //   closeOnContentClick: true,
-          //   trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
-          //   content: m(MenuItem, {
-          //     label: 'New channel',
-          //     onclick: (e) => {
-          //       e.preventDefault();
-          //       app.modals.create({ modal: NewTagModal });
-          //     }
-          //   }),
-          // }),
-        }),
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+      community: app.activeCommunityId()
+    });
+
+    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const { chat, description, name, website } = meta;
+
+    return m('.CommunityInfoModule.SidebarModule', [
+      // m(TagCaratMenu, { tag }),
+      // tag && [
+      //   m(Subheader, { text: `About #${tag}` }),
+      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      // ],
+
+      m('.community-icon', [
+        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
+        app.community && m(CommunityIcon, { community: app.community.meta }),
       ]),
-      adminsAndMods.length > 0 && m(List, { class: 'community-admins' }, adminsAndMods.map((r) => {
-        return m(ListItem, {
-          class: 'community-admin',
-          label: m(UserBlock, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
-        });
-      })),
-      // m('h3', 'Most active members'),
-      // TODO
+      m('.community-name', name),
+      m('.community-description', description),
+      isAdmin && m(PopoverMenu, {
+        class: 'community-config-menu',
+        position: 'bottom',
+        transitionDuration: 0,
+        hoverCloseDelay: 0,
+        closeOnContentClick: true,
+        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
+        content: m(MenuItem, {
+          label: 'Edit community',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({ modal: ManageCommunityModal });
+          }
+        }),
+      }),
+      website && m('.community-info', [
+        m(Icon, { name: Icons.GLOBE }),
+        m('div', [
+          m('a', {
+            target: '_blank',
+            href: website
+          }, extractDomain(website)),
+        ]),
+      ]),
+      website && m('.community-info', [
+        m(Icon, { name: Icons.MESSAGE_SQUARE }),
+        m('div', [
+          m('a', {
+            target: '_blank',
+            href: chat
+          }, extractDomain(chat)),
+        ]),
+      ]),
     ]);
   }
 };
@@ -231,7 +257,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       .map((name, idx) => getTagRow(featuredTags[name].id, name, featuredTags[name].description));
 
     return m('.TagsModule.SidebarModule', [
-      m(List, [
+      m(List, { interactive: false }, [
         m(ListItem, {
           label: 'Channels',
           contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
@@ -271,66 +297,23 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
   }
 };
 
-const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
+const AdminsModule: m.Component<{}> = {
   view: (vnode) => {
-    const { communityName, communityDescription, tag } = vnode.attrs;
-    if (!app.chain && !app.community) return;
+    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
+    if (adminsAndMods.length === 0) return; // for now, hide the admin module if there are no admins
 
-    const isAdmin = app.user.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-      community: app.activeCommunityId()
-    });
-
-    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const { chat, description, name, website } = meta;
-
-    return m('.CommunityInfoModule.SidebarModule', [
-      // m(TagCaratMenu, { tag }),
-      // tag && [
-      //   m(Subheader, { text: `About #${tag}` }),
-      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
-      // ],
-
-      m('.community-icon', [
-        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
-        app.community && m(CommunityIcon, { community: app.community.meta }),
-      ]),
-      m('.community-name', name),
-      m('.community-description', description),
-      isAdmin && m(PopoverMenu, {
-        class: 'community-config-menu',
-        position: 'bottom',
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        closeOnContentClick: true,
-        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
-        content: m(MenuItem, {
-          label: 'Edit community',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({ modal: ManageCommunityModal });
-          }
+    return m('.AdminsModule.SidebarModule', [
+      m(List, { interactive: false }, [
+        m(ListItem, {
+          label: 'Admins & Mods',
         }),
-      }),
-      website && m('.community-info', [
-        m(Icon, { name: Icons.GLOBE }),
-        m('div', [
-          m('a', {
-            target: '_blank',
-            href: website
-          }, extractDomain(website)),
-        ]),
       ]),
-      website && m('.community-info', [
-        m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        m('div', [
-          m('a', {
-            target: '_blank',
-            href: chat
-          }, extractDomain(chat)),
-        ]),
-      ]),
+      adminsAndMods.length > 0 && m(List, { class: 'community-admins' }, adminsAndMods.map((r) => {
+        return m(ListItem, {
+          class: 'community-admin',
+          label: m(UserBlock, { user: new AddressInfo(r.id, r.address, r.address_chain, null), showRole: true })
+        });
+      })),
     ]);
   }
 };
@@ -360,7 +343,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
       m(CommunityInfoModule),
       app.chain && m(NavigationModule),
       m(TagsModule),
-      m(MembersModule),
+      m(AdminsModule),
     ]);
   },
 };
