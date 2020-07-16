@@ -23,7 +23,8 @@ import MarkdownFormattedText from './markdown_formatted_text';
 interface IThreadForm {
   tagName?: string;
   tagId?: number;
-  title?: string;
+  threadTitle?: string;
+  linkTitle?: string;
   url?: string;
 }
 
@@ -104,8 +105,8 @@ export const loadDraft = async (dom, state, draft) => {
     state.quillEditorState.editor.setText(newDraftMarkdown);
   }
   titleInput.val(draft.title);
-  state.form.title = draft.title;
-  localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.title);
+  state.form.threadTitle = draft.title;
+  localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
   state.activeTag = draft.tag;
   state.form.tagName = draft.tag;
   state.fromDraft = draft.id;
@@ -152,14 +153,12 @@ export const NewThreadForm: m.Component<{
     if (vnode_.state.newType === undefined) {
       vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || 'Discussion';
     }
-    const editorNamespace = vnode_.state.newType === 'Link' ? 'new-link' : 'new-discussion';
-    if (!vnode_.state.form.title) {
-      vnode_.state.form.title = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
-    }
-    if (editorNamespace === 'new-link' && !vnode_.state.form.url) {
+    if (vnode_.state.newType === 'Link') {
       vnode_.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
+      vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
+    } else {
+      vnode_.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
     }
-    console.log(vnode_.state.form);
   },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
@@ -181,7 +180,7 @@ export const NewThreadForm: m.Component<{
       try {
         const title = await getLinkTitle(vnode.state.form.url);
         if (!vnode.state.autoTitleOverride) {
-          vnode.state.form.title = title;
+          vnode.state.form.linkTitle = title;
         }
       } catch (err) {
         notifyError(err.message);
@@ -197,21 +196,26 @@ export const NewThreadForm: m.Component<{
         vnode.state.quillEditorState.markdownMode
           ? vnode.state.quillEditorState.editor.getText()
           : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
-      if (vnode.state.form.title) {
-        localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
-      }
-      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link' && vnode.state.form.url) {
-        localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
+      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Discussion') {
+        if (vnode.state.form.threadTitle) {
+          localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
+        }
+      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+        if (vnode.state.form.url) {
+          localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
+        }
+        if (vnode.state.form.linkTitle) {
+          localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
+        }
       }
     };
 
     const populateFromLocalStorage = () => {
-      const editorNamespace_ = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
-      if (!vnode.state.form.title) {
-        vnode.state.form.title = localStorage.getItem(`${app.activeId()}-${editorNamespace_}-storedTitle`);
-      }
-      if (editorNamespace_ === 'new-link') {
+      if (vnode.state.newType === 'Link') {
         vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
+        vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
+      } else {
+        vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
       }
     };
 
@@ -289,7 +293,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
                 if (detectURL(value)) getUrlForLinkPost();
               },
-              defaultValue: localStorage.getItem(`${app.activeId()}-new-link-storedLink`),
+              value: vnode.state.form.url,
               tabindex: 1,
             }),
           ]),
@@ -301,10 +305,10 @@ export const NewThreadForm: m.Component<{
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
-                vnode.state.form.title = value;
-                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.title);
+                vnode.state.form.threadTitle = value;
+                localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.threadTitle);
               },
-              defaultValue: localStorage.getItem(`${app.activeId()}-new-link-storedTitle`),
+              defaultValue: vnode.state.form.threadTitle,
               tabindex: 1,
             }),
           ]),
@@ -376,8 +380,8 @@ export const NewThreadForm: m.Component<{
               name: 'title',
               placeholder: 'Title',
               onchange: (e) => {
-                vnode.state.form.title = (e as any).target.value;
-                localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.title);
+                vnode.state.form.threadTitle = (e as any).target.value;
+                localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`),
               tabindex: 1,
@@ -413,8 +417,8 @@ export const NewThreadForm: m.Component<{
               onclick: async (e) => {
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
-                if (!vnode.state.form.title) {
-                  vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
+                if (!vnode.state.form.threadTitle) {
+                  vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
                 }
                 try {
                   await newThread(form, quillEditorState, author);
@@ -444,8 +448,8 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
-                if (!vnode.state.form.title) {
-                  vnode.state.form.title = ($(document).find('input[name=\'title\'').val() as string);
+                if (!vnode.state.form.threadTitle) {
+                  vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
                 }
                 try {
                   saveDraft(form, quillEditorState, author, vnode.state.fromDraft);
