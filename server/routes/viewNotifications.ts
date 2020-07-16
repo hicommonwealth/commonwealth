@@ -48,38 +48,38 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     notificationParams.where = { is_read: false };
   }
 
-  const associationParams: any = [{
-    model: models.Chain,
-    required: false,
-    as: 'Chain',
-  }, {
-    model: models.OffchainCommunity,
-    required: false,
-    as: 'OffchainCommunity',
-  }, {
-    model: models.OffchainThread,
-    required: false,
-    as: 'OffchainThread',
-  }, {
-    model: models.OffchainComment,
-    required: false,
-    as: 'OffchainComment',
-  }, {
-    model: models.ChainEventType,
-    required: false,
-    as: 'ChainEventType',
-  }, {
-    model: models.ChainEntity,
-    required: false,
-    as: 'ChainEntity',
-  }];
+  // const associationParams: any = [{
+  //   model: models.Chain,
+  //   required: false,
+  //   as: 'Chain',
+  // }, {
+  //   model: models.OffchainCommunity,
+  //   required: false,
+  //   as: 'OffchainCommunity',
+  // }, {
+  //   model: models.OffchainThread,
+  //   required: false,
+  //   as: 'OffchainThread',
+  // }, {
+  //   model: models.OffchainComment,
+  //   required: false,
+  //   as: 'OffchainComment',
+  // }, {
+  //   model: models.ChainEventType,
+  //   required: false,
+  //   as: 'ChainEventType',
+  // }, {
+  //   model: models.ChainEntity,
+  //   required: false,
+  //   as: 'ChainEntity',
+  // }];
 
   // perform the query
   const subscriptions = await models.Subscription.findAll({
     where: {
       [Op.and]: searchParams
     },
-    include: [ notificationParams, ...associationParams ],
+    include: [ notificationParams, ],
   });
 
   // TODO: flatten? sort by date?

@@ -40,7 +40,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
 
   const subscriptions = await models.Subscription.findAll({
     where: { subscriber_id: req.user.id },
-    include: [ ...associationParams ],
+    include: associationParams,
   });
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
 };

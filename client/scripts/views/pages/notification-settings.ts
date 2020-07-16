@@ -604,6 +604,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
+      console.dir(result.result);
       result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
