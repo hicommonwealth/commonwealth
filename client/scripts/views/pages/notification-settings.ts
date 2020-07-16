@@ -645,9 +645,11 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
-    $.get(`${app.serverUrl()}/viewSubscriptions`, {
+    $.get(`${app.serverUrl()}/subscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
+      console.dir('viewSubscription');
+      console.dir(result.result);
       result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
