@@ -146,6 +146,24 @@ export const NewThreadForm: m.Component<{
   saving: boolean,
   uploadsInProgress: number,
 }> = {
+  oninit: (vnode_) => {
+    vnode_.state.form = {};
+    vnode_.state.error = {};
+    vnode_.state.recentlySaved = [];
+    vnode_.state.uploadsInProgress = 0;
+    if (vnode_.state.newType === undefined) {
+      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
+      if (!vnode_.state.newType) vnode_.state.newType = 'Discussion';
+    }
+    const editorNamespace = vnode_.state.newType === 'Link' ? 'new-link' : 'new-discussion';
+    if (!vnode_.state.form.title) {
+      vnode_.state.form.title = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+    }
+    if (editorNamespace === 'new-link' && !vnode_.state.form.url) {
+      vnode_.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
+    }
+    console.log(vnode_.state.form);
+  },
   view: (vnode) => {
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
@@ -154,14 +172,14 @@ export const NewThreadForm: m.Component<{
     if (vnode.state.quillEditorState?.container) vnode.state.quillEditorState.container.tabIndex = 8;
 
     // init
-    if (!vnode.state.recentlySaved) vnode.state.recentlySaved = [];
-    if (vnode.state.form === undefined) vnode.state.form = {};
-    if (vnode.state.error === undefined) vnode.state.error = {};
-    if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
-    if (vnode.state.newType === undefined) {
-      vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
-      if (!vnode.state.newType) vnode.state.newType = 'Discussion';
-    }
+    // if (!vnode.state.recentlySaved) vnode.state.recentlySaved = [];
+    // if (vnode.state.form === undefined) vnode.state.form = {};
+    // if (vnode.state.error === undefined) vnode.state.error = {};
+    // if (vnode.state.uploadsInProgress === undefined) vnode.state.uploadsInProgress = 0;
+    // if (vnode.state.newType === undefined) {
+    //   vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`);
+    //   if (!vnode.state.newType) vnode.state.newType = 'Discussion';
+    // }
     const { error } = vnode.state;
 
     const getUrlForLinkPost = _.debounce(async () => {
@@ -179,7 +197,6 @@ export const NewThreadForm: m.Component<{
     const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
 
     const saveToLocalStorage = () => {
-      console.log(editorNamespace);
       // start commenting out selectively to avoid redundancy
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
         vnode.state.quillEditorState.markdownMode
@@ -261,6 +278,7 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               class: 'new-thread-title',
               placeholder: 'Title',
+              name: 'title',
               onchange: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
@@ -310,19 +328,21 @@ export const NewThreadForm: m.Component<{
               intent: 'primary',
               label: 'Create link',
               name: 'submit',
-              onclick: (e) => {
-                if (!vnode.state.error.url && !detectURL(vnode.state.form.url)) {
-                  vnode.state.error.url = 'Must provide a valid URL.';
-                  notifyError(vnode.state.error.url);
-                }
-                if (!Object.values(vnode.state.error).length) {
-                  newLink(vnode.state.form, vnode.state.quillEditorState, author);
-                }
-                if (isModal && !vnode.state.error) {
-                  $(e.target).trigger('modalcomplete');
-                  setTimeout(() => {
-                    $(e.target).trigger('modalexit');
-                  }, 0);
+              onclick: async (e) => {
+                if (!detectURL(vnode.state.form.url)) {
+                  notifyError('Must provide a valid URL.');
+                } else {
+                  if (!Object.values(vnode.state.error).length) {
+                    vnode.state.error = await newLink(vnode.state.form, vnode.state.quillEditorState, author);
+                  }
+                  if (vnode.state.error) {
+                    notifyError(Object.keys(vnode.state.error)[0]);
+                  } else if (isModal) {
+                    $(e.target).trigger('modalcomplete');
+                    setTimeout(() => {
+                      $(e.target).trigger('modalexit');
+                    }, 0);
+                  }
                 }
               },
             }),
@@ -448,14 +468,14 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
           ]),
-          error
-            && (typeof error === 'string' || Object.keys(error).length)
-            ? m('.error-message', [
-              (typeof error === 'string')
-                ? m('span', error)
-                : Object.values(error).map((val) => m('span', `${val} `)),
-            ])
-            : m('.error-placeholder'),
+          // error
+          //   && (typeof error === 'string' || Object.keys(error).length)
+          //   ? m('.error-message', [
+          //     (typeof error === 'string')
+          //       ? m('span', error)
+          //       : Object.values(error).map((val) => m('span', `${val} `)),
+          //   ])
+          //   : m('.error-placeholder'),
         ]),
       ]),
       !!discussionDrafts.length && m('.new-thread-form-sidebar', [

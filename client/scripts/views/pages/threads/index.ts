@@ -201,8 +201,9 @@ export function detectURL(str: string) {
   return !!str.match(re_weburl);
 }
 
-export const newLink = (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
-  return newThread(form, quillEditorState, author, kind);
+export const newLink = async (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
+  const errors = await newThread(form, quillEditorState, author, kind);
+  return errors;
 };
 
 export const getLinkTitle = async (url: string) => {
