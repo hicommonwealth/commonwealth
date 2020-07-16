@@ -167,7 +167,20 @@ export const NewThreadForm: m.Component<{
       vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
     }
   },
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<{
+    header: boolean,
+    isModal: boolean
+  }, {
+    activeTag: OffchainTag | string,
+    autoTitleOverride,
+    form: IThreadForm,
+    fromDraft?: number,
+    newType: string,
+    quillEditorState,
+    recentlySaved: number[],
+    saving: boolean,
+    uploadsInProgress: number,
+  }>) => {
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
@@ -354,7 +367,7 @@ export const NewThreadForm: m.Component<{
                   notifyError('Must provide a valid URL.');
                 } else {
                   if (!vnode.state.form.linkTitle) {
-                    vnode.state.form.linkTitle = ($(document).find('input[name=\'new-link-title\'').val() as string);
+                    vnode.state.form.linkTitle = ($(vnode.dom).find('input[name=\'new-link-title\'').val() as string);
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
@@ -429,7 +442,7 @@ export const NewThreadForm: m.Component<{
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(document).find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(vnode.dom).find('input[name=\'new-thread-title\'').val() as string);
                 }
                 try {
                   await newThread(form, quillEditorState, author);
@@ -465,7 +478,7 @@ export const NewThreadForm: m.Component<{
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(document).find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = ($(vnode.dom).find('input[name=\'new-thread-title\'').val() as string);
                 }
                 const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
                   ? undefined
@@ -503,7 +516,9 @@ export const NewThreadForm: m.Component<{
           //   : m('.error-placeholder'),
         ]),
       ]),
-      !!discussionDrafts.length && m('.new-thread-form-sidebar', [
+      !!discussionDrafts.length
+      && newType === PostType.Discussion
+      && m('.new-thread-form-sidebar', [
         m(List, { interactive: true }, discussionDrafts.map((draft) => {
           const { body } = draft;
           let bodyComponent;
