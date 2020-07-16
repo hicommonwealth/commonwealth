@@ -226,14 +226,14 @@ export const NewThreadForm: m.Component<{
       }
     };
 
-    const clearLocalStorage = () => {
-      if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Link) {
+    const clearLocalStorage = (type: PostType) => {
+      if (type === PostType.Discussion) {
+        localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
+        localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
+      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Link) {
         localStorage.removeItem(`${app.activeId()}-new-link-storedText`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedTitle`);
         localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
-      } else if (localStorage.getItem(`${app.activeId()}-post-type`) === PostType.Discussion) {
-        localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-        localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
       }
       localStorage.removeItem(`${app.activeId()}-post-type`);
     };
@@ -360,11 +360,11 @@ export const NewThreadForm: m.Component<{
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
                     vnode.state.saving = false;
-                    clearLocalStorage();
                     if (isModal) {
                       $(e.target).trigger('modalcomplete');
                       setTimeout(() => {
                         $(e.target).trigger('modalexit');
+                        clearLocalStorage(PostType.Link);
                       }, 0);
                     }
                   } catch (err) {
@@ -436,13 +436,13 @@ export const NewThreadForm: m.Component<{
                 try {
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
-                  clearLocalStorage();
                   const { fromDraft } = vnode.state;
                   if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
                   setTimeout(() => {
                     $(e.target).trigger('modalexit');
+                    clearLocalStorage(PostType.Discussion);
                   }, 0);
                 } catch (err) {
                   vnode.state.saving = false;
@@ -461,6 +461,7 @@ export const NewThreadForm: m.Component<{
               onclick: (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
+                debugger
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = ($(document).find('input[name=\'title\'').val() as string);
                 }
@@ -469,11 +470,9 @@ export const NewThreadForm: m.Component<{
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
-                    localStorage.removeItem(`${app.activeId()}-new-discussion-storedText`);
-                    localStorage.removeItem(`${app.activeId()}-new-discussion-storedTitle`);
-                    localStorage.removeItem(`${app.activeId()}-post-type`);
                     setTimeout(() => {
                       $(e.target).trigger('modalexit');
+                      clearLocalStorage(PostType.Discussion);
                     }, 0);
                   }
                   m.route.set(`/${app.activeId()}`);
