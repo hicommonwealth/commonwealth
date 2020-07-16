@@ -176,6 +176,21 @@ export const NewThreadForm: m.Component<{
     const { newType, saving, uploadsInProgress } = vnode.state;
     const editorNamespace = vnode.state.newType === 'Link' ? 'new-link' : 'new-discussion';
 
+    const saveToLocalStorage = () => {
+      console.log(editorNamespace);
+      // start commenting out selectively to avoid redundancy
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
+        vnode.state.quillEditorState.markdownMode
+          ? vnode.state.quillEditorState.editor.getText()
+          : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
+      if (vnode.state.form.title) {
+        localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
+      }
+      if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+        localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
+      }
+    };
+
     return m('.NewThreadForm', {
       class: `${vnode.state.newType === 'Link' ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
       oncreate: (vvnode) => {
@@ -194,13 +209,8 @@ export const NewThreadForm: m.Component<{
               label: 'Discussion',
               onclick: (e) => {
                 vnode.state.newType = 'Discussion';
-                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
-                  vnode.state.quillEditorState.markdownMode
-                    ? vnode.state.quillEditorState.editor.getText()
-                    : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
-                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
-                localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Discussion');
+                saveToLocalStorage();
               },
               active: vnode.state.newType === 'Discussion',
             }),
@@ -208,12 +218,8 @@ export const NewThreadForm: m.Component<{
               label: 'Link',
               onclick: (e) => {
                 vnode.state.newType = 'Link';
-                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`,
-                  vnode.state.quillEditorState.markdownMode
-                    ? vnode.state.quillEditorState.editor.getText()
-                    : JSON.stringify(vnode.state.quillEditorState.editor.getContents()));
-                localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedTitle`, vnode.state.form.title);
                 localStorage.setItem(`${app.activeId()}-post-type`, 'Link');
+                saveToLocalStorage();
               },
               active: vnode.state.newType === 'Link',
             }),

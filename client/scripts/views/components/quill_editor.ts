@@ -797,6 +797,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     const body = markdownMode
       ? editor?.getText()
       : JSON.stringify(editor?.getContents());
+    console.log('removed');
     const title = (document.querySelector('input[name=\'title\']') as HTMLInputElement);
     if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
       localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
@@ -815,18 +816,20 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    if (vnode.state.markdownMode === undefined) {
-      if (!contentsDoc && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-        try {
-          contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
-          if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-            vnode.state.markdownMode = true;
-          } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
-            vnode.state.markdownMode = false;
-          }
-        } catch (e) {
-          // do nothing if text fails to parse
-        }
+
+    if (!contentsDoc && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+      try {
+        contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        vnode.state.markdownMode = false;
+      } catch (e) {
+        contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        vnode.state.markdownMode = true;
+      }
+    } else if (vnode.state.markdownMode === undefined) {
+      if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+        vnode.state.markdownMode = true;
+      } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
+        vnode.state.markdownMode = false;
       } else {
         // Otherwise, just set vnode.state.markdownMode based on the app setting
         vnode.state.markdownMode = !!(app.user?.disableRichText);
@@ -839,6 +842,9 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
         localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
         localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+        if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+          localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+        }
         localStorage.removeItem(`${app.activeId()}-post-type`);
       };
     }
