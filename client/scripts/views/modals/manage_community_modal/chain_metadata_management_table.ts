@@ -100,13 +100,12 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         intent: 'primary',
         onclick: async (e) => {
           const { name, description, website, chat, telegram, github } = vnode.state;
-          if (website.length && !urlHasValidHTTPPrefix(website)) {
-            notifyError('Website must have a valid http prefix');
-          } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
-            notifyError('Chat must have a valid http prefix');
+          try {
+            await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
+            $(e.target).trigger('modalexit');
+          } catch (err) {
+            notifyError(err.message);
           }
-          await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
-          $(e.target).trigger('modalexit');
         },
       }),
     ]);

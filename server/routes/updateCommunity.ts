@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { urlHasValidHTTPPrefix } from 'client/scripts/helpers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,6 +10,8 @@ export const Errors = {
   CantChangeNetwork: 'Cannot change community network',
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
+  InvalidWebsite: 'Website must have valid http prefix',
+  InvalidChat: 'Chat must have valid http prefix'
 };
 
 const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -33,13 +36,21 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
+  const { chat, description, invites, name, privacy, website } = req.body;
+
+  if (website.length && !urlHasValidHTTPPrefix(website)) {
+    return next(new Error(Errors.InvalidWebsite));
+  } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+    return next(new Error(Errors.InvalidChat));
+  }
+
   if (req.body.name) community.name = req.body.name;
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
-  community.description = req.body.description;
-  community.website = req.body.website;
-  community.chat = req.body.chat;
-  community.invitesEnabled = req.body.invites || false;
-  community.privacyEnabled = req.body.privacy || false;
+  community.description = description;
+  community.website = website;
+  community.chat = chat;
+  community.invitesEnabled = invites || false;
+  community.privacyEnabled = privacy || false;
   await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
