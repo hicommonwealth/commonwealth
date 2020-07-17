@@ -62,7 +62,7 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         m(InputPropertyRow, {
           title: 'Chat',
           defaultValue: vnode.state.chat,
-          placeholder: 'https://discord.gg',
+          placeholder: 'https://discord.com/invite',
           onChangeHandler: (v) => { vnode.state.chat = v; },
         }),
         m(InputPropertyRow, {
