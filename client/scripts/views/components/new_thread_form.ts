@@ -151,18 +151,18 @@ export const NewThreadForm: m.Component<{
   saving: boolean,
   uploadsInProgress: number,
 }> = {
-  oninit: (vnode_) => {
-    vnode_.state.form = {};
-    vnode_.state.recentlyDeletedDrafts = [];
-    vnode_.state.uploadsInProgress = 0;
-    if (vnode_.state.newType === undefined) {
-      vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
+  oninit: (vnode) => {
+    vnode.state.form = {};
+    vnode.state.recentlyDeletedDrafts = [];
+    vnode.state.uploadsInProgress = 0;
+    if (vnode.state.newType === undefined) {
+      vnode.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
     }
-    if (vnode_.state.newType === PostType.Discussion) {
-      vnode_.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
+    if (vnode.state.newType === PostType.Discussion) {
+      vnode.state.form.threadTitle = localStorage.getItem(`${app.activeId()}-new-discussion-storedTitle`);
     } else {
-      vnode_.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
-      vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
+      vnode.state.form.url = localStorage.getItem(`${app.activeId()}-new-link-storedLink`);
+      vnode.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
     }
   },
   view: (vnode) => {
@@ -416,7 +416,9 @@ export const NewThreadForm: m.Component<{
                 vnode.state.saving = true;
                 const { form, quillEditorState } = vnode.state;
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = (
+                    $(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string
+                  );
                 }
                 try {
                   await newThread(form, quillEditorState, author);
