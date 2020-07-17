@@ -13,7 +13,8 @@ const Errors = {
   ChainRequiredForEntity: 'Chain id required for ChainEntity association',
   NoChainEntity: 'Cannot find ChainEntity',
   InvalidChain: 'Invalid chain',
-  InvalidChainEventId: 'Invalid ChainEvent id'
+  InvalidChainEventId: 'Invalid ChainEvent id',
+  NoMentionDelete: 'Cannot delete mention subscription',
 };
 
 export default Errors;
