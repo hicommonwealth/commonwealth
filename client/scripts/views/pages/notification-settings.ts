@@ -46,6 +46,43 @@ interface ISubscriptionRowState {
   paused: boolean;
 }
 
+const labelMaker = (subscription: NotificationSubscription) => {
+  const chainOrCommunityId = subscription.Chain
+    ? subscription.Chain.id
+    : subscription.OffchainCommunity
+      ? subscription.OffchainCommunity.id
+      : null;
+  switch (subscription.category) {
+    case (NotificationCategories.NewComment): {
+      console.dir(subscription);
+      const threadOrComment = subscription.OffchainThread
+        ? subscription.OffchainThread.title
+        : subscription.OffchainComment
+          ? subscription.OffchainComment.id
+          : subscription.objectId;
+      return subscription.OffchainThread
+        ? m('a',{
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
+          }
+        }, `New Comment on '${String(threadOrComment).slice(0, 12)}...'`)
+        : `New Comment on '${String(threadOrComment).slice(0, 12)}...'`;
+    }
+    case (NotificationCategories.NewReaction): {
+      const threadOrComment = subscription.OffchainThread
+        ? subscription.OffchainThread.id
+        : subscription.OffchainComment
+          ? subscription.OffchainComment.id
+          : subscription.objectId;
+      return `New Reaction on ${String(threadOrComment).slice(0, 12)}...`;
+    }
+    default:
+      break;
+  }
+};
+
 const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState> = {
   oninit: (vnode) => {
     vnode.state.subscription = vnode.attrs.subscription;
@@ -53,33 +90,27 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
   view: (vnode) => {
     const { label } = vnode.attrs;
     const { subscription } = vnode.state;
-    const subscriptions = app.user.notifications;
-    const activeSubscription = subscriptions.subscriptions
-      .find((v) => v.category === subscription.category && v.objectId === subscription.objectId);
-    if (activeSubscription) {
-      vnode.state.subscription = activeSubscription;
-    }
     return m('tr.SubscriptionRow', [
-      m('td', label || `${capitalize(vnode.state.subscription.objectId)}: ${vnode.state.subscription.category}`),
-      activeSubscription
-        && m('td', [
-          m(Checkbox, {
-            checked: activeSubscription.isActive,
-            class: '',
-            size: 'lg',
-            onclick: async (e) => {
-              e.preventDefault();
-              if (activeSubscription.isActive) {
-                await subscriptions.disableSubscriptions([activeSubscription]);
-              } else {
-                await subscriptions.enableSubscriptions([activeSubscription]);
-              }
-              m.redraw();
+      m('td', [
+        label || labelMaker(subscription)]),
+      m('td', [
+        m(Checkbox, {
+          checked: subscription.isActive,
+          class: '',
+          size: 'lg',
+          onclick: async (e) => {
+            e.preventDefault();
+            if (subscription.isActive) {
+              await app.user.notifications.disableSubscriptions([subscription]);
+            } else {
+              await app.user.notifications.enableSubscriptions([subscription]);
             }
-          }),
-        ]),
-      activeSubscription && app.user.email
-        && m(ImmediateEmailCheckbox, { subscription: activeSubscription }),
+            m.redraw();
+          }
+        }),
+      ]),
+      subscription && app.user.email
+        && m(ImmediateEmailCheckbox, { subscription, }),
     ]);
   }
 };
@@ -340,8 +371,17 @@ interface ICommunitySpecificNotificationsAttrs {
 const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotificationsAttrs, {}> = {
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
+    const filteredSubscriptions = subscriptions.filter(
+      (s) => s.OffchainCommunity?.id === community.id
+        && s.category !== NotificationCategories.NewThread
+        && s.category !== NotificationCategories.NewMention
+    );
+    console.dir(filteredSubscriptions);
     return [
       m(NewThreadRow, { community, subscriptions }),
+      filteredSubscriptions.map((subscription) => {
+        return m(SubscriptionRow, { subscription, });
+      })
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
     ];
   },
@@ -499,7 +539,10 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
           m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
         ]),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
-      subscriptions.filter((s) => !chainIds.includes(s.objectId)).map((subscription) => {
+      subscriptions.filter((s) => !chainIds.includes(s.objectId)
+        && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.NewThread
+      ).map((subscription) => {
         return m(SubscriptionRow, { subscription });
       })
       // m(GeneralPastThreadsAndComments, { subscriptions }),
@@ -524,9 +567,6 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     vnode.state.selectedCommunityId = 'All communities';
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
-    // for testing, not production
-    // vnode.state.selectedCommunity  = vnode.attrs.communities.find((c) => c.name === 'internal');
-    // vnode.state.selectedCommunityId = vnode.state.selectedCommunity.name;
   },
   view: (vnode) => {
     const { subscriptions, communities } = vnode.attrs;
@@ -605,9 +645,11 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
       jwt: app.user.jwt,
     }).then((result) => {
       console.dir(result.result);
+      vnode.state.subscriptions = [];
       result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
+      console.dir(vnode.state.subscriptions);
       m.redraw();
     }, (error) => {
       m.route.set('/');
