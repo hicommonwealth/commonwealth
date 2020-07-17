@@ -46,7 +46,7 @@ export const parseMentionsForServer = (text, isMarkdown) => {
   }
 };
 
-export const saveDraft = (
+export const saveDraft = async (
   form,
   quillEditorState,
   author,
@@ -56,49 +56,44 @@ export const saveDraft = (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const { title, tagName } = form;
-  if (quillEditorState.editor.getText().length <= 1 && !title) {
-    return ({ draft: NewDraftErrors.InsufficientData });
+  const { threadTitle, tagName } = form;
+  if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
+    throw new Error(NewDraftErrors.InsufficientData);
   }
   const attachments = [];
   if (existingDraft) {
-    (async () => {
-      let result;
-      try {
-        result = await app.user.discussionDrafts.edit(
-          existingDraft,
-          title,
-          bodyText,
-          tagName,
-          attachments
-        );
-      } catch (e) {
-        console.error(e);
-      }
-      mixpanel.track('Update discussion draft', {
-        'Step No': 2,
-        Step: 'Filled in Proposal and Discussion',
-      });
-    })();
+    let result;
+    try {
+      result = await app.user.discussionDrafts.edit(
+        existingDraft,
+        threadTitle,
+        bodyText,
+        tagName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Update discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
   } else {
-    (async () => {
-      let result;
-      try {
-        result = await app.user.discussionDrafts.create(
-          title,
-          bodyText,
-          tagName,
-          attachments
-        );
-      } catch (e) {
-        console.error(e);
-        return ({ draft: e });
-      }
-      mixpanel.track('Save discussion draft', {
-        'Step No': 2,
-        Step: 'Filled in Proposal and Discussion',
-      });
-    })();
+    let result;
+    try {
+      result = await app.user.discussionDrafts.create(
+        threadTitle,
+        bodyText,
+        tagName,
+        attachments
+      );
+    } catch (err) {
+      throw new Error(err);
+    }
+    mixpanel.track('Save discussion draft', {
+      'Step No': 2,
+      Step: 'Filled in Proposal and Discussion',
+    });
   }
 };
 
@@ -110,24 +105,30 @@ export const newThread = async (
   privacy?: boolean,
   readOnly?: boolean
 ) => {
-  if (!form.title) {
-    return ({ title: NewThreadErrors.NoTitle });
+  if (kind === OffchainThreadKind.Forum) {
+    if (!form.threadTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+  }
+  if (kind === OffchainThreadKind.Link) {
+    if (!form.linkTitle) {
+      throw new Error(NewThreadErrors.NoTitle);
+    }
+    if (!form.url) {
+      throw new Error(NewThreadErrors.NoUrl);
+    }
   }
   if (!form.tagName) {
-    return ({ tag: NewThreadErrors.NoTag });
-  }
-  if (kind === OffchainThreadKind.Link && !form.url) {
-    return ({ url: NewThreadErrors.NoUrl });
+    throw new Error(NewThreadErrors.NoTag);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
-    return ({ editor: NewThreadErrors.NoBody });
+    throw new Error(NewThreadErrors.NoBody);
   }
 
   quillEditorState.editor.enable(false);
 
   const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
   if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
   const bodyText = !quillEditorState ? ''
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
@@ -137,7 +138,8 @@ export const newThread = async (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tagName, tagId, title, url } = form;
+  const { tagName, tagId, threadTitle, linkTitle, url } = form;
+  const title = threadTitle || linkTitle;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
   // const unescapedText = '' + $textarea.val();
@@ -170,7 +172,7 @@ export const newThread = async (
   } catch (e) {
     console.error(e);
     quillEditorState.editor.enable();
-    return ({ thread_creation: e });
+    throw new Error(e);
   }
   const activeEntity = app.activeCommunityId() ? app.community : app.chain;
   updateLastVisited(app.activeCommunityId()
@@ -202,17 +204,21 @@ export function detectURL(str: string) {
   return !!str.match(re_weburl);
 }
 
-export const newLink = (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
-  return newThread(form, quillEditorState, author, kind);
+export const newLink = async (form, quillEditorState, author, kind = OffchainThreadKind.Link) => {
+  const errors = await newThread(form, quillEditorState, author, kind);
+  return errors;
 };
 
 export const getLinkTitle = async (url: string) => {
   if (url.slice(0, 4) !== 'http') url = `http://${url}`;
   const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
-  if (response.status === 404) return '404: Not Found';
-  if (response.status === 500) return '500: Server Error';
-  const html = await response.text();
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const title = doc.querySelectorAll('title')[0].innerText;
-  return title;
+  if (response.status === 404) throw new Error(`404: ${url} Not Found`);
+  if (response.status === 500) throw new Error(`500: ${url} Server Error`);
+  if (response.status === 200) {
+    const html = await response.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    console.log(doc);
+    const title = doc.querySelectorAll('title')[0];
+    if (title) return title.innerText;
+  }
 };

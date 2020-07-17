@@ -21,6 +21,11 @@ $discussion-meta-color: #999;
 }
 
 .ViewProposalPage {
+    .ProposalHeader {
+        .proposal-content {
+            position: relative;
+        }
+    }
     .ProposalHeader,
     .ProposalComment {
         @include supports-jump-highlight();
@@ -30,7 +35,8 @@ $discussion-meta-color: #999;
     .CreateComment {
         padding-top: $discussion-inner-padding;
     }
-    .ProposalComments {
+    .ProposalComments.no-active-account,
+    .CreateComment {
         padding-bottom: $discussion-outer-padding;
     }
     .proposal-body-bottom, .comment-body-bottom {
@@ -48,6 +54,7 @@ $discussion-meta-color: #999;
     // header
     //
     .ProposalHeader {
+        position: relative;
         .proposal-top {
             display: flex;
             padding-bottom: $discussion-separator-padding;
@@ -94,16 +101,13 @@ $discussion-meta-color: #999;
                 text-decoration: underline;
             }
         }
-        .ProposalBodyReaction {
-            margin-top: $discussion-reaction-padding;
-            display: inline-block;
-        }
     }
 
     //
     // body
     //
     .ProposalComment {
+        position: relative;
         display: flex;
         .comment-body {
             flex: 1;
@@ -170,12 +174,15 @@ $discussion-meta-color: #999;
             stroke: #777;
         }
     }
+    .ProposalBodyReaction {
+        margin-top: $discussion-reaction-padding;
+        display: inline-block;
+    }
 
     .comments-error {
         @include error-text();
         margin: 30px 0;
     }
-
 
     .proposal-content,
     .ProposalComment {

@@ -1,5 +1,6 @@
 import 'modals/new_thread_modal.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
 import { CompactModalExitButton } from 'views/modal';
 import { NewThreadForm } from 'views/components/new_thread_form';
@@ -12,10 +13,7 @@ const NewThreadModal = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body-max', [
-        m(NewThreadForm, {
-          isModal: true,
-          header: false,
-        }),
+        m(NewThreadForm, { isModal: true }),
       ]),
     ]);
   }

@@ -8,11 +8,13 @@ import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_
 
 interface ICommunityMetadataManagementState {
   name: string;
-  chat: string;
   description: string;
   invitesValue: boolean;
   privacyValue: boolean;
   website: string;
+  chat: string;
+  telegram: string;
+  github: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -30,6 +32,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
     vnode.state.description = vnode.attrs.community.description;
     vnode.state.website = vnode.attrs.community.website;
     vnode.state.chat = vnode.attrs.community.chat;
+    vnode.state.telegram = vnode.attrs.community.telegram;
+    vnode.state.github = vnode.attrs.community.github;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -58,16 +62,28 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       m(InputPropertyRow, {
         title: 'Chat',
         defaultValue: vnode.state.chat,
-        placeholder: 'https://discord.gg',
+        placeholder: 'https://discord.com/invite',
         onChangeHandler: (v) => { vnode.state.chat = v; },
       }),
+      m(InputPropertyRow, {
+        title: 'Telegram',
+        defaultValue: vnode.state.telegram,
+        placeholder: 'https://t.me',
+        onChangeHandler: (v) => { vnode.state.telegram = v; },
+      }),
+      m(InputPropertyRow, {
+        title: 'Github',
+        defaultValue: vnode.state.github,
+        placeholder: 'https://github.com',
+        onChangeHandler: (v) => { vnode.state.github = v; },
+      }),
       m(TogglePropertyRow, {
-        title: 'Private Community?',
+        title: 'Private community?',
         defaultValue: vnode.attrs.community.privacyEnabled,
         onToggle: (checked) => { vnode.state.privacyValue = checked; },
       }),
       m(TogglePropertyRow, {
-        title: 'Invites Enabled?',
+        title: 'Invites enabled?',
         defaultValue: vnode.attrs.community.invitesEnabled,
         onToggle: (checked) => { vnode.state.invitesValue = checked; },
       }),
