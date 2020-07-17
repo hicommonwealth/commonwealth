@@ -92,6 +92,9 @@ code {
 pre {
     padding: 10px 12px;
 }
+.right{
+    float: right;
+}
 .clear {
     clear: both;
 }
@@ -360,4 +363,23 @@ td, th {
 }
 .cui-spinner.cui-spinner-fill {
     z-index: initial;
+}
+.gray-txt{
+    color: rgba(86, 84, 84, 0.66);
+    font-size: 1rem;
+    font-weight: 400;
+}
+.padding-b-15{
+    padding-bottom: 15px;
+}
+.pointer{
+    cursor: pointer;
+}
+.font-s-13{
+    font-size: 13px
+}
+.balance{
+    font-weight: 500;
+    font-size: 25px;
+    margin: 0px;
 }

@@ -2,7 +2,7 @@ import m from 'mithril';
 import app from 'state';
 import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
-import { ChainBase, ChainClass } from 'models';
+import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
 import { Icon, Icons } from 'construct-ui';
 import PageLoading from 'views/pages/loading';
@@ -10,7 +10,6 @@ import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
 import ValidatorRowWaiting from './validator_row_waiting';
 import RecentBlock from './recent_block';
-import { filter } from 'underscore';
 
 const model = {
   perPage: 20,

@@ -367,6 +367,7 @@ $(() => {
     // '/:scope/questions':         importRoute(import('views/pages/questions'), { scoped: true }),
     // '/:scope/requests':          importRoute(import('views/pages/requests'), { scoped: true }),
     '/:scope/validators':        importRoute(import('views/pages/validators'), { scoped: true }),
+    '/:scope/manageStaking':        importRoute(import('views/pages/manage_staking'), { scoped: true }),
 
     // NEAR login
     '/:scope/finishNearLogin':    importRoute(import('views/pages/finish_near_login'), { scoped: true }),

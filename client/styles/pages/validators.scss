@@ -103,7 +103,7 @@
         margin-left: 4px;
     }
     .compact-modal-title h3 .User a.user-display-name {
-        color: #fff;
+        // color: #fff;
         font-weight: 700;
         margin-right: 10px;
     }
@@ -147,6 +147,46 @@
     .chill-button {
         display: inline-block;
         margin-top: 6px;
+    }
+}
+
+
+.NewNominator {
+    max-width: 500px;
+    min-width: 500px;
+    .warning{
+        background: #ffffe0;
+        border-color: #eeeeae;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #f2f2f2;
+        border-radius: 0.25rem;
+    }
+    .error{
+        border-color: #eeeeae;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #f2f2f2;
+        border-radius: 0.25rem;
+        background: #fff6f6;
+        border-color: #e0b4b4;
+        color: #9f3a38;
+    }
+    h5 {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: #aaa;
+        letter-spacing: 0.3px;
+        margin: 0 0 5px;
+    }
+    .padding-t-10{
+        padding-top: 10px;
+    }
+    .nominee-stash{
+        .strong{
+            font-weight: 800;
+            padding-right: 8px;
+        }
     }
 }
 
@@ -289,6 +329,26 @@
             font-size: 17px;
         }
         .validators-preheader-item-progressbox {
+            width: fit-content !important;
+        }
+    }
+}
+
+.ManageStakingPage {
+    margin: 0 auto;
+    .manage-staking-preheader {
+        display: grid;
+        grid-row-gap: 30px;
+        grid-template-columns: auto auto auto auto auto auto auto;
+        margin-bottom: 30px;
+        .manage-staking-preheader-item h3 {
+            @include small-gray;
+            margin: 0 0 6px;
+        }
+        .manage-staking-preheader-item .manage-staking-preheader-item-text {
+            font-size: 17px;
+        }
+        .manage-staking-preheader-item-progressbox {
             width: fit-content !important;
         }
     }
