@@ -542,6 +542,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
       subscriptions.filter((s) => !chainIds.includes(s.objectId)
         && s.category !== NotificationCategories.NewMention
         && s.category !== NotificationCategories.NewThread
+        && s.category !== NotificationCategories.ChainEvent
       ).map((subscription) => {
         return m(SubscriptionRow, { subscription });
       })
