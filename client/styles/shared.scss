@@ -20,21 +20,23 @@ $form-border-radius: 3px;
 $form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
+// default styles
 $lighttextgrey: #999;
 $electricblue: #229bd6;
-
-$header-height: 60px;
-$left-sidebar-width: 220px;
-$right-sidebar-width: 340px;
-$sublayout-max-width: 1340px;
-
-$vertical-padding: 24px; // padding between header and content
-$left-horizontal-padding: 18px; // padding on sides of the page
-$right-horizontal-padding: 24px; // padding on inside of sidebars
-$header-spacing: 14px; // padding between header items
-
 $standard-light-text: #999;
 $standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
+
+// widths and heights
+$layout-max-width: 1300px;
+$left-sidebar-width: 300px;
+$right-sidebar-width: 340px;
+$sublayout-max-width: 1340px;
+$header-height: 60px;
+
+// paddings
+$vertical-padding: 24px;
+$sidebar-padding: 32px;
+$header-spacing: 14px;
 
 // construct-ui styles
 $menu-item-height: 30px;

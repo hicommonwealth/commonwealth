@@ -85,7 +85,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
             m('.role-remove', [
               m('span.already-connected', [
                 role.permission === RolePermission.admin
-                  ? 'Admin' : role.permission === RolePermission.moderator ? 'Moderator' : 'Already joined'
+                  ? 'Admin' : role.permission === RolePermission.moderator ? 'Moderator' : 'Member'
               ]),
               m('span.icon', {
                 onclick: deleteRole.bind(this, index)
