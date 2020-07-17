@@ -35,6 +35,11 @@
         .cui-form {
             margin: 0;
             margin-right: 28px;
+            // space between title and tag
+            .tag-selection-drop-menu {
+                margin-left: 12px;
+                width: calc(100% - 12px);
+            }
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
