@@ -251,7 +251,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
             m(Checkbox, {
               class: '',
               disabled: !vnode.state.isSubscribedAll,
-              checked: !isSomeEmail && vnode.state.isEmailAll,
+              checked: isSomeEmail && vnode.state.isEmailAll,
               indeterminate: isSomeEmail && !vnode.state.isEmailAll,
               size: 'lg',
               onchange: async (e) => {
