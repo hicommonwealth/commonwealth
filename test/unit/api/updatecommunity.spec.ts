@@ -92,6 +92,26 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.chat).to.be.equal(chat);
     });
 
+    it('should update telegram', async () => {
+      const telegram = 'http://t.me';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, telegram, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.telegram).to.be.equal(telegram);
+    });
+
+    it('should update github', async () => {
+      const github = 'http://github.com';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, github, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.github).to.be.equal(github);
+    });
+
     it('should update symbol', async () => {
       const symbol = 'CWL';
       const res = await chai.request(app)
@@ -214,6 +234,26 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: offchainCommunity.id, chat, });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.chat).to.be.equal(chat);
+    });
+
+    it('should update telegram', async () => {
+      const telegram = 'http://t.me';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, telegram, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.telegram).to.be.equal(telegram);
+    });
+
+    it('should update github', async () => {
+      const github = 'http://github.com';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, github, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.github).to.be.equal(github);
     });
 
     it('should fail without a community id', async () => {
