@@ -4,21 +4,23 @@ import m from 'mithril';
 import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
 
 import { OffchainTag } from 'models';
-import { symbols } from 'helpers';
 
 const TagSelector: m.Component<{
-  activeTag?: OffchainTag | string;
+  activeTag?: OffchainTag | string | boolean;
   featuredTags: OffchainTag[];
   tabindex?: number;
   tags: OffchainTag[];
   updateFormData: Function;
 }, {
   error: string;
-  selectedTag: OffchainTag | string;
+  selectedTag?: OffchainTag | string;
 }> = {
   view: (vnode) => {
     const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
-    if (activeTag && !vnode.state.selectedTag) {
+    debugger
+    if (activeTag === false) {
+      delete vnode.state.selectedTag;
+    } else if (activeTag && !vnode.state.selectedTag) {
       (vnode.state.selectedTag as any) = activeTag;
     }
 

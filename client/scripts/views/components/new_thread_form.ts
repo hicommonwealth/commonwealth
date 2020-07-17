@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 import 'components/new_thread_form.scss';
 
 import m from 'mithril';
@@ -140,7 +141,7 @@ export const loadDraft = async (dom, state, draft) => {
 export const NewThreadForm: m.Component<{
   isModal: boolean
 }, {
-  activeTag: OffchainTag | string,
+  activeTag: OffchainTag | string | boolean,
   autoTitleOverride,
   form: IThreadForm,
   fromDraft?: number,
@@ -164,19 +165,7 @@ export const NewThreadForm: m.Component<{
       vnode_.state.form.linkTitle = localStorage.getItem(`${app.activeId()}-new-link-storedTitle`);
     }
   },
-  view: (vnode: m.VnodeDOM<{
-    isModal: boolean
-  }, {
-    activeTag: OffchainTag | string,
-    autoTitleOverride,
-    form: IThreadForm,
-    fromDraft?: number,
-    newType: string,
-    quillEditorState,
-    recentlyDeletedDrafts: number[],
-    saving: boolean,
-    uploadsInProgress: number,
-  }>) => {
+  view: (vnode) => {
     if (!app.community && !app.chain) return;
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
@@ -397,7 +386,9 @@ export const NewThreadForm: m.Component<{
           ]),
           m(FormGroup, { span: 4 }, [
             m(TagSelector, {
-              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
+              activeTag:(vnode.state.activeTag === false || vnode.state.activeTag)
+                ? vnode.state.activeTag
+                : localStorage.getItem(`${app.activeId()}-active-tag`),
               tags: app.tags.getByCommunity(app.activeId()),
               featuredTags: app.tags.getByCommunity(app.activeId())
                 .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
@@ -474,9 +465,10 @@ export const NewThreadForm: m.Component<{
                   clearLocalStorage(PostType.Discussion);
                   vnode.state.quillEditorState.editor.setContents([{ insert: '\n' }]);
                   title.val('');
-                  delete vnode.state.activeTag;
-                  delete vnode.state.form;
+                  vnode.state.activeTag = false;
                   delete vnode.state.fromDraft;
+                  vnode.state.form = {};
+                  debugger
                   m.redraw();
                 } catch (err) {
                   vnode.state.saving = false;
