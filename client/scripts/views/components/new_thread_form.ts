@@ -379,14 +379,6 @@ export const NewThreadForm: m.Component<{
               },
             }),
           ]),
-          // error
-          //   && (typeof error === 'string' || Object.keys(error).length)
-          //   ? m('.error-message', [
-          //     (typeof error === 'string')
-          //       ? m('span', error)
-          //       : Object.values(error).map((val) => m('span', `${val} `)),
-          //   ])
-          //   : m('.error-placeholder'),
         ]),
         //
         newType === PostType.Discussion && m(Form, [
@@ -495,14 +487,6 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
           ]),
-          // error
-          //   && (typeof error === 'string' || Object.keys(error).length)
-          //   ? m('.error-message', [
-          //     (typeof error === 'string')
-          //       ? m('span', error)
-          //       : Object.values(error).map((val) => m('span', `${val} `)),
-          //   ])
-          //   : m('.error-placeholder'),
         ]),
       ]),
       !!discussionDrafts.length
