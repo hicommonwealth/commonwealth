@@ -3,14 +3,16 @@ import m from 'mithril';
 import { Table, Button } from 'construct-ui';
 
 import { CommunityInfo, ChainInfo } from 'client/scripts/models';
+import { notifyError } from 'controllers/app/notifications';
 import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface ICommunityMetadataManagementState {
   name: string;
+  chat: string;
   description: string;
-  url: string;
-  privacyValue: boolean;
   invitesValue: boolean;
+  privacyValue: boolean;
+  website: string;
 }
 
 export interface IChainOrCommMetadataManagementAttrs {
@@ -26,7 +28,8 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.community.name;
     vnode.state.description = vnode.attrs.community.description;
-    vnode.state.url = vnode.attrs.community.id;
+    vnode.state.website = vnode.attrs.community.website;
+    vnode.state.chat = vnode.attrs.community.chat;
   },
   view: (vnode) => {
     return m('.CommunityMetadataManagementTable', [m(Table, {
@@ -47,10 +50,16 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         textarea: true,
       }),
       m(InputPropertyRow, {
-        title: 'URL',
-        defaultValue: `commonwealth.im/${vnode.state.url}`,
-        disabled: true,
-        onChangeHandler: (v) => { vnode.state.url = v; },
+        title: 'Website',
+        defaultValue: vnode.state.website,
+        placeholder: 'https://example.com',
+        onChangeHandler: (v) => { vnode.state.website = v; },
+      }),
+      m(InputPropertyRow, {
+        title: 'Chat',
+        defaultValue: vnode.state.chat,
+        placeholder: 'https://discord.gg',
+        onChangeHandler: (v) => { vnode.state.chat = v; },
       }),
       m(TogglePropertyRow, {
         title: 'Private Community?',
@@ -82,13 +91,28 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       label: 'Save changes',
       intent: 'primary',
       onclick: async (e) => {
-        await vnode.attrs.community.updateCommunityData(
-          vnode.state.name,
-          vnode.state.description,
-          vnode.state.privacyValue,
-          vnode.state.invitesValue,
-        );
-        $(e.target).trigger('modalexit');
+        const {
+          name,
+          description,
+          website,
+          chat,
+          invitesValue,
+          privacyValue,
+        } = vnode.state;
+        try {
+          await vnode.attrs.community.updateCommunityData({
+            name,
+            description,
+            website,
+            chat,
+            privacyValue,
+            invitesValue,
+          });
+          $(e.target).trigger('modalexit');
+        } catch (err) {
+          notifyError(err.responseJSON?.error || 'Community update failed');
+
+        }
       },
     }),
     ]);
