@@ -40,13 +40,13 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
 
   const { active, chat, description, icon_url, name, symbol, type, website, telegram, github } = req.body;
 
-  if (website.length && !urlHasValidHTTPPrefix(website)) {
+  if (website && website.length && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
-  } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+  } else if (chat && chat.length && !urlHasValidHTTPPrefix(chat)) {
     return next(new Error(Errors.InvalidChat));
-  } else if (telegram.length && !telegram.startsWith('https://t.me/')) {
+  } else if (telegram && telegram.length && !telegram.startsWith('https://t.me/')) {
     return next(new Error(Errors.InvalidTelegram));
-  } else if (github.length && !github.startsWith('https://github.com/')) {
+  } else if (github && github.length && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
   }
 
