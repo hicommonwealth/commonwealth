@@ -21,7 +21,7 @@
         .cui-tabs {
             margin-top: 4px;
             margin-bottom: 16px;
-            padding: 0 28px;
+            padding-right: 28px;
             border-bottom: 1px solid #eee;
             .cui-tabs-item {
                 padding: 12px 0;
@@ -33,7 +33,8 @@
             }
         }
         .cui-form {
-            margin: 0 28px;
+            margin: 0;
+            margin-right: 28px;
         }
         button[name="submit"], button[name="submission"] {
             margin-right: 12px;
@@ -41,6 +42,14 @@
         .error-message {
             @include error-text;
             margin: 10px 0 20px;
+        }
+    }
+    &.is-modal .new-thread-form-body {
+        .cui-tabs {
+            padding-left: 28px;
+        }
+        .cui-form {
+            margin-left: 28px;
         }
     }
     .new-thread-form-sidebar {
