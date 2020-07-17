@@ -19,7 +19,7 @@ const TagSelector: m.Component<{
     const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
     if (activeTag === false) {
       delete vnode.state.selectedTag;
-    } else if (activeTag && !vnode.state.selectedTag) {
+    } else if (activeTag) {
       (vnode.state.selectedTag as any) = activeTag;
     }
 

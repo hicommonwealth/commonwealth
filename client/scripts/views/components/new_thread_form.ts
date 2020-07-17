@@ -116,6 +116,7 @@ export const loadDraft = async (dom, state, draft) => {
   state.activeTag = draft.tag;
   state.form.tagName = draft.tag;
   state.fromDraft = draft.id;
+  console.log(state);
   m.redraw();
 };
 
