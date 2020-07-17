@@ -14,6 +14,10 @@ import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
 
+const removeUrlPrefix = (url) => {
+  return url.replace(/^https?:\/\//, '');
+};
+
 const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
     const { communityName, communityDescription, tag } = vnode.attrs;
@@ -24,6 +28,9 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       chain: app.activeChainId(),
       community: app.activeCommunityId()
     });
+
+    const meta = app.chain ? app.chain.meta.chain : app.community.meta;
+    const { name, description, website, chat, telegram, github } = meta;
 
     return m('.CommunityInfoModule.SidebarModule', [
       // m(TagCaratMenu, { tag }),
@@ -36,8 +43,8 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
         app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
         app.community && m(CommunityIcon, { community: app.community.meta }),
       ]),
-      m('.community-name', app.chain ? app.chain.meta.chain.name : app.community.meta.name),
-      m('.community-description', app.chain ? app.chain.meta.chain.description : app.community.meta.description),
+      m('.community-name', name),
+      m('.community-description', description),
       isAdmin && m(PopoverMenu, {
         class: 'community-config-menu',
         position: 'bottom',
@@ -53,17 +60,33 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           }
         }),
       }),
-      m('.community-info', [
+      website && m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
-        m('.community-info-text', [
-          m('a', { href: 'https://edgewa.re' }, 'edgewa.re'),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: website
+        }, removeUrlPrefix(website)),
       ]),
-      m('.community-info', [
+      chat && m('.community-info', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        m('.community-info-text', [
-          m('a', { href: 'https://discord.gg/Aae7Da' }, 'discord.gg/Aae7Da'),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: chat
+        }, removeUrlPrefix(chat)),
+      ]),
+      telegram && m('.community-info', [
+        m(Icon, { name: Icons.SEND }),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: telegram
+        }, removeUrlPrefix(telegram)),
+      ]),
+      github && m('.community-info', [
+        m(Icon, { name: Icons.GITHUB }),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: github
+        }, removeUrlPrefix(github)),
       ]),
     ]);
   }

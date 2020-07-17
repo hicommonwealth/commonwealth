@@ -50,16 +50,18 @@ export const InputPropertyRow: m.Component<{
   defaultValue: string,
   disabled?: boolean,
   onChangeHandler: Function,
+  placeholder?: string,
   textarea?: boolean,
 }> = {
   view: (vnode) => {
-    const { title, defaultValue, disabled, onChangeHandler, textarea } = vnode.attrs;
+    const { title, defaultValue, disabled, onChangeHandler, placeholder, textarea } = vnode.attrs;
 
     return m('tr.InputPropertyRow', [
       m('td', { class: 'title-column', }, title),
       m('td', [
         m((textarea ? TextArea : Input), {
           defaultValue,
+          placeholder,
           fluid: true,
           disabled: disabled || false,
           onkeyup: (e) => { onChangeHandler((e.target as any).value); },
