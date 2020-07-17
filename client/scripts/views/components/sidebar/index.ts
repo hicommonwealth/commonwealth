@@ -13,7 +13,10 @@ import EditTagModal from 'views/modals/edit_tag_modal';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 import { UserBlock } from 'views/components/widgets/user';
-import { extractDomain } from 'helpers';
+
+const removeUrlPrefix = (url) => {
+  return url.replace(/^https?:\/\//, '');
+};
 
 const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
   view: (vnode) => {
@@ -59,39 +62,31 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       }),
       website && m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
-        m('.community-info-text', [
-          m('a', {
-            target: '_blank',
-            href: website
-          }, extractDomain(website)),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: website
+        }, removeUrlPrefix(website)),
       ]),
       chat && m('.community-info', [
         m(Icon, { name: Icons.MESSAGE_SQUARE }),
-        m('.community-info-text', [
-          m('a', {
-            target: '_blank',
-            href: chat
-          }, extractDomain(chat)),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: chat
+        }, removeUrlPrefix(chat)),
       ]),
       telegram && m('.community-info', [
         m(Icon, { name: Icons.SEND }),
-        m('.community-info-text', [
-          m('a', {
-            target: '_blank',
-            href: telegram
-          }, extractDomain(telegram)),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: telegram
+        }, removeUrlPrefix(telegram)),
       ]),
       github && m('.community-info', [
         m(Icon, { name: Icons.GITHUB }),
-        m('.community-info-text', [
-          m('a', {
-            target: '_blank',
-            href: github
-          }, extractDomain(github)),
-        ]),
+        m('a.community-info-text', {
+          target: '_blank',
+          href: github
+        }, removeUrlPrefix(github)),
       ]),
     ]);
   }
