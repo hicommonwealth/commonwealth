@@ -78,8 +78,10 @@ class ChainEntityController {
 
   public deinit() {
     this.store.clear();
-    this._subscriber.unsubscribe();
-    this._subscriber = undefined;
+    if (this._subscriber) {
+      this._subscriber.unsubscribe();
+      this._subscriber = undefined;
+    }
   }
 
   // handle a single incoming chain event emitted from client connection with node

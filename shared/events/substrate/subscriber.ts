@@ -11,7 +11,7 @@ import { factory, formatFilename } from '../../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
-  private _subscription;
+  private _subscription: () => void;
   private _versionName: string;
   private _versionNumber: number;
 
@@ -20,17 +20,16 @@ export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
    */
   public subscribe(cb: (block: SubstrateBlock) => any) {
     // wait for version available before we start producing blocks
-    const runtimeVersionP = new Promise((resolve) => {
+    new Promise((resolve) => {
       this._api.rpc.state.subscribeRuntimeVersion((version: RuntimeVersion) => {
         this._versionNumber = +version.specVersion;
         this._versionName = version.specName.toString();
         log.info(`Fetched runtime version for ${this._versionName}: ${this._versionNumber}`);
         resolve();
       });
-    });
-    runtimeVersionP.then(() => {
+    }).then(() => {
       // subscribe to events and pass to block processor
-      this._subscription = this._api.rpc.chain.subscribeNewHeads(async (header: Header) => {
+      return this._api.rpc.chain.subscribeNewHeads(async (header: Header) => {
         const events = await this._api.query.system.events.at(header.hash);
         const signedBlock = await this._api.rpc.chain.getBlock(header.hash);
         const extrinsics: Extrinsic[] = signedBlock.block.extrinsics;
@@ -44,6 +43,8 @@ export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
         log.trace(`Fetched Block for ${this._versionName}:${this._versionNumber}: ${+block.header.number}`);
         cb(block);
       });
+    }).then((subscription: () => void) => {
+      this._subscription = subscription;
     });
   }
 

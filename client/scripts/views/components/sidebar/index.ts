@@ -107,17 +107,17 @@ const NavigationModule: m.Component<{}, {}> = {
     });
 
     // sidebar menu
-    const substrateGovernanceProposals = (app.chain?.base === ChainBase.Substrate)
+    const substrateGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.Substrate)
       ? ((app.chain as any).democracy.store.getAll().filter((p) => !p.completed && !p.passed).length
         + (app.chain as any).democracyProposals.store.getAll().filter((p) => !p.completed).length
         + (app.chain as any).council.store.getAll().filter((p) => !p.completed).length
         + (app.chain as any).treasury.store.getAll().filter((p) => !p.completed).length) : 0;
-    const edgewareSignalingProposals = (app.chain?.class === ChainClass.Edgeware)
+    const edgewareSignalingProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Edgeware)
       ? (app.chain as any).signaling.store.getAll().filter((p) => !p.completed).length : 0;
     const allSubstrateGovernanceProposals = substrateGovernanceProposals + edgewareSignalingProposals;
-    const cosmosGovernanceProposals = (app.chain?.base === ChainBase.CosmosSDK)
+    const cosmosGovernanceProposals = (app.chain?.loaded && app.chain?.base === ChainBase.CosmosSDK)
       ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
-    const molochProposals = (app.chain?.class === ChainClass.Moloch)
+    const molochProposals = (app.chain?.loaded && app.chain?.class === ChainClass.Moloch)
       ? (app.chain as any).governance.store.getAll().filter((p) => !p.completed).length : 0;
 
     const hasProposals = app.chain && !app.community && (
@@ -163,6 +163,21 @@ const NavigationModule: m.Component<{}, {}> = {
             label: 'Proposals',
             contentLeft: m(Icon, { name: Icons.CHECK_SQUARE }),
             onclick: (e) => m.route.set(`/${app.activeChainId()}/proposals`),
+            contentRight: [
+              (app.chain?.base === ChainBase.Substrate)
+                && m(Tag, {
+                  rounded: true,
+                  label: app.chain?.loaded ? allSubstrateGovernanceProposals : '-',
+                }),
+              (app.chain?.base === ChainBase.CosmosSDK) && m(Tag, {
+                rounded: true,
+                label: app.chain?.loaded ? cosmosGovernanceProposals : '-',
+              }),
+              (app.chain?.class === ChainClass.Moloch) && m(Tag, {
+                rounded: true,
+                label: app.chain?.loaded ? molochProposals : '-',
+              }),
+            ],
           }),
           // council (substrate only)
           !app.community && app.chain?.base === ChainBase.Substrate
