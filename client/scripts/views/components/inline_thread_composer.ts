@@ -11,6 +11,7 @@ import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, Off
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
+import { notifyError } from 'controllers/app/notifications';
 import TagSelector from './tag_selector';
 
 interface ILinkPostAttrs {
@@ -90,7 +91,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         placeholder: 'Add a description (optional)',
         tabindex: 2,
         theme: 'bubble',
-        editorNamespace: 'new-link-inline',
+        editorNamespace: `${app.activeId()}-new-link-inline`,
         onkeyboardSubmit: createLink,
       }),
       m(TagSelector, {
@@ -99,11 +100,6 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         updateFormData: (tagName: string, tagId?: number) => {
           vnode.state.form.tagName = tagName;
           vnode.state.form.tagId = tagId;
-        },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
         },
         tabindex: 3,
       }),
@@ -115,7 +111,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
             intent: 'primary',
             onclick: createLink,
             tabindex: 4,
-            label: 'Create link'
+            label: 'Create thread'
           }),
           m(Button, {
             class: !author ? 'disabled' : '',
@@ -193,11 +189,6 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         updateFormData: (tagName: string, tagId?: number) => {
           vnode.state.form.tagName = tagName;
           vnode.state.form.tagId = tagId;
-        },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
         },
         tabindex: 3,
       }),
@@ -290,9 +281,13 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
     if (!author) return null;
 
     const getTitleForLinkPost = _.debounce(async () => {
-      vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
-      if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
-      vnode.state.textTitle = null;
+      try {
+        vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
+        if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
+        vnode.state.textTitle = null;
+      } catch (err) {
+        notifyError(err.message);
+      }
       m.redraw();
     }, 750);
     const closeComposer = (e, clear) => {

@@ -1,5 +1,6 @@
 import 'modals/new_thread_modal.scss';
 
+import $ from 'jquery';
 import m from 'mithril';
 import { CompactModalExitButton } from 'views/modal';
 import { NewThreadForm } from 'views/components/new_thread_form';
