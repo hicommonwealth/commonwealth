@@ -146,13 +146,13 @@ export const NewThreadForm: m.Component<{
   fromDraft?: number,
   newType: string,
   quillEditorState,
-  recentlySaved: number[],
+  recentlyDeletedDrafts: number[],
   saving: boolean,
   uploadsInProgress: number,
 }> = {
   oninit: (vnode_) => {
     vnode_.state.form = {};
-    vnode_.state.recentlySaved = [];
+    vnode_.state.recentlyDeletedDrafts = [];
     vnode_.state.uploadsInProgress = 0;
     if (vnode_.state.newType === undefined) {
       vnode_.state.newType = localStorage.getItem(`${app.activeId()}-post-type`) || PostType.Discussion;
@@ -173,7 +173,7 @@ export const NewThreadForm: m.Component<{
     fromDraft?: number,
     newType: string,
     quillEditorState,
-    recentlySaved: number[],
+    recentlyDeletedDrafts: number[],
     saving: boolean,
     uploadsInProgress: number,
   }>) => {
@@ -430,7 +430,7 @@ export const NewThreadForm: m.Component<{
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
                   const { fromDraft } = vnode.state;
-                  if (fromDraft && !vnode.state.recentlySaved.includes(fromDraft)) {
+                  if (fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
                   if (isModal) {
@@ -458,10 +458,11 @@ export const NewThreadForm: m.Component<{
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
                 vnode.state.saving = true;
+                const title = $(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\']');
                 if (!vnode.state.form.threadTitle) {
-                  vnode.state.form.threadTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-thread-title\'').val() as string);
+                  vnode.state.form.threadTitle = (title.val() as string);
                 }
-                const fromDraft = (vnode.state.recentlySaved.includes(vnode.state.fromDraft))
+                const fromDraft = (vnode.state.recentlyDeletedDrafts.includes(vnode.state.fromDraft))
                   ? undefined
                   : vnode.state.fromDraft;
                 try {
@@ -469,14 +470,14 @@ export const NewThreadForm: m.Component<{
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
-                    setTimeout(() => {
-                      $(e.target).trigger('modalexit');
-                      clearLocalStorage(PostType.Discussion);
-                    }, 0);
-                  } else {
-                    m.route.set(`/${app.activeId()}`);
-                    clearLocalStorage(PostType.Discussion);
                   }
+                  clearLocalStorage(PostType.Discussion);
+                  vnode.state.quillEditorState.editor.setContents([{ insert: '\n' }]);
+                  title.val('');
+                  delete vnode.state.activeTag;
+                  delete vnode.state.form;
+                  delete vnode.state.fromDraft;
+                  m.redraw();
                 } catch (err) {
                   vnode.state.saving = false;
                   notifyError(err.message);
@@ -527,7 +528,7 @@ export const NewThreadForm: m.Component<{
                     e.stopPropagation();
                     try {
                       await app.user.discussionDrafts.delete(draft.id);
-                      vnode.state.recentlySaved.push(draft.id);
+                      vnode.state.recentlyDeletedDrafts.push(draft.id);
                     } catch (err) {
                       notifyError(err.message);
                     }
