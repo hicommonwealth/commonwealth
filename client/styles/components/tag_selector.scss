@@ -1,4 +1,11 @@
 @import 'client/styles/shared';
 
 .TagSelector {
+    .cui-popover-content {
+        padding: 0 !important;
+        min-width: 178px;
+        .cui-list {
+            border-radius: 3px;
+        }
+    }
 }

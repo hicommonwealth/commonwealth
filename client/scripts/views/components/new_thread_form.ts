@@ -293,7 +293,7 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         newType === PostType.Link && m(Form, [
-          m(FormGroup, [
+          m(FormGroup, { span: 8 }, [
             m(Input, {
               placeholder: 'https://',
               onchange: (e) => {
@@ -306,7 +306,17 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: 8 }, [
+          m(FormGroup, { span: 4 }, [
+            m(TagSelector, {
+              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: updateTagState,
+              tabindex: 2,
+            }),
+          ]),
+          m(FormGroup, [
             m(Input, {
               class: 'new-thread-title',
               placeholder: 'Title',
@@ -318,16 +328,6 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
               },
               defaultValue: vnode.state.form.linkTitle,
-              tabindex: 2,
-            }),
-          ]),
-          m(FormGroup, { span: 4 }, [
-            m(TagSelector, {
-              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: updateTagState,
               tabindex: 3,
             }),
           ]),
