@@ -10,10 +10,10 @@ export const Errors = {
   CantChangeNetwork: 'Cannot change chain network',
   NotAdmin: 'Not an admin',
   NoChainFound: 'Chain not found',
-  InvalidWebsite: 'Website must have http:// prefix',
-  InvalidChat: 'Chat must have http:// prefix',
-  InvalidTelegram: 'Telegram must have http:// prefix',
-  InvalidGithub: 'Github must have http:// prefix',
+  InvalidWebsite: 'Website must begin with https://',
+  InvalidChat: 'Chat must begin with https://',
+  InvalidTelegram: 'Telegram must begin with https://t.me/',
+  InvalidGithub: 'Github must begin with https://github.com/',
 };
 
 const updateChain = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -44,9 +44,9 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.InvalidWebsite));
   } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
     return next(new Error(Errors.InvalidChat));
-  } else if (telegram.length && !urlHasValidHTTPPrefix(telegram)) {
+  } else if (telegram.length && !telegram.startsWith('https://t.me/')) {
     return next(new Error(Errors.InvalidTelegram));
-  } else if (github.length && !urlHasValidHTTPPrefix(github)) {
+  } else if (github.length && !github.startsWith('https://github.com/')) {
     return next(new Error(Errors.InvalidGithub));
   }
 
