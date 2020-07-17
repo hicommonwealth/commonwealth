@@ -468,8 +468,6 @@ export const NewThreadForm: m.Component<{
                   vnode.state.activeTag = false;
                   delete vnode.state.fromDraft;
                   vnode.state.form = {};
-                  debugger
-                  m.redraw();
                 } catch (err) {
                   vnode.state.saving = false;
                   notifyError(err.message);

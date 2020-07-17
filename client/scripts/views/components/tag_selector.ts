@@ -17,7 +17,6 @@ const TagSelector: m.Component<{
 }> = {
   view: (vnode) => {
     const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
-    debugger
     if (activeTag === false) {
       delete vnode.state.selectedTag;
     } else if (activeTag && !vnode.state.selectedTag) {
