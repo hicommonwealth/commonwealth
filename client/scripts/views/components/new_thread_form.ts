@@ -233,7 +233,8 @@ export const NewThreadForm: m.Component<{
     const { newType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
-      class: `${newType === PostType.Link ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''} `
+      class: `${newType === PostType.Link ? 'link-post' : ''} `
+        + `${newType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
         + `${isModal ? 'is-modal' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
