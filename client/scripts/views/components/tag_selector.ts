@@ -25,8 +25,7 @@ const TagSelector: m.Component<{
     const itemRender = (tag) => {
       return m(ListItem, {
         class: featuredTags.includes(tag) ? 'featured-tag' : 'other-tag',
-        // contentLeft: m('.tagItem', `# ${tag.name}`),
-        label: `# ${tag.name}`,
+        label: tag.name,
         selected: (vnode.state.selectedTag as OffchainTag)?.name === tag.name,
       });
     };

@@ -13,10 +13,7 @@ const NewThreadModal = {
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body-max', [
-        m(NewThreadForm, {
-          isModal: true,
-          header: false,
-        }),
+        m(NewThreadForm, { isModal: true }),
       ]),
     ]);
   }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from '../../shared/logging';
+import { urlHasValidHTTPPrefix } from '../../shared/helpers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,6 +10,10 @@ export const Errors = {
   CantChangeNetwork: 'Cannot change community network',
   CommunityNotFound: 'Community not found',
   NotAdmin: 'Not an admin',
+  InvalidWebsite: 'Website must begin with https://',
+  InvalidChat: 'Chat must begin with https://',
+  InvalidTelegram: 'Telegram must begin with https://t.me/',
+  InvalidGithub: 'Github must begin with https://github.com/',
 };
 
 const updateCommunity = async (models, req: Request, res: Response, next: NextFunction) => {
@@ -33,11 +38,28 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
+  const { chat, description, invites, name, privacy, website, telegram, github } = req.body;
+
+  if (website.length && !urlHasValidHTTPPrefix(website)) {
+    return next(new Error(Errors.InvalidWebsite));
+  } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
+    return next(new Error(Errors.InvalidChat));
+  } else if (telegram.length && !telegram.startsWith('https://t.me/')) {
+    return next(new Error(Errors.InvalidTelegram));
+  } else if (github.length && !github.startsWith('https://github.com/')) {
+    return next(new Error(Errors.InvalidGithub));
+  }
+
   if (req.body.name) community.name = req.body.name;
-  if (req.body.description) community.description = req.body.description;
   if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
-  community.invitesEnabled = req.body.invites || false;
-  community.privacyEnabled = req.body.privacy || false;
+  community.description = description;
+  community.website = website;
+  community.chat = chat;
+  community.telegram = telegram;
+  community.github = github;
+  community.invitesEnabled = invites || false;
+  community.privacyEnabled = privacy || false;
+  await community.save();
 
   // @TODO -> make sure this gets changed... on the front end, only allow one image to be attached
   if (req.body['attachments[]']) {
@@ -55,8 +77,6 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
 
     return res.json({ status: 'Success', result: finalCommunity.toJSON() });
   }
-
-  await community.save();
 
   return res.json({ status: 'Success', result: community.toJSON() });
 };

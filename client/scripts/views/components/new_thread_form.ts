@@ -138,7 +138,6 @@ export const loadDraft = async (dom, state, draft) => {
 // };
 
 export const NewThreadForm: m.Component<{
-  header: boolean,
   isModal: boolean
 }, {
   activeTag: OffchainTag | string,
@@ -166,7 +165,6 @@ export const NewThreadForm: m.Component<{
     }
   },
   view: (vnode: m.VnodeDOM<{
-    header: boolean,
     isModal: boolean
   }, {
     activeTag: OffchainTag | string,
@@ -246,13 +244,13 @@ export const NewThreadForm: m.Component<{
     const { newType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
-      class: `${newType === PostType.Link ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''}`,
+      class: `${newType === PostType.Link ? 'link-post' : ''} ${discussionDrafts.length > 0 ? 'has-drafts' : ''} `
+        + `${isModal ? 'is-modal' : ''}`,
       oncreate: (vvnode) => {
         $(vvnode.dom).find('.cui-input input').prop('autocomplete', 'off').focus();
       },
     }, [
       m('.new-thread-form-body', [
-        vnode.attrs.header && m('h2.page-title', 'New Thread'),
         m(FormGroup, [
           m(Tabs, {
             align: 'left',
@@ -272,7 +270,6 @@ export const NewThreadForm: m.Component<{
             m(TabItem, {
               label: PostType.Link,
               onclick: (e) => {
-
                 saveToLocalStorage(PostType.Discussion);
                 vnode.state.newType = PostType.Link;
                 localStorage.setItem(`${app.activeId()}-post-type`, PostType.Link);
@@ -296,7 +293,7 @@ export const NewThreadForm: m.Component<{
           ]),
         ]),
         newType === PostType.Link && m(Form, [
-          m(FormGroup, [
+          m(FormGroup, { span: 8 }, [
             m(Input, {
               placeholder: 'https://',
               onchange: (e) => {
@@ -307,6 +304,16 @@ export const NewThreadForm: m.Component<{
               },
               defaultValue: vnode.state.form.url,
               tabindex: 1,
+            }),
+          ]),
+          m(FormGroup, { span: 4 }, [
+            m(TagSelector, {
+              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: updateTagState,
+              tabindex: 2,
             }),
           ]),
           m(FormGroup, [
@@ -321,7 +328,7 @@ export const NewThreadForm: m.Component<{
                 localStorage.setItem(`${app.activeId()}-new-link-storedTitle`, vnode.state.form.linkTitle);
               },
               defaultValue: vnode.state.form.linkTitle,
-              tabindex: 1,
+              tabindex: 3,
             }),
           ]),
           m(FormGroup, [
@@ -332,18 +339,8 @@ export const NewThreadForm: m.Component<{
               },
               placeholder: 'Comment (optional)',
               editorNamespace: 'new-link',
-              tabindex: 3,
-            })
-          ]),
-          m(FormGroup, [
-            m(TagSelector, {
-              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: updateTagState,
               tabindex: 4,
-            }),
+            })
           ]),
           m(FormGroup, [
             m(Button, {
@@ -357,7 +354,9 @@ export const NewThreadForm: m.Component<{
                   notifyError('Must provide a valid URL.');
                 } else {
                   if (!vnode.state.form.linkTitle) {
-                    vnode.state.form.linkTitle = ($(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string);
+                    vnode.state.form.linkTitle = (
+                      $(e.target).closest('.NewThreadForm').find('input[name=\'new-link-title\'').val() as string
+                    );
                   }
                   try {
                     await newLink(vnode.state.form, vnode.state.quillEditorState, author);
@@ -382,7 +381,7 @@ export const NewThreadForm: m.Component<{
         ]),
         //
         newType === PostType.Discussion && m(Form, [
-          m(FormGroup, [
+          m(FormGroup, { span: 8 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -396,6 +395,16 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
+          m(FormGroup, { span: 4 }, [
+            m(TagSelector, {
+              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
+              tags: app.tags.getByCommunity(app.activeId()),
+              featuredTags: app.tags.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
+              updateFormData: updateTagState,
+              tabindex: 2,
+            }),
+          ]),
           m(FormGroup, [
             m(QuillEditor, {
               contentsDoc: '',
@@ -403,15 +412,6 @@ export const NewThreadForm: m.Component<{
                 vnode.state.quillEditorState = state;
               },
               editorNamespace: 'new-discussion',
-              tabindex: 2,
-            }),
-          ]),
-          m(FormGroup, [
-            m(TagSelector, {
-              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: updateTagState,
               tabindex: 3,
             }),
           ]),
@@ -484,7 +484,7 @@ export const NewThreadForm: m.Component<{
               },
               label: 'Save as draft',
               name: 'save',
-              tabindex: 4
+              tabindex: 5
             }),
           ]),
         ]),
