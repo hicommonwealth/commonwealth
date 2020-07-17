@@ -38,16 +38,14 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
     }
   }
 
-  const { chat, description, invites, name, privacy, website } = req.body;
+  const { chat, description, invites, name, privacy, website, telegram, github } = req.body;
 
   if (website.length && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
   } else if (chat.length && !urlHasValidHTTPPrefix(chat)) {
     return next(new Error(Errors.InvalidChat));
-  }
   } else if (telegram.length && !urlHasValidHTTPPrefix(telegram)) {
     return next(new Error(Errors.InvalidTelegram));
-  }
   } else if (github.length && !urlHasValidHTTPPrefix(github)) {
     return next(new Error(Errors.InvalidGithub));
   }
