@@ -336,7 +336,7 @@ export const NewThreadForm: m.Component<{
             m(Button, {
               class: !author ? 'disabled' : '',
               intent: 'primary',
-              label: 'Create link',
+              label: 'Create thread',
               name: 'submit',
               onclick: async (e) => {
                 vnode.state.saving = true;
