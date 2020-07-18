@@ -3,9 +3,8 @@ import app from 'state';
 import BN from 'bn.js';
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { formatNumber } from '@polkadot/util';
 import { formatCoin } from 'adapters/currency';
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Intent } from 'construct-ui';
 import NewNominator from 'views/pages/manage_staking/substrate/new_nominator';
 
 interface IPreHeaderState {
@@ -14,8 +13,7 @@ interface IPreHeaderState {
 
 interface IPreHeaderAttrs {
   sender: SubstrateAccount;
-  bondedTotal?: BN,
-  stakedCount?: number
+  bondedTotal?: BN
 }
 
 const model = {
@@ -32,24 +30,26 @@ export const SubstratePreHeader = makeDynamicComponent<IPreHeaderAttrs, IPreHead
     groupKey: app.chain.class.toString()
   }),
   view: (vnode) => {
-    const { stakedCount, bondedTotal } = vnode.attrs;
+    const { bondedTotal } = vnode.attrs;
 
     return [
-      m('.manage-staking-preheader', [
-        m('.manage-staking-preheader-item', [
+      m('.manage-staking-preheader.right', [
+        m('.manage-staking-preheader-item.padding-l-r-12', [
           m('h3', 'Total Bonded'),
           m('.preheader-item-text', formatCoin(app.chain.chain.coins(bondedTotal), true))
         ]),
-        m('.manage-staking-preheader-item', [
-          m('h3', 'Staked Count'),
-          m('.preheader-item-text', formatNumber(stakedCount))
+        m('.manage-staking-preheader-item.padding-l-r-12', [
+          m('.preheader-item-text', [
+            m('button.cui-button.cui-align-center.cui-primary', {
+              onclick: model.onNewNominee,
+            }, 'Nominator ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
+          ]),
         ]),
         m('.manage-staking-preheader-item', [
           m('.preheader-item-text', [
-            m('a.btn.formular-button-primary', {
-              href: '#',
-              onclick: model.onNewNominee,
-            }, m(Icon, { name: Icons.PLUS, size: 'xl' }), ' Nominator')
+            m('button.cui-button.cui-align-center.cui-primary', {
+              // onclick: model.onNewNominee,
+            }, 'Validator ', m(Icon, { name: Icons.PLUS, size: 'xl' }))
           ]),
         ])
       ])

@@ -9,7 +9,7 @@ const PresentationComponent = (state, chain: Substrate) => {
 
   return m('div.manage-staking-presentation',
     m(Tabs, [{
-      name: 'Account Actions',
+      name: 'Manage Staking',
       content: m(AccountActions, { ownStashInfos })
     }]));
 };

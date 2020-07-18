@@ -66,7 +66,7 @@ const ListNominees = makeDynamicComponent<ListNomineesAttrs, IListNomineesState>
       && m('div.inactive-noms', m(Popover, {
         interactionType: 'click',
         trigger: m('div.inactive-noms.pointer', `Inactive nominations (${nomsInactive.length})`),
-        content: m('div', m(NomineesList, { nominees: nomsWaiting }))
+        content: m('div', m(NomineesList, { nominees: nomsInactive }))
       })),
       nomsWaiting
       && nomsWaiting.length !== 0

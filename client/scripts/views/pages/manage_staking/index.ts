@@ -40,8 +40,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
-            bondedTotal,
-            stakedCount: ownStashInfos.length
+            bondedTotal
           }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];
@@ -50,8 +49,7 @@ export const Validators = makeDynamicComponent<{}, IValidatorPageState>({
         vComponents = [
           m(SubstratePreHeader, {
             sender: app.user.activeAccount as SubstrateAccount,
-            bondedTotal,
-            stakedCount: ownStashInfos.length
+            bondedTotal
           }),
           SubstratePresentationComponent(vnode.state, app.chain as Substrate),
         ];

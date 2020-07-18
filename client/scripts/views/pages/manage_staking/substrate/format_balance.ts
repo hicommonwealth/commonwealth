@@ -8,13 +8,13 @@ import { DeriveBalancesAll } from '@polkadot/api-derive/types';
 import BN from 'bn.js';
 
 interface FormatBalanceState {
-    dynamic: {
-        allBalances: DeriveBalancesAll
-    }
+  dynamic: {
+    allBalances: DeriveBalancesAll
+  }
 }
 
 interface FormatBalanceAttrs {
-    controller: SubstrateAccount
+  controller: SubstrateAccount
 }
 
 const FormatBalance = makeDynamicComponent<FormatBalanceAttrs, FormatBalanceState>({

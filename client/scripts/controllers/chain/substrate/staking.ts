@@ -17,6 +17,7 @@ import { DeriveStakingValidators, DeriveStakingQuery,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected,
   DeriveStakingAccount, DeriveBalancesAll, DeriveSessionIndexes } from '@polkadot/api-derive/types';
+import { Registration } from '@polkadot/types/interfaces/identity';
 
 import { IValidators } from './account';
 import SubstrateChain from './shared';
@@ -164,7 +165,7 @@ export function extractInactivesNominees(stashId: string, nominees: string[], ac
   // waiting if validator is inactive or we have not submitted long enough ago
   const nomsWaiting = exposures
     .map((exposure, index) => exposure.total.unwrap().isZero()
-    || (nomsInactive.includes(nominees[index]) && activeEra.sub(submittedIn).lten(2))
+    || (nomsInactive.includes(nominees[index]) && submittedIn && activeEra.sub(submittedIn).lten(2))
       ? nominees[index]
       : null)
     .filter((waitingId): waitingId is string => !!waitingId);
@@ -252,6 +253,9 @@ class SubstrateStaking implements StorageModule {
   }
   public get sessionInfo(): Observable<DeriveSessionProgress> {
     return this._Chain.query((api: ApiRx) => api.derive.session.progress());
+  }
+  public identity(addresses: string[]): Observable<any> {
+    return this._Chain.query((api: ApiRx) => api.query.identity.identityOf.multi(addresses));
   }
   public info(address: string): Observable<IAccountInfo> {
     return this._Chain.query(

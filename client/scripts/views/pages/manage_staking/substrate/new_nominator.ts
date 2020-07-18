@@ -19,17 +19,35 @@ interface NewNominatorState {
 interface NewNominatorAttrs {
 }
 
+const model = {
+  error: true,
+  payload: {},
+  onChange: (payload, noError: boolean) => {
+    console.log(noError);
+    model.payload = payload;
+    model.error = !noError;
+  }
+};
+
 const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>({
   getObservables: () => ({
     groupKey: app.chain.class.toString()
   }),
   view: (vnode) => {
     return m('.NewNominator', [
-      m('.compact-modal-title', [
+      m('.compact-modal-title.center-lg', [
+        m('h5', [ 'Step 1 of 2' ]),
         m('h3', [ 'Setup Nominator' ]),
       ]),
       m('.compact-modal-body',
-        m(Bond)),
+        m(Bond, {
+          onChange: model.onChange
+        }),
+        m('div.center-lg.padding-t-10',
+          m('button.cui-button.cui-align-center.cui-primary', {
+            disabled: model.error,
+            onclick: () => {},
+          }, 'Next')))
     ]);
   },
 });

@@ -12,15 +12,21 @@ export interface AccountActionsAttrs {
   ownStashInfos?: StakerState[]
 }
 
+const model: {
+  foundStashes: StakerState[]
+} = {
+  foundStashes: []
+};
+
 const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActionsState>({
+  oncreate: (vnode) => {
+    const { ownStashInfos } = vnode.attrs;
+    model.foundStashes = ownStashInfos.sort(sortStashes);
+  },
   getObservables: () => ({
     groupKey: app.chain.class.toString()
   }),
-  view: (vnode) => {
-    const { ownStashInfos } = vnode.attrs;
-
-    const foundStashes: StakerState[] = ownStashInfos.sort(sortStashes);
-
+  view: () => {
     return m('div.account_actions',
       m('table.mange-staking-table', [
         m('tr.mange-staking-heading', [
@@ -32,7 +38,7 @@ const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActions
           m('th.val-btns', ''),
           m('th.val-settings', '')
         ]),
-        foundStashes.map((info) => {
+        model.foundStashes.map((info) => {
           return m(AccountActionsRow, { info });
         }),
       ]));
