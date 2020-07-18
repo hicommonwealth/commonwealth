@@ -9,7 +9,7 @@ import { IdentificationTuple } from '@polkadot/types/interfaces/session';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
-import { Kind, OpaqueTimeSlot } from '@polkadot/types/interfaces/offences';
+import { Kind, OpaqueTimeSlot, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
 import { CWEvent } from '../../interfaces';
 
@@ -496,12 +496,17 @@ export default async function (
        */
       case SubstrateEventKind.Offence: {
         const [ offenceKind, opaqueTimeSlot, applied ] = event.data as unknown as [ Kind, OpaqueTimeSlot, boolean ];
+        const reportIds = await api.query.offences.concurrentReportsIndex(offenceKind, opaqueTimeSlot);
+        const offenceDetails: Option<OffenceDetails>[] = await api.query.offences.reports
+          .multi(reportIds.map((reportId) => reportId.toString()));
+
         return {
           data: {
             kind,
             offenceKind: offenceKind.toString(),
             opaqueTimeSlot: opaqueTimeSlot.toString(),
-            applied: typeof applied === 'undefined' ? true : applied
+            applied: typeof applied === 'undefined' ? true : applied,
+            offenceDetails
           }
         };
       }

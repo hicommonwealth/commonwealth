@@ -80,6 +80,12 @@ export function constructFakeApi(callOverrides): ApiPromise {
       voting: {
         voteRecords: callOverrides['voteRecords'],
       },
+      offences: {
+        concurrentReportsIndex: callOverrides['concurrentReportsIndex'],
+        reports: {
+          multi: callOverrides['reports.multi'],
+        }
+      }
     },
     derive: {
       chain: {

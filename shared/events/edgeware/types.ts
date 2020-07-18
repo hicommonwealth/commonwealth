@@ -1,6 +1,7 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 import { IdentificationTuple } from '@polkadot/types/interfaces/session';
-import { Vec } from '@polkadot/types';
+import { Vec, Option } from '@polkadot/types';
+import { OffenceDetails } from '@polkadot/types/interfaces/offences';
 /**
  * To implement a new form of event, add it to this enum, and add its
  * JSON interface below (ensure it is stringify-able and then parse-able).
@@ -390,6 +391,7 @@ export interface ISubstrateOffence extends ISubstrateEvent {
   offenceKind: string;
   opaqueTimeSlot: string;
   applied: boolean;
+  offenceDetails: Option<OffenceDetails>[]
 }
 
 

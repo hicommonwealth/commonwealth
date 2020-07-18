@@ -5,18 +5,20 @@ import {
   Proposal, TreasuryProposal, Votes, Event, Extrinsic,
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
-import { Vec, bool } from '@polkadot/types';
+import { Option, Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord, VoteRecord } from 'edgeware-node-types/dist';
+import { ReportIdOf, OffenceDetails } from '@polkadot/types/interfaces/offences';
 import EdgewareEnricherFunc from '../../../../shared/events/edgeware/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
 import { SubstrateEventKind } from '../../../../shared/events/edgeware/types';
-
 const { assert } = chai;
 
 const blockNumber = 10;
 const api = constructFakeApi({
   currentIndex: async () => new BN(12),
+  concurrentReportsIndex: async () => [ '0x00' ] as unknown as Vec<ReportIdOf>,
+  'reports.multi': async () => [ ] as unknown as Option<OffenceDetails>[],
   bonded: async (stash) => stash !== 'alice-stash'
     ? constructOption()
     : constructOption('alice' as unknown as AccountId),
@@ -709,7 +711,8 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   /** offences events */
   it('should enrich new offence event', async () => {
     const kind = SubstrateEventKind.Offence;
-    const event = constructEvent([ 'offline', '10000', true ], 'offences', [ 'Kind', 'OpaqueTimeSlot', 'boolean' ]);
+    const event = constructEvent([ 'offline', '10000', true, null ],
+      'offences', [ 'Kind', 'OpaqueTimeSlot', 'boolean', 'Option<OffenceDetails>[]' ]);
     const result = await EdgewareEnricherFunc(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
@@ -717,7 +720,8 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         offenceKind: 'offline',
         opaqueTimeSlot: '10000',
-        applied: true
+        applied: true,
+        offenceDetails: []
       }
     });
   });
