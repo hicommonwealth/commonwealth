@@ -307,11 +307,11 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
         }),
       ]),
       m(List, {
-        onupdate: (vnode2) => {
+        onupdate: (vvnode) => {
           if (app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
               && !vnode.state.dragulaInitialized) {
             vnode.state.dragulaInitialized = true;
-            dragula([vnode2.dom]).on('drop', async (el, target, source) => {
+            dragula([vvnode.dom]).on('drop', async (el, target, source) => {
               const reorder = Array.from(source.children).map((child) => {
                 return (child as HTMLElement).id;
               });

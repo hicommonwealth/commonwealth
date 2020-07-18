@@ -375,8 +375,8 @@ const NewProposalForm = {
               options: {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
-                oncreate: (vnode2) => {
-                  $(vnode2.dom).val(author.address);
+                oncreate: (vvnode) => {
+                  $(vvnode.dom).val(author.address);
                   vnode.state.form.beneficiary = author.address;
                 }
               },

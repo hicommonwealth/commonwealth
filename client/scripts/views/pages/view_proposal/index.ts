@@ -403,7 +403,7 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
 
     return m('.ProposalComments', {
       class: app.user.activeAccount ? '' : 'no-active-account',
-      oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; },
+      oncreate: (vvnode) => { vnode.state.dom = vvnode.dom; },
     }, [
       // show comments
       comments

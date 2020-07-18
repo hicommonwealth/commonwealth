@@ -117,8 +117,8 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
           m(DropdownFormField, {
             name: 'invitedAddressChain',
             choices: chains,
-            oncreate: (vnode2) => {
-              const result = $(vnode2.dom).find('select').val().toString();
+            oncreate: (vvnode) => {
+              const result = $(vvnode.dom).find('select').val().toString();
               vnode.state.selectedChain = result;
               m.redraw();
             },
