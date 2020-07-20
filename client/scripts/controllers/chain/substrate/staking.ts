@@ -17,7 +17,6 @@ import { DeriveStakingValidators, DeriveStakingQuery,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected,
   DeriveStakingAccount, DeriveBalancesAll, DeriveSessionIndexes } from '@polkadot/api-derive/types';
-import { Registration } from '@polkadot/types/interfaces/identity';
 
 import { IValidators } from './account';
 import SubstrateChain from './shared';
@@ -250,6 +249,14 @@ class SubstrateStaking implements StorageModule {
   }
   public get validatorCount(): Observable<SessionIndex> {
     return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
+  }
+  public get validatorsAddress(): Observable<string[]> {
+    return this._Chain.query(
+      (api: ApiRx) => api.derive.staking.validators()
+    ).pipe(map((addresses) => {
+      const { validators } = addresses;
+      return validators.map((validator) => validator.toString());
+    }));
   }
   public get sessionInfo(): Observable<DeriveSessionProgress> {
     return this._Chain.query((api: ApiRx) => api.derive.session.progress());

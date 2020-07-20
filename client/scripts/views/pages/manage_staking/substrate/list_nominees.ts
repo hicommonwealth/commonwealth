@@ -49,7 +49,7 @@ const ListNominees = makeDynamicComponent<ListNomineesAttrs, IListNomineesState>
   }),
   view: (vnode) => {
     if (!vnode.state.dynamic.nominees)
-      return 'Loading ...';
+      return m('p', 'Loading ...');
 
     const { nomsActive, nomsInactive, nomsWaiting } = vnode.state.dynamic.nominees;
 

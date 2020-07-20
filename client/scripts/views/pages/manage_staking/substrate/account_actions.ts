@@ -12,9 +12,11 @@ export interface AccountActionsAttrs {
   ownStashInfos?: StakerState[]
 }
 
-const model: {
+interface IModel {
   foundStashes: StakerState[]
-} = {
+}
+
+const model: IModel = {
   foundStashes: []
 };
 

@@ -2,6 +2,7 @@ import m from 'mithril';
 import app from 'state';
 import { makeDynamicComponent } from 'models/mithril';
 import Bond from 'views/pages/manage_staking/substrate/bond';
+import Nominate from 'views/pages/manage_staking/substrate/nominate';
 
 const MAX_STEP = 2;
 const MIN_STEP = 1;
@@ -14,7 +15,9 @@ interface IModel {
   error: boolean,
   payload: object,
   step: number,
+  selected: string[],
   onChange(payload: any, noError: boolean): void,
+  onNominate(selected: string[]): void,
   next(): void,
   bond(): void,
 }
@@ -23,9 +26,13 @@ const model: IModel = {
   error: true,
   payload: {},
   step: MIN_STEP,
+  selected: [],
   onChange: (payload: object, noError: boolean) => {
     model.payload = payload;
     model.error = !noError;
+  },
+  onNominate: (selected: string[]) => {
+    model.selected = selected;
   },
   next: () => {
     if (model.step < MAX_STEP)
@@ -63,9 +70,9 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
         ]),
         model.step === MAX_STEP
         && m('span.second-step', [
-          // m(Bond, {
-          //   onChange: model.onChange
-          // }),
+          m(Nominate, {
+            onNominate: model.onNominate
+          }),
           m('div.center-lg.padding-t-10',
             m('button.cui-button.cui-align-center.cui-primary', {
             // disabled: model.error,

@@ -37,7 +37,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
     const { stakingAccount, balancesAll } = vnode.state.dynamic;
     const balance = stakingAccount?.stakingLedger?.active.unwrap();
     if (!stakingAccount || !balancesAll)
-      return 'Loading';
+      return m('p', 'Loading ...');
 
     const {
       controllerId, destination, destinationId,
@@ -84,15 +84,9 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
         m('span.right',
           m(PopoverMenu, {
             content: [
-              m(MenuItem, {
-                label: 'Bond more funds'
-              }),
-              m(MenuItem, {
-                label: 'Unbond funds'
-              }),
-              m(MenuItem, {
-                label: 'Withdraw unbonded funds'
-              }),
+              m(MenuItem, { label: 'Bond more funds' }),
+              m(MenuItem, { label: 'Unbond funds' }),
+              m(MenuItem, { label: 'Withdraw unbonded funds' }),
               m(MenuDivider),
               m(MenuItem, { label: 'Change controller account' }),
               m(MenuItem, { label: 'Change reward destination' }),
