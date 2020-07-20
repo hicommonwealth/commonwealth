@@ -189,7 +189,9 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
             m(MenuDivider),
           ],
           m(MenuItem, {
-            onclick: () => m.route.set('/settings'),
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/settings`)
+              : m.route.set('/settings'),
             label: 'Settings'
           }),
           m(MenuItem, {
