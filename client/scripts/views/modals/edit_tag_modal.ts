@@ -62,6 +62,9 @@ const EditTagModal : m.Component<{
           m(TextInputFormField, {
             title: 'Name',
             options: {
+              oncreate: (vvnode) => {
+                $(vvnode.dom).focus().select();
+              },
               class: 'tag-form-name',
               tabindex: 1,
               value: vnode.state?.form?.name,
