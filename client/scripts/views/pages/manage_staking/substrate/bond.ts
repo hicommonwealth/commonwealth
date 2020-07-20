@@ -86,10 +86,21 @@ function getSiOptions(): SiDef[] {
   return temp;
 }
 
-const bondedModel = {
+interface IBondedModel {
+  options: SiDef[],
+  selectedItem: SiDef,
+  renderItem(item: SiDef): m.Vnode<any, any>,
+  itemPredicate(query: string, item: SiDef): boolean,
+  handleSelect(item: SiDef): void,
+  label(): m.Vnode<any, any>,
+  balanceChange(e:any): void,
+  intent: Intent,
+  balance: number
+}
+const bondedModel: IBondedModel = {
   options: [],
   selectedItem: formatBalance.findSi('-'),
-  renderItem : (item: SiDef) => {
+  renderItem: (item: SiDef) => {
     return m(ListItem, {
       label: item.text,
       selected: bondedModel.selectedItem && bondedModel.selectedItem === item
@@ -129,7 +140,6 @@ interface IPaymentModel {
   text: string,
   value: number
 }
-
 const paymentModel = {
   options: rewardDestinationOptions,
   selectedItem: rewardDestinationOptions[0],
@@ -152,7 +162,13 @@ const paymentModel = {
   }
 };
 
-const errors = {
+interface IErrors {
+  controller: boolean,
+  onController(error: boolean): void,
+  balance: boolean,
+  onBalance(error: boolean): void
+}
+const errors: IErrors = {
   controller: true,
   onController: (error) => {
     errors.controller = error;

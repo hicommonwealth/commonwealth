@@ -12,7 +12,7 @@ interface NominateState { dynamic: {
 } }
 
 interface NominateAttrs {
-  onNominate(selected: string[]): void,
+  onChange(selected: string[]): void,
 }
 
 interface IModel {
@@ -50,7 +50,7 @@ const Nominate = makeDynamicComponent<NominateAttrs, NominateState>({
       model.not_selected = validators;
       m.redraw();
     }
-    vnode.attrs.onNominate(model.selected);
+    vnode.attrs.onChange(model.selected);
   },
   getObservables: () => ({
     groupKey: app.chain.class.toString(),
