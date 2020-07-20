@@ -18,7 +18,6 @@ interface IState {
 
 const SettingsWell: m.Component<{}, IState> = {
   view: (vnode) => {
-    console.log(app.activeChainId());
 
     const nodes = (app.chain && app.chain.meta ? [] : [{
       name: 'node',

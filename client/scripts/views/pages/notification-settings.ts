@@ -22,7 +22,6 @@ const EmailPanel: m.Component<{}, { email: string, interval: string, updateInter
     vnode.state.email = app.user.email;
   },
   view: (vnode) => {
-    console.log(app.activeChainId());
     const { updateIntervalMessage, interval, email } = vnode.state;
     return m('.EmailPanel', [
       m('.EmailInterval', [
