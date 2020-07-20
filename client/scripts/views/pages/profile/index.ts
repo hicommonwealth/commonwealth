@@ -351,7 +351,7 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
       class: 'ProfilePage',
     }, [
       m('.forum-container-alt', [
-        m(ProfileHeader, { account }),
+        // m(ProfileHeader, { account }),
         m('.row.row-narrow.forum-row', [
           m('.col-xs-8', [
             m(Tabs, [{
