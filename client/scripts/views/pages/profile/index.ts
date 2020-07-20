@@ -200,16 +200,14 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
                 type: UserContent.Threads,
                 content: { proposals }
               }),
-            },
-            {
+            }, {
               name: commentsTabTitle,
               content: m(ProfileContent, {
                 account,
                 type: UserContent.Comments,
                 content: { comments }
               }),
-            }
-            ]),
+            }]),
           ]),
           m('.col-xs-4', [
             m(ProfileBio, { account }),

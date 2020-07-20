@@ -8,11 +8,17 @@ import { link, slugify } from '../../../helpers';
 import QuillFormattedText from '../../components/quill_formatted_text';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 
-const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: Array<OffchainComment<any>>, account: Account<any> } > = {
+interface IProfileCommentGroupAttrs {
+  proposal: OffchainThread;
+  comments: Array<OffchainComment<any>>;
+  account: Account<any>;
+}
+
+const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
-    const { author, createdAt, body, slug, identifier, title, } = proposal;
+    const { slug, identifier, title, } = proposal;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [
@@ -24,7 +30,6 @@ const ProfileCommentGroup : m.Component< { proposal: OffchainThread, comments: A
         }),
         ' commented on ',
         link('a', `/${(proposal.chain || proposal.community)}/proposal/${slug}/${identifier}-${slugify(title)}`, 'Loading...'),
-        // createdAt ? ` ${createdAt}` : '',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [
