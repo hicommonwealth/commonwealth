@@ -19,7 +19,7 @@ function capitalizeFirstLetter(string) {
 
 const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
-  return (app.chain.base === ChainBase.Substrate) && m('button.formular-button-primary', {
+  return (account.chainBase === ChainBase.Substrate) && m('button.formular-button-primary', {
     // wait for info to load before making it clickable
     class: currentIdentity ? '' : 'disabled',
     onclick: async () => {
@@ -44,8 +44,8 @@ export interface IProfileHeaderState {
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const account: Account<any> = vnode.attrs.account;
-    const onOwnProfile = app.user.activeAccount && account.address === app.user.activeAccount.address;
-
+    // const onOwnProfile = app.user.activeAccount && account.address === app.user.activeAccount.address;
+    const onOwnProfile = false;
     // kick off identity subscription
     if (onOwnProfile && app.chain.loaded && app.chain.base === ChainBase.Substrate && !vnode.state.subscription) {
       vnode.state.subscription = (app.chain as Substrate).identities.get(account as SubstrateAccount)
@@ -60,7 +60,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]),
         m('.bio-right', [
           m('.name-row', [
-            m(User, { user: account, hideAvatar: true }),
+            // m(User, { user: account, hideAvatar: true }),
             // TODO: Badges for identity verification, etc.
           ]),
           m('.info-row', [
