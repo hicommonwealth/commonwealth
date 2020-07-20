@@ -98,18 +98,17 @@ interface IProfilePageState {
   loading: boolean;
 }
 
+
+
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.loaded = false;
-    vnode.state.loading = false;
+    vnode.state.loading = true;
     vnode.state.threads = [];
     vnode.state.comments = [];
   },
   oncreate: async (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
-  },
-  view: (vnode) => {
     const loadProfile = async () => {
       const chain = m.route.param('base');
       const { address } = vnode.attrs;
@@ -153,12 +152,11 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
         }
       });
     };
-
+    mixpanel.track('PageVisit', { 'Page Name': 'LoginPage' });
+    loadProfile();
+  },
+  view: (vnode) => {
     const { account, loaded, loading } = vnode.state;
-    if (!account && !loaded && !loading) {
-      vnode.state.loading = true;
-      loadProfile();
-    }
     if (loading) return m(PageLoading);
     if (!account) {
       return m(PageNotFound, { message: 'Make sure the profile address is valid.' });
