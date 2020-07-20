@@ -364,9 +364,7 @@ const Sidebar: m.Component<{ activeTag: string }> = {
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
           label: 'Notifications',
-          onclick: () => app.activeChainId()
-            ? m.route.set(`/${app.activeChainId()}/notification-settings`)
-            : m.route.set('/notification-settings'),
+          onclick: (e) => m.route.set('/notification-settings'),
         }),
       ]),
     ] : [
