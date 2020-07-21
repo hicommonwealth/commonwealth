@@ -8,8 +8,9 @@ class OffchainReaction<T extends IUniqueId> {
   public readonly reaction: string;
   public readonly threadId: number | string;
   public readonly commentId: number | string;
-  public readonly proposalId: string;
+  public readonly proposalId: number | string;
   public readonly author_chain: string;
+  // TODO: Do thread/comment/proposal ids ever appear as strings?
 
   constructor(id, author, chain, community, reaction, threadId, proposalId, commentId, author_chain) {
     this.id = id;

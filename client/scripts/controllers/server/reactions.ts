@@ -42,6 +42,7 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
+    console.log(options);
     console.log({ 'post instanceof Proposal': (post instanceof Proposal) });
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) options['proposal_id'] = (post as AnyProposal).identifier;

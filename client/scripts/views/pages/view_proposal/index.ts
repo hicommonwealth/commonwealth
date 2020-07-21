@@ -43,7 +43,6 @@ import {
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
 import CreateComment from './create_comment';
-import ReactionButton, { ReactionType } from '../../components/reaction_button';
 
 interface IProposalHeaderAttrs {
   commentCount: number;
@@ -110,6 +109,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalHeaderOnchainStatus, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
+            m(ProposalBodyReaction, { item: proposal }),
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
@@ -171,7 +171,6 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             && m('.proposal-body-button-group', [
               m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
               m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
-              m(ReactionButton, { post: proposal, type: ReactionType.Like }),
             ]),
 
           !vnode.state.editing

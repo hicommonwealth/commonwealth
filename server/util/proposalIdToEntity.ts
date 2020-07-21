@@ -1,13 +1,21 @@
 import { SubstrateEntityKind } from '../../shared/events/substrate/types';
 import { MolochEntityKind } from '../../shared/events/moloch/types';
 
-// given an "old style" identifier such as treasuryproposal_4, attempts to
+// this function can take either an "old style" identifier such as treasuryproposal_4,
+// or a "new style" identifier/type combination such as 4 and treasuryproposal, and attempts
 // fetch the corresponding chain entity from the database
-export default async function (models, chain: string, identifier: string) {
+export default async function (models, chain: string, identifier: string, type?) {
   console.log(`Looking up proposal: ${chain}: ${identifier}`);
-  const [ prefix, type_id ] = identifier.split('_');
-  const findEntity = (type) => {
-    return models.ChainEntity.findOne({ where: { chain, type, type_id } });
+  let prefix;
+  let type_id;
+  if (type) {
+    prefix = type;
+    type_id = identifier;
+  } else {
+    [ prefix, type_id ] = identifier.split('_');
+  }
+  const findEntity = (type_) => {
+    return models.ChainEntity.findOne({ where: { chain, type: type_, type_id } });
   };
   switch (prefix) {
     case 'referendum': {
