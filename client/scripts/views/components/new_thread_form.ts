@@ -170,6 +170,9 @@ export const NewThreadForm: m.Component<{
     const author = app.user.activeAccount;
     const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
     const { isModal } = vnode.attrs;
+    if (vnode.state.quillEditorState?.container) {
+      vnode.state.quillEditorState.container.tabIndex = 8;
+    }
     const getUrlForLinkPost = _.debounce(async () => {
       try {
         const title = await getLinkTitle(vnode.state.form.url);
