@@ -19,7 +19,7 @@ export const Errors = {
 const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { reaction, comment_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
   if (!thread_id && !comment_id) {
     return next(new Error(Errors.NoPostId));
@@ -36,6 +36,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   if (community) options['community'] = community.id;
   else if (chain) options['chain'] = chain.id;
   if (thread_id) options['thread_id'] = thread_id;
+  else if (proposal_id) options['proposal_id'] = proposal_id;
   else if (comment_id) options['comment_id'] = comment_id;
 
   let finalReaction;
@@ -72,7 +73,12 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       }
       cwUrl = getProposalUrl(prefix, proposal, comment);
       root_type = prefix;
-    } else {
+    } else if (proposal_id) {
+      proposal = await proposalIdToEntity(models, chain.id, proposal_id);
+      cwUrl = getProposalUrl('discussion', proposal);
+      console.log(cwUrl);
+      // root_type = PLACEHOLDER
+    } else if (thread_id) {
       proposal = await models.OffchainThread.findByPk(Number(thread_id));
       cwUrl = getProposalUrl('discussion', proposal, comment);
       root_type = 'discussion';
@@ -98,7 +104,11 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     notification_data['comment_text'] = comment.text;
   }
 
-  const location = thread_id ? `discussion_${thread_id}` : `comment-${comment_id}`;
+  const location = thread_id
+    ? `discussion_${thread_id}`
+    : proposal_id
+      ? `PLACEHOLDER_${proposal_id}`
+      : `comment-${comment_id}`;
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,
