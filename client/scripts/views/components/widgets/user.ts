@@ -121,7 +121,7 @@ const User: m.Component<{
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
-      // roleTag,
+      showRole && roleTag,
     ]);
 
     return tooltip
