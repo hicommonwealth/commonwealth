@@ -33,6 +33,7 @@ const User: m.Component<{
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
+    const adminsAndMods = (app.chain ? app.chain.meta.chain : app.community.meta).adminsAndMods;
 
     if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
       vnode.state.identityWidgetLoading = true;
@@ -55,18 +56,18 @@ const User: m.Component<{
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = app.user.isAdminOrMod({ account: vnode.attrs.user });
+      role = adminsAndMods.find((r) => r.address === address);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = app.user.isAdminOrMod({ account });
+      role = adminsAndMods.find((r) => r.address === account.address);
     }
-    // const roleTag = role ? m(Tag, {
-    //   class: 'roleTag',
-    //   label: role.permission,
-    //   rounded: true,
-    //   size: 'sm',
-    // }) : null;
+    const roleTag = role ? m(Tag, {
+      class: 'roleTag',
+      label: role.permission,
+      rounded: true,
+      size: 'sm',
+    }) : null;
 
     const userFinal = avatarOnly
       ? m('.User.avatar-only', {
@@ -97,7 +98,7 @@ const User: m.Component<{
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
-        // showRole && roleTag,
+        showRole && roleTag,
       ]);
 
     const tooltipPopover = m('.UserTooltip', {
