@@ -115,6 +115,19 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
   }
 };
 
+interface IEventSubscriptionTypeRowAttrs {
+  title: string;
+  subscription: NotificationSubscription;
+}
+
+const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
+  view: (vnode) => {
+
+
+    return;
+  }
+};
+
 interface IEventSubscriptionRowAttrs {
   chain: string;
   kind: IChainEventKind;
@@ -272,7 +285,10 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
             EventSubscriptionRow,
             { chain: vnode.state.chain, kind, titler },
           ))
-          : m('No events available on this chain.')
+          : m('No events available on this chain.'),
+        
+        
+
       ]),
     ]);
   }

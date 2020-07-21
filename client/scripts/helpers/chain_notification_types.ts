@@ -1,4 +1,4 @@
-export const Edgeware = {
+export const EdgewareChainNotificationTypes = {
     Council: [
         'edgeware-collective-disapproved',
         'edgeware-collective-executed',
