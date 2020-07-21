@@ -54,18 +54,18 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | OffchainComment<any>): Array<OffchainReaction<any>> {
+  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>): Array<OffchainReaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | OffchainComment<any>) {
+  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AnyProposal | OffchainComment<any>) {
     if (rxnOrPost instanceof OffchainReaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`
         : proposalId
-          ? `PLACEHOLDER`
+          ? 'PLACEHOLDER'
           : `comment-${commentId}`;
     } else if (rxnOrPost instanceof OffchainThread) {
       return `discussion-${rxnOrPost.id}`;

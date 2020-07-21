@@ -8,7 +8,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { ReactionStore } from 'stores';
-import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread } from 'models';
+import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 const modelFromServer = (reaction) => {
@@ -19,6 +19,7 @@ const modelFromServer = (reaction) => {
     reaction.community,
     reaction.reaction,
     reaction.thread_id,
+    reaction.proposal_id,
     reaction.comment_id,
     reaction.Address.chain,
   );
@@ -28,7 +29,7 @@ class ReactionsController {
   private _store: ReactionStore = new ReactionStore();
   public get store() { return this._store; }
 
-  public getByPost(post: OffchainThread | OffchainComment<any>) {
+  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>) {
     return this._store.getByPost(post);
   }
 
@@ -41,7 +42,9 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
+    console.log({ 'post instanceof Proposal': (post instanceof Proposal) });
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
+    else if (post instanceof Proposal) options['proposal_id'] = (post as AnyProposal).identifier;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
@@ -59,7 +62,9 @@ class ReactionsController {
 
   public async refresh(post: any, chainId: string, communityId: string) {
     const options = { chain: chainId, community: communityId };
-    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).identifier;
+    // TODO: ensure identifier vs id use is correct; see also create method
+    if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
+    else if (post instanceof Proposal) options['proposal_id'] = (post as AnyProposal).identifier;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
