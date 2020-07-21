@@ -5,7 +5,7 @@ $active-color: #ececec;
 .Sidebar {
     margin: 36px 0 48px;
     .SidebarModule {
-        background: #f8f8f8;
+        background: $background-color-light;
         border-radius: 4px;
         padding: 14px 12px;
         margin-bottom: 18px;
@@ -17,7 +17,6 @@ $active-color: #ececec;
             background: transparent;
             .cui-list-item {
                 color: #111;
-                font-size: 15px;
                 font-weight: 500;
                 border: none;
                 border-radius: 3px;
@@ -49,7 +48,7 @@ $active-color: #ececec;
         }
         > .cui-list.cui-interactive {
             .cui-list-item:hover {
-                background: #eee;
+                background: $background-color-light-hover;
             }
             .cui-icon-action:hover {
                 .cui-icon svg {
@@ -75,7 +74,6 @@ $active-color: #ececec;
             }
         }
         .community-name {
-            font-size: 16px;
             font-weight: 600;
             margin-bottom: 8px;
         }
@@ -113,12 +111,12 @@ $active-color: #ececec;
             width: 10px;
             height: 10px;
             border-radius: 2px;
-            background: #eee;
+            background: $background-color-light-hover;
             margin: 1px 3px;
         }
         > .cui-list {
             .cui-list.more-tags-list {
-                border-top: 1px solid #eee;
+                border-top: 1px solid $background-color-light-hover;
                 margin-top: 10px;
                 padding: 10px 0;
                 max-height: 230px;

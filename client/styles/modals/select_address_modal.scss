@@ -13,18 +13,18 @@
     }
 
     .select-address-options {
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid $background-color-border;
     }
     .select-address-option {
         position: relative;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-border;
         border-bottom: none;
         cursor: pointer;
         &:hover {
-            background: #fafafa;
+            background: $background-color-light;
         }
         &.selected {
-            background: #e2e7ff !important;
+            background: $background-color-light-hover !important;
         }
         &.existing {
             background: initial !important;
@@ -40,11 +40,11 @@
                     position: relative;
                     margin-right: 11px;
                     font-size: 13.5px;
-                    color: #888;
+                    color: $text-color-medium;
                 }
                 .cui-icon svg {
                     cursor: pointer;
-                    stroke: #888;
+                    stroke: $text-color-medium;
                 }
                 .cui-icon:hover svg {
                     stroke: $error-red;
@@ -57,7 +57,7 @@
     }
     .select-address-explanation {
         font-size: 14px;
-        color: #222;
+        color: $text-color-dark;
         margin: 15px 0 18px;
     }
     button {

@@ -28,7 +28,7 @@
         margin-left: 4px;
     }
     .compact-modal-title h3 .User a.user-display-name {
-        color: #fff;
+        color: $background-color-white;
         font-weight: 700;
         margin-right: 10px;
     }
@@ -53,7 +53,7 @@
     .well {
         margin: 12px 0;
         padding: 18px 24px;
-        background: #f8f8f8;
+        background: $background-color-white-hover;
         &.not-available {
             color: #999;
         }

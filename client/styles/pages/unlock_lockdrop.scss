@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .UnlockPage {
     .content {
         background: #fff;
@@ -49,7 +51,7 @@
             width: 100%;
         }
         input[type="text"][readonly] {
-            background: #f8f8f8;
+            background: $background-color-light-hover;
         }
         .buttons {
             margin: 14px 0 16px;

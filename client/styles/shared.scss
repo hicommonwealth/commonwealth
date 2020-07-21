@@ -7,30 +7,44 @@ $theme-base-color: #5b7bf6;
 $theme-accent-dark: darken(#5b7bf6, 7%);
 $theme-focus-border: #3960f4;
 
-$offwhite-extralight: #fcfbfa;
-$offwhite-light: #f9f8f6;
-$offwhite-dark: #282625;
-$badge-red: #de243b;    // radish red for badges
-$error-red: $red800;
-$success-green: $light_green800;
+$header-color: #4f62bd;           // ?? (TODO)
+$header-text-color: #ffffff;      // ??
 
-$primary-green: #41a360;
+$background-color-white: #ffffff;       // white background
+$background-color-white-hover: #f9fafd; // white background with hover
+$background-color-light: #eef1fa;       // light background - used in sidebar, most styles
+$background-color-light-hover: #e5e8f7; // light background with hover
+$background-color-border: #e0e4f1;      // border color
+$background-color-placeholder: #adb7d5; // placeholder color
+
+$text-color-lightest: #b5b7b9;          // light text on white background
+$text-color-lighter: #a3a4a7;           // light text on white background - used for most styles
+$text-color-light: #9a9da4;             // light text on light background
+$text-color-medium: #777;               // medium text on any background
+$text-color-dark: #222;                 // black text on any background
+
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
 
 $form-border-radius: 3px;
 $form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
 // default styles
+$badge-red: #de243b;    // radish red for badges
+$error-red: $red800;
+$success-green: $light_green800;
+$primary-green: #41a360;
 $lighttextgrey: #999;
 $electricblue: #229bd6;
 $standard-light-text: #999;
 $standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
 
 // widths and heights
-$layout-max-width: 1300px;
-$left-sidebar-width: 300px;
-$right-sidebar-width: 340px;
-$sublayout-max-width: 1340px;
+$layout-max-width: 9999px;
+$left-sidebar-width: 240px;
+$right-sidebar-width: 300px;
+$sublayout-max-width: 9999px;
 $header-height: 60px;
 
 // paddings
@@ -235,7 +249,7 @@ $menu-item-height: 30px;
     }
     ul a {
         text-decoration: none;
-        color: $offwhite-dark;
+        color: #111;
     }
     ul li {
         margin: 0;
@@ -248,10 +262,10 @@ $menu-item-height: 30px;
     }
     ul li:hover {
         background: #08c;
-        color: $offwhite-extralight;
+        color: #fff;
     }
     ul a li:hover {
-        color: $offwhite-extralight;;
+        color: #fff;
     }
     ul li.disabled {
         opacity: 0.4;

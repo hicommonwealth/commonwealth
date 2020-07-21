@@ -7,7 +7,7 @@ $discussion-meta-padding: 12px; // padding between comment meta & comment conten
 $discussion-reaction-padding: 18px; // padding between comment content & comment reaction
 $discussion-comment-padding: 28px; // padding between comment content & avatar
 
-$discussion-meta-font-size: 14px;
+$discussion-meta-font-size: 1rem;
 $discussion-meta-color: #999;
 
 @mixin supports-jump-highlight() {
@@ -80,11 +80,11 @@ $discussion-meta-color: #999;
             }
         }
         .proposal-title {
-            margin: 4px 0;
+            margin: 4px 0 2px;
             .ProposalHeaderTitle {
                 display: inline;
-                font-size: 25px;
-                font-weight: 600;
+                font-size: 1.45rem;
+                font-weight: 500;
                 flex: 1;
                 line-height: 1.15;
             }

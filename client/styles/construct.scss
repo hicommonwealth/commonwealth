@@ -1,16 +1,312 @@
 @import 'shared.scss';
 
-$cui-base-border-color: #dadada;
+//
+// text sizing and typography
+//
 
-$cui-primary-bg-color: $theme-base-color;
-$cui-primary-bg-color-hover:      darken($cui-primary-bg-color, 7%) !default;
-$cui-primary-bg-color-active:     darken($cui-primary-bg-color, 11%) !default;
-$cui-primary-gradient:            linear-gradient(180deg, $cui-primary-bg-color 10.5%, darken($cui-primary-bg-color, 3.5%) 100%) !default;
-$cui-primary-gradient-hover:      linear-gradient(180deg, $cui-primary-bg-color  10.5%, darken($cui-primary-bg-color, 7%) 100%) !default;
-$cui-primary-gradient-active:     linear-gradient(180deg, $cui-primary-bg-color  10.5%, darken($cui-primary-bg-color, 7%) 100%) !default;
-$cui-primary-border-color:        darken($cui-primary-bg-color, 7%) !default;
-$cui-primary-border-color-hover:  darken($cui-primary-bg-color, 14%) !default;
-$cui-primary-border-color-active: darken($cui-primary-bg-color, 21%) !default;
+$cui-base-size: 12.75px;
+$cui-spacer: $cui-base-size * 1.5;
+
+$cui-font-family:           Arial, "Helvetica Neue", Helvetica, sans-serif;
+$cui-font-family-monospace: monospace;
+
+$cui-font-weight-light:           300;
+$cui-font-weight-normal:          400;
+$cui-font-weight-bold:            500;
+$cui-font-weight-heavy:           600; // this is only used in overrides
+$cui-font-weight: $cui-font-weight-normal;
+
+$cui-line-height: 1.5;
+
+$cui-paragraph-margin-bottom:   1rem;
+
+$cui-headings-margin-bottom: $cui-spacer;
+
+$cui-headings-font-family: inherit;
+$cui-headings-font-weight: 400;
+$cui-headings-line-height: 1.2;
+
+$cui-font-size:    floor($cui-base-size) * 1.4;
+$cui-font-size-xs: floor($cui-base-size) * 1.2;
+$cui-font-size-sm: floor($cui-base-size) * 1.3;
+$cui-font-size-lg: floor($cui-base-size) * 1.6;
+$cui-font-size-xl: floor($cui-base-size) * 1.8;
+
+$cui-h1-font-size: $cui-font-size * 2.5;
+$cui-h2-font-size: $cui-font-size * 2;
+$cui-h3-font-size: $cui-font-size * 1.5;
+$cui-h4-font-size: $cui-font-size * 1.25;
+$cui-h5-font-size: $cui-font-size * 1;
+$cui-h6-font-size: $cui-font-size * 0.75;
+
+//
+// text colors
+//
+
+$cui-body-bg: $blue-grey50;
+$cui-body-color: $blue-grey800;
+$cui-body-font-size: $cui-base-size * 1.6;
+
+$cui-text-color:               $cui-body-color;
+$cui-placeholder-color:        lighten($grey500, 3%);
+$cui-placeholder-color-focus:  $grey500;
+$cui-hover-color:              tint($blue-grey50, 25%);
+
+$cui-headings-color: $cui-body-color;
+
+$cui-link-color:               $blue800;
+$cui-link-decoration:          none;
+$cui-link-hover-color:         shade($cui-link-color, 25%);
+$cui-link-hover-decoration:    underline;
+$cui-focus-outline-color:      $blue300;
+
+$cui-base-text-color:          lighten($grey800, 3%);
+$cui-base-text-color-hover:    $grey800;
+
+$cui-icon-color:               lighten($grey800, 3%);
+$cui-icon-color-hover:         $grey800;
+
+$cui-text-muted:               $grey600;
+$cui-text-disabled:            $grey200;
+
+//
+// component styling
+//
+
+$cui-base-height-multiplier: 1;
+
+$cui-base-height-xs:  floor($cui-base-size * 2.35);
+$cui-base-height-sm:  floor($cui-base-size * 2.65);
+$cui-base-height:     floor($cui-base-size * 3);
+$cui-base-height-lg:  floor($cui-base-size * 3.3);
+$cui-base-height-xl:  floor($cui-base-size * 3.75);
+
+//
+// component colors
+//
+
+$cui-border-radius: 4px;
+
+$cui-base-bg-color:     #ffffff;
+$cui-primary-bg-color:  #4f62bd;
+$cui-positive-bg-color: #4caf50;
+$cui-negative-bg-color: #d4302f;
+
+$cui-base-bg-color-hover:         darken(#EAEAEC, 1.5%);
+$cui-base-bg-color-active:        darken(#EAEAEC, 6.5%);
+
+$cui-base-gradient:               $cui-base-bg-color;
+$cui-base-gradient-hover:         linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 2.5%) 100%) !default;
+$cui-base-gradient-active:        linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 3.5%) 100%) !default;
+$cui-base-border-color:           #EAEAEC;
+$cui-base-border-color-hover:     darken(#EAEAEC, 3.5%);
+$cui-base-border-color-active:    darken(#EAEAEC, 4.5%);
+$cui-base-box-shadow:             none;
+$cui-base-box-shadow-active:      inset 0px 4px 5px shade($blue-grey50, 12.5%);
+
+$cui-primary-bg-color-hover:      darken($cui-primary-bg-color, 7%);
+$cui-primary-bg-color-active:     darken($cui-primary-bg-color, 12%);
+$cui-primary-gradient:            $cui-primary-bg-color;
+$cui-primary-gradient-hover:      $cui-primary-bg-color-hover;
+$cui-primary-gradient-active:     $cui-primary-bg-color-active;
+$cui-primary-border-color:        $cui-primary-bg-color;
+$cui-primary-border-color-hover:  $cui-primary-bg-color-hover;
+$cui-primary-border-color-active: $cui-primary-bg-color-active;
+
+$cui-positive-bg-color-hover:      darken($cui-positive-bg-color, 5%);
+$cui-positive-bg-color-active:     darken($cui-positive-bg-color, 10%);
+$cui-positive-gradient:            $cui-positive-bg-color;
+$cui-positive-gradient-hover:      $cui-positive-bg-color-hover;
+$cui-positive-gradient-active:     $cui-positive-bg-color-active;
+$cui-positive-border-color:        $cui-positive-bg-color;
+$cui-positive-border-color-hover:  $cui-positive-bg-color-hover;
+$cui-positive-border-color-active: $cui-positive-bg-color-active;
+
+$cui-negative-bg-color-hover:      darken($cui-negative-bg-color, 6%);
+$cui-negative-bg-color-active:     darken($cui-negative-bg-color, 11%);
+$cui-negative-gradient:            $cui-negative-bg-color;
+$cui-negative-gradient-hover:      $cui-negative-bg-color-hover;
+$cui-negative-gradient-active:     $cui-negative-bg-color-active;
+$cui-negative-border-color:        $cui-negative-bg-color;
+$cui-negative-border-color-hover:  $cui-negative-bg-color-hover;
+$cui-negative-border-color-active: $cui-negative-bg-color-active;
 
 @import 'construct-ui/src/utils/focus-manager/index.scss';
 @import 'construct-ui/src/components/index.scss';
+
+//
+// construct theme overrides
+//
+
+.cui-button {
+    font-weight: $cui-font-weight-bold !important; // fix weight
+}
+.cui-callout .cui-callout-header {
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-form .cui-form-label {
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-empty-state .cui-empty-state-header {
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-callout .cui-callout-header {
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-list .cui-list-item.cui-selected {
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-menu .cui-menu-heading {
+    font-weight: $cui-font-weight-bold; // fix weight
+    // color: $blue-grey900;
+    // font-size: 12px;
+}
+.cui-tabs .cui-tabs-item {
+    font-weight: $cui-font-weight-bold; // fix weight
+    &, .cui-icon {
+        // color: $blue-grey300;
+    }
+}
+.cui-card h4 {
+    margin: 0 0 0.2em;
+    font-weight: $cui-font-weight-bold; // fix weight
+}
+.cui-table th {
+    font-weight: $cui-font-weight-heavy; // fix weight
+}
+
+.cui-switch .cui-control-indicator::after {
+    box-sizing: border-box; // fix switch sizing
+}
+
+// button color fixes
+.cui-button {
+    // adjust label position on xl buttons
+    &.cui-xl .cui-button-label,
+    &.cui-xl .cui-button-sublabel {
+        position: relative;
+        top: -1px;
+    }
+
+    // adjust sublabel colors to grey from blue grey
+    .cui-button-sublabel {
+        color: $grey400;
+    }
+    &.cui-basic .cui-button-sublabel,
+    &.cui-outlined .cui-button-sublabel {
+        color: $grey400;
+    }
+
+    // adjust basic button styles
+    &.cui-basic,
+    .cui-button-group.cui-basic & {
+        &:hover {
+            background: #f4f4f5;
+            color: $cui-base-text-color;
+        }
+        &:active, &.cui-active {
+            background: #EAEAEC;
+            color: $cui-base-text-color;
+        }
+    }
+}
+
+// reduce list padding
+.cui-list {
+    .cui-list-item {
+        padding: (floor($cui-base-padding / 1.2) * 0.75) floor($cui-base-padding / 1.2);
+    }
+    @each $size in $cui-sizes {
+        .cui-list.cui-#{$size} {
+            @include cui-list-sizing(
+                map-get($cui-padding-map, $size) * 0.8,
+                map-get($cui-font-size-map, $size)
+            )
+        }
+    }
+}
+
+// reduce tab padding
+.cui-tabs {
+    .cui-tabs-item {
+        padding: $cui-base-padding 0;
+        margin: 0 ($cui-base-padding * 0.84);
+    }
+    @each $size in $cui-sizes {
+        &.cui-#{$size} {
+            @include cui-tabs-size(
+                map-get($cui-padding-map, $size),
+                map-get($cui-font-size-map, $size)
+            )
+        }
+    }
+}
+
+// reduce menu padding
+.cui-menu {
+    max-width: 240px; // allow menus to be wider by default
+    padding: 6px 0;
+    > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+    > .cui-menu-divider {
+        margin: 4px 0 6px;
+    }
+    .cui-button-label {
+        width: 100%;
+        text-align: left;
+    }
+    button.cui-button.cui-menu-item {
+        min-height: $menu-item-height;
+        height: $menu-item-height;
+        line-height: $menu-item-height;
+    }
+    // other special cases
+    > .TagEditorButton > .cui-button.cui-basic {
+        color: #333;
+        .cui-icon svg {
+            stroke: #333;
+        }
+    }
+}
+
+// icon styles
+.cui-icon.filled-icon svg {
+    fill: currentColor;
+}
+
+// empty state override
+.cui-empty-state.cui-empty-state-fill {
+    z-index: initial;
+}
+.cui-spinner.cui-spinner-fill {
+    z-index: initial;
+}
+
+// the declarative construct-ui toaster doesn't allow position to be set by default, so we override it here
+.cui-toaster.cui-toaster-top {
+    top: auto;
+    bottom: 0;
+    z-index: 99999;
+}
+
+// portal z-index
+.cui-portal {
+    z-index: 51;
+}
+
+// dialog headers
+.cui-dialog-header {
+    padding: 15px 15px 15px 25px;
+    h3 {
+        margin: 4px 0 0;
+        font-weight: 600;
+    }
+    > button.cui-dialog-close-button {
+        position: relative;
+        top: 1px;
+    }
+}
