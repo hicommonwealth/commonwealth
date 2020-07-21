@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Proposal.associate = (models) => {
     models.Proposal.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.Proposal.hasMany(models.OffchainReaction, { foreignKey: 'proposal_id', targetKey: 'identifier' })
   };
 
   return Proposal;
