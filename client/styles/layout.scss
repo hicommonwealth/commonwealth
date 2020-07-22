@@ -108,7 +108,7 @@ a.btn {
     outline: none;
     border: none;
     box-shadow: none;
-    background: #eee;
+    background: $background-color-light;
     color: #111;
     transition: 0.07s background ease-in-out;
     text-align: center;
@@ -116,7 +116,7 @@ a.btn {
     overflow: hidden;
     text-overflow: ellipsis;
     &:hover {
-        background: #f2f2f2;
+        background: $background-color-light-hover;
     }
     &:disabled,
     &.disabled, {

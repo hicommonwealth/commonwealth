@@ -2,11 +2,11 @@
 
 .DiscussionRowHeader {
     display: flex;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid $background-color-light;
 
     color: #999;
     .discussion-row-header-col {
-        font-size: 14px;
+        font-size: 0.94rem;
         text-align: right;
         width: 82px;
         padding: 10px 0;

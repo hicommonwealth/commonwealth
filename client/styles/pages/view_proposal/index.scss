@@ -58,7 +58,7 @@ $discussion-meta-color: #999;
         .proposal-top {
             display: flex;
             padding-bottom: $discussion-separator-padding;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid $background-color-light;
         }
         .proposal-top-left {
             flex: 1;

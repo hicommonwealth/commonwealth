@@ -208,9 +208,9 @@
 // 8. mentions container
 .ql-mention-list-container {
     background: white;
-    border-top: 1px solid #eee;
-    border-left: 1px solid #eee;
-    border-right: 1px solid #eee;
+    border-top: 1px solid $background-color-light;
+    border-left: 1px solid $background-color-light;
+    border-right: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
     border-radius: 4px;
     z-index: 2;
@@ -221,7 +221,7 @@
         cursor: pointer;
         li {
             padding: 5px 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid $background-color-light;
             margin: 0;
             display: flex;
             align-items: center;
@@ -262,7 +262,7 @@
             margin-right: 8px;
             border-radius: 9999px;
             &.missing {
-                background-color: #eee;
+                background-color: $background-color-light;
             }
         }
     }

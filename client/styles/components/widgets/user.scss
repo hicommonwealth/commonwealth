@@ -10,7 +10,7 @@
     border-radius: 9999px;
     overflow: hidden;
     .avatar-image {
-        background: #eee;
+        background: $background-color-light;
         background-size: cover;
     }
 }
@@ -27,7 +27,7 @@
     .avatar-image {
         width: 100% !important;
         height: 100% !important;
-        background: #eee;
+        background: $background-color-light;
         background-size: cover;
     }
 }

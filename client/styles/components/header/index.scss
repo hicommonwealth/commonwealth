@@ -5,8 +5,7 @@
     left: 0;
     right: 0;
     padding: 0 $sidebar-padding;
-    background: #1f1f1f;
-    box-shadow: 0 0 4px rgba(0,0,0,0.07);
+    border-bottom: 1px solid $background-color-light;
     z-index: 50;
 
     .header-content {
@@ -24,13 +23,6 @@
         > .cui-button-group,
         > .CommunitySelector {
             margin-left: $header-spacing;
-        }
-        > .placeholder > .CommunityLabel {
-            color: #fff;
-        }
-        > .cui-button,
-        > .LoginSelector > .cui-button {
-            border: none !important;
         }
     }
 }

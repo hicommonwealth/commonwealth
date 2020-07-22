@@ -80,7 +80,7 @@
         border-radius: 4px;
         padding: 20px 22px 12px;
         margin: 7px;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
         @include xs-max {
             width: 142px;
@@ -311,7 +311,7 @@
         text-align: left;
         padding: 12px 16px 7px 12px;
         margin: 24px 0 30px;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         border-radius: 4px;
     }
     .btn-finished-action {

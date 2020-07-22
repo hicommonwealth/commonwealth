@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .HorizontalTabs {
     display: flex;
     border: 1px solid #ddd;
@@ -5,11 +7,11 @@
 
     .tab-bar {
         width: 200px;
-        border-right: 1px solid #eee;
+        border-right: 1px solid $background-color-light;
         a.tab-entry {
             display: block;
             padding: 10px 16px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid $background-color-light;
             text-decoration: none;
             color: #111;
             cursor: pointer;

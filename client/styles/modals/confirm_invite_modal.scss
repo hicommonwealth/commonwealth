@@ -40,7 +40,7 @@
 
     // TODO: refactor into its own component
     .CommunityBlock {
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         padding: 18px;
         margin-bottom: 40px;
 
@@ -58,7 +58,7 @@
     .SwitchAddress {
         display: block;
         padding: 15px 20px 10px;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         @include sm-min {
             width: 420px;
         }
