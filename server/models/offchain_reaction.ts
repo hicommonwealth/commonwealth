@@ -37,7 +37,7 @@ export default (
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.INTEGER, allowNull: true },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
-    proposal_id: { type: dataTypes.INTEGER, allowNull: true },
+    proposal_id: { type: dataTypes.STRING, allowNull: true },
     comment_id: { type: dataTypes.INTEGER, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     reaction: { type: dataTypes.STRING, allowNull: false },
@@ -58,7 +58,6 @@ export default (
     models.OffchainReaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.ChainEntity, { foreignKey: 'proposal_id', targetKey: 'id' });
   };
 
   return OffchainReaction;

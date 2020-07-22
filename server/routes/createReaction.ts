@@ -44,7 +44,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     console.log(proposal);
     if (!proposal) return next(new Error(Errors.NoProposalMatch));
     root_type = proposal_id.split('_')[0];
-    options['proposal_id'] = proposal.id;
+    options['proposal_id'] = proposal_id;
   } else if (comment_id) options['comment_id'] = comment_id;
 
   let finalReaction;

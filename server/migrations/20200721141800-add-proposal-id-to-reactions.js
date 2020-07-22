@@ -6,12 +6,8 @@ module.exports = {
       'OffchainReactions',
       'proposal_id',
       {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
-        references: {
-          model: 'ChainEntities',
-          key: 'id',
-        }
       },
     );
     await queryInterface.addIndex(
@@ -28,12 +24,8 @@ module.exports = {
         'OffchainReactions',
         'proposal_id',
         {
-          type: DataTypes.INTEGER,
+          type: DataTypes.STRING,
           allowNull: true,
-          references: {
-            model: 'ChainEntities',
-            key: 'id'
-          }
         }
       );
     });

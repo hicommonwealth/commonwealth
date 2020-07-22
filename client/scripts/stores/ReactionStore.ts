@@ -60,7 +60,6 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
   }
 
   public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AnyProposal | OffchainComment<any>) {
-    debugger
     if (rxnOrPost instanceof OffchainReaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
@@ -71,7 +70,6 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     } else if (rxnOrPost instanceof OffchainThread) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
-      debugger
       return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
     } else if (rxnOrPost instanceof OffchainComment) {
       return `comment-${rxnOrPost.id}`;
