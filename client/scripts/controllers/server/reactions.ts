@@ -2,13 +2,11 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import _ from 'lodash';
-import moment from 'moment-twitter';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 
 import { ReactionStore } from 'stores';
-import { OffchainReaction, IUniqueId, AnyProposal, OffchainComment, OffchainThread, Proposal } from 'models';
+import { OffchainReaction, AnyProposal, OffchainComment, OffchainThread, Proposal, ChainEntity } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 const modelFromServer = (reaction) => {
@@ -34,6 +32,7 @@ class ReactionsController {
   }
 
   public async create(address: string, post: any, reaction: string, chainId: string, communityId: string) {
+    debugger
     const options = {
       author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
@@ -45,7 +44,7 @@ class ReactionsController {
     console.log(options);
     console.log({ 'post instanceof Proposal': (post instanceof Proposal) });
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
-    else if (post instanceof Proposal) options['proposal_id'] = (post as AnyProposal).identifier;
+    else if (post instanceof Proposal) options['proposal_id'] = ((post as unknown) as ChainEntity).type + ((post as unknown) as ChainEntity).id;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
