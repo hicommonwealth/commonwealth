@@ -1,21 +1,8 @@
 @import 'client/styles/shared';
 
 .FeedbackModal {
-    .header {
-        background-color: #222;
-        color: white;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        padding-left: 32px;
-        font-size: 19px;
-        font-weight: 500;
-    }
     textarea {
         min-height: 90px;
-    }
-    button {
-        margin-bottom: 4px;
     }
     .error-message {
         margin: 10px 0;

@@ -25,6 +25,9 @@ $active-color: #ececec;
                 .cui-icon svg {
                     stroke: #111;
                 }
+                &:hover, &.cui-active {
+                    background: $background-color-light-hover;
+                }
                 .cui-icon-action {
                     position: absolute;
                     right: 0;
