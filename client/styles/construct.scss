@@ -88,10 +88,10 @@ $cui-base-height-xl:  floor($cui-base-size * 3.75);
 
 $cui-border-radius: 4px;
 
-$cui-base-bg-color:     #ffffff;
-$cui-primary-bg-color:  #4f62bd;
-$cui-positive-bg-color: #4caf50;
-$cui-negative-bg-color: #d4302f;
+$cui-base-bg-color: $base-bg-color;
+$cui-primary-bg-color: $primary-bg-color;
+$cui-positive-bg-color: $positive-bg-color;
+$cui-negative-bg-color: $negative-bg-color;
 
 $cui-base-bg-color-hover:         darken(#EAEAEC, 1.5%);
 $cui-base-bg-color-active:        darken(#EAEAEC, 6.5%);

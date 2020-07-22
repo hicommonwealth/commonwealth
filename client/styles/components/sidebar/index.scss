@@ -23,10 +23,17 @@ $active-color: #ececec;
                 padding: 4px 12px 5px;
                 line-height: 1.25;
                 .cui-icon svg {
-                    stroke: #111;
+                    stroke: $text-color-lighter;
                 }
-                &:hover, &.cui-active {
+                &:hover {
                     background: $background-color-light-hover;
+                }
+                &.cui-active, &.cui-active:hover {
+                    background: $primary-bg-color !important;
+                    color: #fff;
+                    .cui-icon svg {
+                        stroke: #fff;
+                    }
                 }
                 .cui-icon-action {
                     position: absolute;
