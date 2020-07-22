@@ -20,6 +20,8 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  let proposal;
+  let root_type;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new Error(Errors.NoPostId));
@@ -37,8 +39,12 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   else if (chain) options['chain'] = chain.id;
 
   if (thread_id) options['thread_id'] = thread_id;
-  else if (proposal_id) options['proposal_id'] = proposal_id;
-  else if (comment_id) options['comment_id'] = comment_id;
+  else if (proposal_id) {
+    proposal = await proposalIdToEntity(models, chain.id, proposal_id);
+    console.log(proposal);
+    root_type = 'PLACEHOLDER';
+    options['proposal_id'] = proposal.id;
+  } else if (comment_id) options['comment_id'] = comment_id;
 
   let finalReaction;
   let created;
@@ -58,8 +64,6 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
 
   let comment;
   let cwUrl;
-  let root_type;
-  let proposal;
   try {
     if (comment_id) {
       comment = await models.OffchainComment.findByPk(Number(comment_id));
@@ -74,10 +78,6 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       }
       cwUrl = getProposalUrl(prefix, proposal, comment);
       root_type = prefix;
-    } else if (proposal_id) {
-      proposal = await proposalIdToEntity(models, chain.id, proposal_id);
-      console.log(proposal);
-      root_type = 'PLACEHOLDER';
     } else if (thread_id) {
       proposal = await models.OffchainThread.findByPk(Number(thread_id));
       cwUrl = getProposalUrl('discussion', proposal, comment);

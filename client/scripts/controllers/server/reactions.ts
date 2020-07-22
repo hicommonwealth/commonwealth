@@ -44,7 +44,7 @@ class ReactionsController {
     console.log(options);
     console.log({ 'post instanceof Proposal': (post instanceof Proposal) });
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
-    else if (post instanceof Proposal) options['proposal_id'] = ((post as unknown) as ChainEntity).type + ((post as unknown) as ChainEntity).id;
+    else if (post instanceof Proposal) options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
     else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
