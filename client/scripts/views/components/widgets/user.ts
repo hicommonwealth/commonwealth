@@ -56,11 +56,11 @@ const User: m.Component<{
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = adminsAndMods.find((r) => r.address === address && r.chain_id === chainId);
+      role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = adminsAndMods.find((r) => r.address === account.address && r.chain_id === account.chain.id);
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
     }
     const roleTag = role ? m(Tag, {
       class: 'roleTag',
