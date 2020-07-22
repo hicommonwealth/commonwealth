@@ -3,14 +3,15 @@ import m from 'mithril';
 import {
   Breadcrumb, BreadcrumbItem,
   Icon, Icons,
-  Input,
+  Input, TextArea,
   Button, ButtonGroup,
   Card, Callout,
   Form, FormGroup, FormLabel,
   List, ListItem,
   Menu, MenuItem,
   PopoverMenu,
-  Switch, Checkbox, Radio,
+  Switch, Checkbox,
+  Radio, RadioGroup,
   Tabs, TabItem,
   Table
 } from 'construct-ui';
@@ -282,6 +283,39 @@ const Examples = {
         ]),
       ]),
 
+      // form in card
+      m('div', [
+        m(Card, [
+          m(Form, { gutter: 15 }, [
+            m(FormGroup, [
+              m(FormLabel, { for: 'name' }, 'Name'),
+              m(Input, {
+                id: 'name',
+                name: 'name',
+                placeholder: 'Name...'
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, { for: 'bio' }, 'Bio'),
+              m(TextArea, {
+                id: 'bio',
+                name: 'bio',
+                placeholder: 'Bio...'
+              })
+            ]),
+            m(FormGroup, [
+              m(FormLabel, { for: 'privacy' }, 'Privacy'),
+              m(RadioGroup, {
+                options: ['Public', 'Private'],
+                name: 'privacy',
+                onchange: (e) => { vnode.state.radioGroupSelected = (e.currentTarget as HTMLInputElement).value; },
+                value: vnode.state.radioGroupSelected,
+              }),
+            ]),
+          ]),
+        ]),
+      ]),
+
       // list
       m('div', [
         m(List, [ 'List item 1', 'List item 2', 'List item 3', 'List item 4' ].map(item => m(ListItem, {
@@ -311,6 +345,24 @@ const Examples = {
 
       // tabs
       m(Tabs, {
+        align: 'left',
+        bordered: true,
+        fluid: false,
+        size: 'default',
+      }, [
+        [ 'Accounts', 'Projects', 'Settings' ].map((item) => m(TabItem, {
+          label: [
+            item === 'Settings' && m(Icon, {
+              name: Icons.SETTINGS,
+              style: 'margin-right: 5px'
+            }),
+            item
+          ],
+          active: vnode.state.activeTab === item || (!vnode.state.activeTab && item === 'Accounts'),
+          onclick: () => { vnode.state.activeTab = item; },
+        }))
+      ]),
+      m(Tabs, {
         align: 'center',
         bordered: true,
         fluid: false,
@@ -324,7 +376,7 @@ const Examples = {
             }),
             item
           ],
-          active: vnode.state.activeTab === item,
+          active: vnode.state.activeTab === item || (!vnode.state.activeTab && item === 'Accounts'),
           onclick: () => { vnode.state.activeTab = item; },
         }))
       ]),

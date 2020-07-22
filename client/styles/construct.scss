@@ -95,7 +95,7 @@ $cui-negative-bg-color: #d4302f;
 $cui-base-bg-color-hover:         darken(#EAEAEC, 1.5%);
 $cui-base-bg-color-active:        darken(#EAEAEC, 6.5%);
 
-$cui-base-gradient:               $cui-base-bg-color;
+$cui-base-gradient:               linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 1%) 100%) !default;
 $cui-base-gradient-hover:         linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 2.5%) 100%) !default;
 $cui-base-gradient-active:        linear-gradient(180deg, $cui-base-bg-color 10.5%, darken($cui-base-bg-color, 3.5%) 100%) !default;
 $cui-base-border-color:           #EAEAEC;
@@ -229,7 +229,7 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 // reduce tab padding
 .cui-tabs {
     .cui-tabs-item {
-        padding: $cui-base-padding 0;
+        padding: ($cui-base-padding * 0.84) 0;
         margin: 0 ($cui-base-padding * 0.84);
     }
     @each $size in $cui-sizes {
@@ -263,13 +263,7 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
         min-height: $menu-item-height;
         height: $menu-item-height;
         line-height: $menu-item-height;
-    }
-    // other special cases
-    > .TagEditorButton > .cui-button.cui-basic {
-        color: #333;
-        .cui-icon svg {
-            stroke: #333;
-        }
+        font-weight: $cui-font-weight-normal !important; // !important to override the .cui-button style
     }
 }
 
@@ -309,4 +303,9 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
         position: relative;
         top: 1px;
     }
+}
+
+// form labels
+.cui-form .cui-form-label {
+    font-size: $cui-font-size;
 }
