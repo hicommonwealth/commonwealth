@@ -276,10 +276,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       ...additionalOptions,
     };
     const apiRx = new ApiRx(options);
-    const apiPromise = new ApiPromise(options);
     this._api = apiRx;
+    await this._api.isReady.toPromise();
+
+    // clone API as promise
+    const apiPromise = new ApiPromise({ source: apiRx, ...options });
     this._apiPromise = apiPromise;
-    return this._api.isReady.toPromise();
+    return this._api;
   }
 
   private _removeConnectedCb: () => void;

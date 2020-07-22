@@ -14,7 +14,7 @@
         display: flex;
         align-items: center;
         height: $header-height;
-        max-width: 1100px;
+        max-width: $layout-max-width;
 
         .placeholder,
         .header-breadcrumb {

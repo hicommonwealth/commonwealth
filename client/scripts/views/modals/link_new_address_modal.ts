@@ -771,14 +771,14 @@ const LinkNewAddressModal = {
             name: 'name',
             placeholder: 'Name',
             limit: 40,
-            oncreate: (vnode2) => {
+            oncreate: (vvnode) => {
               // prefill preexisting name, or default name
               if (vnode.state.newAddress && vnode.state.newAddress.profile && vnode.state.newAddress.profile.name) {
-                $(vnode2.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.name);
+                $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.name);
                 vnode.state.hasName = true;
                 m.redraw();
               } else if (vnode.state.newAddress.chain.network === 'near') {
-                $(vnode2.dom).find('input[type="text"]').val(vnode.state.newAddress.address);
+                $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.address);
                 vnode.state.hasName = true;
                 m.redraw();
               }
@@ -790,12 +790,12 @@ const LinkNewAddressModal = {
             name: 'headline',
             placeholder: 'Headline (optional)',
             limit: 80,
-            oncreate: (vnode2) => {
+            oncreate: (vvnode) => {
               // prefile preexisting headline
               if (vnode.state.newAddress && vnode.state.newAddress.profile) {
-                $(vnode2.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.headline);
+                $(vvnode.dom).find('input[type="text"]').val(vnode.state.newAddress.profile.headline);
               }
-              $(vnode2.dom).trigger('keyup');
+              $(vvnode.dom).trigger('keyup');
             },
             onkeyup: (e) => vnode.state.hasHeadline = !!e.target.value,
           }),
@@ -807,9 +807,9 @@ const LinkNewAddressModal = {
             class: 'new-profile-bio',
             name: 'bio',
             placeholder: 'Short Bio (optional)',
-            oncreate: (vnode2) => {
+            oncreate: (vvnode) => {
               if (vnode.state.newAddress && vnode.state.newAddress.profile)
-                $(vnode2.dom).val(vnode.state.newAddress.profile.bio);
+                $(vvnode.dom).val(vnode.state.newAddress.profile.bio);
             },
           }),
           m('.error-message', vnode.state.error),

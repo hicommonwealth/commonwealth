@@ -7,7 +7,7 @@ import $ from 'jquery';
 import { DropdownFormField, RadioSelectorFormField } from 'views/components/forms';
 import { notifySuccess } from 'controllers/app/notifications';
 import SettingsController from 'controllers/app/settings';
-import { selectNode } from 'app';
+import { selectNode, initChain } from 'app';
 import { NodeInfo } from 'models';
 import { Icon, Icons, Button, Input } from 'construct-ui';
 
@@ -40,6 +40,7 @@ const SettingsWell: m.Component<{}, IState> = {
             callback: async (result) => {
               const n: NodeInfo = app.config.nodes.getById(result);
               await selectNode(n);
+              await initChain();
               m.route.set(`/${n.chain.id}/settings`);
             },
           }),

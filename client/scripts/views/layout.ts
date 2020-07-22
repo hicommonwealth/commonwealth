@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { EmptyState, Icons } from 'construct-ui';
 
-import { initChain, initCommunity, deinitChainOrCommunity } from 'app';
+import { initChain, initCommunity, deinitChainOrCommunity, selectNode } from 'app';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import Header from 'views/components/header';
@@ -30,9 +30,11 @@ export const LoadingLayout: m.Component<{ wideLayout: boolean }> = {
   }
 };
 
-export const Layout: m.Component<{ scope: string, wideLayout?: boolean }, { loadingScope }> = {
+export const Layout: m.Component<{
+  scope: string, wideLayout?: boolean, deferChain?: boolean
+}, { loadingScope, deferred }> = {
   view: (vnode) => {
-    const { scope, wideLayout } = vnode.attrs;
+    const { scope, wideLayout, deferChain } = vnode.attrs;
     const scopeMatchesChain = app.config.nodes.getAll().find((n) => n.chain.id === scope);
     const scopeMatchesCommunity = app.config.communities.getAll().find((c) => c.id === scope);
 
@@ -72,12 +74,21 @@ export const Layout: m.Component<{ scope: string, wideLayout?: boolean }, { load
       // This happens only once, and then loadingScope should be set
       vnode.state.loadingScope = scope;
       if (scopeMatchesChain) {
-        initChain(scope);
+        vnode.state.deferred = deferChain;
+        selectNode(scopeMatchesChain, deferChain).then(() => {
+          if (!deferChain) {
+            initChain();
+          }
+        });
         return m(LoadingLayout, { wideLayout });
       } else if (scopeMatchesCommunity) {
         initCommunity(scope);
         return m(LoadingLayout, { wideLayout });
       }
+    } else if (scope && vnode.state.deferred && !deferChain) {
+      vnode.state.deferred = false;
+      initChain();
+      return m(LoadingLayout, { wideLayout });
     } else if (!scope && ((app.chain && app.chain.class) || app.community)) {
       // Handle the case where we unload the chain or community, if we're
       // going to a page that doesn't have one

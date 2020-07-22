@@ -44,6 +44,7 @@ const NewTagModal: m.Component<{
               class: 'tag-form-name',
               tabindex: 1,
               value: vnode.state?.form?.name,
+              autofocus: true,
             },
             callback: (value) => {
               vnode.state.form.name = value;

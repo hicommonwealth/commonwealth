@@ -2,7 +2,6 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -36,6 +35,10 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
   if (extraAttrs) Object.assign(attrs, extraAttrs);
   return m(selector, attrs, children);
 }
+
+/*
+ * general links
+ */
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');

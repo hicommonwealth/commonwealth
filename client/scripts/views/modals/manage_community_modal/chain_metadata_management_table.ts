@@ -3,12 +3,17 @@ import m from 'mithril';
 import { Button, Table } from 'construct-ui';
 
 import { ChainNetwork } from 'client/scripts/models';
+import { notifyError } from 'controllers/app/notifications';
 import { IChainOrCommMetadataManagementAttrs } from './community_metadata_management_table';
 import { InputPropertyRow, ManageRolesRow } from './metadata_rows';
 
 interface IChainMetadataManagementState {
   name: string;
   description: string;
+  website: string;
+  chat: string;
+  telegram: string;
+  github: string;
   url: string;
   loadingFinished: boolean;
   loadingStarted: boolean;
@@ -21,7 +26,10 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
   oninit: (vnode) => {
     vnode.state.name = vnode.attrs.chain.name;
     vnode.state.description = vnode.attrs.chain.description;
-    vnode.state.url = vnode.attrs.chain.id;
+    vnode.state.website = vnode.attrs.chain.website;
+    vnode.state.chat = vnode.attrs.chain.chat;
+    vnode.state.telegram = vnode.attrs.chain.telegram;
+    vnode.state.github = vnode.attrs.chain.github;
     vnode.state.iconUrl = vnode.attrs.chain.iconUrl;
     vnode.state.network = vnode.attrs.chain.network;
     vnode.state.symbol = vnode.attrs.chain.symbol;
@@ -46,28 +54,28 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
           textarea: true,
         }),
         m(InputPropertyRow, {
-          title: 'URL',
-          defaultValue: `commonwealth.im/${vnode.state.url}`,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.url = v; },
+          title: 'Website',
+          defaultValue: vnode.state.website,
+          placeholder: 'https://example.com',
+          onChangeHandler: (v) => { vnode.state.website = v; },
         }),
         m(InputPropertyRow, {
-          title: 'Network',
-          defaultValue: vnode.state.network,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.network = v; },
+          title: 'Chat',
+          defaultValue: vnode.state.chat,
+          placeholder: 'https://discord.com/invite',
+          onChangeHandler: (v) => { vnode.state.chat = v; },
         }),
         m(InputPropertyRow, {
-          title: 'Symbol',
-          defaultValue: vnode.state.symbol,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.symbol = v; },
+          title: 'Telegram',
+          defaultValue: vnode.state.telegram,
+          placeholder: 'https://t.me',
+          onChangeHandler: (v) => { vnode.state.telegram = v; },
         }),
         m(InputPropertyRow, {
-          title: 'Icon',
-          defaultValue: vnode.state.iconUrl,
-          disabled: true,
-          onChangeHandler: (v) => { vnode.state.iconUrl = v; },
+          title: 'Github',
+          defaultValue: vnode.state.github,
+          placeholder: 'https://github.com',
+          onChangeHandler: (v) => { vnode.state.github = v; },
         }),
         m('tr', [
           m('td', 'Admins'),
@@ -90,8 +98,13 @@ const ChainMetadataManagementTable: m.Component<IChainOrCommMetadataManagementAt
         label: 'Save changes',
         intent: 'primary',
         onclick: async (e) => {
-          await vnode.attrs.chain.updateChainData(vnode.state.name, vnode.state.description);
-          $(e.target).trigger('modalexit');
+          const { name, description, website, chat, telegram, github } = vnode.state;
+          try {
+            await vnode.attrs.chain.updateChainData(name, description, website, chat, telegram, github);
+            $(e.target).trigger('modalexit');
+          } catch (err) {
+            notifyError(err.responseJSON?.error || 'Chain update failed');
+          }
         },
       }),
     ]);

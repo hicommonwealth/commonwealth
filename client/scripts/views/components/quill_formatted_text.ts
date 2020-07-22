@@ -250,7 +250,7 @@ const QuillFormattedText : m.Component<{ doc, hideFormatting?, collapse? }> = {
     const { doc, hideFormatting, collapse } = vnode.attrs;
 
     return m('.QuillFormattedText', {
-      oncreate: (vnode2) => {
+      oncreate: (vvnode) => {
         if (!(<any>window).twttr) loadScript('//platform.twitter.com/widgets.js')
           .then(() => { console.log('Twitter Widgets loaded'); });
       }

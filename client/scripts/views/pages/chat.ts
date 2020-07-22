@@ -135,7 +135,7 @@ const Chat = {
                 class: vnode.state.chat.isConnected ? '' : 'disabled',
                 disabled: !vnode.state.chat.isConnected,
                 placeholder: vnode.state.chat.isConnected ? 'Enter a message...' : 'Disconnected',
-                oncreate: (vnode2) => $(vnode2.dom).focus(),
+                oncreate: (vvnode) => $(vvnode.dom).focus(),
                 oninput: vnode.state.outgoingTypingInputHandler,
                 onkeydown: (e) => {
                   // collapse on escape
