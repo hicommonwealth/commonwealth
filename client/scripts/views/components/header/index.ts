@@ -19,13 +19,11 @@ const Header: m.Component<{}> = {
           m(CommunitySelector),
         ]),
         // new proposal
-        m(NewProposalButton, { fluid: false, dark: true }),
+        m(NewProposalButton, { fluid: false }),
         // notifications menu
         app.isLoggedIn() && m(NotificationsMenu),
         // invites menu
         app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
-          class: 'cui-button-dark',
-          size: 'sm',
           iconLeft: Icons.MAIL,
           onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
         }),

@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
-import { Tooltip, Tag } from 'construct-ui';
+import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
@@ -178,7 +178,7 @@ export const UserBlock: m.Component<{
         ]),
       ]),
       m('.user-block-right', [
-        m('.user-block-selected', selected ? '✓' : ''),
+        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
     ]);
   }

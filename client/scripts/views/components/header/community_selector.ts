@@ -160,9 +160,7 @@ const CommunitySelector = {
             hasArrow: false
           },
           trigger: m(Button, {
-            size: 'sm',
             iconLeft: Icons.GLOBE,
-            class: 'cui-button-dark',
           }),
         }),
       ]),

@@ -238,7 +238,7 @@ const Examples = {
       // card
       m('div', [
         m(Card, {
-          elevation: 1,
+          elevation: 0,
           fluid: true,
           interactive: true,
           size: 'default',

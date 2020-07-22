@@ -19,7 +19,7 @@ const EmptyChannelPlaceholder: m.Component<{ tagName?: string, communityName?: s
           : [ m('strong', communityName), ' community!' ]
       ]),
       m('p', 'There are no posts here yet.'),
-      m(NewProposalButton, { fluid: false, threadOnly: true, large: true }),
+      m(NewProposalButton, { fluid: false, threadOnly: true }),
     ]);
   }
 };

@@ -75,9 +75,9 @@ $cui-text-disabled:            $grey200;
 
 $cui-base-height-multiplier: 1;
 
-$cui-base-height-xs:  floor($cui-base-size * 2.35);
-$cui-base-height-sm:  floor($cui-base-size * 2.65);
-$cui-base-height:     floor($cui-base-size * 3);
+$cui-base-height-xs:  floor($cui-base-size * 2.25);
+$cui-base-height-sm:  floor($cui-base-size * 2.5);
+$cui-base-height:     floor($cui-base-size * 2.9);
 $cui-base-height-lg:  floor($cui-base-size * 3.3);
 $cui-base-height-xl:  floor($cui-base-size * 3.75);
 
@@ -207,6 +207,16 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
         &:active, &.cui-active {
             background: #EAEAEC;
             color: $cui-base-text-color;
+        }
+    }
+}
+
+// adjust card padding
+.cui-card {
+    padding-bottom: floor($cui-base-padding * 1.25) * 1.2;
+    @each $size in $cui-sizes {
+        &.cui-#{$size} {
+            padding-bottom: floor(map-get($cui-padding-map, $size) * 1.25) * 1.2;
         }
     }
 }
