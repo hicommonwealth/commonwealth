@@ -16,7 +16,7 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     super.add(reaction);
     this.getAll().sort(byAscendingCreationDate);
     const identifier = this.getPostIdentifier(reaction);
-
+    console.log(identifier);
     if (!this._storePost[identifier]) {
       this._storePost[identifier] = [];
     }
@@ -60,16 +60,19 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
   }
 
   public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AnyProposal | OffchainComment<any>) {
+    debugger
     if (rxnOrPost instanceof OffchainReaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`
-        : `${proposalId}` || `comment-${commentId}`;
+        : proposalId
+          ? `${proposalId}`
+          : `comment-${commentId}`;
     } else if (rxnOrPost instanceof OffchainThread) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
       debugger
-      return `${(rxnOrPost as AnyProposal).slug}-${(rxnOrPost as AnyProposal).identifier}`;
+      return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
     } else if (rxnOrPost instanceof OffchainComment) {
       return `comment-${rxnOrPost.id}`;
     }

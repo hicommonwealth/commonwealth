@@ -42,6 +42,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   else if (proposal_id) {
     proposal = await proposalIdToEntity(models, chain.id, proposal_id);
     console.log(proposal);
+    if (!proposal) return next(new Error(Errors.NoProposalMatch));
     root_type = proposal_id.split('_')[0];
     options['proposal_id'] = proposal.id;
   } else if (comment_id) options['comment_id'] = comment_id;

@@ -43,7 +43,7 @@ class ReactionsController {
 
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}-${(post as AnyProposal).identifier}`;
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
     } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
@@ -64,7 +64,7 @@ class ReactionsController {
     // TODO: ensure identifier vs id use is correct; see also create method
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}-${(post as AnyProposal).identifier}`;
+      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
     } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
