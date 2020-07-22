@@ -4053,9 +4053,9 @@ constants-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
   integrity sha1-wguW2MYXdIqvHBYCF2DNJ/y4y3U=
 
-construct-ui@raykyri/construct-ui#12fea60cf2e7ea155c5e5b145a31fdc680cd4be3:
+construct-ui@raykyri/construct-ui#6b207641dcca8c3e0d9560cc7584f05ac17137fe:
   version "0.2.5"
-  resolved "https://codeload.github.com/raykyri/construct-ui/tar.gz/12fea60cf2e7ea155c5e5b145a31fdc680cd4be3"
+  resolved "https://codeload.github.com/raykyri/construct-ui/tar.gz/6b207641dcca8c3e0d9560cc7584f05ac17137fe"
   dependencies:
     classnames "^2.2.6"
     enquire.js "^2.1.6"
