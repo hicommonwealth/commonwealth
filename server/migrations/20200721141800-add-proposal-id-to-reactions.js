@@ -9,7 +9,7 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: 'ChainEntity',
+          model: 'ChainEntities',
           key: 'id',
         }
       },
@@ -31,7 +31,7 @@ module.exports = {
           type: DataTypes.INTEGER,
           allowNull: true,
           references: {
-            model: 'ChainEntity',
+            model: 'ChainEntities',
             key: 'id'
           }
         }
