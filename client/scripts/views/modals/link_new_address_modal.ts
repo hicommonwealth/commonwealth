@@ -184,10 +184,10 @@ const LinkNewAddressModal = {
       });
 
       return m('.LinkNewAddressModal', [
+        m('.compact-modal-title', [
+          m('h3', 'Select a network')
+        ]),
         m('.link-address-step', [
-          m('.link-address-step-header', [
-            m('h3', 'Select a network')
-          ]),
           m('.chains', [
             Object.entries(chains).map(([chain, nodeList] : [string, any]) => m('.chain-card', {
               class: (nodeList[0].chain.network === ChainNetwork.Cosmos

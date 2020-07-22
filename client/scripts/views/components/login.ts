@@ -8,8 +8,6 @@ import app from 'state';
 import { ChainBase } from 'models';
 
 interface IAttrs {
-  creatingAccount?: boolean;
-  hideHeader?: boolean;
 }
 
 interface IState {
@@ -22,7 +20,6 @@ interface IState {
 
 const Login: m.Component<IAttrs, IState> = {
   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    const { hideHeader, creatingAccount } = vnode.attrs;
 
     if (app.chain && app.chain.base === ChainBase.NEAR && !vnode.state.forceRegularLogin) {
       return m('.Login', {
@@ -30,7 +27,6 @@ const Login: m.Component<IAttrs, IState> = {
           e.stopPropagation();
         }
       }, [
-        !hideHeader && m('h4', 'Log in or sign up'),
         m(Button, {
           class: 'login-button-black',
           onclick: async (e) => {
@@ -76,7 +72,6 @@ const Login: m.Component<IAttrs, IState> = {
         e.stopPropagation();
       }
     }, [
-      !hideHeader && m('h4', creatingAccount ? 'Create account' : 'Log in or create account'),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 9 }, [
           m(Input, {
@@ -123,16 +118,13 @@ const Login: m.Component<IAttrs, IState> = {
                 m.redraw();
               });
             },
-            label: creatingAccount
-              ? (vnode.state.disabled ? 'Creating account...' : 'Sign up')
-              : (vnode.state.disabled ? 'Logging in...' : 'Log in')
+            label: 'Go',
+            loading: vnode.state.disabled,
           }),
         ])
       ]),
       vnode.state.success && m('.login-message.success', [
-        creatingAccount
-          ? 'Check your email to finish creating your account.'
-          : 'Check your email to finish logging in.'
+        'Check your email to continue.'
       ]),
       vnode.state.failure && m('.login-message.failure', [
         vnode.state.error || 'An error occurred.'
@@ -151,7 +143,7 @@ const Login: m.Component<IAttrs, IState> = {
                 path: m.route.get()
               }));
             },
-            label: creatingAccount ? 'Sign up with Github' : 'Log in with Github'
+            label: 'Continue with Github'
           }),
         ]),
       ]),
@@ -166,9 +158,7 @@ const Login: m.Component<IAttrs, IState> = {
               app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
               $(e.target).trigger('menuclose');
             },
-            label: creatingAccount
-              ? `Sign up with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`
-              : `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
+            label: `Continue with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`,
           }),
         ]),
       ]),

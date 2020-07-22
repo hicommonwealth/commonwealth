@@ -10,6 +10,8 @@ $discussion-comment-padding: 28px; // padding between comment content & avatar
 $discussion-meta-font-size: 1rem;
 $discussion-meta-color: #999;
 
+$discussion-title-font-size: 1.45rem;
+
 @mixin supports-jump-highlight() {
   &.highlighted {
     background-color: #ffd;
@@ -83,7 +85,7 @@ $discussion-meta-color: #999;
             margin: 4px 0 2px;
             .ProposalHeaderTitle {
                 display: inline;
-                font-size: 1.45rem;
+                font-size: $discussion-title-font-size;
                 font-weight: 500;
                 flex: 1;
                 line-height: 1.15;
