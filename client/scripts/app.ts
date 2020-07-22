@@ -370,7 +370,7 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notification-settings':    importRoute('views/pages/notification-settings', { scoped: false }),
+    '/:scope/notification-settings': importRoute('views/pages/notification-settings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
