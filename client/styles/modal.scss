@@ -50,13 +50,13 @@
         }
     }
     .compact-modal-body {
-        padding: 16px 28px 0;
+        padding: 20px 28px 0;
         &:last-child {
-            padding-bottom: 16px;
+            padding-bottom: 18px;
         }
     }
     .compact-modal-actions {
-        padding: 6px 28px 28px;
+        padding: 2px 28px 28px;
     }
     @include xs-max {
         .compact-modal-title {
