@@ -239,7 +239,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
 
     const getTagRow = (id, name, description) => m(ListItem, {
       key: id,
-      contentLeft: m('.tag-icon', { style: 'background: #72b483' }),
+      contentLeft: m('.proposal-tag-icon'),
       contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}` && [
         m(PopoverMenu, {
           class: 'sidebar-edit-tag',

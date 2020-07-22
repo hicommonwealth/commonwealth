@@ -1,5 +1,12 @@
 @import 'client/styles/shared';
 
+.tag-selection-drop-menu {
+    @include proposal-tag-inline;
+    .proposal-tag-icon {
+        margin-right: 8px;
+    }
+}
+
 .TagSelector {
     .no-matching-tags {
         max-width: 190px;
@@ -9,6 +16,10 @@
         min-width: 178px;
         .cui-list {
             border-radius: 3px;
+            @include proposal-tag-inline;
+            .proposal-tag-icon {
+                margin-right: 9px;
+            }
         }
     }
 }

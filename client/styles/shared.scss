@@ -1,4 +1,7 @@
-@import 'construct-ui/src/_shared/_colors';
+$base-bg-color:     #ffffff;
+$primary-bg-color:  #4f62bd;
+$positive-bg-color: #4caf50;
+$negative-bg-color: #d4302f;
 
 $fonts: Metric, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: 'iA Writer Duospace', monospace;
@@ -32,8 +35,8 @@ $form-active-color: #08c;
 
 // default styles
 $badge-red: #de243b;    // radish red for badges
-$error-red: $red800;
-$success-green: $light_green800;
+$error-red: $negative-bg-color;
+$success-green: $positive-bg-color;
 $primary-green: #41a360;
 $lighttextgrey: #999;
 $electricblue: #229bd6;
@@ -79,7 +82,7 @@ $menu-item-height: 30px;
 
 @mixin error-text {
     font-weight: 600;
-    color: $red600;
+    color: $negative-bg-color;
 }
 @mixin success-text {
     font-weight: 700;
@@ -339,11 +342,11 @@ $menu-item-height: 30px;
 @mixin proposal-tag-inline {
     .proposal-tag-icon {
         display: inline-block;
+        background: transparent;
+        border: 1.5px solid $text-color-lightest;
+        border-radius: 99px;
         width: 9px;
         height: 9px;
-        border-radius: 2px;
-        background: #eee;
-        margin-left: 1px;
-        margin-right: 8px;
+        margin-right: 6px;
     }
 }

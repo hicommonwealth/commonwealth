@@ -55,7 +55,7 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
 
     return m('.ProposalHeaderTags', [
       link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-        m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+        m('span.proposal-tag-icon'),
         m('span.proposal-tag-name', `${proposal.tag?.name}`),
       ]),
     ]);

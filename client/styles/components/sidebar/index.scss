@@ -20,7 +20,7 @@ $active-color: #ececec;
                 font-weight: 500;
                 border: none;
                 border-radius: 3px;
-                padding: 5px 12px;
+                padding: 4px 12px 5px;
                 line-height: 1.25;
                 .cui-icon svg {
                     stroke: #111;
@@ -106,13 +106,6 @@ $active-color: #ececec;
     .NavigationModule {
     }
     .TagsModule {
-        .tag-icon {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            background: $background-color-light-hover;
-            margin: 1px 3px;
-        }
         > .cui-list {
             .cui-list.more-tags-list {
                 border-top: 1px solid $background-color-light-hover;
@@ -121,6 +114,13 @@ $active-color: #ececec;
                 max-height: 230px;
                 margin-bottom: -10px;
             }
+        }
+
+        // tag icons
+        @include proposal-tag-inline;
+        .proposal-tag-icon {
+            margin-right: 0;
+            border-color: $background-color-placeholder;
         }
     }
     .MembersModule {
