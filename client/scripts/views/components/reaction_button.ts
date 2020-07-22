@@ -105,6 +105,8 @@ const ReactionButton: m.Component<IAttrs, IState> = {
       m('.reactions-icon', '👍'),
       m('.reactions-count', likes.length),
     ]);
+    // const a = app;
+    // debugger
 
     return (tooltip && reactors.length)
       ? m(Tooltip, {

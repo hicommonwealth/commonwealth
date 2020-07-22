@@ -42,7 +42,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   else if (proposal_id) {
     proposal = await proposalIdToEntity(models, chain.id, proposal_id);
     console.log(proposal);
-    root_type = 'PLACEHOLDER';
+    root_type = proposal_id.split('_')[0];
     options['proposal_id'] = proposal.id;
   } else if (comment_id) options['comment_id'] = comment_id;
 
@@ -106,9 +106,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
 
   const location = thread_id
     ? `discussion_${thread_id}`
-    : proposal_id
-      ? `PLACEHOLDER_${proposal_id}`
-      : `comment-${comment_id}`;
+    : proposal_id || `comment-${comment_id}`;
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,

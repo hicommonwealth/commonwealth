@@ -40,11 +40,10 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
-    console.log(options);
-    console.log({ 'post instanceof Proposal': (post instanceof Proposal) });
+
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
     else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}_${(post as AnyProposal).identifier}`;
+      options['proposal_id'] = `${(post as AnyProposal).slug}-${(post as AnyProposal).identifier}`;
     } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
@@ -64,8 +63,9 @@ class ReactionsController {
     const options = { chain: chainId, community: communityId };
     // TODO: ensure identifier vs id use is correct; see also create method
     if (post instanceof OffchainThread) options['thread_id'] = (post as OffchainThread).id;
-    else if (post instanceof Proposal) options['proposal_id'] = (post as AnyProposal).identifier;
-    else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
+    else if (post instanceof Proposal) {
+      options['proposal_id'] = `${(post as AnyProposal).slug}-${(post as AnyProposal).identifier}`;
+    } else if (post instanceof OffchainComment) options['comment_id'] = (post as OffchainComment<any>).id;
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'

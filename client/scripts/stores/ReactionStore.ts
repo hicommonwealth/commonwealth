@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { OffchainReaction, AnyProposal, OffchainThread, OffchainComment } from '../models';
+import { OffchainReaction, AnyProposal, OffchainThread, OffchainComment, Proposal } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 import { IUniqueId } from '../models/interfaces';
 
@@ -64,11 +64,12 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`
-        : proposalId
-          ? 'PLACEHOLDER'
-          : `comment-${commentId}`;
+        : `${proposalId}` || `comment-${commentId}`;
     } else if (rxnOrPost instanceof OffchainThread) {
       return `discussion-${rxnOrPost.id}`;
+    } else if (rxnOrPost instanceof Proposal) {
+      debugger
+      return `${(rxnOrPost as AnyProposal).slug}-${(rxnOrPost as AnyProposal).identifier}`;
     } else if (rxnOrPost instanceof OffchainComment) {
       return `comment-${rxnOrPost.id}`;
     }
