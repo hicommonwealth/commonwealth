@@ -54,7 +54,7 @@ const labelMaker = (subscription: NotificationSubscription) => {
       : null;
   switch (subscription.category) {
     case (NotificationCategories.NewComment): {
-      console.dir(subscription);
+      // console.dir(subscription);
       const threadOrComment = subscription.OffchainThread
         ? subscription.OffchainThread.title
         : subscription.OffchainComment
@@ -72,7 +72,7 @@ const labelMaker = (subscription: NotificationSubscription) => {
     }
     case (NotificationCategories.NewReaction): {
       const threadOrComment = subscription.OffchainThread
-        ? subscription.OffchainThread.id
+        ? subscription.OffchainThread.title
         : subscription.OffchainComment
           ? subscription.OffchainComment.id
           : subscription.objectId;
@@ -388,7 +388,6 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
     );
-    console.dir(filteredSubscriptions);
     return [
       m(NewThreadRow, { community, subscriptions }),
       filteredSubscriptions.map((subscription) => {
@@ -657,12 +656,10 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     $.post(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
-      console.dir(result.result);
       vnode.state.subscriptions = [];
       result.result.forEach((sub) => {
         vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
       });
-      console.dir(vnode.state.subscriptions);
       m.redraw();
     }, (error) => {
       m.route.set('/');
