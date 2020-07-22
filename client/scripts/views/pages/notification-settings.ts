@@ -148,8 +148,6 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
         m(Checkbox, {
           checked: subscription && subscription.isActive,
           size: 'lg',
-          // label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
-          // iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
           onchange: async (e) => {
             e.preventDefault();
             if (subscription && subscription.isActive) {
@@ -168,8 +166,6 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
           disabled: !subscription?.isActive,
           checked: subscription?.isActive && subscription?.immediateEmail,
           size: 'lg',
-          // label: subscription && subscription.isActive ? 'Notification on' : 'Notifications off',
-          // iconLeft: subscription && subscription.isActive ? Icons.BELL : Icons.BELL_OFF,
           onchange: async (e) => {
             e.preventDefault();
             if (subscription && subscription.immediateEmail) {
