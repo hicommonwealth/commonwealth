@@ -16,7 +16,6 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     super.add(reaction);
     this.getAll().sort(byAscendingCreationDate);
     const identifier = this.getPostIdentifier(reaction);
-    console.log(identifier);
     if (!this._storePost[identifier]) {
       this._storePost[identifier] = [];
     }

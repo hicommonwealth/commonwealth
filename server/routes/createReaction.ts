@@ -41,7 +41,6 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
     proposal = await proposalIdToEntity(models, chain.id, proposal_id);
-    console.log(proposal);
     if (!proposal) return next(new Error(Errors.NoProposalMatch));
     root_type = proposal_id.split('_')[0];
     options['proposal_id'] = proposal_id;

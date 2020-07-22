@@ -7,8 +7,8 @@ import { MolochEntityKind } from '../../shared/events/moloch/types';
 export default async function (models, chain: string, identifier: string) {
   console.log(`Looking up proposal: ${chain}: ${identifier}`);
   const [ prefix, type_id ] = identifier.split('_');
-  const findEntity = (type_) => {
-    return models.ChainEntity.findOne({ where: { chain, type: type_, type_id } });
+  const findEntity = (type) => {
+    return models.ChainEntity.findOne({ where: { chain, type, type_id } });
   };
   switch (prefix) {
     case 'referendum': {
