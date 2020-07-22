@@ -28,8 +28,7 @@ const ProfileCommentGroup : m.Component<IProfileCommentGroupAttrs> = {
           hideAvatar: true,
           tooltip: true
         }),
-        ' commented on ',
-        link('a', `/${(proposal.chain || proposal.community)}/proposal/${slug}/${identifier}-${slugify(title)}`, 'Loading...'),
+        ' commented',
       ]),
       m('.activity', [
         comments.map((comment) => m('.proposal-comment', [
