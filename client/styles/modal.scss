@@ -27,34 +27,19 @@
         border-radius: 3px;
         z-index: 20;
     }
-    .modal-title {
-        padding: 20px 28px 19px;
-        border-bottom: 1px solid #eee;
-    }
-    .modal-title h1,
-    .modal-title h2,
-    .modal-title h3 {
-        font-size: 19px;
-        font-weight: 500;
-        margin: 0;
-        padding: 0;
-    }
-    .modal-body {
-        padding: 28px;
-        border-bottom: 1px solid #eee;
-    }
-    .modal-actions {
-        padding: 22px 28px;
-        float: right;
+    @include xs-max {
+        .popup {
+            min-width: 310px;
+        }
     }
 
     .compact-modal-title {
         padding: 18px 27px;
-        background: #272524;
+        background: #4f63be;
         color: #fff;
         line-height: 1.2;
         h1, h2, h3 {
-            font-size: 17px;
+            font-size: 1.1rem;
             font-weight: 500;
             margin: 0;
             padding: 0;
@@ -74,9 +59,6 @@
         padding: 6px 28px 28px;
     }
     @include xs-max {
-        .popup {
-            min-width: 310px;
-        }
         .compact-modal-title {
             padding: 14px 20px 12px;
             h1, h2, h3 {
@@ -91,22 +73,15 @@
     }
 }
 
-.ModalExitButton,
 .CompactModalExitButton {
     position: absolute;
-    top: 13px;
-    right: 22px;
-    font-size: 22px;
+    top: 0.35em;
+    right: 0.75em;
+    font-size: 1.65rem;
     cursor: pointer;
+    color: #fff;
     opacity: 0.4;
     &:hover {
         opacity: 0.6;
     }
-}
-
-.ModalExitButton {
-    color: #777;
-}
-.CompactModalExitButton {
-    color: #fff;
 }
