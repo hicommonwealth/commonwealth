@@ -18,6 +18,7 @@
     "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
     "start": "nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project tsconfig.node.json' server.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
+    "migrate-events": "NO_CLIENT=true RUN_ENTITY_MIGRATION=all ts-node --project tsconfig.node.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "reset-server": "NO_CLIENT=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "update-events": "UPDATE_EVENTS=true ts-node --project tsconfig.node.json server.ts",
