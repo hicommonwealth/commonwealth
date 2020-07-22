@@ -37,7 +37,7 @@ export default (
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     chain: { type: dataTypes.INTEGER, allowNull: true },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
-    proposal_id: { type: dataTypes.STRING, allowNull: true },
+    proposal_id: { type: dataTypes.INTEGER, allowNull: true },
     comment_id: { type: dataTypes.INTEGER, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     reaction: { type: dataTypes.STRING, allowNull: false },
