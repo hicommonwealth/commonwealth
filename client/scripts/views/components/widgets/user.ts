@@ -94,7 +94,7 @@ const User: m.Component<{
             linkify
               ? link(`a.user-display-name${
                 (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-              profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
@@ -117,7 +117,7 @@ const User: m.Component<{
           ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
