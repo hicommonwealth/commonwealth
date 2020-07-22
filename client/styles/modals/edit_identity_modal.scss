@@ -10,7 +10,7 @@
         align-items: center;
         padding-left: 32px;
         font-size: 19px;
-        font-weight: 700;
+        font-weight: 500;
     }
     .form {
         padding: 20px 32px 32px;
@@ -40,7 +40,7 @@
     }
     .error-message {
         color: $error-red;
-        font-weight: bold;
+        font-weight: 500;
         margin-top: 16px;
     }
 }

@@ -4,7 +4,7 @@
  * make sure you copy the url from the website since the url may change between versions.
  * */
 .toast-title {
-  font-weight: bold;
+  font-weight: 500;
 }
 .toast-message {
   -ms-word-wrap: break-word;
@@ -24,7 +24,7 @@
   top: -0.3em;
   float: right;
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 500;
   color: #FFFFFF;
   -webkit-text-shadow: 0 1px 0 #ffffff;
   text-shadow: 0 1px 0 #ffffff;

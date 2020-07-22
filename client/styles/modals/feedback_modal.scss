@@ -9,7 +9,7 @@
         align-items: center;
         padding-left: 32px;
         font-size: 19px;
-        font-weight: 700;
+        font-weight: 500;
     }
     textarea {
         min-height: 90px;
@@ -19,12 +19,12 @@
     }
     .error-message {
         margin: 10px 0;
-        font-weight: 700;
+        font-weight: 500;
         color: $error-red;
     }
     .success-message {
         margin: 10px 0;
-        font-weight: 700;
+        font-weight: 500;
         color: $success-green;
     }
 }

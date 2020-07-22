@@ -7,7 +7,7 @@
     }
     .proposal-status {
         color: #999;
-        font-weight: 700;
+        font-weight: 500;
         &.pass {
             color: #06983a;
         }
@@ -17,7 +17,7 @@
     }
     .proposal-comments {
         display: inline-block;
-        font-weight: 700;
+        font-weight: 500;
         color: #999;
     }
 }
@@ -83,7 +83,7 @@
     // left
     .proposal-row-left {
         .proposal-display-id {
-            font-weight: 700;
+            font-weight: 500;
             font-size: 16px;
             line-height: 1.2;
         }
@@ -116,7 +116,7 @@
         }
 
         .proposal-row-metadata {
-            font-weight: 600;
+            font-weight: 500;
             min-width: 90px;
 
             @include xs-max {
