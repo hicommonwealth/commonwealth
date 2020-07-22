@@ -38,7 +38,7 @@ import {
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
+  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
@@ -402,7 +402,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     };
 
     return m('.ProposalComments', {
-      oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; },
+      class: app.user.activeAccount ? '' : 'no-active-account',
+      oncreate: (vvnode) => { vnode.state.dom = vvnode.dom; },
     }, [
       // show comments
       comments

@@ -37,7 +37,7 @@ export default class MolochGovernance extends ProposalModule<
 
   private _api: MolochAPI;
   private _Members: MolochMembers;
-  private _useClientChainEntities: boolean;
+  private _usingServerChainEntities: boolean;
 
   // GETTERS
   public get proposalCount() { return this._proposalCount; }
@@ -55,16 +55,16 @@ export default class MolochGovernance extends ProposalModule<
   }
 
   public get api() { return this._api; }
-  public get useClientChainEntities() { return this._useClientChainEntities; }
+  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // INIT / DEINIT
   public async init(
     api: MolochAPI,
     Members: MolochMembers,
-    useClientChainEntities = true,
+    usingServerChainEntities = false,
   ) {
     this._Members = Members;
-    this._useClientChainEntities = useClientChainEntities;
+    this._usingServerChainEntities = usingServerChainEntities;
     this._api = api;
     this._guildBank = await this._api.Contract.guildBank();
 
@@ -78,7 +78,7 @@ export default class MolochGovernance extends ProposalModule<
     this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
 
     // fetch all proposals
-    if (!this._useClientChainEntities) {
+    if (this._usingServerChainEntities) {
       console.log('Fetching moloch proposals from backend.');
       await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
       const entities = this.app.chain.chainEntities.store.getByType(MolochEntityKind.Proposal);

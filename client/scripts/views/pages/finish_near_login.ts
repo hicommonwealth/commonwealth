@@ -1,6 +1,6 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import nearlib from 'nearlib';
+import * as nearlib from 'nearlib';
 
 import app from 'state';
 import { initAppState } from 'app';

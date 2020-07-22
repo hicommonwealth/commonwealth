@@ -1,34 +1,34 @@
 import 'components/tag_selector.scss';
 
 import m from 'mithril';
-import { SelectList, ListItem, Colors, Button, Icons, List } from 'construct-ui';
+import { SelectList, ListItem, Callout, Colors, Button, Icons, List } from 'construct-ui';
 
+import app from 'state';
+import NewTagModal from 'views/modals/new_tag_modal';
 import { OffchainTag } from 'models';
-import { symbols } from 'helpers';
 
 const TagSelector: m.Component<{
-  tags: OffchainTag[];
+  activeTag?: OffchainTag | string | boolean;
   featuredTags: OffchainTag[];
-  activeTag?: OffchainTag | string;
   tabindex?: number;
+  tags: OffchainTag[];
   updateFormData: Function;
-  updateParentErrors?: Function;
 }, {
   error: string;
-  selectedTag: OffchainTag | string;
+  selectedTag?: OffchainTag | string;
 }> = {
-  oninit: (vnode) => {
-    const { activeTag } = vnode.attrs;
-    if (activeTag) (vnode.state.selectedTag as any) = activeTag;
-  },
   view: (vnode) => {
-    const { featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
+    const { activeTag, featuredTags, tabindex, tags, updateFormData } = vnode.attrs;
+    if (activeTag === false) {
+      delete vnode.state.selectedTag;
+    } else if (activeTag) {
+      (vnode.state.selectedTag as any) = activeTag;
+    }
 
     const itemRender = (tag) => {
       return m(ListItem, {
         class: featuredTags.includes(tag) ? 'featured-tag' : 'other-tag',
-        // contentLeft: m('.tagItem', `# ${tag.name}`),
-        label: `# ${tag.name}`,
+        label: tag.name,
         selected: (vnode.state.selectedTag as OffchainTag)?.name === tag.name,
       });
     };
@@ -61,25 +61,19 @@ const TagSelector: m.Component<{
         .concat(tags_.filter((tag) => !featuredTags.includes(tag)).sort((a, b) => a.name > b.name ? 1 : -1));
     };
 
-    const EmptyContent: m.Component<{}, {}> = {
-      view: (vnode_) => {
-        return m('a.no-matching-tags', {
-          href: '#',
-          onclick: () => addTag(),
-        }, 'No matches found. Add tag?');
-      }
-    };
-
     return m(SelectList, {
       class: 'TagSelector',
       filterable: false,
       checkmark: false,
       closeOnSelect: true,
-      emptyContent: m(EmptyContent),
-      inputAttrs: {
-        class: 'autocomplete-tag-input',
-        placeholder: 'Select a tag...',
-      },
+      emptyContent: [
+        m(Callout, {
+          class: 'no-matching-tags',
+          icon: Icons.ALERT_TRIANGLE,
+          intent: 'negative',
+          content: 'This community has not been configured with tags yet',
+        }),
+      ],
       itemPredicate,
       itemRender,
       items: sortTags(tags),
@@ -92,7 +86,7 @@ const TagSelector: m.Component<{
         label: vnode.state.selectedTag
           ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
           : '',
-        sublabel: vnode.state.selectedTag ? '' : 'Select a tag (required)',
+        sublabel: vnode.state.selectedTag ? '' : 'Select a tag',
         tabindex
       }),
     });
