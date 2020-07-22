@@ -13,13 +13,13 @@ $discussion-meta-color: #999;
 $discussion-title-font-size: 1.45rem;
 
 @mixin supports-jump-highlight() {
-  &.highlighted {
-    background-color: #ffd;
-  }
-  &.highlighted.highlightAnimationComplete {
-    background-color: #fff;
-    transition: background-color 1s ease-in-out;
-  }
+    &.highlighted {
+        background-color: #ffd;
+    }
+    &.highlighted.highlightAnimationComplete {
+        background-color: #fff;
+        transition: background-color 1s ease-in-out;
+    }
 }
 
 .ViewProposalPage {
@@ -194,8 +194,8 @@ $discussion-title-font-size: 1.45rem;
         position: absolute;
         top: 48px;
         bottom: -40px;
-        background: #efefef;
-        left: 17px;
+        background: $background-color-light;
+        left: 19px;
         width: 2px;
         z-index: -1;
     }

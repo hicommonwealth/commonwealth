@@ -21,11 +21,12 @@
         border-color: $background-color-border !important;
     }
     .reactions-icon {
-        padding: 4px 0 3px;
-        padding-left: 9px;
+        padding: 2px 0;
+        padding-left: 8px;
+        margin-right: -3px;
     }
     .reactions-count {
-        padding: 4px 6px 3px 2px;
+        padding: 2px 4px 2px 0px;
         min-width: 26px;
         font-weight: 500;
         text-align: center;

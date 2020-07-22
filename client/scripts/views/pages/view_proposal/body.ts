@@ -54,7 +54,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
         user: author,
         tooltip: true,
         avatarOnly: true,
-        avatarSize: 36,
+        avatarSize: 40,
       }),
     ]);
   }
