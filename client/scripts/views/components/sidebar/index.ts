@@ -221,6 +221,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
         featuredTagListItems.length === 0 && otherTagListItems.length === 0 && m(ListItem, {
           class: 'section-callout',
           label: m(Callout, {
+            size: 'sm',
             intent: 'negative',
             icon: Icons.ALERT_TRIANGLE,
             content: 'This community has not been configured with tags yet',

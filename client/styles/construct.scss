@@ -142,9 +142,6 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 .cui-button {
     font-weight: $cui-font-weight-bold !important; // fix weight
 }
-.cui-callout .cui-callout-header {
-    font-weight: $cui-font-weight-bold; // fix weight
-}
 .cui-form .cui-form-label {
     font-weight: $cui-font-weight-bold; // fix weight
 }
@@ -210,6 +207,11 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
             color: $cui-base-text-color;
         }
     }
+}
+
+// reduce callout spacing
+.cui-callout {
+    line-height: 1.2;
 }
 
 // adjust card padding

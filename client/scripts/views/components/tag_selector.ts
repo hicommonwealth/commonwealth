@@ -71,6 +71,7 @@ const TagSelector: m.Component<{
       closeOnSelect: true,
       emptyContent: [
         m(Callout, {
+          size: 'sm',
           class: 'no-matching-tags',
           icon: Icons.ALERT_TRIANGLE,
           intent: 'negative',

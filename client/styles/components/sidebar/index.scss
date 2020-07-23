@@ -52,6 +52,9 @@
                     font-size: 15px;
                     color: $text-color-lighter;
                 }
+                &.section-callout {
+                    margin-top: 8px;
+                }
                 .cui-list-item-content-left .cui-icon svg {
                     stroke: $text-color-lighter;
                 }
