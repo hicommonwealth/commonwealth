@@ -1,6 +1,7 @@
 import { SubstrateTypes, MolochTypes } from '@commonwealth/chain-events';
 
-// given an "old style" identifier such as treasuryproposal_4, attempts to
+// this function can take either an "old style" identifier such as treasuryproposal_4,
+// or a "new style" identifier/type combination such as 4 and treasuryproposal, and attempts
 // fetch the corresponding chain entity from the database
 export default async function (models, chain: string, identifier: string) {
   console.log(`Looking up proposal: ${chain}: ${identifier}`);

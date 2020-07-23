@@ -444,7 +444,7 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyReaction: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyReaction: m.Component<{ item: OffchainThread | AnyProposal | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
