@@ -51,6 +51,19 @@
 .LoginSelector {
 }
 
+.login-selector-popover {
+    .cui-popover-content {
+        padding: 0;
+        .cui-menu.LoginSelectorMenu {
+            border: none;
+            .cui-menu-item.cui-button.switch-user {
+                height: 40px;
+                max-height: 40px;
+            }
+        }
+    }
+}
+
 .login-selector-hint-popover {
     .cui-popover-content {
         padding: 11px 16px;

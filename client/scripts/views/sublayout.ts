@@ -14,17 +14,19 @@ const Sublayout: m.Component<{ class: string, leftSidebar?, rightSidebar? }> = {
     const { leftSidebar, rightSidebar } = vnode.attrs;
 
     const sublayoutHeader = m('.sublayout-header', [
-      // new proposal
-      m(NewProposalButton, { fluid: false }),
-      // notifications menu
-      app.isLoggedIn() && m(NotificationsMenu),
-      // invites menu
-      app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, {
-        iconLeft: Icons.MAIL,
-        onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-      }),
-      // login selector
-      m(LoginSelector),
+      m('.sublayout-header-left', [
+        m('h4.sublayout-header-heading', 'Discussions'),
+      ]),
+      m('.sublayout-header-right', [
+        m(NewProposalButton, { fluid: false }),                           // new proposal
+        app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
+        app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, { // invites menu
+          class: 'InvitesButton',
+          iconLeft: Icons.MAIL,
+          onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+        }),
+        m(LoginSelector),                                                 // login selector
+      ]),
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [

@@ -164,6 +164,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           // address list
           (app.chain || app.community) && [
             activeAddressesWithRole.map((account) => m(MenuItem, {
+              class: 'switch-user',
               align: 'left',
               basic: true,
               onclick: (e) => {
