@@ -57,9 +57,9 @@ const labelMaker = (subscription: NotificationSubscription) => {
     case (NotificationCategories.NewComment): {
       // console.dir(subscription);
       const threadOrComment = subscription.OffchainThread
-        ? subscription.OffchainThread.title
+        ? decodeURIComponent(subscription.OffchainThread.title)
         : subscription.OffchainComment
-          ? subscription.OffchainComment.id
+          ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
         ? m('a',{
@@ -68,16 +68,16 @@ const labelMaker = (subscription: NotificationSubscription) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
-        }, `New Comment on '${String(threadOrComment).slice(0, 12)}...'`)
-        : `New Comment on '${String(threadOrComment).slice(0, 12)}...'`;
+        }, `New Comment on '${String(threadOrComment)}'`)
+        : `New Comment on '${String(threadOrComment)}'`;
     }
     case (NotificationCategories.NewReaction): {
       const threadOrComment = subscription.OffchainThread
-        ? subscription.OffchainThread.title
+        ? decodeURIComponent(subscription.OffchainThread.title)
         : subscription.OffchainComment
-          ? subscription.OffchainComment.id
+          ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
-      return `New Reaction on ${String(threadOrComment).slice(0, 12)}...`;
+      return `New Reaction on '${String(threadOrComment)}'`;
     }
     default:
       break;
@@ -336,13 +336,13 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
         m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
         m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
 
-
-        supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
-          ? vnode.state.eventKinds.map((kind) => m(
-            EventSubscriptionRow,
-            { chain: vnode.state.chain, kind, titler },
-          ))
-          : m('No events available on this chain.'),
+        // List all event kinds in the UI.
+        // supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
+        //   ? vnode.state.eventKinds.map((kind) => m(
+        //     EventSubscriptionRow,
+        //     { chain: vnode.state.chain, kind, titler, key: kind },
+        //   ))
+        //   : m('No events available on this chain.'),
       ]),
     ]);
   }
