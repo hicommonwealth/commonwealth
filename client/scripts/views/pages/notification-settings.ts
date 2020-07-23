@@ -391,7 +391,7 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
     return [
       m(NewThreadRow, { community, subscriptions }),
       filteredSubscriptions.map((subscription) => {
-        return m(SubscriptionRow, { subscription, });
+        return m(SubscriptionRow, { subscription, key: subscription.id });
       })
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
     ];
