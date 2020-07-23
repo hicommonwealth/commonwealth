@@ -6,7 +6,7 @@ import { Tag, Button, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { Account, RoleInfo, RolePermission } from 'models';
-import User, { UserBlock } from 'views/components/widgets/user';
+import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -81,12 +81,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       m('.compact-modal-body', [
         m('.select-address-options', [
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
-            m(UserBlock, { user: account }),
+            m(UserBlock, { user: account, showRole: true }),
             m('.role-remove', [
-              m('span.already-connected', [
-                role.permission === RolePermission.admin
-                  ? 'Admin' : role.permission === RolePermission.moderator ? 'Moderator' : 'Member'
-              ]),
+              m('span.already-connected', 'Already joined'),
               m('span.icon', {
                 onclick: deleteRole.bind(this, index)
               }, m(Icon, { name: Icons.X })),
@@ -99,7 +96,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
               vnode.state.selectedIndex = index;
             },
           }, [
-            m(UserBlock, { user: account, selected: vnode.state.selectedIndex === index }),
+            m(UserBlock, { user: account, showRole: true, selected: vnode.state.selectedIndex === index }),
             role && m('.role-permission', [
               m(Tag, { label: formatAsTitleCase(role.permission), rounded: true, size: 'sm' }),
               role.is_user_default && m(Tag, { label: 'Last used', rounded: true, size: 'sm' }),

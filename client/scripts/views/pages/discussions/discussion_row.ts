@@ -79,7 +79,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
                 linkify: true,
                 tooltip: true,
-                showRole: true,
                 hideAvatar: true,
               }),
               m(ThreadCaratMenu, { proposal }),
