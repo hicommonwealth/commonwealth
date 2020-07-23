@@ -1,4 +1,4 @@
-import 'pages/discussions/thread_carat_menu.scss';
+import 'pages/discussions/discussion_row_menu.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -72,7 +72,7 @@ export const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen:
   }
 };
 
-const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOpen: boolean }> = {
+const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
@@ -90,7 +90,13 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
       })
       || proposal.author === app.user.activeAccount.address);
 
-    return [
+    return m('.DiscussionRowMenu', {
+      onclick: (e) => {
+        // prevent clicks from propagating to discussion row
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, [
       m(PopoverMenu, {
         transitionDuration: 0,
         closeOnOutsideClick: true,
@@ -104,8 +110,6 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         inline: true,
         trigger: m(Icon, {
           name: Icons.CHEVRON_DOWN,
-          class: 'ThreadCaratMenu',
-          style: 'margin-right: 6px;'
         }),
       }),
       vnode.state.tagEditorIsOpen && m(TagEditor, {
@@ -114,8 +118,8 @@ const ThreadCaratMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOp
         onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
         openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
       })
-    ];
+    ]);
   },
 };
 
-export default ThreadCaratMenu;
+export default DiscussionRowMenu;

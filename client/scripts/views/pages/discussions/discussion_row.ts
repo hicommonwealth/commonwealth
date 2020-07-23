@@ -14,7 +14,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
 
-import ThreadCaratMenu from './thread_carat_menu';
+import DiscussionRowMenu from './discussion_row_menu';
 
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -55,7 +55,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       + `${slugify(proposal.title)}`;
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
-      m('.discussion-row', [
+      link('a.discussion-row', discussionLink, [
         m('.discussion-top', [
           m('.discussion-top-left', [
             m('.discussion-title', [
@@ -81,7 +81,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 tooltip: true,
                 hideAvatar: true,
               }),
-              m(ThreadCaratMenu, { proposal }),
+              m(DiscussionRowMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [

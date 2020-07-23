@@ -24,7 +24,7 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TagEditor from 'views/components/tag_editor';
-import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/thread_carat_menu';
+import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import User from 'views/components/widgets/user';

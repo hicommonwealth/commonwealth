@@ -3,8 +3,8 @@
 .DiscussionRowHeader {
     display: flex;
     border-bottom: 1px solid $background-color-light;
-
-    color: #999;
+    margin-bottom: 2px;
+    color: $text-color-light;
     .discussion-row-header-col {
         font-size: 0.94rem;
         text-align: right;
