@@ -460,11 +460,11 @@ export const NewThreadForm: m.Component<{
                 if (!vnode.state.form.threadTitle) {
                   vnode.state.form.threadTitle = (title.val() as string);
                 }
-                const fromDraft = (vnode.state.recentlyDeletedDrafts.includes(vnode.state.fromDraft))
+                const fromDraft_ = (vnode.state.recentlyDeletedDrafts.includes(vnode.state.fromDraft))
                   ? undefined
                   : vnode.state.fromDraft;
                 try {
-                  await saveDraft(form, quillEditorState, author, fromDraft);
+                  await saveDraft(form, quillEditorState, author, fromDraft_);
                   vnode.state.saving = false;
                   if (isModal) {
                     notifySuccess('Draft saved');
