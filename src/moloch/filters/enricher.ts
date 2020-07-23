@@ -1,7 +1,7 @@
 import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
+import { Moloch1 } from '../contractTypes/Moloch1';
 import { CWEvent } from '../../interfaces';
-import { MolochEventKind, MolochRawEvent, IMolochEventData, MolochApi } from '../types';
-import { Moloch1 } from '../../../eth/types/Moloch1';
+import { EventKind, RawEvent, IEventData, Api } from '../types';
 
 // these functions unwrap the uint type received from chain,
 // which is an object like { _hex: <value> }, into a string/number
@@ -21,15 +21,15 @@ function hexToNumber({ _hex: n }: { _hex: string }): number {
  * Once fetched, the function marshalls the event data and the additional information
  * into the interface, and returns a fully-formed event, ready for database storage.
  */
-export default async function (
+export async function Enrich(
   version: 1 | 2,
-  api: MolochApi,
+  api: Api,
   blockNumber: number,
-  kind: MolochEventKind,
-  rawData: MolochRawEvent,
-): Promise<CWEvent<IMolochEventData>> {
+  kind: EventKind,
+  rawData: RawEvent,
+): Promise<CWEvent<IEventData>> {
   switch (kind) {
-    case MolochEventKind.SubmitProposal: {
+    case EventKind.SubmitProposal: {
       const {
         proposalIndex,
         delegateKey,
@@ -60,7 +60,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.SubmitVote: {
+    case EventKind.SubmitVote: {
       const { proposalIndex, delegateKey, memberAddress, uintVote } = rawData.args as any;
       const member = await (api as Moloch1).members(memberAddress);
       return {
@@ -77,7 +77,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.ProcessProposal: {
+    case EventKind.ProcessProposal: {
       const { proposalIndex, applicant, memberAddress, tokenTribute, sharesRequested, didPass } = rawData.args as any;
       const proposal = await (api as Moloch1).proposalQueue(proposalIndex);
       return {
@@ -95,7 +95,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.Ragequit: {
+    case EventKind.Ragequit: {
       const { memberAddress, sharesToBurn } = rawData.args as any;
       return {
         blockNumber,
@@ -107,7 +107,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.Abort: {
+    case EventKind.Abort: {
       const { proposalIndex, applicantAddress } = rawData.args as any;
       return {
         blockNumber,
@@ -119,7 +119,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.UpdateDelegateKey: {
+    case EventKind.UpdateDelegateKey: {
       const { memberAddress, newDelegateKey } = rawData.args as any;
       return {
         blockNumber,
@@ -133,7 +133,7 @@ export default async function (
         }
       };
     }
-    case MolochEventKind.SummonComplete: {
+    case EventKind.SummonComplete: {
       const { summoner, shares } = rawData.args as any;
       return {
         blockNumber,

@@ -1,11 +1,4 @@
-import { IEventHandler, CWEvent } from '../src/interfaces';
-
-import subscribeMolochEvents, { createMolochApi } from '../src/moloch/index';
-import { MolochEventChains } from '../src/moloch/types';
-
-import subscribeSubstrateEvents, { createSubstrateApi, createSubstrateProvider } from '../src/substrate/index';
-import { SubstrateEventChains } from '../src/substrate/types';
-import storageFetcher from '../src/substrate/storageFetcher';
+import { IEventHandler, CWEvent, SubstrateEvents, MolochEvents } from '../dist/index';
 
 import { factory, formatFilename } from '../src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -39,14 +32,14 @@ const skipCatchup = false;
 
 const url = networks[chain];
 if (!url) throw new Error(`no url for chain ${chain}`);
-if (SubstrateEventChains.includes(chain)) {
-  createSubstrateProvider(url).then((provider) => {
-    return createSubstrateApi(provider, chain).isReady;
+if (SubstrateEvents.Types.EventChains.includes(chain)) {
+  SubstrateEvents.createProvider(url).then((provider) => {
+    return SubstrateEvents.createApi(provider, chain).isReady;
   }).then((api) => {
-    const fetcher = new storageFetcher(api);
+    const fetcher = new SubstrateEvents.StorageFetcher(api);
     return fetcher.fetch().then(() => api);
   }).then((api) => {
-    subscribeSubstrateEvents({
+    SubstrateEvents.subscribeEvents({
       chain,
       api,
       handlers: [ new StandaloneEventHandler() ],
@@ -54,12 +47,12 @@ if (SubstrateEventChains.includes(chain)) {
       verbose: true,
     });
   });
-} else if (MolochEventChains.includes(chain)) {
+} else if (MolochEvents.Types.EventChains.includes(chain)) {
   const contract = contracts[chain];
   const contractVersion = 1;
   if (!contract) throw new Error(`no contract address for chain ${chain}`);
-  createMolochApi(url, contractVersion, contract).then((api) => {
-    subscribeMolochEvents({
+  MolochEvents.createApi(url, contractVersion, contract).then((api) => {
+    MolochEvents.subscribeEvents({
       chain,
       api,
       contractVersion,

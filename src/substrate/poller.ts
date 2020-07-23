@@ -5,12 +5,12 @@ import { ApiPromise } from '@polkadot/api';
 import { Hash } from '@polkadot/types/interfaces';
 
 import { IEventPoller, IDisconnectedRange } from '../interfaces';
-import { SubstrateBlock } from './types';
+import { Block } from './types';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IEventPoller<ApiPromise, SubstrateBlock> {
+export class Poller extends IEventPoller<ApiPromise, Block> {
   /**
    * Connects to chain, fetches specified blocks and passes them
    * along for processing.
@@ -18,7 +18,7 @@ export default class extends IEventPoller<ApiPromise, SubstrateBlock> {
    * @param startBlock first block to fetch
    * @param endBlock last block to fetch, omit to fetch to latest
    */
-  public async poll(range: IDisconnectedRange): Promise<SubstrateBlock[]> {
+  public async poll(range: IDisconnectedRange): Promise<Block[]> {
     // discover current block if no end block provided
     if (!range.endBlock) {
       const header = await this._api.rpc.chain.getHeader();
@@ -53,7 +53,7 @@ export default class extends IEventPoller<ApiPromise, SubstrateBlock> {
     const nonZeroHashes = hashes.filter((hash) => !hash.isEmpty);
     log.info(`${nonZeroHashes.length} active and ${hashes.length - nonZeroHashes.length} pruned hashes fetched!`);
     log.debug('Fetching headers and events...');
-    const blocks: SubstrateBlock[] = await Promise.all(nonZeroHashes.map(async (hash) => {
+    const blocks: Block[] = await Promise.all(nonZeroHashes.map(async (hash) => {
       const header = await this._api.rpc.chain.getHeader(hash);
       const events = await this._api.query.system.events.at(hash);
       const signedBlock = await this._api.rpc.chain.getBlock(hash);

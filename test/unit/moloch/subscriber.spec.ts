@@ -1,8 +1,8 @@
 import { EventEmitter } from 'events';
 import chai from 'chai';
 
-import Subscriber from '../../../src/moloch/subscriber';
-import { MolochApi, MolochRawEvent } from '../../../src/moloch/types';
+import { Subscriber } from '../../../src/moloch/subscriber';
+import { Api, RawEvent } from '../../../src/moloch/types';
 
 const { assert } = chai;
 
@@ -11,7 +11,7 @@ const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 describe('Moloch Event Subscriber Tests', () => {
   it('should callback with event data', (done) => {
     const molochApi = new EventEmitter();
-    const subscriber = new Subscriber(molochApi as unknown as MolochApi, 'moloch-test');
+    const subscriber = new Subscriber(molochApi as unknown as Api, 'moloch-test');
     const event = {
       event: 'SubmitProposal',
       blockNumber: 10,
@@ -23,8 +23,8 @@ describe('Moloch Event Subscriber Tests', () => {
         tokenTribute: toHex(5),
         sharesRequested: toHex(6),
       }
-    } as unknown as MolochRawEvent;
-    const cb = (receivedEvent: MolochRawEvent) => {
+    } as unknown as RawEvent;
+    const cb = (receivedEvent: RawEvent) => {
       assert.deepEqual(event, receivedEvent);
       done();
     };
@@ -34,15 +34,15 @@ describe('Moloch Event Subscriber Tests', () => {
 
   it('should no-op on unnecessary unsubscribe', (done) => {
     const molochApi = new EventEmitter();
-    const subscriber = new Subscriber(molochApi as unknown as MolochApi, 'moloch-test');
+    const subscriber = new Subscriber(molochApi as unknown as Api, 'moloch-test');
     subscriber.unsubscribe();
     done();
   });
 
   it('should unsubscribe successfully', (done) => {
     const molochApi = new EventEmitter();
-    const subscriber = new Subscriber(molochApi as unknown as MolochApi, 'moloch-test');
-    const cb = (receivedEvent: MolochRawEvent) => {
+    const subscriber = new Subscriber(molochApi as unknown as Api, 'moloch-test');
+    const cb = (receivedEvent: RawEvent) => {
       assert.fail('should not reach callback');
     };
     subscriber.subscribe(cb);

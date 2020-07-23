@@ -1,15 +1,15 @@
 import EthDater from 'ethereum-block-by-date';
 
 import { CWEvent, IStorageFetcher, IDisconnectedRange } from '../interfaces';
-import { IMolochEventData, MolochEventKind, MolochApi, Moloch1Proposal, Moloch2Proposal } from './types';
-import { Moloch1 } from '../../eth/types/Moloch1';
-import { Moloch2 } from '../../eth/types/Moloch2';
+import { IEventData, EventKind, Api, ProposalV1, ProposalV2 } from './types';
+import { Moloch1 } from './contractTypes/Moloch1';
+import { Moloch2 } from './contractTypes/Moloch2';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IStorageFetcher<MolochApi> {
-  constructor(protected readonly _api: MolochApi, private readonly _version: 1 | 2, private readonly _dater: EthDater) {
+export class StorageFetcher extends IStorageFetcher<Api> {
+  constructor(protected readonly _api: Api, private readonly _version: 1 | 2, private readonly _dater: EthDater) {
     super(_api);
   }
 
@@ -21,22 +21,22 @@ export default class extends IStorageFetcher<MolochApi> {
   private _currentBlock: number;
   private _currentTimestamp: number;
 
-  private _isMoloch1Proposal(m: Moloch1Proposal | Moloch2Proposal): m is Moloch1Proposal {
+  private _isProposalV1(m: ProposalV1 | ProposalV2): m is ProposalV1 {
     return this._version === 1;
   }
 
   private async _eventsFromProposal(
     index: number,
-    proposal: Moloch1Proposal | Moloch2Proposal,
+    proposal: ProposalV1 | ProposalV2,
     startTime: number,
     startBlock: number,
-  ): Promise<CWEvent<IMolochEventData>[]> {
-    const events: CWEvent<IMolochEventData>[] = [ ];
-    if (this._isMoloch1Proposal(proposal)) {
-      const proposedEvent: CWEvent<IMolochEventData> = {
+  ): Promise<CWEvent<IEventData>[]> {
+    const events: CWEvent<IEventData>[] = [ ];
+    if (this._isProposalV1(proposal)) {
+      const proposedEvent: CWEvent<IEventData> = {
         blockNumber: startBlock,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: index,
           member: proposal.proposer,
           applicant: proposal.applicant,
@@ -69,10 +69,10 @@ export default class extends IStorageFetcher<MolochApi> {
           }
         }
 
-        const abortedEvent: CWEvent<IMolochEventData> = {
+        const abortedEvent: CWEvent<IEventData> = {
           blockNumber,
           data: {
-            kind: MolochEventKind.Abort,
+            kind: EventKind.Abort,
             proposalIndex: index,
             applicant: proposal.applicant,
           }
@@ -92,10 +92,10 @@ export default class extends IStorageFetcher<MolochApi> {
           blockNumber = startBlock + 2;
         }
 
-        const processedEvent: CWEvent<IMolochEventData> = {
+        const processedEvent: CWEvent<IEventData> = {
           blockNumber,
           data: {
-            kind: MolochEventKind.ProcessProposal,
+            kind: EventKind.ProcessProposal,
             proposalIndex: index,
             applicant: proposal.applicant,
             member: proposal.proposer,
@@ -123,7 +123,7 @@ export default class extends IStorageFetcher<MolochApi> {
    *
    * @param range Determines the range of blocks to query events within.
    */
-  public async fetch(range?: IDisconnectedRange, fetchAllCompleted = false): Promise<CWEvent<IMolochEventData>[]> {
+  public async fetch(range?: IDisconnectedRange, fetchAllCompleted = false): Promise<CWEvent<IEventData>[]> {
     // we need to fetch a few constants to convert voting periods into blocks
     this._periodDuration = +(await this._api.periodDuration());
     this._summoningTime = +(await this._api.summoningTime());
@@ -157,7 +157,7 @@ export default class extends IStorageFetcher<MolochApi> {
     log.info(`Fetching Moloch entities for range: ${range.startBlock}-${range.endBlock}.`);
 
     const queueLength = +(await this._api.getProposalQueueLength());
-    const results: CWEvent<IMolochEventData>[] = [];
+    const results: CWEvent<IEventData>[] = [];
 
     /* eslint-disable no-await-in-loop */
     for (let i = 0; i < queueLength; i++) {
@@ -168,7 +168,7 @@ export default class extends IStorageFetcher<MolochApi> {
         : +(await (this._api as Moloch2).proposalQueue(queuePosition));
 
       // fetch actual proposal
-      const proposal: Moloch1Proposal | Moloch2Proposal = this._version === 1
+      const proposal: ProposalV1 | ProposalV2 = this._version === 1
         ? await this._api.proposalQueue(proposalIndex)
         : await this._api.proposals(proposalIndex);
       log.debug(`Fetched Moloch proposal ${proposalIndex} from storage.`);
@@ -201,7 +201,7 @@ export default class extends IStorageFetcher<MolochApi> {
         // halt fetch once we find a completed proposal in order to save data
         // we may want to run once without this, in order to fetch backlog, or else develop a pagination
         // strategy, but for now our API usage is limited.
-        if (!fetchAllCompleted && events.find((p) => p.data.kind === MolochEventKind.ProcessProposal)) {
+        if (!fetchAllCompleted && events.find((p) => p.data.kind === EventKind.ProcessProposal)) {
           log.debug(`Proposal ${proposalIndex} is marked processed, halting fetch.`);
           break;
         }

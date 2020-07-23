@@ -1,27 +1,27 @@
 import { Event } from 'ethers';
 import { ISubscribeOptions } from '../interfaces';
-import { Moloch1 } from '../../eth/types/Moloch1';
-import { Moloch2 } from '../../eth/types/Moloch2';
+import { Moloch1 } from './contractTypes/Moloch1';
+import { Moloch2 } from './contractTypes/Moloch2';
 
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type Moloch1Proposal = UnPromisify<ReturnType<Moloch1['functions']['proposalQueue']>>;
-export type Moloch2Proposal = UnPromisify<ReturnType<Moloch2['functions']['proposals']>>;
+export type ProposalV1 = UnPromisify<ReturnType<Moloch1['functions']['proposalQueue']>>;
+export type ProposalV2 = UnPromisify<ReturnType<Moloch2['functions']['proposals']>>;
 
-export type MolochApi = Moloch1 | Moloch2;
+export type Api = Moloch1 | Moloch2;
 
-export const MolochEventChains = [ 'moloch', 'moloch-local' ];
+export const EventChains = [ 'moloch', 'moloch-local' ];
 
-export type MolochRawEvent = Event;
+export type RawEvent = Event;
 
-export interface IMolochSubscribeOptions extends ISubscribeOptions<MolochApi> {
+export interface SubscribeOptions extends ISubscribeOptions<Api> {
   contractVersion: 1 | 2;
 }
 
-export enum MolochEntityKind {
+export enum EntityKind {
   Proposal = 'proposal',
 }
 
-export enum MolochEventKind {
+export enum EventKind {
   SubmitProposal = 'submit-proposal',
   SubmitVote = 'submit-vote',
   ProcessProposal = 'process-proposal',
@@ -32,16 +32,16 @@ export enum MolochEventKind {
   // TODO: add V2s as needed
 }
 
-interface IMolochEvent {
-  kind: MolochEventKind;
+interface IEvent {
+  kind: EventKind;
 }
 
 type Address = string;
 type Balance = string;
 
 // TODO: populate these with data members
-export interface IMolochSubmitProposal extends IMolochEvent {
-  kind: MolochEventKind.SubmitProposal;
+export interface ISubmitProposal extends IEvent {
+  kind: EventKind.SubmitProposal;
   proposalIndex: number;
   delegateKey?: Address;
   member: Address;
@@ -52,8 +52,8 @@ export interface IMolochSubmitProposal extends IMolochEvent {
   startTime: number;
 }
 
-export interface IMolochSubmitVote extends IMolochEvent {
-  kind: MolochEventKind.SubmitVote;
+export interface ISubmitVote extends IEvent {
+  kind: EventKind.SubmitVote;
   proposalIndex: number;
   delegateKey: Address;
   member: Address;
@@ -62,8 +62,8 @@ export interface IMolochSubmitVote extends IMolochEvent {
   highestIndexYesVote: number;
 }
 
-export interface IMolochProcessProposal extends IMolochEvent {
-  kind: MolochEventKind.ProcessProposal;
+export interface IProcessProposal extends IEvent {
+  kind: EventKind.ProcessProposal;
   proposalIndex: number;
   applicant: Address;
   member: Address;
@@ -74,39 +74,39 @@ export interface IMolochProcessProposal extends IMolochEvent {
   noVotes: string;
 }
 
-export interface IMolochRagequit extends IMolochEvent {
-  kind: MolochEventKind.Ragequit;
+export interface IRagequit extends IEvent {
+  kind: EventKind.Ragequit;
   member: Address;
   sharesToBurn: Balance;
 }
 
-export interface IMolochAbort extends IMolochEvent {
-  kind: MolochEventKind.Abort;
+export interface IAbort extends IEvent {
+  kind: EventKind.Abort;
   proposalIndex: number;
   applicant: Address;
 }
 
-export interface IMolochUpdateDelegateKey extends IMolochEvent {
-  kind: MolochEventKind.UpdateDelegateKey;
+export interface IUpdateDelegateKey extends IEvent {
+  kind: EventKind.UpdateDelegateKey;
   member: Address;
   newDelegateKey: Address;
 }
 
-export interface IMolochSummonComplete extends IMolochEvent {
-  kind: MolochEventKind.SummonComplete;
+export interface ISummonComplete extends IEvent {
+  kind: EventKind.SummonComplete;
   summoner: Address;
   shares: Balance;
 }
 
-export type IMolochEventData =
-  IMolochSubmitProposal
-  | IMolochSubmitVote
-  | IMolochProcessProposal
-  | IMolochRagequit
-  | IMolochAbort
-  | IMolochUpdateDelegateKey
-  | IMolochSummonComplete
+export type IEventData =
+  ISubmitProposal
+  | ISubmitVote
+  | IProcessProposal
+  | IRagequit
+  | IAbort
+  | IUpdateDelegateKey
+  | ISummonComplete
 // eslint-disable-next-line semi-style
 ;
 
-export const MolochEventKinds: MolochEventKind[] = Object.values(MolochEventKind);
+export const EventKinds: EventKind[] = Object.values(EventKind);

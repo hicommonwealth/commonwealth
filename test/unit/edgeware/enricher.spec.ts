@@ -7,9 +7,9 @@ import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types'
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces';
-import SubstrateEnricherFunc from '../../../src/substrate/filters/enricher';
+import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption } from './testUtil';
-import { SubstrateEventKind } from '../../../src/substrate/types';
+import { EventKind } from '../../../src/substrate/types';
 
 const { assert } = chai;
 
@@ -140,9 +140,9 @@ const constructBool = (b: boolean): bool => {
 describe('Edgeware Event Enricher Filter Tests', () => {
   /** staking events */
   it('should enrich edgeware/old reward event', async () => {
-    const kind = SubstrateEventKind.Reward;
+    const kind = EventKind.Reward;
     const event = constructEvent([ 10000, 5 ], 'staking', [ 'Balance', 'Balance' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -152,9 +152,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich new reward event', async () => {
-    const kind = SubstrateEventKind.Reward;
+    const kind = EventKind.Reward;
     const event = constructEvent([ 'Alice', 10000 ], 'staking', [ 'AccountId', 'Balance' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'Alice' ],
@@ -166,9 +166,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich slash event', async () => {
-    const kind = SubstrateEventKind.Slash;
+    const kind = EventKind.Slash;
     const event = constructEvent([ 'Alice', 10000 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'Alice' ],
@@ -180,9 +180,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich bonded event', async () => {
-    const kind = SubstrateEventKind.Bonded;
+    const kind = EventKind.Bonded;
     const event = constructEvent([ 'alice-stash', 10000 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'alice-stash' ],
@@ -195,9 +195,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich unbonded event', async () => {
-    const kind = SubstrateEventKind.Unbonded;
+    const kind = EventKind.Unbonded;
     const event = constructEvent([ 'alice-stash', 10000 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'alice-stash' ],
@@ -212,9 +212,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** democracy events */
   it('should enrich vote-delegated event', async () => {
-    const kind = SubstrateEventKind.VoteDelegated;
+    const kind = EventKind.VoteDelegated;
     const event = constructEvent([ 'delegator', 'target' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'target' ],
@@ -226,9 +226,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich democracy-proposed event', async () => {
-    const kind = SubstrateEventKind.DemocracyProposed;
+    const kind = EventKind.DemocracyProposed;
     const event = constructEvent([ '1', 1000 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'charlie' ],
@@ -242,9 +242,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich democracy-tabled event', async () => {
-    const kind = SubstrateEventKind.DemocracyTabled;
+    const kind = EventKind.DemocracyTabled;
     const event = constructEvent([ '1', 1000 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -254,9 +254,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich old edgeware democracy-started event', async () => {
-    const kind = SubstrateEventKind.DemocracyStarted;
+    const kind = EventKind.DemocracyStarted;
     const event = constructEvent([ '1', 'Supermajorityapproval' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     console.log(result);
     assert.deepEqual(result, {
       blockNumber,
@@ -270,9 +270,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich new kusama democracy-started event', async () => {
-    const kind = SubstrateEventKind.DemocracyStarted;
+    const kind = EventKind.DemocracyStarted;
     const event = constructEvent([ '2', 'Supermajorityapproval' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     console.log(result);
     assert.deepEqual(result, {
       blockNumber,
@@ -287,9 +287,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
   });
 
   it('should enrich democracy-passed event', async () => {
-    const kind = SubstrateEventKind.DemocracyPassed;
+    const kind = EventKind.DemocracyPassed;
     const event = constructEvent([ '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -300,9 +300,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich democracy-not-passed event', async () => {
-    const kind = SubstrateEventKind.DemocracyNotPassed;
+    const kind = EventKind.DemocracyNotPassed;
     const event = constructEvent([ '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -312,9 +312,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich democracy-cancelled event', async () => {
-    const kind = SubstrateEventKind.DemocracyCancelled;
+    const kind = EventKind.DemocracyCancelled;
     const event = constructEvent([ '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -324,9 +324,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich democracy-executed event', async () => {
-    const kind = SubstrateEventKind.DemocracyExecuted;
+    const kind = EventKind.DemocracyExecuted;
     const event = constructEvent([ '1', constructBool(false) ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -339,9 +339,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** preimage events */
   it('should enrich preimage-noted event', async () => {
-    const kind = SubstrateEventKind.PreimageNoted;
+    const kind = EventKind.PreimageNoted;
     const event = constructEvent([ 'hash', 'alice', 100 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -358,9 +358,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich preimage-used event', async () => {
-    const kind = SubstrateEventKind.PreimageUsed;
+    const kind = EventKind.PreimageUsed;
     const event = constructEvent([ 'hash', 'alice', 100 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -371,9 +371,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich preimage-invalid event', async () => {
-    const kind = SubstrateEventKind.PreimageInvalid;
+    const kind = EventKind.PreimageInvalid;
     const event = constructEvent([ 'hash', '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -384,9 +384,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich preimage-missing event', async () => {
-    const kind = SubstrateEventKind.PreimageMissing;
+    const kind = EventKind.PreimageMissing;
     const event = constructEvent([ 'hash', '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -397,9 +397,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich preimage-reaped event', async () => {
-    const kind = SubstrateEventKind.PreimageReaped;
+    const kind = EventKind.PreimageReaped;
     const event = constructEvent([ 'hash', 'alice', 100, 'bob' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'bob' ],
@@ -414,9 +414,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** treasury events */
   it('should enrich treasury-proposed event', async () => {
-    const kind = SubstrateEventKind.TreasuryProposed;
+    const kind = EventKind.TreasuryProposed;
     const event = constructEvent([ '1' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -431,9 +431,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich treasury-awarded event', async () => {
-    const kind = SubstrateEventKind.TreasuryAwarded;
+    const kind = EventKind.TreasuryAwarded;
     const event = constructEvent([ '1', 1000, 'bob' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -445,9 +445,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich treasury-rejected event', async () => {
-    const kind = SubstrateEventKind.TreasuryRejected;
+    const kind = EventKind.TreasuryRejected;
     const event = constructEvent([ '1', 100 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -459,9 +459,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** elections events */
   it('should enrich election-new-term event', async () => {
-    const kind = SubstrateEventKind.ElectionNewTerm;
+    const kind = EventKind.ElectionNewTerm;
     const event = constructEvent([ [ [ 'alice', 10 ], [ 'bob', 20] ] ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -471,9 +471,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich election-empty-term event', async () => {
-    const kind = SubstrateEventKind.ElectionEmptyTerm;
+    const kind = EventKind.ElectionEmptyTerm;
     const event = constructEvent([ ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -482,9 +482,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich election-candidacy-submitted event', async () => {
-    const kind = SubstrateEventKind.ElectionCandidacySubmitted;
+    const kind = EventKind.ElectionCandidacySubmitted;
     const extrinsic = constructExtrinsic('alice');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, extrinsic);
+    const result = await Enrich(api, blockNumber, kind, extrinsic);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -495,9 +495,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich election-member-kicked event', async () => {
-    const kind = SubstrateEventKind.ElectionMemberKicked;
+    const kind = EventKind.ElectionMemberKicked;
     const event = constructEvent([ 'alice' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -507,9 +507,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich election-member-renounced event', async () => {
-    const kind = SubstrateEventKind.ElectionMemberRenounced;
+    const kind = EventKind.ElectionMemberRenounced;
     const event = constructEvent([ 'alice' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -521,9 +521,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** collective events */
   it('should enrich collective-proposed event', async () => {
-    const kind = SubstrateEventKind.CollectiveProposed;
+    const kind = EventKind.CollectiveProposed;
     const event = constructEvent([ 'alice', '1', 'hash', '3' ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -543,9 +543,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich collective-voted event', async () => {
-    const kind = SubstrateEventKind.CollectiveVoted;
+    const kind = EventKind.CollectiveVoted;
     const event = constructEvent([ 'alice', 'hash', constructBool(true), '1', '0' ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -559,9 +559,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich collective-approved event', async () => {
-    const kind = SubstrateEventKind.CollectiveApproved;
+    const kind = EventKind.CollectiveApproved;
     const event = constructEvent([ 'hash' ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -572,9 +572,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich collective-disapproved event', async () => {
-    const kind = SubstrateEventKind.CollectiveDisapproved;
+    const kind = EventKind.CollectiveDisapproved;
     const event = constructEvent([ 'hash' ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -585,9 +585,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich collective-executed event', async () => {
-    const kind = SubstrateEventKind.CollectiveExecuted;
+    const kind = EventKind.CollectiveExecuted;
     const event = constructEvent([ 'hash', constructBool(true) ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -599,9 +599,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich collective-member-executed event', async () => {
-    const kind = SubstrateEventKind.CollectiveExecuted;
+    const kind = EventKind.CollectiveExecuted;
     const event = constructEvent([ 'hash', constructBool(false) ], 'council');
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -615,9 +615,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** signaling events */
   it('should enrich signaling-new-proposal event', async () => {
-    const kind = SubstrateEventKind.SignalingNewProposal;
+    const kind = EventKind.SignalingNewProposal;
     const event = constructEvent([ 'alice', 'hash' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'alice' ],
@@ -635,9 +635,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich signaling-commit-started event', async () => {
-    const kind = SubstrateEventKind.SignalingCommitStarted;
+    const kind = EventKind.SignalingCommitStarted;
     const event = constructEvent([ 'hash', '101', '20' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -649,9 +649,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich signaling-voting-started event', async () => {
-    const kind = SubstrateEventKind.SignalingVotingStarted;
+    const kind = EventKind.SignalingVotingStarted;
     const event = constructEvent([ 'hash', '101', '20' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -663,9 +663,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich signaling-voting-completed event', async () => {
-    const kind = SubstrateEventKind.SignalingVotingCompleted;
+    const kind = EventKind.SignalingVotingCompleted;
     const event = constructEvent([ 'hash', '101' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -678,9 +678,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** TreasuryReward events */
   it('should enrich treasury-reward-minted-v1 event', async () => {
-    const kind = SubstrateEventKind.TreasuryRewardMinting;
+    const kind = EventKind.TreasuryRewardMinting;
     const event = constructEvent([ 1000, 100, 10 ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -691,9 +691,9 @@ describe('Edgeware Event Enricher Filter Tests', () => {
     });
   });
   it('should enrich treasury-reward-minted-v2 event', async () => {
-    const kind = SubstrateEventKind.TreasuryRewardMintingV2;
+    const kind = EventKind.TreasuryRewardMintingV2;
     const event = constructEvent([ 1000, 10, 'pot' ]);
-    const result = await SubstrateEnricherFunc(api, blockNumber, kind, event);
+    const result = await Enrich(api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -706,16 +706,16 @@ describe('Edgeware Event Enricher Filter Tests', () => {
 
   /** other */
   it('should not enrich invalid event', (done) => {
-    const kind = 'invalid-event' as SubstrateEventKind;
+    const kind = 'invalid-event' as EventKind;
     const event = constructEvent([ ]);
-    SubstrateEnricherFunc(api, blockNumber, kind, event)
+    Enrich(api, blockNumber, kind, event)
       .then((v) => done(new Error('should not permit invalid event')))
       .catch(() => done());
   });
   it('should not enrich with invalid API query', (done) => {
-    const kind = SubstrateEventKind.Bonded;
+    const kind = EventKind.Bonded;
     const event = constructEvent([ 'alice-not-stash', 10000 ]);
-    SubstrateEnricherFunc(api, blockNumber, kind, event)
+    Enrich(api, blockNumber, kind, event)
       .then((v) => done(new Error('should not permit invalid API result')))
       .catch(() => done());
   });

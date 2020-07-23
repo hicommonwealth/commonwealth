@@ -1,28 +1,28 @@
 import chai from 'chai';
-import { MolochEventKind, MolochRawEvent, MolochApi } from '../../../src/moloch/types';
-import MolochEnricherFunc from '../../../src/moloch/filters/enricher';
+import { EventKind, RawEvent, Api } from '../../../src/moloch/types';
+import { Enrich } from '../../../src/moloch/filters/enricher';
 
 const { assert } = chai;
 
-const constructEvent = (data: object, section = '', typeDef: string[] = []): MolochRawEvent => {
+const constructEvent = (data: object, section = '', typeDef: string[] = []): RawEvent => {
   return {
     args: data,
-  } as MolochRawEvent;
+  } as RawEvent;
 };
 
 const blockNumber = 10000;
-const api: MolochApi = {
+const api: Api = {
   proposalQueue: async (n) => ({ startingPeriod: '1', details: 'hello', yesVotes: '5', noVotes: '4' }),
   periodDuration: async () => '2',
   summoningTime: async () => '0',
   members: async (addr) => ({ delegateKey: addr, shares: '10', exists: true, highestIndexYesVote: 1 }),
-} as unknown as MolochApi;
+} as unknown as Api;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 
 describe('Moloch Event Enricher Filter Tests', () => {
   it('should enrich submit proposal event', async () => {
-    const kind = MolochEventKind.SubmitProposal;
+    const kind = EventKind.SubmitProposal;
     const event = constructEvent({
       proposalIndex: toHex(1),
       delegateKey: 'delegate',
@@ -31,7 +31,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
       tokenTribute: toHex(5),
       sharesRequested: toHex(6),
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'member' ],
@@ -50,14 +50,14 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich submit vote event', async () => {
-    const kind = MolochEventKind.SubmitVote;
+    const kind = EventKind.SubmitVote;
     const event = constructEvent({
       proposalIndex: toHex(1),
       delegateKey: 'delegate',
       memberAddress: 'member',
       uintVote: 1,
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'member' ],
@@ -74,7 +74,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich process proposal event', async () => {
-    const kind = MolochEventKind.ProcessProposal;
+    const kind = EventKind.ProcessProposal;
     const event = constructEvent({
       proposalIndex: toHex(1),
       applicant: 'applicant',
@@ -85,7 +85,7 @@ describe('Moloch Event Enricher Filter Tests', () => {
       yesVotes: toHex(5),
       noVotes: toHex(4),
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {
@@ -103,12 +103,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich ragequit event', async () => {
-    const kind = MolochEventKind.Ragequit;
+    const kind = EventKind.Ragequit;
     const event = constructEvent({
       memberAddress: 'member',
       sharesToBurn: toHex(10),
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'member' ],
@@ -121,12 +121,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich abort event', async () => {
-    const kind = MolochEventKind.Abort;
+    const kind = EventKind.Abort;
     const event = constructEvent({
       proposalIndex: toHex(1),
       applicantAddress: 'applicant',
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       excludeAddresses: [ 'applicant' ],
@@ -139,12 +139,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich update delegate key event', async () => {
-    const kind = MolochEventKind.UpdateDelegateKey;
+    const kind = EventKind.UpdateDelegateKey;
     const event = constructEvent({
       memberAddress: 'member',
       newDelegateKey: 'new-delegate',
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       includeAddresses: [ 'new-delegate' ],
@@ -157,12 +157,12 @@ describe('Moloch Event Enricher Filter Tests', () => {
   });
 
   it('should enrich summon complete event', async () => {
-    const kind = MolochEventKind.SummonComplete;
+    const kind = EventKind.SummonComplete;
     const event = constructEvent({
       summoner: 'summoner',
       shares: toHex(5),
     });
-    const result = await MolochEnricherFunc(1, api, blockNumber, kind, event);
+    const result = await Enrich(1, api, blockNumber, kind, event);
     assert.deepEqual(result, {
       blockNumber,
       data: {

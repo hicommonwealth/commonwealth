@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 
-import { SubstrateBalanceString, SubstrateEventKind, ISubstrateEventData } from '../types';
 import { IEventLabel, LabelerFilter } from '../../interfaces';
+import { BalanceString, EventKind, IEventData } from '../types';
 
 function fmtAddr(addr : string) {
   if (!addr) return;
@@ -13,7 +13,7 @@ function fmtAddr(addr : string) {
 const EDG_DECIMAL = 18;
 const KUSAMA_DECIMAL = 15;
 
-export function formatNumberShort(num: number) {
+function formatNumberShort(num: number) {
   const round = (n, digits?) => {
     if (digits === undefined) digits = 2;
     return Math.round(n * Math.pow(10, digits)) / Math.pow(10, digits);
@@ -35,7 +35,7 @@ export function formatNumberShort(num: number) {
     num.toString();
 }
 
-const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => {
+const edgBalanceFormatter = (chain, balance: BalanceString): string => {
   const denom = chain === 'edgeware'
     ? 'EDG'
     : chain === 'edgeware-local' || chain === 'edgeware-testnet'
@@ -64,17 +64,17 @@ const edgBalanceFormatter = (chain, balance: SubstrateBalanceString): string => 
  * This a labeler function, which takes event data and describes it in "plain english",
  * such that we can display a notification regarding its contents.
  */
-const labelSubstrateEvent: LabelerFilter = (
+export const Label: LabelerFilter = (
   blockNumber: number,
   chainId: string,
-  data: ISubstrateEventData,
+  data: IEventData,
 ): IEventLabel => {
   const balanceFormatter = (bal) => edgBalanceFormatter(chainId, bal);
   switch (data.kind) {
     /**
      * Staking Events
      */
-    case SubstrateEventKind.Slash: {
+    case EventKind.Slash: {
       const { validator, amount } = data;
       return {
         heading: 'Validator Slashed',
@@ -82,7 +82,7 @@ const labelSubstrateEvent: LabelerFilter = (
         // TODO: get link to validator page
       };
     }
-    case SubstrateEventKind.Reward: {
+    case EventKind.Reward: {
       const { amount } = data;
       return {
         heading: 'Validator Rewarded',
@@ -92,7 +92,7 @@ const labelSubstrateEvent: LabelerFilter = (
         // TODO: get link to validator page
       };
     }
-    case SubstrateEventKind.Bonded: {
+    case EventKind.Bonded: {
       const { stash, controller, amount } = data;
       return {
         heading: 'Bonded',
@@ -101,7 +101,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${stash}` : null,
       };
     }
-    case SubstrateEventKind.Unbonded: {
+    case EventKind.Unbonded: {
       const { stash, controller, amount } = data;
       return {
         heading: 'Bonded',
@@ -114,7 +114,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * Democracy Events
      */
-    case SubstrateEventKind.VoteDelegated: {
+    case EventKind.VoteDelegated: {
       const { who, target } = data;
       return {
         heading: 'Vote Delegated',
@@ -122,7 +122,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyProposed: {
+    case EventKind.DemocracyProposed: {
       const { deposit, proposalIndex } = data;
       return {
         heading: 'Democracy Proposal Created',
@@ -130,7 +130,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyTabled: {
+    case EventKind.DemocracyTabled: {
       const { proposalIndex } = data;
       return {
         heading: 'Democracy Proposal Tabled',
@@ -138,7 +138,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/democracyproposal/${proposalIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyStarted: {
+    case EventKind.DemocracyStarted: {
       const { endBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Started',
@@ -148,7 +148,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyPassed: {
+    case EventKind.DemocracyPassed: {
       const { dispatchBlock, referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Passed',
@@ -158,7 +158,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyNotPassed: {
+    case EventKind.DemocracyNotPassed: {
       const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Failed',
@@ -167,7 +167,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyCancelled: {
+    case EventKind.DemocracyCancelled: {
       const { referendumIndex } = data;
       return {
         heading: 'Democracy Referendum Cancelled',
@@ -176,7 +176,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.DemocracyExecuted: {
+    case EventKind.DemocracyExecuted: {
       const { referendumIndex, executionOk } = data;
       return {
         heading: 'Democracy Referendum Executed',
@@ -188,7 +188,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * Preimage Events
      */
-    case SubstrateEventKind.PreimageNoted: {
+    case EventKind.PreimageNoted: {
       const { proposalHash, noter } = data;
       return {
         heading: 'Preimage Noted',
@@ -201,7 +201,7 @@ const labelSubstrateEvent: LabelerFilter = (
         //    link to the noter's profile.
       };
     }
-    case SubstrateEventKind.PreimageUsed: {
+    case EventKind.PreimageUsed: {
       const { proposalHash, noter } = data;
       return {
         heading: 'Preimage Used',
@@ -209,7 +209,7 @@ const labelSubstrateEvent: LabelerFilter = (
         // TODO: see linkUrl comment above, on PreimageNoted.
       };
     }
-    case SubstrateEventKind.PreimageInvalid: {
+    case EventKind.PreimageInvalid: {
       const { proposalHash, referendumIndex } = data;
       return {
         heading: 'Preimage Invalid',
@@ -217,7 +217,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.PreimageMissing: {
+    case EventKind.PreimageMissing: {
       const { proposalHash, referendumIndex } = data;
       return {
         heading: 'Preimage Missing',
@@ -225,7 +225,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/referendum/${referendumIndex}` : null,
       };
     }
-    case SubstrateEventKind.PreimageReaped: {
+    case EventKind.PreimageReaped: {
       const { proposalHash, noter, reaper } = data;
       return {
         heading: 'Preimage Reaped',
@@ -237,7 +237,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * Treasury Events
      */
-    case SubstrateEventKind.TreasuryProposed: {
+    case EventKind.TreasuryProposed: {
       const { proposalIndex, proposer, value } = data;
       return {
         heading: 'Treasury Proposal Created',
@@ -245,7 +245,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/treasuryproposal/${proposalIndex}` : null,
       };
     }
-    case SubstrateEventKind.TreasuryAwarded: {
+    case EventKind.TreasuryAwarded: {
       const { proposalIndex, value, beneficiary } = data;
       return {
         heading: 'Treasury Proposal Awarded',
@@ -253,7 +253,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/treasuryproposal/${proposalIndex}` : null,
       };
     }
-    case SubstrateEventKind.TreasuryRejected: {
+    case EventKind.TreasuryRejected: {
       const { proposalIndex } = data;
       return {
         heading: 'Treasury Proposal Rejected',
@@ -268,7 +268,7 @@ const labelSubstrateEvent: LabelerFilter = (
      * Note: all election events simply link to the council page.
      *   We may want to change this if deemed unnecessary.
      */
-    case SubstrateEventKind.ElectionNewTerm: {
+    case EventKind.ElectionNewTerm: {
       const { newMembers } = data;
       return {
         heading: 'New Election Term Started',
@@ -277,14 +277,14 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
     }
-    case SubstrateEventKind.ElectionEmptyTerm: {
+    case EventKind.ElectionEmptyTerm: {
       return {
         heading: 'New Election Term Started',
         label: 'A new election term started with no new members.',
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
     }
-    case SubstrateEventKind.ElectionCandidacySubmitted: {
+    case EventKind.ElectionCandidacySubmitted: {
       const { candidate } = data;
       return {
         heading: 'Council Candidate Submitted',
@@ -293,7 +293,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/council` : null,
       };
     }
-    case SubstrateEventKind.ElectionMemberKicked: {
+    case EventKind.ElectionMemberKicked: {
       const { who } = data;
       return {
         heading: 'Council Member Kicked',
@@ -302,7 +302,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/council/` : null,
       };
     }
-    case SubstrateEventKind.ElectionMemberRenounced: {
+    case EventKind.ElectionMemberRenounced: {
       const { who } = data;
       return {
         heading: 'Council Member Renounced',
@@ -315,7 +315,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * Collective Events
      */
-    case SubstrateEventKind.CollectiveProposed: {
+    case EventKind.CollectiveProposed: {
       const { proposer, proposalHash, threshold, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -325,7 +325,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
-    case SubstrateEventKind.CollectiveVoted: {
+    case EventKind.CollectiveVoted: {
       const { vote, proposalHash, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -335,7 +335,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
-    case SubstrateEventKind.CollectiveApproved: {
+    case EventKind.CollectiveApproved: {
       const { proposalHash, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -345,7 +345,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
-    case SubstrateEventKind.CollectiveDisapproved: {
+    case EventKind.CollectiveDisapproved: {
       const { collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -355,7 +355,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
-    case SubstrateEventKind.CollectiveExecuted: {
+    case EventKind.CollectiveExecuted: {
       const { executionOk, collectiveName, proposalHash } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -365,7 +365,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/councilmotion/${proposalHash}` : null,
       };
     }
-    case SubstrateEventKind.CollectiveMemberExecuted: {
+    case EventKind.CollectiveMemberExecuted: {
       const { executionOk, collectiveName } = data;
       const collective = collectiveName && collectiveName === 'technicalCommittee'
         ? 'Technical Committee' : 'Council';
@@ -380,7 +380,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * Signaling Events
      */
-    case SubstrateEventKind.SignalingNewProposal: {
+    case EventKind.SignalingNewProposal: {
       const { proposer, voteId } = data;
       return {
         heading: 'New Signaling Proposal',
@@ -388,7 +388,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
       };
     }
-    case SubstrateEventKind.SignalingCommitStarted: {
+    case EventKind.SignalingCommitStarted: {
       const { endBlock, voteId } = data;
       return {
         heading: 'Signaling Proposal Commit Started',
@@ -396,7 +396,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
       };
     }
-    case SubstrateEventKind.SignalingVotingStarted: {
+    case EventKind.SignalingVotingStarted: {
       const { endBlock, voteId } = data;
       return {
         heading: 'Signaling Proposal Voting Started',
@@ -404,7 +404,7 @@ const labelSubstrateEvent: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/proposal/signalingproposal/${voteId}` : null,
       };
     }
-    case SubstrateEventKind.SignalingVotingCompleted: {
+    case EventKind.SignalingVotingCompleted: {
       const { voteId } = data;
       return {
         heading: 'Signaling Proposal Completed',
@@ -416,7 +416,7 @@ const labelSubstrateEvent: LabelerFilter = (
     /**
      * TreasuryReward events
      */
-    case SubstrateEventKind.TreasuryRewardMinting: {
+    case EventKind.TreasuryRewardMinting: {
       const { pot, reward } = data;
       return {
         heading: 'Treasury Reward Minted',
@@ -424,7 +424,7 @@ const labelSubstrateEvent: LabelerFilter = (
         // TODO: link to pot? or something?
       };
     }
-    case SubstrateEventKind.TreasuryRewardMintingV2: {
+    case EventKind.TreasuryRewardMintingV2: {
       const { pot, potAddress } = data;
       return {
         heading: 'Treasury Reward Minted',
@@ -440,5 +440,3 @@ const labelSubstrateEvent: LabelerFilter = (
     }
   }
 };
-
-export default labelSubstrateEvent;

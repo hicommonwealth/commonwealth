@@ -1,6 +1,6 @@
 import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
 
-export const SubstrateEventChains = [
+export const EventChains = [
   'edgeware',
   // 'edgeware-local',
   'kusama',
@@ -15,17 +15,17 @@ export const SubstrateEventChains = [
  */
 
 /** Special types for formatting/labeling purposes */
-export type SubstrateBalanceString = string;
-export type SubstrateBigIntString = string;
-export type SubstrateBlockNumber = number;
-export type SubstrateAccountId = string;
-export type SubstrateRuntimeVersion = number;
+export type BalanceString = string;
+export type BigIntString = string;
+export type BlockNumber = number;
+export type AccountId = string;
+export type RuntimeVersion = number;
 
 /**
- * Substrate lacks a block type that includes events as well, so we synthesize a type
+ *  lacks a block type that includes events as well, so we synthesize a type
  * from the combination of headers, events, and extrinsics.
  */
-export interface SubstrateBlock {
+export interface Block {
   header: Header;
   events: EventRecord[];
   extrinsics: Extrinsic[];
@@ -34,7 +34,7 @@ export interface SubstrateBlock {
 }
 
 // Used for grouping EventKinds together for archival purposes
-export enum SubstrateEntityKind {
+export enum EntityKind {
   DemocracyProposal = 'democracy-proposal',
   DemocracyReferendum = 'democracy-referendum',
   DemocracyPreimage = 'democracy-preimage',
@@ -51,7 +51,7 @@ export function isEvent(e: Event | Extrinsic): e is Event {
   return !(e.data instanceof Uint8Array);
 }
 
-export enum SubstrateEventKind {
+export enum EventKind {
   Slash = 'slash',
   Reward = 'reward',
   Bonded = 'bonded',
@@ -100,90 +100,90 @@ export enum SubstrateEventKind {
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 }
 
-interface ISubstrateEvent {
-  kind: SubstrateEventKind;
+interface IEvent {
+  kind: EventKind;
 }
 
 /**
  * Staking Events
  */
-export interface ISubstrateSlash extends ISubstrateEvent {
-  kind: SubstrateEventKind.Slash;
-  validator: SubstrateAccountId;
-  amount: SubstrateBalanceString;
+export interface ISlash extends IEvent {
+  kind: EventKind.Slash;
+  validator: AccountId;
+  amount: BalanceString;
 }
 
-export interface ISubstrateReward extends ISubstrateEvent {
-  kind: SubstrateEventKind.Reward;
-  validator?: SubstrateAccountId;
-  amount: SubstrateBalanceString;
+export interface IReward extends IEvent {
+  kind: EventKind.Reward;
+  validator?: AccountId;
+  amount: BalanceString;
 }
 
-export interface ISubstrateBonded extends ISubstrateEvent {
-  kind: SubstrateEventKind.Bonded;
-  stash: SubstrateAccountId;
-  amount: SubstrateBalanceString;
-  controller: SubstrateAccountId;
+export interface IBonded extends IEvent {
+  kind: EventKind.Bonded;
+  stash: AccountId;
+  amount: BalanceString;
+  controller: AccountId;
 }
 
-export interface ISubstrateUnbonded extends ISubstrateEvent {
-  kind: SubstrateEventKind.Unbonded;
-  stash: SubstrateAccountId;
-  amount: SubstrateBalanceString;
-  controller: SubstrateAccountId;
+export interface IUnbonded extends IEvent {
+  kind: EventKind.Unbonded;
+  stash: AccountId;
+  amount: BalanceString;
+  controller: AccountId;
 }
 
 /**
  * Democracy Events
  */
-export interface ISubstrateVoteDelegated extends ISubstrateEvent {
-  kind: SubstrateEventKind.VoteDelegated;
-  who: SubstrateAccountId;
-  target: SubstrateAccountId;
+export interface IVoteDelegated extends IEvent {
+  kind: EventKind.VoteDelegated;
+  who: AccountId;
+  target: AccountId;
 }
 
-export interface ISubstrateDemocracyProposed extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyProposed;
+export interface IDemocracyProposed extends IEvent {
+  kind: EventKind.DemocracyProposed;
   proposalIndex: number;
   proposalHash: string;
-  deposit: SubstrateBalanceString;
-  proposer: SubstrateAccountId;
+  deposit: BalanceString;
+  proposer: AccountId;
 }
 
-export interface ISubstrateDemocracyTabled extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyTabled;
+export interface IDemocracyTabled extends IEvent {
+  kind: EventKind.DemocracyTabled;
   proposalIndex: number;
   // TODO: do we want to store depositors?
 }
 
-export interface ISubstrateDemocracyStarted extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyStarted;
+export interface IDemocracyStarted extends IEvent {
+  kind: EventKind.DemocracyStarted;
   referendumIndex: number;
   proposalHash: string;
   voteThreshold: string;
-  endBlock: SubstrateBlockNumber;
+  endBlock: BlockNumber;
 }
 
-export interface ISubstrateDemocracyPassed extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyPassed;
+export interface IDemocracyPassed extends IEvent {
+  kind: EventKind.DemocracyPassed;
   referendumIndex: number;
-  dispatchBlock: SubstrateBlockNumber | null;
+  dispatchBlock: BlockNumber | null;
   // TODO: worth enriching with tally?
 }
 
-export interface ISubstrateDemocracyNotPassed extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyNotPassed;
+export interface IDemocracyNotPassed extends IEvent {
+  kind: EventKind.DemocracyNotPassed;
   referendumIndex: number;
   // TODO: worth enriching with tally?
 }
 
-export interface ISubstrateDemocracyCancelled extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyCancelled;
+export interface IDemocracyCancelled extends IEvent {
+  kind: EventKind.DemocracyCancelled;
   referendumIndex: number;
 }
 
-export interface ISubstrateDemocracyExecuted extends ISubstrateEvent {
-  kind: SubstrateEventKind.DemocracyExecuted;
+export interface IDemocracyExecuted extends IEvent {
+  kind: EventKind.DemocracyExecuted;
   referendumIndex: number;
   executionOk: boolean;
 }
@@ -192,10 +192,10 @@ export interface ISubstrateDemocracyExecuted extends ISubstrateEvent {
  * Preimage Events
  * TODO: do we want to track depositors and deposit amounts?
  */
-export interface ISubstratePreimageNoted extends ISubstrateEvent {
-  kind: SubstrateEventKind.PreimageNoted;
+export interface IPreimageNoted extends IEvent {
+  kind: EventKind.PreimageNoted;
   proposalHash: string;
-  noter: SubstrateAccountId;
+  noter: AccountId;
   preimage: {
     method: string;
     section: string;
@@ -203,52 +203,52 @@ export interface ISubstratePreimageNoted extends ISubstrateEvent {
   };
 }
 
-export interface ISubstratePreimageUsed extends ISubstrateEvent {
-  kind: SubstrateEventKind.PreimageUsed;
+export interface IPreimageUsed extends IEvent {
+  kind: EventKind.PreimageUsed;
   proposalHash: string;
-  noter: SubstrateAccountId;
+  noter: AccountId;
 }
 
-export interface ISubstratePreimageInvalid extends ISubstrateEvent {
-  kind: SubstrateEventKind.PreimageInvalid;
+export interface IPreimageInvalid extends IEvent {
+  kind: EventKind.PreimageInvalid;
   proposalHash: string;
   referendumIndex: number;
 }
 
-export interface ISubstratePreimageMissing extends ISubstrateEvent {
-  kind: SubstrateEventKind.PreimageMissing;
+export interface IPreimageMissing extends IEvent {
+  kind: EventKind.PreimageMissing;
   proposalHash: string;
   referendumIndex: number;
 }
 
-export interface ISubstratePreimageReaped extends ISubstrateEvent {
-  kind: SubstrateEventKind.PreimageReaped;
+export interface IPreimageReaped extends IEvent {
+  kind: EventKind.PreimageReaped;
   proposalHash: string;
-  noter: SubstrateAccountId;
-  reaper: SubstrateAccountId;
+  noter: AccountId;
+  reaper: AccountId;
 }
 
 /**
  * Treasury Events
  */
-export interface ISubstrateTreasuryProposed extends ISubstrateEvent {
-  kind: SubstrateEventKind.TreasuryProposed;
+export interface ITreasuryProposed extends IEvent {
+  kind: EventKind.TreasuryProposed;
   proposalIndex: number;
-  proposer: SubstrateAccountId;
-  value: SubstrateBalanceString;
-  beneficiary: SubstrateAccountId;
-  bond: SubstrateBalanceString;
+  proposer: AccountId;
+  value: BalanceString;
+  beneficiary: AccountId;
+  bond: BalanceString;
 }
 
-export interface ISubstrateTreasuryAwarded extends ISubstrateEvent {
-  kind: SubstrateEventKind.TreasuryAwarded;
+export interface ITreasuryAwarded extends IEvent {
+  kind: EventKind.TreasuryAwarded;
   proposalIndex: number;
-  value: SubstrateBalanceString;
-  beneficiary: SubstrateAccountId;
+  value: BalanceString;
+  beneficiary: AccountId;
 }
 
-export interface ISubstrateTreasuryRejected extends ISubstrateEvent {
-  kind: SubstrateEventKind.TreasuryRejected;
+export interface ITreasuryRejected extends IEvent {
+  kind: EventKind.TreasuryRejected;
   proposalIndex: number;
   // can also fetch slashed bond value if needed
   // cannot fetch other data because proposal data disappears on rejection
@@ -257,37 +257,37 @@ export interface ISubstrateTreasuryRejected extends ISubstrateEvent {
 /**
  * Elections Events
  */
-export interface ISubstrateElectionNewTerm extends ISubstrateEvent {
-  kind: SubstrateEventKind.ElectionNewTerm;
-  newMembers: SubstrateAccountId[];
+export interface IElectionNewTerm extends IEvent {
+  kind: EventKind.ElectionNewTerm;
+  newMembers: AccountId[];
 }
 
-export interface ISubstrateElectionEmptyTerm extends ISubstrateEvent {
-  kind: SubstrateEventKind.ElectionEmptyTerm;
+export interface IElectionEmptyTerm extends IEvent {
+  kind: EventKind.ElectionEmptyTerm;
 }
 
-export interface ISubstrateCandidacySubmitted extends ISubstrateEvent {
-  kind: SubstrateEventKind.ElectionCandidacySubmitted;
-  candidate: SubstrateAccountId;
+export interface ICandidacySubmitted extends IEvent {
+  kind: EventKind.ElectionCandidacySubmitted;
+  candidate: AccountId;
 }
 
-export interface ISubstrateElectionMemberKicked extends ISubstrateEvent {
-  kind: SubstrateEventKind.ElectionMemberKicked;
-  who: SubstrateAccountId;
+export interface IElectionMemberKicked extends IEvent {
+  kind: EventKind.ElectionMemberKicked;
+  who: AccountId;
 }
 
-export interface ISubstrateElectionMemberRenounced extends ISubstrateEvent {
-  kind: SubstrateEventKind.ElectionMemberRenounced;
-  who: SubstrateAccountId;
+export interface IElectionMemberRenounced extends IEvent {
+  kind: EventKind.ElectionMemberRenounced;
+  who: AccountId;
 }
 
 /**
  * Collective Events
  */
-export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveProposed;
+export interface ICollectiveProposed extends IEvent {
+  kind: EventKind.CollectiveProposed;
   collectiveName?: 'council' | 'technicalCommittee';
-  proposer: SubstrateAccountId;
+  proposer: AccountId;
   proposalIndex: number;
   proposalHash: string;
   threshold: number;
@@ -299,35 +299,35 @@ export interface ISubstrateCollectiveProposed extends ISubstrateEvent {
   };
 }
 
-export interface ISubstrateCollectiveVoted extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveVoted;
+export interface ICollectiveVoted extends IEvent {
+  kind: EventKind.CollectiveVoted;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
-  voter: SubstrateAccountId;
+  voter: AccountId;
   vote: boolean;
 }
 
-export interface ISubstrateCollectiveApproved extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveApproved;
+export interface ICollectiveApproved extends IEvent {
+  kind: EventKind.CollectiveApproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
 }
 
-export interface ISubstrateCollectiveDisapproved extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveDisapproved;
+export interface ICollectiveDisapproved extends IEvent {
+  kind: EventKind.CollectiveDisapproved;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
 }
 
-export interface ISubstrateCollectiveExecuted extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveExecuted;
+export interface ICollectiveExecuted extends IEvent {
+  kind: EventKind.CollectiveExecuted;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   executionOk: boolean;
 }
 
-export interface ISubstrateCollectiveMemberExecuted extends ISubstrateEvent {
-  kind: SubstrateEventKind.CollectiveMemberExecuted;
+export interface ICollectiveMemberExecuted extends IEvent {
+  kind: EventKind.CollectiveMemberExecuted;
   collectiveName?: 'council' | 'technicalCommittee';
   proposalHash: string;
   executionOk: boolean;
@@ -336,11 +336,11 @@ export interface ISubstrateCollectiveMemberExecuted extends ISubstrateEvent {
 /**
  * Signaling Events
  */
-export interface ISubstrateSignalingNewProposal extends ISubstrateEvent {
-  kind: SubstrateEventKind.SignalingNewProposal;
-  proposer: SubstrateAccountId;
+export interface ISignalingNewProposal extends IEvent {
+  kind: EventKind.SignalingNewProposal;
+  proposer: AccountId;
   proposalHash: string;
-  voteId: SubstrateBigIntString;
+  voteId: BigIntString;
   title: string;
   description: string;
   tallyType: string;
@@ -348,101 +348,101 @@ export interface ISubstrateSignalingNewProposal extends ISubstrateEvent {
   choices: string[];
 }
 
-export interface ISubstrateSignalingCommitStarted extends ISubstrateEvent {
-  kind: SubstrateEventKind.SignalingCommitStarted;
+export interface ISignalingCommitStarted extends IEvent {
+  kind: EventKind.SignalingCommitStarted;
   proposalHash: string;
-  voteId: SubstrateBigIntString;
+  voteId: BigIntString;
   endBlock: number;
 }
 
-export interface ISubstrateSignalingVotingStarted extends ISubstrateEvent {
-  kind: SubstrateEventKind.SignalingVotingStarted;
+export interface ISignalingVotingStarted extends IEvent {
+  kind: EventKind.SignalingVotingStarted;
   proposalHash: string;
-  voteId: SubstrateBigIntString;
+  voteId: BigIntString;
   endBlock: number;
 }
 
-export interface ISubstrateSignalingVotingCompleted extends ISubstrateEvent {
-  kind: SubstrateEventKind.SignalingVotingCompleted;
+export interface ISignalingVotingCompleted extends IEvent {
+  kind: EventKind.SignalingVotingCompleted;
   proposalHash: string;
-  voteId: SubstrateBigIntString;
+  voteId: BigIntString;
   // TODO: worth enriching with tally?
 }
 
 /**
  * TreasuryReward events
  */
-export interface ISubstrateTreasuryRewardMinting extends ISubstrateEvent {
-  kind: SubstrateEventKind.TreasuryRewardMinting;
-  pot: SubstrateBalanceString;
-  reward: SubstrateBalanceString;
+export interface ITreasuryRewardMinting extends IEvent {
+  kind: EventKind.TreasuryRewardMinting;
+  pot: BalanceString;
+  reward: BalanceString;
 }
-export interface ISubstrateTreasuryRewardMintingV2 extends ISubstrateEvent {
-  kind: SubstrateEventKind.TreasuryRewardMintingV2;
-  pot: SubstrateBalanceString;
-  potAddress: SubstrateAccountId;
+export interface ITreasuryRewardMintingV2 extends IEvent {
+  kind: EventKind.TreasuryRewardMintingV2;
+  pot: BalanceString;
+  potAddress: AccountId;
 }
 
-export type ISubstrateEventData =
-  ISubstrateSlash
-  | ISubstrateReward
-  | ISubstrateBonded
-  | ISubstrateUnbonded
-  | ISubstrateVoteDelegated
-  | ISubstrateDemocracyProposed
-  | ISubstrateDemocracyTabled
-  | ISubstrateDemocracyStarted
-  | ISubstrateDemocracyPassed
-  | ISubstrateDemocracyNotPassed
-  | ISubstrateDemocracyCancelled
-  | ISubstrateDemocracyExecuted
-  | ISubstratePreimageNoted
-  | ISubstratePreimageUsed
-  | ISubstratePreimageInvalid
-  | ISubstratePreimageMissing
-  | ISubstratePreimageReaped
-  | ISubstrateTreasuryProposed
-  | ISubstrateTreasuryAwarded
-  | ISubstrateTreasuryRejected
-  | ISubstrateElectionNewTerm
-  | ISubstrateElectionEmptyTerm
-  | ISubstrateCandidacySubmitted
-  | ISubstrateElectionMemberKicked
-  | ISubstrateElectionMemberRenounced
-  | ISubstrateCollectiveProposed
-  | ISubstrateCollectiveVoted
-  | ISubstrateCollectiveApproved
-  | ISubstrateCollectiveDisapproved
-  | ISubstrateCollectiveExecuted
-  | ISubstrateCollectiveMemberExecuted
-  | ISubstrateSignalingNewProposal
-  | ISubstrateSignalingCommitStarted
-  | ISubstrateSignalingVotingStarted
-  | ISubstrateSignalingVotingCompleted
-  | ISubstrateTreasuryRewardMinting
-  | ISubstrateTreasuryRewardMintingV2
+export type IEventData =
+  ISlash
+  | IReward
+  | IBonded
+  | IUnbonded
+  | IVoteDelegated
+  | IDemocracyProposed
+  | IDemocracyTabled
+  | IDemocracyStarted
+  | IDemocracyPassed
+  | IDemocracyNotPassed
+  | IDemocracyCancelled
+  | IDemocracyExecuted
+  | IPreimageNoted
+  | IPreimageUsed
+  | IPreimageInvalid
+  | IPreimageMissing
+  | IPreimageReaped
+  | ITreasuryProposed
+  | ITreasuryAwarded
+  | ITreasuryRejected
+  | IElectionNewTerm
+  | IElectionEmptyTerm
+  | ICandidacySubmitted
+  | IElectionMemberKicked
+  | IElectionMemberRenounced
+  | ICollectiveProposed
+  | ICollectiveVoted
+  | ICollectiveApproved
+  | ICollectiveDisapproved
+  | ICollectiveExecuted
+  | ICollectiveMemberExecuted
+  | ISignalingNewProposal
+  | ISignalingCommitStarted
+  | ISignalingVotingStarted
+  | ISignalingVotingCompleted
+  | ITreasuryRewardMinting
+  | ITreasuryRewardMintingV2
 // eslint-disable-next-line semi-style
 ;
 
-export const SubstrateEventKinds: SubstrateEventKind[] = Object.values(SubstrateEventKind);
+export const EventKinds: EventKind[] = Object.values(EventKind);
 
 /**
  * The following auxiliary types and functions are used in migrations and should
  * not be relied upon for general implementations.
  */
-export type ISubstrateDemocracyProposalEvents =
-  ISubstrateDemocracyProposed | ISubstrateDemocracyTabled;
-export type ISubstrateDemocracyReferendumEvents =
-  ISubstrateDemocracyStarted | ISubstrateDemocracyPassed | ISubstrateDemocracyNotPassed
-  | ISubstrateDemocracyCancelled | ISubstrateDemocracyExecuted;
-export type ISubstrateDemocracyPreimageEvents =
-  ISubstratePreimageNoted | ISubstratePreimageUsed | ISubstratePreimageInvalid
-  | ISubstratePreimageMissing | ISubstratePreimageReaped;
-export type ISubstrateTreasuryProposalEvents =
-  ISubstrateTreasuryProposed | ISubstrateTreasuryRejected | ISubstrateTreasuryAwarded;
-export type ISubstrateCollectiveProposalEvents =
-  ISubstrateCollectiveProposed | ISubstrateCollectiveVoted | ISubstrateCollectiveApproved
-  | ISubstrateCollectiveDisapproved | ISubstrateCollectiveExecuted;
-export type ISubstrateSignalingProposalEvents =
-  ISubstrateSignalingNewProposal | ISubstrateSignalingCommitStarted
-  | ISubstrateSignalingVotingStarted | ISubstrateSignalingVotingCompleted;
+export type IDemocracyProposalEvents =
+  IDemocracyProposed | IDemocracyTabled;
+export type IDemocracyReferendumEvents =
+  IDemocracyStarted | IDemocracyPassed | IDemocracyNotPassed
+  | IDemocracyCancelled | IDemocracyExecuted;
+export type IDemocracyPreimageEvents =
+  IPreimageNoted | IPreimageUsed | IPreimageInvalid
+  | IPreimageMissing | IPreimageReaped;
+export type ITreasuryProposalEvents =
+  ITreasuryProposed | ITreasuryRejected | ITreasuryAwarded;
+export type ICollectiveProposalEvents =
+  ICollectiveProposed | ICollectiveVoted | ICollectiveApproved
+  | ICollectiveDisapproved | ICollectiveExecuted;
+export type ISignalingProposalEvents =
+  ISignalingNewProposal | ISignalingCommitStarted
+  | ISignalingVotingStarted | ISignalingVotingCompleted;

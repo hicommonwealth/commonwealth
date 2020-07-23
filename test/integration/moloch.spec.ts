@@ -5,8 +5,8 @@ import { Moloch1Factory } from '../../eth/types/Moloch1Factory';
 import { Moloch1 } from '../../eth/types/Moloch1';
 import { TokenFactory } from '../../eth/types/TokenFactory';
 import { Token } from '../../eth/types/Token';
-import { MolochApi, IMolochEventData, MolochEventKind } from '../../src/moloch/types';
-import subscribeMolochEvents from '../../src/moloch/index';
+import { Api, IEventData, EventKind } from '../../src/moloch/types';
+import { subscribeEvents } from '../../src/moloch/subscribeFunc';
 import { IEventHandler, CWEvent } from '../../src/interfaces';
 
 const { assert } = chai;
@@ -51,14 +51,14 @@ class MolochEventHandler extends IEventHandler {
     super();
   }
 
-  public async handle(event: CWEvent<IMolochEventData>): Promise<any> {
+  public async handle(event: CWEvent<IEventData>): Promise<any> {
     this.emitter.emit(event.data.kind.toString(), event);
     this.emitter.emit('*', event);
   }
 }
 
 interface ISetupData {
-  api: MolochApi;
+  api: Api;
   token: Token;
   addresses: string[];
   provider: providers.Web3Provider;
@@ -71,11 +71,11 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
   const [ member ] = addresses;
   const signer = provider.getSigner(member);
   const token = await deployToken(signer);
-  const api: MolochApi = await deployMoloch1(signer, member, token.address);
+  const api: Api = await deployMoloch1(signer, member, token.address);
   const emitter = new EventEmitter();
   const handler = new MolochEventHandler(emitter);
   if (subscribe) {
-    await subscribeMolochEvents({
+    await subscribeEvents({
       chain: 'test',
       api,
       contractVersion: 1,
@@ -88,7 +88,7 @@ async function setupSubscription(subscribe = true): Promise<ISetupData> {
 
 async function submitProposal(
   provider: providers.Web3Provider,
-  api: MolochApi,
+  api: Api,
   token: Token,
   member: string,
   applicant: string,
@@ -124,10 +124,10 @@ describe('Moloch Event Integration Tests', () => {
     const { addresses, handler } = await setupSubscription();
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.SummonComplete.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.SummonComplete.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.SummonComplete,
+            kind: EventKind.SummonComplete,
             summoner: addresses[0],
             shares: '1',
           });
@@ -144,10 +144,10 @@ describe('Moloch Event Integration Tests', () => {
     await submitProposal(provider, api, token, member, applicant);
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.SubmitProposal.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.SubmitProposal.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.SubmitProposal,
+            kind: EventKind.SubmitProposal,
             proposalIndex: 0,
             member,
             delegateKey: member,
@@ -173,10 +173,10 @@ describe('Moloch Event Integration Tests', () => {
     await api.submitVote(0, 2);
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.SubmitVote.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.SubmitVote.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.SubmitVote,
+            kind: EventKind.SubmitVote,
             proposalIndex: 0,
             member,
             delegateKey: member,
@@ -209,10 +209,10 @@ describe('Moloch Event Integration Tests', () => {
     await api.processProposal(0);
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.ProcessProposal.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.ProcessProposal.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.ProcessProposal,
+            kind: EventKind.ProcessProposal,
             proposalIndex: 0,
             member,
             applicant,
@@ -257,10 +257,10 @@ describe('Moloch Event Integration Tests', () => {
 
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.Abort.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.Abort.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.Abort,
+            kind: EventKind.Abort,
             proposalIndex: 0,
             applicant,
           });
@@ -294,10 +294,10 @@ describe('Moloch Event Integration Tests', () => {
     await appMoloch.ragequit(5);
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.Ragequit.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.Ragequit.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.Ragequit,
+            kind: EventKind.Ragequit,
             member: applicant,
             sharesToBurn: '5',
           });
@@ -318,10 +318,10 @@ describe('Moloch Event Integration Tests', () => {
     await api.updateDelegateKey(addresses[1]);
     await new Promise((resolve) => {
       handler.emitter.on(
-        MolochEventKind.UpdateDelegateKey.toString(),
-        (evt: CWEvent<IMolochEventData>) => {
+        EventKind.UpdateDelegateKey.toString(),
+        (evt: CWEvent<IEventData>) => {
           assert.deepEqual(evt.data, {
-            kind: MolochEventKind.UpdateDelegateKey,
+            kind: EventKind.UpdateDelegateKey,
             member,
             newDelegateKey,
           });
@@ -368,10 +368,10 @@ describe('Moloch Event Integration Tests', () => {
     provider.send('evm_increaseTime', [3]);
 
     // perform migration
-    const events: CWEvent<IMolochEventData>[] = [];
-    handler.emitter.on('*', (evt: CWEvent<IMolochEventData>) => events.push(evt));
+    const events: CWEvent<IEventData>[] = [];
+    handler.emitter.on('*', (evt: CWEvent<IEventData>) => events.push(evt));
     const discoverReconnectRange = async () => ({ startBlock: 0 });
-    const subscription = await subscribeMolochEvents({
+    const subscription = await subscribeEvents({
       chain: 'test',
       api,
       contractVersion: 1,
@@ -389,7 +389,7 @@ describe('Moloch Event Integration Tests', () => {
     ].map((period) => (+period * periodDuration) + summonTime);
     assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 0), [
       {
-        kind: MolochEventKind.SubmitProposal,
+        kind: EventKind.SubmitProposal,
         proposalIndex: 0,
         member,
         applicant: applicant1,
@@ -399,7 +399,7 @@ describe('Moloch Event Integration Tests', () => {
         startTime: proposalStartTimes[0],
       },
       {
-        kind: MolochEventKind.ProcessProposal,
+        kind: EventKind.ProcessProposal,
         proposalIndex: 0,
         member,
         applicant: applicant1,
@@ -413,7 +413,7 @@ describe('Moloch Event Integration Tests', () => {
 
     assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 1), [
       {
-        kind: MolochEventKind.SubmitProposal,
+        kind: EventKind.SubmitProposal,
         proposalIndex: 1,
         member,
         applicant: applicant2,
@@ -423,14 +423,14 @@ describe('Moloch Event Integration Tests', () => {
         startTime: proposalStartTimes[1],
       },
       {
-        kind: MolochEventKind.Abort,
+        kind: EventKind.Abort,
         proposalIndex: 1,
         applicant: applicant2,
       }
     ]);
     assert.sameDeepMembers(events.map((e) => e.data).filter((e) => (e as any).proposalIndex === 2), [
       {
-        kind: MolochEventKind.SubmitProposal,
+        kind: EventKind.SubmitProposal,
         proposalIndex: 2,
         member: applicant1,
         applicant: applicant2,

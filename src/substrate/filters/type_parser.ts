@@ -1,88 +1,88 @@
-import { SubstrateEventKind } from '../types';
+import { EventKind } from '../types';
 
 /**
  * This is the Type Parser function, which takes a raw Substrate chain Event
  * and determines which of our local event kinds it belongs to.
  */
-export default function (
+export function ParseType (
   versionName: string,
   versionNumber: number,
   section: string,
   method: string,
-): SubstrateEventKind | null {
+): EventKind | null {
   // TODO: we can unify this with the enricher file: parse out the kind, and then
   //   marshall the rest of the types in the same place. But for now, we can leave as-is.
   switch (section) {
     case 'staking':
       switch (method) {
-        case 'Slash': return SubstrateEventKind.Slash;
-        case 'Reward': return SubstrateEventKind.Reward;
+        case 'Slash': return EventKind.Slash;
+        case 'Reward': return EventKind.Reward;
         // NOTE: these are not supported yet on Edgeware, only kusama and edgeware-develop
-        case 'Bonded': return SubstrateEventKind.Bonded;
-        case 'Unbonded': return SubstrateEventKind.Unbonded;
+        case 'Bonded': return EventKind.Bonded;
+        case 'Unbonded': return EventKind.Unbonded;
         default: return null;
       }
     case 'democracy':
       switch (method) {
-        case 'Proposed': return SubstrateEventKind.DemocracyProposed;
-        case 'Tabled': return SubstrateEventKind.DemocracyTabled;
-        case 'Started': return SubstrateEventKind.DemocracyStarted;
-        case 'Passed': return SubstrateEventKind.DemocracyPassed;
-        case 'NotPassed': return SubstrateEventKind.DemocracyNotPassed;
-        case 'Cancelled': return SubstrateEventKind.DemocracyCancelled;
-        case 'Executed': return SubstrateEventKind.DemocracyExecuted;
-        case 'Delegated': return SubstrateEventKind.VoteDelegated;
-        case 'PreimageNoted': return SubstrateEventKind.PreimageNoted;
-        case 'PreimageUsed': return SubstrateEventKind.PreimageUsed;
-        case 'PreimageInvalid': return SubstrateEventKind.PreimageInvalid;
-        case 'PreimageMissing': return SubstrateEventKind.PreimageMissing;
-        case 'PreimageReaped': return SubstrateEventKind.PreimageReaped;
+        case 'Proposed': return EventKind.DemocracyProposed;
+        case 'Tabled': return EventKind.DemocracyTabled;
+        case 'Started': return EventKind.DemocracyStarted;
+        case 'Passed': return EventKind.DemocracyPassed;
+        case 'NotPassed': return EventKind.DemocracyNotPassed;
+        case 'Cancelled': return EventKind.DemocracyCancelled;
+        case 'Executed': return EventKind.DemocracyExecuted;
+        case 'Delegated': return EventKind.VoteDelegated;
+        case 'PreimageNoted': return EventKind.PreimageNoted;
+        case 'PreimageUsed': return EventKind.PreimageUsed;
+        case 'PreimageInvalid': return EventKind.PreimageInvalid;
+        case 'PreimageMissing': return EventKind.PreimageMissing;
+        case 'PreimageReaped': return EventKind.PreimageReaped;
         default: return null;
       }
     case 'treasury':
       switch (method) {
-        case 'Proposed': return SubstrateEventKind.TreasuryProposed;
-        case 'Awarded': return SubstrateEventKind.TreasuryAwarded;
-        case 'Rejected': return SubstrateEventKind.TreasuryRejected;
+        case 'Proposed': return EventKind.TreasuryProposed;
+        case 'Awarded': return EventKind.TreasuryAwarded;
+        case 'Rejected': return EventKind.TreasuryRejected;
         default: return null;
       }
     case 'elections':
     case 'electionsPhragmen':
       switch (method) {
-        case 'submitCandidacy': return SubstrateEventKind.ElectionCandidacySubmitted;
-        case 'NewTerm': return SubstrateEventKind.ElectionNewTerm;
-        case 'EmptyTerm': return SubstrateEventKind.ElectionEmptyTerm;
-        case 'MemberKicked': return SubstrateEventKind.ElectionMemberKicked;
-        case 'MemberRenounced': return SubstrateEventKind.ElectionMemberRenounced;
+        case 'submitCandidacy': return EventKind.ElectionCandidacySubmitted;
+        case 'NewTerm': return EventKind.ElectionNewTerm;
+        case 'EmptyTerm': return EventKind.ElectionEmptyTerm;
+        case 'MemberKicked': return EventKind.ElectionMemberKicked;
+        case 'MemberRenounced': return EventKind.ElectionMemberRenounced;
         default: return null;
       }
     case 'collective':
     case 'council':
     case 'technicalCollective':
       switch (method) {
-        case 'Proposed': return SubstrateEventKind.CollectiveProposed;
-        case 'Voted': return SubstrateEventKind.CollectiveVoted;
-        case 'Approved': return SubstrateEventKind.CollectiveApproved;
-        case 'Disapproved': return SubstrateEventKind.CollectiveDisapproved;
-        case 'Executed': return SubstrateEventKind.CollectiveExecuted;
-        case 'MemberExecuted': return SubstrateEventKind.CollectiveMemberExecuted;
+        case 'Proposed': return EventKind.CollectiveProposed;
+        case 'Voted': return EventKind.CollectiveVoted;
+        case 'Approved': return EventKind.CollectiveApproved;
+        case 'Disapproved': return EventKind.CollectiveDisapproved;
+        case 'Executed': return EventKind.CollectiveExecuted;
+        case 'MemberExecuted': return EventKind.CollectiveMemberExecuted;
         default: return null;
       }
     case 'signaling':
       switch (method) {
-        case 'NewProposal': return SubstrateEventKind.SignalingNewProposal;
-        case 'CommitStarted': return SubstrateEventKind.SignalingCommitStarted;
-        case 'VotingStarted': return SubstrateEventKind.SignalingVotingStarted;
-        case 'VotingCompleted': return SubstrateEventKind.SignalingVotingCompleted;
+        case 'NewProposal': return EventKind.SignalingNewProposal;
+        case 'CommitStarted': return EventKind.SignalingCommitStarted;
+        case 'VotingStarted': return EventKind.SignalingVotingStarted;
+        case 'VotingCompleted': return EventKind.SignalingVotingCompleted;
         default: return null;
       }
     case 'treasuryReward':
       switch (method) {
         // case 'TreasuryMinting': {
         //   if (versionNumber < 34) {
-        //     return SubstrateEventKind.TreasuryRewardMinting;
+        //     return EventKind.TreasuryRewardMinting;
         //   } else {
-        //     return SubstrateEventKind.TreasuryRewardMintingV2;
+        //     return EventKind.TreasuryRewardMintingV2;
         //   }
         // }
         default: return null;

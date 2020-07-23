@@ -5,14 +5,14 @@ import { ApiPromise } from '@polkadot/api';
 import { Extrinsic, Event } from '@polkadot/types/interfaces';
 
 import { IEventProcessor, CWEvent } from '../interfaces';
-import { SubstrateBlock, isEvent, ISubstrateEventData } from './types';
-import parseEventType from './filters/type_parser';
-import enrichEvent from './filters/enricher';
+import { Block, isEvent, IEventData } from './types';
+import { ParseType } from './filters/type_parser';
+import { Enrich } from './filters/enricher';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
+export class Processor extends IEventProcessor<ApiPromise, Block> {
   private _lastBlockNumber: number;
   public get lastBlockNumber() { return this._lastBlockNumber; }
 
@@ -23,7 +23,7 @@ export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
    * @param block the block received for processing
    * @returns an array of processed events
    */
-  public async process(block: SubstrateBlock): Promise<CWEvent<ISubstrateEventData>[]> {
+  public async process(block: Block): Promise<CWEvent<IEventData>[]> {
     // cache block number if needed for disconnection purposes
     const blockNumber = +block.header.number;
     if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {
@@ -32,8 +32,8 @@ export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
 
     const applyFilters = async (data: Event | Extrinsic) => {
       const kind = isEvent(data)
-        ? parseEventType(block.versionName, block.versionNumber, data.section, data.method)
-        : parseEventType(
+        ? ParseType(block.versionName, block.versionNumber, data.section, data.method)
+        : ParseType(
           block.versionName,
           block.versionNumber,
           data.method.sectionName,
@@ -41,7 +41,7 @@ export default class extends IEventProcessor<ApiPromise, SubstrateBlock> {
         );
       if (kind !== null) {
         try {
-          const result = await enrichEvent(this._api, blockNumber, kind, data);
+          const result = await Enrich(this._api, blockNumber, kind, data);
           return result;
         } catch (e) {
           log.error(`Event enriching failed for ${kind}`);

@@ -1,8 +1,8 @@
 import chai from 'chai';
 import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
 
-import Processor from '../../../src/substrate/processor';
-import { SubstrateEventKind, ISubstrateSlash } from '../../../src/substrate/types';
+import { Processor } from '../../../src/substrate/processor';
+import { EventKind, ISlash } from '../../../src/substrate/types';
 import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;
@@ -100,16 +100,16 @@ describe('Edgeware Event Processor Tests', () => {
         {
           /* eslint-disable dot-notation */
           data: {
-            kind: SubstrateEventKind.Slash,
+            kind: EventKind.Slash,
             validator: 'Alice',
             amount: '10000',
-          } as ISubstrateSlash,
+          } as ISlash,
           blockNumber: 1,
           includeAddresses: ['Alice'],
         },
         {
           data: {
-            kind: SubstrateEventKind.DemocracyProposed,
+            kind: EventKind.DemocracyProposed,
             proposalIndex: 4,
             proposalHash: 'hash',
             deposit: '100000',
@@ -122,7 +122,7 @@ describe('Edgeware Event Processor Tests', () => {
       assert.deepEqual(results[1], [
         {
           data: {
-            kind: SubstrateEventKind.DemocracyStarted,
+            kind: EventKind.DemocracyStarted,
             referendumIndex: 5,
             proposalHash: 'hash',
             voteThreshold: 'Supermajorityapproval',
@@ -132,7 +132,7 @@ describe('Edgeware Event Processor Tests', () => {
         },
         {
           data: {
-            kind: SubstrateEventKind.ElectionCandidacySubmitted,
+            kind: EventKind.ElectionCandidacySubmitted,
             candidate: 'Alice',
           },
           blockNumber: 2,

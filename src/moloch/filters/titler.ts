@@ -1,38 +1,38 @@
-import { MolochEventKind } from '../types';
 import { IEventTitle, TitlerFilter } from '../../interfaces';
+import { EventKind } from '../types';
 
 /**
  * This a titler function, not to be confused with the labeler -- it takes a particular
  * kind of event, and returns a "plain english" description of that type. This is used
  * on the client to present a list of subscriptions that a user might want to subscribe to.
  */
-const titlerFunc: TitlerFilter = (kind: MolochEventKind): IEventTitle => {
+export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
   switch (kind) {
-    case MolochEventKind.SubmitProposal: return {
+    case EventKind.SubmitProposal: return {
       title: 'Proposal Submitted',
       description: 'A new proposal is submitted.',
     };
-    case MolochEventKind.SubmitVote: return {
+    case EventKind.SubmitVote: return {
       title: 'Vote Submitted',
       description: 'A proposal is voted on.',
     };
-    case MolochEventKind.ProcessProposal: return {
+    case EventKind.ProcessProposal: return {
       title: 'Proposal Processed',
       description: 'A proposal is completed and processed.',
     };
-    case MolochEventKind.Ragequit: return {
+    case EventKind.Ragequit: return {
       title: 'Member Ragequit',
       description: 'A member ragequits.',
     };
-    case MolochEventKind.Abort: return {
+    case EventKind.Abort: return {
       title: 'Proposal Aborted',
       description: 'A proposal is aborted by its applicant.',
     };
-    case MolochEventKind.UpdateDelegateKey: return {
+    case EventKind.UpdateDelegateKey: return {
       title: 'Delegate Key Updated',
       description: 'A member updates their delegate key.',
     };
-    case MolochEventKind.SummonComplete: return {
+    case EventKind.SummonComplete: return {
       title: 'Summon Complete',
       description: 'The contract is summoned (never emitted).',
     };
@@ -43,5 +43,3 @@ const titlerFunc: TitlerFilter = (kind: MolochEventKind): IEventTitle => {
     }
   }
 };
-
-export default titlerFunc;

@@ -5,12 +5,12 @@ import { ApiPromise } from '@polkadot/api';
 import { Header, RuntimeVersion, Extrinsic } from '@polkadot/types/interfaces';
 
 import { IEventSubscriber } from '../interfaces';
-import { SubstrateBlock } from './types';
+import { Block } from './types';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
+export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   private _subscription;
   private _versionName: string;
   private _versionNumber: number;
@@ -18,7 +18,7 @@ export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
   /**
    * Initializes subscription to chain and starts emitting events.
    */
-  public subscribe(cb: (block: SubstrateBlock) => any) {
+  public subscribe(cb: (block: Block) => any) {
     // wait for version available before we start producing blocks
     const runtimeVersionP = new Promise((resolve) => {
       this._api.rpc.state.subscribeRuntimeVersion((version: RuntimeVersion) => {
@@ -34,7 +34,7 @@ export default class extends IEventSubscriber<ApiPromise, SubstrateBlock> {
         const events = await this._api.query.system.events.at(header.hash);
         const signedBlock = await this._api.rpc.chain.getBlock(header.hash);
         const extrinsics: Extrinsic[] = signedBlock.block.extrinsics;
-        const block: SubstrateBlock = {
+        const block: Block = {
           header,
           events,
           extrinsics,

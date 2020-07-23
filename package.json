@@ -1,11 +1,13 @@
 {
   "name": "@commonwealth/chain-events",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Listen to various chains for events.",
   "license": "GPL-3.0",
   "files": [
-    "dist/"
+    "./dist/"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",

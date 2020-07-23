@@ -9,19 +9,19 @@ import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/type
 
 import { constructFakeApi, constructOption } from './testUtil';
 import {
-  SubstrateEventKind,
-  ISubstrateDemocracyProposed,
-  ISubstrateDemocracyStarted,
-  ISubstrateDemocracyPassed,
-  ISubstratePreimageNoted,
-  ISubstrateTreasuryProposed,
-  ISubstrateCollectiveProposed,
-  ISubstrateSignalingNewProposal,
-  ISubstrateSignalingVotingStarted,
-  ISubstrateSignalingVotingCompleted,
-  ISubstrateCollectiveVoted
+  EventKind,
+  IDemocracyProposed,
+  IDemocracyStarted,
+  IDemocracyPassed,
+  IPreimageNoted,
+  ITreasuryProposed,
+  ICollectiveProposed,
+  ISignalingNewProposal,
+  ISignalingVotingStarted,
+  ISignalingVotingCompleted,
+  ICollectiveVoted
 } from '../../../src/substrate/types';
-import StorageFetcher from '../../../src/substrate/storageFetcher';
+import { StorageFetcher } from '../../../src/substrate/storageFetcher';
 
 const { assert } = chai;
 
@@ -190,41 +190,41 @@ describe('Edgeware Event Migration Tests', () => {
     assert.sameDeepMembers(events, [
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.DemocracyProposed,
+          kind: EventKind.DemocracyProposed,
           proposalIndex: 1,
           proposalHash: 'hash1',
           proposer: 'Charlie',
           deposit: '100',
-        } as ISubstrateDemocracyProposed
+        } as IDemocracyProposed
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.DemocracyStarted,
+          kind: EventKind.DemocracyStarted,
           referendumIndex: 3,
           proposalHash: 'image-hash-2',
           voteThreshold: 'Supermajorityapproval',
           endBlock: 100,
-        } as ISubstrateDemocracyStarted
+        } as IDemocracyStarted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.DemocracyStarted,
+          kind: EventKind.DemocracyStarted,
           referendumIndex: 2,
           proposalHash: 'image-hash-1',
           voteThreshold: '',
           endBlock: 0,
-        } as ISubstrateDemocracyStarted
+        } as IDemocracyStarted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.DemocracyPassed,
+          kind: EventKind.DemocracyPassed,
           referendumIndex: 2,
           dispatchBlock: 50,
-        } as ISubstrateDemocracyPassed
+        } as IDemocracyPassed
       },
       { blockNumber: 10,
         data: {
-          kind: SubstrateEventKind.PreimageNoted,
+          kind: EventKind.PreimageNoted,
           proposalHash: 'image-hash-1',
           noter: 'Alice',
           preimage: {
@@ -232,11 +232,11 @@ describe('Edgeware Event Migration Tests', () => {
             section: 'section-1',
             args: [ 'arg-1-1', 'arg-1-2' ],
           }
-        } as ISubstratePreimageNoted
+        } as IPreimageNoted
       },
       { blockNumber: 20,
         data: {
-          kind: SubstrateEventKind.PreimageNoted,
+          kind: EventKind.PreimageNoted,
           proposalHash: 'hash1',
           noter: 'Bob',
           preimage: {
@@ -244,21 +244,21 @@ describe('Edgeware Event Migration Tests', () => {
             section: 'section-2',
             args: [ 'arg-2-1', 'arg-2-2' ],
           }
-        } as ISubstratePreimageNoted
+        } as IPreimageNoted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.TreasuryProposed,
+          kind: EventKind.TreasuryProposed,
           proposalIndex: 20,
           proposer: 'Alice',
           value: '50',
           beneficiary: 'Bob',
           bond: '5',
-        } as ISubstrateTreasuryProposed
+        } as ITreasuryProposed
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.CollectiveProposed,
+          kind: EventKind.CollectiveProposed,
           collectiveName: 'council',
           proposalIndex: 15,
           proposalHash: 'council-hash',
@@ -269,29 +269,29 @@ describe('Edgeware Event Migration Tests', () => {
             section: 'proposal-section',
             args: [ 'proposal-arg-1', 'proposal-arg-2' ],
           }
-        } as ISubstrateCollectiveProposed
+        } as ICollectiveProposed
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.CollectiveVoted,
+          kind: EventKind.CollectiveVoted,
           collectiveName: 'council',
           proposalHash: 'council-hash',
           voter: 'Alice',
           vote: true,
-        } as ISubstrateCollectiveVoted
+        } as ICollectiveVoted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.CollectiveVoted,
+          kind: EventKind.CollectiveVoted,
           collectiveName: 'council',
           proposalHash: 'council-hash',
           voter: 'Bob',
           vote: false,
-        } as ISubstrateCollectiveVoted
+        } as ICollectiveVoted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingNewProposal,
+          kind: EventKind.SignalingNewProposal,
           proposer: 'Inactive Author',
           proposalHash: 'inactive-hash',
           voteId: '1',
@@ -300,11 +300,11 @@ describe('Edgeware Event Migration Tests', () => {
           tallyType: 'inactive tally',
           voteType: 'inactive vote',
           choices: [ 'inactive1', 'inactive2' ],
-        } as ISubstrateSignalingNewProposal
+        } as ISignalingNewProposal
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingNewProposal,
+          kind: EventKind.SignalingNewProposal,
           proposer: 'Active Author',
           proposalHash: 'active-hash',
           voteId: '2',
@@ -313,11 +313,11 @@ describe('Edgeware Event Migration Tests', () => {
           tallyType: 'active tally',
           voteType: 'active vote',
           choices: [ 'active1', 'active2' ],
-        } as ISubstrateSignalingNewProposal
+        } as ISignalingNewProposal
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingNewProposal,
+          kind: EventKind.SignalingNewProposal,
           proposer: 'Completed Author',
           proposalHash: 'completed-hash',
           voteId: '3',
@@ -326,30 +326,30 @@ describe('Edgeware Event Migration Tests', () => {
           tallyType: 'completed tally',
           voteType: 'completed vote',
           choices: [ 'completed1', 'completed2' ],
-        } as ISubstrateSignalingNewProposal
+        } as ISignalingNewProposal
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingVotingStarted,
+          kind: EventKind.SignalingVotingStarted,
           proposalHash: 'active-hash',
           voteId: '2',
           endBlock: 250,
-        } as ISubstrateSignalingVotingStarted
+        } as ISignalingVotingStarted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingVotingStarted,
+          kind: EventKind.SignalingVotingStarted,
           proposalHash: 'completed-hash',
           voteId: '3',
           endBlock: 100,
-        } as ISubstrateSignalingVotingStarted
+        } as ISignalingVotingStarted
       },
       { blockNumber,
         data: {
-          kind: SubstrateEventKind.SignalingVotingCompleted,
+          kind: EventKind.SignalingVotingCompleted,
           proposalHash: 'completed-hash',
           voteId: '3',
-        } as ISubstrateSignalingVotingCompleted
+        } as ISignalingVotingCompleted
       },
     ]);
   });

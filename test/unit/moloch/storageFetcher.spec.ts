@@ -1,12 +1,11 @@
 import chai from 'chai';
-import moment from 'moment';
-import Fetcher from '../../../src/moloch/storageFetcher';
-import { Moloch1Proposal, MolochEventKind } from '../../../src/moloch/types';
+import { StorageFetcher } from '../../../src/moloch/storageFetcher';
+import { ProposalV1, EventKind } from '../../../src/moloch/types';
 import { Moloch1 } from '../../../eth/types/Moloch1';
 
 const { assert } = chai;
 
-const makeApi = (proposals: Moloch1Proposal[]) => {
+const makeApi = (proposals: ProposalV1[]) => {
   return {
     periodDuration: async () => '1',
     summoningTime: async () => '2',
@@ -38,13 +37,13 @@ const makeDater = (minAvailableBlock = 0) => {
 describe('Moloch Storage Fetcher Tests', () => {
   it('should run gracefully with nothing in storage', async () => {
     const api = makeApi([]);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, []);
   });
 
   it('should fetch an active moloch1 proposal from storage', async () => {
-    const proposals: Moloch1Proposal[] = [{
+    const proposals: ProposalV1[] = [{
       proposer: 'proposer',
       applicant: 'applicant',
       sharesRequested: '2',
@@ -57,14 +56,14 @@ describe('Moloch Storage Fetcher Tests', () => {
       tokenTribute: '4',
       details: 'test',
       maxTotalSharesAtYesVote: '2',
-    } as unknown as Moloch1Proposal];
+    } as unknown as ProposalV1];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [{
       blockNumber: 3,
       data: {
-        kind: MolochEventKind.SubmitProposal,
+        kind: EventKind.SubmitProposal,
         proposalIndex: 0,
         member: 'proposer',
         applicant: 'applicant',
@@ -77,7 +76,7 @@ describe('Moloch Storage Fetcher Tests', () => {
   });
 
   it('should fetch an aborted moloch1 proposal from storage', async () => {
-    const proposals: Moloch1Proposal[] = [{
+    const proposals: ProposalV1[] = [{
       proposer: 'proposer',
       applicant: 'applicant',
       sharesRequested: '2',
@@ -90,15 +89,15 @@ describe('Moloch Storage Fetcher Tests', () => {
       tokenTribute: '4',
       details: 'test',
       maxTotalSharesAtYesVote: '2',
-    } as unknown as Moloch1Proposal];
+    } as unknown as ProposalV1];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [
       {
         blockNumber: 3,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 0,
           member: 'proposer',
           applicant: 'applicant',
@@ -111,7 +110,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 5,
         data: {
-          kind: MolochEventKind.Abort,
+          kind: EventKind.Abort,
           proposalIndex: 0,
           applicant: 'applicant',
         }
@@ -122,7 +121,7 @@ describe('Moloch Storage Fetcher Tests', () => {
   // TODO: write test where we are still in abort window to verify block # synthesis
 
   it('should fetch a processed moloch1 proposal from storage', async () => {
-    const proposals: Moloch1Proposal[] = [{
+    const proposals: ProposalV1[] = [{
       proposer: 'proposer',
       applicant: 'applicant',
       sharesRequested: '2',
@@ -135,15 +134,15 @@ describe('Moloch Storage Fetcher Tests', () => {
       tokenTribute: '4',
       details: 'test',
       maxTotalSharesAtYesVote: '2',
-    } as unknown as Moloch1Proposal];
+    } as unknown as ProposalV1];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     const fetched = await fetcher.fetch();
     assert.deepEqual(fetched, [
       {
         blockNumber: 3,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 0,
           member: 'proposer',
           applicant: 'applicant',
@@ -156,7 +155,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 8,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 0,
           member: 'proposer',
           applicant: 'applicant',
@@ -171,7 +170,7 @@ describe('Moloch Storage Fetcher Tests', () => {
   });
 
   it('should accept a range parameter with/without endBlock', async () => {
-    const proposals: Moloch1Proposal[] = [
+    const proposals: ProposalV1[] = [
       {
         proposer: 'proposer',
         applicant: 'applicant',
@@ -185,7 +184,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as Moloch1Proposal,
+      } as unknown as ProposalV1,
       {
         proposer: 'proposer',
         applicant: 'applicant',
@@ -199,7 +198,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as Moloch1Proposal,
+      } as unknown as ProposalV1,
       {
         proposer: 'proposer',
         applicant: 'applicant',
@@ -213,10 +212,10 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as Moloch1Proposal,
+      } as unknown as ProposalV1,
     ];
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     const range = { startBlock: 9 };
     const fetched = await fetcher.fetch(range);
     assert.sameDeepMembers(fetched.filter((p) => (p.data as any).proposalIndex === 0), []);
@@ -224,7 +223,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 12,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -237,7 +236,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 17,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -253,7 +252,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 102,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 2,
           member: 'proposer',
           applicant: 'applicant',
@@ -271,7 +270,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 12,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -284,7 +283,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 17,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -299,7 +298,7 @@ describe('Moloch Storage Fetcher Tests', () => {
   });
 
   it('should terminate fetch on completed due to argument', async () => {
-    const proposals: Moloch1Proposal[] = [
+    const proposals: ProposalV1[] = [
       {
         proposer: 'proposer',
         applicant: 'applicant',
@@ -313,7 +312,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as Moloch1Proposal,
+      } as unknown as ProposalV1,
       {
         proposer: 'proposer',
         applicant: 'applicant',
@@ -327,11 +326,11 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as Moloch1Proposal,
+      } as unknown as ProposalV1,
     ];
 
     const api = makeApi(proposals);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
 
     // should only fetch the first/most recent completed proposal
     const fetched = await fetcher.fetch(null, false);
@@ -339,7 +338,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 12,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -352,7 +351,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 17,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -371,7 +370,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 3,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 0,
           member: 'proposer',
           applicant: 'applicant',
@@ -384,7 +383,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 8,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 0,
           member: 'proposer',
           applicant: 'applicant',
@@ -400,7 +399,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 12,
         data: {
-          kind: MolochEventKind.SubmitProposal,
+          kind: EventKind.SubmitProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -413,7 +412,7 @@ describe('Moloch Storage Fetcher Tests', () => {
       {
         blockNumber: 17,
         data: {
-          kind: MolochEventKind.ProcessProposal,
+          kind: EventKind.ProcessProposal,
           proposalIndex: 1,
           member: 'proposer',
           applicant: 'applicant',
@@ -431,7 +430,7 @@ describe('Moloch Storage Fetcher Tests', () => {
     const api = makeApi([{
       startingPeriod: '1',
     } as any]);
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     fetcher.fetch().then(() => {
       done('should throw on proposal error');
     }).catch((err) => {
@@ -441,7 +440,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should throw error on api error', (done) => {
     const api = {} as any;
-    const fetcher = new Fetcher(api, 1, makeDater());
+    const fetcher = new StorageFetcher(api, 1, makeDater());
     fetcher.fetch().then(() => {
       done('should throw on api error');
     }).catch((err) => {

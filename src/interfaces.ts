@@ -2,27 +2,15 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import {
-  ISubstrateEventData,
-  SubstrateEventKind,
-  SubstrateEntityKind,
-  SubstrateEventChains,
-  SubstrateEventKinds
-} from './substrate/types';
-import {
-  MolochEntityKind,
-  IMolochEventData,
-  MolochEventKind,
-  MolochEventChains,
-  MolochEventKinds
-} from './moloch/types';
+import * as SubstrateTypes from './substrate/types';
+import * as MolochTypes from './moloch/types';
 
 // add other events here as union types
-export type IChainEntityKind = SubstrateEntityKind | MolochEntityKind;
-export type IChainEventData = ISubstrateEventData | IMolochEventData;
-export type IChainEventKind = SubstrateEventKind | MolochEventKind;
-export const ChainEventKinds = [...SubstrateEventKinds, ...MolochEventKinds];
-export const EventSupportingChains = [...SubstrateEventChains, ...MolochEventChains];
+export type IChainEntityKind = SubstrateTypes.EntityKind | MolochTypes.EntityKind;
+export type IChainEventData = SubstrateTypes.IEventData | MolochTypes.IEventData;
+export type IChainEventKind = SubstrateTypes.EventKind | MolochTypes.EventKind;
+export const ChainEventKinds = [...SubstrateTypes.EventKinds, ...MolochTypes.EventKinds];
+export const EventSupportingChains = [...SubstrateTypes.EventChains, ...MolochTypes.EventChains];
 export enum EntityEventKind {
   Create = 0,
   Update,
@@ -132,25 +120,25 @@ export type TitlerFilter = (
 
 export function entityToFieldName(entity: IChainEntityKind): string | null {
   switch (entity) {
-    case SubstrateEntityKind.DemocracyProposal: {
+    case SubstrateTypes.EntityKind.DemocracyProposal: {
       return 'proposalIndex';
     }
-    case SubstrateEntityKind.DemocracyReferendum: {
+    case SubstrateTypes.EntityKind.DemocracyReferendum: {
       return 'referendumIndex';
     }
-    case SubstrateEntityKind.DemocracyPreimage: {
+    case SubstrateTypes.EntityKind.DemocracyPreimage: {
       return 'proposalHash';
     }
-    case SubstrateEntityKind.TreasuryProposal: {
+    case SubstrateTypes.EntityKind.TreasuryProposal: {
       return 'proposalIndex';
     }
-    case SubstrateEntityKind.CollectiveProposal: {
+    case SubstrateTypes.EntityKind.CollectiveProposal: {
       return 'proposalHash';
     }
-    case SubstrateEntityKind.SignalingProposal: {
+    case SubstrateTypes.EntityKind.SignalingProposal: {
       return 'proposalHash';
     }
-    case MolochEntityKind.Proposal: {
+    case MolochTypes.EntityKind.Proposal: {
       return 'proposalIndex';
     }
     default: {
@@ -163,78 +151,78 @@ export function entityToFieldName(entity: IChainEntityKind): string | null {
 
 export function eventToEntity(event: IChainEventKind): [ IChainEntityKind, EntityEventKind ] {
   switch (event) {
-    case SubstrateEventKind.DemocracyProposed: {
-      return [ SubstrateEntityKind.DemocracyProposal, EntityEventKind.Create ];
+    case SubstrateTypes.EventKind.DemocracyProposed: {
+      return [ SubstrateTypes.EntityKind.DemocracyProposal, EntityEventKind.Create ];
     }
-    case SubstrateEventKind.DemocracyTabled: {
-      return [ SubstrateEntityKind.DemocracyProposal, EntityEventKind.Complete ];
-    }
-
-    case SubstrateEventKind.DemocracyStarted: {
-      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Create ];
-    }
-    case SubstrateEventKind.DemocracyPassed: {
-      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Update ];
-    }
-    case SubstrateEventKind.DemocracyNotPassed:
-    case SubstrateEventKind.DemocracyCancelled:
-    case SubstrateEventKind.DemocracyExecuted: {
-      return [ SubstrateEntityKind.DemocracyReferendum, EntityEventKind.Complete ];
+    case SubstrateTypes.EventKind.DemocracyTabled: {
+      return [ SubstrateTypes.EntityKind.DemocracyProposal, EntityEventKind.Complete ];
     }
 
-    case SubstrateEventKind.PreimageNoted: {
-      return [ SubstrateEntityKind.DemocracyPreimage, EntityEventKind.Create ];
+    case SubstrateTypes.EventKind.DemocracyStarted: {
+      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Create ];
     }
-    case SubstrateEventKind.PreimageUsed:
-    case SubstrateEventKind.PreimageInvalid:
-    case SubstrateEventKind.PreimageReaped: {
-      return [ SubstrateEntityKind.DemocracyPreimage, EntityEventKind.Complete ];
+    case SubstrateTypes.EventKind.DemocracyPassed: {
+      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Update ];
     }
-
-    case SubstrateEventKind.TreasuryProposed: {
-      return [ SubstrateEntityKind.TreasuryProposal, EntityEventKind.Create ];
-    }
-    case SubstrateEventKind.TreasuryRejected:
-    case SubstrateEventKind.TreasuryAwarded: {
-      return [ SubstrateEntityKind.TreasuryProposal, EntityEventKind.Complete ];
+    case SubstrateTypes.EventKind.DemocracyNotPassed:
+    case SubstrateTypes.EventKind.DemocracyCancelled:
+    case SubstrateTypes.EventKind.DemocracyExecuted: {
+      return [ SubstrateTypes.EntityKind.DemocracyReferendum, EntityEventKind.Complete ];
     }
 
-    case SubstrateEventKind.CollectiveProposed: {
-      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Create ];
+    case SubstrateTypes.EventKind.PreimageNoted: {
+      return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Create ];
     }
-    case SubstrateEventKind.CollectiveVoted:
-    case SubstrateEventKind.CollectiveApproved: {
-      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Update ];
+    case SubstrateTypes.EventKind.PreimageUsed:
+    case SubstrateTypes.EventKind.PreimageInvalid:
+    case SubstrateTypes.EventKind.PreimageReaped: {
+      return [ SubstrateTypes.EntityKind.DemocracyPreimage, EntityEventKind.Complete ];
     }
-    case SubstrateEventKind.CollectiveDisapproved:
-    case SubstrateEventKind.CollectiveExecuted: {
-      return [ SubstrateEntityKind.CollectiveProposal, EntityEventKind.Complete ];
+
+    case SubstrateTypes.EventKind.TreasuryProposed: {
+      return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Create ];
+    }
+    case SubstrateTypes.EventKind.TreasuryRejected:
+    case SubstrateTypes.EventKind.TreasuryAwarded: {
+      return [ SubstrateTypes.EntityKind.TreasuryProposal, EntityEventKind.Complete ];
+    }
+
+    case SubstrateTypes.EventKind.CollectiveProposed: {
+      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Create ];
+    }
+    case SubstrateTypes.EventKind.CollectiveVoted:
+    case SubstrateTypes.EventKind.CollectiveApproved: {
+      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Update ];
+    }
+    case SubstrateTypes.EventKind.CollectiveDisapproved:
+    case SubstrateTypes.EventKind.CollectiveExecuted: {
+      return [ SubstrateTypes.EntityKind.CollectiveProposal, EntityEventKind.Complete ];
     }
 
     // Signaling Events
-    case SubstrateEventKind.SignalingNewProposal: {
-      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Create ];
+    case SubstrateTypes.EventKind.SignalingNewProposal: {
+      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Create ];
     }
-    case SubstrateEventKind.SignalingCommitStarted:
-    case SubstrateEventKind.SignalingVotingStarted: {
-      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Update ];
+    case SubstrateTypes.EventKind.SignalingCommitStarted:
+    case SubstrateTypes.EventKind.SignalingVotingStarted: {
+      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Update ];
     }
-    case SubstrateEventKind.SignalingVotingCompleted: {
-      return [ SubstrateEntityKind.SignalingProposal, EntityEventKind.Complete ];
+    case SubstrateTypes.EventKind.SignalingVotingCompleted: {
+      return [ SubstrateTypes.EntityKind.SignalingProposal, EntityEventKind.Complete ];
     }
 
     // Moloch Events
-    case MolochEventKind.SubmitProposal: {
-      return [ MolochEntityKind.Proposal, EntityEventKind.Create ];
+    case MolochTypes.EventKind.SubmitProposal: {
+      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Create ];
     }
-    case MolochEventKind.SubmitVote: {
-      return [ MolochEntityKind.Proposal, EntityEventKind.Update ];
+    case MolochTypes.EventKind.SubmitVote: {
+      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Update ];
     }
-    case MolochEventKind.ProcessProposal: {
-      return [ MolochEntityKind.Proposal, EntityEventKind.Complete ];
+    case MolochTypes.EventKind.ProcessProposal: {
+      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Complete ];
     }
-    case MolochEventKind.Abort: {
-      return [ MolochEntityKind.Proposal, EntityEventKind.Complete ];
+    case MolochTypes.EventKind.Abort: {
+      return [ MolochTypes.EntityKind.Proposal, EntityEventKind.Complete ];
     }
     default: {
       return null;

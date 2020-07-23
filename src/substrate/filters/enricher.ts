@@ -7,8 +7,8 @@ import {
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
-import { SubstrateEventKind, ISubstrateEventData, isEvent } from '../types';
 import { CWEvent } from '../../interfaces';
+import { EventKind, IEventData, isEvent } from '../types';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -18,14 +18,14 @@ import { CWEvent } from '../../interfaces';
  * Once fetched, the function marshalls the event data and the additional information
  * into the interface, and returns a fully-formed event, ready for database storage.
  */
-export default async function (
+export async function Enrich(
   api: ApiPromise,
   blockNumber: number,
-  kind: SubstrateEventKind,
+  kind: EventKind,
   rawData: Event | Extrinsic,
-): Promise<CWEvent<ISubstrateEventData>> {
+): Promise<CWEvent<IEventData>> {
   const extractEventData = async (event: Event): Promise<{
-    data: ISubstrateEventData,
+    data: IEventData,
     includeAddresses?: string[],
     excludeAddresses?: string[],
   }> => {
@@ -33,7 +33,7 @@ export default async function (
       /**
        * Staking Events
        */
-      case SubstrateEventKind.Reward: {
+      case EventKind.Reward: {
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
           const [ amount, remainder ] = event.data as unknown as [ Balance, Balance ] & Codec;
@@ -56,7 +56,7 @@ export default async function (
           };
         }
       }
-      case SubstrateEventKind.Slash: {
+      case EventKind.Slash: {
         const [ validator, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         return {
           includeAddresses: [ validator.toString() ],
@@ -68,8 +68,8 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.Bonded:
-      case SubstrateEventKind.Unbonded: {
+      case EventKind.Bonded:
+      case EventKind.Unbonded: {
         const [ stash, amount ] = event.data as unknown as [ AccountId, Balance ] & Codec;
         const controllerOpt = await api.query.staking.bonded<Option<AccountId>>(stash);
         if (!controllerOpt.isSome) {
@@ -89,7 +89,7 @@ export default async function (
       /**
        * Democracy Events
        */
-      case SubstrateEventKind.VoteDelegated: {
+      case EventKind.VoteDelegated: {
         const [ who, target ] = event.data as unknown as [ AccountId, AccountId ] & Codec;
         return {
           includeAddresses: [ target.toString() ],
@@ -101,7 +101,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.DemocracyProposed: {
+      case EventKind.DemocracyProposed: {
         const [ proposalIndex, deposit ] = event.data as unknown as [ PropIndex, Balance ] & Codec;
         const props = await api.query.democracy.publicProps();
         const prop = props.find((p) => p.length > 0 && +p[0] === +proposalIndex);
@@ -121,7 +121,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.DemocracyTabled: {
+      case EventKind.DemocracyTabled: {
         const [ proposalIndex ] = event.data as unknown as [ PropIndex, Balance, Vec<AccountId> ] & Codec;
         return {
           data: {
@@ -131,7 +131,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.DemocracyStarted: {
+      case EventKind.DemocracyStarted: {
         const [ referendumIndex, voteThreshold ] = event.data as unknown as [ ReferendumIndex, VoteThreshold ] & Codec;
         const infoOpt = await api.query.democracy.referendumInfoOf<Option<ReferendumInfoTo239 | ReferendumInfo>>(
           referendumIndex
@@ -169,7 +169,7 @@ export default async function (
         }
       }
 
-      case SubstrateEventKind.DemocracyPassed: {
+      case EventKind.DemocracyPassed: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         // dispatch queue -- if not present, it was already executed
         const dispatchQueue = await api.derive.democracy.dispatchQueue();
@@ -183,8 +183,8 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.DemocracyNotPassed:
-      case SubstrateEventKind.DemocracyCancelled: {
+      case EventKind.DemocracyNotPassed:
+      case EventKind.DemocracyCancelled: {
         const [ referendumIndex ] = event.data as unknown as [ ReferendumIndex ] & Codec;
         return {
           data: {
@@ -194,7 +194,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.DemocracyExecuted: {
+      case EventKind.DemocracyExecuted: {
         const [ referendumIndex, executionOk ] = event.data as unknown as [ ReferendumIndex, bool ] & Codec;
         return {
           data: {
@@ -208,7 +208,7 @@ export default async function (
       /**
        * Preimage Events
        */
-      case SubstrateEventKind.PreimageNoted: {
+      case EventKind.PreimageNoted: {
         const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
         const image = await api.derive.democracy.preimage(hash);
         if (!image || !image.proposal) {
@@ -228,7 +228,7 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.PreimageUsed: {
+      case EventKind.PreimageUsed: {
         const [ hash, noter, deposit ] = event.data as unknown as [ Hash, AccountId, Balance ] & Codec;
         return {
           data: {
@@ -238,8 +238,8 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.PreimageInvalid:
-      case SubstrateEventKind.PreimageMissing: {
+      case EventKind.PreimageInvalid:
+      case EventKind.PreimageMissing: {
         const [ hash, referendumIndex ] = event.data as unknown as [ Hash, ReferendumIndex ] & Codec;
         return {
           data: {
@@ -249,7 +249,7 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.PreimageReaped: {
+      case EventKind.PreimageReaped: {
         const [
           hash,
           noter,
@@ -270,7 +270,7 @@ export default async function (
       /**
        * Treasury Events
        */
-      case SubstrateEventKind.TreasuryProposed: {
+      case EventKind.TreasuryProposed: {
         const [ proposalIndex ] = event.data as unknown as [ ProposalIndex ] & Codec;
         const proposalOpt = await api.query.treasury.proposals<Option<TreasuryProposal>>(proposalIndex);
         if (!proposalOpt.isSome) {
@@ -290,7 +290,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.TreasuryAwarded: {
+      case EventKind.TreasuryAwarded: {
         const [
           proposalIndex,
           amount,
@@ -306,7 +306,7 @@ export default async function (
         };
       }
 
-      case SubstrateEventKind.TreasuryRejected: {
+      case EventKind.TreasuryRejected: {
         const [ proposalIndex, slashedBond ] = event.data as unknown as [ ProposalIndex, Balance ] & Codec;
         return {
           data: {
@@ -319,7 +319,7 @@ export default async function (
       /**
        * Elections Events
        */
-      case SubstrateEventKind.ElectionNewTerm: {
+      case EventKind.ElectionNewTerm: {
         const [ newMembers ] = event.data as unknown as [ Vec<[ AccountId, Balance ] & Codec> ] & Codec;
         return {
           data: {
@@ -328,11 +328,11 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.ElectionEmptyTerm: {
+      case EventKind.ElectionEmptyTerm: {
         return { data: { kind } };
       }
-      case SubstrateEventKind.ElectionMemberKicked:
-      case SubstrateEventKind.ElectionMemberRenounced: {
+      case EventKind.ElectionMemberKicked:
+      case EventKind.ElectionMemberRenounced: {
         const [ who ] = event.data as unknown as [ AccountId ] & Codec;
         return {
           data: {
@@ -345,7 +345,7 @@ export default async function (
       /**
        * Collective Events
        */
-      case SubstrateEventKind.CollectiveProposed: {
+      case EventKind.CollectiveProposed: {
         const [
           proposer,
           index,
@@ -374,7 +374,7 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.CollectiveVoted: {
+      case EventKind.CollectiveVoted: {
         const [ voter, hash, vote ] = event.data as unknown as [ AccountId, Hash, bool ] & Codec;
         return {
           excludeAddresses: [ voter.toString() ],
@@ -388,8 +388,8 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.CollectiveApproved:
-      case SubstrateEventKind.CollectiveDisapproved: {
+      case EventKind.CollectiveApproved:
+      case EventKind.CollectiveDisapproved: {
         const [ hash ] = event.data as unknown as [ Hash ] & Codec;
         return {
           data: {
@@ -400,8 +400,8 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.CollectiveExecuted:
-      case SubstrateEventKind.CollectiveMemberExecuted: {
+      case EventKind.CollectiveExecuted:
+      case EventKind.CollectiveMemberExecuted: {
         const [ hash, executionOk ] = event.data as unknown as [ Hash, bool ] & Codec;
         return {
           data: {
@@ -417,7 +417,7 @@ export default async function (
       /**
        * Signaling Events
        */
-      case SubstrateEventKind.SignalingNewProposal: {
+      case EventKind.SignalingNewProposal: {
         const [ proposer, hash ] = event.data as unknown as [ AccountId, Hash ] & Codec;
         const proposalInfoOpt = await api.query.signaling.proposalOf<Option<ProposalRecord>>(hash);
         if (!proposalInfoOpt.isSome) {
@@ -442,8 +442,8 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.SignalingCommitStarted:
-      case SubstrateEventKind.SignalingVotingStarted: {
+      case EventKind.SignalingCommitStarted:
+      case EventKind.SignalingVotingStarted: {
         const [ hash, voteId, endBlock ] = event.data as unknown as [ Hash, u64, BlockNumber ] & Codec;
         return {
           data: {
@@ -454,7 +454,7 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.SignalingVotingCompleted: {
+      case EventKind.SignalingVotingCompleted: {
         const [ hash, voteId ] = event.data as unknown as [ Hash, u64 ] & Codec;
         return {
           data: {
@@ -468,7 +468,7 @@ export default async function (
       /**
        * TreasuryReward events
        */
-      case SubstrateEventKind.TreasuryRewardMinting: {
+      case EventKind.TreasuryRewardMinting: {
         const [ pot, reward, blockNum ] = event.data as unknown as [ Balance, Balance, BlockNumber ] & Codec;
         return {
           data: {
@@ -478,7 +478,7 @@ export default async function (
           }
         };
       }
-      case SubstrateEventKind.TreasuryRewardMintingV2: {
+      case EventKind.TreasuryRewardMintingV2: {
         const [ pot, blockNum, potAddress ] = event.data as unknown as [ Balance, BlockNumber, AccountId ] & Codec;
         return {
           data: {
@@ -496,12 +496,12 @@ export default async function (
   };
 
   const extractExtrinsicData = async (extrinsic: Extrinsic): Promise<{
-    data: ISubstrateEventData,
+    data: IEventData,
     includeAddresses?: string[],
     excludeAddresses?: string[],
   }> => {
     switch (kind) {
-      case SubstrateEventKind.ElectionCandidacySubmitted: {
+      case EventKind.ElectionCandidacySubmitted: {
         const candidate = extrinsic.signer.toString();
         return {
           excludeAddresses: [ candidate ],

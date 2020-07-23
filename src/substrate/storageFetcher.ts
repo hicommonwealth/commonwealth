@@ -13,30 +13,31 @@ import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
+
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import {
-  SubstrateEventKind,
-  ISubstrateDemocracyProposed,
-  ISubstrateDemocracyStarted,
-  ISubstrateDemocracyPassed,
-  ISubstratePreimageNoted,
-  ISubstrateTreasuryProposed,
-  ISubstrateCollectiveProposed,
-  ISubstrateCollectiveVoted,
-  ISubstrateSignalingNewProposal,
-  ISubstrateSignalingCommitStarted,
-  ISubstrateSignalingVotingStarted,
-  ISubstrateSignalingVotingCompleted,
-  ISubstrateEventData,
+  EventKind,
+  IDemocracyProposed,
+  IDemocracyStarted,
+  IDemocracyPassed,
+  IPreimageNoted,
+  ITreasuryProposed,
+  ICollectiveProposed,
+  ICollectiveVoted,
+  ISignalingNewProposal,
+  ISignalingCommitStarted,
+  ISignalingVotingStarted,
+  ISignalingVotingCompleted,
+  IEventData,
 } from './types';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export default class extends IStorageFetcher<ApiPromise> {
+export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   private _blockNumber: number;
 
-  public async fetch(): Promise<CWEvent<ISubstrateEventData>[]> {
+  public async fetch(): Promise<CWEvent<IEventData>[]> {
     // get current blockNumber for synthesizing events
     this._blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
@@ -48,10 +49,10 @@ export default class extends IStorageFetcher<ApiPromise> {
 
     /** democracy preimages */
     const proposalHashes = democracyProposalEvents
-      .map((d) => (d.data as ISubstrateDemocracyStarted).proposalHash);
+      .map((d) => (d.data as IDemocracyStarted).proposalHash);
     const referendaHashes = democracyReferendaEvents
-      .filter((d) => d.data.kind === SubstrateEventKind.DemocracyStarted)
-      .map((d) => (d.data as ISubstrateDemocracyStarted).proposalHash);
+      .filter((d) => d.data.kind === EventKind.DemocracyStarted)
+      .map((d) => (d.data as IDemocracyStarted).proposalHash);
     const democracyPreimageEvents = await this._fetchDemocracyPreimages([ ...proposalHashes, ...referendaHashes ]);
 
     /** treasury proposals */
@@ -74,14 +75,14 @@ export default class extends IStorageFetcher<ApiPromise> {
     ];
   }
 
-  private async _fetchDemocracyProposals(): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchDemocracyProposals(): Promise<CWEvent<IEventData>[]> {
     log.info('Fetching democracy proposals...');
     const publicProps = await this._api.query.democracy.publicProps();
     const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> = await this._api.queryMulti(
       publicProps.map(([ idx ]) => [ this._api.query.democracy.depositOf, idx ])
     );
     const proposedEvents = _.zip(publicProps, deposits)
-      .map(([ [ idx, hash, proposer ], depositOpt ]): ISubstrateDemocracyProposed => {
+      .map(([ [ idx, hash, proposer ], depositOpt ]): IDemocracyProposed => {
         if (!depositOpt.isSome) return null;
 
         // handle kusama vs edgeware depositOpt order
@@ -93,7 +94,7 @@ export default class extends IStorageFetcher<ApiPromise> {
           deposit = depositors[0];
         }
         return {
-          kind: SubstrateEventKind.DemocracyProposed,
+          kind: EventKind.DemocracyProposed,
           proposalIndex: +idx,
           proposalHash: hash.toString(),
           proposer: proposer.toString(),
@@ -105,36 +106,36 @@ export default class extends IStorageFetcher<ApiPromise> {
     return proposedEvents.map((data) => ({ blockNumber: this._blockNumber, data }));
   }
 
-  private async _fetchDemocracyReferenda(): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchDemocracyReferenda(): Promise<CWEvent<IEventData>[]> {
     log.info('Migrating democracy referenda...');
     const activeReferenda = await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
       return {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: EventKind.DemocracyStarted,
         referendumIndex: +r.index,
         proposalHash: r.imageHash.toString(),
         voteThreshold: r.status.threshold.toString(),
         endBlock: +r.status.end,
-      } as ISubstrateDemocracyStarted;
+      } as IDemocracyStarted;
     });
     const dispatchQueue = await this._api.derive.democracy.dispatchQueue();
-    const passedEvents: Array<ISubstrateDemocracyStarted | ISubstrateDemocracyPassed> = _.flatten(
+    const passedEvents: Array<IDemocracyStarted | IDemocracyPassed> = _.flatten(
       dispatchQueue.map(({ index, at, imageHash }) => {
         return [
           {
-            kind: SubstrateEventKind.DemocracyStarted,
+            kind: EventKind.DemocracyStarted,
             referendumIndex: +index,
             proposalHash: imageHash.toString(),
 
             // fake unknown values for started event
             voteThreshold: '',
             endBlock: 0,
-          } as ISubstrateDemocracyStarted,
+          } as IDemocracyStarted,
           {
-            kind: SubstrateEventKind.DemocracyPassed,
+            kind: EventKind.DemocracyPassed,
             referendumIndex: +index,
             dispatchBlock: +at,
-          } as ISubstrateDemocracyPassed
+          } as IDemocracyPassed
         ];
       })
     );
@@ -143,15 +144,15 @@ export default class extends IStorageFetcher<ApiPromise> {
   }
 
   // must pass proposal hashes found in prior events
-  private async _fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchDemocracyPreimages(hashes: string[]): Promise<CWEvent<IEventData>[]> {
     log.info('Migrating preimages...');
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
-    const notedEvents: Array<[ number, ISubstratePreimageNoted ]> = _.zip(hashes, preimages)
+    const notedEvents: Array<[ number, IPreimageNoted ]> = _.zip(hashes, preimages)
       .map(([ hash, preimage ]: [ string, DeriveProposalImage ]) => {
         if (!preimage || !preimage.proposal) return [ 0, null ];
         return [ +preimage.at, {
-          kind: SubstrateEventKind.PreimageNoted,
+          kind: EventKind.PreimageNoted,
           proposalHash: hash,
           noter: preimage.proposer.toString(),
           preimage: {
@@ -159,7 +160,7 @@ export default class extends IStorageFetcher<ApiPromise> {
             section: preimage.proposal.sectionName,
             args: preimage.proposal.args.map((arg) => arg.toString()),
           }
-        } as ISubstratePreimageNoted ];
+        } as IPreimageNoted ];
       });
     const cwEvents = notedEvents
       .filter(([ blockNumber, data ]) => !!data)
@@ -168,24 +169,24 @@ export default class extends IStorageFetcher<ApiPromise> {
     return cwEvents;
   }
 
-  private async _fetchTreasuryProposals(): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchTreasuryProposals(): Promise<CWEvent<IEventData>[]> {
     log.info('Migrating treasury proposals...');
     const proposals = await this._api.derive.treasury.proposals();
     const proposedEvents = proposals.proposals.map((p) => {
       return {
-        kind: SubstrateEventKind.TreasuryProposed,
+        kind: EventKind.TreasuryProposed,
         proposalIndex: +p.id,
         proposer: p.proposal.proposer.toString(),
         value: p.proposal.value.toString(),
         beneficiary: p.proposal.beneficiary.toString(),
         bond: p.proposal.bond.toString(),
-      } as ISubstrateTreasuryProposed;
+      } as ITreasuryProposed;
     });
     log.info(`Found ${proposedEvents.length} treasury proposals!`);
     return proposedEvents.map((data) => ({ blockNumber: this._blockNumber, data }));
   }
 
-  private async _fetchCollectiveProposals(): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchCollectiveProposals(): Promise<CWEvent<IEventData>[]> {
     log.info('Migrating collective proposals...');
     const councilProposals = await this._api.derive.council.proposals();
     let technicalCommitteeProposals = [];
@@ -199,7 +200,7 @@ export default class extends IStorageFetcher<ApiPromise> {
       .filter((p) => p.proposal && p.votes)
       .map((p) => {
         return {
-          kind: SubstrateEventKind.CollectiveProposed,
+          kind: EventKind.CollectiveProposed,
           collectiveName: name,
           proposalIndex: +p.votes.index,
           proposalHash: p.hash.toString(),
@@ -212,33 +213,33 @@ export default class extends IStorageFetcher<ApiPromise> {
 
           // unknown
           proposer: '',
-        } as ISubstrateCollectiveProposed;
+        } as ICollectiveProposed;
       });
     const constructVotedEvents = (ps: DeriveCollectiveProposal[], name: 'council' | 'technicalCommittee') => ps
       .filter((p) => p.proposal && p.votes)
       .map((p) => {
         return [
           ...p.votes.ayes.map((who) => ({
-            kind: SubstrateEventKind.CollectiveVoted,
+            kind: EventKind.CollectiveVoted,
             collectiveName: name,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: true,
-          } as ISubstrateCollectiveVoted)),
+          } as ICollectiveVoted)),
           ...p.votes.nays.map((who) => ({
-            kind: SubstrateEventKind.CollectiveVoted,
+            kind: EventKind.CollectiveVoted,
             collectiveName: name,
             proposalHash: p.hash.toString(),
             voter: who.toString(),
             vote: false,
-          } as ISubstrateCollectiveVoted)),
+          } as ICollectiveVoted)),
         ];
       });
     const proposedEvents = [
       ...constructProposedEvents(councilProposals, 'council'),
       ...constructProposedEvents(technicalCommitteeProposals, 'technicalCommittee')
     ];
-    const votedEvents: ISubstrateCollectiveVoted[] = _.flatten([
+    const votedEvents: ICollectiveVoted[] = _.flatten([
       constructVotedEvents(councilProposals, 'council'),
       constructVotedEvents(technicalCommitteeProposals, 'technicalCommittee'),
     ]);
@@ -246,7 +247,7 @@ export default class extends IStorageFetcher<ApiPromise> {
     return [...proposedEvents, ...votedEvents].map((data) => ({ blockNumber: this._blockNumber, data }));
   }
 
-  private async _fetchSignalingProposals(): Promise<CWEvent<ISubstrateEventData>[]> {
+  private async _fetchSignalingProposals(): Promise<CWEvent<IEventData>[]> {
     log.info('Migrating signaling proposals...');
     if (!this._api.query.voting || !this._api.query.signaling) {
       log.info('Found no signaling proposals (wrong chain)!');
@@ -279,7 +280,7 @@ export default class extends IStorageFetcher<ApiPromise> {
     // generate events
     const newProposalEvents = allRecords.map(([ hash, proposal, voting ]) => {
       return {
-        kind: SubstrateEventKind.SignalingNewProposal,
+        kind: EventKind.SignalingNewProposal,
         proposer: proposal.author.toString(),
         proposalHash: hash.toString(),
         voteId: voting.id.toString(),
@@ -288,7 +289,7 @@ export default class extends IStorageFetcher<ApiPromise> {
         tallyType: voting.data.tally_type.toString(),
         voteType: voting.data.vote_type.toString(),
         choices: voting.outcomes.map((outcome) => outcome.toString()),
-      } as ISubstrateSignalingNewProposal;
+      } as ISignalingNewProposal;
     });
 
     // we're not using commit in production, but check anyway
@@ -296,11 +297,11 @@ export default class extends IStorageFetcher<ApiPromise> {
       .filter(([ hash, proposal ]) => proposal.stage.isCommit)
       .map(([ hash, proposal, voting ]) => {
         return {
-          kind: SubstrateEventKind.SignalingCommitStarted,
+          kind: EventKind.SignalingCommitStarted,
           proposalHash: hash.toString(),
           voteId: voting.id.toString(),
           endBlock: +proposal.transition_time,
-        } as ISubstrateSignalingCommitStarted;
+        } as ISignalingCommitStarted;
       });
 
     // assume all voting/completed proposals skipped straight there without commit
@@ -308,21 +309,21 @@ export default class extends IStorageFetcher<ApiPromise> {
       .filter(([ hash, proposal ]) => proposal.stage.isVoting || proposal.stage.isCompleted)
       .map(([ hash, proposal, voting ]) => {
         return {
-          kind: SubstrateEventKind.SignalingVotingStarted,
+          kind: EventKind.SignalingVotingStarted,
           proposalHash: hash.toString(),
           voteId: voting.id.toString(),
           endBlock: +proposal.transition_time,
-        } as ISubstrateSignalingVotingStarted;
+        } as ISignalingVotingStarted;
       });
 
     const completedEvents = allRecords
       .filter(([ hash, proposal ]) => proposal.stage.isCompleted)
       .map(([ hash, proposal, voting ]) => {
         return {
-          kind: SubstrateEventKind.SignalingVotingCompleted,
+          kind: EventKind.SignalingVotingCompleted,
           proposalHash: hash.toString(),
           voteId: voting.id.toString(),
-        } as ISubstrateSignalingVotingCompleted;
+        } as ISignalingVotingCompleted;
       });
 
     const events = [...newProposalEvents, ...commitStartedEvents, ...votingStartedEvents, ...completedEvents];
