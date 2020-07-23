@@ -206,7 +206,6 @@
         text-align: right;
         margin: 8px 0 0;
         a.btn, button {
-            @include clean-button;
             margin-left: 8px;
             margin-top: 3px;
             margin-bottom: 3px;
@@ -310,9 +309,9 @@
     }
     a.btn {
         background-color: white !important;
-        border: 1px solid $electricblue !important;
+        border: 1px solid $theme-base-color !important;
         background-image: none !important;
-        color: $electricblue;
+        color: $theme-base-color;
         border-radius: 4px;
     }
 }

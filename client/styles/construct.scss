@@ -86,7 +86,7 @@ $cui-base-height-xl:  floor($cui-base-size * 3.75);
 // component colors
 //
 
-$cui-border-radius: 4px;
+$cui-border-radius: $base-border-radius;
 
 $cui-base-bg-color: $base-bg-color;
 $cui-primary-bg-color: $primary-bg-color;

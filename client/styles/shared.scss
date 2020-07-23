@@ -1,3 +1,7 @@
+@import 'mixins/animation';
+@import 'mixins/responsive';
+@import 'mixins/dragula';
+
 $fonts: Metric, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: 'iA Writer Duospace', monospace;
 
@@ -5,6 +9,7 @@ $base-bg-color:     #ffffff;
 $primary-bg-color:  #4f62bd;
 $positive-bg-color: #4caf50;
 $negative-bg-color: #d4302f;
+$base-border-radius: 4px;
 
 $theme-base-color: #5b7bf6;
 $theme-accent-dark: darken(#5b7bf6, 7%);
@@ -26,88 +31,47 @@ $text-color-light: #9a9da4;             // light text on light background
 $text-color-medium: #777;               // medium text on any background
 $text-color-dark: #222;                 // black text on any background
 
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
-
-$form-border-radius: 3px;
 $form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
-// default styles
-$badge-red: #de243b;    // radish red for badges
-$error-red: $negative-bg-color;
-$success-green: $positive-bg-color;
-$primary-green: #41a360;
-$lighttextgrey: #999;
-$electricblue: #229bd6;
-$standard-light-text: #999;
-$standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
+$positive-text-color: $positive-bg-color;
+$negative-text-color: $negative-bg-color;
 
-// paddings
-$vertical-padding: 24px;
 $sidebar-width: 230px;
-$header-spacing: 14px;
 $layout-max-width: 970px;
 
-@mixin popout {
-    animation: popout 0.05s ease;
-    -webkit-animation: popout 0.05s ease;
-}
-@keyframes popout {
-    from { transform: scale(0.975); }
-    80% { transform: scale(1); }
-    to { transform: scale(1); }
-}
-@-webkit-keyframes popout {
-    from { -webkit-transform: scale(0.975); }
-    80% { -webkit-transform: scale(1); }
-    to { -webkit-transform: scale(1); }
+@mixin formfield-base {
+    display: block;
+    width: 100%;
+    border: 1px solid $form-border-color;
+    border-radius: $base-border-radius;
+    outline: none;
+    box-shadow: none;
+    &:focus {
+        border-color: $form-active-color;
+    }
 }
 
-@mixin hoverFloat {
-    transition: transform 50ms ease-in-out;
-    &:hover {
-        transform: translate(0, -1px);
+@mixin formfield-text {
+    @include formfield-base;
+    padding: 10px;
+    &::placeholder {
+        color: $text-color-light;
+    }
+    &:focus::placeholder {
+        color: $text-color-light;
     }
 }
 
 @mixin error-text {
-    font-weight: 600;
+    font-weight: 500;
     color: $negative-bg-color;
 }
 @mixin success-text {
-    font-weight: 700;
-    color: $success-green;
-}
-@mixin profile-notice($background, $text-color) {
-    display: inline-block;
-    margin-bottom: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    background: $background;
-    color: $text-color;
-    // text
-    font-size: 14px;
     font-weight: 500;
-    text-align: left;
-    a {
-        color: $text-color;
-        cursor: pointer;
-        text-decoration: underline;
-    }
-    @include xs-max {
-        padding: 8px 12px;
-    }
+    color: $positive-bg-color;
 }
-@mixin category-icon {
-    display: inline-block;
-    background: #ccc;
-    width: 10px;
-    height: 10px;
-    margin-top: 2px;
-    margin-right: 8px;
-    border-radius: 2px;
-}
+
 @mixin attachments {
     p {
         font-weight: 700;
@@ -128,205 +92,6 @@ $layout-max-width: 970px;
             width: 50%;
             margin: 10px 0 4px;
         }
-    }
-}
-
-@mixin clearfix {
-    *zoom: 1;
-    &:before,
-    &:after {
-        display: table;
-        content: "";
-        line-height: 0;
-    }
-    &:after {
-        clear: both;
-    }
-}
-
-@mixin xxs-max {
-    @media only screen and (max-width: 42em) { @content; }
-}
-@mixin xs-max {
-    @media only screen and (max-width: 48em) { @content; }
-}
-@mixin sm-max {
-    @media only screen and (max-width: 62em) { @content; }
-}
-@mixin md-max {
-    @media only screen and (max-width: 75em) { @content; }
-}
-@mixin sm-min {
-    @media only screen and (min-width: 48em) { @content; }
-}
-@mixin md-min {
-    @media only screen and (min-width: 62em) { @content; }
-}
-@mixin lg-min {
-    @media only screen and (min-width: 75em) { @content; }
-}
-
-@mixin formfield-base {
-    display: block;
-    width: 100%;
-    border: 1px solid $form-border-color;
-    border-radius: $form-border-radius;
-    outline: none;
-    box-shadow: none;
-    &:focus {
-        border-color: $form-active-color;
-    }
-}
-
-@mixin formfield-text {
-    @include formfield-base;
-    padding: 10px 10px;
-    &::placeholder {
-        color: #aaa;
-    }
-    &:focus::placeholder {
-        color: #999;
-    }
-}
-
-@mixin dark-menu-styles {
-    color: #fff;
-    z-index: 9999;
-    background: #343434;
-    border-radius: 0 0 2px 2px;
-    ul {
-        padding: 4px 0;
-        margin: 0;
-    }
-    ul a {
-        text-decoration: none;
-        color: #fff;
-    }
-    ul li {
-        margin: 0;
-        padding: 6px 16px;
-        list-style: none;
-        cursor: pointer;
-    }
-    ul li:last-child {
-        border-bottom: none;
-    }
-    ul li:hover {
-        background: #454545;
-        color: #fff;
-    }
-    ul a li:hover {
-        color: #fff;
-    }
-    ul li.disabled {
-        opacity: 0.4;
-        pointer-events: none;
-    }
-    ul li.divider {
-        height: 1px;
-        padding: 0;
-        margin: 6px 0;
-        border-bottom: 1px solid #474747;
-    }
-}
-
-@mixin menu-styles {
-    color: #111;
-    z-index: 9999;
-    background: #fff;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.04);
-    ul {
-        padding: 2px 0;
-        margin: 0;
-    }
-    ul a {
-        text-decoration: none;
-        color: #111;
-    }
-    ul li {
-        margin: 0;
-        padding: 6px 16px;
-        list-style: none;
-        cursor: pointer;
-    }
-    ul li:last-child {
-        border-bottom: none;
-    }
-    ul li:hover {
-        background: #08c;
-        color: #fff;
-    }
-    ul a li:hover {
-        color: #fff;
-    }
-    ul li.disabled {
-        opacity: 0.4;
-        pointer-events: none;
-    }
-    ul li.divider {
-        height: 1px;
-        padding: 0;
-        margin: 2px 0;
-        border-bottom: 1px solid #ececec;
-    }
-}
-
-@mixin clean-button {
-    background-color: white !important;
-    border: 1px solid $electricblue !important;
-    background-image: none !important;
-    color: $electricblue;
-    border-radius: $form-border-radius;
-    padding: 8px 20px;
-}
-
-@mixin clean-button-2 {
-    background-color: $electricblue !important;
-    background-image: none !important;
-    border: 0px solid transparent !important;
-    color: white !important;
-    font-weight: 700;
-    border-radius: $form-border-radius;
-    padding: 8px 20px;
-}
-
-@mixin clean-button-2 {
-    background-color: $electricblue !important;
-    background-image: none !important;
-    border: 0px solid transparent !important;
-    color: white !important;
-    font-weight: 700;
-    border-radius: 4px;
-    padding: 8px 20px;
-}
-
-@mixin dragula {
-    .gu-mirror {
-        cursor: pointer;
-        position: fixed !important;
-        margin: 0 !important;
-        z-index: 9999 !important;
-        opacity: 0.8;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-        filter: alpha(opacity=80);
-    }
-    .gu-hide {
-        display: none !important;
-    }
-    .gu-unselectable {
-        cursor: default;
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
-    }
-    .gu-transit {
-        cursor: pointer;
-        opacity: 0.5;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-        filter: alpha(opacity=20);
     }
 }
 

@@ -102,10 +102,10 @@
             word-break: break-word;
         }
         .txbox-content.txbox-success {
-            color: $success-green;
+            color: $positive-text-color;
         }
         .txbox-content.txbox-fail {
-            color: $error-red;
+            color: $negative-text-color;
         }
     }
 }

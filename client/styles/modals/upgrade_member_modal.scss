@@ -8,11 +8,11 @@
     .error-message {
         margin: 10px 0;
         font-weight: 500;
-        color: $error-red;
+        color: $negative-text-color;
     }
     .success-message {
         margin: 10px 0;
         font-weight: 500;
-        color: $success-green;
+        color: $positive-text-color;
     }
 }

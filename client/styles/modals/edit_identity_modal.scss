@@ -28,18 +28,11 @@
     .form-bottom {
         margin-top: 20px;
         button {
-            @include clean-button;
-            border: 0px solid transparent !important;
             margin-right: 12px;
-            color: white !important;
-            &.formular-button-primary {
-                background-color: $electricblue !important;
-            }
-            background-color: darkgray !important;
         }
     }
     .error-message {
-        color: $error-red;
+        color: $negative-text-color;
         font-weight: 500;
         margin-top: 16px;
     }

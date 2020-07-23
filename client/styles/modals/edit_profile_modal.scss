@@ -51,18 +51,11 @@
             justify-content: left;
         }
         button {
-            @include clean-button;
-            border: 0px solid transparent !important;
             margin-right: 12px;
-            color: white !important;
-            &.formular-button-primary {
-                background-color: $electricblue !important;
-            }
-            background-color: darkgray !important;
         }
     }
     .error-message {
-        color: $error-red;
+        color: $negative-text-color;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;

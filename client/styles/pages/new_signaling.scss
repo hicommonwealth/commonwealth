@@ -58,9 +58,6 @@
         @include error-text();
         margin-top: 24px;
     }
-    .empty-profile-notification {
-        @include profile-notice(#fdf3e1, #111);
-    }
     @include xs-max {
         .actions {
             margin: 10px 0;

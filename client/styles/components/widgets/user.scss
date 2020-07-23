@@ -38,10 +38,10 @@
     top: -1px;
     margin-left: 4px;
     &.green {
-        color: $primary-green;
+        color: $positive-bg-color;
     }
     &.red {
-        color: $badge-red;
+        color: $negative-bg-color;
     }
     &.gray {
         color: #aaa;
