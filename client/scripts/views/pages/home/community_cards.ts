@@ -139,7 +139,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
         .filter(([c, nodeList]) => !app.user.isMember({ account: app.user.activeAccount, chain: c }) || vnode.state.justJoinedChains.indexOf(c) !== -1);
 
       otherCommunities = app.config.communities.getAll()
-        .filter((c) => c.visible)
+        .filter((c) => { debugger; console.log(c.visible); return c.visible; })
         .filter((c) => !app.user.isMember({ account: app.user.activeAccount, community: c.id }) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
     }
 

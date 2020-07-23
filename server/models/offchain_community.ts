@@ -17,6 +17,7 @@ export interface OffchainCommunityAttributes {
   telegram?: string;
   github?: string;
   featured_tags?: string[];
+  visible: boolean;
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
   created_at?: Date;
@@ -50,6 +51,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
+      visible: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       description: { type: dataTypes.TEXT, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       chat: { type: dataTypes.STRING, allowNull: true },

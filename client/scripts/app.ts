@@ -40,6 +40,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       data.communities.map((community) => {
+        console.log(community);
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
@@ -49,6 +50,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           telegram: community.telegram,
           github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
+          visible: community.visible,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
           featuredTags: community.featured_tags,
