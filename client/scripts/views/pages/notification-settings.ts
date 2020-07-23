@@ -365,7 +365,7 @@ export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttr
   },
 };
 
-const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo }> = {
+const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo | ChainInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
     const subscription = subscriptions.find(
@@ -376,7 +376,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
 };
 
 interface ICommunitySpecificNotificationsAttrs {
-  community: CommunityInfo;
+  community: CommunityInfo | ChainInfo;
   subscriptions: NotificationSubscription[];
 }
 
@@ -384,9 +384,10 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
   view: (vnode) => {
     const { community, subscriptions } = vnode.attrs;
     const filteredSubscriptions = subscriptions.filter(
-      (s) => s.OffchainCommunity?.id === community.id
+      (s) => (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.ChainEvent
     );
     return [
       m(NewThreadRow, { community, subscriptions }),
@@ -565,10 +566,11 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
 interface ICommunityNotificationsAttrs {
   subscriptions: NotificationSubscription[];
   communities: CommunityInfo[];
+  chains: ChainInfo[];
 }
 
 interface ICommunityNotificationsState {
-  selectedCommunity: CommunityInfo;
+  selectedCommunity: CommunityInfo | ChainInfo;
   selectedCommunityId: string;
   communityIds: string[];
 }
@@ -579,9 +581,14 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     vnode.state.selectedCommunityId = 'All communities';
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
+    const roleChains = app.user.roles.map((r) => r.chain_id);
+    vnode.attrs.chains.forEach((c) => {
+      if (roleChains.includes(c.id)) vnode.state.communityIds.push(c.name);
+    });
+    vnode.state.communityIds.sort();
   },
   view: (vnode) => {
-    const { subscriptions, communities } = vnode.attrs;
+    const { subscriptions, communities, chains } = vnode.attrs;
     const { selectedCommunity, selectedCommunityId, communityIds } = vnode.state;
     if (!communities || !subscriptions) return;
     return m('.CommunityNotifications', [
@@ -611,7 +618,7 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
               : 'All communities',
           }),
           onSelect: (community: string) => {
-            vnode.state.selectedCommunity = communities.find((c) => c.name === community);
+            vnode.state.selectedCommunity = communities.find((c) => c.name === community) || chains.find((c) => c.name === community);
             vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || 'All communities';
             m.redraw();
           }
@@ -693,7 +700,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     }, [
       m('.forum-container', [
         (selectedFilter === 'community-notifications')
-          && m(CommunityNotifications, { subscriptions, communities, }),
+          && m(CommunityNotifications, { subscriptions, communities, chains, }),
         (selectedFilter === 'chain-notifications')
           && m(ChainNotificationManagementPage, {
             subscriptions,
