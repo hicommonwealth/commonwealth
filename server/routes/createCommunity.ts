@@ -68,6 +68,7 @@ const createCommunity = async (models, req: Request, res: Response, next: NextFu
     name: req.body.name,
     description: req.body.description,
     default_chain: (req.body.default_chain) ? req.body.default_chain : 'ethereum',
+    visible: false,
     isAuthenticatedForum,
     privacyEnabled,
     invitesEnabled,
