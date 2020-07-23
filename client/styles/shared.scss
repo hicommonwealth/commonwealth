@@ -43,20 +43,11 @@ $electricblue: #229bd6;
 $standard-light-text: #999;
 $standard-box-shadow: 0 0 6px rgba(0,0,0,0.07);
 
-// widths and heights
-$layout-max-width: 9999px;
-$left-sidebar-width: 240px;
-$right-sidebar-width: 300px;
-$sublayout-max-width: 9999px;
-$header-height: 60px;
-
 // paddings
 $vertical-padding: 24px;
-$sidebar-padding: 32px;
+$sidebar-width: 220px;
 $header-spacing: 14px;
-
-// construct-ui styles
-$menu-item-height: 30px;
+$layout-max-width: 970px;
 
 @mixin popout {
     animation: popout 0.05s ease;

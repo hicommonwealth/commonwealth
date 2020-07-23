@@ -292,9 +292,6 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
         text-align: left;
     }
     button.cui-button.cui-menu-item {
-        min-height: $menu-item-height;
-        height: $menu-item-height;
-        line-height: $menu-item-height;
         font-weight: $cui-font-weight-normal !important; // !important to override the .cui-button style
     }
 }

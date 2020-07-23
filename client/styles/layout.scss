@@ -37,6 +37,17 @@ html {
 .forum-container {
     padding: 20px 0;
 }
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: $sidebar-width;
+    height: 100%;
+    background: $background-color-light;
+}
+.layout-container {
+    padding-left: $sidebar-width;
+}
 
 //
 // typography
