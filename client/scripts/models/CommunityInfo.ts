@@ -11,6 +11,7 @@ interface CommunityData {
   chat: string,
   telegram: string,
   github: string,
+  visible: boolean;
   invitesEnabled: boolean,
   privacyEnabled: boolean,
 }
@@ -24,6 +25,7 @@ class CommunityInfo {
   public telegram: string;
   public github: string;
   public readonly defaultChain: ChainInfo;
+  public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
   public readonly featuredTags: string[];
@@ -32,7 +34,7 @@ class CommunityInfo {
 
   constructor(
     id, name, description, website, chat, telegram, github, defaultChain,
-    invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?
+    visible, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?
   ) {
     this.id = id;
     this.name = name;
@@ -42,6 +44,7 @@ class CommunityInfo {
     this.telegram = telegram;
     this.github = github;
     this.defaultChain = defaultChain;
+    this.visible = visible;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
     this.featuredTags = featuredTags || [];
@@ -59,6 +62,7 @@ class CommunityInfo {
       json.telegram,
       json.github,
       json.default_chain,
+      json.visible,
       json.invitesEnabled,
       json.privacyEnabled,
       json.featuredTags,
