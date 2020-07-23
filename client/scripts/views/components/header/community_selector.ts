@@ -40,6 +40,7 @@ const CommunityLabel: m.Component<{
     if (chain) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(ChainIcon, {
+          size: 24,
           chain,
           onclick: link ? (() => m.route.set(`/${chain.id}`)) : null
         }),
@@ -56,6 +57,7 @@ const CommunityLabel: m.Component<{
     if (community) return m('.CommunityLabel', [
       m('.community-label-left', [
         m(CommunityIcon, {
+          size: 24,
           community,
           onclick: link ? (() => m.route.set(`/${community.id}`)) : null
         }),
@@ -73,7 +75,7 @@ const CommunityLabel: m.Component<{
     ]);
 
     return m('.CommunityLabel.CommunityLabelPlaceholder', [
-      m('span.community-name', 'Select a community'),
+      m('span.community-name', 'Commonwealth'),
     ]);
   }
 };
@@ -105,6 +107,7 @@ const CommunitySelector = {
       if (item instanceof CommunityInfo) return app.activeCommunityId() === item.id;
       return false;
     });
+    const currentCommunity = selectableCommunities[currentIndex];
 
     return m('.CommunitySelector', [
       m('.title-selector', [
@@ -160,7 +163,13 @@ const CommunitySelector = {
             hasArrow: false
           },
           trigger: m(Button, {
-            iconLeft: Icons.GLOBE,
+            basic: true,
+            label: [
+              currentCommunity instanceof CommunityInfo
+                ? m(CommunityLabel, { community: currentCommunity })
+                : m(CommunityLabel, { chain: currentCommunity }),
+              m(Icon, { name: Icons.MENU, size: 'sm' }),
+            ],
           }),
         }),
       ]),

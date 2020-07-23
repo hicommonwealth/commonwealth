@@ -3,6 +3,34 @@
 $active-color: #ececec;
 
 .Sidebar {
+    .SidebarHeader {
+        border-bottom: 1px solid $background-color-border;
+        margin-bottom: 18px;
+        .cui-button {
+            padding: 0;
+            width: 100%;
+            height: initial;
+            background: none !important;
+            > .cui-button-label {
+                padding: 0 19px;
+                width: 100%;
+                display: flex;
+                > .CommunityLabel {
+                    padding: 14px 0 15px;
+                    max-width: calc(100% - 18px);
+                }
+                > .CommunityLabel.CommunityLabelPlaceholder {
+                    padding: 22px 0;
+                    padding-left: 4px;
+                    font-weight: 500;
+                }
+                .cui-icon {
+                    margin-top: 26px;
+                    margin-left: 2px;
+                }
+            }
+        }
+    }
     .SidebarModule {
         margin: 0 15px 20px;
         > .cui-list {

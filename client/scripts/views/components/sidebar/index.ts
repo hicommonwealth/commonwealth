@@ -218,7 +218,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
               }),
             }),
         }),
-        m(ListItem, {
+        featuredTagListItems.length === 0 && otherTagListItems.length === 0 && m(ListItem, {
           class: 'section-callout',
           label: m(Callout, {
             intent: 'primary',
@@ -275,7 +275,7 @@ const SettingsModule: m.Component<{}> = {
 const Sidebar: m.Component<{}> = {
   view: (vnode) => {
     return m('.Sidebar', [
-      m(CommunitySelector),
+      m('.SidebarHeader', m(CommunitySelector)),
       m(NavigationModule),
       (app.chain || app.community) && m(TagsModule),
       app.isLoggedIn() && m(SettingsModule),
