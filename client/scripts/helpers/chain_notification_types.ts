@@ -1,5 +1,6 @@
 export const EdgewareChainNotificationTypes = {
     Council: [
+        'edgeware-collective-approved',
         'edgeware-collective-disapproved',
         'edgeware-collective-executed',
         'edgeware-collective-member-executed',
