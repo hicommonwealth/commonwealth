@@ -243,6 +243,15 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 .cui-tag {
     line-height: 1.2;
     @include cui-tag-sizing($cui-base-height * 0.5, $cui-base-padding, $cui-font-size);
+    .cui-icon svg {
+        $icon-size: $cui-font-size * 0.75;
+        height: $icon-size;
+        width: $icon-size;
+        max-height: $icon-size;
+        max-width: $icon-size;
+        min-height: $icon-size;
+        min-width: $icon-size;
+    }
     @include cui-tag-style(
         $cui-base-text-color,
         $cui-hover-color,
@@ -256,6 +265,17 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
                 map-get($cui-padding-map, $size),
                 map-get($cui-font-size-map, $size)
             );
+        }
+        &.cui-#{$size} {
+            .cui-icon svg {
+                $icon-size: map-get($cui-font-size-map, $size) * 0.75;
+                height: $icon-size;
+                width: $icon-size;
+                max-height: $icon-size;
+                max-width: $icon-size;
+                min-height: $icon-size;
+                min-width: $icon-size;
+            }
         }
     }
 }

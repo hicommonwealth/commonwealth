@@ -238,6 +238,13 @@ const Examples = {
         m(Tag, { intent: 'primary', size: 'lg', label: 'Large' }),
         m(Tag, { intent: 'primary', size: 'xl', label: 'Extra large' }),
       ]),
+      m('div', [
+        m(Tag, { rounded: true, size: 'xs', label: [ m(Icon, { name: Icons.LOCK }), ' Extra small' ] }),
+        m(Tag, { rounded: true, size: 'sm', label: [ m(Icon, { name: Icons.LOCK }), ' Small' ] }),
+        m(Tag, { rounded: true, size: 'default', label: [ m(Icon, { name: Icons.LOCK }), ' Default' ] }),
+        m(Tag, { rounded: true, size: 'lg', label: [ m(Icon, { name: Icons.LOCK }), ' Large' ] }),
+        m(Tag, { rounded: true, size: 'xl', label: [ m(Icon, { name: Icons.LOCK }), ' Extra large' ] }),
+      ]),
 
       // callout
       m('div', [

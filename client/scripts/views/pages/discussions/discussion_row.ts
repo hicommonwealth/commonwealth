@@ -84,6 +84,15 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             ]),
           ]),
           m('.discussion-top-right', [
+            proposal.readOnly && m('.discussion-locked', [
+              m(Tag, {
+                size: 'xs',
+                label: [
+                  m(Icon, { name: Icons.LOCK, size: 'xs' }),
+                  ' Locked'
+                ],
+              }),
+            ]),
             m('.discussion-commenters', [
               m('.commenters-avatars', app.comments.uniqueCommenters(proposal)
                 .map(([chain, address]) => {
