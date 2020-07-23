@@ -81,7 +81,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 tooltip: true,
                 hideAvatar: true,
               }),
-              m(DiscussionRowMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [
@@ -101,6 +100,9 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               class: lastUpdated.isBefore(moment().subtract(365, 'days')) ? 'older' : '',
             }, [
               link('a', discussionLink, formatLastUpdated(lastUpdated)),
+            ]),
+            app.isLoggedIn() && m('.discussion-row-menu', [
+              m(DiscussionRowMenu, { proposal }),
             ]),
           ]),
         ]),

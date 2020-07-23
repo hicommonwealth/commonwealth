@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .CommunitySelector {
 }
 
@@ -7,5 +9,38 @@
     }
     .cui-list {
         max-height: 100vh;
+    }
+    .cui-menu {
+        border: none;
+        max-width: 280px;
+    }
+    button.cui-button.cui-menu-item {
+        text-align: left;
+        padding: 0 14px;
+        height: initial;
+        max-height: initial;
+        .cui-button-label {
+            display: flex;
+        }
+        // for address selection
+        .UserBlock {
+            padding: 6px 0 8px;
+            width: 100%;
+        }
+        // for community selection
+        .CommunityLabel {
+            padding: 2px 0;
+        }
+    }
+    .community-star-toggle .cui-icon svg {
+        stroke: lighten(#546e7b, 40%);
+    }
+    $star-color: #ecbc00;
+    .community-star-toggle .cui-icon:hover svg {
+        stroke: $star-color !important;
+    }
+    .cui-list-item.starred .community-star-toggle .cui-icon svg {
+        stroke: $star-color !important;
+        fill: $star-color !important;
     }
 }

@@ -161,7 +161,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
             name: Icons.CHEVRON_DOWN,
           }),
           content: m(MenuItem, {
-            label: 'Edit channel',
+            label: 'Edit tag',
             onclick: (e) => {
               app.modals.create({
                 modal: EditTagModal,
@@ -200,7 +200,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       m(List, { size: 'lg' }, [
         m(ListItem, {
           class: 'section-header',
-          label: 'Discussion Topics',
+          label: 'Discussion Tags',
           contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
             && m(PopoverMenu, {
               class: 'sidebar-add-tag',
@@ -210,7 +210,7 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
               closeOnContentClick: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               content: m(MenuItem, {
-                label: 'New channel',
+                label: 'New tag',
                 onclick: (e) => {
                   e.preventDefault();
                   app.modals.create({ modal: NewTagModal });
@@ -222,8 +222,8 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
           class: 'section-callout',
           label: m(Callout, {
             intent: 'primary',
-            header: 'No topics',
-            content: 'The community admin must create topics before anyone can post.',
+            header: 'No tags',
+            content: 'Admin must create some tags to enable posting in this community',
           }),
         }),
       ]),

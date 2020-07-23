@@ -170,6 +170,14 @@ $discussion-title-font-size: 1.45rem;
             }
         }
     }
+    .QuillEditor {
+        margin-top: 8px;
+    }
+    .ProposalBodyCancelEdit,
+    .ProposalBodySaveEdit {
+        margin-right: 12px;
+        margin-top: 17px;
+    }
     .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
         stroke: #999;
         &:hover {

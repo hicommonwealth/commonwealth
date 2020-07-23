@@ -4,6 +4,7 @@
     display: block;
     padding: 0 32px;
     .sublayout-main {
+        position: relative;
         display: flex;
         margin: 0 auto;
         min-height: calc(100vh - 60px);

@@ -277,7 +277,11 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 // reduce menu padding
 .cui-menu {
     max-width: 240px; // allow menus to be wider by default
-    padding: 6px 0;
+    padding: 5px 0 6px;
+    .cui-menu-item.cui-button {
+        min-height: 30px;
+        height: 30px;
+    }
     > .cui-button.cui-basic {
         color: #333;
         .cui-icon svg {

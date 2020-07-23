@@ -8,7 +8,7 @@
     .discussion-row-header-col {
         font-size: 0.94rem;
         text-align: right;
-        width: 82px;
+        width: 84px;
         padding: 10px 0;
         &.discussion-row-header-replies {
             padding-right: 6px;
@@ -17,6 +17,9 @@
             flex: 1;
             width: initial;
             text-align: left;
+        }
+        &.discussion-row-menu {
+            width: 28px;
         }
     }
 }

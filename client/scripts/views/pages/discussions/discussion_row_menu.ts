@@ -62,7 +62,7 @@ export const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen:
     return m('.TagEditorButton', [
       m(MenuItem, {
         fluid: true,
-        label: 'Edit tags',
+        label: 'Move to another tag',
         onclick: (e) => {
           e.preventDefault();
           openTagEditor();

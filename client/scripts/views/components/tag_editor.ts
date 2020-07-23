@@ -64,7 +64,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
-      }, 'Edit tags'),
+      }, 'Move to another tag'),
       m(Dialog, {
         basic: false,
         closeOnEscapeKey: true,
@@ -86,7 +86,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit tags',
+        title: 'Edit tag',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
@@ -100,7 +100,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             },
           }),
           m(Button, {
-            label: 'Submit',
+            label: 'Save changes',
             intent: 'primary',
             onclick: async () => {
               const { tagName, tagId } = vnode.state;
