@@ -2,7 +2,7 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
@@ -106,7 +106,7 @@ class SubstrateCollective extends ProposalModule<
     const title = this._Chain.methodToTitle(action);
     const txFunc = fromTechnicalCommittee
       ? ((api: ApiRx) => api.tx.technicalCommittee.propose(threshold, action))
-      : ((api: ApiRx) => api.tx.council.propose(threshold, action));
+      : ((api: ApiRx) => (api.tx.council.propose as any)(threshold, action));
     return this._Chain.createTXModalData(
       author,
       txFunc,

@@ -12,7 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateEventKind, ISubstrateDemocracyProposed } from 'events/substrate/types';
+import { SubstrateEventKind, ISubstrateDemocracyProposed } from '@commonwealth/chain-events/dist/src/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -212,7 +212,7 @@ class SubstrateDemocracyProposal extends Proposal<
     // deposit parameter is ignored
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiRx) => api.tx.democracy.second(this.data.index),
+      (api: ApiRx) => (api.tx.democracy.second as any)(this.data.index),
       'secondDemocracyProposal',
       this.title
     );

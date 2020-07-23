@@ -12,7 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateEventKind, ISubstrateDemocracyStarted } from 'events/substrate/types';
+import { SubstrateEventKind, ISubstrateDemocracyStarted } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { BehaviorSubject, Unsubscribable, of } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';

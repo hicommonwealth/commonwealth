@@ -10,6 +10,8 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
+import { SubstrateEventKinds } from '@commonwealth/chain-events/dist/src/substrate/types';
+
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
 import setupPassport from './server/passport';
@@ -17,7 +19,6 @@ import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
-import { SubstrateEventKinds } from './shared/events/substrate/types';
 
 require('express-async-errors');
 

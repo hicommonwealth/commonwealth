@@ -1,4 +1,4 @@
-import * as edgewareDefinitions from 'edgeware-node-types/dist/definitions';
+import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
 
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
@@ -54,7 +54,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
 
   public async initApi() {
     const edgTypes = Object.values(edgewareDefinitions)
-      .reduce((res, { default: { types } }): object => ({ ...res, ...types }), {});
+      .reduce((res, { types }): object => ({ ...res, ...types }), {});
     await this.chain.resetApi(this.meta, {
       types: {
         ...edgTypes,

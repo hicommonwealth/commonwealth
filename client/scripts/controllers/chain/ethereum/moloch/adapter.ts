@@ -1,13 +1,14 @@
-import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { MolochEntityKind } from '@commonwealth/chain-events/dist/src/moloch/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
-import { setActiveAccount } from 'controllers/app/login';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import ChainEntityController from 'controllers/server/chain_entities';
-import { MolochEntityKind } from 'events/moloch/types';
 import { ChainBase, ChainClass, IChainAdapter, ChainEntity, ChainEvent, NodeInfo } from 'models';
+
+import { setActiveAccount } from 'controllers/app/login';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import MolochMembers from './members';

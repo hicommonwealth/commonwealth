@@ -3,7 +3,7 @@ import { ApiRx } from '@polkadot/api';
 import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { ITXModalData, ProposalModule } from 'models';
-import { SubstrateEntityKind } from 'events/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
@@ -61,7 +61,7 @@ class SubstrateDemocracy extends ProposalModule<
     // TODO: verify that hash corresponds to an actual preimage & is in a reap-able state
     return this._Chain.createTXModalData(
       author,
-      (api: ApiRx) => api.tx.democracy.reapPreimage(hash),
+      (api: ApiRx) => (api.tx.democracy.reapPreimage as any)(hash),
       'reapPreimage',
       `Preimage hash: ${hash}`,
     );

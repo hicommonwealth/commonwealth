@@ -3,7 +3,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';

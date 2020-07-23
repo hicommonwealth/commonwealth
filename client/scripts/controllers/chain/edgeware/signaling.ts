@@ -7,7 +7,7 @@ import { ProposalModule } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/substrate/types';
+import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<

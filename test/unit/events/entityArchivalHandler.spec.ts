@@ -4,13 +4,15 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
+import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
+import {
+  SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData
+} from '@commonwealth/chain-events/dist/src/substrate/types';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import { CWEvent } from '../../../shared/events/interfaces';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import EntityArchivalHandler from '../../../server/eventHandlers/entityArchival';
-import { SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData } from '../../../shared/events/substrate/types';
 import { WebsocketMessageType } from '../../../shared/types';
 
 chai.use(chaiHttp);

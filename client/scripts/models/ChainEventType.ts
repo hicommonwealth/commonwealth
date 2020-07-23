@@ -1,4 +1,4 @@
-import { SubstrateEventKind } from 'events/substrate/types';
+import { SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
 
 class ChainEventType {
   public readonly id: string;
