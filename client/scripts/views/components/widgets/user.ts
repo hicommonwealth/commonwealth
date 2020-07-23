@@ -63,10 +63,10 @@ const User: m.Component<{
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
     }
     const roleTag = role ? m(Tag, {
-      class: 'roleTag',
+      class: 'role-tag',
       label: role.permission,
       rounded: true,
-      size: 'sm',
+      size: 'xs',
     }) : null;
 
     const userFinal = avatarOnly

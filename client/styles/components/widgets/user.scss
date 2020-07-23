@@ -73,10 +73,12 @@
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
     }
-    .roleTag {
-        margin-left: 6px;
+    .role-tag {
+        margin-left: 10px;
         margin-right: 0;
         padding: 0 6px;
+        position: relative;
+        top: -1px;
     }
 }
 

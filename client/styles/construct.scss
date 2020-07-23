@@ -237,6 +237,27 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     }
 }
 
+// reduce tag padding
+.cui-tag {
+    line-height: 1.2;
+    @include cui-tag-sizing($cui-base-height * 0.5, $cui-base-padding, $cui-font-size);
+    @include cui-tag-style(
+        $cui-base-text-color,
+        $cui-hover-color,
+        tint($blue-grey100, 10%)
+    );
+    @each $size in $cui-sizes {
+        &.cui-#{$size},
+        .cui-#{$size} & {
+            @include cui-tag-sizing(
+                map-get($cui-height-map, $size) * 0.5,
+                map-get($cui-padding-map, $size),
+                map-get($cui-font-size-map, $size)
+            );
+        }
+    }
+}
+
 // reduce tab padding
 .cui-tabs {
     .cui-tabs-item {

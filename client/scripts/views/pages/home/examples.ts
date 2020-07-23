@@ -12,6 +12,7 @@ import {
   PopoverMenu,
   Switch, Checkbox,
   Radio, RadioGroup,
+  Tag,
   Tabs, TabItem,
   Table
 } from 'construct-ui';
@@ -214,6 +215,28 @@ const Examples = {
         m(BreadcrumbItem, { href: '#' }, m(Icon, { name: Icons.HOME })),
         m(BreadcrumbItem, { href: '#' }, 'Application'),
         m(BreadcrumbItem, 'Section 1')
+      ]),
+
+      m('div', [
+        m(Tag, { size: 'xs', label: 'Extra small' }),
+        m(Tag, { size: 'sm', label: 'Small' }),
+        m(Tag, { size: 'default', label: 'Default' }),
+        m(Tag, { size: 'lg', label: 'Large' }),
+        m(Tag, { size: 'xl', label: 'Extra large' }),
+      ]),
+      m('div', [
+        m(Tag, { rounded: true, size: 'xs', label: 'Extra small' }),
+        m(Tag, { rounded: true, size: 'sm', label: 'Small' }),
+        m(Tag, { rounded: true, size: 'default', label: 'Default' }),
+        m(Tag, { rounded: true, size: 'lg', label: 'Large' }),
+        m(Tag, { rounded: true, size: 'xl', label: 'Extra large' }),
+      ]),
+      m('div', [
+        m(Tag, { intent: 'primary', size: 'xs', label: 'Extra small' }),
+        m(Tag, { intent: 'primary', size: 'sm', label: 'Small' }),
+        m(Tag, { intent: 'primary', size: 'default', label: 'Default' }),
+        m(Tag, { intent: 'primary', size: 'lg', label: 'Large' }),
+        m(Tag, { intent: 'primary', size: 'xl', label: 'Extra large' }),
       ]),
 
       // callout
