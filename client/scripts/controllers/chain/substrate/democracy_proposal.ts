@@ -12,14 +12,14 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateEventKind, ISubstrateDemocracyProposed } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: ISubstrateDemocracyProposed,
+  event: SubstrateTypes.IDemocracyProposed,
 ): ISubstrateDemocracyProposal => {
   const enc = new TextEncoder();
   return {
@@ -97,10 +97,14 @@ class SubstrateDemocracyProposal extends Proposal<
     super('democracyproposal', backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+        ).data as SubstrateTypes.IDemocracyProposed
     ));
     const eventData = entity.chainEvents
-      .find((e) => e.data.kind === SubstrateEventKind.DemocracyProposed).data as ISubstrateDemocracyProposed;
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+      ).data as SubstrateTypes.IDemocracyProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;
@@ -134,14 +138,14 @@ class SubstrateDemocracyProposal extends Proposal<
 
   public update(e: ChainEvent) {
     switch (e.data.kind) {
-      case SubstrateEventKind.DemocracyProposed: {
+      case SubstrateTypes.EventKind.DemocracyProposed: {
         break;
       }
-      case SubstrateEventKind.DemocracyTabled: {
+      case SubstrateTypes.EventKind.DemocracyTabled: {
         this.complete();
         break;
       }
-      case SubstrateEventKind.PreimageNoted: {
+      case SubstrateTypes.EventKind.PreimageNoted: {
         const preimage = this._Proposals.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._method = preimage.method;

@@ -8,14 +8,14 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ISubstrateTreasuryProposed, SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasury from './treasury';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: ISubstrateTreasuryProposed
+  event: SubstrateTypes.ITreasuryProposed
 ): ISubstrateTreasuryProposal => {
   return {
     identifier: event.proposalIndex.toString(),
@@ -87,7 +87,7 @@ export class SubstrateTreasuryProposal
     super('treasuryproposal', backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.TreasuryProposed).data as ISubstrateTreasuryProposed
+        .find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed).data as SubstrateTypes.ITreasuryProposed
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -113,15 +113,15 @@ export class SubstrateTreasuryProposal
       return;
     }
     switch (e.data.kind) {
-      case SubstrateEventKind.TreasuryProposed: {
+      case SubstrateTypes.EventKind.TreasuryProposed: {
         break;
       }
-      case SubstrateEventKind.TreasuryAwarded: {
+      case SubstrateTypes.EventKind.TreasuryAwarded: {
         this._awarded.next(true);
         this.complete();
         break;
       }
-      case SubstrateEventKind.TreasuryRejected: {
+      case SubstrateTypes.EventKind.TreasuryRejected: {
         this._awarded.next(false);
         this.complete();
         break;

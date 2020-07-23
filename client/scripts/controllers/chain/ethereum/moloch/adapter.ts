@@ -1,4 +1,4 @@
-import { MolochEntityKind } from '@commonwealth/chain-events/dist/src/moloch/types';
+import { MolochTypes } from '@commonwealth/chain-events';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthWebWalletController from 'controllers/app/eth_web_wallet';
@@ -36,7 +36,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
 
   public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
     switch (entity.type) {
-      case MolochEntityKind.Proposal: {
+      case MolochTypes.EntityKind.Proposal: {
         const constructorFunc = (e: ChainEntity) => new MolochProposal(this.accounts, this.governance, e);
         this.governance.updateProposal(constructorFunc, entity, event);
         break;

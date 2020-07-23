@@ -3,9 +3,15 @@
  */
 import WebSocket from 'ws';
 import {
-  IEventHandler, CWEvent, eventToEntity, entityToFieldName, EntityEventKind, IChainEntityKind, IChainEventData
-} from '@commonwealth/chain-events/dist/src/interfaces';
-import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+  IEventHandler,
+  CWEvent,
+  eventToEntity,
+  entityToFieldName,
+  EntityEventKind,
+  IChainEntityKind,
+  IChainEventData,
+  SubstrateTypes
+} from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
 import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';
@@ -60,7 +66,7 @@ export default class extends IEventHandler {
      * on whether it is a creation, modification, or unrelated event.
      */
     const createEntityFn = async (type: IChainEntityKind, type_id: string, completed = false) => {
-      if (type === SubstrateEntityKind.DemocracyPreimage) {
+      if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
         // we always mark preimages as "completed" -- we have no link between democracy proposals
         // and preimages in the database, so we want to always fetch them for archival purposes,
         // which requires marking them completed.

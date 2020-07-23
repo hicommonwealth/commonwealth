@@ -11,11 +11,9 @@ import {
   entityToFieldName,
   IStorageFetcher,
   IEventProcessor,
-  IEventSubscriber
-} from '@commonwealth/chain-events/dist/src/interfaces';
-import {
-  SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted
-} from '@commonwealth/chain-events/dist/src/substrate/types';
+  IEventSubscriber,
+  SubstrateTypes
+} from '@commonwealth/chain-events';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -43,11 +41,13 @@ class ChainEntityController {
   }
 
   public getPreimage(hash: string) {
-    const preimage = this.store.getByType(SubstrateEntityKind.DemocracyPreimage)
+    const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
       .find((preimageEntity) => preimageEntity.typeId === hash);
     if (preimage) {
-      const notedEvent = preimage.chainEvents.find((event) => event.data.kind === SubstrateEventKind.PreimageNoted);
-      return (notedEvent.data as ISubstratePreimageNoted).preimage;
+      const notedEvent = preimage.chainEvents.find(
+        (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
+      );
+      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
     } else {
       return null;
     }

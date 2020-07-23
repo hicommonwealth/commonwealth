@@ -4,10 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
-import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
-import {
-  SubstrateEventKind, SubstrateEntityKind, ISubstrateEventData
-} from '@commonwealth/chain-events/dist/src/substrate/types';
+import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -29,10 +26,10 @@ describe('Edgeware Archival Event Handler Tests', () => {
   });
 
   it('should create chain entity from event', async () => {
-    const event: CWEvent<ISubstrateEventData> = {
+    const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 3,
         endBlock: 100,
         proposalHash: 'hash',
@@ -50,7 +47,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
       assert.deepEqual(payload.data.chainEvent, dbEvent.toJSON());
       assert.deepEqual(payload.data.chainEventType, dbEventType.toJSON());
       assert.equal(payload.data.chainEntity.chain, 'edgeware');
-      assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.DemocracyReferendum);
+      assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.DemocracyReferendum);
       assert.equal(payload.data.chainEntity.type_id, '3');
     });
     const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
@@ -61,17 +58,17 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // verify outputs
     const entity = await handledDbEvent.getChainEntity();
     assert.equal(entity.chain, 'edgeware');
-    assert.equal(entity.type, SubstrateEntityKind.DemocracyReferendum);
+    assert.equal(entity.type, SubstrateTypes.EntityKind.DemocracyReferendum);
     assert.equal(entity.type_id, '3');
     const events = await entity.getChainEvents();
     assert.deepEqual(events.map((e) => e.toJSON()), [ handledDbEvent.toJSON() ]);
   });
 
   it('should update chain entity from event', async () => {
-    const createEvent: CWEvent<ISubstrateEventData> = {
+    const createEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 20,
       data: {
-        kind: SubstrateEventKind.TreasuryProposed,
+        kind: SubstrateTypes.EventKind.TreasuryProposed,
         proposalIndex: 5,
         proposer: 'Alice',
         value: '100',
@@ -80,10 +77,10 @@ describe('Edgeware Archival Event Handler Tests', () => {
       },
     };
 
-    const updateEvent: CWEvent<ISubstrateEventData> = {
+    const updateEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 25,
       data: {
-        kind: SubstrateEventKind.TreasuryAwarded,
+        kind: SubstrateTypes.EventKind.TreasuryAwarded,
         proposalIndex: 5,
         value: '100',
         beneficiary: 'Bob',
@@ -104,13 +101,13 @@ describe('Edgeware Archival Event Handler Tests', () => {
         assert.deepEqual(payload.data.chainEvent, createDbEvent.toJSON());
         assert.deepEqual(payload.data.chainEventType, createDbEventType.toJSON());
         assert.equal(payload.data.chainEntity.chain, 'edgeware');
-        assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.TreasuryProposal);
+        assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.TreasuryProposal);
         assert.equal(payload.data.chainEntity.type_id, '5');
       } else if (nEmissions === 1) {
         assert.deepEqual(payload.data.chainEvent, updateDbEvent.toJSON());
         assert.deepEqual(payload.data.chainEventType, updateDbEventType.toJSON());
         assert.equal(payload.data.chainEntity.chain, 'edgeware');
-        assert.equal(payload.data.chainEntity.type, SubstrateEntityKind.TreasuryProposal);
+        assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.TreasuryProposal);
         assert.equal(payload.data.chainEntity.type_id, '5');
       } else {
         assert.fail('more than 2 emissions');
@@ -128,18 +125,18 @@ describe('Edgeware Archival Event Handler Tests', () => {
     const updateEntity = await handleUpdateEvent.getChainEntity();
     assert.deepEqual(entity, updateEntity);
     assert.equal(entity.chain, 'edgeware');
-    assert.equal(entity.type, SubstrateEntityKind.TreasuryProposal);
+    assert.equal(entity.type, SubstrateTypes.EntityKind.TreasuryProposal);
     assert.equal(entity.type_id, '5');
     const events = await entity.getChainEvents();
     assert.sameDeepMembers(events.map((e) => e.toJSON()), [ createDbEvent.toJSON(), updateDbEvent.toJSON() ]);
   });
 
   it('should ignore unrelated events', async () => {
-    const event: CWEvent<ISubstrateEventData> = {
+    const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.Slash,
+        kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
