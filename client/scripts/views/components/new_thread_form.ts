@@ -231,7 +231,7 @@ export const NewThreadForm: m.Component<{
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { newType, saving } = vnode.state;
+    const { fromDraft,newType, saving } = vnode.state;
 
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} `
@@ -372,7 +372,10 @@ export const NewThreadForm: m.Component<{
         ]),
         //
         newType === PostType.Discussion && m(Form, [
-          m(FormGroup, { span: 8 }, [
+          fromDraft && m(FormGroup, { span: 2, class: 'draft-badge-wrap' }, [
+            m('.draft-badge', 'Draft')
+          ]),
+          m(FormGroup, { span: fromDraft ? 7 : 8 }, [
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
@@ -386,7 +389,7 @@ export const NewThreadForm: m.Component<{
               tabindex: 1,
             }),
           ]),
-          m(FormGroup, { span: 4 }, [
+          m(FormGroup, { span: fromDraft ? 3 : 4 }, [
             m(TagSelector, {
               activeTag:(vnode.state.activeTag === false || vnode.state.activeTag)
                 ? vnode.state.activeTag
@@ -472,6 +475,7 @@ export const NewThreadForm: m.Component<{
                   vnode.state.activeTag = false;
                   delete vnode.state.fromDraft;
                   vnode.state.form = {};
+                  m.redraw();
                 } catch (err) {
                   vnode.state.saving = false;
                   notifyError(err.message);
