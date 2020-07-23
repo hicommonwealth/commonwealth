@@ -1,9 +1,9 @@
-import { SubstrateEventKind } from '@commonwealth/chain-events';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 
 class ChainEventType {
   public readonly id: string;
   public readonly chain: string;
-  public readonly eventName: SubstrateEventKind;
+  public readonly eventName: SubstrateTypes.EventKind;
 
   constructor(id, chain, eventName) {
     this.id = id;
