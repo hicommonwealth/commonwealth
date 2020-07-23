@@ -110,7 +110,9 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   },
   oncreate: async (vnode) => {
     const loadProfile = async () => {
-      const chain = m.route.param('base');
+      const chain = (m.route.param('base'))
+        ? m.route.param('base')
+        : m.route.param('scope');
       const { address } = vnode.attrs;
       await $.ajax({
         url: `${app.serverUrl()}/profile`,
