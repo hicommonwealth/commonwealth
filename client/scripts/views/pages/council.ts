@@ -180,11 +180,11 @@ const CouncilPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading, { message: 'Chain is loading...' });
+    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain...' });
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
 
-    if (!initialized) return m(PageLoading, { message: 'Chain is loading...' });
+    if (!initialized) return m(PageLoading, { message: 'Loading council data...' });
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || []).map((a) => app.chain.accounts.get(a));
