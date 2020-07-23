@@ -1,10 +1,8 @@
 import crypto from 'crypto';
+import { EventSupportingChains, SubstrateTypes, MolochTypes } from '@commonwealth/chain-events';
+
 import { NotificationCategories } from '../../shared/types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import app from '../../server';
-import { SubstrateEventKinds, SubstrateEventChains } from '../../shared/events/substrate/types';
-import { MolochEventKinds, MolochEventChains } from '../../shared/events/moloch/types';
-import { EventSupportingChains } from '../../shared/events/interfaces';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -397,9 +395,9 @@ const resetServer = (models, closeMiddleware) => {
 
     // initialize chain event types
     const initChainEventTypes = (chain) => {
-      if (SubstrateEventChains.includes(chain)) {
+      if (SubstrateTypes.EventChains.includes(chain)) {
         return Promise.all(
-          SubstrateEventKinds.map((event_name) => {
+          SubstrateTypes.EventKinds.map((event_name) => {
             return models.ChainEventType.create({
               id: `${chain}-${event_name}`,
               chain,
@@ -407,9 +405,9 @@ const resetServer = (models, closeMiddleware) => {
             });
           })
         );
-      } else if (MolochEventChains.includes(chain)) {
+      } else if (MolochTypes.EventChains.includes(chain)) {
         return Promise.all(
-          MolochEventKinds.map((event_name) => {
+          MolochTypes.EventKinds.map((event_name) => {
             return models.ChainEventType.create({
               id: `${chain}-${event_name}`,
               chain,

@@ -2,7 +2,7 @@ import 'pages/view_proposal/create_comment.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Button } from 'construct-ui';
+import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
@@ -14,25 +14,21 @@ import User from 'views/components/widgets/user';
 
 import { GlobalStatus } from './body';
 
-interface ICreateCommentAttrs {
-  callback: CallableFunction;
-  cancellable?: boolean;
-  getSetGlobalEditingStatus: CallableFunction;
-  getSetGlobalReplyStatus: CallableFunction;
-  parentComment?: OffchainComment<any>;
-  rootProposal: AnyProposal | OffchainThread;
-  tabindex?: number;
-}
-
-interface ICreateCommentState {
-  quillEditorState: any;
-  uploadsInProgress;
-  error;
-  saving: boolean;
-  sendingComment;
-}
-
-const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
+const CreateComment: m.Component<{
+  callback: CallableFunction,
+  cancellable?: boolean,
+  getSetGlobalEditingStatus: CallableFunction,
+  getSetGlobalReplyStatus: CallableFunction,
+  parentComment?: OffchainComment<any>,
+  rootProposal: AnyProposal | OffchainThread,
+  tabindex?: number,
+}, {
+  quillEditorState: any,
+  uploadsInProgress,
+  error,
+  saving: boolean,
+  sendingComment,
+}> = {
   view: (vnode) => {
     const {
       callback,
@@ -132,40 +128,44 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
       ]),
       m('.create-comment-body', [
         m(User, { user: author, tooltip: true, hideAvatar: true }),
-        m(QuillEditor, {
-          contentsDoc: '',
-          oncreateBind: (state) => {
-            vnode.state.quillEditorState = state;
-          },
-          editorNamespace: `${document.location.pathname}-commenting`,
-          onkeyboardSubmit: submitComment,
-          tabindex: vnode.attrs.tabindex,
-        }),
-        m('.form-bottom', [
-          m(Button, {
-            intent: 'primary',
-            type: 'submit',
-            compact: true,
-            disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
-            onclick: submitComment,
-            label: (uploadsInProgress > 0)
-              ? 'Uploading...'
-              : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
-          }),
-          cancellable
-            && m(Button, {
-              intent: 'none',
-              type: 'cancel',
-              compact: true,
-              onclick: (e) => {
-                e.preventDefault();
-                getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
+          ? m(Callout, { content: 'Commenting is disabled because this post has been locked. ' })
+          : [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
               },
-              label: 'Cancel'
+              editorNamespace: `${document.location.pathname}-commenting`,
+              onkeyboardSubmit: submitComment,
+              tabindex: vnode.attrs.tabindex,
             }),
-          error
-            && m('.new-comment-error', error),
-        ])
+            m('.form-bottom', [
+              m(Button, {
+                intent: 'primary',
+                type: 'submit',
+                compact: true,
+                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+                onclick: submitComment,
+                label: (uploadsInProgress > 0)
+                  ? 'Uploading...'
+                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+              }),
+              cancellable
+                && m(Button, {
+                  intent: 'none',
+                  type: 'cancel',
+                  compact: true,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                  },
+                  label: 'Cancel'
+                }),
+              error
+                && m('.new-comment-error', error),
+            ])
+          ]
       ])
     ]);
   }

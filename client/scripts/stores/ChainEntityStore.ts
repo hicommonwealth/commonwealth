@@ -1,4 +1,4 @@
-import { IChainEntityKind } from 'events/interfaces';
+import { IChainEntityKind } from '@commonwealth/chain-events';
 
 import { ChainEntity } from '../models';
 import Store from './Store';

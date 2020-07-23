@@ -1,8 +1,9 @@
 import _ from 'underscore';
 import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
+import { SubstrateTypes } from '@commonwealth/chain-events';
+import { VoteOutcome, VoteRecord } from '@edgeware/node-types/interfaces';
 import { ApiRx } from '@polkadot/api';
 import { Option } from '@polkadot/types';
-import { VoteRecord } from 'edgeware-node-types/dist/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
 import {
   Account, Proposal, ProposalStatus, ProposalEndTime, IVote, VotingType,
@@ -12,8 +13,6 @@ import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { BehaviorSubject, Unsubscribable, combineLatest, of } from 'rxjs';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { ISubstrateSignalingNewProposal, SubstrateEventKind } from 'events/substrate/types';
-import { VoteOutcome } from 'edgeware-node-types/dist';
 import EdgewareSignaling from './signaling';
 
 export enum SignalingProposalStage {
@@ -25,7 +24,7 @@ export enum SignalingProposalStage {
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
-  event: ISubstrateSignalingNewProposal,
+  event: SubstrateTypes.ISignalingNewProposal,
 ): IEdgewareSignalingProposal => {
   return {
     identifier: event.proposalHash,
@@ -160,7 +159,9 @@ export class EdgewareSignalingProposal
     super('signalingproposal', backportEventToAdapter(
       ChainInfo,
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.SignalingNewProposal).data as ISubstrateSignalingNewProposal
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.SignalingNewProposal
+        ).data as SubstrateTypes.ISignalingNewProposal
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
@@ -182,10 +183,10 @@ export class EdgewareSignalingProposal
       return;
     }
     switch (e.data.kind) {
-      case SubstrateEventKind.SignalingNewProposal: {
+      case SubstrateTypes.EventKind.SignalingNewProposal: {
         break;
       }
-      case SubstrateEventKind.SignalingCommitStarted: {
+      case SubstrateTypes.EventKind.SignalingCommitStarted: {
         if (this.stage !== SignalingProposalStage.PreVoting) {
           console.error('signaling stage out of order!');
           return;
@@ -194,7 +195,7 @@ export class EdgewareSignalingProposal
         this._endBlock.next(e.data.endBlock);
         break;
       }
-      case SubstrateEventKind.SignalingVotingStarted: {
+      case SubstrateTypes.EventKind.SignalingVotingStarted: {
         if (this.stage !== SignalingProposalStage.Commit && this.stage !== SignalingProposalStage.PreVoting) {
           console.error('signaling stage out of order!');
           return;
@@ -203,7 +204,7 @@ export class EdgewareSignalingProposal
         this._endBlock.next(e.data.endBlock);
         break;
       }
-      case SubstrateEventKind.SignalingVotingCompleted: {
+      case SubstrateTypes.EventKind.SignalingVotingCompleted: {
         if (this.stage !== SignalingProposalStage.Voting) {
           console.error('signaling stage out of order!');
           return;

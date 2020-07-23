@@ -12,7 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   ChainBase, Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateEventKind, ISubstrateDemocracyStarted } from 'events/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { BehaviorSubject, Unsubscribable, of } from 'rxjs';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
@@ -103,7 +103,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
   }
 }
 
-const backportEventToAdapter = (event: ISubstrateDemocracyStarted): ISubstrateDemocracyReferendum => {
+const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubstrateDemocracyReferendum => {
   const enc = new TextEncoder();
   return {
     identifier: event.referendumIndex.toString(),
@@ -157,11 +157,15 @@ export class SubstrateDemocracyReferendum
   ) {
     super('referendum', backportEventToAdapter(
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted).data as ISubstrateDemocracyStarted
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
+        ).data as SubstrateTypes.IDemocracyStarted
     ));
 
     const eventData = entity.chainEvents
-      .find((e) => e.data.kind === SubstrateEventKind.DemocracyStarted).data as ISubstrateDemocracyStarted;
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
+      ).data as SubstrateTypes.IDemocracyStarted;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Democracy = Democracy;
@@ -193,29 +197,29 @@ export class SubstrateDemocracyReferendum
       return;
     }
     switch (e.data.kind) {
-      case SubstrateEventKind.DemocracyStarted: {
+      case SubstrateTypes.EventKind.DemocracyStarted: {
         break;
       }
-      case SubstrateEventKind.DemocracyCancelled:
-      case SubstrateEventKind.DemocracyNotPassed: {
+      case SubstrateTypes.EventKind.DemocracyCancelled:
+      case SubstrateTypes.EventKind.DemocracyNotPassed: {
         this._passed.next(false);
         this.complete();
         break;
       }
-      case SubstrateEventKind.DemocracyPassed: {
+      case SubstrateTypes.EventKind.DemocracyPassed: {
         this._passed.next(true);
         this._executionBlock = e.data.dispatchBlock;
         this._endBlock = e.data.dispatchBlock; // fix timer if in dispatch queue
         break;
       }
-      case SubstrateEventKind.DemocracyExecuted: {
+      case SubstrateTypes.EventKind.DemocracyExecuted: {
         if (!this.passed) {
           this._passed.next(true);
         }
         this.complete();
         break;
       }
-      case SubstrateEventKind.PreimageNoted: {
+      case SubstrateTypes.EventKind.PreimageNoted: {
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
           this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;

@@ -129,6 +129,7 @@ const CreateCommunityModal: m.Component<IAttrs, IState> = {
                 null,
                 null,
                 result.result.default_chain,
+                false,
                 result.result.invitesEnabled,
                 result.result.privacyEnabled,
                 result.featured_tags,
