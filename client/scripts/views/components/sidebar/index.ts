@@ -229,9 +229,10 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
                 content: 'This community has not been configured with tags yet',
               }),
             })
-            : m('div', { style: 'text-align: center' }, [
-              m(Spinner, { active: true, size: 'xs' })
-            ]),
+            : m(ListItem, {
+              class: 'section-callout',
+              label: m('div', { style: 'text-align: center' }, m(Spinner, { active: true, size: 'xs' })),
+            }),
         ]
       ]),
       m(List, {
