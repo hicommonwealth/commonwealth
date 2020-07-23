@@ -12,6 +12,7 @@ import {
   PopoverMenu,
   Switch, Checkbox,
   Radio, RadioGroup,
+  Spinner,
   Tag,
   Tabs, TabItem,
   Table
@@ -435,6 +436,26 @@ const Examples = {
             m('td', 'Cell 2')
           ])
         ])
+      ]),
+
+      // spinner
+      m(Card, [
+        m(Spinner, { active: true, fill: true }),
+      ]),
+      m(Card, { style: 'height: 160px' }, [
+        m(Spinner, { active: true, fill: true, size: 'xs', message: 'Extra small' }),
+      ]),
+      m(Card, { style: 'height: 160px' }, [
+        m(Spinner, { active: true, fill: true, size: 'sm', message: 'Small' }),
+      ]),
+      m(Card, { style: 'height: 160px' }, [
+        m(Spinner, { active: true, fill: true, size: 'default', message: 'Default' }),
+      ]),
+      m(Card, { style: 'height: 160px' }, [
+        m(Spinner, { active: true, fill: true, size: 'lg', message: 'Large' }),
+      ]),
+      m(Card, { style: 'height: 160px' }, [
+        m(Spinner, { active: true, fill: true, size: 'xl', message: 'Extra large' }),
       ]),
     ]);
   }

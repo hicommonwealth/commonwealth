@@ -322,6 +322,11 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
     }
 }
 
+// position items relatively inside cards
+.cui-card {
+    position: relative;
+}
+
 // icon styles
 .cui-icon.filled-icon svg {
     fill: currentColor;

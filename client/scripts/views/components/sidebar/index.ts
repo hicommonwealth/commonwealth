@@ -3,7 +3,7 @@ import 'components/sidebar/index.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import dragula from 'dragula';
-import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
+import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -218,15 +218,21 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
               }),
             }),
         }),
-        featuredTagListItems.length === 0 && otherTagListItems.length === 0 && m(ListItem, {
-          class: 'section-callout',
-          label: m(Callout, {
-            size: 'sm',
-            intent: 'negative',
-            icon: Icons.ALERT_TRIANGLE,
-            content: 'This community has not been configured with tags yet',
-          }),
-        }),
+        featuredTagListItems.length === 0 && otherTagListItems.length === 0 && [
+          app.threads.initialized
+            ? m(ListItem, {
+              class: 'section-callout',
+              label: m(Callout, {
+                size: 'sm',
+                intent: 'negative',
+                icon: Icons.ALERT_TRIANGLE,
+                content: 'This community has not been configured with tags yet',
+              }),
+            })
+            : m('div', { style: 'text-align: center' }, [
+              m(Spinner, { active: true, size: 'xs' })
+            ]),
+        ]
       ]),
       m(List, {
         size: 'lg',
