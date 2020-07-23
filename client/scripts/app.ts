@@ -40,7 +40,6 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
         }));
       });
       data.communities.map((community) => {
-        console.log(community);
         return app.config.communities.add(CommunityInfo.fromJSON({
           id: community.id,
           name: community.name,
