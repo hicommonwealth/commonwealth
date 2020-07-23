@@ -4,8 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
-import { SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -78,7 +77,7 @@ describe('Event Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
         endBlock: 100,
         proposalHash: 'hash',
@@ -115,7 +114,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.Slash,
+        kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
@@ -152,7 +151,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
@@ -190,7 +189,7 @@ describe('Event Handler Tests', () => {
       blockNumber: 12,
       excludeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',

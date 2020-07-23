@@ -8,7 +8,7 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { ProposalModule } from 'models';
-import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
@@ -76,7 +76,7 @@ class SubstrateTreasury extends ProposalModule<
           this._pot.next(this._Chain.coins(pot));
         });
         */
-        const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.TreasuryProposal);
+        const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
         const constructorFunc = (e) => new SubstrateTreasuryProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

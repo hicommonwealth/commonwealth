@@ -1,13 +1,8 @@
 import WebSocket from 'ws';
-import subscribeSubstrateEvents, {
-  createSubstrateProvider, createSubstrateApi
-} from '@commonwealth/chain-events/dist/src/substrate/index';
-import subscribeMolochEvents, { createMolochApi } from '@commonwealth/chain-events/dist/src/moloch/index';
 import {
-  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
-} from '@commonwealth/chain-events/dist/src/interfaces';
-import { SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
-import { MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
+} from '@commonwealth/chain-events';
 
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
@@ -64,7 +59,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
       let subscriber: IEventSubscriber<any, any>;
-      if (SubstrateEventChains.includes(node.chain)) {
+      if (SubstrateTypes.EventChains.includes(node.chain)) {
         let nodeUrl = node.url;
         const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
         nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
@@ -75,9 +70,9 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
         }
         nodeUrl = protocol + nodeUrl;
-        const provider = await createSubstrateProvider(nodeUrl);
-        const api = await createSubstrateApi(provider, node.chain).isReady;
-        subscriber = await subscribeSubstrateEvents({
+        const provider = await SubstrateEvents.createProvider(nodeUrl);
+        const api = await SubstrateEvents.createApi(provider, node.chain).isReady;
+        subscriber = await SubstrateEvents.subscribeEvents({
           chain: node.chain,
           handlers,
           skipCatchup,
@@ -85,10 +80,10 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           performMigration: !!migrate,
           api,
         });
-      } else if (MolochEventChains.includes(node.chain)) {
+      } else if (MolochTypes.EventChains.includes(node.chain)) {
         const contractVersion = 1;
-        const api = await createMolochApi(node.url, contractVersion, node.address);
-        subscriber = await subscribeMolochEvents({
+        const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
+        subscriber = await MolochEvents.subscribeEvents({
           chain: node.chain,
           handlers,
           skipCatchup,

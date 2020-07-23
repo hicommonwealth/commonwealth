@@ -3,9 +3,7 @@ import moment from 'moment';
 
 import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import {
-  MolochEventKind, IMolochSubmitProposal, IMolochProcessProposal
-} from '@commonwealth/chain-events/dist/src/moloch/types';
+import { MolochTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -53,21 +51,21 @@ const backportEntityToAdapter = (
   Gov: MolochGovernance,
   entity: ChainEntity
 ): IMolochProposalResponse => {
-  const startEvent = entity.chainEvents.find((e) => e.data.kind === MolochEventKind.SubmitProposal);
-  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochEventKind.ProcessProposal);
-  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochEventKind.Abort);
+  const startEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.SubmitProposal);
+  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
+  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
   if (!startEvent) {
     throw new Error('Proposal start event not found!');
   }
-  const identifier = `${(startEvent.data as IMolochSubmitProposal).proposalIndex}`;
+  const identifier = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
   const id = identifier;
-  const details = (startEvent.data as IMolochSubmitProposal).details;
-  const timestamp = `${(startEvent.data as IMolochSubmitProposal).startTime}`;
+  const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
+  const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;
   const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
-  const delegateKey = (startEvent.data as IMolochSubmitProposal).member;
-  const applicantAddress = (startEvent.data as IMolochSubmitProposal).applicant;
-  const tokenTribute = (startEvent.data as IMolochSubmitProposal).tokenTribute;
-  const sharesRequested = (startEvent.data as IMolochSubmitProposal).sharesRequested;
+  const delegateKey = (startEvent.data as MolochTypes.ISubmitProposal).member;
+  const applicantAddress = (startEvent.data as MolochTypes.ISubmitProposal).applicant;
+  const tokenTribute = (startEvent.data as MolochTypes.ISubmitProposal).tokenTribute;
+  const sharesRequested = (startEvent.data as MolochTypes.ISubmitProposal).sharesRequested;
   const processed = !!processEvent;
   const proposal: IMolochProposalResponse = {
     identifier,
@@ -85,11 +83,11 @@ const backportEntityToAdapter = (
 
   // optional properties
   if (processEvent) {
-    proposal.didPass = (processEvent.data as IMolochProcessProposal).didPass;
+    proposal.didPass = (processEvent.data as MolochTypes.IProcessProposal).didPass;
     proposal.aborted = false;
     proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
-    proposal.yesVotes = (processEvent.data as IMolochProcessProposal).yesVotes;
-    proposal.yesVotes = (processEvent.data as IMolochProcessProposal).noVotes;
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).yesVotes;
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).noVotes;
   }
   if (abortEvent) {
     proposal.didPass = false;
@@ -257,10 +255,10 @@ export default class MolochProposal extends Proposal<
       return;
     }
     switch (e.data.kind) {
-      case MolochEventKind.SubmitProposal: {
+      case MolochTypes.EventKind.SubmitProposal: {
         break;
       }
-      case MolochEventKind.SubmitVote: {
+      case MolochTypes.EventKind.SubmitVote: {
         const memberJson = {
           id: e.data.member,
           delegateKey: e.data.delegateKey,
@@ -277,14 +275,14 @@ export default class MolochProposal extends Proposal<
         }
         break;
       }
-      case MolochEventKind.Abort: {
+      case MolochTypes.EventKind.Abort: {
         this.data.aborted = true;
         this.data.didPass = false;
         this.data.status = 'ABORTED';
         this.complete(this._Gov.store);
         break;
       }
-      case MolochEventKind.ProcessProposal: {
+      case MolochTypes.EventKind.ProcessProposal: {
         this.data.processed = true;
         this.data.aborted = false;
         this.data.didPass = e.data.didPass;

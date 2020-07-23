@@ -4,8 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
-import { CWEvent } from '@commonwealth/chain-events/dist/src/interfaces';
-import { SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
@@ -24,7 +23,7 @@ describe('Event Storage Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
         endBlock: 100,
         proposalHash: 'hash',
@@ -60,7 +59,7 @@ describe('Event Storage Handler Tests', () => {
     const event: CWEvent = {
       blockNumber: 11,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 1,
         endBlock: 100,
         proposalHash: 'hash2',

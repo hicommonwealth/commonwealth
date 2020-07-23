@@ -13,10 +13,7 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
-import { MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
-import SubstrateLabeler from '@commonwealth/chain-events/dist/src/substrate/filters/labeler';
-import MolochLabeler from '@commonwealth/chain-events/dist/src/moloch/filters/labeler';
+import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -171,14 +168,14 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       let label;
       if (!vnode.state.startedLabelerLoad) {
         vnode.state.startedLabelerLoad = true;
-        if (SubstrateEventChains.includes(chainId)) {
-          label = SubstrateLabeler(
+        if (SubstrateTypes.EventChains.includes(chainId)) {
+          label = SubstrateEvents.Label(
             notification.chainEvent.blockNumber,
             chainId,
             notification.chainEvent.data,
           );
-        } else if (MolochEventChains.includes(chainId)) {
-          label = MolochLabeler(
+        } else if (MolochTypes.EventChains.includes(chainId)) {
+          label = MolochEvents.Label(
             notification.chainEvent.blockNumber,
             chainId,
             notification.chainEvent.data,

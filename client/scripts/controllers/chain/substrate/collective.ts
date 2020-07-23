@@ -2,7 +2,7 @@ import { first } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Call, AccountId } from '@polkadot/types/interfaces';
 import { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ProposalModule } from 'models';
 import { Unsubscribable } from 'rxjs';
 import { Vec } from '@polkadot/types';
@@ -34,7 +34,7 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
     this._moduleName = moduleName;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.CollectiveProposal);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
       const constructorFunc = (e) => new SubstrateCollectiveProposal(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

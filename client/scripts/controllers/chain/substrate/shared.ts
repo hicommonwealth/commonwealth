@@ -39,12 +39,7 @@ import {
   ChainEvent,
 } from 'models';
 
-import SubstrateStorageFetcher from '@commonwealth/chain-events/dist/src/substrate/storageFetcher';
-import SubstrateEventSubscriber from '@commonwealth/chain-events/dist/src/substrate/subscriber';
-import SubstrateEventProcessor from '@commonwealth/chain-events/dist/src/substrate/processor';
-import {
-  SubstrateEntityKind, SubstrateEventKind, ISubstrateCollectiveProposalEvents,
-} from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -85,20 +80,20 @@ async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
 // dispatches an entity update to the appropriate module
 export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: ChainEvent): void {
   switch (entity.type) {
-    case SubstrateEntityKind.DemocracyProposal: {
+    case SubstrateTypes.EntityKind.DemocracyProposal: {
       const constructorFunc = (e) => new SubstrateDemocracyProposal(
         chain.chain, chain.accounts, chain.democracyProposals, e
       );
       return chain.democracyProposals.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.DemocracyReferendum: {
+    case SubstrateTypes.EntityKind.DemocracyReferendum: {
       const constructorFunc = (e) => new SubstrateDemocracyReferendum(
         chain.chain, chain.accounts, chain.democracy, e
       );
       return chain.democracy.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.DemocracyPreimage: {
-      if (event.data.kind === SubstrateEventKind.PreimageNoted) {
+    case SubstrateTypes.EntityKind.DemocracyPreimage: {
+      if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
         console.log('dispatching preimage noted, from entity', entity);
         const proposal = chain.democracyProposals.getByHash(entity.typeId);
         if (proposal) {
@@ -111,14 +106,14 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
       }
       break;
     }
-    case SubstrateEntityKind.TreasuryProposal: {
+    case SubstrateTypes.EntityKind.TreasuryProposal: {
       const constructorFunc = (e) => new SubstrateTreasuryProposal(
         chain.chain, chain.accounts, chain.treasury, e
       );
       return chain.treasury.updateProposal(constructorFunc, entity, event);
     }
-    case SubstrateEntityKind.CollectiveProposal: {
-      const collectiveName = (event.data as ISubstrateCollectiveProposalEvents).collectiveName;
+    case SubstrateTypes.EntityKind.CollectiveProposal: {
+      const collectiveName = (event.data as SubstrateTypes.ICollectiveProposalEvents).collectiveName;
       if (collectiveName && collectiveName === 'technicalCommittee'
         && (chain.class === ChainClass.Kusama || chain.class === ChainClass.Polkadot)) {
         const constructorFunc = (e) => new SubstrateCollectiveProposal(
@@ -132,7 +127,7 @@ export function handleSubstrateEntityUpdate(chain, entity: ChainEntity, event: C
         return chain.council.updateProposal(constructorFunc, entity, event);
       }
     }
-    case SubstrateEntityKind.SignalingProposal: {
+    case SubstrateTypes.EntityKind.SignalingProposal: {
       if (chain.class === ChainClass.Edgeware) {
         const constructorFunc = (e) => new EdgewareSignalingProposal(
           chain.chain, chain.accounts, chain.signaling, e
@@ -316,9 +311,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
-    const fetcher = new SubstrateStorageFetcher(this._apiPromise);
-    const subscriber = new SubstrateEventSubscriber(this._apiPromise);
-    const processor = new SubstrateEventProcessor(this._apiPromise);
+    const fetcher = new SubstrateEvents.StorageFetcher(this._apiPromise);
+    const subscriber = new SubstrateEvents.Subscriber(this._apiPromise);
+    const processor = new SubstrateEvents.Processor(this._apiPromise);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain,
       fetcher,

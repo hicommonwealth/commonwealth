@@ -5,11 +5,9 @@ import $ from 'jquery';
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds, SubstrateEventChains } from '@commonwealth/chain-events/dist/src/substrate/types';
-import { MolochEventKinds, MolochEventChains } from '@commonwealth/chain-events/dist/src/moloch/types';
-import SubstrateTitlerFunc from '@commonwealth/chain-events/dist/src/substrate/filters/titler';
-import MolochTitlerFunc from '@commonwealth/chain-events/dist/src/moloch/filters/titler';
-import { IChainEventKind, EventSupportingChains, TitlerFilter } from '@commonwealth/chain-events/dist/src/interfaces';
+import {
+  SubstrateEvents, SubstrateTypes, MolochEvents, MolochTypes, IChainEventKind, EventSupportingChains, TitlerFilter
+} from '@commonwealth/chain-events';
 import Tabs from 'views/components/widgets/tabs';
 import { DropdownFormField } from 'views/components/forms';
 import Sublayout from 'views/sublayout';
@@ -352,18 +350,18 @@ interface IEventSubscriptionState {
 const EventSubscriptions: m.Component<{}, IEventSubscriptionState> = {
   oninit: (vnode) => {
     vnode.state.chain = EventSupportingChains.sort()[0];
-    vnode.state.eventKinds = SubstrateEventKinds;
+    vnode.state.eventKinds = SubstrateTypes.EventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
   },
   view: (vnode) => {
     let titler;
-    if (SubstrateEventChains.includes(vnode.state.chain)) {
-      titler = SubstrateTitlerFunc;
-      vnode.state.eventKinds = SubstrateEventKinds;
-    } else if (MolochEventChains.includes(vnode.state.chain)) {
-      titler = MolochTitlerFunc;
-      vnode.state.eventKinds = MolochEventKinds;
+    if (SubstrateTypes.EventChains.includes(vnode.state.chain)) {
+      titler = SubstrateEvents.Title;
+      vnode.state.eventKinds = SubstrateTypes.EventKinds;
+    } else if (MolochTypes.EventChains.includes(vnode.state.chain)) {
+      titler = MolochEvents.Title;
+      vnode.state.eventKinds = MolochTypes.EventKinds;
     } else {
       titler = null;
       vnode.state.eventKinds = [];

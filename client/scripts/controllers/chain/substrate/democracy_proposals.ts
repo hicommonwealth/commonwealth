@@ -5,7 +5,7 @@ import { BlockNumber, Call, Balance, VoteThreshold, Hash } from '@polkadot/types
 import { bool, Option } from '@polkadot/types';
 import { ApiRx } from '@polkadot/api';
 import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { ProposalModule } from 'models';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
@@ -61,7 +61,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     return new Promise((resolve, reject) => {
-      const entities = this.app.chain.chainEntities.store.getByType(SubstrateEntityKind.DemocracyProposal);
+      const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
       const constructorFunc = (e) => new SubstrateDemocracyProposal(this._Chain, this._Accounts, this, e);
       const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
 

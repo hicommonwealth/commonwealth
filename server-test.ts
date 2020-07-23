@@ -10,7 +10,7 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import WebSocket from 'ws';
 
-import { SubstrateEventKinds } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 
 import { SESSION_SECRET } from './server/config';
 import setupAPI from './server/router';
@@ -181,7 +181,7 @@ const resetServer = (debug=false): Promise<void> => {
       // initialize chain event types
       const initChainEventTypes = (chain) => {
         return Promise.all(
-          SubstrateEventKinds.map((event_name) => {
+          SubstrateTypes.EventKinds.map((event_name) => {
             return models['ChainEventType'].create({
               id: `${chain}-${event_name}`,
               chain,

@@ -9,7 +9,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ISubstrateCollectiveProposed, SubstrateEventKind } from '@commonwealth/chain-events/dist/src/substrate/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
@@ -24,7 +24,7 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   }
 }
 
-const backportEventToAdapter = (event: ISubstrateCollectiveProposed): ISubstrateCollectiveProposal => {
+const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISubstrateCollectiveProposal => {
   return {
     identifier: event.proposalHash.toString(),
     index: event.proposalIndex,
@@ -67,10 +67,14 @@ export class SubstrateCollectiveProposal
   ) {
     super('councilmotion', backportEventToAdapter(
       entity.chainEvents
-        .find((e) => e.data.kind === SubstrateEventKind.CollectiveProposed).data as ISubstrateCollectiveProposed
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
+        ).data as SubstrateTypes.ICollectiveProposed
     ));
     const eventData = entity.chainEvents
-      .find((e) => e.data.kind === SubstrateEventKind.CollectiveProposed).data as ISubstrateCollectiveProposed;
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
+      ).data as SubstrateTypes.ICollectiveProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;
@@ -92,7 +96,7 @@ export class SubstrateCollectiveProposal
       return;
     }
     switch (e.data.kind) {
-      case SubstrateEventKind.CollectiveProposed: {
+      case SubstrateTypes.EventKind.CollectiveProposed: {
         // proposer always submits an implicit yes vote
         if (e.data.proposer) {
           const voter = this._Accounts.fromAddress(e.data.proposer);
@@ -100,21 +104,21 @@ export class SubstrateCollectiveProposal
         }
         break;
       }
-      case SubstrateEventKind.CollectiveVoted: {
+      case SubstrateTypes.EventKind.CollectiveVoted: {
         const voter = this._Accounts.fromAddress(e.data.voter);
         this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, e.data.vote));
         break;
       }
-      case SubstrateEventKind.CollectiveDisapproved: {
+      case SubstrateTypes.EventKind.CollectiveDisapproved: {
         this._approved.next(false);
         this.complete();
         break;
       }
-      case SubstrateEventKind.CollectiveApproved: {
+      case SubstrateTypes.EventKind.CollectiveApproved: {
         this._approved.next(true);
         break;
       }
-      case SubstrateEventKind.CollectiveExecuted: {
+      case SubstrateTypes.EventKind.CollectiveExecuted: {
         if (!this._approved.value) {
           this._approved.next(true);
         }
