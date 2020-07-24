@@ -1,9 +1,10 @@
+import 'components/sidebar/community_info_module.scss';
+
 import m from 'mithril';
 
 import app from 'state';
 import { List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 const removeUrlPrefix = (url) => {
@@ -31,10 +32,6 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
       //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
       // ],
 
-      m('.community-icon', [
-        app.chain && m(ChainIcon, { chain: app.chain.meta.chain, size: 48 }),
-        app.community && m(CommunityIcon, { community: app.community.meta }),
-      ]),
       m('.community-name', name),
       m('.community-description', description),
       isAdmin && m(PopoverMenu, {

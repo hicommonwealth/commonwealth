@@ -1,14 +1,22 @@
+@import 'client/styles/shared';
+
 .CommunityInfoModule {
-    position: relative;
-    padding: 22px 26px;
-    .ChainIcon, .CommunityIcon {
-        margin-top: 6px;
-        margin-bottom: 14px;
-    }
+    // position at bottom of sidebar
+    position: absolute;
+    bottom: 14px;
+    margin-bottom: 0 !important;
+
+    // background
+    background: $background-color-light-hover;
+    padding: 18px 18px 8px;
+    border-radius: 4px;
+    line-height: 1.2;
+    font-size: 0.94rem;
+
     .community-config {
         position: absolute;
-        top: 30px;
-        right: 24px;
+        top: 20px;
+        right: 20px;
         svg {
             stroke: #333;
         }

@@ -11,7 +11,8 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTagModal from 'views/modals/new_tag_modal';
 import EditTagModal from 'views/modals/edit_tag_modal';
 
-import CommunitySelector from '../header/community_selector';
+import CommunitySelector from './community_selector';
+import CommunityInfoModule from './community_info_module';
 
 const NavigationModule: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -287,6 +288,7 @@ const Sidebar: m.Component<{}> = {
       m(NavigationModule),
       (app.chain || app.community) && m(TagsModule),
       app.isLoggedIn() && m(SettingsModule),
+      (app.chain || app.community) && m(CommunityInfoModule),
     ]);
   },
 };

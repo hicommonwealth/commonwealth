@@ -1,4 +1,4 @@
-import 'components/header/community_selector.scss';
+import 'components/sidebar/community_selector.scss';
 
 import m from 'mithril';
 import { Button, Icon, Icons, List, ListItem, SelectList } from 'construct-ui';
