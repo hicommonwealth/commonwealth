@@ -51,6 +51,13 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         },
     });
 
+    // Get reactions to be transfered
+    const reactionsToBeMerged = await models.OffchainReaction.findAll({
+        where: {
+            address_id: addressToBeMerged.id,
+        }
+    })
+
     // Get roles to be transfered
     const rolesToBeMerged = await models.Role.findAll({
         where: {
@@ -87,6 +94,33 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             });
         })
     )
+
+    // Transfer Reactions
+    await Promise.all(
+        reactionsToBeMerged.map((reaction) => {
+            return reaction.update({
+                address_id: addressToBeOwner.id,
+            });
+        })
+    )
+    // Prune Reactions (doubled on object)
+    const allReactions = await models.Reactions.findAll({
+        where: {
+            address_id: addressToBeOwner.id,
+        }
+    });
+    for (let i=0; i<allReactions.length-1; i++) {
+        const reaction1 = allReactions[i];
+        for (let j=i+1; j<allReactions.length; j++) {
+            const reaction2 = allReactions[j];
+            if (reaction1.proposal_id === reaction2.proposal_id
+                || reaction1.thread_id === reaction2.proposal_id
+                || reaction1.comment_id === reaction2.comment_id
+            ) {
+                await reaction2.destroy();
+            }
+        }
+    }
 
     // Transfer Roles
     await Promise.all(
