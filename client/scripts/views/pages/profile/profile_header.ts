@@ -1,17 +1,20 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import app from 'state';
+import { Button } from 'construct-ui';
 import * as clipboard from 'clipboard-polyfill';
+import { Unsubscribable } from 'rxjs';
+
+import app from 'state';
 import { Account, ChainBase } from 'models';
-import {Unsubscribable } from 'rxjs';
+
+import { formatAddressShort } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import { formatAddressShort } from '../../../helpers';
-import EditProfileModal from '../../modals/edit_profile_modal';
-import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
-import EditIdentityModal from '../../modals/edit_identity_modal';
-import User from '../../components/widgets/user';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import User from 'views/components/widgets/user';
+import EditProfileModal from 'views/modals/edit_profile_modal';
+import EditIdentityModal from 'views/modals/edit_identity_modal';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -19,7 +22,8 @@ function capitalizeFirstLetter(string) {
 
 const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIdentity) => {
   const chainName = capitalizeFirstLetter(app.chain.class);
-  return (account.chainBase === ChainBase.Substrate) && m('button.formular-button-primary', {
+  return (account.chainBase === ChainBase.Substrate) && m(Button, {
+    intent: 'primary',
     // wait for info to load before making it clickable
     class: currentIdentity ? '' : 'disabled',
     onclick: async () => {
@@ -28,7 +32,8 @@ const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIde
         data: { account: account as SubstrateAccount, currentIdentity },
       });
     },
-  }, currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`);
+    label: currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`
+  });
 };
 
 export interface IProfileHeaderAttrs {
@@ -90,14 +95,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         m('.bio-actions', [
           onOwnProfile ? [
             editIdentityAction(account, vnode.state.identity),
-            m('button.formular-button-primary', {
+            m(Button, {
+              intent: 'primary',
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
                   data: account
                 });
               },
-            }, 'Edit profile'),
+              label: 'Edit profile'
+            }),
           ] : [
             // TODO: actions for others' accounts
           ]

@@ -2,6 +2,7 @@ import 'pages/home/index.scss';
 
 import m from 'mithril';
 import CommunityCards from './community_cards';
+import Examples from './examples';
 
 const Homepage: m.Component<{}, {}> = {
   view: (vnode: m.VnodeDOM) => {
@@ -9,6 +10,7 @@ const Homepage: m.Component<{}, {}> = {
       m('.container', [
         m(CommunityCards),
       ]),
+      m(Examples),
     ]);
   }
 };

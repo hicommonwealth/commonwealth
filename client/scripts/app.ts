@@ -320,7 +320,6 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
-    wideLayout?: boolean;
     deferChain?: boolean;
   }
 
@@ -333,7 +332,7 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, wideLayout } = attrs;
+      const { scoped } = attrs;
       let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
@@ -350,7 +349,7 @@ $(() => {
       if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
         deferChain = true;
       }
-      return m(Layout, { scope, wideLayout, deferChain }, [ vnode ]);
+      return m(Layout, { scope, deferChain }, [ vnode ]);
     },
   });
 
@@ -362,7 +361,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, wideLayout: true }),
+    '/':                         importRoute('views/pages/home', { scoped: false }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),

@@ -132,10 +132,10 @@ const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
         }, `${community.id}`),
       ])),
       vnode.state.success && m('.success-message', {
-        style: 'color: #5eaf77; font-weight: 600; margin: 10px 0;'
+        style: 'color: #5eaf77; font-weight: 500; margin: 10px 0;'
       }, vnode.state.error),
       vnode.state.error && m('.error-message', {
-        style: 'color: red; font-weight: 600; margin: 10px 0;'
+        style: 'color: red; font-weight: 500; margin: 10px 0;'
       }, vnode.state.error),
     ]);
   }

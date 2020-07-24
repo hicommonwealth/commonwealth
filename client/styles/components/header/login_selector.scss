@@ -1,18 +1,5 @@
 @import 'client/styles/shared';
 
-@mixin unseen-pip {
-    .pip {
-        display: inline-block;
-        background: $badge-red;
-        font-weight: 600;
-        color: #fff;
-        border-radius: 9999px;
-        padding: 2px 6px;
-        margin: 3px 0 2px 4px;
-        font-size: 13px;
-    }
-}
-
 .CommunityLabel {
     text-align: left;
     flex: 1;
@@ -22,7 +9,7 @@
 
     .site-brand {
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 500;
     }
     .community-label-left {
         padding-right: 12px;
@@ -39,12 +26,12 @@
         max-width: 100%;
     }
     .community-name-row {
-        font-weight: 600;
+        font-weight: 500;
         line-height: 1.25;
     }
     .community-id {
         font-size: 13px;
-        color: #888;
+        opacity: 0.6;
     }
     .icon-globe, .icon-lock {
         margin-left: 2px;
@@ -62,11 +49,18 @@
 }
 
 .LoginSelector {
-    margin-left: $header-spacing;
-    .unseen-count {
-        display: inline-block;
-        margin-left: 3px;
-        @include unseen-pip;
+}
+
+.login-selector-popover {
+    .cui-popover-content {
+        padding: 0;
+        .cui-menu.LoginSelectorMenu {
+            border: none;
+            .cui-menu-item.cui-button.switch-user {
+                height: 40px;
+                max-height: 40px;
+            }
+        }
     }
 }
 
@@ -76,47 +70,5 @@
         font-size: 14px;
         max-width: 165px;
         text-align: center;
-    }
-}
-
-.login-selector-popover {
-    .cui-popover-content {
-        padding: 0;
-    }
-    .cui-menu {
-        border: none;
-        max-width: 280px;
-    }
-    button.cui-button.cui-menu-item {
-        text-align: left;
-        padding: 0 14px;
-        height: initial;
-        max-height: initial;
-        .cui-button-label {
-            display: flex;
-        }
-        // for address selection
-        .UserBlock {
-            padding: 6px 0 8px;
-            width: 100%;
-        }
-        // for community selection
-        .CommunityLabel {
-            padding: 2px 0;
-        }
-        .unseen-count {
-            @include unseen-pip;
-        }
-    }
-    .community-star-toggle .cui-icon svg {
-        stroke: lighten(#546e7b, 40%);
-    }
-    $star-color: #ecbc00;
-    .community-star-toggle .cui-icon:hover svg {
-        stroke: $star-color;
-    }
-    &.starred .community-star-toggle .cui-icon svg {
-        stroke: $star-color;
-        fill: $star-color;
     }
 }

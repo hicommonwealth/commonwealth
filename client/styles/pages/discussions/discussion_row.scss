@@ -1,50 +1,58 @@
 @import 'client/styles/shared';
 
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
+
 .DiscussionRow {
     display: block;
+    margin: 0 -20px;
 
-    // layout
-    .discussion-top {
-        padding: 16px 0 14px;
-        border-bottom: 1px solid #eee;
+    // wrapper
+    a.discussion-row {
+        display: block;
+        text-decoration: none;
+        padding: 0 20px;
+        border-radius: 6px;
+        &:hover {
+            background: $background-color-white-hover;
+        }
     }
 
     // content
     .discussion-top {
         display: flex;
+        padding: 12px 0;
         .discussion-top-left {
+            line-height: 1.1;
             flex: 1;
             .discussion-title a {
-                color: #111;
-                font-size: 16px;
+                color: $text-color-dark;
+                font-size: $text-size-item-header;
                 text-decoration: none;
-                font-weight: 600;
-                line-height: 1.1;
-                &:hover {
-                    text-decoration: underline;
-                }
+                font-weight: 500;
                 .cui-icon svg {
                     position: relative;
                     margin-left: 2px;
                     top: -2px;
-                    stroke: #999;
+                    stroke: $text-color-light;
                 }
             }
             .discussion-meta {
-                color: $standard-light-text;
-                font-size: 14px;
+                color: $text-color-light;
+                font-size: $text-size-item-meta;
+                margin-top: 2px;
                 $discussion-meta-padding: 18px;
                 a.proposal-tag {
                     margin-right: $discussion-meta-padding;
                     @include proposal-tag-inline;
-                    color: #999;
+                    color: $text-color-light;
                 }
                 .User a {
                     display: inline-block;
                     text-decoration: none;
-                    color: $standard-light-text;
+                    color: $text-color-light;
                     &:hover {
-                        color: darken($standard-light-text, 8%);
+                        color: darken($text-color-light, 8%);
                         text-decoration: underline;
                     }
                     a.user-display-name {
@@ -57,20 +65,10 @@
                 }
                 a.discussion-created, a.discussion-replies {
                     text-decoration: none;
-                    color: $standard-light-text;
+                    color: $text-color-light;
                     &:hover {
-                        color: darken($standard-light-text, 8%);
+                        color: darken($text-color-light, 8%);
                         text-decoration: underline;
-                    }
-                }
-                .ThreadCaratMenu {
-                    margin-left: 12px;
-                    svg {
-                        cursor: pointer;
-                        stroke: #bbb;
-                        &:hover {
-                            stroke: #888;
-                        }
                     }
                 }
             }
@@ -79,12 +77,22 @@
             display: flex;
             align-items: center;
             padding-left: 10px;
+            .discussion-locked {
+                margin-left: 10px;
+                .cui-tag .cui-icon {
+                    margin-right: 3px;
+                }
+            }
             .discussion-commenters {
-                padding-left: 20px;
+                min-width: 100px;
+                padding-left: 10px;
+                padding-right: 20px;
                 text-align: right;
+                white-space: nowrap;
+
                 .commenters-avatars .User {
                     margin-top: 5px;
-                    margin-right: -12px;
+                    margin-right: -16px;
                 }
             }
             .ReactionButton {
@@ -94,13 +102,17 @@
                 min-width: 80px;
                 padding-left: 14px;
                 text-align: right;
-                font-size: 14px;
+                font-size: $text-size-item-meta;
                 &.older {
                     min-width: 116px;
                 }
                 a {
-                    color: #999;
+                    font-size: $text-size-item-meta;
+                    color: $text-color-light;
                 }
+            }
+            .discussion-row-menu {
+                width: 28px;
             }
         }
     }

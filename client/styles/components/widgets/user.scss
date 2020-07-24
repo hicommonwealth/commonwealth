@@ -10,24 +10,24 @@
     border-radius: 9999px;
     overflow: hidden;
     .avatar-image {
-        background: #eee;
+        background: $background-color-light;
         background-size: cover;
     }
 }
 
 @mixin circledAvatar {
-    box-shadow: 0 0 3px rgba(0,0,0,0.2);
     border-radius: 9999px;
     overflow: hidden;
     margin: 0;
     background: #fff;
+    box-shadow: 0 0 0 1px rgba(128,128,128,0.2);
     svg {
         margin: 2px;
     }
     .avatar-image {
         width: 100% !important;
         height: 100% !important;
-        background: #eee;
+        background: $background-color-light;
         background-size: cover;
     }
 }
@@ -38,10 +38,10 @@
     top: -1px;
     margin-left: 4px;
     &.green {
-        color: $primary-green;
+        color: $positive-bg-color;
     }
     &.red {
-        color: $badge-red;
+        color: $negative-bg-color;
     }
     &.gray {
         color: #aaa;
@@ -73,10 +73,14 @@
     &.linkified a.user-display-name:hover {
         text-decoration: underline;
     }
-    .roleTag {
-        margin-left: 6px;
+    .role-tag {
+        margin-left: 10px;
         margin-right: 0;
         padding: 0 6px;
+        position: relative;
+        top: -1px;
+        background: $background-color-light;
+        border-color: $background-color-border;
     }
 }
 
@@ -125,15 +129,17 @@
         .user-block-symbol {
             text-align: center;
             padding: 0 4px;
-            line-height: 1.5;
+            line-height: 1.25;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 500;
             border-radius: 6px;
             background: #333;
             color: #fff;
 
             position: absolute;
-            bottom: 0;
+            bottom: 4px;
+            left: 2px;
+            width: 25px;
         }
     }
     .user-block-center {
@@ -143,12 +149,8 @@
         .user-block-address {
             text-align: left;
         }
-        .user-block-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
         .user-block-address {
-            font-size: 13px;
+            font-size: 0.85em;
             opacity: 0.6;
         }
     }
@@ -167,12 +169,12 @@
             top: 4px;
         }
         .user-block-center {
-            line-height: 17px;
+            line-height: 1em;
             .user-block-name {
-                font-size: 14px;
+                font-size: 0.94em;
             }
             .user-block-address {
-                font-size: 13px;
+                font-size: 0.8em;
             }
         }
     }

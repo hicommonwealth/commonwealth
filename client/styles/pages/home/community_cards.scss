@@ -23,7 +23,7 @@
         margin-bottom: 60px;
         h3 {
             flex: 1;
-            font-weight: 600;
+            font-weight: 500;
             margin: 15px 0 18px;
         }
         .card-description {
@@ -42,8 +42,8 @@
         display: inline-block;
         line-height: 1.2;
         padding: 3px 8px 2px;
-        color: $badge-red;
-        border: 1px solid $badge-red;
+        color: $positive-bg-color;
+        border: 1px solid $positive-bg-color;
         border-radius: 9999px;
     }
 }

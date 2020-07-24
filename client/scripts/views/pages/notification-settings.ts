@@ -664,15 +664,15 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     if (!app.loginStatusLoaded()) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
-      leftSidebar: m(SubscriptionsPageSideBar, {
-        selectedFilter,
-        communities,
-        chains,
-        onChangeHandler: (v) => {
-          vnode.state.selectedFilter = v;
-          m.redraw();
-        },
-      }),
+      // leftSidebar: m(SubscriptionsPageSideBar, {
+      //   selectedFilter,
+      //   communities,
+      //   chains,
+      //   onChangeHandler: (v) => {
+      //     vnode.state.selectedFilter = v;
+      //     m.redraw();
+      //   },
+      // }),
     }, [
       m('.forum-container', [
         (selectedFilter === 'default')

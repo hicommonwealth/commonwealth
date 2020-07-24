@@ -24,7 +24,7 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TagEditor from 'views/components/tag_editor';
-import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/thread_carat_menu';
+import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import User from 'views/components/widgets/user';
@@ -136,14 +136,14 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                m(MenuDivider),
                 canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
                   openTagEditor: () => {
                     vnode.state.tagEditorIsOpen = true;
                   }
                 }),
-                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
                 canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
+                canEdit && m(MenuDivider),
+                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
@@ -169,8 +169,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
           vnode.state.editing
             && m('.proposal-body-button-group', [
-              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
               m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
             ]),
 
           !vnode.state.editing

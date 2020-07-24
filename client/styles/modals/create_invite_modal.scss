@@ -9,7 +9,7 @@
         margin-bottom: 40px;
         border-radius: 4px;
         .community-name {
-            font-weight: 700;
+            font-weight: 500;
         }
         .community-url {
             color: #999;
@@ -30,12 +30,12 @@
 
     .error-message {
         margin: 10px 0;
-        font-weight: 700;
-        color: $error-red;
+        font-weight: 500;
+        color: $negative-text-color;
     }
     .success-message {
         margin: 10px 0;
-        font-weight: 700;
-        color: $success-green;
+        font-weight: 500;
+        color: $positive-text-color;
     }
 }

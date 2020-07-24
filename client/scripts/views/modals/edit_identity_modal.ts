@@ -3,6 +3,7 @@ import 'modals/edit_identity_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { Button } from 'construct-ui';
 
 import { IdentityInfo } from '@polkadot/types/interfaces';
 import { Data } from '@polkadot/types/primitive';
@@ -128,21 +129,24 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         getInput('Twitter', 'twitter', 'Twitter identity of the controller of the account, without leading @'),
         m('.form-bottom', [
           m('.buttons', [
-            m('button.btn.formular-button-primary', {
-              class: vnode.state.saving ? 'disabled' : '',
+            m(Button, {
+              intent: 'primary',
+              disabled: vnode.state.saving,
               onclick: async (e) => {
                 e.preventDefault();
                 await updateIdentity();
                 if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
                 vnode.state.saving = false;
-              }
-            }, 'Set Identity'),
-            m('button', {
+              },
+              label: 'Set Identity'
+            }),
+            m(Button, {
               onclick: (e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
-              }
-            }, 'Cancel'),
+              },
+              label: 'Cancel'
+            }),
           ]),
           m('.clear'),
           vnode.state.error && m('.error-message', vnode.state.error),

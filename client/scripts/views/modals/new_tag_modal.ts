@@ -33,7 +33,7 @@ const NewTagModal: m.Component<{
 
     return m('.NewTagModal', [
       m('.compact-modal-title', [
-        m('h3', 'New channel'),
+        m('h3', 'New tag'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -77,12 +77,12 @@ const NewTagModal: m.Component<{
                 m.redraw();
                 $(e.target).trigger('modalexit');
               }).catch(() => {
-                vnode.state.error = 'Error creating channel';
+                vnode.state.error = 'Error creating tag';
                 vnode.state.saving = false;
                 m.redraw();
               });
             },
-            label: 'Create channel',
+            label: 'Create tag',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),

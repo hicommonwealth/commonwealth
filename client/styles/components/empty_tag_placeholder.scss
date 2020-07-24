@@ -1,0 +1,35 @@
+@import 'client/styles/shared';
+
+$size: 46px;
+
+.EmptyTagPlaceholder {
+    padding: 40px 0;
+    .icon-circle {
+        display: inline-block;
+        background: $theme-base-color;
+        color: #fff;
+        width: $size;
+        height: $size;
+        border-radius: $size / 2;
+        text-align: center;
+        padding: 12px 0;
+        svg {
+            stroke: #fff;
+        }
+    }
+    h1 {
+        font-size: 25px;
+        font-weight: 400;
+        margin: 18px 0 0;
+        strong {
+            font-weight: 500;
+        }
+    }
+    p {
+        font-size: 16px;
+        margin: 6px 0 0;
+    }
+    .NewProposalButton {
+        margin-top: 18px;
+    }
+}

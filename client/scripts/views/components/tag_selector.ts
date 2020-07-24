@@ -28,7 +28,10 @@ const TagSelector: m.Component<{
     const itemRender = (tag) => {
       return m(ListItem, {
         class: featuredTags.includes(tag) ? 'featured-tag' : 'other-tag',
-        label: tag.name,
+        label: [
+          m('span.proposal-tag-icon'),
+          m('span.tag-name', tag.name),
+        ],
         selected: (vnode.state.selectedTag as OffchainTag)?.name === tag.name,
       });
     };
@@ -68,6 +71,7 @@ const TagSelector: m.Component<{
       closeOnSelect: true,
       emptyContent: [
         m(Callout, {
+          size: 'sm',
           class: 'no-matching-tags',
           icon: Icons.ALERT_TRIANGLE,
           intent: 'negative',
@@ -84,7 +88,10 @@ const TagSelector: m.Component<{
         compact: true,
         iconRight: Icons.CHEVRON_DOWN,
         label: vnode.state.selectedTag
-          ? ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string))
+          ? [
+            m('span.proposal-tag-icon'),
+            m('span.tag-name', ((vnode.state.selectedTag as OffchainTag).name || (vnode.state.selectedTag as string)))
+          ]
           : '',
         sublabel: vnode.state.selectedTag ? '' : 'Select a tag',
         tabindex

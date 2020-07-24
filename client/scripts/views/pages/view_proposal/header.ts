@@ -55,7 +55,7 @@ export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainT
 
     return m('.ProposalHeaderTags', [
       link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-        m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+        m('span.proposal-tag-icon'),
         m('span.proposal-tag-name', `${proposal.tag?.name}`),
       ]),
     ]);
@@ -109,7 +109,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
-        label: proposal.readOnly ? 'Turn on commenting' : 'Turn off commenting',
+        label: proposal.readOnly ? 'Enable commenting' : 'Disable commenting',
       }),
       // privacy toggle, show only if thread is private
       (proposal as OffchainThread).privacy && m(MenuItem, {

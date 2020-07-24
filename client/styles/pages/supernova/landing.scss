@@ -59,7 +59,7 @@
                 display: block;
                 width: calc(100% + 15px);
                 font-size: 17px;
-                font-weight: 700;
+                font-weight: 500;
             }
         }
         @include xs-max {
@@ -74,7 +74,7 @@
         .section-heading {
             text-transform: uppercase;
             letter-spacing: 0.2px;
-            font-weight: 700;
+            font-weight: 500;
             font-size: 13px;
             border-bottom: 1px solid #ececec;
             padding-bottom: 4px;

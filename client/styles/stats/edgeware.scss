@@ -1,7 +1,9 @@
+@import 'client/styles/shared';
+
 .EdgewareStatsPage {
     .container {
-        background: #fff;
-        border: 1px solid #eee;
+        background: $background-color-white;
+        border: 1px solid $background-color-border;
         margin: 20px auto;
         padding: 20px 34px 34px;
     }
@@ -90,7 +92,7 @@
         margin-bottom: 24px;
     }
     .top-line-summary {
-        border: 2px solid #eee;
+        border: 2px solid $background-color-light;
         border-radius: 6px;
         margin: 0px;
         padding: 8px 10px 4px;
@@ -109,7 +111,7 @@
         width: 100%;
         padding: 20px 20px 0;
         border-radius: 6px;
-        border: 2px solid #eee;
+        border: 2px solid $background-color-light;
         margin: 16px 0;
         min-height: 230px;
     }

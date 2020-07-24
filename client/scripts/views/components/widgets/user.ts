@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { formatAddressShort, link } from 'helpers';
-import { Tooltip, Tag } from 'construct-ui';
+import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
 import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
@@ -63,10 +63,10 @@ const User: m.Component<{
       role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
     }
     const roleTag = role ? m(Tag, {
-      class: 'roleTag',
+      class: 'role-tag',
       label: role.permission,
       rounded: true,
-      size: 'sm',
+      size: 'xs',
     }) : null;
 
     const userFinal = avatarOnly
@@ -179,7 +179,7 @@ export const UserBlock: m.Component<{
         ]),
       ]),
       m('.user-block-right', [
-        m('.user-block-selected', selected ? '✓' : ''),
+        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
     ]);
   }

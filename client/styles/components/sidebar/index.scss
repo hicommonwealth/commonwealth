@@ -1,14 +1,36 @@
 @import 'client/styles/shared';
 
-$active-color: #ececec;
-
 .Sidebar {
-    margin: 36px 0 48px;
-    .SidebarModule {
-        background: #f8f8f8;
-        border-radius: 4px;
-        padding: 14px 12px;
+    .SidebarHeader {
+        border-bottom: 1px solid $background-color-border;
         margin-bottom: 18px;
+        .cui-button {
+            padding: 0;
+            width: 100%;
+            height: initial;
+            background: none !important;
+            > .cui-button-label {
+                padding: 0 19px;
+                width: 100%;
+                display: flex;
+                > .CommunityLabel {
+                    padding: 14px 0 15px;
+                    max-width: calc(100% - 18px);
+                }
+                > .CommunityLabel.CommunityLabelPlaceholder {
+                    padding: 22px 0;
+                    padding-left: 5px;
+                    font-weight: 500;
+                }
+                .cui-icon {
+                    margin-top: 26px;
+                    margin-left: 2px;
+                }
+            }
+        }
+    }
+    .SidebarModule {
+        margin: 0 15px 20px;
         > .cui-list {
             // reset list styles
             overflow-x: hidden;
@@ -16,19 +38,35 @@ $active-color: #ececec;
             user-select: none;
             background: transparent;
             .cui-list-item {
-                color: #111;
-                font-size: 15px;
+                // small adjustments to .cui-lg list
+                font-size: 18px;
                 font-weight: 500;
+                padding: 3px 12px 4px;
+                border-radius: 4px;
                 border: none;
-                border-radius: 3px;
-                padding: 5px 12px;
-                line-height: 1.25;
-                .cui-icon svg {
-                    stroke: #111;
+                &.section-header, &.section-callout {
+                    background: initial !important;
+                    cursor: initial;
                 }
-                &.cui-selected,
-                &.cui-active {
-                    background: #eee;
+                &.section-header {
+                    font-size: 15px;
+                    color: $text-color-lighter;
+                }
+                &.section-callout {
+                    margin-top: 8px;
+                }
+                .cui-list-item-content-left .cui-icon svg {
+                    stroke: $text-color-lighter;
+                }
+                &:hover {
+                    background: $background-color-light-hover;
+                }
+                &.cui-active, &.cui-active:hover {
+                    background: $primary-bg-color !important;
+                    color: #fff;
+                    .cui-icon svg {
+                        stroke: #fff;
+                    }
                 }
                 .cui-icon-action {
                     position: absolute;
@@ -40,16 +78,18 @@ $active-color: #ececec;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 0 4px 4px 0;
                     .cui-icon svg {
                         opacity: 0.6;
                     }
+                }
+                .cui-callout {
+                    font-weight: initial;
                 }
             }
         }
         > .cui-list.cui-interactive {
             .cui-list-item:hover {
-                background: #eee;
+                background: $background-color-light-hover;
             }
             .cui-icon-action:hover {
                 .cui-icon svg {
@@ -59,76 +99,29 @@ $active-color: #ececec;
         }
     }
 
-    .CommunityInfoModule {
-        position: relative;
-        padding: 22px 26px;
-        .ChainIcon, .CommunityIcon {
-            margin-top: 6px;
-            margin-bottom: 14px;
-        }
-        .community-config {
-            position: absolute;
-            top: 30px;
-            right: 24px;
-            svg {
-                stroke: #333;
-            }
-        }
-        .community-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .community-description {
-            margin-bottom: 14px;
-        }
-        .community-info {
-            display: flex;
-            margin: 3px 0;
-            .community-info-text {
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-            }
-            .cui-icon {
-                margin-right: 10px;
-                svg {
-                    stroke: #111;
-                    position: relative;
-                    top: 3px;
-                    // icon size
-                    height: 14px;
-                    width: 14px;
-                    min-width: 14px;
-                    min-height: 14px;
-                }
-            }
-        }
-    }
 
-    .NavigationModule {
-    }
     .TagsModule {
-        .tag-icon {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            background: #eee;
-            margin: 1px 3px;
-        }
         > .cui-list {
             .cui-list.more-tags-list {
-                border-top: 1px solid #eee;
+                border-top: 1px solid $background-color-light-hover;
                 margin-top: 10px;
                 padding: 10px 0;
                 max-height: 230px;
                 margin-bottom: -10px;
             }
         }
-    }
-    .MembersModule {
-        .community-admins {
-            margin: 6px 0;
+
+        // tag icons
+        .cui-list-item {
+            @include proposal-tag-inline;
+        }
+        .cui-list .cui-list-item-content-left {
+            padding-left: 4px !important;
+            padding-right: 12px !important;
+        }
+        .proposal-tag-icon {
+            margin-right: 0;
+            border-color: $background-color-placeholder;
         }
     }
 }

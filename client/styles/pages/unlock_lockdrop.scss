@@ -1,14 +1,16 @@
+@import 'client/styles/shared';
+
 .UnlockPage {
     .content {
-        background: #fff;
-        border: 1px solid #eee;
+        background: $background-color-white;
+        border: 1px solid $background-color-light;
         margin: 20px 0;
         padding: 20px 34px 0;
     }
     .error-message,
     .success-message {
         margin: 20px 0;
-        font-weight: 700;
+        font-weight: 500;
     }
     .error-message {
         color: #d32e26;
@@ -49,7 +51,7 @@
             width: 100%;
         }
         input[type="text"][readonly] {
-            background: #f8f8f8;
+            background: $background-color-light-hover;
         }
         .buttons {
             margin: 14px 0 16px;

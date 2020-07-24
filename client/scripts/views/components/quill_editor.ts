@@ -870,7 +870,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           ? m(Tooltip, {
             trigger: m(Tag, {
               label: 'Markdown',
-              size: 'sm',
+              size: 'xs',
               onclick: (e) => {
                 if (!vnode.state.markdownMode) return;
                 const cachedContents = vnode.state.editor.getContents();
@@ -899,7 +899,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           : m(Tooltip, {
             trigger: m(Tag, {
               label: 'Rich text',
-              size: 'sm',
+              size: 'xs',
               onclick: async (e) => {
                 if (vnode.state.markdownMode) return;
 
