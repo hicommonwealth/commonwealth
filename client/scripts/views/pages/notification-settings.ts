@@ -56,7 +56,6 @@ const labelMaker = (subscription: NotificationSubscription) => {
       : null;
   switch (subscription.category) {
     case (NotificationCategories.NewComment): {
-      // console.dir(subscription);
       const threadOrComment = subscription.OffchainThread
         ? decodeURIComponent(subscription.OffchainThread.title)
         : subscription.OffchainComment
@@ -287,52 +286,66 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
           m('th', 'In app'),
           m('th', 'By email'),
         ]),
-        m('tr.EventSubscriptionRow', [
-          m('td', { class: 'bold', }, 'Subscribe To All Chain Notifications'),
-          app.loginStatusLoaded && m('td', [
-            m(Checkbox, {
-              class: '',
-              checked: vnode.state.isSubscribedAll,
-              indeterminate,
-              size: 'lg',
-              onchange: async (e) => {
-                e.preventDefault();
-                if (vnode.state.isSubscribedAll) {
-                  await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
-                } else {
-                  await Promise.all(
-                    vnode.state.eventKinds.map((kind) => {
-                      return app.user.notifications.subscribe(
-                        NotificationCategories.ChainEvent,
-                        `${vnode.state.chain}-${kind.toString()}`
-                      );
-                    })
-                  );
-                }
-                m.redraw();
-              }
-            }),
-          ]),
-          m('td', [
-            m(Checkbox, {
-              class: '',
-              disabled: !vnode.state.isSubscribedAll,
-              checked: isSomeEmail && vnode.state.isEmailAll,
-              indeterminate: isSomeEmail && !vnode.state.isEmailAll,
-              size: 'lg',
-              onchange: async (e) => {
-                e.preventDefault();
-                if (!allActiveSubscriptions) return;
-                if (vnode.state.isEmailAll) {
-                  await app.user.notifications.disableImmediateEmails(allActiveSubscriptions);
-                } else {
-                  await app.user.notifications.enableImmediateEmails(allActiveSubscriptions);
-                }
-                m.redraw();
-              }
-            }),
-          ]),
-        ]),
+        // m('tr.EventSubscriptionRow', [
+        //   m('td', { class: 'bold', }, 'Subscribe To All Chain Notifications'),
+        //   m(Popover, {
+        //     closeOnEscapeKey: true,
+        //     closeOnContentClick: true,
+        //     content: m('div', 'Are you sure?'),
+        //     interactionType: 'hover',
+        //     transitionDuration: 0,
+        //     trigger: m('td', [
+        //       m(Checkbox, {
+        //         class: '',
+        //         checked: vnode.state.isSubscribedAll,
+        //         indeterminate,
+        //         size: 'lg',
+        //         onchange: async (e) => {
+        //           e.preventDefault();
+        //           if (vnode.state.isSubscribedAll) {
+        //             await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
+        //           } else {
+        //             await Promise.all(
+        //               vnode.state.eventKinds.map((kind) => {
+        //                 return app.user.notifications.subscribe(
+        //                   NotificationCategories.ChainEvent,
+        //                   `${vnode.state.chain}-${kind.toString()}`
+        //                 );
+        //               })
+        //             );
+        //           }
+        //           m.redraw();
+        //         }
+        //       }),
+        //     ]),
+        //   }),
+        //   m(Popover, {
+        //     closeOnEscapeKey: true,
+        //     closeOnContentClick: true,
+        //     content: m('div', 'Are you sure?'),
+        //     interactionType: 'hover',
+        //     transitionDuration: 0,
+        //     trigger: m('td', [
+        //       m(Checkbox, {
+        //         class: '',
+        //         disabled: !vnode.state.isSubscribedAll,
+        //         checked: isSomeEmail && vnode.state.isEmailAll,
+        //         indeterminate: isSomeEmail && !vnode.state.isEmailAll,
+        //         size: 'lg',
+        //         onchange: async (e) => {
+        //           e.preventDefault();
+        //           if (!allActiveSubscriptions) return;
+        //           if (vnode.state.isEmailAll) {
+        //             await app.user.notifications.disableImmediateEmails(allActiveSubscriptions);
+        //           } else {
+        //             await app.user.notifications.enableImmediateEmails(allActiveSubscriptions);
+        //           }
+        //           m.redraw();
+        //         }
+        //       }),
+        //     ]),
+        //   }),
+        // ]),
         m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
         m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
         m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
@@ -354,7 +367,6 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
 };
 
 interface IChainOrCommNotifPageAttrs {
-  subscriptions: NotificationSubscription[];
   selectedFilter?: string;
   chains?: ChainInfo[];
   communities?: CommunityInfo[];
@@ -362,7 +374,7 @@ interface IChainOrCommNotifPageAttrs {
 
 const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> = {
   view: (vnode) => {
-    const { subscriptions, chains } = vnode.attrs;
+    const { chains } = vnode.attrs;
     if (chains.length < 1) return;
     return m('ChainNotificationManagementPage', [
       m('h1', 'Subscribe to Chain Events'),
@@ -434,7 +446,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     const subscription = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    return subscription && m(SubscriptionRow, { subscription, label: 'New Threads' });
+    return subscription && m(SubscriptionRow, { subscription, label: 'New Threads', bold: true });
   },
 };
 
@@ -495,89 +507,55 @@ const GeneralNewThreadsAndComments:
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
       return m('tr.GeneralNewThreadsAndComments', [
-        m('td', { class: 'bold', }, 'All New threads and comments'),
-
-        // NOT CENTERED, BUT WORKS
-        // m(Popover, {
-        //   closeOnEscapeKey: true,
-        //   closeOnContentClick: true,
-        //   content: m('div', 'hi'),
-        //   interactionType: 'hover',
-        //   trigger: m('td', [
-        //     m(Checkbox, {
-        //       indeterminate: (!everyThread && someThreads),
-        //       checked: generalStatus,
-        //       size: 'lg',
-        //       onchange: async (e) => {
-        //         e.preventDefault();
-        //         if (generalStatus) {
-        //           await app.user.notifications.disableSubscriptions(threadSubs);
-        //         } else {
-        //           await app.user.notifications.enableSubscriptions(threadSubs);
-        //         }
-        //         m.redraw();
-        //       }
-        //     }),
-        //   ]),
-        // }),
-
-        // THIS DOESN'T WORK, BUT I EXPECT IT SHOULD. NO HOVER
-        // m('td', [
-        //   m(Popover, {
-        //     closeOnEscapeKey: true,
-        //     closeOnContentClick: true,
-        //     content: m('div', 'hi'),
-        //     interactionType: 'hover',
-        //     trigger: m(Checkbox, {
-        //       indeterminate: (!everyThread && someThreads),
-        //       checked: generalStatus,
-        //       size: 'lg',
-        //       onchange: async (e) => {
-        //         e.preventDefault();
-        //         if (generalStatus) {
-        //           await app.user.notifications.disableSubscriptions(threadSubs);
-        //         } else {
-        //           await app.user.notifications.enableSubscriptions(threadSubs);
-        //         }
-        //         m.redraw();
-        //       }
-        //     }),
-        //   }),
-        // ]),
-
-        m('td', [
-          m(Checkbox, {
-            indeterminate: (!everyThread && someThreads),
-            checked: generalStatus,
-            size: 'lg',
-            onchange: async (e) => {
-              e.preventDefault();
-              if (generalStatus) {
-                await app.user.notifications.disableSubscriptions(threadSubs);
-              } else {
-                await app.user.notifications.enableSubscriptions(threadSubs);
+        m('td', { class: 'bold', }, 'New threads and comments'),
+        // Here, we're subscribing to all New Threads, but not auto-subscribing to comments on each new thread.
+        m(Popover, {
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          content: m('div', 'Are you sure?'),
+          interactionType: 'hover',
+          transitionDuration: 0,
+          trigger: m('td', [
+            m(Checkbox, {
+              indeterminate: (!everyThread && someThreads),
+              checked: generalStatus,
+              size: 'lg',
+              onchange: async (e) => {
+                e.preventDefault();
+                if (generalStatus) {
+                  await app.user.notifications.disableSubscriptions(threadSubs);
+                } else {
+                  await app.user.notifications.enableSubscriptions(threadSubs);
+                }
+                m.redraw();
               }
-              m.redraw();
-            }
-          }),
-        ]),
-        m('td', [
-          m(Checkbox, {
-            disabled: !generalStatus,
-            checked: emailStatus,
-            indeterminate: (!everyEmail && someEmail),
-            size: 'lg',
-            onchange: async (e) => {
-              e.preventDefault();
-              if (emailStatus) {
-                await app.user.notifications.disableImmediateEmails(threadSubs);
-              } else {
-                await app.user.notifications.enableImmediateEmails(threadSubs);
+            }),
+          ]),
+        }),
+        m(Popover, {
+          closeOnEscapeKey: true,
+          closeOnContentClick: true,
+          content: m('div', 'Are you sure?'),
+          interactionType: 'hover',
+          transitionDuration: 0,
+          trigger: m('td', [
+            m(Checkbox, {
+              disabled: !generalStatus,
+              checked: emailStatus,
+              indeterminate: (!everyEmail && someEmail),
+              size: 'lg',
+              onchange: async (e) => {
+                e.preventDefault();
+                if (emailStatus) {
+                  await app.user.notifications.disableImmediateEmails(threadSubs);
+                } else {
+                  await app.user.notifications.enableImmediateEmails(threadSubs);
+                }
+                m.redraw();
               }
-              m.redraw();
-            }
-          })
-        ])
+            })
+          ])
+        }),
       ]);
     },
   };
@@ -766,7 +744,6 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
           && m(CommunityNotifications, { subscriptions, communities, chains, }),
         (selectedFilter === 'chain-notifications')
           && m(ChainNotificationManagementPage, {
-            subscriptions,
             chains,
           }),
       ]),
