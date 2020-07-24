@@ -129,7 +129,10 @@ const CreateComment: m.Component<{
       m('.create-comment-body', [
         m(User, { user: author, tooltip: true, hideAvatar: true }),
         (rootProposal instanceof OffchainThread && rootProposal.readOnly)
-          ? m(Callout, { content: 'Commenting is disabled because this post has been locked. ' })
+          ? m(Callout, {
+            intent: 'primary',
+            content: 'Commenting is disabled because this post has been locked.',
+          })
           : [
             m(QuillEditor, {
               contentsDoc: '',

@@ -271,13 +271,10 @@ m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
   updateRoute.apply(this, args);
-  // wait until any redraws have happened before setting the scroll position
-  setTimeout(() => {
-    const html = document.getElementsByTagName('html')[0];
-    if (html) html.scrollTo(0, 0);
-    const body = document.getElementsByTagName('body')[0];
-    if (body) body.scrollTo(0, 0);
-  }, 0);
+  const html = document.getElementsByTagName('html')[0];
+  if (html) html.scrollTo(0, 0);
+  const body = document.getElementsByTagName('body')[0];
+  if (body) body.scrollTo(0, 0);
 };
 
 // set up ontouchmove blocker

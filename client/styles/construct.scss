@@ -213,6 +213,9 @@ $cui-negative-border-color-active: $cui-negative-bg-color-active;
 .cui-callout {
     line-height: 1.2;
 }
+.cui-callout.cui-primary {
+    border-color: tint($cui-primary-border-color, 75%);
+}
 
 // adjust card padding
 .cui-card {

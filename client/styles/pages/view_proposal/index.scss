@@ -133,6 +133,12 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
+    .ProposalHeader .proposal-content {
+        .ProposalBodyReaction {
+            margin-top: $discussion-reaction-padding;
+        }
+    }
+
     .ProposalComments {
         .threading-level {
             margin-left: 54px;
