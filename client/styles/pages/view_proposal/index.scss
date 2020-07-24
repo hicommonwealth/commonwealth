@@ -89,6 +89,15 @@ $discussion-title-font-size: 1.45rem;
                 font-weight: 500;
                 flex: 1;
                 line-height: 1.15;
+                .cui-tag {
+                    font-weight: 400;
+                    margin-left: 12px;
+                    position: relative;
+                    top: -2px;
+                    .cui-icon {
+                        margin-right: 3px;
+                    }
+                }
             }
         }
         .ProposalHeaderExternalLink {

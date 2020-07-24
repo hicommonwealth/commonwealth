@@ -66,7 +66,16 @@ export const ProposalHeaderTitle: m.Component<{ proposal: AnyProposal | Offchain
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    return m('.ProposalHeaderTitle', proposal.title);
+    return m('.ProposalHeaderTitle', [
+      proposal.title,
+      (proposal instanceof OffchainThread && proposal.readOnly) && m(Tag, {
+        size: 'xs',
+        label: [
+          m(Icon, { name: Icons.LOCK, size: 'xs' }),
+          ' Locked'
+        ],
+      }),
+    ]);
   }
 };
 
