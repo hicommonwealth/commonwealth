@@ -163,9 +163,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
     // Keep Address and Offchain Profile in DB, but unassociate with User?
     // Just leave profile page empty (no comments/threads/reactions)?
 
-
-
-    return res.json({ status: 'Success', result: 'Here' });
+    return res.json({ status: 'Success', });
 };
 
 export default mergeAccounts;
