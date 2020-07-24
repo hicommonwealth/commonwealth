@@ -44,6 +44,7 @@
                 padding: 3px 12px 4px;
                 border-radius: 4px;
                 border: none;
+                white-space: nowrap;
                 &.section-header, &.section-callout {
                     background: initial !important;
                     cursor: initial;
@@ -54,6 +55,11 @@
                 }
                 &.section-callout {
                     margin-top: 8px;
+                    white-space: initial;
+                }
+                .proposal-tag-icon {
+                    position: relative;
+                    top: -1px;
                 }
                 .cui-list-item-content-left .cui-icon svg {
                     stroke: $text-color-lighter;
@@ -66,6 +72,9 @@
                     color: #fff;
                     .cui-icon svg {
                         stroke: #fff;
+                    }
+                    .proposal-tag-icon {
+                        border-color: #fff;
                     }
                 }
                 .cui-icon-action {
