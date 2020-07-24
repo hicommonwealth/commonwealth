@@ -5,6 +5,7 @@
     position: absolute;
     bottom: 14px;
     margin-bottom: 0 !important;
+    max-width: calc(100% - 34px);
 
     // background
     background: $background-color-light-hover;
@@ -22,6 +23,8 @@
         }
     }
     .community-name {
+        color: $text-color-medium;
+        font-size: 0.9rem;
         font-weight: 500;
         margin-bottom: 8px;
     }
