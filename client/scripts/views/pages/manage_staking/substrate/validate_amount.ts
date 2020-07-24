@@ -17,18 +17,48 @@ interface ValidateAmountState {
 
 interface ValidateAmountAttrs {
   controller: SubstrateAccount,
-  amount: BN,
+  amount: string,
   si: SiDef,
   onError(isFatal: boolean): void
 }
 
-function getValuesFromBn(valueBn: BN, si: SiDef | null): BN {
-  const value = si
-    ? valueBn.mul(BN_TEN.pow(new BN(formatBalance.getDefaults().decimals + si.power))).toString()
-    : valueBn.toString();
+function getSiPowers(si: SiDef | null): [BN, number, number] {
+  if (!si) {
+    return [BN_ZERO, 0, 0];
+  }
 
-  return new BN(value);
+  formatBalance.setDefaults({ decimals: 18 });
+
+  const basePower = formatBalance.getDefaults().decimals;
+
+  return [new BN(basePower + si.power), basePower, si.power];
 }
+
+export function getValuesFromBn(input: string, si: SiDef | null): BN {
+  const [siPower, basePower, siUnitPower] = getSiPowers(si);
+  let result = new BN(0);
+  const isDecimalValue = input.match(/^(\d+)\.(\d+)$/);
+
+  if (isDecimalValue) {
+    if (siUnitPower - isDecimalValue[2].length < -basePower) {
+      result = new BN(-1);
+    }
+
+    const div = new BN(input.replace(/\.\d*$/, ''));
+    const modString = input.replace(/^\d+\./, '');
+    const mod = new BN(modString);
+
+    result = div
+      .mul(BN_TEN.pow(siPower))
+      .add(mod.mul(BN_TEN.pow(new BN(basePower + siUnitPower - modString.length))));
+  } else {
+    result = new BN(input.replace(/[^\d]/g, ''))
+      .mul(BN_TEN.pow(siPower));
+  }
+
+  return result;
+}
+
 const ValidateAmount = makeDynamicComponent<ValidateAmountAttrs, ValidateAmountState>({
   getObservables: (attrs) => ({
     groupKey:  attrs.controller.profile.address,

@@ -217,17 +217,9 @@ class SubstrateStaking implements StorageModule {
   private _Chain: SubstrateChain;
   // TODO: remove this and replace with database
   public allAccounts: string[] = [
-    '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
     '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY',
-    '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-    '5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc',
-    '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y',
-    '5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy',
-    '5HGjWAeFDfFCWPsjFQdVV2Msvz2XtMktvgocEZcCj68kUMaw',
-    '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL',
-    '5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV',
-    '5GUFBAVShACLQZJoQa75nRAr67tJ8Rw2s444siZVb9gXpybd',
-    '5CSxHdMU6aAkxsbC94H88SnqvjWqrhxZkJBCw81fwGzLiTxC'
+    '5DfiW5jBTU8PRkLnF7PqK54uYUP1E2d8rboJ4aFedMo3RFbi',
+    '5Hb4wZBEYUz4hPgoNXyFPP726gSaeVwy5DAHLMmb4DxPCMhG'
   ];
 
   private _app: IApp;

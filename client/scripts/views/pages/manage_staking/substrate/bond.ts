@@ -95,7 +95,7 @@ interface IBondedModel {
   label(): m.Vnode<any, any>,
   balanceChange(e:any): void,
   intent: Intent,
-  balance: number
+  balance: string
 }
 const bondedModel: IBondedModel = {
   options: [],
@@ -124,7 +124,7 @@ const bondedModel: IBondedModel = {
       ? Intent.NEGATIVE
       : Intent.POSITIVE;
 
-    bondedModel.balance = balance;
+    bondedModel.balance = e.target.value;
   },
   intent: null,
   balance: null
@@ -298,7 +298,7 @@ const Bond = makeDynamicComponent<BondAttrs, BondState>({
         bondedModel.selectedItem && !!bondedModel.balance && stashModel.selectedItem
           && m(ValidateAmount, {
             controller: stashModel.selectedItem,
-            amount: new BN(bondedModel.balance),
+            amount: bondedModel.balance,
             si: bondedModel.selectedItem,
             onError: errors.onBalance
           }),

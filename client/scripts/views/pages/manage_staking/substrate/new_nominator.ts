@@ -1,3 +1,5 @@
+import $ from 'jquery';
+import BN from 'bn.js';
 import m from 'mithril';
 import app from 'state';
 import { makeDynamicComponent } from 'models/mithril';
@@ -5,9 +7,29 @@ import Bond from 'views/pages/manage_staking/substrate/bond';
 import Nominate from 'views/pages/manage_staking/substrate/nominate';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SiDef } from '@polkadot/util/types';
+import { getValuesFromBn } from 'views/pages/manage_staking/substrate/validate_amount';
+import Substrate from 'controllers/chain/substrate/main';
+import { createTXModal } from 'views/modals/tx_signing_modal';
+import { ITXModalData } from 'models';
 
 const MAX_STEP = 2;
 const MIN_STEP = 1;
+
+function openTXModal(txFunc: ITXModalData) {
+  try {
+    createTXModal(txFunc)
+      .then((res) => {
+        console.log('------------------ response');
+        console.log(res);
+        m.redraw();
+      })
+      .catch((e) => {
+        m.redraw();
+      });
+  } catch (e) {
+    m.redraw();
+  }
+}
 
 interface NewNominatorState { dynamic: {} }
 
@@ -17,7 +39,7 @@ interface IBonded {
   controller: SubstrateAccount,
   stash: SubstrateAccount,
   si: SiDef,
-  balance: number,
+  balance: string,
   payment: {
     text: string,
     value: number
@@ -29,13 +51,16 @@ interface IModel {
   bonded: IBonded | null,
   step: number,
   nominates: string[],
+  txSuccess: boolean,
   onBondedChange(payload: any, noError: boolean): void,
   onNominateChange(selected: string[]): void,
   next(): void,
   bond(): void,
+  txCallback(success: boolean): void
 }
 
 const model: IModel = {
+  txSuccess: false,
   error: true,
   bonded: null,
   step: MIN_STEP,
@@ -52,9 +77,26 @@ const model: IModel = {
       model.step = ++model.step;
   },
   bond: () => {
-    console.log('model.bonded');
-    console.log(model.bonded);
-    console.log(model.nominates);
+    let amount = new BN(0);
+    amount = getValuesFromBn(model.bonded.balance, model.bonded.si);
+    const stashId = model.bonded.stash.address;
+    const controllerId = model.bonded.controller.address;
+    const destination = model.bonded.payment.value;
+
+    const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(stashId, amount, destination);
+    const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(controllerId, amount, destination);
+    const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController')(controllerId);
+    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate')(model.nominates);
+
+    const params = stashId === controllerId
+      ? [bondTx, nominateTx]
+      : [bondOwnTx, nominateTx, controllerTx];
+    const txFunc = (model.bonded.stash as SubstrateAccount).batchTx(params);
+    txFunc.cb = model.txCallback;
+    openTXModal(txFunc);
+  },
+  txCallback: (success) => {
+    model.txSuccess = success;
   }
 };
 
@@ -80,22 +122,32 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
           m(Bond, {
             onChange: model.onBondedChange
           }),
-          m('div.center-lg.padding-t-10',
+          m('div.center-lg.padding-t-10', [
             m('button.cui-button.cui-align-center.cui-primary', {
               disabled: model.error,
               onclick: model.next,
-            }, 'Next'))
+            }, 'Next')
+          ])
         ]),
         model.step === MAX_STEP
         && m('span.second-step', [
           m(Nominate, {
             onChange: model.onNominateChange
           }),
-          m('div.center-lg.padding-t-10',
-            m('button.cui-button.cui-align-center.cui-primary', {
-            // disabled: model.error,
+          m('div.center-lg.padding-t-10', [
+            !model.txSuccess
+            && m('button.cui-button.cui-align-center.cui-primary', {
+              disabled: !model.nominates.length,
               onclick: model.bond,
-            }, 'Bond & Nominate'))
+            }, 'Bond & Nominate'),
+            model.txSuccess
+            && m('button.cui-button.cui-align-center.cui-default', {
+              onclick: (e) => {
+                e.preventDefault();
+                $(vnode.dom).trigger('modalexit');
+              },
+            }, 'Close')
+          ])
         ]))
     ]);
   },
