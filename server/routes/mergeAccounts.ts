@@ -10,6 +10,7 @@ export const Errors = {
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
     const { oldAddress, newAddress, } = req.body;
 
+    // get User model with Addresses
     const user = await models.User.findOne({
         where: {
             id: req.user.id,
@@ -17,12 +18,14 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         include: [ {model: models.Address, as: 'userAddressModels', }, ],
     });
 
+    // Check addresses are owned by User
     const { userAddressModels } = user;
     const userAddresses = userAddressModels.map((a) => a.id);
     if (!userAddresses.includes(oldAddress) || !userAddresses.includes(newAddress)) {
         return next(new Error(Errors.AddressesNotOwned))
     }
 
+    // Get "To be merged" Address Model with its Profile
     const addressToBeMerged = await models.Address.findOne({
         where: {
             address: oldAddress,
