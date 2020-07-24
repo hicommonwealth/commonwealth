@@ -87,6 +87,6 @@ Each chain implements several abstract classes, described in [interfaces.ts](./s
   * `Enrich` uses the API to query additional data about a ChainEvent that did not appear in the original `Block`, and constructs the final `CWEvent` object. This is used because many "events" on chains provide only minimal info, which we may want to augment for application purposes.
   * Two other filters exist, which are not used by the `Processor`, but may be useful in an application:
     * `Title` takes a kind of ChainEvent and produces an object with a title and description, useful for enumerating a human-readable list of possible ChainEvents.
-    * `Label` takes a specific ChainEvent and produces an object with a heading, a label, and a linkUrl, useful for creating human-readable UIs around particular events. The `linkUrl` property in particular is currently specific to [Commonwealth](commonwealth.im), but may in the future be generalized.
+    * `Label` takes a specific ChainEvent and produces an object with a heading, a label, and a linkUrl, useful for creating human-readable UIs around particular events. The `linkUrl` property in particular is currently specific to [Commonwealth](https://commonwealth.im/), but may in the future be generalized.
 
 Note that every item on this list may not be implemented for every chain (e.g. Moloch does not have a `Poller`), but the combination of these components provides the pieces to create a more usable application-usable event stream than what is exposed on the chain.
