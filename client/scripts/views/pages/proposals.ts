@@ -9,7 +9,9 @@ import { formatDuration, blockperiodToDuration } from 'helpers';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import Edgeware from 'controllers/chain/edgeware/main';
-import { convictionToWeight, convictionToLocktime, convictions } from 'controllers/chain/substrate/democracy_referendum';
+import {
+  convictionToWeight, convictionToLocktime, convictions
+} from 'controllers/chain/substrate/democracy_referendum';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import ConvictionsTable from 'views/components/proposals/convictions_table';
@@ -26,7 +28,7 @@ const ProposalsPage: m.Component<{}> = {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
   },
   view: (vnode) => {
-    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain...' });
+    if (!app.chain || !app.chain.loaded) return m(PageLoading, { message: 'Connecting to chain...', title: 'Proposals' });
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
@@ -72,6 +74,7 @@ const ProposalsPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'ProposalsPage',
+      title: 'Proposals',
       rightSidebar: [
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),

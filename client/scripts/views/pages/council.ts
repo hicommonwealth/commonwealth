@@ -180,11 +180,11 @@ const CouncilPage: m.Component<{}> = {
     });
   },
   view: (vnode) => {
-    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain...' });
+    if (!app.chain) return m(PageLoading, { message: 'Connecting to chain...', title: 'Council' });
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
 
-    if (!initialized) return m(PageLoading, { message: 'Loading council data...' });
+    if (!initialized) return m(PageLoading, { message: 'Loading council data from chain...', title: 'Council' });
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || []).map((a) => app.chain.accounts.get(a));
@@ -206,6 +206,7 @@ const CouncilPage: m.Component<{}> = {
 
     return m(Sublayout, {
       class: 'CouncilPage',
+      title: 'Council',
       rightSidebar: [
         // stats
         m('.forum-container.stats-tile', [

@@ -82,7 +82,7 @@ $discussion-title-font-size: 1.45rem;
             }
         }
         .proposal-title {
-            margin: 4px 0 2px;
+            margin: 4px 0 0;
             .ProposalHeaderTitle {
                 display: inline;
                 font-size: $discussion-title-font-size;
@@ -185,7 +185,6 @@ $discussion-title-font-size: 1.45rem;
         }
     }
     .ProposalBodyReaction {
-        margin-top: $discussion-reaction-padding;
         display: inline-block;
     }
 
