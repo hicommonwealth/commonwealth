@@ -1,4 +1,4 @@
-// import 'pages/subscriptions.scss';
+import 'pages/subscriptions.scss';
 import 'components/sidebar/index.scss';
 
 
@@ -40,6 +40,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription: NotificationSubscriptio
 interface ISubscriptionRowAttrs {
   subscription: NotificationSubscription;
   label?: string;
+  bold?: boolean;
 }
 
 interface ISubscriptionRowState {
@@ -89,10 +90,12 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
     vnode.state.subscription = vnode.attrs.subscription;
   },
   view: (vnode) => {
-    const { label } = vnode.attrs;
+    const { label, bold } = vnode.attrs;
     const { subscription } = vnode.state;
     return m('tr.SubscriptionRow', [
-      m('td', [
+      m('td', {
+        class: bold ? 'bold' : null,
+      }, [
         label || labelMaker(subscription)]),
       m('td', [
         m(Checkbox, {
@@ -123,7 +126,7 @@ interface IEventSubscriptionTypeRowAttrs {
 
 const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
   view: (vnode) => {
-    const { title, notificationTypeArray } = vnode.attrs;
+    const { title, notificationTypeArray, } = vnode.attrs;
     const subscriptions = app.loginStatusLoaded && app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent
@@ -137,7 +140,9 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
     const allSubscriptionsCreated = subscriptions.length === notificationTypeArray.length;
 
     return m('tr.EventSubscriptionTypeRow', [
-      m('td', title),
+      m('td', {
+        class: 'bold'
+      }, title),
       m('td', [
         m(Checkbox, {
           checked: allSubscriptionsCreated && everySubscriptionActive,
@@ -162,7 +167,7 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
       ]),
       m('td', [
         m(Checkbox, {
-          disabled: !allSubscriptionsCreated && !everySubscriptionActive,
+          disabled: !everySubscriptionActive,
           checked: everySubscriptionActive && everySubscriptionEmail,
           indeterminate: !everySubscriptionEmail && someSubscriptionsEmail,
           size: 'lg',
@@ -283,7 +288,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
           m('th', 'By email'),
         ]),
         m('tr.EventSubscriptionRow', [
-          m('td', 'Subscribe To All Chain Notifications'),
+          m('td', { class: 'bold', }, 'Subscribe To All Chain Notifications'),
           app.loginStatusLoaded && m('td', [
             m(Checkbox, {
               class: '',
@@ -490,7 +495,7 @@ const GeneralNewThreadsAndComments:
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
       return m('tr.GeneralNewThreadsAndComments', [
-        m('td', 'All New threads and comments'),
+        m('td', { class: 'bold', }, 'All New threads and comments'),
 
         // NOT CENTERED, BUT WORKS
         // m(Popover, {
@@ -590,7 +595,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     return [
       mentionsSubscription
         && m('tr.mentions', [
-          m('td', 'Mentions:'),
+          m('td', { class: 'bold', }, 'Mentions:'),
           m('td', [
             m(Checkbox, {
               size: 'lg',
