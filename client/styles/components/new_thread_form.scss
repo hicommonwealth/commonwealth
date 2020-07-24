@@ -35,22 +35,6 @@
                 margin-left: 24px;
             }
         }
-        .draft-badge-wrap {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            .draft-badge {
-                display: inline-block;
-                margin-right: 12px;
-                width: calc(100% - 6px);
-                padding: 3px 8px 2px;
-                line-height: 1.2;
-                color: $negative-text-color;
-                border: 1px solid $negative-text-color;
-                border-radius: 9999px;
-                text-align: center;
-            }
-        }
         .cui-form {
             margin: 0;
             margin-right: 28px;
@@ -90,6 +74,13 @@
                 border-bottom-color: #eee;
                 max-height: 140px;
                 overflow: hidden;
+                .discussion-draft-title-wrap {
+                    display: flex;
+                    .cui-icon-edit {
+                        color: $negative-text-color;
+                        margin: 0 8px 8px 0;
+                    }
+                }
                 .discussion-draft-title {
                     font-weight: 400;
                     line-height: 1.25;
@@ -125,6 +116,22 @@
                     }
                 }
             }
+        }
+    }
+    .draft-badge-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .draft-badge {
+            display: inline-block;
+            margin-right: 12px;
+            width: calc(100% - 6px);
+            padding: 3px 8px 2px;
+            line-height: 1.2;
+            color: $negative-text-color;
+            border: 1px solid $negative-text-color;
+            border-radius: 9999px;
+            text-align: center;
         }
     }
 }
