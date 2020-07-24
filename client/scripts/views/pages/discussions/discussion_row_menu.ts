@@ -105,6 +105,14 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIs
         content: [
           canEditThread && m(TagEditorButton, { openTagEditor: () => { vnode.state.tagEditorIsOpen = true; } }),
           canEditThread && m(ThreadDeletionButton, { proposal }),
+          canEditThread && m(MenuItem, {
+            class: 'read-only-toggle',
+            onclick: (e) => {
+              e.preventDefault();
+              app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
+            },
+            label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
+          }),
           m(ThreadSubscriptionButton, { proposal }),
         ],
         inline: true,

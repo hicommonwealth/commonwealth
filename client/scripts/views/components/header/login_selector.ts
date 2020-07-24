@@ -156,7 +156,8 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           },
           label: [
             (!app.chain && !app.community) ? 'Logged in'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount }) : 'Select an address',
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+                : 'Select an address',
           ],
           iconRight: Icons.CHEVRON_DOWN,
         }),

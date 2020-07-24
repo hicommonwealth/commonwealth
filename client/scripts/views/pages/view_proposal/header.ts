@@ -118,7 +118,7 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
           e.preventDefault();
           app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
         },
-        label: proposal.readOnly ? 'Enable commenting' : 'Disable commenting',
+        label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),
       // privacy toggle, show only if thread is private
       (proposal as OffchainThread).privacy && m(MenuItem, {
