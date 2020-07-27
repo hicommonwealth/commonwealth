@@ -160,7 +160,8 @@ const CommunitySelector = {
           filterable: false,
           checkmark: false,
           popoverAttrs: {
-            hasArrow: false
+            hasArrow: false,
+            inline: true,
           },
           trigger: m(Button, {
             basic: true,

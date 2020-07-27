@@ -6,6 +6,7 @@
     bottom: 14px;
     margin-bottom: 0 !important;
     max-width: calc(100% - 34px);
+    user-select: none;
 
     // background
     background: $background-color-light-hover;
