@@ -94,7 +94,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               }),
             ]),
             m('.discussion-commenters', [
-              m('.commenters-avatars', app.comments.uniqueCommenters(proposal)
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
                 .map(([chain, address]) => {
                   return m(User, {
                     user: new AddressInfo(null, address, chain, null),
