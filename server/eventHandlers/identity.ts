@@ -29,7 +29,29 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    // TODO: update DB according to event
+    // fetch OffchainProfile corresponding to address
+    const { who } = event.data;
+    const profile = await this._models.OffchainProfile.findOne({
+      include: [{
+        model: this._models.Address,
+        where: {
+          // TODO: do we need to modify address case?
+          address: who,
+          chain: this._chain,
+        },
+        required: true,
+      }]
+    });
+    if (!profile) return;
+
+    // update profile data depending on event
+    if (event.data.kind === SubstrateTypes.EventKind.IdentitySet) {
+      profile.identity = event.data.displayName;
+      await profile.save();
+    } else {
+      profile.identity = null;
+      await profile.save();
+    }
 
     return dbEvent;
   }
