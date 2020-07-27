@@ -35,6 +35,7 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
+import { migrateIdentities } from './server/scripts/migrateIdentities.js';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -48,6 +49,7 @@ const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDR
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION;
+const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
 const NO_EVENTS = process.env.NO_EVENTS === 'true';
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
@@ -178,24 +180,34 @@ if (SHOULD_RESET_DB) {
   updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
 } else {
   if (!NO_EVENTS) {
-    setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
-      .then(() => {
-        if (RUN_ENTITY_MIGRATION) {
-          models.sequelize.close()
-            .then(() => process.exit(0));
-        }
-      }, (err) => {
-        if (RUN_ENTITY_MIGRATION) {
-          console.error(`Entity migration failed: ${err.message}`);
-          models.sequelize.close()
-            .then(() => (closeMiddleware()))
-            .then(() => process.exit(1));
-        } else {
-          console.error(`Chain event listener setup failed: ${err.message}`);
-        }
-      });
+    // handle various chain-event cases
+    if (IDENTITY_MIGRATION) {
+      migrateIdentities(models);
+    } else {
+      // TODO: remove the entity migration option from this call and make it another top-level function
+      setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
+        .then(() => {
+          if (RUN_ENTITY_MIGRATION) {
+            models.sequelize.close()
+              .then(() => process.exit(0));
+          }
+        }, (err) => {
+          if (RUN_ENTITY_MIGRATION) {
+            console.error(`Entity migration failed: ${err.message}`);
+            models.sequelize.close()
+              .then(() => (closeMiddleware()))
+              .then(() => process.exit(1));
+          } else {
+            console.error(`Chain event listener setup failed: ${err.message}`);
+          }
+        });
+    }
   }
-  if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
+
+  // finally, after chain event setup
+  if (!RUN_ENTITY_MIGRATION && !IDENTITY_MIGRATION) {
+    setupServer(app, wss, sessionParser);
+  }
 }
 
 export default app;

@@ -8,6 +8,7 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import IdentityHandler from '../eventHandlers/identity';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -50,6 +51,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       const notificationHandler = new EventNotificationHandler(models, wss);
       const migrationHandler = new MigrationHandler(models, node.chain);
       const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+      const identityHandler = new IdentityHandler(models, node.chain);
 
       // handlers are run in order, so if migrating, we run migration -> entityArchival,
       // but normally it's storage -> notification -> entityArchival
@@ -60,6 +62,11 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       }
       let subscriber: IEventSubscriber<any, any>;
       if (SubstrateTypes.EventChains.includes(node.chain)) {
+        // only handle identities on substrate chains
+        if (!migrate) {
+          handlers.push(identityHandler);
+        }
+
         let nodeUrl = node.url;
         const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
         nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
