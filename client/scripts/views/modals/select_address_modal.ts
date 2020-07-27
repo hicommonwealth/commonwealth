@@ -28,12 +28,11 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
-        // m.redraw();
+        m.redraw();
         vnode.state.selectedIndex = null;
         // select the address, and close the form
         notifySuccess(`Joined with ${formatAddressShort(addressInfo.address)}`);
         app.user.setActiveAccount(account);
-        m.redraw();
         $(e.target).trigger('modalexit');
       }).catch((err: any) => {
         vnode.state.loading = false;
