@@ -489,6 +489,44 @@ export async function Enrich(
         };
       }
 
+      /**
+       * Identity events
+       */
+      case EventKind.IdentitySet: {
+        const [ who ] = event.data as unknown as [ AccountId ] & Codec;
+        const registrationOpt = await api.query.identity.identityOf(who);
+        if (!registrationOpt.isSome) {
+          throw new Error('unable to retrieve identity info');
+        }
+        const displayName = registrationOpt.unwrap().info.display.toString();
+        return {
+          excludeAddresses: [ who.toString() ],
+          data: {
+            kind,
+            who: who.toString(),
+            displayName,
+          }
+        };
+      }
+      case EventKind.IdentityCleared: {
+        const [ who ] = event.data as unknown as [ AccountId ] & Codec;
+        return {
+          excludeAddresses: [ who.toString() ],
+          data: {
+            kind,
+            who: who.toString(),
+          }
+        };
+      }
+      case EventKind.IdentityKilled: {
+        const [ who ] = event.data as unknown as [ AccountId ] & Codec;
+        return {
+          data: {
+            kind,
+            who: who.toString(),
+          }
+        };
+      }
       default: {
         throw new Error(`unknown event type: ${kind}`);
       }

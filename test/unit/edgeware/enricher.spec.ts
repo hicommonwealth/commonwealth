@@ -1,7 +1,7 @@
 import chai from 'chai';
 import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, ReferendumInfo,
-  Proposal, TreasuryProposal, Votes, Event, Extrinsic,
+  Proposal, TreasuryProposal, Votes, Event, Extrinsic, Registration
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
@@ -51,7 +51,7 @@ const api = constructFakeApi({
     { index: 1, imageHash: 'hash1', at: 20 },
     { index: 2, imageHash: 'hash2', at: 30 },
   ] as unknown as DeriveDispatch[],
-  treasuryProposals: (idx) => +idx !== 1
+  treasuryProposals: async (idx) => +idx !== 1
     ? constructOption()
     : constructOption({
       proposer: 'alice',
@@ -59,7 +59,7 @@ const api = constructFakeApi({
       beneficiary: 'bob',
       bond: 2000,
     } as unknown as TreasuryProposal),
-  voting: (hash) => hash.toString() !== 'hash'
+  voting: async (hash) => hash.toString() !== 'hash'
     ? constructOption()
     : constructOption({
       index: 1,
@@ -68,7 +68,7 @@ const api = constructFakeApi({
       nays: [ 'charlie', 'dave' ],
       end: 100,
     } as unknown as Votes),
-  signalingProposalOf: (hash) => hash.toString() !== 'hash'
+  signalingProposalOf: async (hash) => hash.toString() !== 'hash'
     ? constructOption()
     : constructOption({
       index: 1,
@@ -79,7 +79,7 @@ const api = constructFakeApi({
       contents: 'contents',
       vote_id: 101,
     } as unknown as ProposalRecord),
-  voteRecords: (vote_id) => +vote_id !== 101
+  voteRecords: async (vote_id) => +vote_id !== 101
     ? constructOption()
     : constructOption({
       data: {
@@ -88,7 +88,7 @@ const api = constructFakeApi({
       },
       outcomes: [1, 2],
     } as unknown as VoteRecord),
-  preimage: (hash) => hash.toString() !== 'hash'
+  preimage: async (hash) => hash.toString() !== 'hash'
     ? undefined
     : {
       at: 30,
@@ -100,13 +100,18 @@ const api = constructFakeApi({
       },
       proposer: 'alice',
     } as unknown as DeriveProposalImage,
-  collectiveProposalOf: (hash) => hash.toString() !== 'hash'
+  collectiveProposalOf: async (hash) => hash.toString() !== 'hash'
     ? constructOption()
     : constructOption({
       sectionName: 'section',
       methodName: 'method',
       args: ['arg1', 'arg2'],
-    } as unknown as Proposal)
+    } as unknown as Proposal),
+  identityOf: async (addr) => constructOption({
+    info: {
+      display: `${addr}-display-name`,
+    }
+  } as unknown as Registration),
 });
 
 class FakeEventData extends Array {
@@ -700,6 +705,47 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         pot: '1000',
         potAddress: 'pot',
+      }
+    });
+  });
+
+  /** Identity events */
+  it('should enrich identity-set event', async () => {
+    const kind = EventKind.IdentitySet;
+    const event = constructEvent([ 'alice' ]);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        who: 'alice',
+        displayName: 'alice-display-name',
+      }
+    });
+  });
+  it('should enrich identity-cleared event', async () => {
+    const kind = EventKind.IdentityCleared;
+    const event = constructEvent([ 'alice', 1000 ]);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      excludeAddresses: [ 'alice' ],
+      data: {
+        kind,
+        who: 'alice',
+      }
+    });
+  });
+  it('should enrich identity-killed event', async () => {
+    const kind = EventKind.IdentityKilled;
+    const event = constructEvent([ 'alice', 1000 ]);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        who: 'alice',
       }
     });
   });

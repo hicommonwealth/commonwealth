@@ -257,6 +257,28 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
       };
     }
 
+    /**
+     * Identity events
+     */
+    case EventKind.IdentitySet: {
+      return {
+        title: 'Identity Set',
+        description: 'A user sets an identity.',
+      }
+    }
+    case EventKind.IdentityCleared: {
+      return {
+        title: 'Identity Cleared',
+        description: 'A user clears an identity.',
+      }
+    }
+    case EventKind.IdentityKilled: {
+      return {
+        title: 'Identity Killed',
+        description: 'A user\'s identity is rejected.',
+      }
+    }
+
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
       const _exhaustiveMatch: never = kind;

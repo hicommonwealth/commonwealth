@@ -10,7 +10,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "nyc ts-mocha --config ./.mocharc.json ./test/**/*.spec.ts",
+    "unit-test": "nyc ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
+    "integration-test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts",
+    "test": "nyc ts-mocha --config ./.mocharc.json ./test/integration/*.spec.ts ./test/unit/**/*.spec.ts",
     "listen": "ts-node -T ./scripts/listener.ts"
   },
   "engines": {

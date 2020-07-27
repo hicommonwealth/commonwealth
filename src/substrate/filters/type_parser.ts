@@ -87,6 +87,14 @@ export function ParseType (
         // }
         default: return null;
       }
+    case 'identity': {
+      switch (method) {
+        case 'IdentitySet': return EventKind.IdentitySet;
+        case 'IdentityCleared': return EventKind.IdentityCleared;
+        case 'IdentityKilled': return EventKind.IdentityKilled;
+        default: return null;
+      }
+    }
     default:
       return null;
   }

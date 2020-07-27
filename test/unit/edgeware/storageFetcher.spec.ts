@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {
-  AccountId, BalanceOf,
+  AccountId, BalanceOf, Registration
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
@@ -29,6 +29,16 @@ const blockNumber = 10;
 const api = constructFakeApi({
   getHeader: async () => ({
     number: blockNumber,
+  }),
+
+  // identities
+  identityOfMulti: async (addrs) => addrs.map((addr, i) => {
+    if (i === 1) return constructOption();
+    return constructOption({
+      info: {
+        display: `${addr}-display-name`,
+      }
+    } as unknown as Registration)
   }),
 
   // democracy proposals
@@ -183,8 +193,7 @@ const api = constructFakeApi({
 
 /* eslint-disable: dot-notation */
 describe('Edgeware Event Migration Tests', () => {
-  /** staking events */
-  it('should generate all events', async () => {
+  it('should generate proposal events events', async () => {
     const fetcher = new StorageFetcher(api);
     const events = await fetcher.fetch();
     assert.sameDeepMembers(events, [
@@ -352,5 +361,28 @@ describe('Edgeware Event Migration Tests', () => {
         } as ISignalingVotingCompleted
       },
     ]);
+  });
+
+  it('should generate identity-set events events', async () => {
+    const fetcher = new StorageFetcher(api);
+    const events = await fetcher.fetchIdentities(['alice', 'bob', 'charlie']);
+    assert.sameDeepMembers(events, [
+      {
+        blockNumber,
+        data: {
+          kind: EventKind.IdentitySet,
+          who: 'alice',
+          displayName: 'alice-display-name',
+        }
+      },
+      {
+        blockNumber,
+        data: {
+          kind: EventKind.IdentitySet,
+          who: 'charlie',
+          displayName: 'charlie-display-name',
+        }
+      },
+    ])
   });
 });

@@ -98,6 +98,10 @@ export enum EventKind {
 
   TreasuryRewardMinting = 'treasury-reward-minting',
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
+
+  IdentitySet = 'identity-set',
+  IdentityCleared = 'identity-cleared',
+  IdentityKilled = 'identity-killed',
 }
 
 interface IEvent {
@@ -383,6 +387,25 @@ export interface ITreasuryRewardMintingV2 extends IEvent {
   potAddress: AccountId;
 }
 
+/**
+ * Identity events
+ */
+export interface IIdentitySet extends IEvent {
+  kind: EventKind.IdentitySet;
+  who: AccountId;
+  displayName: string;
+}
+
+export interface IIdentityCleared extends IEvent {
+  kind: EventKind.IdentityCleared;
+  who: AccountId;
+}
+
+export interface IIdentityKilled extends IEvent {
+  kind: EventKind.IdentityKilled;
+  who: AccountId;
+}
+
 export type IEventData =
   ISlash
   | IReward
@@ -421,6 +444,9 @@ export type IEventData =
   | ISignalingVotingCompleted
   | ITreasuryRewardMinting
   | ITreasuryRewardMintingV2
+  | IIdentitySet
+  | IIdentityCleared
+  | IIdentityKilled
 // eslint-disable-next-line semi-style
 ;
 

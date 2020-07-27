@@ -433,6 +433,34 @@ export const Label: LabelerFilter = (
       };
     }
 
+    /**
+     * Identity events
+     */
+    case EventKind.IdentitySet: {
+      const { who, displayName } = data;
+      return {
+        heading: 'Identity Set',
+        label: `${fmtAddr(who)} set identity with display name "${displayName}".`,
+        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+      }
+    }
+    case EventKind.IdentityCleared: {
+      const { who } = data;
+      return {
+        heading: 'Identity Cleared',
+        label: `${fmtAddr(who)} cleared their identity.`,
+        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+      }
+    }
+    case EventKind.IdentityKilled: {
+      const { who } = data;
+      return {
+        heading: 'Identity Killed',
+        label: `${fmtAddr(who)}'s identity was rejected.`,
+        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+      }
+    }
+
     default: {
       // ensure exhaustive matching -- gives ts error if missing cases
       const _exhaustiveMatch: never = data;

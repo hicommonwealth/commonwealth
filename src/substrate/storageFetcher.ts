@@ -8,7 +8,7 @@
 import _ from 'underscore';
 import { ApiPromise } from '@polkadot/api';
 import { Option, Vec } from '@polkadot/types';
-import { BalanceOf, AccountId, Hash, BlockNumber } from '@polkadot/types/interfaces';
+import { BalanceOf, AccountId, Hash, BlockNumber, Registration } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
@@ -29,6 +29,7 @@ import {
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
   IEventData,
+  IIdentitySet,
 } from './types';
 
 import { factory, formatFilename } from '../logging';
@@ -36,6 +37,33 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   private _blockNumber: number;
+
+  public async fetchIdentities(addresses: string[]): Promise<CWEvent<IIdentitySet>[]> {
+    this._blockNumber = +(await this._api.rpc.chain.getHeader()).number;
+
+    // fetch all identities from chain
+    const identities: Option<Registration>[] = await this._api.query.identity.identityOf.multi(addresses);
+
+    // construct events
+    const cwEvents: CWEvent<IIdentitySet>[] = _.zip(addresses, identities)
+      .map(([ address, id ]: [ string, Option<Registration> ]): CWEvent<IIdentitySet> => {
+        // if no identity found, do nothing
+        if (!id.isSome) return null;
+        const { info } = id.unwrap();
+        return {
+          // use current block as "fake" set date
+          blockNumber: this._blockNumber,
+          data: {
+            kind: EventKind.IdentitySet,
+            who: address,
+            displayName: info.display.toString(),
+          }
+        };
+      })
+      // remove null values
+      .filter((v) => !!v);
+    return cwEvents;
+  }
 
   public async fetch(): Promise<CWEvent<IEventData>[]> {
     // get current blockNumber for synthesizing events

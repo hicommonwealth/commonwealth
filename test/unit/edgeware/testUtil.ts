@@ -23,7 +23,13 @@ export function constructOption<T extends Codec>(value?: T): Option<T> {
   }
 }
 
-export function constructFakeApi(callOverrides): ApiPromise {
+export function constructFakeApi(
+  callOverrides: { [name: string]: (...args: any[]) => Promise<any> }
+): ApiPromise {
+  // TODO: auto-multi everything here
+  const identityOf = function (...args) { return callOverrides['identityOf'](...args); };
+  identityOf.multi = callOverrides['identityOfMulti'];
+
   return {
     createType: (name, value) => value,
     queryMulti: (queries) => {
@@ -77,6 +83,9 @@ export function constructFakeApi(callOverrides): ApiPromise {
       voting: {
         voteRecords: callOverrides['voteRecords'],
       },
+      identity: {
+        identityOf
+      }
     },
     derive: {
       chain: {
