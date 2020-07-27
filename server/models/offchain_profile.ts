@@ -3,6 +3,7 @@ import { AddressAttributes } from './address';
 
 export interface OffchainProfileAttributes {
   address_id: number;
+  identity?: string;   // display name from chain
   data?: string;
 
   // associations
@@ -25,6 +26,7 @@ export default (
   const OffchainProfile = sequelize.define<OffchainProfileInstance, OffchainProfileAttributes>(
     'OffchainProfile', {
       address_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+      identity: { type: dataTypes.STRING, allowNull: true },
       data: { type: dataTypes.TEXT, allowNull: true },
     }, {
       underscored: true,
