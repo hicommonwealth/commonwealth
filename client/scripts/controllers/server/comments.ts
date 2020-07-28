@@ -6,7 +6,7 @@ import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
-import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread } from 'models';
+import { OffchainComment, OffchainAttachment, IUniqueId, AnyProposal, OffchainThread, AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 // tslint:disable: object-literal-key-quotes
 
@@ -73,7 +73,8 @@ class CommentsController {
       : (this._store.getByProposal(proposal)).map((c) => `${c.authorChain}#${c.author}`);
 
     return _.uniq((comments as string[]))
-      .map((slug) => slug.split(/#/));
+      .map((slug) => slug.split(/#/))
+      .map(([address, chain]) => new AddressInfo(null, address, chain, null));
   }
 
   public lastCommented<T extends IUniqueId>(proposal: T) {

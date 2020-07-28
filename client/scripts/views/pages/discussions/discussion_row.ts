@@ -15,6 +15,7 @@ import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
 
 import DiscussionRowMenu from './discussion_row_menu';
+import UserGallery from '../../components/widgets/user_gallery';
 
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -94,15 +95,11 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               }),
             ]),
             m('.discussion-commenters', [
-              m('.commenters-avatars', app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
-                .map(([chain, address]) => {
-                  return m(User, {
-                    user: new AddressInfo(null, address, chain, null),
-                    avatarOnly: true,
-                    tooltip: true,
-                    avatarSize: 24,
-                  });
-                })),
+              m(UserGallery, {
+                avatarSize: 24,
+                class: '.commenter-avatars',
+                users: app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
+              }),
             ]),
             m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true }),
             m('.discussion-last-updated', {
