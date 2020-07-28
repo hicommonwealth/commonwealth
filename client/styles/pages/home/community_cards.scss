@@ -1,13 +1,11 @@
 @import 'client/styles/shared';
 
 .HomepageCommunityCards {
-    margin-top: 100px;
-
-    .CommunityIcon {
-        margin-bottom: 21px;
+    .ChainIcon {
+        margin-bottom: 10px;
     }
-    h3 {
-        font-size: 17px;
+    .CommunityIcon {
+        margin-bottom: 15px;
     }
     h4 {
         margin-top: 32px;
@@ -17,25 +15,34 @@
     }
     .home-card {
         float: left;
-        width: calc(50% - 30px);
-        margin-top: 15px;
+        width: calc(33% - 30px);
+        @include md-max {
+            width: calc(50% - 30px);
+            max-width: none;
+        }
+        @include xs-max {
+            width: 100%;
+        }
         margin-right: 30px;
-        margin-bottom: 60px;
+        margin-bottom: 30px;
+        padding: 30px 34px;
+        height: 265px;
         h3 {
             flex: 1;
             font-weight: 500;
-            margin: 15px 0 18px;
+            margin: 0 0 7px;
+            white-space: nowrap;
+            text-overflow: ellipse;
+            overflow: hidden;
         }
         .card-description {
-            height: 84px;
+            margin: 0 0 16px;
+            line-height: 1.25;
+            height: 68px;
             overflow: hidden;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
-        }
-        .cui-button {
-            margin-top: 10px;
-            min-width: 90px;
         }
     }
     .new-threads {

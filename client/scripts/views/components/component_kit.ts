@@ -18,10 +18,10 @@ import {
   Table
 } from 'construct-ui';
 
-const Examples = {
+const ComponentKit = {
   view: (vnode) => {
-    return m('.Examples', [
-      m('style', '.Examples > * { margin: 20px; }\n .Examples > .gallery > * { margin-right: 20px; }'),
+    return m('.ComponentKit', [
+      m('style', '.ComponentKit > * { margin: 20px; }\n .ComponentKit > .gallery > * { margin-right: 20px; }'),
 
       // buttons and inputs
       m('.gallery', [
@@ -461,4 +461,4 @@ const Examples = {
   }
 };
 
-export default Examples;
+export default ComponentKit;
