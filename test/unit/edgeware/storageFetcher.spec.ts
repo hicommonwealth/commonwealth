@@ -1,13 +1,13 @@
 import chai from 'chai';
 import {
-  AccountId, BalanceOf, Registration
+  AccountId, BalanceOf, Registration, RegistrarInfo
 } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
 
-import { constructFakeApi, constructOption } from './testUtil';
+import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import {
   EventKind,
   IDemocracyProposed,
@@ -19,7 +19,8 @@ import {
   ISignalingNewProposal,
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
-  ICollectiveVoted
+  ICollectiveVoted,
+  IdentityJudgement
 } from '../../../src/substrate/types';
 import { StorageFetcher } from '../../../src/substrate/storageFetcher';
 
@@ -37,9 +38,19 @@ const api = constructFakeApi({
     return constructOption({
       info: {
         display: `${addr}-display-name`,
-      }
+      },
+      judgements: addr !== 'charlie' ? [
+        [ 0, constructIdentityJudgement(IdentityJudgement.KnownGood) ],
+        [ 1, constructIdentityJudgement(IdentityJudgement.Erroneous) ],
+      ] : [
+
+      ],
     } as unknown as Registration)
   }),
+  registrars: async () => [
+    constructOption({ account: 'charlie' } as unknown as RegistrarInfo),
+    constructOption({ account: 'dave' } as unknown as RegistrarInfo),
+  ],
 
   // democracy proposals
   publicProps: async () => [
@@ -373,6 +384,7 @@ describe('Edgeware Event Migration Tests', () => {
           kind: EventKind.IdentitySet,
           who: 'alice',
           displayName: 'alice-display-name',
+          judgements: [ [ 'charlie', IdentityJudgement.KnownGood ], [ 'dave', IdentityJudgement.Erroneous ] ],
         }
       },
       {
@@ -381,6 +393,7 @@ describe('Edgeware Event Migration Tests', () => {
           kind: EventKind.IdentitySet,
           who: 'charlie',
           displayName: 'charlie-display-name',
+          judgements: [ ],
         }
       },
     ])

@@ -1,7 +1,9 @@
 /* eslint-disable dot-notation */
 import { ApiPromise } from '@polkadot/api';
 import { Option } from '@polkadot/types';
+import { IdentityJudgement } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
+import { IdentityJudgement as JudgementEnum } from '../../../src/substrate/types';
 
 export function constructOption<T extends Codec>(value?: T): Option<T> {
   if (value) {
@@ -21,6 +23,42 @@ export function constructOption<T extends Codec>(value?: T): Option<T> {
       unwrap: () => { throw new Error('option is null'); }
     } as unknown as Option<T>;
   }
+}
+
+export function constructIdentityJudgement(j: JudgementEnum): IdentityJudgement {
+  const obj = {
+    isUnknown: false,
+    isFeePaid: false,
+    isReasonable: false,
+    isKnownGood: false,
+    isOutOfDate: false,
+    isLowQuality: false,
+    isErroneous: false,
+  };
+  switch (j) {
+    case JudgementEnum.Unknown:
+      obj.isUnknown = true;
+      break;
+    case JudgementEnum.Reasonable:
+      obj.isReasonable = true;
+      break;
+    case JudgementEnum.OutOfDate:
+      obj.isOutOfDate = true;
+      break;
+    case JudgementEnum.LowQuality:
+      obj.isLowQuality = true;
+      break;
+    case JudgementEnum.KnownGood:
+      obj.isKnownGood = true;
+      break;
+    case JudgementEnum.FeePaid:
+      obj.isFeePaid = true;
+      break;
+    case JudgementEnum.Erroneous:
+      obj.isErroneous = true;
+      break;
+  }
+  return obj as unknown as IdentityJudgement;
 }
 
 export function constructFakeApi(
@@ -84,7 +122,8 @@ export function constructFakeApi(
         voteRecords: callOverrides['voteRecords'],
       },
       identity: {
-        identityOf
+        identityOf,
+        registrars: callOverrides['registrars'],
       }
     },
     derive: {
