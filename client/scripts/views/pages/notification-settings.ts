@@ -648,7 +648,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()
     );
-    vnode.state.selectedFilter = 'community-notifications';
+    vnode.state.selectedFilter = 'Community Notifications';
     vnode.state.subscriptions = [];
     vnode.state.communities = [];
   },
@@ -677,15 +677,42 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
     const chainIds = chains.map((c) => c.id);
     const communityIds = communities.map((c) => c.id);
+    const options = ['Community Notifications', 'Chain Event Notifications'];
     if (!app.loginStatusLoaded()) return;
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
     }, [
       m('.forum-container', [
-        (selectedFilter === 'community-notifications')
+        m(SelectList, {
+          class: 'ChainCommunitySelector',
+          filterable: false,
+          checkmark: false,
+          emptyContent: null,
+          inputAttrs: {
+            class: 'ChainCommunitySelector',
+          },
+          itemRender: (option: string) => {
+            return m(ListItem, {
+              label: option,
+              selected: (option === vnode.state.selectedFilter),
+            });
+          },
+          items: options,
+          trigger: m(Button, {
+            align: 'left',
+            compact: true,
+            iconRight: Icons.CHEVRON_DOWN,
+            label: vnode.state.selectedFilter,
+          }),
+          onSelect: (option: string) => {
+            vnode.state.selectedFilter = option;
+            m.redraw();
+          }
+        }),
+        (selectedFilter === 'Community Notifications')
           && m(CommunityNotifications, { subscriptions, communities, chains, }),
-        (selectedFilter === 'chain-notifications')
+        (selectedFilter === 'Chain Event Notifications')
           && m(ChainNotificationManagementPage, {
             chains,
           }),
