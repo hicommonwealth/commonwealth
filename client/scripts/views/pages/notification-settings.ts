@@ -638,7 +638,7 @@ const ChainEventOrCommunitySelector: m.Component<{selectedFilter: string, setFil
   view: (vnode) => {
     const options = ['Community Notifications', 'Chain Event Notifications'];
     return m(SelectList, {
-      class: 'ChainCommunitySelector',
+      class: 'ChainCommunitySelector CommunitySelectList',
       filterable: false,
       checkmark: false,
       emptyContent: null,
