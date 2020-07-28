@@ -2,21 +2,41 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    // data will be populated later, via `yarn migrate-identities`.
-    return queryInterface.addColumn(
-      'OffchainProfiles',
-      'identity',
-      {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-    );
+    return queryInterface.sequelize.transaction(async (t) => {
+      // data will be populated later, via `yarn migrate-identities`.
+      await queryInterface.addColumn(
+        'OffchainProfiles',
+        'identity',
+        {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        { transaction: t },
+      );
+      await queryInterface.addColumn(
+        'OffchainProfiles',
+        'judgements',
+        {
+          type: DataTypes.JSONB,
+          allowNull: true,
+        },
+        { transaction: t },
+      );
+    });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn(
-      'OffchainProfiles',
-      'identity',
-    );
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.removeColumn(
+        'OffchainProfiles',
+        'identity',
+        { transaction: t },
+      );
+      await queryInterface.removeColumn(
+        'OffchainProfiles',
+        'judgements',
+        { transaction: t },
+      );
+    });
   }
 };

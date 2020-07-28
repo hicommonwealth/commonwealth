@@ -4,6 +4,7 @@
  * from the chain, writing the results back into the database.
  */
 
+import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents } from '@commonwealth/chain-events';
 import { OffchainProfileAttributes, OffchainProfileInstance } from '../models/offchain_profile';
 
@@ -71,6 +72,9 @@ export async function migrateIdentities(models, chain?: string): Promise<Offchai
       const profile = profiles.find((p) => p.Address.address === identityEvent.data.who);
       if (profile) {
         profile.identity = identityEvent.data.displayName;
+        profile.judgements = _.object<{ [name: string]: SubstrateTypes.IdentityJudgement }>(
+          identityEvent.data.judgements
+        );
         await profile.save();
         log.debug(`Discovered name '${profile.identity}' for ${profile.Address.address}!`);
         updatedProfiles.push(profile);
