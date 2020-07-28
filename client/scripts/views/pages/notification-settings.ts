@@ -390,13 +390,6 @@ const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> =
   },
 };
 
-interface ISubscriptionSideBarListItemAttrs {
-  label: string;
-  id: string;
-  selectedFilter: string;
-  onChangeHandler: Function;
-}
-
 const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo | ChainInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
