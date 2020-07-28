@@ -30,6 +30,8 @@ import {
   ISignalingVotingCompleted,
   IEventData,
   IIdentitySet,
+  parseJudgement,
+  IdentityJudgement,
 } from './types';
 
 import { factory, formatFilename } from '../logging';
@@ -41,15 +43,26 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   public async fetchIdentities(addresses: string[]): Promise<CWEvent<IIdentitySet>[]> {
     this._blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
-    // fetch all identities from chain
+    // fetch all identities and registrars from chain
     const identities: Option<Registration>[] = await this._api.query.identity.identityOf.multi(addresses);
+    const registrars = await this._api.query.identity.registrars();
 
     // construct events
     const cwEvents: CWEvent<IIdentitySet>[] = _.zip(addresses, identities)
       .map(([ address, id ]: [ string, Option<Registration> ]): CWEvent<IIdentitySet> => {
         // if no identity found, do nothing
         if (!id.isSome) return null;
-        const { info } = id.unwrap();
+        const { info, judgements } = id.unwrap();
+
+        // parse out judgements from identity info
+        const parsedJudgements = judgements
+          .map(([ id, judgement ]): [ string, IdentityJudgement ] => {
+            const registrarOpt = registrars[+id];
+            // skip invalid registrars
+            if (!registrarOpt || !registrarOpt.isSome) return null;
+            return [ registrarOpt.unwrap().account.toString(), parseJudgement(judgement) ];
+          })
+          .filter((j) => !!j);
         return {
           // use current block as "fake" set date
           blockNumber: this._blockNumber,
@@ -57,6 +70,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
             kind: EventKind.IdentitySet,
             who: address,
             displayName: info.display.toString(),
+            judgements: parsedJudgements,
           }
         };
       })

@@ -1,15 +1,16 @@
 import chai from 'chai';
 import {
   AccountId, PropIndex, Hash, ReferendumInfoTo239, ReferendumInfo,
-  Proposal, TreasuryProposal, Votes, Event, Extrinsic, Registration
+  Proposal, TreasuryProposal, Votes, Event, Extrinsic, Registration,
+  RegistrarInfo
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Vec, bool } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces';
 import { Enrich } from '../../../src/substrate/filters/enricher';
-import { constructFakeApi, constructOption } from './testUtil';
-import { EventKind } from '../../../src/substrate/types';
+import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
+import { EventKind, IdentityJudgement } from '../../../src/substrate/types';
 
 const { assert } = chai;
 
@@ -110,8 +111,16 @@ const api = constructFakeApi({
   identityOf: async (addr) => constructOption({
     info: {
       display: `${addr}-display-name`,
-    }
+    },
+    judgements: [
+      [ 0, constructIdentityJudgement(IdentityJudgement.KnownGood) ],
+      [ 1, constructIdentityJudgement(IdentityJudgement.Erroneous) ],
+    ]
   } as unknown as Registration),
+  registrars: async () => [
+    constructOption({ account: 'charlie' } as unknown as RegistrarInfo),
+    constructOption({ account: 'dave' } as unknown as RegistrarInfo),
+  ]
 });
 
 class FakeEventData extends Array {
@@ -721,9 +730,24 @@ describe('Edgeware Event Enricher Filter Tests', () => {
         kind,
         who: 'alice',
         displayName: 'alice-display-name',
+        judgements: [ [ 'charlie', IdentityJudgement.KnownGood ], [ 'dave', IdentityJudgement.Erroneous ] ],
       }
     });
   });
+  it('should enrich identity-judgment-given event', async () => {
+    const kind = EventKind.JudgementGiven;
+    const event = constructEvent([ 'alice', 1 ]);
+    const result = await Enrich(api, blockNumber, kind, event);
+    assert.deepEqual(result, {
+      blockNumber,
+      data: {
+        kind,
+        who: 'alice',
+        registrar: 'dave',
+        judgement: IdentityJudgement.Erroneous,
+      }
+    });
+  })
   it('should enrich identity-cleared event', async () => {
     const kind = EventKind.IdentityCleared;
     const event = constructEvent([ 'alice', 1000 ]);

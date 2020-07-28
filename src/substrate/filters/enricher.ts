@@ -8,7 +8,7 @@ import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/type
 import { Option, bool, Vec, u32, u64 } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { CWEvent } from '../../interfaces';
-import { EventKind, IEventData, isEvent } from '../types';
+import { EventKind, IEventData, isEvent, parseJudgement, IdentityJudgement } from '../types';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -499,12 +499,56 @@ export async function Enrich(
           throw new Error('unable to retrieve identity info');
         }
         const displayName = registrationOpt.unwrap().info.display.toString();
+        const judgementInfo = registrationOpt.unwrap().judgements;
+        const judgements: [string, IdentityJudgement][] = [];
+        if (judgementInfo.length > 0) {
+          const registrars = await api.query.identity.registrars();
+          judgements.push(...judgementInfo.map(([ id, judgement ]): [ string, IdentityJudgement ] => {
+            const registrarOpt = registrars[+id];
+            if (!registrarOpt || !registrarOpt.isSome) {
+              throw new Error('invalid judgement!');
+            }
+            return [ registrarOpt.unwrap().account.toString(), parseJudgement(judgement) ];
+          }));
+        }
         return {
           excludeAddresses: [ who.toString() ],
           data: {
             kind,
             who: who.toString(),
             displayName,
+            judgements,
+          }
+        };
+      }
+      case EventKind.JudgementGiven: {
+        const [ who, registrarId ] = event.data as unknown as [ AccountId, u32 ] & Codec;
+        
+        // convert registrar from id to address
+        const registrars = await api.query.identity.registrars();
+        const registrarOpt = registrars[+registrarId];
+        if (!registrarOpt || !registrarOpt.isSome) {
+          throw new Error('unable to retrieve registrar info');
+        }
+        const registrar = registrarOpt.unwrap().account;
+
+        // query the actual judgement provided
+        const registrationOpt = await api.query.identity.identityOf(who);
+        if (!registrationOpt.isSome) {
+          throw new Error('unable to retrieve identity info');
+        }
+        const judgementTuple = registrationOpt.unwrap().judgements
+          .find(([ id, value ]) => +id === +registrarId);
+        if (!judgementTuple) {
+          throw new Error('unable to find judgement');
+        }
+        const judgement = parseJudgement(judgementTuple[1]);
+        return {
+          data: {
+            kind,
+            who: who.toString(),
+            registrar: registrar.toString(),
+            judgement,
           }
         };
       }

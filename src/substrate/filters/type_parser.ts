@@ -90,6 +90,7 @@ export function ParseType (
     case 'identity': {
       switch (method) {
         case 'IdentitySet': return EventKind.IdentitySet;
+        case 'JudgementGiven': return EventKind.JudgementGiven;
         case 'IdentityCleared': return EventKind.IdentityCleared;
         case 'IdentityKilled': return EventKind.IdentityKilled;
         default: return null;

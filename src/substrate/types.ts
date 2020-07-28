@@ -1,4 +1,6 @@
-import { Header, EventRecord, Extrinsic, Event } from '@polkadot/types/interfaces';
+import {
+  Header, EventRecord, Extrinsic, Event, IdentityJudgement as SubstrateJudgement
+} from '@polkadot/types/interfaces';
 
 export const EventChains = [
   'edgeware',
@@ -20,6 +22,25 @@ export type BigIntString = string;
 export type BlockNumber = number;
 export type AccountId = string;
 export type RuntimeVersion = number;
+export enum IdentityJudgement {
+  Unknown = 'unknown',
+  FeePaid = 'fee-paid',
+  Reasonable = 'reasonable',
+  KnownGood = 'known-good',
+  OutOfDate = 'out-of-date',
+  LowQuality = 'low-quality',
+  Erroneous = 'erroneous',
+}
+
+export function parseJudgement(j: SubstrateJudgement): IdentityJudgement {
+  if (j.isFeePaid) return IdentityJudgement.FeePaid;
+  if (j.isReasonable) return IdentityJudgement.Reasonable;
+  if (j.isKnownGood) return IdentityJudgement.KnownGood;
+  if (j.isOutOfDate) return IdentityJudgement.OutOfDate;
+  if (j.isLowQuality) return IdentityJudgement.LowQuality;
+  if (j.isErroneous) return IdentityJudgement.Erroneous;
+  return IdentityJudgement.Unknown;
+}
 
 /**
  *  lacks a block type that includes events as well, so we synthesize a type
@@ -100,6 +121,7 @@ export enum EventKind {
   TreasuryRewardMintingV2 = 'treasury-reward-minting-v2',
 
   IdentitySet = 'identity-set',
+  JudgementGiven = 'identity-judgement-given',
   IdentityCleared = 'identity-cleared',
   IdentityKilled = 'identity-killed',
 }
@@ -394,6 +416,14 @@ export interface IIdentitySet extends IEvent {
   kind: EventKind.IdentitySet;
   who: AccountId;
   displayName: string;
+  judgements: [AccountId, IdentityJudgement][];
+}
+
+export interface IJudgementGiven extends IEvent {
+  kind: EventKind.JudgementGiven;
+  who: AccountId;
+  registrar: AccountId;
+  judgement: IdentityJudgement;
 }
 
 export interface IIdentityCleared extends IEvent {
@@ -445,6 +475,7 @@ export type IEventData =
   | ITreasuryRewardMinting
   | ITreasuryRewardMintingV2
   | IIdentitySet
+  | IJudgementGiven
   | IIdentityCleared
   | IIdentityKilled
 // eslint-disable-next-line semi-style

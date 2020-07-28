@@ -266,6 +266,12 @@ export const Title: TitlerFilter = (kind: EventKind): IEventTitle => {
         description: 'A user sets an identity.',
       }
     }
+    case EventKind.JudgementGiven: {
+      return {
+        title: 'Identity Judgement Given',
+        description: 'A registrar passes judgement on an identity.',
+      }
+    }
     case EventKind.IdentityCleared: {
       return {
         title: 'Identity Cleared',

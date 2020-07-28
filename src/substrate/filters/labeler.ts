@@ -444,6 +444,14 @@ export const Label: LabelerFilter = (
         linkUrl: chainId ? `/${chainId}/account/${who}` : null,
       }
     }
+    case EventKind.JudgementGiven: {
+      const { who, registrar, judgement } = data;
+      return {
+        heading: 'Identity Judgement Given',
+        label: `Registrar ${fmtAddr(registrar)} passed judgement '${judgement}' on ${fmtAddr(who)}.`,
+        linkUrl: chainId ? `/${chainId}/account/${who}` : null,
+      }
+    }
     case EventKind.IdentityCleared: {
       const { who } = data;
       return {
