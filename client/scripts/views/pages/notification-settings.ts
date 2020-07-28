@@ -1,6 +1,4 @@
 import 'pages/subscriptions.scss';
-import 'components/sidebar/index.scss';
-
 
 import m from 'mithril';
 import $ from 'jquery';
