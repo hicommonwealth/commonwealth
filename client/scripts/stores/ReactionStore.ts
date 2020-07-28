@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { OffchainReaction, AnyProposal, OffchainThread, OffchainComment } from '../models';
+import { OffchainReaction, AnyProposal, OffchainThread, OffchainComment, Proposal } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 import { IUniqueId } from '../models/interfaces';
 
@@ -16,7 +16,6 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     super.add(reaction);
     this.getAll().sort(byAscendingCreationDate);
     const identifier = this.getPostIdentifier(reaction);
-
     if (!this._storePost[identifier]) {
       this._storePost[identifier] = [];
     }
@@ -54,17 +53,23 @@ class ReactionStore extends IdStore<OffchainReaction<any>> {
     return this;
   }
 
-  public getByPost(post: OffchainThread | OffchainComment<any>): Array<OffchainReaction<any>> {
+  public getByPost(post: OffchainThread | AnyProposal | OffchainComment<any>): Array<OffchainReaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | OffchainComment<any>) {
+  public getPostIdentifier(rxnOrPost: OffchainReaction<any> | OffchainThread | AnyProposal | OffchainComment<any>) {
     if (rxnOrPost instanceof OffchainReaction) {
-      const { threadId, commentId } = rxnOrPost;
-      return threadId ? `discussion-${threadId}` : `comment-${commentId}`;
+      const { threadId, commentId, proposalId } = rxnOrPost;
+      return threadId
+        ? `discussion-${threadId}`
+        : proposalId
+          ? `${proposalId}`
+          : `comment-${commentId}`;
     } else if (rxnOrPost instanceof OffchainThread) {
       return `discussion-${rxnOrPost.id}`;
+    } else if (rxnOrPost instanceof Proposal) {
+      return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
     } else if (rxnOrPost instanceof OffchainComment) {
       return `comment-${rxnOrPost.id}`;
     }

@@ -54,7 +54,7 @@ export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainCo
         user: author,
         tooltip: true,
         avatarOnly: true,
-        avatarSize: 36,
+        avatarSize: 40,
       }),
     ]);
   }
@@ -141,30 +141,6 @@ export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainT
     } else {
       return null;
     }
-  }
-};
-
-export const ProposalBodyReply: m.Component<{
-  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
-}> = {
-  view: (vnode) => {
-    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
-    if (!item) return;
-
-    return m('.ProposalBodyReply', [
-      m('a', {
-        class: 'reply',
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-            if (!confirmed) return;
-          }
-          getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
-        },
-      }, 'Comment on this reply'),
-    ]);
   }
 };
 
@@ -468,7 +444,7 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyReaction: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyReaction: m.Component<{ item: OffchainThread | AnyProposal | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;

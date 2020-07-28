@@ -16,7 +16,7 @@ import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import EmptyChannelPlaceholder from 'views/components/empty_channel_placeholder';
+import EmptyTagPlaceholder from 'views/components/empty_tag_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
@@ -31,6 +31,7 @@ const DiscussionRowHeader = {
       m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
       m('.discussion-row-header-col', 'Likes'),
       m('.discussion-row-header-col', 'Activity'),
+      app.isLoggedIn() && m('.discussion-row-header-col.discussion-row-menu'),
     ]);
   }
 };
@@ -65,7 +66,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading);
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: 'Discussions' });
 
     const { tag } = vnode.attrs;
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
@@ -147,7 +148,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       }
 
       return m('.discussions-main', [
-        m(EmptyChannelPlaceholder, { tagName: tag }),
+        m(EmptyTagPlaceholder, { tagName: tag }),
       ]);
     };
 
@@ -230,7 +231,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return m('.discussions-main', [
         // m(InlineThreadComposer),
         allProposals.length === 0
-          ? m(EmptyChannelPlaceholder, { communityName })
+          ? m(EmptyTagPlaceholder, { communityName })
           : [
             m(DiscussionRowHeader),
             getRecentPostsSortedByWeek(),
@@ -245,7 +246,10 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       ]);
     };
 
-    return m(Sublayout, { class: 'DiscussionsPage' }, [
+    return m(Sublayout, {
+      class: 'DiscussionsPage',
+      title: 'Discussions',
+    }, [
       (app.chain || app.community) && [
         tag
           ? getSingleTagListing(tag)

@@ -1,17 +1,13 @@
 import WebSocket from 'ws';
+import {
+  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
+  SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
+} from '@commonwealth/chain-events';
+
 import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import subscribeSubstrateEvents, {
-  createSubstrateProvider, createSubstrateApi
-} from '../../shared/events/substrate/index';
-import subscribeMolochEvents, { createMolochApi } from '../../shared/events/moloch/index';
-import {
-  IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber
-} from '../../shared/events/interfaces';
-import { SubstrateEventChains } from '../../shared/events/substrate/types';
-import { MolochEventChains } from '../../shared/events/moloch/types';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -63,14 +59,20 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
         handlers.push(storageHandler, notificationHandler, entityArchivalHandler);
       }
       let subscriber: IEventSubscriber<any, any>;
-      if (SubstrateEventChains.includes(node.chain)) {
-        const hasProtocol = node.url.indexOf('wss://') !== -1 || node.url.indexOf('ws://') !== -1;
-        const isInsecureProtocol = node.url.indexOf('edgewa.re') === -1;
-        const protocol = hasProtocol ? '' : (isInsecureProtocol ? 'ws://' : 'wss://');
-        const url = protocol + node.url;
-        const provider = await createSubstrateProvider(url);
-        const api = await createSubstrateApi(provider, node.chain.startsWith('edgeware')).isReady;
-        subscriber = await subscribeSubstrateEvents({
+      if (SubstrateTypes.EventChains.includes(node.chain)) {
+        let nodeUrl = node.url;
+        const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
+        nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
+        const isInsecureProtocol = nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1
+          && nodeUrl.indexOf('rpc.polkadot.io') === -1;
+        const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
+        if (nodeUrl.indexOf(':9944') !== -1) {
+          nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
+        }
+        nodeUrl = protocol + nodeUrl;
+        const provider = await SubstrateEvents.createProvider(nodeUrl);
+        const api = await SubstrateEvents.createApi(provider, node.chain).isReady;
+        subscriber = await SubstrateEvents.subscribeEvents({
           chain: node.chain,
           handlers,
           skipCatchup,
@@ -78,10 +80,10 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           performMigration: !!migrate,
           api,
         });
-      } else if (MolochEventChains.includes(node.chain)) {
+      } else if (MolochTypes.EventChains.includes(node.chain)) {
         const contractVersion = 1;
-        const api = await createMolochApi(node.url, contractVersion, node.address);
-        subscriber = await subscribeMolochEvents({
+        const api = await MolochEvents.createApi(node.url, contractVersion, node.address);
+        subscriber = await MolochEvents.subscribeEvents({
           chain: node.chain,
           handlers,
           skipCatchup,

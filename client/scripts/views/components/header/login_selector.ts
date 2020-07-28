@@ -21,24 +21,6 @@ import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import { setActiveAccount } from 'controllers/app/login';
 
-export const getSelectableCommunities = () => {
-  return (app.config.communities.getAll() as (CommunityInfo | ChainInfo)[])
-    .concat(app.config.chains.getAll())
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .sort((a, b) => {
-      // sort starred communities at top
-      if (a instanceof ChainInfo && app.communities.isStarred(a.id, null)) return -1;
-      if (a instanceof CommunityInfo && app.communities.isStarred(null, a.id)) return -1;
-      return 0;
-    })
-    .filter((item) => {
-      // only show chains with nodes
-      return (item instanceof ChainInfo)
-        ? app.config.nodes.getByChain(item.id)?.length
-        : true;
-    });
-};
-
 const CommunityLabel: m.Component<{
   chain?: ChainInfo,
   community?: CommunityInfo,
@@ -114,9 +96,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
     if (!app.isLoggedIn()) return m('.LoginSelector', [
       m('.login-selector-user', [
         m(Button, {
-          class: 'cui-button-dark',
           iconLeft: Icons.USER,
-          size: 'sm',
           fluid: true,
           label: 'Log in',
           onclick: () => app.modals.create({ modal: LoginModal }),
@@ -132,9 +112,6 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
       });
     });
     const isPrivateCommunity = app.community?.meta.privacyEnabled;
-    const totalUnseenCount = app.isLoggedIn() && (getSelectableCommunities() as any).map((item) => {
-      return app.user.unseenPosts[item.id]?.activePosts || 0;
-    }).reduce((a, b) => { return a + b; }, 0);
 
     // wrap the popover in another popover, to display address selection hint
     // only show the onboarding hint if 1) we are in a community, 2) the user has a compatible address, and
@@ -171,20 +148,16 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
         position: 'top-end',
         inline: true,
         trigger: m(Button, {
-          class: 'cui-button-dark',
           intent: 'none',
-          size: 'sm',
           fluid: true,
           compact: true,
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? 'Select a community'
-              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount }) : 'Select an address',
-            app.isLoggedIn() && totalUnseenCount > 0 && m('.unseen-count', [
-              m('.pip', totalUnseenCount),
-            ]),
+            (!app.chain && !app.community) ? 'Logged in'
+              : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
+                : 'Select an address',
           ],
           iconRight: Icons.CHEVRON_DOWN,
         }),
@@ -192,6 +165,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           // address list
           (app.chain || app.community) && [
             activeAddressesWithRole.map((account) => m(MenuItem, {
+              class: 'switch-user',
               align: 'left',
               basic: true,
               onclick: (e) => {
@@ -212,66 +186,10 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
             }),
             m(MenuDivider),
           ],
-          // communities list
-          (getSelectableCommunities() as any).concat(['home']).map((item) => {
-            const getUnseenCount = (id) => {
-              const isNew = app.isLoggedIn() && !app.user.unseenPosts[id];
-              const unseenCount = app.user.unseenPosts[id]?.activePosts || 0;
-
-              return m('.unseen-count', [
-                isNew && m('.pip', 'New'),
-                unseenCount > 0 && m('.pip', unseenCount),
-              ]);
-            };
-
-            if (item instanceof ChainInfo) return m(MenuItem, {
-              onclick: (e) => m.route.set(`/${item.id}`),
-              class: app.communities.isStarred(item.id, null) ? 'starred' : '',
-              label: [
-                m(CommunityLabel, { chain: item }),
-                getUnseenCount(item.id),
-              ],
-              selected: app.activeChainId() === item.id,
-              contentRight: app.isLoggedIn() && app.user.isMember({
-                account: app.user.activeAccount,
-                chain: item.id
-              }) && m('.community-star-toggle', {
-                onclick: (e) => {
-                  app.communities.setStarred(item.id, null, !app.communities.isStarred(item.id, null));
-                }
-              }, [
-                m(Icon, { name: Icons.STAR }),
-              ]),
-            });
-
-            if (item instanceof CommunityInfo) return m(MenuItem, {
-              onclick: (e) => m.route.set(`/${item.id}`),
-              class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-              label: [
-                m(CommunityLabel, { community: item }),
-                getUnseenCount(item.id),
-              ],
-              selected: app.activeCommunityId() === item.id,
-              contentRight: app.isLoggedIn() && app.user.isMember({
-                account: app.user.activeAccount,
-                community: item.id
-              }) && m('.community-star-toggle', {
-                onclick: (e) => {
-                  app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-                },
-              }, [
-                m(Icon, { name: Icons.STAR }),
-              ]),
-            });
-
-            return m(MenuItem, {
-              onclick: (e) => m.route.set('/'),
-              label: 'More communities',
-            });
-          }),
-          m(MenuDivider),
           m(MenuItem, {
-            onclick: () => m.route.set('/settings'),
+            onclick: () => app.activeChainId()
+              ? m.route.set(`/${app.activeChainId()}/settings`)
+              : m.route.set('/settings'),
             label: 'Settings'
           }),
           m(MenuItem, {

@@ -40,12 +40,12 @@
 
     // TODO: refactor into its own component
     .CommunityBlock {
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         padding: 18px;
         margin-bottom: 40px;
 
         .community-block-top {
-            font-weight: bold;
+            font-weight: 500;
             display: inline;
         }
         .community-block-bottom {
@@ -58,7 +58,7 @@
     .SwitchAddress {
         display: block;
         padding: 15px 20px 10px;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         @include sm-min {
             width: 420px;
         }
@@ -96,7 +96,7 @@
         }
         .inviteTitle {
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
             padding: 24px 0 4px;
             margin: 0 10px;
             @include sm-min {

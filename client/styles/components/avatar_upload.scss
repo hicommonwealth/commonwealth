@@ -1,10 +1,12 @@
+@import 'client/styles/shared';
+
 .AvatarUpload {
     margin-bottom: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: white;
-    border: 1px solid #eee;
+    border: 1px solid $background-color-light;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
     .dropzone-attach {
         display: flex;
@@ -178,7 +180,7 @@
                 width: 100%;
                 border-radius: $image-border-radius;
                 background: #999;
-                background: linear-gradient(to bottom, #eee, #ddd);
+                background: linear-gradient(to bottom, $background-color-light, #ddd);
             }
             .dz-details {
                 opacity: 1;

@@ -4,10 +4,10 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 
+import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
+
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import { CWEvent } from '../../../shared/events/interfaces';
-import { SubstrateEventKind, ISubstrateEventData } from '../../../shared/events/substrate/types';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import MigrationHandler from '../../../server/eventHandlers/migration';
 
@@ -26,10 +26,10 @@ describe('Edgeware Migration Event Handler Tests', () => {
 
   it('should create new event', async () => {
     // setup
-    const event: CWEvent<ISubstrateEventData> = {
+    const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.DemocracyStarted,
+        kind: SubstrateTypes.EventKind.DemocracyStarted,
         referendumIndex: 0,
         endBlock: 100,
         proposalHash: 'hash',
@@ -64,15 +64,15 @@ describe('Edgeware Migration Event Handler Tests', () => {
     const legacyEvent: any = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.PreimageNoted,
+        kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
         noter: 'Alice',
       }
     };
-    const currentEvent: CWEvent<ISubstrateEventData> = {
+    const currentEvent: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 10,
       data: {
-        kind: SubstrateEventKind.PreimageNoted,
+        kind: SubstrateTypes.EventKind.PreimageNoted,
         proposalHash: 'hash',
         noter: 'Alice',
         preimage: {
@@ -106,11 +106,11 @@ describe('Edgeware Migration Event Handler Tests', () => {
   });
 
   it('should ignore irrelevant events', async () => {
-    const event: CWEvent<ISubstrateEventData> = {
+    const event: CWEvent<SubstrateTypes.IEventData> = {
       blockNumber: 11,
       includeAddresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
       data: {
-        kind: SubstrateEventKind.Slash,
+        kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
       }
@@ -136,7 +136,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent<ISubstrateEventData>);
+    const dbEvent = await eventHandler.handle(event as unknown as CWEvent<SubstrateTypes.IEventData>);
     assert.equal(dbEvent, null);
   });
 });

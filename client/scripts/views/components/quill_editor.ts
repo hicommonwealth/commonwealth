@@ -44,7 +44,6 @@ const instantiateEditor = (
   let quill;
 
   // Set up markdown mode helper
-  // TODO: Avoid using jquery to inspect
   const isMarkdownMode = () => $editor.parent('.markdown-mode').length > 0;
 
   // Remove existing editor, if there is one
@@ -750,8 +749,7 @@ const instantiateEditor = (
     if (state.unsavedChanges.length() > 0) {
       // Save the entire updated text to localStorage
       const data = JSON.stringify(quill.getContents());
-      localStorage.setItem(`${editorNamespace}-storedText`, data);
-      localStorage.setItem(`${editorNamespace}-markdownMode`, state.markdownMode);
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, data);
       state.unsavedChanges = new Delta();
     }
   }, 2500);
@@ -783,7 +781,7 @@ interface IQuillEditorState {
 const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
   oncreate: (vnode) => {
     // Only bind the alert if we are actually trying to persist the user's changes
-    if (vnode.attrs.contentsDoc === undefined) {
+    if (!vnode.attrs.contentsDoc) {
       vnode.state.beforeunloadHandler = () => {
         if (vnode.state.unsavedChanges && vnode.state.unsavedChanges.length() > 0) {
           return 'There are unsaved changes. Are you sure you want to leave?';
@@ -793,55 +791,71 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     }
   },
   onremove: (vnode) => {
-    if (vnode.attrs.contentsDoc === undefined)
+    const { editor, markdownMode } = vnode.state;
+    const { editorNamespace } = vnode.attrs;
+    const body = markdownMode
+      ? editor?.getText()
+      : JSON.stringify(editor?.getContents());
+    if (body && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+      localStorage.setItem(`${app.activeId()}-${editorNamespace}-storedText`, body);
+    }
+    if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', vnode.state.beforeunloadHandler);
+    }
   },
-  view: (vnode: m.VnodeDOM<IQuillEditorAttrs, IQuillEditorState>) => {
+  view: (vnode) => {
     const theme = vnode.attrs.theme || 'snow';
     const { imageUploader, placeholder, tabindex, editorNamespace, onkeyboardSubmit } = vnode.attrs;
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
-    if (vnode.state.markdownMode === undefined
-        && contentsDoc === undefined
-        && localStorage.getItem(`${editorNamespace}-storedText`) !== null) {
-      try {
-        contentsDoc = JSON.parse(localStorage.getItem(`${editorNamespace}-storedText`));
-        if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-          vnode.state.markdownMode = true;
-        } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
-          vnode.state.markdownMode = false;
-        }
+
+    if (!contentsDoc
+      && !vnode.state.markdownMode
+      && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
+        try {
+        contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
+        vnode.state.markdownMode = false;
       } catch (e) {
-        return;
-      } // do nothing if text fails to parse
-    }
-    // Otherwise, just set vnode.state.markdownMode based on the app setting
-    if (vnode.state.markdownMode === undefined) {
-      vnode.state.markdownMode = !!(app.user?.disableRichText);
+        contentsDoc = localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        vnode.state.markdownMode = true;
+      }
+    } else if (vnode.state.markdownMode === undefined) {
+        if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+        vnode.state.markdownMode = true;
+      } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
+        vnode.state.markdownMode = false;
+      } else {
+        // Otherwise, just set vnode.state.markdownMode based on the app setting
+        vnode.state.markdownMode = !!(app.user?.disableRichText);
+      }
     }
 
     // Set vnode.state.clearUnsavedChanges on first initialization
     if (vnode.state.clearUnsavedChanges === undefined) {
       vnode.state.clearUnsavedChanges = () => {
-        localStorage.removeItem(`${editorNamespace}-storedText`);
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedText`);
+        localStorage.removeItem(`${app.activeId()}-${editorNamespace}-storedTitle`);
+        if (localStorage.getItem(`${app.activeId()}-post-type`) === 'Link') {
+          localStorage.removeItem(`${app.activeId()}-new-link-storedLink`);
+        }
+        localStorage.removeItem(`${app.activeId()}-post-type`);
       };
     }
-
     return m('.QuillEditor', {
       class: vnode.state.markdownMode ? 'markdown-mode' : 'richtext-mode',
       oncreate: (childVnode) => {
-        const $editor = $(vnode.dom).find('.quill-editor');
+        const $editor = $(childVnode.dom).find('.quill-editor');
         vnode.state.editor = instantiateEditor(
           $editor, theme, true, imageUploader, placeholder, editorNamespace,
           vnode.state, onkeyboardSubmit
         );
         // once editor is instantiated, it can be updated with a tabindex
-        $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+        $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
-          const res = vnode.state.editor.setText(contentsDoc);
+                const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
         } else if (contentsDoc && typeof contentsDoc === 'object') {
           const res = vnode.state.editor.setContents(contentsDoc);
@@ -856,20 +870,20 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           ? m(Tooltip, {
             trigger: m(Tag, {
               label: 'Markdown',
-              size: 'sm',
+              size: 'xs',
               onclick: (e) => {
                 if (!vnode.state.markdownMode) return;
                 const cachedContents = vnode.state.editor.getContents();
                 // switch editor to rich text
                 vnode.state.markdownMode = false;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);
                 vnode.state.editor.focus();
@@ -885,7 +899,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
           : m(Tooltip, {
             trigger: m(Tag, {
               label: 'Rich text',
-              size: 'sm',
+              size: 'xs',
               onclick: async (e) => {
                 if (vnode.state.markdownMode) return;
 
@@ -909,13 +923,13 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
                 vnode.state.editor.removeFormat(0, vnode.state.editor.getText().length - 1);
                 cachedContents = vnode.state.editor.getContents();
                 vnode.state.markdownMode = true;
-                const $editor = $(vnode.dom).find('.quill-editor');
+                const $editor = $(e.target).closest('.QuillEditor').find('.quill-editor');
                 vnode.state.editor = instantiateEditor(
                   $editor, theme, true, imageUploader, placeholder, editorNamespace,
                   vnode.state, onkeyboardSubmit
                 );
                 // once editor is instantiated, it can be updated with a tabindex
-                $(vnode.dom).find('.ql-editor').attr('tabindex', tabindex);
+                $(e.target).closest('.QuillEditor').find('.ql-editor').attr('tabindex', tabindex);
                 vnode.state.editor.container.tabIndex = tabindex;
                 vnode.state.editor.setContents(cachedContents);
                 vnode.state.editor.setSelection(vnode.state.editor.getText().length - 1);

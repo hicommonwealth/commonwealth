@@ -9,9 +9,9 @@ import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase } from 'models';
 import NewThreadModal from 'views/modals/new_thread_modal';
 
-const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, dark?: boolean, large?: boolean }> = {
+const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> = {
   view: (vnode) => {
-    const { fluid, threadOnly, dark, large } = vnode.attrs;
+    const { fluid, threadOnly } = vnode.attrs;
     const activeAccount = app.user.activeAccount;
 
     if (!app.isLoggedIn()) return;
@@ -21,24 +21,21 @@ const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, dar
     // just a button for communities, or chains without governance
     if (app.community || threadOnly) {
       return m(Button, {
-        class: dark ? 'NewProposalButton cui-button-dark' : 'NewProposalButton',
+        class: 'NewProposalButton',
         label: 'New thread',
         intent: 'primary',
         fluid,
         disabled: !activeAccount,
-        size: large ? 'default' : 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       });
     }
 
     const ProposalButtonGroup = m(ButtonGroup, [
       m(Button, {
-        class: dark ? 'cui-button-dark' : '',
         disabled: !activeAccount,
         intent: 'primary',
         label: 'New thread',
         fluid,
-        size: large ? 'default' : 'sm',
         onclick: () => app.modals.create({ modal: NewThreadModal }),
       }),
       m(PopoverMenu, {
@@ -46,11 +43,9 @@ const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean, dar
         transitionDuration: 0,
         hoverCloseDelay: 0,
         trigger: m(Button, {
-          class: dark ? 'cui-button-dark' : '',
           disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,
           intent: 'primary',
-          size: large ? 'default' : 'sm',
         }),
         position: 'bottom-end',
         closeOnContentClick: true,

@@ -3,7 +3,7 @@ import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import ChainEntityController, { EntityRefreshOption } from 'controllers/server/chain_entities';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainAdapter, ChainBase, ChainClass, ChainEntity, ChainEvent, NodeInfo } from 'models';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
@@ -25,25 +25,12 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public readonly webWallet: WebWalletController = new WebWalletController();
   public readonly chainEntities = new ChainEntityController();
 
-  private _loaded: boolean = false;
-  public get loaded() { return this._loaded; }
-
   public readonly base = ChainBase.Substrate;
   public readonly class: ChainClass;
 
   constructor(meta: NodeInfo, app: IApp, _class: ChainClass) {
     super(meta, app);
     this.class = _class;
-  }
-
-  // dispatches event updates to a given entity to the appropriate module
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    handleSubstrateEntityUpdate(this, entity, event);
-  }
-
-  public async init(onServerLoaded?) {
-    const useClientChainEntities = true;
-    console.log(`Starting ${this.meta.chain.id} on node: ${this.meta.url}`);
     this.chain = new SubstrateChain(this.app); // kusama chain id
     this.accounts = new SubstrateAccounts(this.app);
     this.phragmenElections = new SubstratePhragmenElections(this.app);
@@ -53,15 +40,21 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.democracy = new SubstrateDemocracy(this.app);
     this.treasury = new SubstrateTreasury(this.app);
     this.identities = new SubstrateIdentities(this.app);
+  }
 
-    await super.init(async () => {
-      await this.chain.resetApi(this.meta);
-      await this.chain.initMetadata();
-    }, onServerLoaded, useClientChainEntities
-      ? EntityRefreshOption.CompletedEntities
-      : EntityRefreshOption.AllEntities);
+  // dispatches event updates to a given entity to the appropriate module
+  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
+    handleSubstrateEntityUpdate(this, entity, event);
+  }
+
+  public async initApi() {
+    await this.chain.resetApi(this.meta);
+    await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    await super.initApi();
+  }
 
+  public async initData() {
     await Promise.all([
       this.phragmenElections.init(this.chain, this.accounts),
       this.council.init(this.chain, this.accounts),
@@ -71,18 +64,15 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
       this.treasury.init(this.chain, this.accounts),
       this.identities.init(this.chain, this.accounts),
     ]);
-    if (useClientChainEntities) {
+    if (!this.usingServerChainEntities) {
       await this.chain.initChainEntities();
     }
-    await this._postModuleLoad(!useClientChainEntities);
     await this.chain.initEventLoop();
-
-    this._loaded = true;
+    await super.initData(this.usingServerChainEntities);
   }
 
   public async deinit(): Promise<void> {
-    this._loaded = false;
-    super.deinit();
+    await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all([
       this.phragmenElections.deinit(),

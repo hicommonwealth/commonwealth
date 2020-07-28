@@ -16,7 +16,7 @@ export enum ReactionType {
 }
 
 interface IAttrs {
-  post: OffchainThread | OffchainComment<any>;
+  post: OffchainThread | AnyProposal | OffchainComment<any>;
   type: ReactionType;
   displayAsLink?: boolean;
   tooltip?: boolean;

@@ -72,6 +72,64 @@ describe('Update Community/Chain Tests', () => {
       expect(res.body.result.description).to.be.equal(description);
     });
 
+    it('should update website', async () => {
+      const website = 'http://edgewa.re';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, website, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.website).to.be.equal(website);
+    });
+
+    it('should update chat', async () => {
+      const chat = 'http://discord.gg';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, chat, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.chat).to.be.equal(chat);
+    });
+
+    it('should fail to update github without proper prefix', async () => {
+      const github = 'github.com';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, github, });
+      expect(res.body.error).to.be.equal(ChainError.InvalidGithub);
+    });
+
+    it('should fail to update telegram without proper prefix', async () => {
+      const telegram = 't.me';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, telegram, });
+      expect(res.body.error).to.be.equal(ChainError.InvalidTelegram);
+    });
+
+    it('should update telegram', async () => {
+      const telegram = 'https://t.me/';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, telegram, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.telegram).to.be.equal(telegram);
+    });
+
+    it('should update github', async () => {
+      const github = 'https://github.com/';
+      const res = await chai.request(app)
+        .post('/api/updateChain')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: chain, github, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.github).to.be.equal(github);
+    });
+
     it('should update symbol', async () => {
       const symbol = 'CWL';
       const res = await chai.request(app)
@@ -174,6 +232,64 @@ describe('Update Community/Chain Tests', () => {
         .send({ jwt: jwtToken, id: offchainCommunity.id, description, });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.description).to.be.equal(description);
+    });
+
+    it('should update website', async () => {
+      const website = 'http://edgewa.re';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, website, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.website).to.be.equal(website);
+    });
+
+    it('should update chat', async () => {
+      const chat = 'http://discord.gg';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, chat, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.chat).to.be.equal(chat);
+    });
+
+    it('should fail to update telegram without a proper prefix', async () => {
+      const telegram = 't.me';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, telegram, });
+      expect(res.body.error).to.be.equal(CommunityError.InvalidTelegram)
+    });
+
+    it('should fail to update github without a proper prefix', async () => {
+      const github = 'github.com';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, github, });
+        expect(res.body.error).to.be.equal(CommunityError.InvalidGithub)
+    });
+
+    it('should update telegram', async () => {
+      const telegram = 'https://t.me/';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, telegram, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.telegram).to.be.equal(telegram);
+    });
+
+    it('should update github', async () => {
+      const github = 'https://github.com/';
+      const res = await chai.request(app)
+        .post('/api/updateCommunity')
+        .set('Accept', 'application/json')
+        .send({ jwt: jwtToken, id: offchainCommunity.id, github, });
+      expect(res.body.status).to.be.equal('Success');
+      expect(res.body.result.github).to.be.equal(github);
     });
 
     it('should fail without a community id', async () => {

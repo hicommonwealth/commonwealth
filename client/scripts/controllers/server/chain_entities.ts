@@ -11,9 +11,9 @@ import {
   entityToFieldName,
   IStorageFetcher,
   IEventProcessor,
-  IEventSubscriber
-} from 'events/interfaces';
-import { SubstrateEventKind, SubstrateEntityKind, ISubstratePreimageNoted } from 'events/substrate/types';
+  IEventSubscriber,
+  SubstrateTypes
+} from '@commonwealth/chain-events';
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -41,11 +41,13 @@ class ChainEntityController {
   }
 
   public getPreimage(hash: string) {
-    const preimage = this.store.getByType(SubstrateEntityKind.DemocracyPreimage)
+    const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
       .find((preimageEntity) => preimageEntity.typeId === hash);
     if (preimage) {
-      const notedEvent = preimage.chainEvents.find((event) => event.data.kind === SubstrateEventKind.PreimageNoted);
-      return (notedEvent.data as ISubstratePreimageNoted).preimage;
+      const notedEvent = preimage.chainEvents.find(
+        (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
+      );
+      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
     } else {
       return null;
     }
@@ -78,8 +80,10 @@ class ChainEntityController {
 
   public deinit() {
     this.store.clear();
-    this._subscriber.unsubscribe();
-    this._subscriber = undefined;
+    if (this._subscriber) {
+      this._subscriber.unsubscribe();
+      this._subscriber = undefined;
+    }
   }
 
   // handle a single incoming chain event emitted from client connection with node

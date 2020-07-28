@@ -19,16 +19,31 @@ interface ITagEditorState {
   isOpen: boolean;
 }
 
-const TagWindow: m.Component<{ thread: OffchainThread, onChangeHandler: Function }> = {
+const TagWindow: m.Component<{
+  thread: OffchainThread,
+  onChangeHandler: Function
+}, {
+  activeTag: OffchainTag | string
+}> = {
   view: (vnode) => {
-    const { onChangeHandler } = vnode.attrs;
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
     const featuredTags = activeMeta.featuredTags.map((t) => {
       return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
+    if (!vnode.state.activeTag) {
+      vnode.state.activeTag = vnode.attrs.thread.tag;
+    }
+
+    const onChangeHandler = (tagName, tagId?) => {
+      vnode.attrs.onChangeHandler(tagName, tagId);
+      vnode.state.activeTag = tagName;
+    };
+
+    const { activeTag } = vnode.state;
+
     return m(TagSelector, {
       featuredTags,
-      activeTag: vnode.attrs.thread.tag,
+      activeTag,
       tags: app.tags.getByCommunity(app.activeId()),
       updateFormData: onChangeHandler,
     });
@@ -42,14 +57,14 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
     vnode.state.tagId = vnode.attrs.thread.tag.id;
   },
   oninit: (vnode) => {
-    vnode.state.isOpen = vnode.attrs.popoverMenu ? true : false;
+    vnode.state.isOpen = !!vnode.attrs.popoverMenu;
   },
   view: (vnode) => {
     return m('.TagEditor', [
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
-      }, 'Edit tags'),
+      }, 'Move to another tag'),
       m(Dialog, {
         basic: false,
         closeOnEscapeKey: true,
@@ -71,7 +86,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit tags',
+        title: 'Edit tag',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
@@ -85,7 +100,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             },
           }),
           m(Button, {
-            label: 'Submit',
+            label: 'Save changes',
             intent: 'primary',
             onclick: async () => {
               const { tagName, tagId } = vnode.state;

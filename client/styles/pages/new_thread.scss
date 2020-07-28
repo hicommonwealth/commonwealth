@@ -1,139 +1,136 @@
 @import 'client/styles/shared';
 
 .NewThreadPage, .NewLinkPage {
-  .ql-container.ql-snow {
-    border-radius: 0 0 4px 4px !important;
-  }
-  input[type="text"] {
-    padding: 11px 13px !important;
-    font-size: 15px;
-  }
-  .ql-editor {
-    min-height: 120px;
-    padding: 16px 16px !important;
-  }
+    .ql-container.ql-snow {
+        border-radius: 0 0 4px 4px !important;
+    }
+    input[type="text"] {
+        padding: 11px 13px !important;
+        font-size: 15px;
+    }
+    .ql-editor {
+        min-height: 120px;
+        padding: 16px 16px !important;
+    }
 
-  // duplicated from NewSignalingPage - to be generalized across all 'New X' forms
-  .new-thread-left, .new-link-left {
-    .User {
-      margin-top: 7px;
-    }
-    @include xs-max {
-      display: none;
-    }
-  }
-  .new-thread-center {
-    .actions {
-      min-width: 231px;
-      width: 231px;
-      @include xs-max {
-        min-width: auto;
-        display: flex;
-        flex-direction: column;
-      }
-      .preview-button {
-        @include xs-max {
-          margin: 12px 0 0 0 !important;
+    // duplicated from NewSignalingPage - to be generalized across all 'New X' forms
+    .new-thread-left, .new-link-left {
+        .User {
+            margin-top: 7px;
         }
-      }
+        @include xs-max {
+            display: none;
+        }
     }
-  }
-  .new-thread-center, .new-link-center {
-    .FormField .form-group {
-      margin-bottom: 12px;
+    .new-thread-center {
+        .actions {
+            min-width: 231px;
+            width: 231px;
+            @include xs-max {
+                min-width: auto;
+                display: flex;
+                flex-direction: column;
+            }
+            .preview-button {
+                @include xs-max {
+                    margin: 12px 0 0 0 !important;
+                }
+            }
+        }
     }
-    .actions {
-      .preview-button {
-        margin: 0 0 0 12px;
-      }
+    .new-thread-center, .new-link-center {
+        .FormField .form-group {
+            margin-bottom: 12px;
+        }
+        .actions {
+            .preview-button {
+                margin: 0 0 0 12px;
+            }
+        }
+        .TagSelector {
+            @include xs-max {
+                margin-left: 20px;
+            }
+        }
+        input[name="LinkURL"] {
+            padding-top: 12px !important;
+            margin-top: 8px;
+            border-bottom: 1px solid transparent;
+            border-radius: 4px 4px 0 0;
+            &:focus {
+                border-bottom: 1px solid #0089cd;
+            }
+        }
+        input[name="LinkTitle"] {
+            padding-top: 13px !important;
+            border-radius: 0 0 4px 4px;
+            margin-bottom: 15px;
+        }
+        input[name="LinkURL"]:focus + input[name="LinkTitle"] {
+            border-top: 1px solid transparent;
+        }
     }
-    .TagSelector {
-      @include xs-max {
-        margin-left: 20px;
-      }
+    .new-thread-right, .new-link-right {
+        h3 {
+            font-weight: 500;
+            font-size: 13px;
+            color: #aaa;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin: 6px 0 12px 0;
+        }
+        .signaling-options {
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 16px 18px 14px;
+            h4 {
+                margin: 0 0 8px 0;
+                font-weight: 500;
+            }
+            p {
+                margin: 0 0 6px 0;
+            }
+        }
+        @include xs-max {
+            margin-top: 16px;
+        }
     }
-    input[name="LinkURL"] {
-      padding-top: 12px !important;
-      margin-top: 8px;
-      border-bottom: 1px solid transparent;
-      border-radius: 4px 4px 0 0;
-      &:focus {
-        border-bottom: 1px solid #0089cd;
-      }
+    .row {
+        margin-bottom: 22px;
     }
-    input[name="LinkTitle"] {
-      padding-top: 13px !important;
-      border-radius: 0 0 4px 4px;
-      margin-bottom: 15px;
+    .error-message {
+        @include error-text();
+        margin-top: 18px;
     }
-    input[name="LinkURL"]:focus + input[name="LinkTitle"] {
-      border-top: 1px solid transparent;
-    }
-  }
-  .new-thread-right, .new-link-right {
-    h3 {
-      font-weight: 700;
-      font-size: 13px;
-      color: #aaa;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      margin: 6px 0 12px 0;
-    }
-    .signaling-options {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 16px 18px 14px;
-      h4 {
-        margin: 0 0 8px 0;
-        font-weight: 700;
-      }
-      p {
-        margin: 0 0 6px 0;
-      }
-    }
-    @include xs-max {
-      margin-top: 16px;
-    }
-  }
-  .row {
-    margin-bottom: 22px;
-  }
-  .error-message {
-    @include error-text();
-    margin-top: 18px;
-  }
-  .empty-profile-notification {
-    @include profile-notice(#fdf3e1, #111);
-  }
 
-  .bottom-panel {
-    display: flex;
-    margin-top: 28px;
-    .form-group, .form-field {
-      margin: 0 !important;
+    .bottom-panel {
+        display: flex;
+        margin-top: 28px;
+        .form-group, .form-field {
+            margin: 0 !important;
+        }
     }
-  }
 
-  .error-placeholder {
-    height: 39px;
-  }
+    .error-placeholder {
+        height: 39px;
+    }
 
-  // unique
-  .DropzoneTextarea {
-    .ResizableTextarea {
-      margin-bottom: 10px;
+    // unique
+    .DropzoneTextarea {
+        .ResizableTextarea {
+            margin-bottom: 10px;
+        }
+        margin-bottom: 20px;
     }
-    margin-bottom: 20px;
-  }
-  .ButtonSelectorFormField {
-    padding-bottom: 0;
-    margin-top: 18px;
-    .form-group .form-field.buttons button {
-      font-size: 14px;
-      padding: 3px 10px;
-      margin: 0 3px 4px 0;
+    .ButtonSelectorFormField {
+        padding-bottom: 0;
+        margin-top: 18px;
+        .form-group .form-field.buttons button {
+            font-size: 14px;
+            padding: 3px 10px;
+            margin: 0 3px 4px 0;
+        }
     }
-  }
 }

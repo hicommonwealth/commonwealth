@@ -3,6 +3,7 @@ $icon-text: #fff;
 
 .ChainIcon {
     img.chain-icon {
+        margin-top: 3px;
         border-radius: 9999px;
         background: $icon-background;
     }
@@ -13,6 +14,7 @@ $icon-text: #fff;
 
 .CommunityIcon {
     .community-icon {
+        margin-top: 3px;
         border-radius: 9999px;
         background: $icon-background;
         display: flex;
@@ -21,7 +23,7 @@ $icon-text: #fff;
         span {
             color: $icon-text;
             text-align: center;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 12px;
             position: relative;
             top: -1px;

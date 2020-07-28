@@ -44,7 +44,12 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           id: community.id,
           name: community.name,
           description: community.description,
+          website: community.website,
+          chat: community.chat,
+          telegram: community.telegram,
+          github: community.github,
           default_chain: app.config.chains.getById(community.default_chain),
+          visible: community.visible,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
           featuredTags: community.featured_tags,
@@ -78,6 +83,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
 export async function deinitChainOrCommunity() {
   if (app.chain) {
     app.chain.networkStatus = ApiStatus.Disconnected;
+    app.chain.deinitServer();
     await app.chain.deinit();
     app.chain = null;
   }
@@ -127,7 +133,7 @@ export async function selectCommunity(c?: CommunityInfo): Promise<void> {
 }
 
 // called by the user, when clicking on the chain/node switcher menu
-export async function selectNode(n?: NodeInfo): Promise<void> {
+export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> {
   // Select the default node, if one wasn't provided
   if (!n) {
     if (app.user.selectedNode) {
@@ -149,11 +155,10 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   }
 
   // Shut down old chain if applicable
-  const oldNode = app.chain && app.chain.meta;
   await deinitChainOrCommunity();
   setTimeout(() => m.redraw()); // redraw to show API status indicator
 
-  // Initialize modules.
+  // Import top-level chain adapter lazily, to facilitate code split.
   if (n.chain.network === ChainNetwork.Edgeware) {
     const Edgeware = (await import(
       /* webpackMode: "lazy" */
@@ -206,31 +211,16 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
   } else {
     throw new Error('Invalid chain');
   }
+  app.chain.deferred = deferred;
 
-  // Initialize the chain, providing an m.redraw() to a callback,
-  // which is called before chain initialization finishes but after
-  // the server is loaded. This allows the navbar/header to be redrawn
-  // to show progress, before all modules are loaded.
-  //
-  // NOTE: While awaiting app.chain.init() to complete, the chain may
-  // be uninitialized, but app.chain is set, so there may be subtle
-  // race conditions that appear at this point if certain modules come
-  // online before others. The solution should be to have some kind of
-  // locking in place before modules start working.
-  //
-  app.chain.init(() => m.redraw()).then(() => {
-    // Emit chain as updated
-    app.chainAdapterReady.next(true);
-    console.log(`${n.chain.network.toUpperCase()} started.`);
-    // Instantiate Account<> objects again, in case they could not be instantiated without the chain fully loaded
-    updateActiveAddresses(n.chain);
-  });
+  // Load server data without initializing modules/chain connection.
+  // Also, load basic API data immediately (connected/disconnected, etc)
+  await Promise.all([
+    app.chain.initServer(),
+    app.chain.initApi(),
+  ]);
 
-  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
-
-  // Try to instantiate Account<> objects for the new chain. However, app.chain.accounts.get() may not be able to
-  // create the Account object, so we also call this again in the callback that runs after the chain initializes
+  // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
 
   // Update default on server if logged in
@@ -241,23 +231,30 @@ export async function selectNode(n?: NodeInfo): Promise<void> {
     });
   }
 
-  // Redraw with chain fully loaded
+  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
+  handleInviteLinkRedirect();
+
+  // Redraw with not-yet-loaded chain
   m.redraw();
 }
 
-// called by the LayoutWithChain wrapper, which is triggered when the
-// user navigates to a page scoped to a particular chain
-export function initChain(chainId: string): Promise<void> {
-  if (chainId) {
-    const chainNodes = app.config.nodes.getByChain(chainId);
-    if (chainNodes && chainNodes.length > 0) {
-      return selectNode(chainNodes[0]);
-    } else {
-      throw new Error(`No nodes found for '${chainId}'`);
-    }
-  } else {
-    throw new Error(`No nodes found for '${chainId}'`);
-  }
+// Initializes a selected chain. Requires `app.chain` to be defined and valid
+// and not already initialized.
+export async function initChain(): Promise<void> {
+  if (!app.chain || !app.chain.meta || app.chain.loaded) return;
+  app.chain.deferred = false;
+  const n = app.chain.meta;
+  await app.chain.initData();
+
+  // Emit chain as updated
+  app.chainAdapterReady.next(true);
+  console.log(`${n.chain.network.toUpperCase()} started.`);
+
+  // Instantiate (again) to create chain-specific Account<> objects
+  updateActiveAddresses(n.chain);
+
+  // Finish redraw to remove loading dialog
+  m.redraw();
 }
 
 export function initCommunity(communityId: string): Promise<void> {
@@ -274,13 +271,10 @@ m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
   updateRoute.apply(this, args);
-  // wait until any redraws have happened before setting the scroll position
-  setTimeout(() => {
-    const html = document.getElementsByTagName('html')[0];
-    if (html) html.scrollTo(0, 0);
-    const body = document.getElementsByTagName('body')[0];
-    if (body) body.scrollTo(0, 0);
-  }, 0);
+  const html = document.getElementsByTagName('html')[0];
+  if (html) html.scrollTo(0, 0);
+  const body = document.getElementsByTagName('body')[0];
+  if (body) body.scrollTo(0, 0);
 };
 
 // set up ontouchmove blocker
@@ -323,10 +317,10 @@ $(() => {
 
   interface RouteAttrs {
     scoped: string | boolean;
-    wideLayout?: boolean;
+    deferChain?: boolean;
   }
 
-  const importRoute = (path, attrs: RouteAttrs) => ({
+  const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
       return import(
         /* webpackMode: "lazy" */
@@ -335,7 +329,8 @@ $(() => {
       ).then((p) => p.default);
     },
     render: (vnode) => {
-      const { scoped, wideLayout } = attrs;
+      const { scoped } = attrs;
+      let deferChain = attrs.deferChain;
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -344,7 +339,14 @@ $(() => {
           ? vnode.attrs.scope.toString()
           // false => scope is null
           : null;
-      return m(Layout, { scope, wideLayout }, [ vnode ]);
+
+      // Special case to defer chain loading specifically for viewing an offchain thread. We need
+      // a special case because OffchainThreads and on-chain proposals are all viewed through the
+      // same "/:scope/proposal/:type/:id" route.
+      if (vnode.attrs.scope && path === 'views/pages/view_proposal/index' && vnode.attrs.type === 'discussion') {
+        deferChain = true;
+      }
+      return m(Layout, { scope, deferChain }, [ vnode ]);
     },
   });
 
@@ -356,7 +358,7 @@ $(() => {
     '/discussions':              redirectRoute(`/${app.activeId() || app.config.defaultChain}/`),
 
     // Landing pages
-    '/':                         importRoute('views/pages/home', { scoped: false, wideLayout: true }),
+    '/':                         importRoute('views/pages/home', { scoped: false }),
     '/about':                    importRoute('views/pages/landing/about', { scoped: false }),
     '/terms':                    importRoute('views/pages/landing/terms', { scoped: false }),
     '/privacy':                  importRoute('views/pages/landing/privacy', { scoped: false }),
@@ -365,7 +367,7 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notification-settings':    importRoute('views/pages/notification-settings', { scoped: false }),
+    '/:scope/notification-settings': importRoute('views/pages/notification-settings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -375,21 +377,21 @@ $(() => {
     '/:scope/home':              redirectRoute((attrs) => `/${attrs.scope}/`),
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
-    '/:scope':                   importRoute('views/pages/discussions', { scoped: true }),
-    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true }),
+    '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
     '/:scope/council':           importRoute('views/pages/council', { scoped: true }),
-    '/:scope/login':             importRoute('views/pages/login', { scoped: true }),
-    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true }),
+    '/:scope/login':             importRoute('views/pages/login', { scoped: true, deferChain: true }),
+    '/:scope/new/thread':        importRoute('views/pages/new_thread', { scoped: true, deferChain: true }),
     '/:scope/new/signaling':     importRoute('views/pages/new_signaling', { scoped: true }),
     '/:scope/new/proposal/:type': importRoute('views/pages/new_proposal/index', { scoped: true }),
     '/:scope/admin':             importRoute('views/pages/admin', { scoped: true }),
     '/:scope/settings':          importRoute('views/pages/settings', { scoped: true }),
     '/:scope/web3login':         importRoute('views/pages/web3login', { scoped: true }),
 
-    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true }),
+    '/:scope/account/:address':  importRoute('views/pages/profile', { scoped: true, deferChain: true }),
     '/:scope/account':           redirectRoute((attrs) => {
       return (app.user.activeAccount)
         ? `/${attrs.scope}/account/${app.user.activeAccount.address}`

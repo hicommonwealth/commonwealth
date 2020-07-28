@@ -3,13 +3,13 @@
 .ReactionButton {
     display: flex;
     cursor: pointer;
-    color: #555;
+    color: $text-color-medium;
     user-select: none;
     // border
     border: 1px solid #ddd;
     border-radius: 5px;
     &:hover, &.active {
-        color: $theme-base-color;
+        color: $theme-accent-dark;
         border-color: $theme-base-color;
         span {
             color: inherit;
@@ -17,17 +17,18 @@
     }
     &.disabled {
         background: initial !important;
-        color: #555 !important;
-        border-color: #ddd !important;
+        color: $text-color-light !important;
+        border-color: $background-color-border !important;
     }
     .reactions-icon {
-        padding: 4px 0 3px;
-        padding-left: 9px;
+        padding: 2px 0;
+        padding-left: 8px;
+        margin-right: -3px;
     }
     .reactions-count {
-        padding: 4px 6px 3px 2px;
+        padding: 2px 4px 2px 0px;
         min-width: 26px;
-        font-weight: 600;
+        font-weight: 500;
         text-align: center;
     }
 }

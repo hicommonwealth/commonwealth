@@ -24,7 +24,7 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import TagEditor from 'views/components/tag_editor';
-import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/thread_carat_menu';
+import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import User from 'views/components/widgets/user';
@@ -38,7 +38,7 @@ import {
 } from './header';
 import {
   activeQuillEditorHasText, GlobalStatus, ProposalBodyAvatar, ProposalBodyAuthor, ProposalBodyCreated,
-  ProposalBodyLastEdited, ProposalBodyReply, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
+  ProposalBodyLastEdited, ProposalBodyEdit, ProposalBodyDelete, ProposalBodyCancelEdit,
   ProposalBodySaveEdit,  ProposalBodySpacer, ProposalBodyText, ProposalBodyAttachments, ProposalBodyEditor,
   ProposalBodyReaction, ProposalBodyEditMenuItem, ProposalBodyDeleteMenuItem, ProposalBodyReplyMenuItem
 } from './body';
@@ -109,6 +109,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
             m(ProposalHeaderOnchainStatus, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalHeaderViewCount, { viewCount }),
+            m(ProposalBodyReaction, { item: proposal }),
           ]),
           proposal instanceof OffchainThread
             && proposal.kind === OffchainThreadKind.Link
@@ -135,14 +136,14 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                m(MenuDivider),
                 canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
                   openTagEditor: () => {
                     vnode.state.tagEditorIsOpen = true;
                   }
                 }),
-                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
                 canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
+                canEdit && m(MenuDivider),
+                m(ThreadSubscriptionButton, { proposal: proposal as OffchainThread }),
               ],
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
@@ -168,8 +169,8 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
 
           vnode.state.editing
             && m('.proposal-body-button-group', [
-              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
               m(ProposalBodySaveEdit, { item: proposal, getSetGlobalEditingStatus, parentState: vnode.state }),
+              m(ProposalBodyCancelEdit, { getSetGlobalEditingStatus, parentState: vnode.state }),
             ]),
 
           !vnode.state.editing
@@ -256,13 +257,13 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 m(ProposalBodyDeleteMenuItem, { item: comment }),
-                parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
-                && m(ProposalBodyReplyMenuItem, {
-                  item: comment,
-                  getSetGlobalReplyStatus,
-                  parentType,
-                  parentState: vnode.state,
-                }),
+                // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
+                // && m(ProposalBodyReplyMenuItem, {
+                //   item: comment,
+                //   getSetGlobalReplyStatus,
+                //   parentType,
+                //   parentState: vnode.state,
+                // }),
               ],
               transitionDuration: 0,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN })
@@ -402,7 +403,8 @@ const ProposalComments: m.Component<IProposalCommentsAttrs, IProposalCommentsSta
     };
 
     return m('.ProposalComments', {
-      oncreate: (vnode2) => { vnode.state.dom = vnode2.dom; },
+      class: app.user.activeAccount ? '' : 'no-active-account',
+      oncreate: (vvnode) => { vnode.state.dom = vvnode.dom; },
     }, [
       // show comments
       comments

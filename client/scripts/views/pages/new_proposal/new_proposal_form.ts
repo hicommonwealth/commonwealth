@@ -342,11 +342,6 @@ const NewProposalForm = {
                 vnode.state.form.tagName = tagName;
                 vnode.state.form.tagId = tagId;
               },
-              updateParentErrors: (err: string) => {
-                if (err) vnode.state.error = err;
-                else delete vnode.state.error;
-                m.redraw();
-              },
               tabindex: 3,
             }),
           hasTitleAndDescription && [
@@ -380,8 +375,8 @@ const NewProposalForm = {
               options: {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
-                oncreate: (vnode2) => {
-                  $(vnode2.dom).val(author.address);
+                oncreate: (vvnode) => {
+                  $(vvnode.dom).val(author.address);
                   vnode.state.form.beneficiary = author.address;
                 }
               },

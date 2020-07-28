@@ -5,14 +5,15 @@ import 'components/sidebar/index.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import _, { capitalize } from 'lodash';
+import { Button, Icons, Select, List, ListItem, Tooltip, Checkbox, Table, SelectList, Popover } from 'construct-ui';
 
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import { SubstrateEventKinds } from 'events/substrate/types';
-import SubstrateTitlerFunc from 'events/substrate/filters/titler';
-import { IChainEventKind, EventSupportingChains, TitlerFilter } from 'events/interfaces';
-import { Button, Icons, Select, List, ListItem, Checkbox, Table, SelectList, Popover } from 'construct-ui';
+import {
+  SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
+} from '@commonwealth/chain-events';
+
 import Sublayout from 'views/sublayout';
 import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
 
@@ -249,7 +250,7 @@ interface IEventSubscriptionState {
 const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionState> = {
   oninit: (vnode) => {
     vnode.state.chain = vnode.attrs.chain.id;
-    vnode.state.eventKinds = SubstrateEventKinds;
+    vnode.state.eventKinds = SubstrateTypes.EventKinds;
     vnode.state.allSupportedChains = EventSupportingChains.sort();
     vnode.state.isSubscribedAll = false;
     vnode.state.isEmailAll = false;
@@ -257,8 +258,8 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}, IEventSubscriptionStat
   view: (vnode) => {
     let titler;
     if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
-      titler = SubstrateTitlerFunc;
-      vnode.state.eventKinds = SubstrateEventKinds;
+      titler = SubstrateEvents.Title;
+      vnode.state.eventKinds = SubstrateTypes.EventKinds;
     } else {
       titler = null;
       vnode.state.eventKinds = [];
@@ -729,15 +730,15 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
-      leftSidebar: m(SubscriptionsPageSideBar, {
-        selectedFilter,
-        communities,
-        chains,
-        onChangeHandler: (v) => {
-          vnode.state.selectedFilter = v;
-          m.redraw();
-        },
-      }),
+      // leftSidebar: m(SubscriptionsPageSideBar, {
+      //   selectedFilter,
+      //   communities,
+      //   chains,
+      //   onChangeHandler: (v) => {
+      //     vnode.state.selectedFilter = v;
+      //     m.redraw();
+      //   },
+      // }),
     }, [
       m('.forum-container', [
         (selectedFilter === 'community-notifications')

@@ -14,7 +14,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
 
-import ThreadCaratMenu from './thread_carat_menu';
+import DiscussionRowMenu from './discussion_row_menu';
 
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -55,7 +55,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       + `${slugify(proposal.title)}`;
 
     return m('.DiscussionRow', { key: proposal.identifier }, [
-      m('.discussion-row', [
+      link('a.discussion-row', discussionLink, [
         m('.discussion-top', [
           m('.discussion-top-left', [
             m('.discussion-title', [
@@ -69,7 +69,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             ]),
             m('.discussion-meta', [
               proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-                m('span.proposal-tag-icon', { style: `background: ${tagColor}` }),
+                m('span.proposal-tag-icon'),
                 m('span.proposal-tag-name', `${proposal.tag.name}`),
               ]),
               (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
@@ -79,15 +79,22 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
                 user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
                 linkify: true,
                 tooltip: true,
-                showRole: true,
                 hideAvatar: true,
               }),
-              m(ThreadCaratMenu, { proposal }),
             ]),
           ]),
           m('.discussion-top-right', [
+            proposal.readOnly && m('.discussion-locked', [
+              m(Tag, {
+                size: 'xs',
+                label: [
+                  m(Icon, { name: Icons.LOCK, size: 'xs' }),
+                  ' Locked'
+                ],
+              }),
+            ]),
             m('.discussion-commenters', [
-              m('.commenters-avatars', app.comments.uniqueCommenters(proposal)
+              m('.commenters-avatars', app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
                 .map(([chain, address]) => {
                   return m(User, {
                     user: new AddressInfo(null, address, chain, null),
@@ -102,6 +109,9 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
               class: lastUpdated.isBefore(moment().subtract(365, 'days')) ? 'older' : '',
             }, [
               link('a', discussionLink, formatLastUpdated(lastUpdated)),
+            ]),
+            app.isLoggedIn() && m('.discussion-row-menu', [
+              m(DiscussionRowMenu, { proposal }),
             ]),
           ]),
         ]),

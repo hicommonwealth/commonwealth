@@ -2,7 +2,7 @@
 
 @mixin small-gray {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
     color: #999;
     letter-spacing: 0.2px;
@@ -28,12 +28,12 @@
         margin-left: 4px;
     }
     .compact-modal-title h3 .User a.user-display-name {
-        color: #fff;
-        font-weight: 700;
+        color: $background-color-white;
+        font-weight: 500;
         margin-right: 10px;
     }
     h4 {
-        font-weight: 700;
+        font-weight: 500;
         font-size: 18px;
         margin: 40px 0 8px;
     }
@@ -53,7 +53,7 @@
     .well {
         margin: 12px 0;
         padding: 18px 24px;
-        background: #f8f8f8;
+        background: $background-color-white-hover;
         &.not-available {
             color: #999;
         }
@@ -102,7 +102,7 @@
         font-size: 15px;
     }
     .val-name {
-        font-weight: 700;
+        font-weight: 500;
     }
     .val-action {
         text-align: right;

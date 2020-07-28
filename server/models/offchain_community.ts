@@ -12,7 +12,12 @@ export interface OffchainCommunityAttributes {
   creator_id: number;
   default_chain: string;
   description?: string;
+  website?: string;
+  chat?: string;
+  telegram?: string;
+  github?: string;
   featured_tags?: string[];
+  visible: boolean;
   privacyEnabled?: boolean;
   invitesEnabled?: boolean;
   created_at?: Date;
@@ -46,7 +51,12 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       creator_id: { type: dataTypes.INTEGER, allowNull: false },
       default_chain: { type: dataTypes.STRING, allowNull: false },
+      visible: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       description: { type: dataTypes.TEXT, allowNull: true },
+      website: { type: dataTypes.STRING, allowNull: true },
+      chat: { type: dataTypes.STRING, allowNull: true },
+      telegram: { type: dataTypes.STRING, allowNull: true },
+      github: { type: dataTypes.STRING, allowNull: true },
       featured_tags: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
       // auth_forum: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       // auth_condition: { type: DataTypes.STRING, allowNull: true, defaultValue: null }, // For Auth Forum Checking

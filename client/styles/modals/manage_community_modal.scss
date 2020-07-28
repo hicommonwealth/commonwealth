@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .ManageCommunityModal {
     width: 800px;
     .compact-modal-body-max {
@@ -23,7 +25,7 @@
     }
     .cui-tabs {
         margin-top: 2px;
-        border-bottom-color: #eee;
+        border-bottom-color: $background-color-light;
         > :first-child {
             margin-left: 15px;
         }
@@ -34,7 +36,7 @@
 
     .panel-left {
         width: 100%;
-        border-right: 1px solid #eee;
+        border-right: 1px solid $background-color-light;
         min-height: 450px;
         max-height: 600px;
         overflow-y: scroll;
@@ -65,10 +67,10 @@
             padding: 11px 20px;
         }
         .cui-button {
-            margin: 16px 28px;
+            margin: 16px 28px 26px;
         }
         .cui-tabs {
-            margin-top: 4px;
+            margin-top: 0;
         }
     }
 
