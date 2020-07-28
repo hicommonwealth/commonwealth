@@ -267,15 +267,26 @@ const SettingsModule: m.Component<{}> = {
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER }),
           label: 'Settings',
-          onclick: (e) => m.route.set('/settings'),
-          active: m.route.get() === '/settings',
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/settings`
+              : '/settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/settings`
+            : m.route.get() === '/settings',
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+          contentLeft: m(Icon, { name: Icons.USER }),
           label: 'Notifications',
-          disabled: !app.activeId(),
-          onclick: (e) => m.route.set(`/${app.activeId()}/notification-settings`),
-          active: app.activeId() && m.route.get() === `/${app.activeId()}/notification-settings`,
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/notification-settings`
+              : '/notification-settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/notification-settings`
+            : m.route.get() === '/notification-settings',
         }),
       ]),
     ]);
