@@ -1,7 +1,7 @@
 import 'pages/home/community_cards.scss';
 
 import m from 'mithril';
-import { Button, Icons } from 'construct-ui';
+import { Button, Icon, Icons, Card } from 'construct-ui';
 
 import app from 'state';
 import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
@@ -14,7 +14,10 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
     const visitedChain = !!app.user.unseenPosts[chain];
     const updatedThreads = app.user.unseenPosts[chain]?.activePosts || 0;
 
-    return m('.home-card', [
+    return m(Card, {
+      elevation: 1,
+      class: 'home-card',
+    }, [
       m(ChainIcon, { chain: nodeList[0].chain }),
       m('h3', chainInfo.name),
       app.user.isMember({ account: app.user.activeAccount, chain: chain as string, }) && justJoinedChains.indexOf(chain) === -1 && [
@@ -25,10 +28,10 @@ const ChainCard : m.Component<{ chain, nodeList, justJoinedChains }> = {
       m(Button, {
         interactive: true,
         compact: true,
-        size: 'sm',
+        fluid: true,
         intent: 'primary',
         onclick: (e) => m.route.set(`/${chain}`),
-        label: m.trust('Go to community &rarr;')
+        label: [ 'Go to community ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
       }),
       // app.isLoggedIn() && m('.chain-membership', [
       //   m(MembershipButton, {
@@ -48,7 +51,10 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
     const visitedCommunity = !!app.user.unseenPosts[community.id];
     const updatedThreads = app.user.unseenPosts[community.id]?.activePosts || 0;
 
-    return m('.home-card', [
+    return m(Card, {
+      elevation: 1,
+      class: 'home-card',
+    }, [
       m(CommunityIcon, { community }),
       m('h3', [
         community.name,
@@ -62,10 +68,10 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
       m(Button, {
         interactive: true,
         compact: true,
-        size: 'sm',
+        fluid: true,
         intent: 'primary',
         onclick: (e) => m.route.set(`/${community.id}`),
-        label: m.trust('Go to community &rarr;'),
+        label: [ 'Go to community ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
       }),
       // app.isLoggedIn() && [
       //   m(MembershipButton, {
@@ -81,24 +87,31 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
 
 const LockdropToolsCard = {
   view: (vnode) => {
-    return m('.LockdropToolsCard.home-card', [
+    return m(Card, {
+      elevation: 1,
+      class: 'home-card LockdropToolsCard',
+    }, [
       m('h3', 'Edgeware Lockdrop Tools'),
-      m(Button, {
-        interactive: true,
-        compact: true,
-        size: 'sm',
-        intent: 'primary',
-        onclick: (e) => m.route.set('/edgeware/stats'),
-        label: m.trust('Lockdrop stats &rarr;'),
-      }),
-      m(Button, {
-        interactive: true,
-        compact: true,
-        size: 'sm',
-        intent: 'primary',
-        onclick: (e) => m.route.set('/edgeware/unlock'),
-        label: m.trust('Unlock tool &rarr;'),
-      }),
+      m('p', [
+        m(Button, {
+          interactive: true,
+          compact: true,
+          fluid: true,
+          intent: 'primary',
+          onclick: (e) => m.route.set('/edgeware/stats'),
+          label: [ 'Lockdrop stats ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+        }),
+      ]),
+      m('p', [
+        m(Button, {
+          interactive: true,
+          compact: true,
+          fluid: true,
+          intent: 'primary',
+          onclick: (e) => m.route.set('/edgeware/unlock'),
+          label: [ 'Unlock ETH ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+        }),
+      ]),
     ]);
   }
 };
@@ -129,22 +142,26 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
       otherChains = Object.entries(chains);
       otherCommunities = app.config.communities.getAll();
     } else {
-      myChains = Object.entries(chains)
-        .filter(([c, nodeList]) => app.user.isMember({ account: app.user.activeAccount, chain: c }) && vnode.state.justJoinedChains.indexOf(c) === -1);
-
-      myCommunities = app.config.communities.getAll()
-        .filter((c) => app.user.isMember({ account: app.user.activeAccount, community: c.id }) && vnode.state.justJoinedCommunities.indexOf(c.id) === -1);
-
-      otherChains = Object.entries(chains)
-        .filter(([c, nodeList]) => !app.user.isMember({ account: app.user.activeAccount, chain: c }) || vnode.state.justJoinedChains.indexOf(c) !== -1);
-
-      otherCommunities = app.config.communities.getAll()
-        .filter((c) => c.visible)
-        .filter((c) => !app.user.isMember({ account: app.user.activeAccount, community: c.id }) || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
+      myChains = Object.entries(chains).filter(([c, nodeList]) => {
+        return app.user.isMember({ account: app.user.activeAccount, chain: c })
+          && vnode.state.justJoinedChains.indexOf(c) === -1;
+      });
+      myCommunities = app.config.communities.getAll().filter((c) => {
+        return app.user.isMember({ account: app.user.activeAccount, community: c.id })
+          && vnode.state.justJoinedCommunities.indexOf(c.id) === -1;
+      });
+      otherChains = Object.entries(chains).filter(([c, nodeList]) => {
+        return !app.user.isMember({ account: app.user.activeAccount, chain: c })
+          || vnode.state.justJoinedChains.indexOf(c) !== -1;
+      });
+      otherCommunities = app.config.communities.getAll().filter((c) => {
+        return c.visible && (
+          !app.user.isMember({ account: app.user.activeAccount, community: c.id })
+            || vnode.state.justJoinedCommunities.indexOf(c.id) !== -1);
+      });
     }
 
     return m('.HomepageCommunityCards', [
-      m('h2', 'Find a public community'),
       m('.communities-list', [
         myChains.map(([chain, nodeList] : [string, any]) => m(ChainCard, { chain, nodeList, justJoinedChains })),
         myCommunities.map((community) => m(CommunityCard, { community, justJoinedCommunities })),

@@ -7,7 +7,7 @@ import $ from 'jquery';
 import Quill from 'quill-2.0-dev/quill';
 import {
   Tabs, TabItem, Form, FormGroup, Input, Button,
-  ButtonGroup, Icon, Icons, Grid, Col, Tooltip, List, ListItem
+  ButtonGroup, Icon, Icons, Grid, Col, Tooltip, List, ListItem, Tag, MenuItem, Card
 } from 'construct-ui';
 
 import app from 'state';
@@ -373,7 +373,12 @@ export const NewThreadForm: m.Component<{
         //
         newType === PostType.Discussion && m(Form, [
           fromDraft && m(FormGroup, { span: 2, class: 'draft-badge-wrap' }, [
-            m('.draft-badge', 'Draft')
+            m(Tag, {
+              class: 'draft-badge',
+              size: 'xs',
+              rounded: true,
+              label: 'Draft',
+            })
           ]),
           m(FormGroup, { span: fromDraft ? 7 : 8 }, [
             m(Input, {
@@ -513,8 +518,18 @@ export const NewThreadForm: m.Component<{
           }
           return m(ListItem, {
             allowOnContentClick: true,
-            contentLeft: [
-              m('.discussion-draft-title', draft.title || 'Untitled'),
+            selected: fromDraft === draft.id,
+            onclick: (e) => {
+              const parent = $(e.target).closest('.NewThreadForm');
+              loadDraft(parent, vnode.state, draft);
+            },
+            contentRight: [
+              fromDraft === draft.id
+                ? m('.discussion-draft-title-wrap', [
+                  m(Icon, { name: Icons.EDIT }),
+                  m('.discussion-draft-title', draft.title || 'Untitled'),
+                ])
+                : m('.discussion-draft-title', draft.title || 'Untitled'),
               m('.discussion-draft-body', draft.body.length
                 ? bodyComponent
                 : ''),
@@ -535,11 +550,6 @@ export const NewThreadForm: m.Component<{
                 }, 'Delete')
               ]),
             ],
-            onclick: (e) => {
-              const parent = $(e.target).closest('.NewThreadForm');
-              loadDraft(parent, vnode.state, draft);
-            },
-            selected: vnode.state.fromDraft === draft.id
           });
         })),
         // m(Button, {
