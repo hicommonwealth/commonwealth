@@ -91,6 +91,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 };
 
 const getBatchNotificationFields = (category, data: IPostNotificationData, length) => {
+  console.log(data);
   if (length === 1) {
     return getNotificationFields(category, data);
   }
@@ -140,7 +141,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
-    authors: [author_address, author_chain],
+    author: [author_address, author_chain],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -220,7 +221,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         ? JSON.parse(notification.data)
         : notification.data;
       const {
-        authors,
+        author,
         createdAt,
         notificationHeader,
         notificationBody,
@@ -237,14 +238,14 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
-        authors.length === 1
+        author.length === 1
           ? m(User, {
-            user: new AddressInfo(null, (authors[0] as [string, string])[0], (authors[0] as [string, string])[1], null),
+            user: new AddressInfo(null, (author as [string, string])[0], (author as [string, string])[1], null),
             avatarOnly: true,
             avatarSize: 36
           })
           : m(UserGallery, {
-            users: authors.map((auth) => new AddressInfo(null, auth[0], auth[1], null)),
+            users: author.map((auth) => new AddressInfo(null, auth[0], auth[1], null)),
             avatarSize: 36,
           }),
         m('.comment-body', [
