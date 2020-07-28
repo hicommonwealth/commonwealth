@@ -629,8 +629,6 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     const scope = vnode.attrs.communities.find((c) => c.id === m.route.param('scope'))
       || vnode.attrs.chains.find((c) => c.id === m.route.param('scope'))
       || null;
-    console.dir(m.route.param('scope'));
-    console.dir(scope);
     vnode.state.selectedCommunityId = (scope) ? scope.name : 'All communities';
     vnode.state.selectedCommunity = scope || null;
   },
