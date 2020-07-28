@@ -619,8 +619,6 @@ interface ICommunityNotificationsState {
 
 const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommunityNotificationsState> = {
   oninit: (vnode) => {
-    vnode.state.selectedCommunity = null;
-    vnode.state.selectedCommunityId = 'All communities';
     vnode.state.communityIds = ['All communities'];
     vnode.attrs.communities.forEach((c) => vnode.state.communityIds.push(c.name));
     const roleChains = app.user.roles.map((r) => r.chain_id);
@@ -628,6 +626,13 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
       if (roleChains.includes(c.id)) vnode.state.communityIds.push(c.name);
     });
     vnode.state.communityIds.sort();
+    const scope = vnode.attrs.communities.find((c) => c.id === m.route.param('scope'))
+      || vnode.attrs.chains.find((c) => c.id === m.route.param('scope'))
+      || null;
+    console.dir(m.route.param('scope'));
+    console.dir(scope);
+    vnode.state.selectedCommunityId = (scope) ? scope.name : 'All communities';
+    vnode.state.selectedCommunity = scope || null;
   },
   view: (vnode) => {
     const { subscriptions, communities, chains } = vnode.attrs;
@@ -696,7 +701,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()
     );
-    vnode.state.selectedFilter = 'chain-notifications';
+    vnode.state.selectedFilter = 'community-notifications';
     vnode.state.subscriptions = [];
     vnode.state.communities = [];
   },
@@ -725,7 +730,6 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
     const chainIds = chains.map((c) => c.id);
     const communityIds = communities.map((c) => c.id);
-
     if (!app.loginStatusLoaded()) return;
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
