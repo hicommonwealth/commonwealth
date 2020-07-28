@@ -397,50 +397,6 @@ interface ISubscriptionSideBarListItemAttrs {
   onChangeHandler: Function;
 }
 
-const SubscriptionSideBarListItem: m.Component<ISubscriptionSideBarListItemAttrs> = {
-  view: (vnode) => {
-    const { id, selectedFilter, onChangeHandler, label } = vnode.attrs;
-    return m(ListItem, {
-      active: selectedFilter === id,
-      label,
-      onclick: () => { onChangeHandler(id); },
-    });
-  },
-};
-
-interface ISubscriptionsPageSideBarAttrs {
-  chains: ChainInfo[];
-  communities: CommunityInfo[];
-  selectedFilter: string;
-  onChangeHandler: Function;
-}
-
-export const SubscriptionsPageSideBar: m.Component<ISubscriptionsPageSideBarAttrs> = {
-  view: (vnode) => {
-    const { selectedFilter, onChangeHandler, chains, communities } = vnode.attrs;
-    return m('.Sidebar', {
-      class: `${app.isLoggedIn() ? 'logged-in' : 'logged-out'} `
-        + `${(app.community || app.chain) ? 'active-community' : 'no-active-community'}`,
-    }, [
-      m(List, { interactive: true, }, [
-        m('h4', 'Notification Settings'),
-        m(SubscriptionSideBarListItem, {
-          label: 'Community Notifications',
-          id: 'community-notifications',
-          selectedFilter,
-          onChangeHandler,
-        }),
-        m(SubscriptionSideBarListItem, {
-          label: 'Chain Notifications',
-          id: 'chain-notifications',
-          selectedFilter,
-          onChangeHandler,
-        })
-      ])
-    ]);
-  },
-};
-
 const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], community: CommunityInfo | ChainInfo }> = {
   view: (vnode) => {
     const { subscriptions, community } = vnode.attrs;
@@ -732,15 +688,6 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
-      // leftSidebar: m(SubscriptionsPageSideBar, {
-      //   selectedFilter,
-      //   communities,
-      //   chains,
-      //   onChangeHandler: (v) => {
-      //     vnode.state.selectedFilter = v;
-      //     m.redraw();
-      //   },
-      // }),
     }, [
       m('.forum-container', [
         (selectedFilter === 'community-notifications')
