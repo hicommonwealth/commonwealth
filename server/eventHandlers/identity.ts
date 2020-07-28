@@ -44,7 +44,7 @@ export default class extends IEventHandler {
         required: true,
       }]
     });
-    if (!profile) return;
+    if (!profile) return dbEvent;
 
     // update profile data depending on event
     if (event.data.kind === SubstrateTypes.EventKind.IdentitySet) {
@@ -52,6 +52,13 @@ export default class extends IEventHandler {
       profile.judgements = _.object<{ [name: string]: SubstrateTypes.IdentityJudgement }>(event.data.judgements);
       await profile.save();
     } else if (event.data.kind === SubstrateTypes.EventKind.JudgementGiven) {
+      // if we don't have an identity saved yet for a judgement, do nothing
+      // TODO: we can augment the judgement event to include all event data, but seems
+      //   unnecessary if we keep the migrations up to date
+      if (!profile.identity) {
+        log.warn('No corresponding identity found for judgement! Needs identity-migration?');
+        return dbEvent;
+      }
       const judgements = profile.judgements;
       judgements[event.data.registrar] = event.data.judgement;
       await profile.save();
