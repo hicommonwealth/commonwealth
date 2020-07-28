@@ -15,6 +15,7 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import UserGallery from './widgets/user_gallery';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -139,7 +140,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
-    author: [author_address, author_chain],
+    authors: [author_address, author_chain],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -219,7 +220,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         ? JSON.parse(notification.data)
         : notification.data;
       const {
-        author,
+        authors,
         createdAt,
         notificationHeader,
         notificationBody,
@@ -236,11 +237,16 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
-        m(User, {
-          user: new AddressInfo(null, (author as [string, string])[0], (author as [string, string])[1], null),
-          avatarOnly: true,
-          avatarSize: 36
-        }),
+        authors.length === 1
+          ? m(User, {
+            user: new AddressInfo(null, (authors[0] as [string, string])[0], (authors[0] as [string, string])[1], null),
+            avatarOnly: true,
+            avatarSize: 36
+          })
+          : m(UserGallery, {
+            users: authors.map((auth) => new AddressInfo(null, auth[0], auth[1], null)),
+            avatarSize: 36,
+          }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),
           notificationBody
