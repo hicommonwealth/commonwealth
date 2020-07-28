@@ -636,6 +636,39 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
   }
 };
 
+const ChainEventOrCommunitySelector: m.Component<{selectedFilter: string, setFilter: Function, }> = {
+  view: (vnode) => {
+    const options = ['Community Notifications', 'Chain Event Notifications'];
+    return m(SelectList, {
+      class: 'ChainCommunitySelector',
+      filterable: false,
+      checkmark: false,
+      emptyContent: null,
+      inputAttrs: {
+        class: 'ChainCommunitySelector',
+      },
+      itemRender: (option: string) => {
+        return m(ListItem, {
+          label: option,
+          selected: (option === vnode.attrs.selectedFilter),
+        });
+      },
+      items: options,
+      trigger: m(Button, {
+        align: 'left',
+        compact: true,
+        iconRight: Icons.CHEVRON_DOWN,
+        label: vnode.attrs.selectedFilter,
+      }),
+      onSelect: (option: string) => {
+        // vnode.state.selectedFilter = option;
+        vnode.attrs.setFilter(option);
+        m.redraw();
+      }
+    });
+  }
+}
+
 interface INotificationSettingsState {
   selectedFilter: string;
   chains: ChainInfo[];
@@ -677,38 +710,15 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     const { selectedFilter, chains, communities, subscriptions } = vnode.state;
     const chainIds = chains.map((c) => c.id);
     const communityIds = communities.map((c) => c.id);
-    const options = ['Community Notifications', 'Chain Event Notifications'];
     if (!app.loginStatusLoaded()) return;
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
       class: 'SubscriptionsPage',
     }, [
       m('.forum-container', [
-        m(SelectList, {
-          class: 'ChainCommunitySelector',
-          filterable: false,
-          checkmark: false,
-          emptyContent: null,
-          inputAttrs: {
-            class: 'ChainCommunitySelector',
-          },
-          itemRender: (option: string) => {
-            return m(ListItem, {
-              label: option,
-              selected: (option === vnode.state.selectedFilter),
-            });
-          },
-          items: options,
-          trigger: m(Button, {
-            align: 'left',
-            compact: true,
-            iconRight: Icons.CHEVRON_DOWN,
-            label: vnode.state.selectedFilter,
-          }),
-          onSelect: (option: string) => {
-            vnode.state.selectedFilter = option;
-            m.redraw();
-          }
+        m(ChainEventOrCommunitySelector, {
+          selectedFilter: vnode.state.selectedFilter,
+          setFilter: (filter) => { vnode.state.selectedFilter = filter; m.redraw(); }, 
         }),
         (selectedFilter === 'Community Notifications')
           && m(CommunityNotifications, { subscriptions, communities, chains, }),
