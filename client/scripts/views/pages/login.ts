@@ -1,6 +1,7 @@
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import app from 'state';
+
 import Login from 'views/components/login';
 import Sublayout from 'views/sublayout';
 

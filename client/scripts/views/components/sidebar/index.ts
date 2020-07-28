@@ -285,7 +285,7 @@ const Sidebar: m.Component<{}> = {
   view: (vnode) => {
     return m('.Sidebar', [
       m('.SidebarHeader', m(CommunitySelector)),
-      m(NavigationModule),
+      (app.chain || app.community) && m(NavigationModule),
       (app.chain || app.community) && m(TagsModule),
       app.isLoggedIn() && m(SettingsModule),
       (app.chain || app.community) && m(CommunityInfoModule),

@@ -134,25 +134,26 @@ const CommunitySelector = {
                 ]),
               })
               : item instanceof CommunityInfo
-              ? m(ListItem, {
-                class: app.communities.isStarred(null, item.id) ? 'starred' : '',
-                label: m(CommunityLabel, { community: item }),
-                selected: app.activeCommunityId() === item.id,
-                contentRight: app.isLoggedIn() && app.user.isMember({
-                  account: app.user.activeAccount,
-                  community: item.id
-                }) && m('.community-star-toggle', {
-                  onclick: (e) => {
-                    app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
-                  },
-                }, [
-                  m(Icon, { name: Icons.STAR }),
-                ]),
-              })
-              : m(ListItem, {
-                class: 'select-list-back-home',
-                label: 'Back to home',
-              });
+                ? m(ListItem, {
+                  class: app.communities.isStarred(null, item.id) ? 'starred' : '',
+                  label: m(CommunityLabel, { community: item }),
+                  selected: app.activeCommunityId() === item.id,
+                  contentRight: app.isLoggedIn() && app.user.isMember({
+                    account: app.user.activeAccount,
+                    community: item.id
+                  }) && m('.community-star-toggle', {
+                    onclick: (e) => {
+                      app.communities.setStarred(null, item.id, !app.communities.isStarred(null, item.id));
+                    },
+                  }, [
+                    m(Icon, { name: Icons.STAR }),
+                  ]),
+                })
+                : m.route.get() !== '/'
+                  ? m(ListItem, {
+                    class: 'select-list-back-home',
+                    label: 'Back to home',
+                  }) : m('div');
           },
           onSelect: (item: any) => {
             m.route.set(item.id ? `/${item.id}` : '/');
