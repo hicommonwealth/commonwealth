@@ -277,7 +277,7 @@ const SettingsModule: m.Component<{}> = {
             : m.route.get() === '/settings',
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.USER }),
+          contentLeft: m(Icon, { name: Icons.VOLUME_2 }),
           label: 'Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
