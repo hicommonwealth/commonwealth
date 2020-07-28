@@ -15,8 +15,10 @@ const UserGallery: m.Component<{
 }, {}> = {
   view: (vnode) => {
     const { users, avatarSize, tooltip } = vnode.attrs;
-    return m('.UserGallery', { class: vnode.attrs.class },
-      (users as any).map((user) => {
+    const userCount = users.length;
+    const displayedUsers = (users as any)
+      .slice(0, Math.max(userCount, 10))
+      .map((user) => {
         const { address, chain } = user;
         return m(User, {
           user: new AddressInfo(null, address, chain, null),
@@ -24,8 +26,13 @@ const UserGallery: m.Component<{
           tooltip,
           avatarSize,
         });
-      })
-    );
+      });
+    const remainingUsers = userCount < 10 ? 0 : userCount - 10;
+    return m('.UserGallery', { class: vnode.attrs.class }, [
+      displayedUsers,
+      remainingUsers
+      && m(`and ${remainingUsers} others`)
+    ]);
   }
 };
 
