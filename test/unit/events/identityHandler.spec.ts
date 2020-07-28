@@ -3,6 +3,7 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import jwtLib from 'jsonwebtoken';
 
 import { CWEvent, SubstrateTypes } from '@commonwealth/chain-events';
 
@@ -10,6 +11,7 @@ import * as modelUtils from '../../util/modelUtils';
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import IdentityHandler from '../../../server/eventHandlers/identity';
+import { JWT_SECRET } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -17,19 +19,21 @@ const { assert } = chai;
 describe('Identity Migration Handler Tests', () => {
   let address_id;
   let address;
+  let jwt;
 
   beforeEach('reset database', async () => {
     await resetDatabase();
     let res = await modelUtils.createAndVerifyAddress({ chain: 'edgeware' });
     address_id = res.address_id;
     address = res.address;
+    jwt = jwtLib.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
 
     const data = {
       bio: 'test bio',
       headline: 'test headline',
       name: 'test name',
     };
-    res = await modelUtils.updateProfile({ chain: 'edgeware', address, data: JSON.stringify(data), });
+    res = await modelUtils.updateProfile({ chain: 'edgeware', address, data: JSON.stringify(data), jwt });
   });
 
   it('should add identity to existing offchain profile', async () => {
@@ -49,15 +53,45 @@ describe('Identity Migration Handler Tests', () => {
     const handler = new IdentityHandler(models, 'edgeware');
     await handler.handle(event, null);
     const profile = await models['OffchainProfile'].findOne();
-    assert.equal(profile.address_id, address_id);
     assert.equal(profile.identity, 'alice');
-    assert.equal(profile.judgements, {
+    assert.deepEqual(profile.judgements, {
       'bob': SubstrateTypes.IdentityJudgement.KnownGood,
       'charlie': SubstrateTypes.IdentityJudgement.LowQuality
     });
   });
 
-  it('should add judgement to existing offchain profile', async () => {
+  it('should add first judgement to existing offchain profile', async () => {
+    const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
+      blockNumber: 10,
+      data: {
+        kind: SubstrateTypes.EventKind.IdentitySet,
+        who: address,
+        displayName: 'alice',
+        judgements: [],
+      }
+    };
+    const judgementEvent: CWEvent<SubstrateTypes.IJudgementGiven> = {
+      blockNumber: 10,
+      data: {
+        kind: SubstrateTypes.EventKind.JudgementGiven,
+        who: address,
+        registrar: 'dave',
+        judgement: SubstrateTypes.IdentityJudgement.Reasonable,
+      }
+    };
+
+    const handler = new IdentityHandler(models, 'edgeware');
+    await handler.handle(setEvent, null);
+    await handler.handle(judgementEvent, null);
+    const profile = await models['OffchainProfile'].findOne();
+    assert.equal(profile.address_id, address_id);
+    assert.equal(profile.identity, 'alice');
+    assert.deepEqual(profile.judgements, {
+      'dave': SubstrateTypes.IdentityJudgement.Reasonable,
+    });
+  });
+
+  it('should add more judgements to existing offchain profile', async () => {
     const setEvent: CWEvent<SubstrateTypes.IIdentitySet> = {
       blockNumber: 10,
       data: {
@@ -82,11 +116,18 @@ describe('Identity Migration Handler Tests', () => {
 
     const handler = new IdentityHandler(models, 'edgeware');
     await handler.handle(setEvent, null);
+    const preJudgementProfile = await models['OffchainProfile'].findOne();
+    assert.equal(preJudgementProfile.identity, 'alice');
+    assert.deepEqual(preJudgementProfile.judgements, {
+      'bob': SubstrateTypes.IdentityJudgement.KnownGood,
+      'charlie': SubstrateTypes.IdentityJudgement.LowQuality
+    });
+
     await handler.handle(judgementEvent, null);
     const profile = await models['OffchainProfile'].findOne();
     assert.equal(profile.address_id, address_id);
     assert.equal(profile.identity, 'alice');
-    assert.equal(profile.judgements, {
+    assert.deepEqual(profile.judgements, {
       'bob': SubstrateTypes.IdentityJudgement.KnownGood,
       'charlie': SubstrateTypes.IdentityJudgement.LowQuality,
       'dave': SubstrateTypes.IdentityJudgement.Reasonable,

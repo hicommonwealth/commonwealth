@@ -35,7 +35,7 @@ export default (
 ): OffchainReactionModel => {
   const OffchainReaction = sequelize.define<OffchainReactionInstance, OffchainReactionAttributes>('OffchainReaction', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    chain: { type: dataTypes.INTEGER, allowNull: true },
+    chain: { type: dataTypes.STRING, allowNull: true },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     proposal_id: { type: dataTypes.STRING, allowNull: true },
     comment_id: { type: dataTypes.INTEGER, allowNull: true },

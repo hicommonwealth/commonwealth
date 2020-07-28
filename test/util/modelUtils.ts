@@ -63,11 +63,11 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   throw new Error('invalid chain');
 };
 
-export const updateProfile = async ({ chain, address, data }) => {
+export const updateProfile = async ({ chain, address, data, jwt }) => {
   const res = await chai.request.agent(app)
     .post('/api/updateProfile')
     .set('Accept', 'application/json')
-    .send({ address, chain, data });
+    .send({ address, chain, data, jwt });
   return res.body;
 };
 

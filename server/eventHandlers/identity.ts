@@ -59,8 +59,12 @@ export default class extends IEventHandler {
         log.warn('No corresponding identity found for judgement! Needs identity-migration?');
         return dbEvent;
       }
-      const judgements = profile.judgements;
-      judgements[event.data.registrar] = event.data.judgement;
+      if (!profile.judgements) {
+        profile.set({ 'judgements': { [event.data.registrar]: event.data.judgement } });
+      } else {
+        const fieldName = `judgements.${event.data.registrar}`;
+        profile.set({ [fieldName]: event.data.judgement });
+      }
       await profile.save();
     } else {
       profile.identity = null;
