@@ -10,7 +10,7 @@
 
     // background
     background: $background-color-light-hover;
-    padding: 18px 18px 8px;
+    padding: 16px 18px 18px;
     border-radius: 4px;
     line-height: 1.2;
     font-size: 0.94rem;
@@ -30,7 +30,7 @@
         margin-bottom: 8px;
     }
     .community-description {
-        margin-bottom: 14px;
+        margin-bottom: 16px;
     }
     .community-info {
         display: flex;
@@ -53,5 +53,8 @@
                 min-height: 14px;
             }
         }
+    }
+    .cui-button:last-child {
+        margin-top: 6px;
     }
 }

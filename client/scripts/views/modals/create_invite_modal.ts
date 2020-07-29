@@ -3,34 +3,86 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
+import { Button, Input, CustomSelect } from 'construct-ui';
 
 import app from 'state';
-import CreateInviteLink from 'views/components/create_invite_link';
 
 import { CommunityInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { DropdownFormField } from 'views/components/forms';
 
-interface ICreateInviteModalAttrs {
-  communityInfo: CommunityInfo;
-}
+const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, { link: string }> = {
+  oninit: (vnode) => {
+    vnode.state.link = '';
+  },
+  view: (vnode) => {
+    return m('.CreateInviteLink', [
+      m('h4', 'Option 3: Create invite link'),
+      m('form.invite-link-parameters', [
+        m('label', { for: 'uses', }, 'Number of uses:'),
+        m('select', { name: 'uses' }, [
+          m('option', { value: 'none', }, 'Unlimited'),
+          m('option', { value: 1, }, 'Once'),
+          // m('option', { value: 2, }, 'Twice'),
+        ]),
+        m('label', { for: 'time', }, 'Expires after:'),
+        m('select', { name: 'time' }, [
+          m('option', { value: 'none', }, 'None'),
+          m('option', { value: '24h', }, '24 hours'),
+          m('option', { value: '48h', }, '48 hours'),
+          m('option', { value: '1w', }, '1 week'),
+          m('option', { value: '30d', }, '30 days'),
+        ]),
+        m(Button, {
+          type: 'submit',
+          intent: 'primary',
+          onclick: (e) => {
+            e.preventDefault();
+            const $form = $(e.target).closest('form');
+            const time = $form.find('[name="time"] option:selected').val();
+            const uses = $form.find('[name="uses"] option:selected').val();
+            // TODO: Change to POST /inviteLink
+            $.post(`${app.serverUrl()}/createInviteLink`, {
+              community_id: app.activeCommunityId(),
+              time,
+              uses,
+              jwt: app.user.jwt,
+            }).then((response) => {
+              const linkInfo = response.result;
+              const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+              if (vnode.attrs.onChangeHandler) vnode.attrs.onChangeHandler(linkInfo);
+              vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${linkInfo.id}`;
+              m.redraw();
+            });
+          },
+          label: 'Get invite link'
+        }),
+        m(Input, {
+          class: 'invite-link-pastebin',
+          disabled: true,
+          value: `${vnode.state.link}`,
+        }),
+      ]),
+    ]);
+  }
+};
 
-interface ICreateInviteModalState {
+const CreateInviteModal: m.Component<{
+  communityInfo: CommunityInfo;
+}, {
   success: boolean;
   failure: boolean;
   disabled: boolean;
   error: string;
   selectedChain: string;
-}
-
-const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModalState> = {
+}> = {
   oncreate: (vnode) => {
     mixpanel.track('New Invite', {
       'Step No': 1,
       'Step': 'Modal Opened'
     });
   },
-  view: (vnode: m.VnodeDOM<ICreateInviteModalAttrs, ICreateInviteModalState>) => {
+  view: (vnode) => {
     const { communityInfo } = vnode.attrs;
     const { name, id, privacyEnabled, invitesEnabled, defaultChain } = communityInfo;
 
@@ -41,14 +93,17 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
     }));
 
     const getInviteButton = (selection) => {
-      return m('button.create-invite-button', {
-        class: vnode.state.disabled ? 'disabled' : '',
+      return m(Button, {
+        class: 'create-invite-button',
+        intent: 'primary',
+        loading: vnode.state.disabled,
         type: 'submit',
-        label: selection,
+        label: selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add',
         onclick: (e) => {
           e.preventDefault();
-          const address = $(vnode.dom).find('[name="address"]').val();
-          const emailAddress = $(vnode.dom).find('[name="emailAddress"]').val();
+          const $form = $(e.target).closest('form');
+          const address = $form.find('[name="address"]').val();
+          const emailAddress = $form.find('[name="emailAddress"]').val();
 
           if (selection !== 'address' && selection !== 'email') return;
           if (selection === 'address' && (address === '' || address === null)) return;
@@ -98,60 +153,57 @@ const CreateInviteModal: m.Component<ICreateInviteModalAttrs, ICreateInviteModal
             m.redraw();
           });
         }
-      }, selection === 'address' ? 'Add member' : selection === 'email' ? 'Invite email' : 'Add');
+      });
     };
 
     return m('.CreateInviteModal', [
-      m('h3', 'Invite members'),
-      m(CompactModalExitButton),
-      m('form.login-option', [
-        m('p.selected-community', [
-          m('.community-name', [
-            name,
-            privacyEnabled && m('span.icon-lock'),
+      m('.compact-modal-title', [
+        m('h3', 'Invite members'),
+        m(CompactModalExitButton),
+      ]),
+      m('.compact-modal-body', [
+        m('form.login-option', [
+          m('form', [
+            m('h4', 'Option 1: Add member by address'),
+            m(DropdownFormField, {
+              name: 'invitedAddressChain',
+              choices: chains,
+              oncreate: (vvnode) => {
+                const result = $(vvnode.dom).find('select').val().toString();
+                vnode.state.selectedChain = result;
+                m.redraw();
+              },
+              callback: (result) => {
+                vnode.state.selectedChain = result;
+                m.redraw();
+              },
+            }),
+            m(Input, {
+              name: 'address',
+              autocomplete: 'off',
+              placeholder: 'Address',
+              oncreate: (vvnode) => {
+                $(vvnode.dom).focus();
+              }
+            }),
+            getInviteButton('address'),
           ]),
-          m('.community-url', `commonwealth.im/${id}`),
-        ]),
-        m('form', [
-          m('h4', 'Option 1: Add member by address'),
-          m(DropdownFormField, {
-            name: 'invitedAddressChain',
-            choices: chains,
-            oncreate: (vvnode) => {
-              const result = $(vvnode.dom).find('select').val().toString();
-              vnode.state.selectedChain = result;
-              m.redraw();
-            },
-            callback: (result) => {
-              vnode.state.selectedChain = result;
-              m.redraw();
-            },
-          }),
-          m('input[type="text"]', {
-            name: 'address',
-            autocomplete: 'off',
-            placeholder: 'Address',
-            oncreate: (vvnode) => {
-              $(vvnode.dom).focus();
-            }
-          }),
-          getInviteButton('address'),
-        ]),
-        m('form', [
-          m('h4', 'Option 2: Invite member by email'),
-          m('input[type="text"]', {
-            name: 'emailAddress',
-            autocomplete: 'off',
-            placeholder: 'satoshi@protonmail.com',
-          }),
-          getInviteButton('email'),
-        ]),
-        m(CreateInviteLink),
-        vnode.state.success && m('.success-message', [
-          'Success! Your invite was sent',
-        ]),
-        vnode.state.failure && m('.error-message', [
-          vnode.state.error || 'An error occurred',
+          m('form', [
+            m('h4', 'Option 2: Invite member by email'),
+            m(Input, {
+              name: 'emailAddress',
+              autocomplete: 'off',
+              placeholder: 'satoshi@protonmail.com',
+            }),
+            getInviteButton('email'),
+          ]),
+          m(CreateInviteLink),
+          vnode.state.success && m('.success-message', [
+            'Success! Your invite was sent',
+          ]),
+          vnode.state.failure && m('.error-message', [
+            vnode.state.error || 'An error occurred',
+          ]),
         ]),
       ]),
     ]);

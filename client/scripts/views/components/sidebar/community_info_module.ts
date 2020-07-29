@@ -3,8 +3,9 @@ import 'components/sidebar/community_info_module.scss';
 import m from 'mithril';
 
 import app from 'state';
-import { List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
+import { Button, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag } from 'construct-ui';
 
+import CreateInviteModal from 'views/modals/create_invite_modal';
 import ManageCommunityModal from 'views/modals/manage_community_modal';
 
 const removeUrlPrefix = (url) => {
@@ -34,21 +35,6 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
 
       m('.community-name', name),
       m('.community-description', description),
-      isAdmin && m(PopoverMenu, {
-        class: 'community-config-menu',
-        position: 'bottom',
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        closeOnContentClick: true,
-        trigger: m(Icon, { class: 'community-config', name: Icons.CHEVRON_DOWN }),
-        content: m(MenuItem, {
-          label: 'Edit community',
-          onclick: (e) => {
-            e.preventDefault();
-            app.modals.create({ modal: ManageCommunityModal });
-          }
-        }),
-      }),
       website && m('.community-info', [
         m(Icon, { name: Icons.GLOBE }),
         m('a.community-info-text', {
@@ -77,6 +63,37 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
           href: github
         }, removeUrlPrefix(github)),
       ]),
+      isAdmin && m(Button, {
+        intent: 'primary',
+        size: 'sm',
+        fluid: true,
+        label: 'Manage community',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({ modal: ManageCommunityModal });
+        }
+      }),
+      // TODO: get this working for chains
+      !app.chain
+        && app.community
+        && app.user?.activeAccount
+        && (app.community.meta.invitesEnabled
+            || app.user.isAdminOrModOfEntity({ community: app.activeCommunityId() }))
+        && m(Button, {
+          intent: 'primary',
+          size: 'sm',
+          fluid: true,
+          label: 'Invite members',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: CreateInviteModal,
+              data: {
+                communityInfo: app.community.meta,
+              },
+            });
+          },
+        }),
     ]);
   }
 };
