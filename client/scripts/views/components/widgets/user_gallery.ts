@@ -1,5 +1,5 @@
 /* eslint-disable no-script-url */
-import 'components/widgets/user.scss';
+import 'components/widgets/user_gallery.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
@@ -27,11 +27,16 @@ const UserGallery: m.Component<{
           avatarSize,
         });
       });
-    const remainingUsers = userCount < 10 ? 0 : userCount - 10;
+    const overflowUsers = userCount < 10 ? 0 : userCount - 10;
+    if (overflowUsers) displayedUsers.push(
+      m('.overflow-users-wrap', {
+        style: `width: ${avatarSize}px; height: ${avatarSize}px;`
+      }, [
+        m('.overflow-users', `+${overflowUsers}`)
+      ])
+    );
     return m('.UserGallery', { class: vnode.attrs.class }, [
       displayedUsers,
-      remainingUsers
-      && m(`and ${remainingUsers} others`)
     ]);
   }
 };

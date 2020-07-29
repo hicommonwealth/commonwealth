@@ -97,7 +97,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             m('.discussion-commenters', [
               m(UserGallery, {
                 avatarSize: 24,
-                class: '.commenter-avatars',
+                class: 'commenters-avatars',
                 users: app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
               }),
             ]),
