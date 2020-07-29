@@ -2,6 +2,7 @@ import $ from 'jquery';
 import BN from 'bn.js';
 import m from 'mithril';
 import app from 'state';
+import { ITXModalData } from 'models';
 import { makeDynamicComponent } from 'models/mithril';
 import Bond from 'views/pages/manage_staking/substrate/bond';
 import Nominate from 'views/pages/manage_staking/substrate/nominate';
@@ -10,7 +11,6 @@ import { SiDef } from '@polkadot/util/types';
 import { getValuesFromBn } from 'views/pages/manage_staking/substrate/validate_amount';
 import Substrate from 'controllers/chain/substrate/main';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { ITXModalData } from 'models';
 
 const MAX_STEP = 2;
 const MIN_STEP = 1;
@@ -18,10 +18,14 @@ const MIN_STEP = 1;
 function openTXModal(txFunc: ITXModalData) {
   try {
     createTXModal(txFunc)
+      .then((modalData: ITXModalData) => {
+        return (app.chain as Substrate).app.chainEvents.createChainStake({
+          author: modalData.author.address
+        });
+      })
       .then((res) => {
-        console.log('------------------ response');
+        console.log('res create in db');
         console.log(res);
-        m.redraw();
       })
       .catch((e) => {
         m.redraw();

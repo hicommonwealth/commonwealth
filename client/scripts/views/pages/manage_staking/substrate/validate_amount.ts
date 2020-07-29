@@ -27,8 +27,6 @@ function getSiPowers(si: SiDef | null): [BN, number, number] {
     return [BN_ZERO, 0, 0];
   }
 
-  formatBalance.setDefaults({ decimals: 18 });
-
   const basePower = formatBalance.getDefaults().decimals;
 
   return [new BN(basePower + si.power), basePower, si.power];

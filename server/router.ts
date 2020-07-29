@@ -32,6 +32,8 @@ import viewReactions from './routes/viewReactions';
 import bulkReactions from './routes/bulkReactions';
 import starCommunity from './routes/starCommunity';
 import createCommunity from './routes/createCommunity';
+import createChainStake from './routes/createChainStake';
+import getChainStake from './routes/getChainStake';
 import deleteCommunity from './routes/deleteCommunity';
 import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
@@ -288,7 +290,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -325,6 +327,12 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+  // chain_stake
+  router.post('/createChainStake', passport.authenticate('jwt', { session: false }),
+    createChainStake.bind(this, models));
+  router.get('/getChainStake', passport.authenticate('jwt', { session: false }),
+    getChainStake.bind(this, models));
 
   app.use('/api', router);
 }

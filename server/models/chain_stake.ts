@@ -4,8 +4,7 @@ export interface ChainStakeAttributes {
   id: number;
   author: string;
   chain: string;
-  chain_base: string;
-  chain_class: string;
+  user_id: number;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -23,8 +22,7 @@ export default (
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     author: { type: dataTypes.STRING, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: false },
-    chain_base: { type: dataTypes.STRING, allowNull: false },
-    chain_class: { type: dataTypes.STRING, allowNull: false },
+    user_id: { type: dataTypes.INTEGER, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false, defaultValue: Sequelize.NOW },
     updated_at: { type: dataTypes.DATE, allowNull: false, defaultValue: Sequelize.NOW },
   }, {
@@ -36,6 +34,7 @@ export default (
 
   ChainStake.associate = (models) => {
     models.ChainStake.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ChainStake.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
   };
 
   return ChainStake;
