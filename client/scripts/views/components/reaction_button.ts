@@ -63,7 +63,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
-        if (app.loginState !== LoginState.LoggedIn) {
+        if (!app.isLoggedIn()) {
           app.modals.create({
             modal: LoginModal
           });
