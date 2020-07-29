@@ -28,8 +28,9 @@ describe('Moloch Event Subscriber Tests', () => {
       assert.deepEqual(event, receivedEvent);
       done();
     };
-    subscriber.subscribe(cb);
-    molochApi.emit('*', event);
+    subscriber.subscribe(cb).then(() => {
+      molochApi.emit('*', event);
+    })
   });
 
   it('should no-op on unnecessary unsubscribe', (done) => {
@@ -45,9 +46,10 @@ describe('Moloch Event Subscriber Tests', () => {
     const cb = (receivedEvent: RawEvent) => {
       assert.fail('should not reach callback');
     };
-    subscriber.subscribe(cb);
-    subscriber.unsubscribe();
-    assert.deepEqual(molochApi.listeners('*'), []);
-    done();
+    subscriber.subscribe(cb).then(() => {
+      subscriber.unsubscribe();
+      assert.deepEqual(molochApi.listeners('*'), []);
+      done();
+    })
   });
 });

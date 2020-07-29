@@ -162,7 +162,7 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
 
   try {
     log.info(`Subscribing to ${chain} endpoint...`);
-    subscriber.subscribe(processBlockFn);
+    await subscriber.subscribe(processBlockFn);
 
     // handle reconnects with poller
     api.on('connected', pollMissedBlocksFn);

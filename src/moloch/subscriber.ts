@@ -20,7 +20,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   /**
    * Initializes subscription to chain and starts emitting events.
    */
-  public subscribe(cb: (event: RawEvent) => any) {
+  public async subscribe(cb: (event: RawEvent) => any): Promise<void> {
     this._listener = (event: RawEvent) => {
       const logStr = `Received ${this._name} event: ${JSON.stringify(event, null, 2)}.`;
       this._verbose ? log.info(logStr) : log.trace(logStr);
@@ -29,7 +29,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     this._api.addListener('*', this._listener);
   }
 
-  public unsubscribe() {
+  public unsubscribe(): void {
     if (this._listener) {
       this._api.removeListener('*', this._listener);
       this._listener = null;

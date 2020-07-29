@@ -50,7 +50,7 @@ export abstract class IEventSubscriber<Api, RawEvent> {
   ) { }
 
   // throws on error
-  public abstract subscribe(cb: (event: RawEvent) => any): void;
+  public abstract subscribe(cb: (event: RawEvent) => any): Promise<void>;
 
   public abstract unsubscribe(): void;
 }
