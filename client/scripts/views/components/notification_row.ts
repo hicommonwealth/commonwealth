@@ -1,5 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
+import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 
@@ -95,11 +96,13 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
     return getNotificationFields(category, data[0]);
   }
 
-  const length = data.length - 1;
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
     parent_comment_text, chain_id, community_id, author_address, author_chain } = data[0];
 
-  const authorInfo = data.map((d) => [d.author_address, d.author_chain]);
+  const authorInfo = _.uniq(data.map((d) => `${d.author_address}#${d.author_chain}`))
+    .map((u) => u.split('#'));
+  const length = authorInfo.length - 1;
+  debugger
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
