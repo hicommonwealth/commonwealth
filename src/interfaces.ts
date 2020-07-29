@@ -49,6 +49,8 @@ export abstract class IEventSubscriber<Api, RawEvent> {
     protected _verbose = false,
   ) { }
 
+  public get api(): Api { return this._api; }
+
   // throws on error
   public abstract subscribe(cb: (event: RawEvent) => any): Promise<void>;
 
