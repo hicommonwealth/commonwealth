@@ -102,7 +102,6 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   const authorInfo = _.uniq(data.map((d) => `${d.author_address}#${d.author_chain}`))
     .map((u) => u.split('#'));
   const length = authorInfo.length - 1;
-  debugger
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
