@@ -21,7 +21,6 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import ChainOrCommunityRoles from './roles';
 import TagCaratMenu from './tag_carat_menu';
 
 const DiscussionRowHeader = {
