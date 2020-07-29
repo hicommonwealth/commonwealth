@@ -1,4 +1,3 @@
-"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -53,13 +52,11 @@ UNION ALL
 ) t`);
 
       const update = (associations) => {
-        return associations.map((obj) =>
-          Object.assign(obj, {
-            active: true,
-            created_at: new Date(),
-            updated_at: new Date(),
-          })
-        );
+        return associations.map((obj) => Object.assign(obj, {
+          active: true,
+          created_at: new Date(),
+          updated_at: new Date(),
+        }));
       };
       const a1 = update(userChainAssociations[0]);
       const a2 = update(userPublicCommunityAssociations[0]);
@@ -69,29 +66,29 @@ UNION ALL
         !a1.length
           ? Promise.resolve()
           : queryInterface.bulkInsert(
-              "Memberships",
-              update(userChainAssociations[0]),
-              { transaction: t }
-            ),
+            'Memberships',
+            update(userChainAssociations[0]),
+            { transaction: t }
+          ),
         !a2.length
           ? Promise.resolve()
           : queryInterface.bulkInsert(
-              "Memberships",
-              update(userPublicCommunityAssociations[0]),
-              { transaction: t }
-            ),
+            'Memberships',
+            update(userPublicCommunityAssociations[0]),
+            { transaction: t }
+          ),
         !a3.length
           ? Promise.resolve()
           : queryInterface.bulkInsert(
-              "Memberships",
-              update(userPrivateCommunityAssociations[0]),
-              { transaction: t }
-            ),
+            'Memberships',
+            update(userPrivateCommunityAssociations[0]),
+            { transaction: t }
+          ),
       ]);
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete("Memberships");
+    return queryInterface.bulkDelete('Memberships');
   },
 };

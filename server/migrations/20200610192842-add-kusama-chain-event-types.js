@@ -47,23 +47,24 @@ const SubstrateEventKinds = {
 module.exports = {
   up: (queryInterface, Sequelize) => {
     // add chain_event and chain_event_type tables
-    return queryInterface.sequelize.transaction(async (t) => {
-      const buildObject = (event_name, chain) => ({
-        id: `${chain}-${event_name}`,
-        chain,
-        event_name,
-      });
-      const kusamaObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kusama'));
+    // return queryInterface.sequelize.transaction(async (t) => {
+    //   const buildObject = (event_name, chain) => ({
+    //     id: `${chain}-${event_name}`,
+    //     chain,
+    //     event_name,
+    //   });
+    //   const kusamaObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kusama'));
 
-      // TODO: somehow switch this on for testing purposes?
-      return queryInterface.bulkInsert(
-        'ChainEventTypes',
-        [
-          ...kusamaObjs,
-        ],
-        { transaction: t }
-      );
-    });
+    //   // TODO: somehow switch this on for testing purposes?
+    //   return queryInterface.bulkInsert(
+    //     'ChainEventTypes',
+    //     [
+    //       ...kusamaObjs,
+    //     ],
+    //     { transaction: t }
+    //   );
+    // });
+    return Promise.resolve();
   },
 
   down: (queryInterface, Sequelize) => {
