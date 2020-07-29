@@ -3,11 +3,14 @@
 .CreateInviteModal {
     form {
         margin: 0;
-        margin-bottom: 30px;
+        max-width: 560px;
         h4 {
             margin-top: 0;
             margin-bottom: 16px;
         }
+    }
+    form + form {
+        margin-top: 40px;
     }
     .error-message {
         margin: 10px 0;
