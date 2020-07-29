@@ -15,11 +15,13 @@ const UserGallery: m.Component<{
 }, {}> = {
   view: (vnode) => {
     const { users, avatarSize, tooltip } = vnode.attrs;
-    const userCount = users.length;
-    const displayedUsers = (users as any)
-      .slice(0, Math.max(userCount, 10))
-      .map((user) => {
-        const { address, chain } = user;
+    debugger
+    const uniqUsers = _.uniq((users as any[]).map((u) => `${u.address}#${u.chain}`))
+      .map((u) => u.split('#'));
+    const userCount = uniqUsers.length;
+    const displayedUsers = (uniqUsers as any)
+      .slice(0, Math.min(userCount, 10))
+      .map(([address, chain]) => {
         return m(User, {
           user: new AddressInfo(null, address, chain, null),
           avatarOnly: true,
