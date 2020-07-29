@@ -514,11 +514,19 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.NewThread
         && s.category !== NotificationCategories.NewMention
         && s.category !== NotificationCategories.ChainEvent
+        && !s.OffchainComment
     );
+    const onComments = subscriptions.filter((s) => 
+      (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
+        && s.OffchainComment);
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
-    console.dir(batchedSubscriptions)
+    if (filteredSubscriptions.length < 1 && onComments.length < 1) return; 
     return [
       m(NewThreadRow, { community, subscriptions }),
+      onComments && m(BatchedSubscriptionRow, {
+        label: 'Notifications on Comments',
+        subscriptions: onComments,
+      }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
       batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, { subscriptions, key: subscriptions[0].id });
