@@ -116,6 +116,28 @@ const LockdropToolsCard = {
   }
 };
 
+const NewCommunityCard = {
+  view: (vnode) => {
+    return m(Card, {
+      elevation: 1,
+      class: 'home-card NewCommunityCard',
+    }, [
+      m('h3', 'Integrating with Commonwealth'),
+      m('p', [
+        m(Button, {
+          interactive: true,
+          compact: true,
+          fluid: true,
+          intent: 'primary',
+          href: 'https://typeform.com/',
+          target: '_blank',
+          label: [ 'Get more info ', m(Icon, { name: Icons.ARROW_RIGHT }) ],
+        }),
+      ]),
+    ]);
+  }
+};
+
 const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedCommunities }> = {
   oninit: (vnode) => {
     vnode.state.justJoinedChains = [];
@@ -170,6 +192,7 @@ const HomepageCommunityCards: m.Component<{}, { justJoinedChains, justJoinedComm
       ]),
       // other
       m(LockdropToolsCard),
+      m(NewCommunityCard),
       m('.clear'),
     ]);
   }

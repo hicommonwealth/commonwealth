@@ -74,7 +74,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       }
       resolve();
     }).catch((err: any) => {
-      app.loadingError = err.responseJSON.error;
+      app.loadingError = err.responseJSON?.error || 'Error loading application state';
       reject(err);
     });
   });
