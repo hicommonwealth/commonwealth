@@ -21,7 +21,6 @@ import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import CreateCommunityModal from 'views/modals/create_community_modal';
 import PageLoading from 'views/pages/loading';
-import CreateInviteLink from 'views/components/create_invite_link';
 
 interface IChainManagerAttrs {
   success?: string;
@@ -503,11 +502,6 @@ const GenericInviteLinks: m.Component<{}, {newlinks}> = {
   },
   view: (vnode) => {
     return m('.GenericInviteLinks', [
-      m(CreateInviteLink, {
-        onChangeHandler: (result) => {
-          vnode.state.newlinks.push(result);
-        },
-      }),
       m(InviteLinkTable, {
         links: vnode.state.newlinks,
       }),

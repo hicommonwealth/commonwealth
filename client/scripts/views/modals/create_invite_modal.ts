@@ -3,14 +3,69 @@ import 'modals/create_invite_modal.scss';
 import m from 'mithril';
 import $ from 'jquery';
 import mixpanel from 'mixpanel-browser';
-import { Button } from 'construct-ui';
+import { Button, Input, CustomSelect } from 'construct-ui';
 
 import app from 'state';
-import CreateInviteLink from 'views/components/create_invite_link';
 
 import { CommunityInfo } from 'models';
 import { CompactModalExitButton } from 'views/modal';
 import { DropdownFormField } from 'views/components/forms';
+
+const CreateInviteLink: m.Component<{ onChangeHandler?: Function }, { link: string }> = {
+  oninit: (vnode) => {
+    vnode.state.link = '';
+  },
+  view: (vnode) => {
+    return m('.CreateInviteLink', [
+      m('h4', 'Option 3: Create invite link'),
+      m('form.invite-link-parameters', [
+        m('label', { for: 'uses', }, 'Number of uses:'),
+        m('select', { name: 'uses' }, [
+          m('option', { value: 'none', }, 'Unlimited'),
+          m('option', { value: 1, }, 'Once'),
+          // m('option', { value: 2, }, 'Twice'),
+        ]),
+        m('label', { for: 'time', }, 'Expires after:'),
+        m('select', { name: 'time' }, [
+          m('option', { value: 'none', }, 'None'),
+          m('option', { value: '24h', }, '24 hours'),
+          m('option', { value: '48h', }, '48 hours'),
+          m('option', { value: '1w', }, '1 week'),
+          m('option', { value: '30d', }, '30 days'),
+        ]),
+        m(Button, {
+          type: 'submit',
+          intent: 'primary',
+          onclick: (e) => {
+            e.preventDefault();
+            const $form = $(e.target).closest('form');
+            const time = $form.find('[name="time"] option:selected').val();
+            const uses = $form.find('[name="uses"] option:selected').val();
+            // TODO: Change to POST /inviteLink
+            $.post(`${app.serverUrl()}/createInviteLink`, {
+              community_id: app.activeCommunityId(),
+              time,
+              uses,
+              jwt: app.user.jwt,
+            }).then((response) => {
+              const linkInfo = response.result;
+              const url = (app.isProduction) ? 'commonwealth.im' : 'localhost:8080';
+              if (vnode.attrs.onChangeHandler) vnode.attrs.onChangeHandler(linkInfo);
+              vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${linkInfo.id}`;
+              m.redraw();
+            });
+          },
+          label: 'Get invite link'
+        }),
+        m(Input, {
+          class: 'invite-link-pastebin',
+          disabled: true,
+          value: `${vnode.state.link}`,
+        }),
+      ]),
+    ]);
+  }
+};
 
 const CreateInviteModal: m.Component<{
   communityInfo: CommunityInfo;
@@ -123,7 +178,7 @@ const CreateInviteModal: m.Component<{
                 m.redraw();
               },
             }),
-            m('input[type="text"]', {
+            m(Input, {
               name: 'address',
               autocomplete: 'off',
               placeholder: 'Address',
@@ -135,7 +190,7 @@ const CreateInviteModal: m.Component<{
           ]),
           m('form', [
             m('h4', 'Option 2: Invite member by email'),
-            m('input[type="text"]', {
+            m(Input, {
               name: 'emailAddress',
               autocomplete: 'off',
               placeholder: 'satoshi@protonmail.com',
