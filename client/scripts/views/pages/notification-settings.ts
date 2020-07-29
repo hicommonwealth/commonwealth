@@ -14,25 +14,46 @@ import {
 
 import Sublayout from 'views/sublayout';
 import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
+import { sortSubscriptions } from 'helpers/notifications';
 
-const ImmediateEmailCheckbox: m.Component<{subscription: NotificationSubscription}> = {
+const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscription, subscriptions?: NotificationSubscription[]}> = {
   view: (vnode) => {
-    const { subscription } = vnode.attrs;
-    return m('td', [
-      m(Checkbox, {
-        disabled: !subscription.isActive,
-        checked: subscription.immediateEmail && subscription.isActive,
-        size: 'lg',
-        onchange: async () => {
-          if (subscription.immediateEmail) {
-            await app.user.notifications.disableImmediateEmails([subscription]);
-          } else {
-            await app.user.notifications.enableImmediateEmails([subscription]);
-          }
-          m.redraw();
-        },
-      })
-    ]);
+    const { subscription, subscriptions } = vnode.attrs;
+    if (subscription) {
+      return m('td', [
+        m(Checkbox, {
+          disabled: !subscription.isActive,
+          checked: subscription.immediateEmail && subscription.isActive,
+          size: 'lg',
+          onchange: async () => {
+            if (subscription.immediateEmail) {
+              await app.user.notifications.disableImmediateEmails([subscription]);
+            } else {
+              await app.user.notifications.enableImmediateEmails([subscription]);
+            }
+            m.redraw();
+          },
+        })
+      ]);
+    } else if (subscriptions) {
+      return m('td', [
+        m(Checkbox, {
+          disabled: !subscriptions[0].isActive,
+          checked: subscriptions[0].immediateEmail && subscriptions[0].isActive,
+          size: 'lg',
+          onchange: async () => {
+            if (subscriptions[0].immediateEmail) {
+              await app.user.notifications.disableImmediateEmails(subscriptions);
+            } else {
+              await app.user.notifications.enableImmediateEmails(subscriptions);
+            }
+            m.redraw();
+          },
+        }),
+      ])
+    } else {
+      return;
+    }
   },
 };
 
@@ -67,8 +88,8 @@ const labelMaker = (subscription: NotificationSubscription) => {
             e.preventDefault();
             m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
           }
-        }, `New Comment on '${String(threadOrComment)}'`)
-        : `New Comment on '${String(threadOrComment)}'`;
+        }, `New Comments on '${String(threadOrComment)}'`)
+        : `New Comments on '${String(threadOrComment)}'`;
     }
     case (NotificationCategories.NewReaction): {
       const threadOrComment = subscription.OffchainThread
@@ -76,7 +97,15 @@ const labelMaker = (subscription: NotificationSubscription) => {
         : subscription.OffchainComment
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
-      return `New Reaction on '${String(threadOrComment)}'`;
+      return subscription.OffchainThread
+      ? m('a',{
+        href: '#',
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
+        }
+      },`New Reactions on '${String(threadOrComment)}'`)
+      : `New Reactions on '${String(threadOrComment)}'`;
     }
     default:
       break;
@@ -113,6 +142,80 @@ const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState>
       ]),
       subscription && app.user.email
         && m(ImmediateEmailCheckbox, { subscription, }),
+    ]);
+  }
+};
+
+interface IBatchedSubscriptionRowAttrs {
+  subscriptions: NotificationSubscription[];
+  label?: string;
+  bold?: boolean;
+}
+
+interface IBatchedSubscriptionRowState {
+  subscriptions: NotificationSubscription[];
+  paused: boolean;
+}
+
+const batchLabel = (subscriptions: NotificationSubscription[]) => {
+  const chainOrCommunityId = subscriptions[0].Chain
+    ? subscriptions[0].Chain.id
+    : subscriptions[0].OffchainCommunity
+      ? subscriptions[0].OffchainCommunity.id
+      : null;
+
+  const threadOrComment = subscriptions[0].OffchainThread
+  ? decodeURIComponent(subscriptions[0].OffchainThread.title)
+  : subscriptions[0].OffchainComment
+    ? decodeURIComponent(subscriptions[0].OffchainComment.id)
+    : subscriptions[0].objectId;
+  
+  return subscriptions[0].OffchainThread
+  ? m('a',{
+    href: '#',
+    onclick: (e) => {
+      e.preventDefault();
+      m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
+    }
+  }, `New Comments & Reactions on '${String(threadOrComment)}'`)
+  : `New Comments & Reactions on 'Comment ${String(threadOrComment)}'`;
+}
+
+
+const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatchedSubscriptionRowState> = {
+  oninit: (vnode) => {
+    vnode.state.subscriptions = vnode.attrs.subscriptions;
+  },
+  view: (vnode) => {
+    const { label, bold } = vnode.attrs;
+    const { subscriptions } = vnode.state;
+    return m('tr.SubscriptionRow', [
+      m('td', {
+        class: bold ? 'bold' : null,
+      }, [
+        (label) ? label
+          : (subscriptions?.length > 1) 
+            ? batchLabel(subscriptions)
+            : labelMaker(subscriptions[0]),
+      ]),
+      m('td', [
+        m(Checkbox, {
+          checked: subscriptions[0].isActive,
+          class: '',
+          size: 'lg',
+          onclick: async (e) => {
+            e.preventDefault();
+            if (subscriptions[0].isActive) {
+              await app.user.notifications.disableSubscriptions(subscriptions);
+            } else {
+              await app.user.notifications.enableSubscriptions(subscriptions);
+            }
+            m.redraw();
+          }
+        }),
+      ]),
+      subscriptions && app.user.email
+        && m(ImmediateEmailCheckbox, { subscriptions, }),
     ]);
   }
 };
@@ -412,11 +515,13 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.NewMention
         && s.category !== NotificationCategories.ChainEvent
     );
+    const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
+    console.dir(batchedSubscriptions)
     return [
       m(NewThreadRow, { community, subscriptions }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      filteredSubscriptions.map((subscription) => {
-        return m(SubscriptionRow, { subscription, key: subscription.id });
+      batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
+        return m(BatchedSubscriptionRow, { subscriptions, key: subscriptions[0].id });
       })
     ];
   },
@@ -518,6 +623,11 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
+    const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => !chainIds.includes(s.objectId)
+      && s.category !== NotificationCategories.NewMention
+      && s.category !== NotificationCategories.NewThread
+      && s.category !== NotificationCategories.ChainEvent
+    ), 'objectId');
     return [
       mentionsSubscription
         && m('tr.mentions', [
@@ -540,12 +650,8 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
           m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
         ]),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
-      subscriptions.filter((s) => !chainIds.includes(s.objectId)
-        && s.category !== NotificationCategories.NewMention
-        && s.category !== NotificationCategories.NewThread
-        && s.category !== NotificationCategories.ChainEvent
-      ).map((subscription) => {
-        return m(SubscriptionRow, { subscription });
+      batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
+        return m(BatchedSubscriptionRow, { subscriptions });
       })
       // m(GeneralPastThreadsAndComments, { subscriptions }),
     ];
