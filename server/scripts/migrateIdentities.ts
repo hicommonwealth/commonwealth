@@ -40,7 +40,7 @@ export async function migrateIdentities(models, chain?: string): Promise<Offchai
     log.info(`Querying all profiles on chain ${node.chain}...`);
     const profiles: OffchainProfileInstance[] = await models.OffchainProfile.findAll({
       include: [{
-        model: this._models.Address,
+        model: models.Address,
         where: {
           chain: node.chain,
         },
@@ -76,7 +76,12 @@ export async function migrateIdentities(models, chain?: string): Promise<Offchai
           identityEvent.data.judgements
         );
         await profile.save();
-        log.debug(`Discovered name '${profile.identity}' for ${profile.Address.address}!`);
+        let logName = profile.Address.address;
+        if (profile.data) {
+          const { name } = JSON.parse(profile.data);
+          logName = name;
+        }
+        log.debug(`Discovered name '${profile.identity}' for ${logName}!`);
         updatedProfiles.push(profile);
       }
     }

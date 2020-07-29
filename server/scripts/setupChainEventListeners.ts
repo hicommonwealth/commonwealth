@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
@@ -35,11 +36,13 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
+const setupChainEventListeners = async (
+  models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string
+): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');
-  await Promise.all(nodes
+  const subscribers: [string, IEventSubscriber<any, any>][] = await Promise.all(nodes
     .filter((node) => EventSupportingChains.includes(node.chain))
     // filter out duplicate nods per-chain, only use one node
     .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
@@ -106,8 +109,9 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           subscriber.unsubscribe();
         }
       });
-      return subscriber;
+      return [ node.chain, subscriber ];
     }));
+  return _.object(subscribers);
 };
 
 export default setupChainEventListeners;

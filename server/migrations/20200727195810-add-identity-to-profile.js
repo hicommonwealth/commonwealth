@@ -8,7 +8,7 @@ module.exports = {
         'OffchainProfiles',
         'identity',
         {
-          type: DataTypes.STRING,
+          type: Sequelize.STRING,
           allowNull: true,
         },
         { transaction: t },
@@ -17,7 +17,7 @@ module.exports = {
         'OffchainProfiles',
         'judgements',
         {
-          type: DataTypes.JSONB,
+          type: Sequelize.JSONB,
           allowNull: true,
         },
         { transaction: t },
