@@ -99,8 +99,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData[]) => 
   const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
     parent_comment_text, chain_id, community_id, author_address, author_chain } = data[0];
 
-  const authorInfo = data.slice(1).map((d) => [d.author_address, d.author_chain])
-
+  const authorInfo = data.map((d) => [d.author_address, d.author_chain]);
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
@@ -220,9 +219,9 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         ]),
       ]);
     } else {
-      const notificationData = notifications.map((d) => typeof notification.data === 'string'
-        ? JSON.parse(notification.data)
-        : notification.data);
+      const notificationData = notifications.map((notif) => typeof notif.data === 'string'
+        ? JSON.parse(notif.data)
+        : notif.data);
       const {
         authorInfo,
         createdAt,
@@ -231,7 +230,6 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         path,
         pageJump
       } = getBatchNotificationFields(category, notificationData);
-      debugger
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {
