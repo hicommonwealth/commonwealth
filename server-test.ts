@@ -19,6 +19,7 @@ import models from './server/database';
 import setupWebsocketServer from './server/socket';
 import { NotificationCategories } from './shared/types';
 import ViewCountCache from './server/util/viewCountCache';
+import IdentityFetchCache from './server/util/identityFetchCache';
 
 require('express-async-errors');
 
@@ -26,6 +27,7 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
+const identityFetchCache = new IdentityFetchCache(0);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 let server;
 
@@ -238,10 +240,11 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache);
+setupAPI(app, models, viewCountCache, identityFetchCache);
 setupErrorHandlers();
 setupServer();
 
 export const resetDatabase = () => resetServer();
+export const getIdentityFetchCache = () => identityFetchCache;
 
 export default app;

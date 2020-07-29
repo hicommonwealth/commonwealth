@@ -7,11 +7,12 @@
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents } from '@commonwealth/chain-events';
 import { OffchainProfileAttributes, OffchainProfileInstance } from '../models/offchain_profile';
+import IdentityEventHandler from '../eventHandlers/identity';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export async function migrateIdentities(models, chain?: string): Promise<OffchainProfileAttributes[]> {
+export async function migrateIdentities(models, chain?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info('Fetching node info for identity migrations...');
   const nodes = [];
@@ -34,7 +35,6 @@ export async function migrateIdentities(models, chain?: string): Promise<Offchai
   }
 
   // 2. for each node, fetch and migrate identities
-  const updatedProfiles: OffchainProfileAttributes[] = [];
   for (const node of nodes) {
     // 2a. query all available addresses in the db on the chain
     log.info(`Querying all profiles on chain ${node.chain}...`);
@@ -66,25 +66,9 @@ export async function migrateIdentities(models, chain?: string): Promise<Offchai
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
 
-    // 2c. write the found identities back to db
+    // 2c. write the found identities back to db using the event handler
     log.info(`Writing identities for chain ${node.chain} back to db...`);
-    for (const identityEvent of identityEvents) {
-      const profile = profiles.find((p) => p.Address.address === identityEvent.data.who);
-      if (profile) {
-        profile.identity = identityEvent.data.displayName;
-        profile.judgements = _.object<{ [name: string]: SubstrateTypes.IdentityJudgement }>(
-          identityEvent.data.judgements
-        );
-        await profile.save();
-        let logName = profile.Address.address;
-        if (profile.data) {
-          const { name } = JSON.parse(profile.data);
-          logName = name;
-        }
-        log.debug(`Discovered name '${profile.identity}' for ${logName}!`);
-        updatedProfiles.push(profile);
-      }
-    }
+    const handler = new IdentityEventHandler(models, node.chain);
+    await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
   }
-  return updatedProfiles;
 }

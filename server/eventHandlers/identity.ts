@@ -51,6 +51,14 @@ export default class extends IEventHandler {
       profile.identity = event.data.displayName;
       profile.judgements = _.object<{ [name: string]: SubstrateTypes.IdentityJudgement }>(event.data.judgements);
       await profile.save();
+
+      // write a comment about the new identity
+      let logName = profile.Address.address;
+      if (profile.data) {
+        const { name } = JSON.parse(profile.data);
+        logName = name;
+      }
+      log.debug(`Discovered name '${profile.identity}' for ${logName}!`);
     } else if (event.data.kind === SubstrateTypes.EventKind.JudgementGiven) {
       // if we don't have an identity saved yet for a judgement, do nothing
       // TODO: we can augment the judgement event to include all event data, but seems

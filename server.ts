@@ -1,3 +1,4 @@
+import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -21,6 +22,7 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
+import IdentityFetchCache from './server/util/identityFetchCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -66,6 +68,7 @@ const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler
   publicPath: '/build',
 }) : null;
 const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
+const identityFetchCache = new IdentityFetchCache(10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
 const closeMiddleware = (): Promise<void> => {
@@ -152,7 +155,7 @@ if (DEV) {
 
 setupMiddleware();
 setupPassport(models);
-setupAPI(app, models, viewCountCache);
+setupAPI(app, models, viewCountCache, identityFetchCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 sendBatchedNotificationEmails(models, 'monthly');
@@ -193,6 +196,15 @@ async function main() {
       let exitCode = 0;
       try {
         const subscribers = await setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION);
+
+        // construct storageFetchers needed for the identity cache
+        const fetchers = {};
+        for (const [ chain, subscriber ] of Object.entries(subscribers)) {
+          if (SubstrateTypes.EventChains.includes(chain)) {
+            fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+          }
+        }
+        identityFetchCache.start(models, fetchers);
       } catch (e) {
         exitCode = 1;
         if (RUN_ENTITY_MIGRATION) {
