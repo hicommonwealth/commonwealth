@@ -158,7 +158,7 @@ export const subscribeEvents: SubscribeFunc<Api, RawEvent, SubscribeOptions> = a
 
   try {
     log.info(`Subscribing to Moloch contract ${chain}...`);
-    subscriber.subscribe(processEventFn);
+    await subscriber.subscribe(processEventFn);
   } catch (e) {
     log.error(`Subscription error: ${e.message}`);
   }

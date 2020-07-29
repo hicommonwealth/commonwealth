@@ -14,24 +14,24 @@ const events = [
 
 const getApi = () => {
   return constructFakeApi({
-    subscribeNewHeads: (callback) => {
+    subscribeNewHeads: async (callback) => {
       callback({ hash: hashes[0], number: '1' });
       const handle = setTimeout(() => callback({ hash: hashes[1], number: '2' }), 50);
       return () => clearInterval(handle); // unsubscribe
     },
-    'events.at': (hash) => {
+    'events.at': async (hash) => {
       if (hash === hashes[0]) return events[0];
       if (hash === hashes[1]) return events[1];
       assert.fail('events.at called with invalid hash');
     },
-    getBlock: (hash) => {
+    getBlock: async (hash) => {
       return {
         block: {
           extrinsics: [],
         }
       };
     },
-    subscribeRuntimeVersion: (callback) => {
+    subscribeRuntimeVersion: async (callback) => {
       callback({ specVersion: 10, specName: 'edgeware' } as unknown as RuntimeVersion);
     }
   });
@@ -116,11 +116,12 @@ describe('Edgeware Event Subscriber Tests', () => {
           done(err);
         }
       }
-    );
-    setTimeout(() => {
-      subscriber.unsubscribe();
-      setTimeout(() => done(), 50);
-    }, 10);
+    ).then(() => {
+      setTimeout(() => {
+        subscriber.unsubscribe();
+        setTimeout(() => done(), 50);
+      }, 10);
+    });
   });
   // TODO: fail tests
 });
