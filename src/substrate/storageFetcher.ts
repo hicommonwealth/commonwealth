@@ -69,7 +69,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
           data: {
             kind: EventKind.IdentitySet,
             who: address,
-            displayName: info.display.toString(),
+            displayName: info.display.asRaw.toUtf8(),
             judgements: parsedJudgements,
           }
         };

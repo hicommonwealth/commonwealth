@@ -498,7 +498,7 @@ export async function Enrich(
         if (!registrationOpt.isSome) {
           throw new Error('unable to retrieve identity info');
         }
-        const displayName = registrationOpt.unwrap().info.display.toString();
+        const displayName = registrationOpt.unwrap().info.display.asRaw.toUtf8();
         const judgementInfo = registrationOpt.unwrap().judgements;
         const judgements: [string, IdentityJudgement][] = [];
         if (judgementInfo.length > 0) {

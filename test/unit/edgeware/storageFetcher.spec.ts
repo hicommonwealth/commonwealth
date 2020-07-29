@@ -2,8 +2,9 @@ import chai from 'chai';
 import {
   AccountId, BalanceOf, Registration, RegistrarInfo
 } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
+import { Vec, Data, TypeRegistry } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
+import { stringToHex } from '@polkadot/util';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
 
@@ -37,7 +38,7 @@ const api = constructFakeApi({
     if (i === 1) return constructOption();
     return constructOption({
       info: {
-        display: `${addr}-display-name`,
+        display: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
       },
       judgements: addr !== 'charlie' ? [
         [ 0, constructIdentityJudgement(IdentityJudgement.KnownGood) ],

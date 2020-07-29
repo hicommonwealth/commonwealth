@@ -5,8 +5,9 @@ import {
   RegistrarInfo
 } from '@polkadot/types/interfaces';
 import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types';
-import { Vec, bool } from '@polkadot/types';
+import { Vec, bool, Data, TypeRegistry } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
+import { stringToHex } from '@polkadot/util';
 import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
@@ -110,7 +111,7 @@ const api = constructFakeApi({
     } as unknown as Proposal),
   identityOf: async (addr) => constructOption({
     info: {
-      display: `${addr}-display-name`,
+      display: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
     },
     judgements: [
       [ 0, constructIdentityJudgement(IdentityJudgement.KnownGood) ],
