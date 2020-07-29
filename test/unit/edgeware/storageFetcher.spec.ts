@@ -36,6 +36,13 @@ const api = constructFakeApi({
   // identities
   identityOfMulti: async (addrs) => addrs.map((addr, i) => {
     if (i === 1) return constructOption();
+    if (addr === 'dave') return constructOption({
+      info: {
+        // NO DISPLAY NAME SET
+        web: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
+      },
+      judgements: [],
+    } as unknown as Registration);
     return constructOption({
       info: {
         display: new Data(new TypeRegistry(), { Raw: stringToHex(`${addr}-display-name`) }),
@@ -377,7 +384,7 @@ describe('Edgeware Event Migration Tests', () => {
 
   it('should generate identity-set events events', async () => {
     const fetcher = new StorageFetcher(api);
-    const events = await fetcher.fetchIdentities(['alice', 'bob', 'charlie']);
+    const events = await fetcher.fetchIdentities(['alice', 'bob', 'charlie', 'dave']);
     assert.sameDeepMembers(events, [
       {
         blockNumber,

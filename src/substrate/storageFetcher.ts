@@ -53,6 +53,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
         // if no identity found, do nothing
         if (!id.isSome) return null;
         const { info, judgements } = id.unwrap();
+        if (!info.display || !info.display.isRaw) return null;
 
         // parse out judgements from identity info
         const parsedJudgements = judgements

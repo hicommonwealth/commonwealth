@@ -498,8 +498,11 @@ export async function Enrich(
         if (!registrationOpt.isSome) {
           throw new Error('unable to retrieve identity info');
         }
-        const displayName = registrationOpt.unwrap().info.display.asRaw.toUtf8();
-        const judgementInfo = registrationOpt.unwrap().judgements;
+        const { info, judgements: judgementInfo } = registrationOpt.unwrap();
+        if (!info.display || !info.display.isRaw) {
+          throw new Error('no display name set');
+        }
+        const displayName = info.display.asRaw.toUtf8();
         const judgements: [string, IdentityJudgement][] = [];
         if (judgementInfo.length > 0) {
           const registrars = await api.query.identity.registrars();
