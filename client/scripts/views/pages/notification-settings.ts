@@ -573,11 +573,8 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
       if (roleChains.includes(c.id)) vnode.state.communityIds.push(c.name);
     });
     vnode.state.communityIds.sort();
-    const scope = vnode.attrs.communities.find((c) => c.id === m.route.param('scope'))
-      || vnode.attrs.chains.find((c) => c.id === m.route.param('scope'))
-      || null;
-    vnode.state.selectedCommunityId = (scope) ? scope.name : 'All communities';
-    vnode.state.selectedCommunity = scope || null;
+    vnode.state.selectedCommunityId = 'All communities';
+    vnode.state.selectedCommunity = null;
   },
   view: (vnode) => {
     const { subscriptions, communities, chains } = vnode.attrs;
