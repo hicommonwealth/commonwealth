@@ -479,7 +479,7 @@ const ChainNotificationManagementPage: m.Component<IChainOrCommNotifPageAttrs> =
     const { chains } = vnode.attrs;
     if (chains.length < 1) return;
     return m('ChainNotificationManagementPage', [
-      m('h1', 'Subscribe to Chain Events'),
+      m('h2', 'Subscribe to Chain Events'),
       chains.filter((c) => c.network === 'edgeware').map((chain) => {
         return [
           m(EventSubscriptions, {
