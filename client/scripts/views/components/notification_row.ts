@@ -251,6 +251,7 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
             avatarSize: 36,
+            tooltip: true,
           }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),

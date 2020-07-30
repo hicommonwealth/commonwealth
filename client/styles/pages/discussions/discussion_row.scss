@@ -77,6 +77,11 @@ $text-size-item-meta: 17px;
             display: flex;
             align-items: center;
             padding-left: 10px;
+            .UserGallery {
+                .overflow-users {
+                    font-size: 13.5px;
+                }
+            }
             .discussion-locked {
                 margin-left: 10px;
                 .cui-tag .cui-icon {
