@@ -784,10 +784,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.2.0.tgz#892be97f7a67e43606e5eba57536c0577402a9d0"
-  integrity sha512-DVqXF5UBquNV4eMZwQnnItvBdCvcljioFhsr6lfWCG9Tjs3sec5A0orVxmPe2zyeDrS6RUHqVOe+KyuYYof6mQ==
+"@commonwealth/chain-events@0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.2.6.tgz#50eff4a2835872cb170724530c888798c898d0e4"
+  integrity sha512-jUPuqAs9ZKD9/dlvlMCsZ+xrBhwojIZoPaaWWSzh4eX4L0SepG4TBFQnat1a7DP9hJGMrAeQNdVDTP+iwQauvw==
   dependencies:
     "@edgeware/node-types" "2.3.5"
     "@polkadot/api" "1.24.1"
