@@ -36,12 +36,13 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
         })
       ]);
     } else if (subscriptions) {
+      const everyActive = subscriptions.every((s) => s.isActive);
       const someEmails = subscriptions.some((s) => s.immediateEmail);
       const everyEmail = subscriptions.every((s) => s.immediateEmail);
       return m('td', [
         m(Checkbox, {
-          disabled: !subscriptions[0].isActive,
-          checked: subscriptions[0].immediateEmail,
+          disabled: !everyActive,
+          checked: everyEmail,
           indeterminate: someEmails && !everyEmail,
           size: 'lg',
           onchange: async () => {
@@ -194,6 +195,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     const { subscriptions } = vnode.state;
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
+    if (!subscriptions) return;
     return m('tr.SubscriptionRow', [
       m('td', {
         class: bold ? 'bold' : null,
@@ -211,7 +213,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
           size: 'lg',
           onclick: async (e) => {
             e.preventDefault();
-            if (subscriptions[0].isActive) {
+            if (everyActive) {
               await app.user.notifications.disableSubscriptions(subscriptions);
             } else {
               await app.user.notifications.enableSubscriptions(subscriptions);
@@ -222,59 +224,6 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
       ]),
       subscriptions && app.user.email
         && m(ImmediateEmailCheckbox, { subscriptions, }),
-    ]);
-  }
-};
-
-interface IEventSubscriptionRowAttrs {
-  chain: string;
-  kind: IChainEventKind;
-  titler: TitlerFilter;
-}
-
-const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
-  view: (vnode) => {
-    const { chain, kind } = vnode.attrs;
-    const { title, description } = vnode.attrs.titler(kind);
-    const objectId = `${chain}-${kind}`;
-    const subscription = app.loginStatusLoaded && app.user.notifications.subscriptions
-      .find((sub) => sub.category === NotificationCategories.ChainEvent
-        && sub.objectId === objectId);
-    return m('tr.EventSubscriptionRow', [
-      m('td', `${title}`),
-      app.loginStatusLoaded && m('td', [
-        m(Checkbox, {
-          checked: subscription && subscription.isActive,
-          size: 'lg',
-          onchange: async (e) => {
-            e.preventDefault();
-            if (subscription && subscription.isActive) {
-              await app.user.notifications.disableSubscriptions([ subscription ]);
-            } else if (subscription && !subscription.isActive) {
-              await app.user.notifications.enableSubscriptions([ subscription ]);
-            } else {
-              await app.user.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
-            }
-            m.redraw();
-          }
-        }),
-      ]),
-      m('td', [
-        m(Checkbox, {
-          disabled: !subscription?.isActive,
-          checked: subscription?.isActive && subscription?.immediateEmail,
-          size: 'lg',
-          onchange: async (e) => {
-            e.preventDefault();
-            if (subscription && subscription.immediateEmail) {
-              await app.user.notifications.disableImmediateEmails([ subscription ]);
-            } else {
-              await app.user.notifications.enableImmediateEmails([ subscription ]);
-            }
-            m.redraw();
-          }
-        }),
-      ]),
     ]);
   }
 };
@@ -311,7 +260,7 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
     if (filteredSubscriptions.length < 1 && onComments.length < 1) return; 
     return [
       m(NewThreadRow, { community, subscriptions }),
-      onComments && m(BatchedSubscriptionRow, {
+      onComments.length > 0 && m(BatchedSubscriptionRow, {
         label: 'Notifications on Comments',
         subscriptions: onComments,
       }),
@@ -419,7 +368,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     ), 'objectId');
     return [
       mentionsSubscription
-        && m('tr.mentions', [
+        && m('tr.mentions.SubscriptionRow', [
           m('td', { class: 'bold', }, 'Mentions:'),
           m('td', [
             m(Checkbox, {
