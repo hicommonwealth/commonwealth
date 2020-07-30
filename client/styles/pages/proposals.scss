@@ -7,6 +7,9 @@
     }
     .stats-container {
         display: flex;
+        .stats-tile {
+            display: inline-block;
+        }
     }
     h4.proposals-subheader {
         text-transform: uppercase;

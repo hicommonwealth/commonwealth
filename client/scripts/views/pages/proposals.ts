@@ -77,6 +77,7 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Proposals',
     }, [
       m('.stats-container', [
+        // TODO: Redesign Moloch
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),
           m('.stats-tile-figure-minor', [
@@ -127,56 +128,55 @@ const ProposalsPage: m.Component<{}> = {
           ] : 'None'),
         ]),
         onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next treasury spend'),
           m('.stats-tile-figure-major', [
             app.chain && (app.chain as Substrate).treasury.nextSpendBlock
               ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
               : '--',
           ]),
-          m('.stats-tile-figure-minor', `Block ${app.chain && (app.chain as Substrate).treasury.nextSpendBlock}`),
+          m('.stats-tile-label', ' till next treasury spend'),
         ]),
         onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Treasury balance'),
-          m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot))
+          m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot)),
+          m('.stats-tile-label', ' in the treasury'),
         ]),
-        onSubstrate && m('.forum-container', [
-          m('ul', [
-            m('h4', 'Referenda'),
-            m('li', [
-              'Referenda are voted on by all coinholders, in a timelock-weighted yes/no vote. ',
-            ]),
-            m('li', [
-              'If a referendum passes, winning voters\' coins are locked for up to ',
-              `${(app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime} blocks `,
-              `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime))}). `,
-              'Locked coins can still be staked or voted.',
-            ]),
-            m('li', [
-              'If a referendum is approved, it executes after a delay of ',
-              `${(app.chain as Substrate).democracy.enactmentPeriod} blocks `,
-              `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod))}).`,
-            ]),
-            m(ConvictionsTable),
-            m('h4', 'Council Motions'),
-            m('li', [
-              'The council can propose referenda, approve/reject treasury expenses, and ',
-              'create emergency proposals/cancellations by creating council motions.'
-            ]),
-            m('li', [
-              'Council motions are voted on by all councillors on a 1-person-1-vote basis.',
-              'Motions are approved when enough councillors vote yes, or removed when enough ',
-              'councillors vote no that approval becomes impossible.',
-            ]),
-            m('h4', 'Democracy Proposals'),
-            m('li', [
-              'Any coinholder can propose a referendum, by placing a bond of at least ',
-              `${app.chain && formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)}. `,
-            ]),
-            m('li', [
-              'Anyone can second the proposal in amounts equal to the original bond, as many times as they wish.',
-            ]),
-          ]),
-        ]),
+        // onSubstrate && m('.forum-container', [
+        //   m('ul', [
+        //     m('h4', 'Referenda'),
+        //     m('li', [
+        //       'Referenda are voted on by all coinholders, in a timelock-weighted yes/no vote. ',
+        //     ]),
+        //     m('li', [
+        //       'If a referendum passes, winning voters\' coins are locked for up to ',
+        //       `${(app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime} blocks `,
+        //       `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime))}). `,
+        //       'Locked coins can still be staked or voted.',
+        //     ]),
+        //     m('li', [
+        //       'If a referendum is approved, it executes after a delay of ',
+        //       `${(app.chain as Substrate).democracy.enactmentPeriod} blocks `,
+        //       `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod))}).`,
+        //     ]),
+        //     m(ConvictionsTable),
+        //     m('h4', 'Council Motions'),
+        //     m('li', [
+        //       'The council can propose referenda, approve/reject treasury expenses, and ',
+        //       'create emergency proposals/cancellations by creating council motions.'
+        //     ]),
+        //     m('li', [
+        //       'Council motions are voted on by all councillors on a 1-person-1-vote basis.',
+        //       'Motions are approved when enough councillors vote yes, or removed when enough ',
+        //       'councillors vote no that approval becomes impossible.',
+        //     ]),
+        //     m('h4', 'Democracy Proposals'),
+        //     m('li', [
+        //       'Any coinholder can propose a referendum, by placing a bond of at least ',
+        //       `${app.chain && formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)}. `,
+        //     ]),
+        //     m('li', [
+        //       'Anyone can second the proposal in amounts equal to the original bond, as many times as they wish.',
+        //     ]),
+        //   ]),
+        // ]),
       ]),
       !visibleReferenda
         && !visibleCouncilProposals
