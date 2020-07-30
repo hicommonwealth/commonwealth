@@ -78,14 +78,16 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         onChangeHandler: (v) => { vnode.state.github = v; },
       }),
       m(TogglePropertyRow, {
-        title: 'Private community?',
+        title: 'Privacy',
         defaultValue: vnode.attrs.community.privacyEnabled,
         onToggle: (checked) => { vnode.state.privacyEnabled = checked; },
+        caption: (checked) => checked ? 'Threads are private to members' : 'Threads are visible to the public',
       }),
       m(TogglePropertyRow, {
-        title: 'Invites enabled?',
+        title: 'Invites',
         defaultValue: vnode.attrs.community.invitesEnabled,
         onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
+        caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
       }),
       m('tr', [
         m('td', 'Admins'),
