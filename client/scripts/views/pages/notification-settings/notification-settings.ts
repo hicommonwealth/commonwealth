@@ -36,10 +36,13 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
         })
       ]);
     } else if (subscriptions) {
+      const someEmails = subscriptions.some((s) => s.immediateEmail);
+      const everyEmail = subscriptions.every((s) => s.immediateEmail);
       return m('td', [
         m(Checkbox, {
           disabled: !subscriptions[0].isActive,
           checked: subscriptions[0].immediateEmail,
+          indeterminate: someEmails && !everyEmail,
           size: 'lg',
           onchange: async () => {
             if (subscriptions[0].immediateEmail) {
@@ -189,6 +192,8 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
   view: (vnode) => {
     const { label, bold } = vnode.attrs;
     const { subscriptions } = vnode.state;
+    const someActive = subscriptions.some((s) => s.isActive);
+    const everyActive = subscriptions.every((s) => s.isActive);
     return m('tr.SubscriptionRow', [
       m('td', {
         class: bold ? 'bold' : null,
@@ -200,7 +205,8 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
       ]),
       m('td', [
         m(Checkbox, {
-          checked: subscriptions[0].isActive,
+          checked: everyActive,
+          indeterminate: someActive && !everyActive,
           class: '',
           size: 'lg',
           onclick: async (e) => {
@@ -566,6 +572,11 @@ const GeneralNewThreadsAndComments:
       const everyEmail = threadSubs.every((s) => s.immediateEmail && communityIds.includes(s.objectId));
       vnode.state.emailStatus = everyEmail;
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
+
+      return m(BatchedSubscriptionRow, {
+        subscriptions: threadSubs,
+        label: 'New Threads (All Communities)',
+      });
 
       return m('tr.GeneralNewThreadsAndComments.SubscriptionRow', [
         m('td', { class: 'bold', }, 'New Threads (All Communities)'),
