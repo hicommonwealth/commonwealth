@@ -635,6 +635,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
       && s.category !== NotificationCategories.NewMention
       && s.category !== NotificationCategories.NewThread
       && s.category !== NotificationCategories.ChainEvent
+      && !s.OffchainComment
     ), 'objectId');
     return [
       mentionsSubscription
