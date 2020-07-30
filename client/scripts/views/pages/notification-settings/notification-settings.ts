@@ -46,7 +46,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
           indeterminate: someEmails && !everyEmail,
           size: 'lg',
           onchange: async () => {
-            if (subscriptions[0].immediateEmail) {
+            if (everyEmail) {
               await app.user.notifications.disableImmediateEmails(subscriptions);
             } else {
               await app.user.notifications.enableImmediateEmails(subscriptions);
@@ -296,57 +296,10 @@ const GeneralNewThreadsAndComments:
       const { communities, subscriptions } = vnode.attrs;
       const communityIds = communities.map((c) => c.id);
       const threadSubs = subscriptions.filter((s) => communityIds.includes(s.objectId));
-      const someThreads = threadSubs.some((s) => s.isActive);
-      const everyThread = threadSubs.every((s) => s.isActive);
-      vnode.state.generalStatus = everyThread;
-      const someEmail = threadSubs.some((s) => s.immediateEmail && communityIds.includes(s.objectId));
-      const everyEmail = threadSubs.every((s) => s.immediateEmail && communityIds.includes(s.objectId));
-      vnode.state.emailStatus = everyEmail;
-      const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
-
       return m(BatchedSubscriptionRow, {
         subscriptions: threadSubs,
         label: 'New Threads (All Communities)',
       });
-
-      return m('tr.GeneralNewThreadsAndComments.SubscriptionRow', [
-        m('td', { class: 'bold', }, 'New Threads (All Communities)'),
-        // Here, we're subscribing to all New Threads, but not auto-subscribing to comments on each new thread.
-        m('td', [
-          m(Checkbox, {
-            indeterminate: (!everyThread && someThreads),
-            checked: generalStatus,
-            size: 'lg',
-            onchange: async (e) => {
-              e.preventDefault();
-              if (generalStatus) {
-                await app.user.notifications.disableSubscriptions(threadSubs);
-              } else {
-                await app.user.notifications.enableSubscriptions(threadSubs);
-              }
-              m.redraw();
-            }
-          }),
-        ]),
-        m('td', [
-          m(Checkbox, {
-            disabled: !generalStatus,
-            checked: emailStatus,
-            indeterminate: (!everyEmail && someEmail),
-            size: 'lg',
-            onchange: async (e) => {
-              e.preventDefault();
-              if (emailStatus) {
-                await app.user.notifications.disableImmediateEmails(threadSubs);
-              } else {
-                await app.user.notifications.enableImmediateEmails(threadSubs);
-              }
-              m.redraw();
-            }
-          })
-          // m(ImmediateEmailCheckbox, { subscriptions: threadSubs }),
-        ]),
-      ]);
     },
   };
 

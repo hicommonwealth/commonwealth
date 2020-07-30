@@ -212,6 +212,7 @@ interface IChainNotifPageAttrs {
   const ChainNotificationManagementPage: m.Component<IChainNotifPageAttrs> = {
     view: (vnode) => {
       const { chains } = vnode.attrs;
+      const chainIds = chains.map((c) => c.id);
       if (chains.length < 1) return;
       return m('ChainNotificationManagementPage', [
         m('h2', 'Subscribe to Chain Events'),
@@ -228,7 +229,6 @@ interface IChainNotifPageAttrs {
 
 interface IChainEventSettingsPageState {
     chains: ChainInfo[];
-    // subscriptions: NotificationSubscription[];
   }
 
 const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
@@ -236,25 +236,11 @@ const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
         vnode.state.chains = _.uniq(
           app.config.chains.getAll()
         );
-        // vnode.state.subscriptions = [];
       },
       oncreate: async (vnode) => {
-        // if (!app.isLoggedIn) m.route.set('/');
-        // $.post(`${app.serverUrl()}/viewSubscriptions`, {
-        //   jwt: app.user.jwt,
-        // }).then((result) => {
-        //   vnode.state.subscriptions = [];
-        //   result.result.forEach((sub) => {
-        //     vnode.state.subscriptions.push(NotificationSubscription.fromJSON(sub));
-        //   });
-        //   m.redraw();
-        // }, (error) => {
-        //   m.route.set('/');
-        // });
       },
       view: (vnode) => {
         const { chains } = vnode.state;
-        const chainIds = chains.map((c) => c.id);
         if (!app.loginStatusLoaded()) return;
         return m(Sublayout, {
           class: 'SubscriptionsPage',
