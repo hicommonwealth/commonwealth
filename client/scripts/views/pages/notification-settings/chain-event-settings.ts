@@ -17,6 +17,59 @@ import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types
 import { sortSubscriptions } from 'helpers/notifications';
 
 
+interface IEventSubscriptionRowAttrs {
+    chain: string;
+    kind: IChainEventKind;
+    titler: TitlerFilter;
+  }
+  
+  const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
+    view: (vnode) => {
+      const { chain, kind } = vnode.attrs;
+      const { title, description } = vnode.attrs.titler(kind);
+      const objectId = `${chain}-${kind}`;
+      const subscription = app.loginStatusLoaded && app.user.notifications.subscriptions
+        .find((sub) => sub.category === NotificationCategories.ChainEvent
+          && sub.objectId === objectId);
+      return m('tr.EventSubscriptionRow', [
+        m('td', `${title}`),
+        app.loginStatusLoaded && m('td', [
+          m(Checkbox, {
+            checked: subscription && subscription.isActive,
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (subscription && subscription.isActive) {
+                await app.user.notifications.disableSubscriptions([ subscription ]);
+              } else if (subscription && !subscription.isActive) {
+                await app.user.notifications.enableSubscriptions([ subscription ]);
+              } else {
+                await app.user.notifications.subscribe(NotificationCategories.ChainEvent, objectId);
+              }
+              m.redraw();
+            }
+          }),
+        ]),
+        m('td', [
+          m(Checkbox, {
+            disabled: !subscription?.isActive,
+            checked: subscription?.isActive && subscription?.immediateEmail,
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (subscription && subscription.immediateEmail) {
+                await app.user.notifications.disableImmediateEmails([ subscription ]);
+              } else {
+                await app.user.notifications.enableImmediateEmails([ subscription ]);
+              }
+              m.redraw();
+            }
+          }),
+        ]),
+      ]);
+    }
+  };
+
 interface IEventSubscriptionTypeRowAttrs {
     title: string;
     notificationTypeArray: string[];
