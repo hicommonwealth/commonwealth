@@ -23,6 +23,7 @@ import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col } from 'construct-ui';
+import moment from 'moment';
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -117,13 +118,39 @@ const ProposalsPage: m.Component<{}> = {
         ]),
         m(Col, { span: 4 }, [
           onSubstrate && m('.stats-tile', [
+            app.chain
+            && (app.chain as Substrate).treasury.bondMinimum
+              ?  `${(app.chain as Substrate).treasury.bondMinimum.inDollars} ${
+                (app.chain as Substrate).treasury.bondMinimum.denom}`
+              : '--',
+            ' proposal bond'
+          ]),
+          onSubstrate && m('.stats-tile', [
+            app.chain
+            && (app.chain as Substrate).democracyProposals.minimumDeposit
+            && (app.chain as Substrate).treasury.computeBond
+              ? `${(app.chain as Substrate).treasury.computeBond(
+                (app.chain as Substrate).democracyProposals.minimumDeposit
+              ).inDollars} ${(app.chain as Substrate).treasury.computeBond(
+                (app.chain as Substrate).democracyProposals.minimumDeposit
+              ).denom}`
+              : '--',
+            ' proposal bond'
+          ])
+        ]),
+        m(Col, { span: 4 }, [
+          onSubstrate && m('.stats-tile', [
+            app.chain
+            && (app.chain as Substrate).democracy.enactmentPeriod
+              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod)
+              : '--',
+            ' enactment delay after proposal'
+          ]),
+          onSubstrate && m('.stats-tile', [
             app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             ' in the treasury',
           ]),
         ]),
-        m(Col, { span: 4 }, [
-          m('', '')
-        ])
         // onSubstrate && m('.stats-tile', [
         //   m('.stats-tile-label', 'Next referendum draws from'),
         //   m('.stats-tile-figure-major', nextReferendum),
