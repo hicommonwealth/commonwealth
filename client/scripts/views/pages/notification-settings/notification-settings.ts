@@ -567,57 +567,43 @@ const GeneralNewThreadsAndComments:
       vnode.state.emailStatus = everyEmail;
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
-      return m('tr.GeneralNewThreadsAndComments', [
-        m('td', { class: 'bold', }, 'New Threads and Comments'),
+      return m('tr.GeneralNewThreadsAndComments.SubscriptionRow', [
+        m('td', { class: 'bold', }, 'New Threads (All Communities)'),
         // Here, we're subscribing to all New Threads, but not auto-subscribing to comments on each new thread.
-        m(Popover, {
-          closeOnEscapeKey: true,
-          closeOnContentClick: true,
-          content: m('div', 'Are you sure?'),
-          interactionType: 'hover',
-          transitionDuration: 0,
-          trigger: m('td', [
-            m(Checkbox, {
-              indeterminate: (!everyThread && someThreads),
-              checked: generalStatus,
-              size: 'lg',
-              onchange: async (e) => {
-                e.preventDefault();
-                if (generalStatus) {
-                  await app.user.notifications.disableSubscriptions(threadSubs);
-                } else {
-                  await app.user.notifications.enableSubscriptions(threadSubs);
-                }
-                m.redraw();
+        m('td', [
+          m(Checkbox, {
+            indeterminate: (!everyThread && someThreads),
+            checked: generalStatus,
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (generalStatus) {
+                await app.user.notifications.disableSubscriptions(threadSubs);
+              } else {
+                await app.user.notifications.enableSubscriptions(threadSubs);
               }
-            }),
-          ]),
-        }),
-        m(Popover, {
-          closeOnEscapeKey: true,
-          closeOnContentClick: true,
-          content: m('div', 'Are you sure?'),
-          interactionType: 'hover',
-          transitionDuration: 0,
-          trigger: m('td', [
-            m(Checkbox, {
-              disabled: !generalStatus,
-              checked: emailStatus,
-              indeterminate: (!everyEmail && someEmail),
-              size: 'lg',
-              onchange: async (e) => {
-                e.preventDefault();
-                if (emailStatus) {
-                  await app.user.notifications.disableImmediateEmails(threadSubs);
-                } else {
-                  await app.user.notifications.enableImmediateEmails(threadSubs);
-                }
-                m.redraw();
+              m.redraw();
+            }
+          }),
+        ]),
+        m('td', [
+          m(Checkbox, {
+            disabled: !generalStatus,
+            checked: emailStatus,
+            indeterminate: (!everyEmail && someEmail),
+            size: 'lg',
+            onchange: async (e) => {
+              e.preventDefault();
+              if (emailStatus) {
+                await app.user.notifications.disableImmediateEmails(threadSubs);
+              } else {
+                await app.user.notifications.enableImmediateEmails(threadSubs);
               }
-            })
-            // m(ImmediateEmailCheckbox, { subscriptions: threadSubs }),
-          ])
-        }),
+              m.redraw();
+            }
+          })
+          // m(ImmediateEmailCheckbox, { subscriptions: threadSubs }),
+        ]),
       ]);
     },
   };
