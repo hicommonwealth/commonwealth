@@ -23,7 +23,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
       return m('td', [
         m(Checkbox, {
           disabled: !subscription.isActive,
-          checked: subscription.immediateEmail && subscription.isActive,
+          checked: subscription.immediateEmail,
           size: 'lg',
           onchange: async () => {
             if (subscription.immediateEmail) {
@@ -39,7 +39,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
       return m('td', [
         m(Checkbox, {
           disabled: !subscriptions[0].isActive,
-          checked: subscriptions[0].immediateEmail && subscriptions[0].isActive,
+          checked: subscriptions[0].immediateEmail,
           size: 'lg',
           onchange: async () => {
             if (subscriptions[0].immediateEmail) {
@@ -562,8 +562,8 @@ const GeneralNewThreadsAndComments:
       const someThreads = threadSubs.some((s) => s.isActive);
       const everyThread = threadSubs.every((s) => s.isActive);
       vnode.state.generalStatus = everyThread;
-      const someEmail = threadSubs.some((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
-      const everyEmail = threadSubs.every((s) => s.isActive && s.immediateEmail && communityIds.includes(s.objectId));
+      const someEmail = threadSubs.some((s) => s.immediateEmail && communityIds.includes(s.objectId));
+      const everyEmail = threadSubs.every((s) => s.immediateEmail && communityIds.includes(s.objectId));
       vnode.state.emailStatus = everyEmail;
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
@@ -615,6 +615,7 @@ const GeneralNewThreadsAndComments:
                 m.redraw();
               }
             })
+            // m(ImmediateEmailCheckbox, { subscriptions: threadSubs }),
           ])
         }),
       ]);
