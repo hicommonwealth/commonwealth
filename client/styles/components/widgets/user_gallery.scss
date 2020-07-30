@@ -9,6 +9,8 @@
   .overflow-users-wrap {
     @include circledAvatar();
     display: inline-block;
+    margin-right: -16px;
+    margin-top: 5px;
     white-space: nowrap;
     background-color: $text-color-lightest;
     .overflow-users {
