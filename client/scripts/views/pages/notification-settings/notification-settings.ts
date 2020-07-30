@@ -475,39 +475,6 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
   }
 };
 
-// const ChainEventOrCommunitySelector: m.Component<{selectedFilter: string, setFilter: Function, }> = {
-//   view: (vnode) => {
-//     const options = ['Community Notifications', 'Chain Event Notifications'];
-//     return m(SelectList, {
-//       class: 'ChainCommunitySelector CommunitySelectList',
-//       filterable: false,
-//       checkmark: false,
-//       emptyContent: null,
-//       inputAttrs: {
-//         class: 'ChainCommunitySelector',
-//       },
-//       itemRender: (option: string) => {
-//         return m(ListItem, {
-//           label: option,
-//           selected: (option === vnode.attrs.selectedFilter),
-//         });
-//       },
-//       items: options,
-//       trigger: m(Button, {
-//         align: 'left',
-//         compact: true,
-//         iconRight: Icons.CHEVRON_DOWN,
-//         label: vnode.attrs.selectedFilter,
-//       }),
-//       onSelect: (option: string) => {
-//         // vnode.state.selectedFilter = option;
-//         vnode.attrs.setFilter(option);
-//         m.redraw();
-//       }
-//     });
-//   }
-// }
-
 interface INotificationSettingsState {
   selectedFilter: string;
   chains: ChainInfo[];
