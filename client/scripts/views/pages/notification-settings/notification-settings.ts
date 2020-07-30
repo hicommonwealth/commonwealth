@@ -2,18 +2,14 @@ import 'pages/subscriptions.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
-import _, { capitalize } from 'lodash';
-import { Button, Icons, Select, List, ListItem, Tooltip, Checkbox, Table, SelectList, Popover } from 'construct-ui';
+import _ from 'lodash';
+import { Button, Icons, ListItem, Checkbox, Table, SelectList, } from 'construct-ui';
 
 import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
-import {
-  SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
-} from '@commonwealth/chain-events';
 
 import Sublayout from 'views/sublayout';
-import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
 import { sortSubscriptions } from 'helpers/notifications';
 
 const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscription, subscriptions?: NotificationSubscription[]}> = {

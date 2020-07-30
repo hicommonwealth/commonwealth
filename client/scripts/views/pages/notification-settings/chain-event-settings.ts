@@ -1,11 +1,10 @@
 import 'pages/subscriptions.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
-import _, { capitalize } from 'lodash';
-import { Button, Icons, Select, List, ListItem, Tooltip, Checkbox, Table, SelectList, Popover } from 'construct-ui';
+import _ from 'lodash';
+import { Checkbox, Table } from 'construct-ui';
 
-import { NotificationSubscription, ChainInfo, CommunityInfo } from 'models';
+import { ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
 import {
@@ -14,8 +13,6 @@ import {
 
 import Sublayout from 'views/sublayout';
 import { EdgewareChainNotificationTypes } from 'helpers/chain_notification_types';
-import { sortSubscriptions } from 'helpers/notifications';
-
 
 interface IEventSubscriptionRowAttrs {
     chain: string;
