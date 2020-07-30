@@ -106,19 +106,19 @@ const ProposalsPage: m.Component<{}> = {
             onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
               : '--',
-            m('.stats-tile-label', ' till next proposal'),
+            ' till next proposal',
           ]),
           onSubstrate && m('.stats-tile', [
             app.chain && (app.chain as Substrate).treasury.nextSpendBlock
               ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
               : '--',
-            m('.stats-tile-label', ' till next treasury spend'),
+            ' till next treasury spend',
           ]),
         ]),
         m(Col, { span: 4 }, [
           onSubstrate && m('.stats-tile', [
             app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-            m('.stats-tile-label', ' in the treasury'),
+            ' in the treasury',
           ]),
         ]),
         m(Col, { span: 4 }, [
