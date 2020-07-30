@@ -568,7 +568,7 @@ const GeneralNewThreadsAndComments:
       const { generalStatus, emailStatus, generalOpen, emailOpen, } = vnode.state;
 
       return m('tr.GeneralNewThreadsAndComments', [
-        m('td', { class: 'bold', }, 'New threads and comments'),
+        m('td', { class: 'bold', }, 'New Threads and Comments'),
         // Here, we're subscribing to all New Threads, but not auto-subscribing to comments on each new thread.
         m(Popover, {
           closeOnEscapeKey: true,
