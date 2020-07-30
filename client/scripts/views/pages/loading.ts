@@ -7,7 +7,7 @@ import Sublayout from 'views/sublayout';
 
 const LoadingPage: m.Component<{ title?: string, message?: string, narrow?: boolean, showNewButton?: boolean }> = {
   view: (vnode) => {
-    const { title, message, narrow, showNewButton, } = vnode.attrs;
+    const { title, message, narrow, showNewButton } = vnode.attrs;
 
     return m(Sublayout, {
       class: 'LoadingPage',
