@@ -99,19 +99,17 @@ class CommunityInfo {
     });
   }
 
-  public async updateCommunityData(communityData) {
-    const {
-      description,
-      invitesEnabled,
-      name,
-      privacyEnabled,
-      website,
-      chat,
-      telegram,
-      github,
-    } = communityData;
+  public async updateCommunityData({
+    description,
+    invitesEnabled,
+    name,
+    privacyEnabled,
+    website,
+    chat,
+    telegram,
+    github,
+  }) {
     // TODO: Change to PUT /community
-
     const r = await $.post(`${app.serverUrl()}/updateCommunity`, {
       'id': app.activeCommunityId(),
       'name': name,

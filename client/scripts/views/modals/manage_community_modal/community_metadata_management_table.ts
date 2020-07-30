@@ -9,8 +9,8 @@ import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_
 interface ICommunityMetadataManagementState {
   name: string;
   description: string;
-  invitesValue: boolean;
-  privacyValue: boolean;
+  invitesEnabled: boolean;
+  privacyEnabled: boolean;
   website: string;
   chat: string;
   telegram: string;
@@ -80,12 +80,12 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
       m(TogglePropertyRow, {
         title: 'Private community?',
         defaultValue: vnode.attrs.community.privacyEnabled,
-        onToggle: (checked) => { vnode.state.privacyValue = checked; },
+        onToggle: (checked) => { vnode.state.privacyEnabled = checked; },
       }),
       m(TogglePropertyRow, {
         title: 'Invites enabled?',
         defaultValue: vnode.attrs.community.invitesEnabled,
-        onToggle: (checked) => { vnode.state.invitesValue = checked; },
+        onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
       }),
       m('tr', [
         m('td', 'Admins'),
@@ -112,8 +112,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           description,
           website,
           chat,
-          invitesValue,
-          privacyValue,
+          telegram,
+          github,
+          invitesEnabled,
+          privacyEnabled,
         } = vnode.state;
         try {
           await vnode.attrs.community.updateCommunityData({
@@ -121,8 +123,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             description,
             website,
             chat,
-            privacyValue,
-            invitesValue,
+            telegram,
+            github,
+            privacyEnabled,
+            invitesEnabled,
           });
           $(e.target).trigger('modalexit');
         } catch (err) {
