@@ -188,7 +188,7 @@ interface IEventSubscriptionState {
           m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: EdgewareChainNotificationTypes.Validator, }),
           m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: EdgewareChainNotificationTypes.Vote, }),
   
-          // List all event kinds in the UI.
+          // List all event kinds in the UI. Good for debugging.
           // supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
           //   ? vnode.state.eventKinds.map((kind) => m(
           //     EventSubscriptionRow,
