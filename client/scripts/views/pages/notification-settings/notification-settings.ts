@@ -513,9 +513,7 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
     );
   },
   view: (vnode) => {
-    const { selectedFilter, chains, communities, subscriptions } = vnode.state;
-    const chainIds = chains.map((c) => c.id);
-    const communityIds = communities.map((c) => c.id);
+    const { chains, communities, subscriptions } = vnode.state;
     if (!app.loginStatusLoaded()) return;
     if (subscriptions.length < 1) return;
     return m(Sublayout, {
