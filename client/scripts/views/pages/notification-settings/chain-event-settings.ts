@@ -38,9 +38,7 @@ interface IEventSubscriptionTypeRowAttrs {
       const allSubscriptionsCreated = subscriptions.length === notificationTypeArray.length;
   
       return m('tr.EventSubscriptionTypeRow', [
-        m('td', {
-          class: 'bold'
-        }, title),
+        m('td', { class: 'bold' }, title),
         m('td', [
           m(Checkbox, {
             checked: allSubscriptionsCreated && everySubscriptionActive,
@@ -65,8 +63,8 @@ interface IEventSubscriptionTypeRowAttrs {
         ]),
         m('td', [
           m(Checkbox, {
-            disabled: !everySubscriptionActive,
-            checked: everySubscriptionActive && everySubscriptionEmail,
+            disabled: !everySubscriptionActive || !allSubscriptionsCreated,
+            checked:  everySubscriptionEmail,
             indeterminate: !everySubscriptionEmail && someSubscriptionsEmail,
             size: 'lg',
             onchange: async (e) => {
@@ -132,66 +130,6 @@ interface IEventSubscriptionState {
             m('th', 'In app'),
             m('th', 'By email'),
           ]),
-          // m('tr.EventSubscriptionRow', [
-          //   m('td', { class: 'bold', }, 'Subscribe To All Chain Notifications'),
-          //   m(Popover, {
-          //     closeOnEscapeKey: true,
-          //     closeOnContentClick: true,
-          //     content: m('div', 'Are you sure?'),
-          //     interactionType: 'hover',
-          //     transitionDuration: 0,
-          //     trigger: m('td', [
-          //       m(Checkbox, {
-          //         class: '',
-          //         checked: vnode.state.isSubscribedAll,
-          //         indeterminate,
-          //         size: 'lg',
-          //         onchange: async (e) => {
-          //           e.preventDefault();
-          //           if (vnode.state.isSubscribedAll) {
-          //             await app.user.notifications.disableSubscriptions(allActiveSubscriptions);
-          //           } else {
-          //             await Promise.all(
-          //               vnode.state.eventKinds.map((kind) => {
-          //                 return app.user.notifications.subscribe(
-          //                   NotificationCategories.ChainEvent,
-          //                   `${vnode.state.chain}-${kind.toString()}`
-          //                 );
-          //               })
-          //             );
-          //           }
-          //           m.redraw();
-          //         }
-          //       }),
-          //     ]),
-          //   }),
-          //   m(Popover, {
-          //     closeOnEscapeKey: true,
-          //     closeOnContentClick: true,
-          //     content: m('div', 'Are you sure?'),
-          //     interactionType: 'hover',
-          //     transitionDuration: 0,
-          //     trigger: m('td', [
-          //       m(Checkbox, {
-          //         class: '',
-          //         disabled: !vnode.state.isSubscribedAll,
-          //         checked: isSomeEmail && vnode.state.isEmailAll,
-          //         indeterminate: isSomeEmail && !vnode.state.isEmailAll,
-          //         size: 'lg',
-          //         onchange: async (e) => {
-          //           e.preventDefault();
-          //           if (!allActiveSubscriptions) return;
-          //           if (vnode.state.isEmailAll) {
-          //             await app.user.notifications.disableImmediateEmails(allActiveSubscriptions);
-          //           } else {
-          //             await app.user.notifications.enableImmediateEmails(allActiveSubscriptions);
-          //           }
-          //           m.redraw();
-          //         }
-          //       }),
-          //     ]),
-          //   }),
-          // ]),
           m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
           m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
           m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: EdgewareChainNotificationTypes.Preimage, }),
