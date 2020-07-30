@@ -2,6 +2,12 @@
 
 .ProposalsPage {
     // TODO: duplicated
+    .sublayout-content {
+        flex-direction: column;
+    }
+    .stats-container {
+        display: flex;
+    }
     h4.proposals-subheader {
         text-transform: uppercase;
         color: #999;

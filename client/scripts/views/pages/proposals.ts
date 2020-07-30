@@ -75,7 +75,8 @@ const ProposalsPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'ProposalsPage',
       title: 'Proposals',
-      rightSidebar: [
+    }, [
+      m('.stats-container', [
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),
           m('.stats-tile-figure-minor', [
@@ -176,8 +177,7 @@ const ProposalsPage: m.Component<{}> = {
             ]),
           ]),
         ]),
-      ],
-    }, [
+      ]),
       !visibleReferenda
         && !visibleCouncilProposals
         && !visibleDemocracyProposals
