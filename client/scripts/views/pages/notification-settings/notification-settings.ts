@@ -57,18 +57,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
   },
 };
 
-interface ISubscriptionRowAttrs {
-  subscription: NotificationSubscription;
-  label?: string;
-  bold?: boolean;
-}
-
-interface ISubscriptionRowState {
-  subscription: NotificationSubscription;
-  paused: boolean;
-}
-
-const labelMaker = (subscription: NotificationSubscription) => {
+const singleLabel = (subscription: NotificationSubscription) => {
   const chainOrCommunityId = subscription.Chain
     ? subscription.Chain.id
     : subscription.OffchainCommunity
@@ -112,51 +101,6 @@ const labelMaker = (subscription: NotificationSubscription) => {
   }
 };
 
-const SubscriptionRow: m.Component<ISubscriptionRowAttrs, ISubscriptionRowState> = {
-  oninit: (vnode) => {
-    vnode.state.subscription = vnode.attrs.subscription;
-  },
-  view: (vnode) => {
-    const { label, bold } = vnode.attrs;
-    const { subscription } = vnode.state;
-    return m('tr.SubscriptionRow', [
-      m('td', {
-        class: bold ? 'bold' : null,
-      }, [
-        label || labelMaker(subscription)]),
-      m('td', [
-        m(Checkbox, {
-          checked: subscription.isActive,
-          class: '',
-          size: 'lg',
-          onclick: async (e) => {
-            e.preventDefault();
-            if (subscription.isActive) {
-              await app.user.notifications.disableSubscriptions([subscription]);
-            } else {
-              await app.user.notifications.enableSubscriptions([subscription]);
-            }
-            m.redraw();
-          }
-        }),
-      ]),
-      subscription && app.user.email
-        && m(ImmediateEmailCheckbox, { subscription, }),
-    ]);
-  }
-};
-
-interface IBatchedSubscriptionRowAttrs {
-  subscriptions: NotificationSubscription[];
-  label?: string;
-  bold?: boolean;
-}
-
-interface IBatchedSubscriptionRowState {
-  subscriptions: NotificationSubscription[];
-  paused: boolean;
-}
-
 const batchLabel = (subscriptions: NotificationSubscription[]) => {
   const chainOrCommunityId = subscriptions[0].Chain
     ? subscriptions[0].Chain.id
@@ -181,6 +125,16 @@ const batchLabel = (subscriptions: NotificationSubscription[]) => {
   : `New Comments & Reactions on 'Comment ${String(threadOrComment)}'`;
 }
 
+interface IBatchedSubscriptionRowAttrs {
+  subscriptions: NotificationSubscription[];
+  label?: string;
+  bold?: boolean;
+}
+
+interface IBatchedSubscriptionRowState {
+  subscriptions: NotificationSubscription[];
+  paused: boolean;
+}
 
 const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatchedSubscriptionRowState> = {
   oninit: (vnode) => {
@@ -199,7 +153,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
         (label) ? label
           : (subscriptions?.length > 1) 
             ? batchLabel(subscriptions)
-            : labelMaker(subscriptions[0]),
+            : singleLabel(subscriptions[0]),
       ]),
       m('td', [
         m(Checkbox, {
@@ -230,7 +184,7 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     const subscription = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    return subscription && m(SubscriptionRow, { subscription, label: 'New Threads', bold: true });
+    return subscription && m(BatchedSubscriptionRow, { subscriptions: [subscription], label: 'New Threads', bold: true });
   },
 };
 
