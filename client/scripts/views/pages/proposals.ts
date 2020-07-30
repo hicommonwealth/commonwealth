@@ -75,6 +75,7 @@ const ProposalsPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'ProposalsPage',
       title: 'Proposals',
+      showNewButton: true,
       rightSidebar: [
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),
