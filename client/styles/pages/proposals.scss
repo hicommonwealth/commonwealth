@@ -7,8 +7,15 @@
     }
     .stats-container {
         display: flex;
-        .stats-tile {
-            display: inline-block;
+        .cui-col-4 {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            .stats-tile {
+                display: inline-block;
+                margin: 0;
+                padding: 0;
+            }
         }
     }
     h4.proposals-subheader {

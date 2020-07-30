@@ -83,7 +83,7 @@ const ProposalsPage: m.Component<{}> = {
         justify: 'space-between'
       }, [
         // TODO: Redesign Moloch
-        // onMoloch && m('.forum-container.stats-tile', [
+        // onMoloch && m('.stats-tile', [
         //   m('.stats-tile-label', 'DAO Basics'),
         //   m('.stats-tile-figure-minor', [
         //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
@@ -102,38 +102,34 @@ const ProposalsPage: m.Component<{}> = {
         //   ]),
         // ]),
         m(Col, { span: 4 }, [
-          onSubstrate && m('.forum-container.stats-tile', [
-            m('.stats-tile-figure-major', [
-              onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-                ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
-                : '--'
-            ]),
+          onSubstrate && m('.stats-tile', [
+            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
+              : '--',
             m('.stats-tile-label', ' till next proposal'),
           ]),
-          onSubstrate && m('.forum-container.stats-tile', [
-            m('.stats-tile-figure-major', [
-              app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-                ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
-                : '--',
-            ]),
+          onSubstrate && m('.stats-tile', [
+            app.chain && (app.chain as Substrate).treasury.nextSpendBlock
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
+              : '--',
             m('.stats-tile-label', ' till next treasury spend'),
           ]),
         ]),
         m(Col, { span: 4 }, [
-          onSubstrate && m('.forum-container.stats-tile', [
-            m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot)),
+          onSubstrate && m('.stats-tile', [
+            app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             m('.stats-tile-label', ' in the treasury'),
           ]),
         ]),
         m(Col, { span: 4 }, [
           m('', '')
         ])
-        // onSubstrate && m('.forum-container.stats-tile', [
+        // onSubstrate && m('.stats-tile', [
         //   m('.stats-tile-label', 'Next referendum draws from'),
         //   m('.stats-tile-figure-major', nextReferendum),
         //   m('.stats-tile-figure-minor', nextReferendumDetail),
         // ]),
-        // onSubstrate && m('.forum-container.stats-tile', [
+        // onSubstrate && m('.stats-tile', [
         //   m('.stats-tile-label', 'Next-up council referendum'),
         //   m('.stats-tile-figure-major', [
         //     (app.chain as Substrate).democracyProposals.nextExternal
@@ -148,7 +144,7 @@ const ProposalsPage: m.Component<{}> = {
         //     m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
         //   ] : 'None'),
         // ]),
-        // onSubstrate && m('.forum-container', [
+        // onSubstrate && m('', [
         //   m('ul', [
         //     m('h4', 'Referenda'),
         //     m('li', [
