@@ -278,7 +278,7 @@ const SettingsModule: m.Component<{}> = {
         }),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.VOLUME_2 }),
-          label: 'Notifications',
+          label: 'Community Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
               ? `/${app.activeId()}/notification-settings`
@@ -287,6 +287,18 @@ const SettingsModule: m.Component<{}> = {
           active: app.activeId()
             ? m.route.get() === `/${app.activeId()}/notification-settings`
             : m.route.get() === '/notification-settings',
+        }),
+        m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.VOLUME_2 }),
+          label: 'Chain Event Notifications',
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/chain-event-settings`
+              : '/chain-event-settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/chain-event-settings`
+            : m.route.get() === '/chain-event-settings',
         }),
       ]),
     ]);
