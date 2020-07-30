@@ -74,7 +74,7 @@ class CommentsController {
 
     return _.uniq((comments as string[]))
       .map((slug) => slug.split(/#/))
-      .map(([address, chain]) => new AddressInfo(null, address, chain, null));
+      .map(([chain, address]) => new AddressInfo(null, address, chain, null));
   }
 
   public lastCommented<T extends IUniqueId>(proposal: T) {

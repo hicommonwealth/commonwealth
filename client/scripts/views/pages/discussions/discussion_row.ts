@@ -10,8 +10,6 @@ import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
 
 import { OffchainThread, OffchainThreadKind, OffchainTag, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
-import QuillFormattedText from 'views/components/quill_formatted_text';
 import User from 'views/components/widgets/user';
 
 import DiscussionRowMenu from './discussion_row_menu';
@@ -97,7 +95,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
             m('.discussion-commenters', [
               m(UserGallery, {
                 avatarSize: 24,
-                class: 'commenters-avatars',
                 users: app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
               }),
             ]),
