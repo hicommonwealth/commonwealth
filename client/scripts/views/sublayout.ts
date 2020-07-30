@@ -14,14 +14,14 @@ const Sublayout: m.Component<{ class: string, title?: string, showNewButton?: bo
     const { title, rightSidebar, showNewButton } = vnode.attrs;
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
-      showNewButton && m(NewProposalButton, { fluid: false }),
-      app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
+      m(LoginSelector),                                                 // login selector
       app.isLoggedIn() && app.config.invites?.length > 0 && m(Button, { // invites menu
         class: 'InvitesButton',
         iconLeft: Icons.MAIL,
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
       }),
-      m(LoginSelector),                                                 // login selector
+      app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
+      showNewButton && m(NewProposalButton, { fluid: false }),
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [
