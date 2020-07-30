@@ -56,10 +56,10 @@ const NavigationModule: m.Component<{}, {}> = {
 
     return m('.NavigationModule.SidebarModule', [
       m(List, { size: 'lg' }, [
-        m(ListItem, {
-          class: 'section-header',
-          label: 'Off-chain',
-        }),
+        // m(ListItem, {
+        //   class: 'section-header',
+        //   label: 'Off-chain',
+        // }),
         m(ListItem, {
           active: onDiscussionsPage(m.route.get()),
           label: 'Discussions',

@@ -25,13 +25,13 @@ const acceptInviteLink = async (models, req, res, next) => {
       id,
     }
   });
-  if (!inviteLink.active) return redirectWithError(res, 'Invite link expired');
+  if (!inviteLink || !inviteLink.active) return redirectWithError(res, 'Invite link expired or invalid');
 
   const { time_limit, multi_use, used, community_id, creator_id } = inviteLink;
 
   if (multi_use !== null) { // meaning limited usage
     if (used === multi_use) {
-      return redirectWithError(res, 'Invite link expired');
+      return redirectWithError(res, 'Invite link expired or invalid');
     }
   }
 
@@ -42,30 +42,30 @@ const acceptInviteLink = async (models, req, res, next) => {
       case '24h':
         if (timeElapsed > 24) {
           await inviteLink.update({ active: false, });
-          return redirectWithError(res, 'Invite link expired');
+          return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '48h':
         if (timeElapsed > (24 * 2)) {
           await inviteLink.update({ active: false, });
-          return redirectWithError(res, 'Invite link expired');
+          return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '1w':
         if (timeElapsed > (24 * 7)) {
           await inviteLink.update({ active: false, });
-          return redirectWithError(res, 'Invite link expired');
+          return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       case '1m':
         if (timeElapsed > (24 * 30)) {
           await inviteLink.update({ active: false, });
-          return redirectWithError(res, 'Invite link expired');
+          return redirectWithError(res, 'Invite link expired or invalid');
         }
         break;
       default:
         await inviteLink.update({ active: false, });
-        return redirectWithError(res, 'Invite link invalid');
+        return redirectWithError(res, 'Invite link expired or invalid');
     }
   }
 

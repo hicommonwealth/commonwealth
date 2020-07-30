@@ -1,12 +1,7 @@
 @import 'client/styles/shared';
 
 .EdgewareStatsPage {
-    .container {
-        background: $background-color-white;
-        border: 1px solid $background-color-border;
-        margin: 20px auto;
-        padding: 20px 34px 34px;
-    }
+    margin: 40px 0;
 
     // shared styles
     .form-field {

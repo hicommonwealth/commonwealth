@@ -1,33 +1,17 @@
 @import 'client/styles/shared';
 
 .CreateInviteModal {
-    padding: 6px 30px 20px;
-
-    .selected-community {
-        border: 1px solid #ddd;
-        padding: 12px 16px 10px;
-        margin-bottom: 40px;
-        border-radius: 4px;
-        .community-name {
-            font-weight: 500;
-        }
-        .community-url {
-            color: #999;
+    form {
+        margin: 0;
+        max-width: 560px;
+        h4 {
+            margin-top: 0;
+            margin-bottom: 16px;
         }
     }
-
     form + form {
-        margin-top: 30px;
+        margin-top: 40px;
     }
-    .create-invite-button {
-        margin: 10px 0 20px;
-    }
-    .DropdownFormField {
-        .form-group {
-            margin: 0 0 10px 0;
-        }
-    }
-
     .error-message {
         margin: 10px 0;
         font-weight: 500;
