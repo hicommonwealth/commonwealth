@@ -77,26 +77,30 @@ const ProposalsPage: m.Component<{}> = {
       class: 'ProposalsPage',
       title: 'Proposals',
     }, [
-      m(Grid, { class: 'stats-container' }, [
+      m(Grid, {
+        align: 'middle',
+        class: 'stats-container',
+        justify: 'space-between'
+      }, [
         // TODO: Redesign Moloch
-        onMoloch && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'DAO Basics'),
-          m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-          ]),
-        ]),
+        // onMoloch && m('.forum-container.stats-tile', [
+        //   m('.stats-tile-label', 'DAO Basics'),
+        //   m('.stats-tile-figure-minor', [
+        //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
+        //   ]),
+        // ]),
         m(Col, { span: 4 }, [
           onSubstrate && m('.forum-container.stats-tile', [
             m('.stats-tile-figure-major', [
@@ -120,7 +124,9 @@ const ProposalsPage: m.Component<{}> = {
             m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot)),
             m('.stats-tile-label', ' in the treasury'),
           ]),
-
+        ]),
+        m(Col, { span: 4 }, [
+          m('', '')
         ])
         // onSubstrate && m('.forum-container.stats-tile', [
         //   m('.stats-tile-label', 'Next referendum draws from'),
