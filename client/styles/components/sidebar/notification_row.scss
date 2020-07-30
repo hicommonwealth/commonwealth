@@ -33,6 +33,8 @@
         overflow: hidden;
         .QuillFormattedText {
             line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
     .comment-body-created {

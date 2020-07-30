@@ -22,7 +22,7 @@ const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc: sliceQuill(doc, 140), hideFormatting: true });
+    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
