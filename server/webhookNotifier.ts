@@ -42,9 +42,7 @@ const send = async (models, content: WebhookContent) => {
 
   let address;
   try {
-    console.trace();
     address = await models.Address.findOne({ where: { address: content.user, chain: content.chain } });
-    console.log(content, address);
   } catch (e) {
     // pass nothing if no matching address is found
   }
