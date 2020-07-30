@@ -22,6 +22,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
+import { Grid, Col } from 'construct-ui';
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -76,7 +77,7 @@ const ProposalsPage: m.Component<{}> = {
       class: 'ProposalsPage',
       title: 'Proposals',
     }, [
-      m('.stats-container', [
+      m(Grid, { class: 'stats-container' }, [
         // TODO: Redesign Moloch
         onMoloch && m('.forum-container.stats-tile', [
           m('.stats-tile-label', 'DAO Basics'),
@@ -96,49 +97,51 @@ const ProposalsPage: m.Component<{}> = {
             `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
           ]),
         ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next referendum'),
-          m('.stats-tile-figure-major', [
-            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
-              : '--'
+        m(Col, { span: 4 }, [
+          onSubstrate && m('.forum-container.stats-tile', [
+            m('.stats-tile-figure-major', [
+              onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
+                ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
+                : '--'
+            ]),
+            m('.stats-tile-label', ' till next proposal'),
           ]),
-          m('.stats-tile-figure-minor', [
-            `Block ${onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock}`
+          onSubstrate && m('.forum-container.stats-tile', [
+            m('.stats-tile-figure-major', [
+              app.chain && (app.chain as Substrate).treasury.nextSpendBlock
+                ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
+                : '--',
+            ]),
+            m('.stats-tile-label', ' till next treasury spend'),
           ]),
         ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next referendum draws from'),
-          m('.stats-tile-figure-major', nextReferendum),
-          m('.stats-tile-figure-minor', nextReferendumDetail),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Next-up council referendum'),
-          m('.stats-tile-figure-major', [
-            (app.chain as Substrate).democracyProposals.nextExternal
-              // ((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
-              // (app.chain as Substrate).chain.methodToTitle(
-              //   (app.chain as Substrate).democracyProposals.nextExternal[0])
-              // ) : '--'
-              ? `${(app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8)}...` : '--'
+        m(Col, { span: 4 }, [
+          onSubstrate && m('.forum-container.stats-tile', [
+            m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot)),
+            m('.stats-tile-label', ' in the treasury'),
           ]),
-          m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
-            m('p', `Hash: ${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8)}...`),
-            m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
-          ] : 'None'),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-figure-major', [
-            app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
-              : '--',
-          ]),
-          m('.stats-tile-label', ' till next treasury spend'),
-        ]),
-        onSubstrate && m('.forum-container.stats-tile', [
-          m('.stats-tile-figure-major', app.chain && formatCoin((app.chain as Substrate).treasury.pot)),
-          m('.stats-tile-label', ' in the treasury'),
-        ]),
+
+        ])
+        // onSubstrate && m('.forum-container.stats-tile', [
+        //   m('.stats-tile-label', 'Next referendum draws from'),
+        //   m('.stats-tile-figure-major', nextReferendum),
+        //   m('.stats-tile-figure-minor', nextReferendumDetail),
+        // ]),
+        // onSubstrate && m('.forum-container.stats-tile', [
+        //   m('.stats-tile-label', 'Next-up council referendum'),
+        //   m('.stats-tile-figure-major', [
+        //     (app.chain as Substrate).democracyProposals.nextExternal
+        //       // ((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
+        //       // (app.chain as Substrate).chain.methodToTitle(
+        //       //   (app.chain as Substrate).democracyProposals.nextExternal[0])
+        //       // ) : '--'
+        //       ? `${(app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8)}...` : '--'
+        //   ]),
+        //   m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
+        //     m('p', `Hash: ${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8)}...`),
+        //     m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
+        //   ] : 'None'),
+        // ]),
         // onSubstrate && m('.forum-container', [
         //   m('ul', [
         //     m('h4', 'Referenda'),
