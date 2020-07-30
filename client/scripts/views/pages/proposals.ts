@@ -142,9 +142,9 @@ const ProposalsPage: m.Component<{}> = {
           onSubstrate && m('.stats-tile', [
             app.chain
             && (app.chain as Substrate).democracy.enactmentPeriod
-              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod)
+              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
               : '--',
-            ' enactment delay after proposal'
+            'd enactment delay after proposal'
           ]),
           onSubstrate && m('.stats-tile', [
             app.chain && formatCoin((app.chain as Substrate).treasury.pot),
