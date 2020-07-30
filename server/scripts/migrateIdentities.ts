@@ -66,7 +66,16 @@ export async function migrateIdentities(models, chain?: string): Promise<void> {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     const identityEvents = await fetcher.fetchIdentities(addresses);
 
-    // 2c. write the found identities back to db using the event handler
+    // 2c. remove all existing identities from profiles
+    await Promise.all(profiles.map(async (p) => {
+      if (p.identity || p.judgements) {
+        p.identity = null;
+        p.judgements = null;
+        await p.save();
+      }
+    }));
+
+    // 2d. write the found identities back to db using the event handler
     log.info(`Writing identities for chain ${node.chain} back to db...`);
     const handler = new IdentityEventHandler(models, node.chain);
     await Promise.all(identityEvents.map((e) => handler.handle(e, null)));
