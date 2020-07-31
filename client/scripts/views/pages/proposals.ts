@@ -81,6 +81,7 @@ const ProposalsPage: m.Component<{}> = {
       m(Grid, {
         align: 'middle',
         class: 'stats-container',
+        gutter: 5,
         justify: 'space-between'
       }, [
         // TODO: Redesign Moloch
