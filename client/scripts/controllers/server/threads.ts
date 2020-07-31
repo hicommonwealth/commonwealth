@@ -172,6 +172,12 @@ class ThreadsController {
       },
       success: (response) => {
         console.dir(response);
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
       },
       error: (err) => {
         console.error(err);
