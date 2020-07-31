@@ -13,6 +13,7 @@ import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import { isTestChain } from '@polkadot/util';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -46,9 +47,16 @@ describe('Thread Tests', () => {
       chainOrCommObj: { offchain_community_id: community },
       role: 'admin',
     });
+    const isAdmin2 = await modelUtils.assignRole({
+      address_id: res.address_id,
+      chainOrCommObj: { chain_id: chain },
+      role: 'admin',
+    });
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
+    expect(isAdmin2).to.not.be.null;
+
 
     res = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = res.address;
@@ -559,6 +567,59 @@ describe('Thread Tests', () => {
     it.skip('should fail to show private threads to a user without access', async () => {
       // TODO: Use /bulkThreads to fetch threads for a user without access
       // TODO: and ensure that a created private thread is not shown to the user
+    });
+  });
+
+  describe('/setPrivacy', () => {
+    let tempThread;
+    it('should create a private thread as non-admin', async () => {
+      let res = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        tagName,
+        tagId,
+        body,
+        jwt: userJWT,
+        privacy: true,
+      });
+      expect(res.status).to.be.equal('Success');
+      expect(res.result.private).to.be.true;
+      tempThread = res.result;
+    });
+
+    it('should turn off privacy as non-admin and turn on readonly', async () => {
+      let res = await chai.request(app)
+        .post('/api/setPrivacy')
+        .set('Accept', 'application/json')
+        .send({
+          thread_id: tempThread.id,
+          privacy: false,
+          read_only: 'true',
+          jwt: userJWT,
+        });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.result.private).to.be.false;
+      expect(res.body.result.read_only).to.be.true;
+    });
+
+    it('should turn off readonly as an admin of community', async () => {
+      let res = await chai.request(app)
+      .post('/api/setPrivacy')
+      .set('Accept', 'application/json')
+      .send({
+        thread_id: tempThread.id,
+        privacy: null,
+        read_only: 'false',
+        jwt: adminJWT,
+      });
+      console.dir(res.error);
+      expect(res.status).to.be.equal(200);
+      console.dir(res.body);
+      expect(res.body.result.private).to.be.false;
+      expect(res.body.result.read_only).to.be.false;
     });
   });
 
