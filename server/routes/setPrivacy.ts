@@ -44,6 +44,7 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
     // threads can be changed from private to public, but not the other way around
     if (thread.private) thread.private = privacy;
     await thread.save();
+  
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread_id, },
       include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
