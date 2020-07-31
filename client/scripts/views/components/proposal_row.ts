@@ -222,34 +222,33 @@ const ProposalRow: m.Component<IRowAttrs> = {
       supportText = null;
     }
 
+    const proposalIdentifier = (slug === ProposalType.SubstrateDemocracyReferendum || proposal.author === null)
+      ? m('.proposal-display-id', proposal.shortIdentifier)
+      : [
+        m('.proposal-pre', [
+          m(User, {
+            user: proposal.author,
+            avatarOnly: true,
+            avatarSize: 36,
+            tooltip: true,
+          }),
+        ]),
+        m('.proposal-pre-mobile', [
+          m(User, {
+            user: proposal.author,
+            avatarOnly: true,
+            avatarSize: 16,
+            tooltip: true,
+          }),
+        ]),
+      ];
+
     return m('.ProposalRow', {
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`);
       }
     }, [
-      m('.proposal-row-left', [
-        (slug === ProposalType.SubstrateDemocracyReferendum || proposal.author === null)
-          ? m('.proposal-display-id', proposal.shortIdentifier)
-          : [
-            m('.proposal-pre', [
-              m(User, {
-                user: proposal.author,
-                avatarOnly: true,
-                avatarSize: 36,
-                tooltip: true,
-              }),
-            ]),
-            m('.proposal-pre-mobile', [
-              m(User, {
-                user: proposal.author,
-                avatarOnly: true,
-                avatarSize: 16,
-                tooltip: true,
-              }),
-            ]),
-          ],
-      ]),
       m('.proposal-row-main.container', [
 
         // Case 0. Referendum + other types of proposals, just one main div with metadata
@@ -258,6 +257,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           m('.proposal-row-metadata', [
+            proposalIdentifier,
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
@@ -277,8 +277,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
         (slug === ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Actions'),
-            m('.proposal-row-metadata', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+            m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
           ]),
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2

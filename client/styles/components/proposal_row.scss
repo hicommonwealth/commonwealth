@@ -104,17 +104,10 @@
         padding-left: 26px;
     }
 
-    // left
-    .proposal-row-left {
-        .proposal-display-id {
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 1.2;
-        }
-    }
     // main
     .proposal-row-main.container {
         display: flex;
+        flex-direction: column;
 
         @include xs-max {
             display: block;
@@ -140,12 +133,17 @@
         }
 
         .proposal-row-metadata {
-            font-weight: 500;
+            color: $text-color-lightest;
+            font-size: 15px;
+            display: flex;
 
             @include xs-max {
                 display: block;
             }
 
+            .proposal-display-id {
+                padding-right: 5px;
+            }
             .proposal-user {
                 margin-top: 4px;
                 color: #bdbdbd;
@@ -207,13 +205,6 @@
         display: block;
         padding: 20px 22px;
         margin: 15px 0;
-        .proposal-row-left {
-            width: 100%;
-            padding: 0;
-            .proposal-display-id {
-                margin: 0;
-            }
-        }
         .proposal-row-right {
             display: flex;
         }
