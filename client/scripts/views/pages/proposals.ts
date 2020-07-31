@@ -22,7 +22,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
-import { Grid, Col } from 'construct-ui';
+import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 
 const ProposalsPage: m.Component<{}> = {
@@ -34,42 +34,64 @@ const ProposalsPage: m.Component<{}> = {
     const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
     const onMoloch = app.chain && app.chain.class === ChainClass.Moloch;
 
-    // new proposals
-    const visibleMolochProposals = onMoloch && (app.chain as Moloch).governance.store.getAll()
-      .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+    // active proposals
+    const activeDemocracyReferenda = onSubstrate
+      && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed);
+    const activeDemocracyProposals = onSubstrate
+      && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => !p.completed);
+    const activeCouncilProposals = onSubstrate
+      && (app.chain as Substrate).council.store.getAll().filter((p) => !p.completed);
+    const activeSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      && (app.chain as Edgeware).signaling.store.getAll()
+        .filter((p) => !p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
+    const activeTreasuryProposals = onSubstrate
+      && (app.chain as Substrate).treasury.store.getAll().filter((p) => !p.completed);
+    const activeCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      && (app.chain as Cosmos).governance.store.getAll()
+        .filter((p) => !p.completed).sort((a, b) => +b.identifier - +a.identifier);
+    const activeMolochProposals = onMoloch
+      && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
+        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    // do not display the dispatch queue as full proposals for now
-    const visibleDispatchQueue = []; // onSubstrate && (app.chain as Substrate).democracy.store.getAll().filter((p) => !p.completed && p.passed);
-    const visibleReferenda = onSubstrate && (app.chain as Substrate).democracy.store.getAll(); // .filter((p) => !p.completed && !p.passed);
-
-    const visibleDemocracyProposals = onSubstrate && (app.chain as Substrate).democracyProposals.store.getAll();
-    const visibleCouncilProposals = onSubstrate && (app.chain as Substrate).council.store.getAll();
-    const visibleSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
-      && (app.chain as Edgeware).signaling.store.getAll().sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
-    const visibleCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
-      && (app.chain as Cosmos).governance.store.getAll().sort((a, b) => +b.identifier - +a.identifier);
-    const visibleTreasuryProposals = onSubstrate && (app.chain as Substrate).treasury.store.getAll();
+    // inactive proposals
+    const inactiveDemocracyReferenda = onSubstrate
+      && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
+    const inactiveDemocracyProposals = onSubstrate
+      && (app.chain as Substrate).democracyProposals.store.getAll().filter((p) => p.completed);
+    const inactiveCouncilProposals = onSubstrate
+      && (app.chain as Substrate).council.store.getAll().filter((p) => p.completed);
+    const inactiveSignalingProposals = (app.chain && app.chain.class === ChainClass.Edgeware)
+      && (app.chain as Edgeware).signaling.store.getAll()
+        .filter((p) => p.completed).sort((p1, p2) => p1.getVotes().length - p2.getVotes().length);
+    const inactiveTreasuryProposals = onSubstrate
+      && (app.chain as Substrate).treasury.store.getAll().filter((p) => p.completed);
+    const inactiveCosmosProposals = (app.chain && app.chain.base === ChainBase.CosmosSDK)
+      && (app.chain as Cosmos).governance.store.getAll()
+        .filter((p) => p.completed).sort((a, b) => +b.identifier - +a.identifier);
+    const inactiveMolochProposals = onMoloch
+      && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
+        .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
       && (app.chain.class === ChainClass.Kusama || app.chain.class === ChainClass.Polkadot)
       && (app.chain as Substrate).technicalCommittee.store.getAll();
 
-    let nextReferendum;
-    let nextReferendumDetail;
-    if (!onSubstrate) {
-      // do nothing
-    } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
-      if (visibleDemocracyProposals)
-        [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
-      else
-        [nextReferendum, nextReferendumDetail] = ['Council',
-          'Last was council, but no democracy proposal was found'];
-    } else if ((app.chain as Substrate).democracyProposals.nextExternal)
-      [nextReferendum, nextReferendumDetail] = ['Council', ''];
-    else
-      [nextReferendum, nextReferendumDetail] = ['Democracy',
-        'Last was democracy, but no council proposal was found'];
+    // let nextReferendum;
+    // let nextReferendumDetail;
+    // if (!onSubstrate) {
+    //   // do nothing
+    // } else if ((app.chain as Substrate).democracyProposals.lastTabledWasExternal) {
+    //   if (visibleDemocracyProposals)
+    //     [nextReferendum, nextReferendumDetail] = ['Democracy', ''];
+    //   else
+    //     [nextReferendum, nextReferendumDetail] = ['Council',
+    //       'Last was council, but no democracy proposal was found'];
+    // } else if ((app.chain as Substrate).democracyProposals.nextExternal)
+    //   [nextReferendum, nextReferendumDetail] = ['Council', ''];
+    // else
+    //   [nextReferendum, nextReferendumDetail] = ['Democracy',
+    //     'Last was democracy, but no council proposal was found'];
 
     const maxConvictionWeight = Math.max.apply(this, convictions().map((c) => convictionToWeight(c)));
     const maxConvictionLocktime = Math.max.apply(this, convictions().map((c) => convictionToLocktime(c)));
@@ -85,24 +107,24 @@ const ProposalsPage: m.Component<{}> = {
         justify: 'space-between'
       }, [
         // TODO: Redesign Moloch
-        onMoloch && m('.stats-tile', [
-          m('.stats-tile-label', 'DAO Basics'),
-          m('.stats-tile-figure-minor', [
-            `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-          ]),
-          m('.stats-tile-figure-minor', [
-            `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-          ]),
-        ]),
+        // onMoloch && m('.stats-tile', [
+        //   m('.stats-tile-label', 'DAO Basics'),
+        //   m('.stats-tile-figure-minor', [
+        //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
+        //   ]),
+        //   m('.stats-tile-figure-minor', [
+        //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
+        //   ]),
+        // ]),
         m(Col, { span: 4 }, [
           onSubstrate && m('.stats-tile', [
             onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
@@ -154,51 +176,52 @@ const ProposalsPage: m.Component<{}> = {
           ]),
         ]),
       ]),
-      !visibleReferenda
-        && !visibleCouncilProposals
-        && !visibleDemocracyProposals
-        && !visibleCosmosProposals
-        && !visibleMolochProposals
-        && m('.no-proposals', 'No referenda, motions, or proposals'),
-      //
-      (visibleDispatchQueue.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-      visibleDispatchQueue && visibleDispatchQueue.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      //
-      (visibleReferenda.length > 0) && m('h4.proposals-subheader', 'Referenda - final voting'),
-      visibleReferenda && visibleReferenda.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleCouncilProposals.length > 0) && m('h4.proposals-subheader', 'Council motions'),
-      visibleCouncilProposals && visibleCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleDemocracyProposals.length > 0) && m('h4.proposals-subheader', [
-        'Democracy Proposed Referenda',
+      m('h4', 'Active Proposals'),
+      m(List, { class: 'active-proposals' }, [
+        !!activeDemocracyReferenda.length
+        && activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
+        !!activeDemocracyProposals.length
+        && activeDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!activeCouncilProposals.length
+        && activeCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!activeSignalingProposals.length
+        && activeSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!activeTreasuryProposals.length
+        && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!activeCosmosProposals.length
+        && activeCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !activeDemocracyReferenda
+        && !activeDemocracyProposals
+        && !activeCouncilProposals
+        && !activeSignalingProposals
+        && !activeTreasuryProposals
+        && !activeCosmosProposals
+        && !activeMolochProposals
+        && m('.no-proposals', 'No active referenda, motions, or proposals'),
       ]),
-      visibleDemocracyProposals
-        && visibleDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleSignalingProposals.length > 0) && m('h4.proposals-subheader', [
-        'Signaling proposals',
+      m('h4', 'Inactive Proposals'),
+      m(List, { class: 'inactive-proposals' }, [
+        !!inactiveDemocracyReferenda.length
+        && inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
+        !!inactiveDemocracyProposals.length
+        && inactiveDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!inactiveCouncilProposals.length
+        && inactiveCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!inactiveSignalingProposals.length
+        && inactiveSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!inactiveTreasuryProposals.length
+        && inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !!inactiveCosmosProposals.length
+        && inactiveCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
+        !inactiveDemocracyReferenda
+        && !inactiveDemocracyProposals
+        && !inactiveCouncilProposals
+        && !inactiveSignalingProposals
+        && !inactiveTreasuryProposals
+        && !inactiveCosmosProposals
+        && !inactiveMolochProposals
+        && m('.no-proposals', 'No inactive referenda, motions, or proposals'),
       ]),
-      visibleSignalingProposals
-        && visibleSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      (visibleTreasuryProposals.length > 0) && m('h4.proposals-subheader', [
-        'Treasury proposals',
-      ]),
-      visibleTreasuryProposals
-        && visibleTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      visibleCosmosProposals && m('h4.proposals-subheader', [
-        'Cosmos proposals',
-        m('a.proposals-action', {
-          onclick: (e) => m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.CosmosProposal }),
-        }, 'New'),
-      ]),
-      visibleCosmosProposals && visibleCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
-      //
-      visibleMolochProposals && m('h4.proposals-subheader', 'DAO proposals'),
-      visibleMolochProposals && visibleMolochProposals.map((proposal) => m(ProposalRow, { proposal })),
     ]);
   }
 };

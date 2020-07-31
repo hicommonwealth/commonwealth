@@ -4,6 +4,10 @@
     // TODO: duplicated
     .sublayout-content {
         flex-direction: column;
+        .cui-list {
+            overflow-y: visible;
+            max-height: max-content;
+        }
     }
     .stats-container {
         display: flex;
