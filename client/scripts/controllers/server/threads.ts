@@ -160,6 +160,24 @@ class ThreadsController {
     });
   }
 
+  public async setPrivacy({ threadId, privacy, readOnly }) {
+    return $.ajax({
+      url: `${app.serverUrl()}/setPrivacy`,
+      type: 'POST',
+      data: {
+        'jwt': app.user.jwt,
+        'privacy': privacy,
+        'read_only': readOnly,
+      },
+      success: (response) => {
+        console.dir(response);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
   public refreshAll(chainId: string, communityId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
