@@ -28,16 +28,18 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
     });
     if (!thread) return next(new Error(Errors.NoThread));
     const userOwnedAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const userRoles = await models.Role.findAll({
-      where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
-      }
-    });
-    const role = userRoles.find((r) => 
-      r.offchain_community_id === thread.community || r.chain_id === thread.chain
-    );
-    if (!role) return next(new Error(Errors.NotAdmin));
-
+    if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
+      const userRoles = await models.Role.findAll({
+        where: {
+          address_id: { [Op.in]: userOwnedAddressIds, },
+        }
+      });
+      const role = userRoles.find((r) => 
+        r.offchain_community_id === thread.community || r.chain_id === thread.chain
+      );
+      if (!role) return next(new Error(Errors.NotAdmin));  
+    }
+    
     if (read_only) thread.read_only = read_only;
     // threads can be changed from private to public, but not the other way around
     if (thread.private) thread.private = privacy;
