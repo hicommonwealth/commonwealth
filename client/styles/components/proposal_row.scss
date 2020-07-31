@@ -122,9 +122,10 @@
                 display: block;
             }
 
-            .proposal-id {
-                padding-right: 5px;
+            .metadata-divider {
+                padding: 0 5px;
             }
+
             .proposal-user {
                 margin-top: 4px;
                 color: #bdbdbd;
@@ -165,9 +166,9 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        min-width: 280px;
-        width: 280px;
-        padding-left: 60px;
+        min-width: 200;
+        width: 200px;
+        padding-left: 30px;
         flex: 0 0 auto;
         color: $text-color-light;
         font-size: 15px;

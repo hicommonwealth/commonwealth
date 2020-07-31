@@ -17,7 +17,7 @@ import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/subs
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
 
 export const formatProposalHashShort = (pHash : string) => {
@@ -264,8 +264,9 @@ const ProposalRow: m.Component<IRowAttrs> = {
             ? proposal.title.split('(')[0]
             : proposal.title),
           m('.proposal-row-metadata', [
-            m('.proposal-id', getProposalId(proposal)),
-            statusText && m('span.proposal-status', { class: statusClass }, statusText),
+            m('span.proposal-id', getProposalId(proposal)),
+            m('span.metadata-divider', ' - '),
+            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
         // Case 1. Democracy Proposal. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
@@ -283,39 +284,49 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug === ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
           m('.proposal-row-metadata', [
-            m('.proposal-id', getProposalId(proposal)),
-            statusText && m('span.proposal-status', { class: statusClass }, statusText),
+            m('span.proposal-id', getProposalId(proposal)),
+            m('span.metadata-divider', ' - '),
+            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ])
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug === ProposalType.SubstrateTreasuryProposal) && [
-          m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Value'),
-            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
-          ]),
-          m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Bond'),
-            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
-          ]),
-          m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Beneficiary'),
-            m('.proposal-row-metadata', [
+          m(Grid, [
+            m(Col, [
+              m('.proposal-row-subheading', 'Value'),
+              m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
+            ]),
+            m(Col, [
+              m('.proposal-row-subheading', 'Bond'),
+              m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
+            ]),
+            m(Col, [
               m('.proposal-user', [
                 m(User, {
-                  user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
+                  user: new AddressInfo(
+                    null,
+                    (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
+                    app.chain.id,
+                    null
+                  ),
                   hideAvatar: true,
                   tooltip: true,
                 }),
               ]),
               m('.proposal-user-mobile', [
                 m(User, {
-                  user: new AddressInfo(null, (proposal as SubstrateTreasuryProposal).beneficiaryAddress, app.chain.id, null),
+                  user: new AddressInfo(
+                    null,
+                    (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
+                    app.chain.id,
+                    null
+                  ),
                   hideAvatar: true,
                   tooltip: true,
                 }),
               ]),
             ])
-          ]),
+          ])
         ],
       ]),
       m('.proposal-row-xs-clear'),
