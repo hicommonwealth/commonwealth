@@ -79,6 +79,7 @@ export class SubstrateCollectiveProposal
     this._Accounts = Accounts;
     this._Collective = Collective;
     this._title = `${eventData.call.section}.${eventData.call.method}(${eventData.call.args.join(', ')})`;
+    this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

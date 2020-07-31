@@ -166,6 +166,7 @@ export class EdgewareSignalingProposal
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Signaling = Signaling;
+    this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
 

@@ -85,24 +85,24 @@ const ProposalsPage: m.Component<{}> = {
         justify: 'space-between'
       }, [
         // TODO: Redesign Moloch
-        // onMoloch && m('.stats-tile', [
-        //   m('.stats-tile-label', 'DAO Basics'),
-        //   m('.stats-tile-figure-minor', [
-        //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-        //   ]),
-        // ]),
+        onMoloch && m('.stats-tile', [
+          m('.stats-tile-label', 'DAO Basics'),
+          m('.stats-tile-figure-minor', [
+            `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
+          ]),
+          m('.stats-tile-figure-minor', [
+            `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
+          ]),
+        ]),
         m(Col, { span: 4 }, [
           onSubstrate && m('.stats-tile', [
             onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
@@ -147,69 +147,12 @@ const ProposalsPage: m.Component<{}> = {
               : '--',
             'd enactment delay after proposal'
           ]),
+          // TODO: Pot is under construction
           onSubstrate && m('.stats-tile', [
             app.chain && formatCoin((app.chain as Substrate).treasury.pot),
             ' in the treasury',
           ]),
         ]),
-        // onSubstrate && m('.stats-tile', [
-        //   m('.stats-tile-label', 'Next referendum draws from'),
-        //   m('.stats-tile-figure-major', nextReferendum),
-        //   m('.stats-tile-figure-minor', nextReferendumDetail),
-        // ]),
-        // onSubstrate && m('.stats-tile', [
-        //   m('.stats-tile-label', 'Next-up council referendum'),
-        //   m('.stats-tile-figure-major', [
-        //     (app.chain as Substrate).democracyProposals.nextExternal
-        //       // ((app.chain as Substrate).democracyProposals.nextExternal[0].sectionName + '.' +
-        //       // (app.chain as Substrate).chain.methodToTitle(
-        //       //   (app.chain as Substrate).democracyProposals.nextExternal[0])
-        //       // ) : '--'
-        //       ? `${(app.chain as Substrate).democracyProposals.nextExternal[0].toString().slice(2, 8)}...` : '--'
-        //   ]),
-        //   m('.stats-tile-figure-minor', (app.chain as Substrate).democracyProposals.nextExternal ? [
-        //     m('p', `Hash: ${(app.chain as Substrate).democracyProposals.nextExternal[0].hash.toString().slice(2, 8)}...`),
-        //     m('p', (app.chain as Substrate).democracyProposals.nextExternal[1].toString()),
-        //   ] : 'None'),
-        // ]),
-        // onSubstrate && m('', [
-        //   m('ul', [
-        //     m('h4', 'Referenda'),
-        //     m('li', [
-        //       'Referenda are voted on by all coinholders, in a timelock-weighted yes/no vote. ',
-        //     ]),
-        //     m('li', [
-        //       'If a referendum passes, winning voters\' coins are locked for up to ',
-        //       `${(app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime} blocks `,
-        //       `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod * maxConvictionLocktime))}). `,
-        //       'Locked coins can still be staked or voted.',
-        //     ]),
-        //     m('li', [
-        //       'If a referendum is approved, it executes after a delay of ',
-        //       `${(app.chain as Substrate).democracy.enactmentPeriod} blocks `,
-        //       `(${formatDuration(blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod))}).`,
-        //     ]),
-        //     m(ConvictionsTable),
-        //     m('h4', 'Council Motions'),
-        //     m('li', [
-        //       'The council can propose referenda, approve/reject treasury expenses, and ',
-        //       'create emergency proposals/cancellations by creating council motions.'
-        //     ]),
-        //     m('li', [
-        //       'Council motions are voted on by all councillors on a 1-person-1-vote basis.',
-        //       'Motions are approved when enough councillors vote yes, or removed when enough ',
-        //       'councillors vote no that approval becomes impossible.',
-        //     ]),
-        //     m('h4', 'Democracy Proposals'),
-        //     m('li', [
-        //       'Any coinholder can propose a referendum, by placing a bond of at least ',
-        //       `${app.chain && formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)}. `,
-        //     ]),
-        //     m('li', [
-        //       'Anyone can second the proposal in amounts equal to the original bond, as many times as they wish.',
-        //     ]),
-        //   ]),
-        // ]),
       ]),
       !visibleReferenda
         && !visibleCouncilProposals

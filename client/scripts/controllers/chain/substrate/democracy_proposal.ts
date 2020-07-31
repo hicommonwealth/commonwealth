@@ -111,7 +111,7 @@ class SubstrateDemocracyProposal extends Proposal<
     this.deposit = this._Chain.coins(new BN(eventData.deposit, 10));
     this._author = this._Accounts.fromAddress(eventData.proposer);
     this.hash = eventData.proposalHash;
-
+    this.createdAt = entity.createdAt;
     // see if preimage exists and populate data if it does
     const preimage = this._Proposals.app.chain.chainEntities.getPreimage(eventData.proposalHash);
     if (preimage) {

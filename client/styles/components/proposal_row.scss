@@ -77,26 +77,11 @@
         }
     }
 
-    .proposal-row-left,
-    .proposal-row-right {
-        flex: 0 0 auto;
-    }
     .proposal-row-main {
         flex: 1 0;
     }
-    .proposal-row-left {
-        min-width: 50px;
-        width: 50px;
-        padding-right: 16px;
-    }
     .proposal-row-responsive-clear {
         display: none;
-    }
-    .proposal-row-right {
-        min-width: 280px;
-        width: 280px;
-        padding-left: 30px;
-        display: flex;
     }
     .proposal-row-right-chart {
         min-width: 120px;
@@ -141,7 +126,7 @@
                 display: block;
             }
 
-            .proposal-display-id {
+            .proposal-id {
                 padding-right: 5px;
             }
             .proposal-user {
@@ -180,12 +165,45 @@
 
     }
     // right
-    .proposal-row-right-text {
-        padding-top: 4px;
-        @include proposal-stats-data();
-    }
-    .proposal-row-right-chart {
-        padding-top: 2px;
+    .proposal-row-right {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-width: 280px;
+        width: 280px;
+        padding-left: 60px;
+        flex: 0 0 auto;
+        color: $text-color-light;
+        font-size: 15px;
+        font-weight: 400;
+        .cui-icon {
+            padding-left: 2px;
+            color: inherit;
+        }
+        .ReactionButton {
+            border: none;
+            color: inherit;
+            font-weight: inherit;
+            margin: 0;
+            padding: 0;
+            .reactions-count {
+                font-weight: inherit;
+                color: inherit;
+                margin: inherit;
+                padding: inherit;
+            }
+            .reactions-icon {
+                margin: inherit;
+                padding: inherit;
+            }
+        }
+        .proposal-row-right-text {
+            padding-top: 4px;
+            @include proposal-stats-data();
+        }
+        .proposal-row-right-chart {
+            padding-top: 2px;
+        }
     }
 
     // responsive

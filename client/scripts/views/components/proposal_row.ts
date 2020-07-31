@@ -12,11 +12,13 @@ import { ProposalStatus, VotingType, AnyProposal, ChainBase, AddressInfo } from 
 import Countdown from 'views/components/countdown';
 import Substrate from 'controllers/chain/substrate/main';
 import User from 'views/components/widgets/user';
-import { ProposalType } from 'identifiers';
+import { ProposalType, proposalSlugToFriendlyName } from 'identifiers';
 import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
+import ReactionButton, { ReactionType } from './reaction_button';
+import { Icon, Icons } from 'construct-ui';
 
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;
@@ -28,6 +30,10 @@ export const getStatusClass = (proposal: AnyProposal) => proposal.isPassing === 
   : proposal.isPassing === ProposalStatus.Passed ? 'pass'
     : proposal.isPassing === ProposalStatus.Failing ? 'fail'
       : proposal.isPassing === ProposalStatus.Failed ? 'fail' : '';
+
+export const getProposalId = (proposal: AnyProposal) => {
+  return `${proposalSlugToFriendlyName.get(proposal.slug)} ${proposal.shortIdentifier}`;
+};
 
 export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => {
   if (proposal.completed) return 'Completed';
@@ -200,7 +206,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const { author, createdAt, slug, identifier, title } = proposal;
-
     const nComments = app.comments.nComments(proposal);
     const authorComment = author ? app.comments.getByProposal(proposal).sort(byAscendingCreationDate)
       .find((comment) => comment.author === author.address) : null;
@@ -257,11 +262,11 @@ const ProposalRow: m.Component<IRowAttrs> = {
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
           m('.proposal-row-metadata', [
-            proposalIdentifier,
+            m('.proposal-id', getProposalId(proposal)),
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
-        // Case 1. Democracy Proposed. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
+        // Case 1. Democracy Proposal. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
         (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
@@ -313,7 +318,20 @@ const ProposalRow: m.Component<IRowAttrs> = {
       ]),
       m('.proposal-row-xs-clear'),
       m('.proposal-row-right', [
-        m('span.proposal-comments', pluralize(nComments, 'comment')),
+        m('span.proposal-comments', [
+          nComments,
+          m(Icon, {
+            name: Icons.MESSAGE_SQUARE
+          })
+        ]),
+        m(ReactionButton, {
+          post: proposal,
+          type: ReactionType.Like,
+          tooltip: true
+        }),
+        createdAt
+        && createdAt instanceof moment
+        && m('.proposal-timestamp', proposal.createdAt.fromNow(true))
       ]),
       m('.clear'),
     ]);
