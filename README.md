@@ -56,11 +56,6 @@ async function subscribe(url) {
     // if not skipping catchup, this function should "discover" the most
     // recently seen block, in order to limit how far back we attempt to "catch-up"
     discoverReconnectRange: undefined,
-
-    // if set to true, rather than opening a subscription permanently, the
-    // function will synthesize "fake events" from objects in storage. Use
-    // for first-run initialization of events relating to ChainEntities.
-    performMigration: false,
   });
   return subscriber;
 }

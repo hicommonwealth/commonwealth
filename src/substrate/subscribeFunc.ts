@@ -71,7 +71,7 @@ export function createApi(provider: WsProvider, chain: string): ApiPromise {
  * @returns An active block subscriber.
  */
 export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions<ApiPromise>> = async (options) => {
-  const { chain, api, handlers, skipCatchup, discoverReconnectRange, performMigration, verbose } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } = options;
   // helper function that sends an event through event handlers
   const handleEventFn = async (event: CWEvent<IEventData>) => {
     let prevResult = null;
@@ -98,17 +98,6 @@ export const subscribeEvents: SubscribeFunc<ApiPromise, Block, ISubscribeOptions
     // send all events through event-handlers in sequence
     await Promise.all(events.map((event) => handleEventFn(event)));
   };
-
-  // special case to perform a migration on first run
-  // returns early, does not initialize the subscription
-  if (performMigration) {
-    const version = await api.rpc.state.getRuntimeVersion();
-    log.info(`Starting event migration for ${version.specName}:${version.specVersion}.`);
-    const fetcher = new StorageFetcher(api);
-    const events = await fetcher.fetch();
-    await Promise.all(events.map((event) => handleEventFn(event)));
-    return;
-  }
 
   const subscriber = new Subscriber(api, verbose);
   const poller = new Poller(api);

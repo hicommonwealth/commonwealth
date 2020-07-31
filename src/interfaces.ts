@@ -63,7 +63,6 @@ export interface ISubscribeOptions<Api> {
   handlers: IEventHandler<IChainEventData>[];
   skipCatchup?: boolean;
   discoverReconnectRange?: () => Promise<IDisconnectedRange>;
-  performMigration?: boolean;
   verbose?: boolean;
 }
 
