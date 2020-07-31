@@ -126,37 +126,29 @@
                 padding: 0 5px;
             }
 
-            .proposal-user {
-                margin-top: 4px;
+        }
+    
+        .proposal-user {
+            margin-top: 4px;
+            color: #bdbdbd;
+            .username {
                 color: #bdbdbd;
-                .username {
-                    color: #bdbdbd;
-                    font-weight: 400;
-                }
+                font-weight: 400;
             }
-            .proposal-user-mobile {
-                display: none;
+        }
+        .proposal-user-mobile {
+            display: none;
+            color: #bdbdbd;
+            .user-display-name username {
+                position: relative;
                 color: #bdbdbd;
-                .user-display-name username {
-                    position: relative;
-                    color: #bdbdbd;
-                    font-weight: 400;
-                    top: 2px;
-                }
+                font-weight: 400;
+                top: 2px;
             }
         }
 
-        .proposal-row-main.item {
-            flex: 1 0 auto;
-            min-width: 110px;
-        }
-        .proposal-row-main-large.item {
-            flex: 2 0 auto;
-            min-width: 220px;
-        }
-
-        .proposal-row-main-large.item {
-            flex: 2 0 auto;
+        .proposal-row-grid {
+            
         }
 
 

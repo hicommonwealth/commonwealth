@@ -291,17 +291,19 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug === ProposalType.SubstrateTreasuryProposal) && [
-          m(Grid, [
-            m(Col, [
+          m('.proposal-row-title', 'PLACEHOLDER'),
+          m(Grid, { class: '.proposal-row-grid' }, [
+            m(Col, { span: 4 }, [
               m('.proposal-row-subheading', 'Value'),
               m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
             ]),
-            m(Col, [
+            m(Col, { span: 4 }, [
               m('.proposal-row-subheading', 'Bond'),
               m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
             ]),
-            m(Col, [
-              m('.proposal-user', [
+            m(Col, { span: 4 }, [
+              m('.proposal-row-subheading', 'Author'),
+              m('.proposal-row-metadata .proposal-user', [
                 m(User, {
                   user: new AddressInfo(
                     null,
@@ -313,7 +315,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                   tooltip: true,
                 }),
               ]),
-              m('.proposal-user-mobile', [
+              m('.proposal-row-metadata .proposal-user-mobile', [
                 m(User, {
                   user: new AddressInfo(
                     null,
@@ -344,7 +346,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         }),
         createdAt
         && createdAt instanceof moment
-        && m('.proposal-timestamp', proposal.createdAt.fromNow(true))
+        && m('.proposal-timestamp', proposal.createdAt.format('MMM  D'))
       ]),
       m('.clear'),
     ]);
