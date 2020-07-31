@@ -13,7 +13,7 @@ import QuillFormattedText, { sliceQuill } from 'views/components/quill_formatted
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
-import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents } from '@commonwealth/chain-events';
+import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (comment_text) => {
@@ -149,7 +149,6 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
 };
 
 const NotificationRow: m.Component<{ notifications: Notification[] }, {
-  startedLabelerLoad: boolean,
   Labeler: any,
   MolochTypes: any,
   SubstrateTypes: any,
@@ -165,28 +164,24 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
       }
       const chainId = notification.chainEvent.type.chain;
       const chainName = app.config.chains.getById(chainId).name;
-      let label;
-      if (!vnode.state.startedLabelerLoad) {
-        vnode.state.startedLabelerLoad = true;
-        if (SubstrateTypes.EventChains.includes(chainId)) {
-          label = SubstrateEvents.Label(
-            notification.chainEvent.blockNumber,
-            chainId,
-            notification.chainEvent.data,
-          );
-        } else if (MolochTypes.EventChains.includes(chainId)) {
-          label = MolochEvents.Label(
-            notification.chainEvent.blockNumber,
-            chainId,
-            notification.chainEvent.data,
-          );
-        } else {
-          throw new Error(`invalid notification chain: ${chainId}`);
-        }
-        m.redraw();
+      let label: IEventLabel;
+      if (SubstrateTypes.EventChains.includes(chainId)) {
+        label = SubstrateEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else if (MolochTypes.EventChains.includes(chainId)) {
+        label = MolochEvents.Label(
+          notification.chainEvent.blockNumber,
+          chainId,
+          notification.chainEvent.data,
+        );
+      } else {
+        throw new Error(`invalid notification chain: ${chainId}`);
       }
+      m.redraw();
 
-      // loading dialogue on chain event notifications while waiting for imports
       if (!label) {
         return m('li.NotificationRow', {
           class: notification.isRead ? '' : 'unread',
@@ -196,7 +191,6 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           ]),
         ]);
       }
-      // use different labelers depending on chain
       return m('li.NotificationRow', {
         class: notification.isRead ? '' : 'unread',
         onclick: async () => {
