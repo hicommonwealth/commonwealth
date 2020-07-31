@@ -10,6 +10,7 @@ import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
+import { Errors as setPrivacyErrors } from 'server/routes/setPrivacy';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -611,16 +612,70 @@ describe('Thread Tests', () => {
       .set('Accept', 'application/json')
       .send({
         thread_id: tempThread.id,
-        privacy: null,
         read_only: 'false',
         jwt: adminJWT,
       });
-      console.dir(res.error);
       expect(res.status).to.be.equal(200);
-      console.dir(res.body);
       expect(res.body.result.private).to.be.false;
       expect(res.body.result.read_only).to.be.false;
     });
+
+    it('should fail without read_only or privacy', async () => {
+      let res = await chai.request(app)
+      .post('/api/setPrivacy')
+      .set('Accept', 'application/json')
+      .send({
+        thread_id: tempThread.id,
+        jwt: adminJWT,
+      });
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(setPrivacyErrors.PrivateOrReadOnly);
+    });
+
+
+    it('should fail without thread_id', async () => {
+      let res = await chai.request(app)
+      .post('/api/setPrivacy')
+      .set('Accept', 'application/json')
+      .send({
+        privacy: 'true',
+        read_only: 'true',
+        jwt: adminJWT,
+      });
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(setPrivacyErrors.NoThreadId);
+    });
+
+    it('should fail with an invalid thread_id', async () => {
+      let res = await chai.request(app)
+      .post('/api/setPrivacy')
+      .set('Accept', 'application/json')
+      .send({
+        thread_id: 123458,
+        privacy: 'true',
+        read_only: 'true',
+        jwt: adminJWT,
+      });
+      expect(res.status).to.be.equal(500);
+      expect(res.body.error).to.be.equal(setPrivacyErrors.NoThread);
+    });
+
+    it('should fail if not an admin or author', async () => {
+      // create new user + jwt
+      let res = await modelUtils.createAndVerifyAddress({ chain });
+      const newUserJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
+      let res2 = await chai.request(app)
+      .post('/api/setPrivacy')
+      .set('Accept', 'application/json')
+      .send({
+        thread_id: tempThread.id,
+        privacy: 'true',
+        read_only: 'true',
+        jwt: newUserJWT,
+      });
+      expect(res2.status).to.be.equal(500);
+      expect(res2.body.error).to.be.equal(setPrivacyErrors.NotAdmin);
+    })
   });
 
   describe('/editComment', () => {
