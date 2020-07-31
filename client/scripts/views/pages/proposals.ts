@@ -176,7 +176,7 @@ const ProposalsPage: m.Component<{}> = {
           ]),
         ]),
       ]),
-      m('h4', 'Active Proposals'),
+      m('h4.proposal-section-header', 'Active Proposals'),
       m(List, { class: 'active-proposals' }, [
         !!activeDemocracyReferenda.length
         && activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
@@ -197,9 +197,9 @@ const ProposalsPage: m.Component<{}> = {
         && !activeTreasuryProposals
         && !activeCosmosProposals
         && !activeMolochProposals
-        && m('.no-proposals', 'No active referenda, motions, or proposals'),
+        && m('.no-proposals', 'None'),
       ]),
-      m('h4', 'Inactive Proposals'),
+      m('h4.proposal-section-header', 'Inactive Proposals'),
       m(List, { class: 'inactive-proposals' }, [
         !!inactiveDemocracyReferenda.length
         && inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
@@ -220,7 +220,7 @@ const ProposalsPage: m.Component<{}> = {
         && !inactiveTreasuryProposals
         && !inactiveCosmosProposals
         && !inactiveMolochProposals
-        && m('.no-proposals', 'No inactive referenda, motions, or proposals'),
+        && m('.no-proposals', 'None'),
       ]),
     ]);
   }

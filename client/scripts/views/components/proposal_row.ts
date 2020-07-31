@@ -270,9 +270,11 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
-            m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal)
-              .title
-              .split('(')[0])),
+            m('.proposal-row-metadata', [
+              formatProposalHashShort((proposal as SubstrateDemocracyProposal)
+                .title
+                .split('(')[0]),
+            ])
           ]),
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Seconds'),
@@ -283,6 +285,8 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug === ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+            m('.proposal-id', getProposalId(proposal)),
+            statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2

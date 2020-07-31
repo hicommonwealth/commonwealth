@@ -28,11 +28,9 @@
         }
     }
     h4.proposals-subheader {
-        text-transform: uppercase;
-        color: #999;
-        letter-spacing: 0.4px;
-        margin-top: 26px;
-        font-weight: 500;
+        color: $text-color-lightest;
+        margin: 20px 0;
+        border-bottom: 1px solid $text-color-lightest;
     }
     a.proposals-action {
         float: right;
