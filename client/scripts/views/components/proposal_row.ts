@@ -17,8 +17,8 @@ import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/subs
 import { SubstrateCollectiveProposal } from 'client/scripts/controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substrate/democracy_proposal';
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
-import ReactionButton, { ReactionType } from './reaction_button';
 import { Icon, Icons } from 'construct-ui';
+import ReactionButton, { ReactionType } from './reaction_button';
 
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;
@@ -63,7 +63,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
           : proposal.isPassing === ProposalStatus.Passed ? 'Passed'
             : proposal.isPassing === ProposalStatus.Failed ? 'Did not pass'
               : proposal.isPassing === ProposalStatus.Passing ? 'Passing'
-                : proposal.isPassing === ProposalStatus.Failing ? 'Will not pass' : '';
+                : proposal.isPassing === ProposalStatus.Failing ? 'Insufficient votes' : '';
   if (proposal.isPassing === ProposalStatus.Passing
       || proposal.isPassing === ProposalStatus.Failing
       || (proposal instanceof MolochProposal
@@ -260,7 +260,9 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
+          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate)
+            ? proposal.title.split('(')[0]
+            : proposal.title),
           m('.proposal-row-metadata', [
             m('.proposal-id', getProposalId(proposal)),
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
@@ -268,26 +270,22 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ],
         // Case 1. Democracy Proposal. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
         (slug === ProposalType.SubstrateDemocracyProposal) && [
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-subheading', 'Action'),
-            m('.proposal-row-metadata', [
-              formatProposalHashShort((proposal as SubstrateDemocracyProposal)
-                .title
-                .split('(')[0]),
-            ])
+          m('.proposal-row-title', [
+            formatProposalHashShort((proposal as SubstrateDemocracyProposal)
+              .title
+              .split('(')[0]),
           ]),
           m('.proposal-row-main.item', [
-            m('.proposal-row-subheading', 'Seconds'),
             m('.proposal-row-metadata', (proposal as SubstrateDemocracyProposal).getVoters.length),
           ]),
         ],
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
         (slug === ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-main-large.item', [
-            m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+          m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+          m('.proposal-row-metadata', [
             m('.proposal-id', getProposalId(proposal)),
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
-          ]),
+          ])
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug === ProposalType.SubstrateTreasuryProposal) && [
