@@ -49,8 +49,7 @@
 
 .ProposalRow {
     display: flex;
-    margin: 10px 0;
-    padding: 17px 20px 13px;
+    margin: 25px 0;
     flex-direction: row;
 
     cursor: pointer;
@@ -86,7 +85,7 @@
     }
 
     // main
-    .proposal-row-main.container {
+    .proposal-row-main {
         display: flex;
         flex-direction: column;
 
@@ -101,6 +100,7 @@
             word-break: break-word;
             line-height: 1.2;
             text-overflow: ellipsis;
+            color: $text-color-dark;
         }
 
         .proposal-row-subheading {
@@ -148,7 +148,7 @@
         }
 
         .proposal-row-grid {
-            
+
         }
 
 

@@ -254,7 +254,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         m.route.set(`/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`);
       }
     }, [
-      m('.proposal-row-main.container', [
+      m('.proposal-row-main', [
 
         // Case 0. Referendum + other types of proposals, just one main div with metadata
         (slug !== ProposalType.SubstrateTreasuryProposal
@@ -346,7 +346,9 @@ const ProposalRow: m.Component<IRowAttrs> = {
         }),
         createdAt
         && createdAt instanceof moment
-        && m('.proposal-timestamp', proposal.createdAt.format('MMM  D'))
+        && m('.proposal-timestamp', moment().diff(proposal.createdAt, 'days') > 30
+          ? proposal.createdAt.format('MMM  D')
+          : proposal.createdAt.fromNow())
       ]),
       m('.clear'),
     ]);
