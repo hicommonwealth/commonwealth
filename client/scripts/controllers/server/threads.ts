@@ -105,12 +105,8 @@ class ThreadsController {
     proposal: OffchainThread,
     body?: string,
     attachments?: string[],
-    readOnly?: boolean,
-    privacy?: boolean
   ) {
     const newBody = body || proposal.body;
-    const newReadOnly = (typeof readOnly === 'boolean') ? readOnly : proposal.readOnly;
-    const newPrivacy = (typeof privacy === 'boolean') ? privacy : proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
@@ -122,8 +118,6 @@ class ThreadsController {
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
-        'read_only': newReadOnly,
-        'privacy': newPrivacy,
         'jwt': app.user.jwt
       },
       success: (response) => {
