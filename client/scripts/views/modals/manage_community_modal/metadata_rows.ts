@@ -76,6 +76,7 @@ export const TogglePropertyRow: m.Component<{
   defaultValue: boolean,
   disabled?: boolean,
   onToggle: Function,
+  caption?: Function,
 }, { checked: boolean }> = {
   oninit: (vnode) => {
     vnode.state.checked = vnode.attrs.defaultValue;
@@ -91,7 +92,8 @@ export const TogglePropertyRow: m.Component<{
             vnode.state.checked = !vnode.state.checked;
             vnode.attrs.onToggle(vnode.state.checked);
           },
-        })
+        }),
+        vnode.attrs.caption && m('.switch-caption', vnode.attrs.caption(vnode.state.checked)),
       ])
     ]);
   },
