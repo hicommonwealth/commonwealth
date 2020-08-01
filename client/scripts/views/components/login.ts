@@ -126,7 +126,7 @@ const Login: m.Component<{}, {
                     m('.chain-login-label-name', chain.name),
                   ]),
                   onclick: (e) => {
-                    $(e.target).trigger('modalexit');
+                    $('.Login').trigger('modalexit');
                     m.route.set(`/${chain.id}/web3login`);
                     app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
                   }

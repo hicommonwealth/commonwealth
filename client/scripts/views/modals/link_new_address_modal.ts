@@ -179,23 +179,25 @@ const LinkNewAddressModal = {
   },
   view: (vnode: m.VnodeDOM<ILinkNewAddressAttrs, ILinkNewAddressState>) => {
     if (!app.chain) {
-      // send user home to select a chain
-      return m('.LinkNewAddressModal', [
-        m('.compact-modal-title', [
-          m('h3', 'Select a network')
-        ]),
-        m('.link-address-step.select-chain-step', [
-          m('p', 'You must select a community first...'),
-          m(Button, {
-            label: 'Go home',
-            intent: 'primary',
-            onclick: (e) => {
-              $(e.target).trigger('modalexit');
-              m.route.set('/');
-            }
-          }),
-        ]),
-      ]);
+      // don't render a modal to avoid a loading flash here
+      return;
+      // // send user home to select a chain
+      // return m('.LinkNewAddressModal', [
+      //   m('.compact-modal-title', [
+      //     m('h3', 'Select a network')
+      //   ]),
+      //   m('.link-address-step.select-chain-step', [
+      //     m('p', 'You must select a community first...'),
+      //     m(Button, {
+      //       label: 'Go home',
+      //       intent: 'primary',
+      //       onclick: (e) => {
+      //         $(e.target).trigger('modalexit');
+      //         m.route.set('/');
+      //       }
+      //     }),
+      //   ]),
+      // ]);
     }
 
     if (vnode.state.step === undefined) {
@@ -448,8 +450,8 @@ const LinkNewAddressModal = {
             href: '#',
             onclick: (e) => {
               e.preventDefault();
-              window.history.back();
               $(e.target).trigger('modalexit');
+              window.history.back();
             }
           }, 'Back'),
         ]),
