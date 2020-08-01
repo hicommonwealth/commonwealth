@@ -270,7 +270,7 @@ export function initCommunity(communityId: string): Promise<void> {
 m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
-  updateRoute.apply(this, args);
+  if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
