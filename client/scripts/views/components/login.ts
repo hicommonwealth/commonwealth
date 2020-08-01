@@ -106,7 +106,7 @@ const Login: m.Component<{}, {
               label: `Continue with ${(app.chain.chain.denom) || ''} wallet`,
               onclick: (e) => {
                 $(e.target).trigger('modalexit');
-                m.route.set(`/${app.chain.id}/web3login`);
+                m.route.set(`/${app.chain.id}/web3login`, { prev: m.route.get() });
                 app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
               }
             })
@@ -127,7 +127,7 @@ const Login: m.Component<{}, {
                   ]),
                   onclick: (e) => {
                     $('.Login').trigger('modalexit');
-                    m.route.set(`/${chain.id}/web3login`);
+                    m.route.set(`/${chain.id}/web3login`, { prev: m.route.get() });
                     app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
                   }
                 });

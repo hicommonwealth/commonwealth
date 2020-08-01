@@ -169,6 +169,15 @@ const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, 
 };
 
 const LinkNewAddressModal = {
+  oncreate: (vnode) => {
+    vnode.state.onpopstate = (e) => {
+      $('.LinkNewAddressModal').trigger('modalexit');
+    };
+    $(window).on('popstate', vnode.state.onpopstate);
+  },
+  onremove: (vnode) => {
+    $(window).off('popstate', vnode.state.onpopstate);
+  },
   view: (vnode) => {
     if (!app.chain) {
       // don't render a modal to avoid a loading flash here
