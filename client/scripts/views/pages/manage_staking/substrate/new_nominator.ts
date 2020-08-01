@@ -23,10 +23,6 @@ function openTXModal(txFunc: ITXModalData) {
           author: modalData.author.address
         });
       })
-      .then((res) => {
-        console.log('res create in db');
-        console.log(res);
-      })
       .catch((e) => {
         m.redraw();
       });

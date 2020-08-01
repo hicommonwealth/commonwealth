@@ -215,12 +215,6 @@ class SubstrateStaking implements StorageModule {
   public byAuthor: Record<string, string> = {};
   public nominations: Record<string, iInfo[]> = {};
   private _Chain: SubstrateChain;
-  // TODO: remove this and replace with database
-  public allAccounts: string[] = [
-    '5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY',
-    '5DfiW5jBTU8PRkLnF7PqK54uYUP1E2d8rboJ4aFedMo3RFbi',
-    '5Hb4wZBEYUz4hPgoNXyFPP726gSaeVwy5DAHLMmb4DxPCMhG'
-  ];
 
   private _app: IApp;
   public get app() { return this._app; }
@@ -510,18 +504,16 @@ class SubstrateStaking implements StorageModule {
     return this._Chain.api.pipe(
       switchMap((api: ApiRx) => combineLatest(
         of(api),
-        // of(this.allAccounts)
         from(this._app.chainEvents.getChainStake({})),
-
       )),
       flatMap(([api, allAccounts] :
-        [ApiRx, any]) => {
-        console.log('allAccounts');
-        console.log(allAccounts);
+        [ApiRx, {author: string}[]]) => {
+        allAccounts = allAccounts || [];
+        const authors: string[] = allAccounts.map((account) => account.author);
         return combineLatest(
-          api.query.staking?.bonded.multi(allAccounts),
-          api.query.staking?.ledger.multi(allAccounts),
-          of(allAccounts),
+          api.query.staking?.bonded.multi(authors),
+          api.query.staking?.ledger.multi(authors),
+          of(authors),
           api.derive.staking.stashes(),
           of(api)
         );

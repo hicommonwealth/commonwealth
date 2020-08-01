@@ -13,16 +13,15 @@ const getChainStake = async (models, req: Request, res: Response, next: NextFunc
   if (!chain) {
     return next(new Error(AddressErrors.InvalidChain));
   }
-  console.log('req.query.chain');
-  console.log(req.query.chain);
-  console.log(req.user.id);
+
   const list = await models.ChainStake.findAll({
     where: {
       user_id: req.user.id,
       chain: req.query.chain
     }
   });
-  return res.json({ status: 'Success', data: list });
+
+  return res.json({ status: 'Success', result: list || [] });
 };
 
 export default getChainStake;

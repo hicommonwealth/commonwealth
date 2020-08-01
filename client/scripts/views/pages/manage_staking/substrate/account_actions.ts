@@ -43,6 +43,9 @@ const AccountActions = makeDynamicComponent<AccountActionsAttrs, IAccountActions
         model.foundStashes.map((info) => {
           return m(AccountActionsRow, { info });
         }),
+        !model.foundStashes.length && m('tr.ManageStakingRow', [
+          m('td', { colspan: '7' }, 'No funds staked yet. Bond funds to validate or nominate a validator')
+        ])
       ]));
   }
 });
