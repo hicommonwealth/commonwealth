@@ -7,6 +7,8 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
+import { Button, Icon, Icons } from 'construct-ui';
+
 import { initAppState } from 'app';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
@@ -177,46 +179,21 @@ const LinkNewAddressModal = {
   },
   view: (vnode: m.VnodeDOM<ILinkNewAddressAttrs, ILinkNewAddressState>) => {
     if (!app.chain) {
-      // show chain selector modal
-      const chains = {};
-      app.config.nodes.getAll().forEach((n) => {
-        chains[n.chain.network] ? chains[n.chain.network].push(n) : chains[n.chain.network] = [n];
-      });
-
+      // send user home to select a chain
       return m('.LinkNewAddressModal', [
         m('.compact-modal-title', [
           m('h3', 'Select a network')
         ]),
-        m('.link-address-step', [
-          m('.chains', [
-            Object.entries(chains).map(([chain, nodeList] : [string, any]) => m('.chain-card', {
-              class: (nodeList[0].chain.network === ChainNetwork.Cosmos
-                      || nodeList[0].chain.network === ChainNetwork.Edgeware
-                      || nodeList[0].chain.network === ChainNetwork.Kusama
-                      || nodeList[0].chain.network === ChainNetwork.Polkadot) ? 'hidden-mobile' : '',
-              onclick: async (e) => {
-                e.preventDefault();
-                // Overwrite the current path to force a switch to another chain.
-                if (app.chain) {
-                  m.route.set(`/${chains[chain][0].chain.id}/web3login`, {}, { replace: true });
-                } else {
-                  m.route.set(`/${chains[chain][0].chain.id}/web3login`);
-                }
-              }
-            }, [
-              m(ChainIcon, { chain: nodeList[0].chain }),
-              m('.chain-info', [
-                m('h3', chain.charAt(0).toUpperCase() + chain.substring(1)),
-                m('p', [
-                  nodeList[0].chain.network === ChainNetwork.NEAR ? 'Hosted wallet at nearprotocol.com'
-                    : nodeList[0].chain.network === ChainNetwork.Ethereum ? 'Browser extension or password'
-                      : nodeList[0].chain.network === ChainNetwork.Cosmos ? 'Command line only'
-                        : 'Command line or browser extension'
-                ]),
-              ]),
-            ])),
-            m('.clear'),
-          ]),
+        m('.link-address-step.select-chain-step', [
+          m('p', 'You must select a community first...'),
+          m(Button, {
+            label: 'Go home',
+            intent: 'primary',
+            onclick: (e) => {
+              $(e.target).trigger('modalexit');
+              m.route.set('/');
+            }
+          }),
         ]),
       ]);
     }
@@ -472,6 +449,7 @@ const LinkNewAddressModal = {
             onclick: (e) => {
               e.preventDefault();
               window.history.back();
+              $(e.target).trigger('modalexit');
             }
           }, 'Back'),
         ]),

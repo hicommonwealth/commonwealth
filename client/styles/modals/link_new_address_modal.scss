@@ -62,48 +62,10 @@
     }
 
     // for step 0 - chain selection
-    .chains {
-        padding: 18px 22px;
-        max-width: 566px;
-        text-align: center;
-        @include xs-max {
-            width: initial;
-        }
-    }
-    .chain-card {
-        display: inline-block;
-        cursor: pointer;
-        text-align: center;
-        // layout
-        width: 160px;
-        height: 145px;
-        border-radius: 4px;
-        padding: 20px 22px 12px;
-        margin: 7px;
-        border: 1px solid $background-color-light;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-        @include xs-max {
-            width: 142px;
-            height: 142px;
-            margin: 4px 5px;
-            padding: 18px 12px 12px;
-            &.hidden-mobile {
-                display: none;
-            }
-        }
-    }
-    .chain-info {
-        .ChainIcon {
-        }
-        h3 {
-            font-size: 15px;
-            margin: 6px 0 4px;
-        }
-        p {
-            color: $text-color-medium;
-            font-size: 13px;
-            line-height: 1.32;
-            margin: 7px 0 4px;
+    .select-chain-step {
+        padding: 55px 0 60px;
+        .cui-button {
+            margin-top: 15px;
         }
     }
 

@@ -30,7 +30,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
-      data.chains.map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
