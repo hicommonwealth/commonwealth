@@ -1,4 +1,3 @@
-'use strict';
 
 import m from 'mithril';
 import Chart from 'chart.js';
@@ -13,12 +12,13 @@ export default {
       m('#canvas-holder', [
         m('canvas#chart', {
           oncreate(vnode) {
-            const canvas = <HTMLCanvasElement> document.getElementById('chart'); //access created canvas
-            const ctx = canvas.getContext('2d'); 
+            const canvas = <HTMLCanvasElement> document.getElementById('chart'); // access created canvas
+            const ctx = canvas.getContext('2d');
             model.instance = new Chart(ctx, model.config);
+            m.redraw();
           }
         })
       ]),
-    ])
+    ]);
   }
 };

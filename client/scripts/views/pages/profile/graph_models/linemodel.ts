@@ -1,4 +1,3 @@
-'use strict';
 
 import m from 'mithril';
 
@@ -23,9 +22,9 @@ export default {
         label: 'values',
         backgroundColor: chartColors.red,
         borderColor: chartColors.red,
-        yValues: [1,2],
+        yValues: [1, 2],
         fill: false,
-      },]
+      }, ]
     },
     options: {
       responsive: true,
