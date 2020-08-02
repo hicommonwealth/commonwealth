@@ -52,6 +52,8 @@ const NavigationModule: m.Component<{}, {}> = {
 
     const onValidatorsPage = (p) => p.startsWith(`/${app.activeChainId()}/validators`);
     const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onManageStakingPage = (p) => p.startsWith(`/${app.activeChainId()}/manageStaking`);
+    const onStakingCalculatorPage = (p) => p.startsWith(`/${app.activeChainId()}/stakingCalculator`);
     if (onNotificationsPage(m.route.get())) return;
 
     return m('.NavigationModule.SidebarModule', [
@@ -98,14 +100,6 @@ const NavigationModule: m.Component<{}, {}> = {
               onclick: (e) => m.route.set(`/${app.activeChainId()}/council`),
               contentRight: [], // TODO
             }),
-          // validators (substrate and cosmos only)
-          // !app.community && (app.chain?.base === ChainBase.CosmosSDK || app.chain?.base === ChainBase.Substrate) &&
-          //   m(ListItem, {
-          //     contentLeft: m(Icon, { name: Icons.SHARE_2 }),
-          //     active: onValidatorsPage(m.route.get()),
-          //     label: 'Validators',
-          //     onclick: (e) => m.route.set(`/${app.activeChainId()}/validators`),
-          //   }),
           showMolochMemberOptions && m(ListItem, {
             onclick: (e) => {
               m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.MolochProposal });

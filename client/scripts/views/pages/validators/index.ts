@@ -7,7 +7,6 @@ import app, { ApiStatus } from 'state';
 import { formatAddressShort } from 'helpers/index';
 import { Coin, formatCoin } from 'adapters/currency';
 import { makeDynamicComponent } from 'models/mithril';
-import _ from 'lodash';
 import { u32 } from '@polkadot/types';
 import { HeaderExtended } from '@polkadot/api-derive';
 import { IValidators, SubstrateAccount } from 'controllers/chain/substrate/account';
