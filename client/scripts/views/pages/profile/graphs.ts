@@ -16,7 +16,6 @@ const graphContent: m.Component<{ xValues: string[],yValues: number[]}> = {
   view(vnode) {
     const { xValues, yValues } = vnode.attrs;
     return [
-      m('h1.title.has-text-centered', 'Line Charts'),
       m('.columns', [
         renderChart(lineModel,xValues,yValues),
       ]
