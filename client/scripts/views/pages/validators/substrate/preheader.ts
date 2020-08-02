@@ -11,7 +11,6 @@ import { formatNumber } from '@polkadot/util';
 import ManageStakingModal from './manage_staking';
 import ClaimPayoutModal from './claim_payout';
 import CardSummary from './card_summary';
-import BN from 'bn.js';
 
 interface IPreHeaderState {
   dynamic: {

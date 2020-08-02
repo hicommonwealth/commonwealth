@@ -270,7 +270,7 @@ class SubstrateStaking implements StorageModule {
       )),
       flatMap((
         [api, { validators: currentSet }, era, electedInfo]:
-        [ApiRx, DeriveStakingValidators, EraIndex, DeriveStakingElected]
+        [ApiRx, DeriveStakingValidators, Option<EraIndex>, DeriveStakingElected]
       ) => {
         const commission: ICommissionInfo = {};
 
@@ -305,7 +305,6 @@ class SubstrateStaking implements StorageModule {
           const exposure = exposures[index];
           const totalStake = exposure.total.toBn();
           const comm = commissions[key] || 0;
-
           if (Object.keys(rewards.validators).length === 1) {
             key = this._app.chain.id;
           }
@@ -316,7 +315,7 @@ class SubstrateStaking implements StorageModule {
             const firstReward = new BN(amount.toString()).muln(Number(comm)).divn(100);
             const secondReward = exposure.own.toBn()
               .mul((new BN(amount.toString())).sub(firstReward))
-              .div(totalStake);
+              .div(totalStake || new BN(1));
             const totalReward = firstReward.add(secondReward);
             const length = rewards.validators[key].length;
             if (valRewards.length > 1) {
@@ -331,7 +330,7 @@ class SubstrateStaking implements StorageModule {
               const periodsInYear = (60 * 60 * 24 * 7 * 52) / eventDiff;
               const percentage = (new BN(totalReward))
                 .mul(new BN(n))
-                .div(new BN(totalStake))
+                .div(totalStake || new BN(1))
                 .toNumber() / n;
               const apr = percentage * periodsInYear;
               validatorRewards[account.toString()] = apr;
