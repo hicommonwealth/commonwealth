@@ -169,45 +169,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
                 return role.update({ address_id: addressToBeOwner.id, });
             }
         }),
-    )
-
-    // await Promise.all(
-    //     rolesToBeMerged.map((role1) => {
-    //         alreadyOwnedRoles.forEach((role2) => {
-    //             if (compare(role1, role2)) {
-    //                 if (role1.permission === 'admin'
-    //                     || (role1.permission === 'moderator' && role2.permission !== 'admin')
-    //                 ) {
-    //                     return [role2.destroy(), role1.update({ address_id: addressToBeOwner.id })];
-    //                 } else if (role2.permission === 'admin'
-    //                     || (role2.permission === 'moderator' && role1.permission !== 'admin')
-    //                 ) {
-    //                     return role1.destroy();
-    //                 }
-    //             }
-    //         })
-    //     }),
-    // )
-
-    // for (let i=0; i<alreadyOwnedRoles.length-1; i++) {
-    //     const role1 = alreadyOwnedRoles[i];
-    //     for (let j=i+1; j<alreadyOwnedRoles.length; j++) {
-    //         const role2 = alreadyOwnedRoles[j];
-    //         // compare
-    //         if (compare(role1, role2)) {
-    //                 // destroy the model with the lowest permission
-    //                 if (role1.permission === 'admin'
-    //                     || (role1.permission === 'moderator' && role2.permission !== 'admin')
-    //                 ) {
-    //                     await role2.destroy();
-    //                 } else if (role2.permission === 'admin'
-    //                     || (role2.permission === 'moderator' && role1.permission !== 'admin')
-    //                 ) {
-    //                     await role1.destroy();
-    //                 }
-    //             }
-    //     }
-    // }
+    );
 
     // TODO: What to do with the old Offchain Profile?
     // Keep Address and Offchain Profile in DB, but unassociate with User?
