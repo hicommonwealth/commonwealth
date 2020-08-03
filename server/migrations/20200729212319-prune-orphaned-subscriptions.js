@@ -20,6 +20,8 @@ module.exports = {
           else {
             queryInterface.sequelize.query(`DELETE FROM "Notifications" WHERE subscription_id=${s.id}; DELETE FROM "Subscriptions" WHERE id=${s.id};`);
           }
+        } else if (!s.offchain_comment_id && !s.offchain_thread_id && !s.chain_id && !s.community_id) {
+          queryInterface.sequelize.query(`DELETE FROM "Notifications" WHERE subscription_id=${s.id}; DELETE FROM "Subscriptions" WHERE id=${s.id};`);
         }
       } else {
         return;
