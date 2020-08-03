@@ -106,7 +106,6 @@ const ProposalsPage: m.Component<{}> = {
         gutter: 5,
         justify: 'space-between'
       }, [
-        // TODO: Redesign Moloch
         // onMoloch && m('.stats-tile', [
         //   m('.stats-tile-label', 'DAO Basics'),
         //   m('.stats-tile-figure-minor', [
@@ -130,7 +129,7 @@ const ProposalsPage: m.Component<{}> = {
             onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
               ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock, includeSeconds: false })
               : '--',
-            ' till next proposal',
+            ' till next referendum',
           ]),
           onSubstrate && m('.stats-tile', [
             app.chain && (app.chain as Substrate).treasury.nextSpendBlock
@@ -143,8 +142,7 @@ const ProposalsPage: m.Component<{}> = {
           onSubstrate && m('.stats-tile', [
             app.chain
             && (app.chain as Substrate).treasury.bondMinimum
-              ?  `${(app.chain as Substrate).treasury.bondMinimum.inDollars} ${
-                (app.chain as Substrate).treasury.bondMinimum.denom}`
+              ? (app.chain as Substrate).treasury.bondMinimum.format()
               : '--',
             ' proposal bond'
           ]),
@@ -152,13 +150,11 @@ const ProposalsPage: m.Component<{}> = {
             app.chain
             && (app.chain as Substrate).democracyProposals.minimumDeposit
             && (app.chain as Substrate).treasury.computeBond
-              ? `${(app.chain as Substrate).treasury.computeBond(
+              ? (app.chain as Substrate).treasury.computeBond(
                 (app.chain as Substrate).democracyProposals.minimumDeposit
-              ).inDollars} ${(app.chain as Substrate).treasury.computeBond(
-                (app.chain as Substrate).democracyProposals.minimumDeposit
-              ).denom}`
+              ).format()
               : '--',
-            ' proposal bond'
+            ' treasury bond'
           ])
         ]),
         m(Col, { span: 4 }, [
@@ -167,7 +163,7 @@ const ProposalsPage: m.Component<{}> = {
             && (app.chain as Substrate).democracy.enactmentPeriod
               ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
               : '--',
-            'd enactment delay after proposal'
+            'd enactment delay after referendum'
           ]),
           // TODO: Pot is under construction
           onSubstrate && m('.stats-tile', [

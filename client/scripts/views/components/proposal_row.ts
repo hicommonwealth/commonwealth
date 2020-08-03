@@ -255,7 +255,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
       }
     }, [
       m('.proposal-row-main', [
-        // Case 0. Referendum + other types of proposals, just one main div with metadata
+        // Case 0. Referendum + other types of proposals
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
@@ -268,7 +268,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
-        // Case 1. Democracy Proposal. 3 main divs 3 1 3 Action, Seconds, Proposer Comment (if any show None in grey)
+        // Case 1. Democracy Proposal
         (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-title', [
             formatProposalHashShort((proposal as SubstrateDemocracyProposal)
@@ -280,10 +280,10 @@ const ProposalRow: m.Component<IRowAttrs> = {
             !!statusText && m('span.metadata-divider', ' • '),
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
             m('span.metadata-divider', ' • '),
-            m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters.length} votes`),
+            m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
           ]),
         ],
-        // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
+        // Case 2 Council Motion
         (slug === ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
           m('.proposal-row-metadata', [
@@ -292,7 +292,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ])
         ],
-        // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
+        // Case 3 Treasury Proposal
         (slug === ProposalType.SubstrateTreasuryProposal) && [
           m('.proposal-row-title', proposal.title),
           m(Grid, { class: '.proposal-row-grid' }, [
