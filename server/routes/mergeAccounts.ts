@@ -125,54 +125,89 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
     }
 
     // Transfer Roles
-    const unmergedRoles = [];
-    await Promise.all(
-        rolesToBeMerged.map((role) => {
-            try {
-                return role.update({
-                    address_id: addressToBeOwner.id,
-                });
-            } catch (e) {
-                unmergedRoles.push(role);
-            }
-        }),
-    );
+    // await Promise.all(
+    //     rolesToBeMerged.map((role) => {
+    //         return role.update({
+    //             address_id: addressToBeOwner.id,
+    //         });
+    //     }),
+    // );
     // Prune Roles
-    const allRoles = await models.Role.findAll({
+
+
+    const compare = (role1, role2) => {
+        if (role1.permission === 'admin'
+            || (role1.permission === 'moderator' && role2.permission !== 'admin')
+        ) {
+            return [role2.destroy(), role1.update({ address_id: addressToBeOwner.id })];
+        } else if (role2.permission === 'admin'
+            || (role2.permission === 'moderator' && role1.permission !== 'admin')
+        ) {
+            return role1.destroy();
+        }
+    }
+
+
+    const alreadyOwnedRoles = await models.Role.findAll({
         where: {
             address_id: addressToBeOwner.id,
         },
     });
+    const alreadyOwnedChains = alreadyOwnedRoles.map((r) => r.chain_id ? r.chain_id : null);
+    const alreadyOwnedComms = alreadyOwnedRoles.map((r) => r.offchain_community_id ? r.offchain_community_id : null);
 
-    console.dir(unmergedRoles);
+    await Promise.all(
+        rolesToBeMerged.map((role) => {
+            if (role.chain_id && alreadyOwnedChains.includes(role.chain_id)) {
+                    // it's included! check hierarchy and destory one of them.
+                const roleTwo = alreadyOwnedRoles.find((r) => r.chain_id === role.chain_id);
+                return compare(role, roleTwo)
+            } else if (role.offchain_community_id && alreadyOwnedComms.includes(role.offchain_community_id)) {
+                const role2 = alreadyOwnedRoles.find((r) => r.offchain_community_id === role.offchain_community_id);
+                return compare(role, role2);
+            } else {
+                return role.update({ address_id: addressToBeOwner.id, });
+            }
+        }),
+    )
 
-    const compare = (a, b) => {
-        if (a.chain_id && b.chain_id) {
-            return a.chain_id === b.chain_id;
-        } else if (a.community_id && b.community_id) {
-            return a.community_id === b.community_id;
-        }
-    }
+    // await Promise.all(
+    //     rolesToBeMerged.map((role1) => {
+    //         alreadyOwnedRoles.forEach((role2) => {
+    //             if (compare(role1, role2)) {
+    //                 if (role1.permission === 'admin'
+    //                     || (role1.permission === 'moderator' && role2.permission !== 'admin')
+    //                 ) {
+    //                     return [role2.destroy(), role1.update({ address_id: addressToBeOwner.id })];
+    //                 } else if (role2.permission === 'admin'
+    //                     || (role2.permission === 'moderator' && role1.permission !== 'admin')
+    //                 ) {
+    //                     return role1.destroy();
+    //                 }
+    //             }
+    //         })
+    //     }),
+    // )
 
-    for (let i=0; i<allRoles.length-1; i++) {
-        const role1 = allRoles[i];
-        for (let j=i+1; j<allRoles.length; j++) {
-            const role2 = allRoles[j];
-            // compare
-            if (compare(role1, role2)) {
-                    // destroy the model with the lowest permission
-                    if (role1.permission === 'admin'
-                        || (role1.permission === 'moderator' && role2.permission !== 'admin')
-                    ) {
-                        await role2.destroy();
-                    } else if (role2.permission === 'admin'
-                        || (role2.permission === 'moderator' && role1.permission !== 'admin')
-                    ) {
-                        await role1.destroy();
-                    }
-                }
-        }
-    }
+    // for (let i=0; i<alreadyOwnedRoles.length-1; i++) {
+    //     const role1 = alreadyOwnedRoles[i];
+    //     for (let j=i+1; j<alreadyOwnedRoles.length; j++) {
+    //         const role2 = alreadyOwnedRoles[j];
+    //         // compare
+    //         if (compare(role1, role2)) {
+    //                 // destroy the model with the lowest permission
+    //                 if (role1.permission === 'admin'
+    //                     || (role1.permission === 'moderator' && role2.permission !== 'admin')
+    //                 ) {
+    //                     await role2.destroy();
+    //                 } else if (role2.permission === 'admin'
+    //                     || (role2.permission === 'moderator' && role1.permission !== 'admin')
+    //                 ) {
+    //                     await role1.destroy();
+    //                 }
+    //             }
+    //     }
+    // }
 
     // TODO: What to do with the old Offchain Profile?
     // Keep Address and Offchain Profile in DB, but unassociate with User?

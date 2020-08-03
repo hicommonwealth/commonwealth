@@ -88,7 +88,12 @@ describe('Merge Account tests', () => {
       const role3 = await modelUtils.assignRole({
         address_id: res.address_id,
         chainOrCommObj: { offchain_community_id: community },
-        role: 'admin',
+        role: 'moderator',
+      });
+      const role4 = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { chain_id: 'edgeware' },
+        role: 'member',
       });
 
       // add threads
