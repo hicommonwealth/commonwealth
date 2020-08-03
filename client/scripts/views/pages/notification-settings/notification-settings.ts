@@ -10,6 +10,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 
 import Sublayout from 'views/sublayout';
+import PageLoading from 'views/pages/loading';
 import { sortSubscriptions } from 'helpers/notifications';
 
 const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscription, subscriptions?: NotificationSubscription[]}> = {
@@ -417,8 +418,8 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   },
   view: (vnode) => {
     const { chains, communities, subscriptions } = vnode.state;
-    if (!app.loginStatusLoaded()) return;
-    if (subscriptions.length < 1) return;
+    if (!app.loginStatusLoaded()) return m(PageLoading);
+    if (subscriptions.length < 1) return m(PageLoading);
     return m(Sublayout, {
       class: 'SubscriptionsPage',
     }, [
