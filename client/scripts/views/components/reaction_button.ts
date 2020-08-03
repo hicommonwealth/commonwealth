@@ -4,9 +4,11 @@ import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
 import { Tooltip } from 'construct-ui';
 
-import app from 'state';
+import app, { LoginState } from 'state';
 import { IUniqueId, Proposal, OffchainComment, OffchainThread, AnyProposal, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
+import SelectAddressModal from '../modals/select_address_modal';
+import LoginModal from '../modals/login_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -35,7 +37,7 @@ const ReactionButton: m.Component<IAttrs, IState> = {
     if (type === ReactionType.Like) likes = reactions.filter((r) => r.reaction === 'like');
     if (type === ReactionType.Dislike) dislikes = reactions.filter((r) => r.reaction === 'dislike');
 
-    const disabled = !app.user.activeAccount || vnode.state.loading;
+    const disabled = vnode.state.loading;
     const activeAddress = app.user.activeAccount?.address;
     const rxn = reactions.find((r) => r.reaction && r.author === activeAddress);
     const hasReacted : boolean = !!rxn;
@@ -61,43 +63,53 @@ const ReactionButton: m.Component<IAttrs, IState> = {
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;
-        // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-        const chainId = app.activeCommunityId() ? null : app.activeChainId();
-        const communityId = app.activeCommunityId();
-        if (hasReacted) {
-          const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
-          vnode.state.loading = true;
-          app.reactions.delete(reaction).then(() => {
-            if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
-              || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
-              app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
+        if (!app.isLoggedIn()) {
+          app.modals.create({
+            modal: LoginModal
+          });
+        } else if (!app.user.activeAccount) {
+          app.modals.create({
+            modal: SelectAddressModal,
+          });
+        } else {
+          // if it's a community use the app.user.activeAccount.chain.id instead of author chain
+          const chainId = app.activeCommunityId() ? null : app.activeChainId();
+          const communityId = app.activeCommunityId();
+          if (hasReacted) {
+            const reaction = reactions.find((r) => r.reaction === hasReactedType && r.author === activeAddress);
+            vnode.state.loading = true;
+            app.reactions.delete(reaction).then(() => {
+              if ((hasReactedType === ReactionType.Like && type === ReactionType.Dislike)
+                || (hasReactedType === ReactionType.Dislike && type === ReactionType.Like)) {
+                app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId).then(() => {
+                  vnode.state.loading = false;
+                  m.redraw();
+                });
+              } else {
+                vnode.state.loading = false;
+                m.redraw();
+              }
+            });
+          } else {
+            vnode.state.loading = true;
+            app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId)
+              .then(() => {
                 vnode.state.loading = false;
                 m.redraw();
               });
-            } else {
-              vnode.state.loading = false;
-              m.redraw();
-            }
+          }
+          mixpanel.track('Create Reaction ', {
+            'Step No': 1,
+            'Step': 'Create Reaction',
+            'Post Name': `${post.slug}: ${post.identifier}`,
+            'Scope': app.activeId(),
           });
-        } else {
-          vnode.state.loading = true;
-          app.reactions.create(app.user.activeAccount.address, post, type, chainId, communityId)
-            .then(() => {
-              vnode.state.loading = false;
-              m.redraw();
-            });
+          mixpanel.people.increment('Reaction');
+          mixpanel.people.set({
+            'Last Reaction Created': new Date().toISOString()
+          });
         }
-        mixpanel.track('Create Reaction ', {
-          'Step No': 1,
-          'Step': 'Create Reaction',
-          'Post Name': `${post.slug}: ${post.identifier}`,
-          'Scope': app.activeId(),
-        });
-        mixpanel.people.increment('Reaction');
-        mixpanel.people.set({
-          'Last Reaction Created': new Date().toISOString()
-        });
-      }
+      },
     }, (type === ReactionType.Dislike) && [
       m('.upvote-icon', '👎'),
       m('.upvote-count', dislikes.length),

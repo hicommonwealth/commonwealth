@@ -1,3 +1,4 @@
+import { SubstrateEvents, SubstrateTypes } from '@commonwealth/chain-events';
 import session from 'express-session';
 import Rollbar from 'rollbar';
 import express from 'express';
@@ -21,6 +22,7 @@ import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
+import IdentityFetchCache from './server/util/identityFetchCache';
 import { SESSION_SECRET, ROLLBAR_SERVER_TOKEN } from './server/config';
 import models from './server/database';
 import { updateEvents, updateBalances } from './server/util/eventPoller';
@@ -35,6 +37,7 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
+import { migrateIdentities } from './server/scripts/migrateIdentities';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -48,6 +51,7 @@ const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDR
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
 const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION;
+const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
 const NO_EVENTS = process.env.NO_EVENTS === 'true';
 
 const rollbar = process.env.NODE_ENV === 'production' && new Rollbar({
@@ -64,6 +68,7 @@ const devMiddleware = (DEV && !NO_CLIENT_SERVER) ? webpackDevMiddleware(compiler
   publicPath: '/build',
 }) : null;
 const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
+const identityFetchCache = new IdentityFetchCache(10 * 60);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
 const closeMiddleware = (): Promise<void> => {
@@ -150,52 +155,74 @@ if (DEV) {
 
 setupMiddleware();
 setupPassport(models);
-setupAPI(app, models, viewCountCache);
+setupAPI(app, models, viewCountCache, identityFetchCache);
 setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 setupErrorHandlers(app, rollbar);
 sendBatchedNotificationEmails(models, 'monthly');
 
-if (SHOULD_RESET_DB) {
-  resetServer(models, closeMiddleware);
-} else if (SHOULD_UPDATE_EVENTS) {
-  updateEvents(app, models);
-} else if (SHOULD_UPDATE_BALANCES) {
-  updateBalances(app, models);
-} else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
-  // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
-  // This only needs to run once on prod to make the necessary queries.
-  fetchStats(models, 'mainnet').then((result) => {
+async function main() {
+  if (SHOULD_RESET_DB) {
+    resetServer(models, closeMiddleware);
+  } else if (SHOULD_UPDATE_EVENTS) {
+    updateEvents(app, models);
+  } else if (SHOULD_UPDATE_BALANCES) {
+    await updateBalances(app, models);
+  } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
+    // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
+    // This only needs to run once on prod to make the necessary queries.
+    await fetchStats(models, 'mainnet');
     log.info('Finished adding Lockdrop statistics into the DB');
     process.exit(0);
-  });
-} else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
-  // MAINNET Cosmos
-  // const cosmosRestUrl = 'http://cosmoshub1.commonwealth.im:1318';
-  // const cosmosChainType = 'cosmos';
-  // TESTNET Cosmos
-  const cosmosRestUrl = 'http://gaia13k1.commonwealth.im:1318';
-  const cosmosChainType = 'gaia13k1';
-  updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
-} else {
-  if (!NO_EVENTS) {
-    setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION)
-      .then(() => {
-        if (RUN_ENTITY_MIGRATION) {
-          models.sequelize.close()
-            .then(() => process.exit(0));
+  } else if (SHOULD_UPDATE_SUPERNOVA_STATS) {
+    // MAINNET Cosmos
+    // const cosmosRestUrl = 'http://cosmoshub1.commonwealth.im:1318';
+    // const cosmosChainType = 'cosmos';
+    // TESTNET Cosmos
+    const cosmosRestUrl = 'http://gaia13k1.commonwealth.im:1318';
+    const cosmosChainType = 'gaia13k1';
+    await updateSupernovaStats(models, cosmosRestUrl, cosmosChainType);
+  } else {
+    if (NO_EVENTS) {
+      setupServer(app, wss, sessionParser);
+    } else {
+      // handle various chain-event cases
+      if (IDENTITY_MIGRATION) {
+        await migrateIdentities(models);
+        log.info('Finished migrating chain identities into the DB');
+        process.exit(0);
+      }
+
+      // TODO: remove the entity migration option from this call and make it another top-level function
+      let exitCode = 0;
+      try {
+        const subscribers = await setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION);
+
+        // construct storageFetchers needed for the identity cache
+        const fetchers = {};
+        for (const [ chain, subscriber ] of Object.entries(subscribers)) {
+          if (SubstrateTypes.EventChains.includes(chain)) {
+            fetchers[chain] = new SubstrateEvents.StorageFetcher(subscriber.api);
+          }
         }
-      }, (err) => {
+        identityFetchCache.start(models, fetchers);
+      } catch (e) {
+        exitCode = 1;
         if (RUN_ENTITY_MIGRATION) {
-          console.error(`Entity migration failed: ${err.message}`);
-          models.sequelize.close()
-            .then(() => (closeMiddleware()))
-            .then(() => process.exit(1));
+          console.error(`Entity migration failed: ${e.message}`);
         } else {
-          console.error(`Chain event listener setup failed: ${err.message}`);
+          console.error(`Chain event listener setup failed: ${e.message}`);
         }
-      });
+      }
+      if (RUN_ENTITY_MIGRATION || exitCode) {
+        await models.sequelize.close();
+        await closeMiddleware();
+        process.exit(exitCode);
+      }
+
+      setupServer(app, wss, sessionParser);
+    }
   }
-  if (!RUN_ENTITY_MIGRATION) setupServer(app, wss, sessionParser);
 }
 
+main();
 export default app;

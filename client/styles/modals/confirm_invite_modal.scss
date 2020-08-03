@@ -1,10 +1,6 @@
 @import 'client/styles/shared';
 
 .ConfirmInviteModal {
-    display: inline-block;
-    @include sm-min {
-        // width: 675px;
-    }
     .compact-modal-title {
         h3 {
             font-size: 17px;

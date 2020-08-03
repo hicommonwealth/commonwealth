@@ -21,7 +21,6 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import ChainOrCommunityRoles from './roles';
 import TagCaratMenu from './tag_carat_menu';
 
 const DiscussionRowHeader = {
@@ -66,7 +65,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
   view: (vnode) => {
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: 'Discussions' });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: 'Discussions', narrow: true });
 
     const { tag } = vnode.attrs;
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
@@ -249,6 +248,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     return m(Sublayout, {
       class: 'DiscussionsPage',
       title: 'Discussions',
+      showNewButton: true,
     }, [
       (app.chain || app.community) && [
         tag

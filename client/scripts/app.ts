@@ -30,7 +30,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       app.config.chains.clear();
       app.config.nodes.clear();
       app.config.communities.clear();
-      data.chains.map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
+      data.chains.filter((chain) => chain.active).map((chain) => app.config.chains.add(ChainInfo.fromJSON(chain)));
       data.nodes.map((node) => {
         return app.config.nodes.add(NodeInfo.fromJSON({
           id: node.id,
@@ -74,7 +74,7 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
       }
       resolve();
     }).catch((err: any) => {
-      app.loadingError = err.responseJSON.error;
+      app.loadingError = err.responseJSON?.error || 'Error loading application state';
       reject(err);
     });
   });
@@ -270,7 +270,7 @@ export function initCommunity(communityId: string): Promise<void> {
 m.route.prefix = '';
 export const updateRoute = m.route.set;
 m.route.set = (...args) => {
-  updateRoute.apply(this, args);
+  if (args[0] !== m.route.get()) updateRoute.apply(this, args);
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
   const body = document.getElementsByTagName('body')[0];
