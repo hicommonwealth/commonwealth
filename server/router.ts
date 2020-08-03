@@ -37,6 +37,7 @@ import updateCommunity from './routes/updateCommunity';
 import viewCount from './routes/viewCount';
 import updateUserEmailInterval from './routes/updateUserEmailInterval';
 import updateEmail from './routes/updateEmail';
+import mergeAccounts from './routes/mergeAccounts';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -217,6 +218,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.post('/updateUserEmailInterval', passport.authenticate('jwt', { session: false }), updateUserEmailInterval.bind(this, models));
   // TODO: Change to PUT /email
   router.post('/updateEmail', passport.authenticate('jwt', { session: false }), updateEmail.bind(this, models));
+
+  router.post('/mergeAccounts', passport.authenticate('jwt', { session: false }), mergeAccounts.bind(this, models));
 
   // fetch addresses (e.g. for mentions)
   // TODO: Change to GET /addresses
