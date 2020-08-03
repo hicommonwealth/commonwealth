@@ -55,7 +55,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
   const status = proposal instanceof MolochProposal && proposal.state === MolochProposalState.NotStarted
     ? 'Waiting to start'
     : proposal instanceof MolochProposal && proposal.state === MolochProposalState.GracePeriod
-      ? (proposal.isPassing === ProposalStatus.Passed ? 'Passed • In grace period' : 'Failed • In grace period')
+      ? (proposal.isPassing === ProposalStatus.Passed ? 'Passed · In grace period' : 'Failed · In grace period')
       : proposal instanceof MolochProposal && proposal.state === MolochProposalState.InProcessingQueue
         ? 'In processing queue'
         : proposal instanceof MolochProposal && proposal.state === MolochProposalState.ReadyToProcess
@@ -68,7 +68,7 @@ export const getStatusText = (proposal: AnyProposal, showCountdown: boolean) => 
       || proposal.isPassing === ProposalStatus.Failing
       || (proposal instanceof MolochProposal
         && (proposal as MolochProposal).state === MolochProposalState.GracePeriod)) {
-    return [ countdown, ` • ${status}` ];
+    return [ countdown, ` · ${status}` ];
   } else {
     return status;
   }
@@ -264,7 +264,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             : proposal.title),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' • '),
+            !!statusText && m('span.metadata-divider', ' · '),
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
         ],
@@ -277,9 +277,9 @@ const ProposalRow: m.Component<IRowAttrs> = {
           ]),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' • '),
+            !!statusText && m('span.metadata-divider', ' · '),
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-            m('span.metadata-divider', ' • '),
+            m('span.metadata-divider', ' · '),
             m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
           ]),
         ],
@@ -288,7 +288,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' • '),
+            !!statusText && m('span.metadata-divider', ' · '),
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ])
         ],
