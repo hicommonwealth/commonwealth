@@ -7,6 +7,7 @@ import jwt, { sign } from 'jsonwebtoken';
 import { NotificationCategories } from 'types';
 import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 const ethUtil = require('ethereumjs-util');
@@ -39,7 +40,7 @@ describe('Merge Account tests', () => {
   
       // generate first address & user
       let res = await modelUtils.createAndVerifyAddress({ chain });
-      console.log('first address', res);
+      // console.log('first address', res);
       userAddress1 = res.address;
       let userEmail = res.email;
       userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
@@ -49,17 +50,13 @@ describe('Merge Account tests', () => {
   
       // generate second address with user JWT
       const { keypair, address } = modelUtils.generateEthAddress();
-      let res2 = await chai.request.agent(app)
-        .post('/api/createAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address: address,
-          chain: chain,
-          jwt: userJWT,
-        });
-      console.log('address2:', res2.body.result);
-      const address_id = res2.body.result.id;
-      const token = res2.body.result.verification_token;
+      const res2 = await models['Address'].createWithToken(
+        res.user_id, chain, address, 
+      )
+      // console.log('res2', res2);
+      // console.log('address2:', res2.body.result);
+      const address_id = res2.id;
+      const token = res2.verification_token;
       const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
       const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
       const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
@@ -76,6 +73,11 @@ describe('Merge Account tests', () => {
       console.log('user_id', user_id);
       const email = res3.body.result.user.email;
       userAddress2 = address;
+
+      const addresses = await models['Address'].findAll({
+        where: { user_id: 2 },
+      })
+      console.log('addresses:', addresses);
     });
 
     it('should do nothing right now', async () => {
