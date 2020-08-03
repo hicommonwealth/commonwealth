@@ -16,12 +16,13 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         where: {
             id: req.user.id,
         },
-        include: [ {model: models.Address, as: 'userAddressModels', }, ],
+        include: [ {model: models.Address, }, ],
     });
-
+    console.log(user);
     // Check addresses are owned by User
-    const { userAddressModels } = user;
-    const userAddresses = userAddressModels.map((a) => a.id);
+    const { Addresses } = user;
+    const userAddresses = Addresses.map((a) => a.address);
+    console.log('addresses', userAddresses);
     if (!userAddresses.includes(oldAddress) || !userAddresses.includes(newAddress)) {
         return next(new Error(Errors.AddressesNotOwned))
     }
@@ -33,19 +34,19 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             user_id: user.id,
         },
         include: [
-            { model: models.OffchainProfile, as: 'Profile', },
+            { model: models.OffchainProfile, },
         ],
     });
 
     // Get threads to be transfered
-    const threadsToBeMerged = await models.OffchainThreads.findAll({
+    const threadsToBeMerged = await models.OffchainThread.findAll({
         where: {
             address_id: addressToBeMerged.id,
         },
     });
 
     // Get comments to be transfered
-    const commentsToBeMerged = await models.OffchainComments.findAll({
+    const commentsToBeMerged = await models.OffchainComment.findAll({
         where: {
             address_id: addressToBeMerged.id,
         },
@@ -72,8 +73,8 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             user_id: user.id,
         },
         include: [
-            { model: models.OffchainProfile, as: 'Profile', },
-            { model: models.Role, as: 'Roles'},
+            { model: models.OffchainProfile, },
+            { model: models.Role, },
         ],
     });
 
@@ -104,7 +105,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         })
     )
     // Prune Reactions (doubled on object)
-    const allReactions = await models.Reactions.findAll({
+    const allReactions = await models.OffchainReaction.findAll({
         where: {
             address_id: addressToBeOwner.id,
         }

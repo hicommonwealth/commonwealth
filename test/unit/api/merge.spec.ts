@@ -80,10 +80,16 @@ describe('Merge Account tests', () => {
       console.log('addresses:', addresses);
     });
 
-    it('should do nothing right now', async () => {
-      console.log(userJWT);
-      console.log(userAddress1);
-      console.log(userAddress2);
+    it('should merge accounts ???', async () => {
+      const res = await chai.request(app)
+        .post('/api/mergeAccounts')
+        .set('Accept', 'application/json')
+        .send({
+          'newAddress': userAddress1,
+          'oldAddress': userAddress2,
+          'jwt': userJWT,
+        });
+      console.dir(res.body);
     });
   });
 });
