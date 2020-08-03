@@ -41,10 +41,10 @@ export default class extends IEventHandler {
       if (existingEvent) {
         existingEvent.event_data = event.data;
         await existingEvent.save();
-        log.debug('Existing event found and migrated successfully!');
+        log.trace('Existing event found and migrated successfully!');
         return existingEvent;
       } else {
-        log.debug('No existing event found, creating new event in db!');
+        log.trace('No existing event found, creating new event in db!');
         return this._models.ChainEvent.create({
           chain_event_type_id: dbEventType.id,
           block_number: event.blockNumber,
