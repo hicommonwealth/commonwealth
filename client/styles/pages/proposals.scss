@@ -27,10 +27,13 @@
             }
         }
     }
-    h4.proposal-section-header {
-        color: $text-color-light;
-        padding: 20px 0;
-        border-bottom: 1px solid $text-color-lightest;
+    .proposal-section-header {
+        font-size: 15px;
+        font-weight: 400;
+        color: $text-color-lightest;
+        padding: 10px 0;
+        margin: 22px 0 0;
+        border-bottom: 1px solid #ededed;
     }
     a.proposals-action {
         float: right;
