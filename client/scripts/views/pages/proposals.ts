@@ -154,7 +154,7 @@ const ProposalsPage: m.Component<{}> = {
                 (app.chain as Substrate).democracyProposals.minimumDeposit
               ).format()
               : '--',
-            ' treasury bond'
+            ' treasury proposal bond'
           ])
         ]),
         m(Col, { span: 4 }, [
@@ -163,7 +163,7 @@ const ProposalsPage: m.Component<{}> = {
             && (app.chain as Substrate).democracy.enactmentPeriod
               ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
               : '--',
-            'd enactment delay after referendum'
+            'd enactment delay after approval'
           ]),
           // TODO: Pot is under construction
           onSubstrate && m('.stats-tile', [
