@@ -40,16 +40,16 @@ describe('Merge Account tests', () => {
   
       // generate first address & user
       let res = await modelUtils.createAndVerifyAddress({ chain });
-      // console.log('first address', res);
+      console.log('first address', res);
       userAddress1 = res.address;
       let userEmail = res.email;
       userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      console.log('userAddress1:', userAddress1);
-      console.log('user_id:', res.user_id);
-      console.log('userJWT:', userJWT);
+      // console.log('userAddress1:', userAddress1);
+      // console.log('user_id:', res.user_id);
+      // console.log('userJWT:', userJWT);
   
       // generate second address with user JWT
-      const { keypair, address } = modelUtils.generateEthAddress();
+      const { keypair, address } = await modelUtils.generateEthAddress();
       const res2 = await models['Address'].createWithToken(
         res.user_id, chain, address, 
       )
@@ -70,14 +70,39 @@ describe('Merge Account tests', () => {
           jwt: userJWT
         });
       const user_id = res3.body.result.user.id;
-      console.log('user_id', user_id);
+      // console.log('user_id', user_id);
       const email = res3.body.result.user.email;
       userAddress2 = address;
 
-      const addresses = await models['Address'].findAll({
-        where: { user_id: 2 },
-      })
-      console.log('addresses:', addresses);
+      // add roles
+      const role1 = await modelUtils.assignRole({
+        address_id: address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+      const role2 = await modelUtils.assignRole({
+        address_id: address_id,
+        chainOrCommObj: { chain_id: 'edgeware' },
+        role: 'moderator',
+      });
+      const role3 = await modelUtils.assignRole({
+        address_id: res.address_id,
+        chainOrCommObj: { offchain_community_id: community },
+        role: 'admin',
+      });
+
+      // add threads
+      const thread = await modelUtils.createThread({
+        chainId: chain,
+        communityId: community,
+        address: userAddress2,
+        jwt: userJWT,
+        title: 'hello',
+        body: 'world',
+        tagName: 'test tag',
+        tagId: undefined,
+        kind: 'forum',
+      });
     });
 
     it('should merge accounts ???', async () => {

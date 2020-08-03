@@ -18,11 +18,10 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         },
         include: [ {model: models.Address, }, ],
     });
-    console.log(user);
+
     // Check addresses are owned by User
     const { Addresses } = user;
     const userAddresses = Addresses.map((a) => a.address);
-    console.log('addresses', userAddresses);
     if (!userAddresses.includes(oldAddress) || !userAddresses.includes(newAddress)) {
         return next(new Error(Errors.AddressesNotOwned))
     }
@@ -110,6 +109,8 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             address_id: addressToBeOwner.id,
         }
     });
+
+
     for (let i=0; i<allReactions.length-1; i++) {
         const reaction1 = allReactions[i];
         for (let j=i+1; j<allReactions.length; j++) {
@@ -124,12 +125,17 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
     }
 
     // Transfer Roles
+    const unmergedRoles = [];
     await Promise.all(
         rolesToBeMerged.map((role) => {
-            return role.update({
-                address_id: addressToBeOwner.id,
-            });
-        })
+            try {
+                return role.update({
+                    address_id: addressToBeOwner.id,
+                });
+            } catch (e) {
+                unmergedRoles.push(role);
+            }
+        }),
     );
     // Prune Roles
     const allRoles = await models.Role.findAll({
@@ -137,15 +143,23 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             address_id: addressToBeOwner.id,
         },
     });
+
+    console.dir(unmergedRoles);
+
+    const compare = (a, b) => {
+        if (a.chain_id && b.chain_id) {
+            return a.chain_id === b.chain_id;
+        } else if (a.community_id && b.community_id) {
+            return a.community_id === b.community_id;
+        }
+    }
+
     for (let i=0; i<allRoles.length-1; i++) {
         const role1 = allRoles[i];
         for (let j=i+1; j<allRoles.length; j++) {
             const role2 = allRoles[j];
             // compare
-            const compare = role1.chain_id
-                ? role1.chain_id === role2.chain_id
-                : role1.community_id === role2.community_id
-            if (compare) {
+            if (compare(role1, role2)) {
                     // destroy the model with the lowest permission
                     if (role1.permission === 'admin'
                         || (role1.permission === 'moderator' && role2.permission !== 'admin')
