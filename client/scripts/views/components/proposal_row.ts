@@ -255,7 +255,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
       }
     }, [
       m('.proposal-row-main', [
-
         // Case 0. Referendum + other types of proposals, just one main div with metadata
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
@@ -276,8 +275,12 @@ const ProposalRow: m.Component<IRowAttrs> = {
               .title
               .split('(')[0]),
           ]),
-          m('.proposal-row-main.item', [
-            m('.proposal-row-metadata', (proposal as SubstrateDemocracyProposal).getVoters.length),
+          m('.proposal-row-metadata', [
+            m('span.proposal-id', getProposalId(proposal)),
+            m('span.metadata-divider', ' - '),
+            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
+            m('span.metadata-divider', ' - '),
+            m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters.length} votes`),
           ]),
         ],
         // Case 2 Council Motion. 2 main divs Action, Proposer Comment 1 1
@@ -291,7 +294,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
         (slug === ProposalType.SubstrateTreasuryProposal) && [
-          m('.proposal-row-title', 'PLACEHOLDER'),
+          m('.proposal-row-title', proposal.title),
           m(Grid, { class: '.proposal-row-grid' }, [
             m(Col, { span: 4 }, [
               m('.proposal-row-subheading', 'Value'),
