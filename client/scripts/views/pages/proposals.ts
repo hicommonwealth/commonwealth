@@ -99,6 +99,7 @@ const ProposalsPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'ProposalsPage',
       title: 'Proposals',
+      showNewButton: true,
     }, [
       m(Grid, {
         align: 'middle',

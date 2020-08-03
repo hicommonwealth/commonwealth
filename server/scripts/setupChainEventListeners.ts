@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import _ from 'underscore';
 import {
   IDisconnectedRange, IEventHandler, EventSupportingChains, IEventSubscriber,
   SubstrateTypes, SubstrateEvents, MolochTypes, MolochEvents
@@ -8,6 +9,7 @@ import EventStorageHandler from '../eventHandlers/storage';
 import EventNotificationHandler from '../eventHandlers/notifications';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import IdentityHandler from '../eventHandlers/identity';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,11 +36,13 @@ const discoverReconnectRange = async (models, chain: string): Promise<IDisconnec
   }
 };
 
-const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string) => {
+const setupChainEventListeners = async (
+  models, wss: WebSocket.Server, skipCatchup?: boolean, migrate?: string
+): Promise<{ [chain: string]: IEventSubscriber<any, any> }> => {
   log.info('Fetching node urls...');
   const nodes = await models.ChainNode.findAll();
   log.info('Setting up event listeners...');
-  await Promise.all(nodes
+  const subscribers: [string, IEventSubscriber<any, any>][] = await Promise.all(nodes
     .filter((node) => EventSupportingChains.includes(node.chain))
     // filter out duplicate nods per-chain, only use one node
     .filter((node) => nodes.map((n) => n.chain).indexOf(node.chain) === nodes.indexOf(node))
@@ -50,6 +54,7 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       const notificationHandler = new EventNotificationHandler(models, wss);
       const migrationHandler = new MigrationHandler(models, node.chain);
       const entityArchivalHandler = new EntityArchivalHandler(models, node.chain, !migrate ? wss : undefined);
+      const identityHandler = new IdentityHandler(models, node.chain);
 
       // handlers are run in order, so if migrating, we run migration -> entityArchival,
       // but normally it's storage -> notification -> entityArchival
@@ -60,6 +65,11 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
       }
       let subscriber: IEventSubscriber<any, any>;
       if (SubstrateTypes.EventChains.includes(node.chain)) {
+        // only handle identities on substrate chains
+        if (!migrate) {
+          handlers.push(identityHandler);
+        }
+
         let nodeUrl = node.url;
         const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
         nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
@@ -99,8 +109,9 @@ const setupChainEventListeners = async (models, wss: WebSocket.Server, skipCatch
           subscriber.unsubscribe();
         }
       });
-      return subscriber;
+      return [ node.chain, subscriber ];
     }));
+  return _.object(subscribers);
 };
 
 export default setupChainEventListeners;

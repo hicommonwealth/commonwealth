@@ -9,8 +9,8 @@ import { InputPropertyRow, TogglePropertyRow, ManageRolesRow } from './metadata_
 interface ICommunityMetadataManagementState {
   name: string;
   description: string;
-  invitesValue: boolean;
-  privacyValue: boolean;
+  invitesEnabled: boolean;
+  privacyEnabled: boolean;
   website: string;
   chat: string;
   telegram: string;
@@ -78,14 +78,16 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
         onChangeHandler: (v) => { vnode.state.github = v; },
       }),
       m(TogglePropertyRow, {
-        title: 'Private community?',
+        title: 'Privacy',
         defaultValue: vnode.attrs.community.privacyEnabled,
-        onToggle: (checked) => { vnode.state.privacyValue = checked; },
+        onToggle: (checked) => { vnode.state.privacyEnabled = checked; },
+        caption: (checked) => checked ? 'Threads are private to members' : 'Threads are visible to the public',
       }),
       m(TogglePropertyRow, {
-        title: 'Invites enabled?',
+        title: 'Invites',
         defaultValue: vnode.attrs.community.invitesEnabled,
-        onToggle: (checked) => { vnode.state.invitesValue = checked; },
+        onToggle: (checked) => { vnode.state.invitesEnabled = checked; },
+        caption: (checked) => checked ? 'Anyone can invite new members' : 'Admins/mods can invite new members',
       }),
       m('tr', [
         m('td', 'Admins'),
@@ -112,8 +114,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
           description,
           website,
           chat,
-          invitesValue,
-          privacyValue,
+          telegram,
+          github,
+          invitesEnabled,
+          privacyEnabled,
         } = vnode.state;
         try {
           await vnode.attrs.community.updateCommunityData({
@@ -121,8 +125,10 @@ m.Component<IChainOrCommMetadataManagementAttrs, ICommunityMetadataManagementSta
             description,
             website,
             chat,
-            privacyValue,
-            invitesValue,
+            telegram,
+            github,
+            privacyEnabled,
+            invitesEnabled,
           });
           $(e.target).trigger('modalexit');
         } catch (err) {

@@ -207,6 +207,7 @@ const CouncilPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'CouncilPage',
       title: 'Council',
+      showNewButton: true,
       rightSidebar: [
         // stats
         m('.forum-container.stats-tile', [

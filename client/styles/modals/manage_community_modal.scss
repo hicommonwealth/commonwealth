@@ -31,13 +31,13 @@
         }
     }
     .ManageRoleRow {
-        padding: 8px 0;
+        padding: 6px 0;
     }
 
     .panel-left {
         width: 100%;
         border-right: 1px solid $background-color-light;
-        min-height: 450px;
+        min-height: 520px;
         max-height: 600px;
         overflow-y: scroll;
 
@@ -60,6 +60,18 @@
                 width: 110px;
             }
         }
+        .TogglePropertyRow {
+            td {
+                padding-top: 16px;
+            }
+            .cui-switch {
+                margin-right: 5px;
+            }
+            .switch-caption {
+                color: $text-color-light;
+                font-size: 94%;
+            }
+        }
     }
 
     .CommunityMetadataManagementTable {
@@ -67,7 +79,7 @@
             padding: 11px 20px;
         }
         .cui-button {
-            margin: 16px 28px 26px;
+            margin: 26px 28px;
         }
         .cui-tabs {
             margin-top: 0;

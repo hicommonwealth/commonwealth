@@ -20,6 +20,7 @@
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "migrate-events": "NO_CLIENT=true RUN_ENTITY_MIGRATION=all ts-node --project tsconfig.node.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
+    "migrate-identities": "NO_CLIENT=true IDENTITY_MIGRATION=true ts-node --project tsconfig.node.json server.ts",
     "reset-server": "NO_CLIENT=true RESET_DB=true ts-node --project tsconfig.node.json server.ts",
     "update-events": "UPDATE_EVENTS=true ts-node --project tsconfig.node.json server.ts",
     "update-balances": "UPDATE_BALANCES=true ts-node --project tsconfig.node.json server.ts",
