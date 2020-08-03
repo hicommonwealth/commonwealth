@@ -6,7 +6,8 @@ import BN from 'bn.js';
 import {
   ISubstrateDemocracyReferendum,
   SubstrateCoin,
-  DemocracyThreshold
+  DemocracyThreshold,
+  formatCall,
 } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
@@ -222,7 +223,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.PreimageNoted: {
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
-          this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+          this._title = formatCall(preimage);
         }
         break;
       }

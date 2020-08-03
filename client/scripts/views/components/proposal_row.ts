@@ -256,7 +256,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate) ? proposal.title.split('(')[0] : proposal.title),
+          m('.proposal-row-title', proposal.title),
           m('.proposal-row-metadata', [
             statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ]),
@@ -266,8 +266,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Action'),
             m('.proposal-row-metadata', formatProposalHashShort((proposal as SubstrateDemocracyProposal)
-              .title
-              .split('(')[0])),
+              .title)),
           ]),
           m('.proposal-row-main.item', [
             m('.proposal-row-subheading', 'Seconds'),
