@@ -128,13 +128,13 @@ const ProposalsPage: m.Component<{}> = {
         m(Col, { span: 4 }, [
           onSubstrate && m('.stats-tile', [
             onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock })
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock, includeSeconds: false })
               : '--',
             ' till next proposal',
           ]),
           onSubstrate && m('.stats-tile', [
             app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock })
+              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock, includeSeconds: false })
               : '--',
             ' till next treasury spend',
           ]),
