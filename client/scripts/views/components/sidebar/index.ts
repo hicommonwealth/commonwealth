@@ -151,8 +151,9 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
     const getTagRow = (id, name, description) => m(ListItem, {
       key: id,
       contentLeft: m('.proposal-tag-icon'),
-      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}` && [
-        m(PopoverMenu, {
+      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+        && m(PopoverMenu, {
           class: 'sidebar-edit-tag',
           position: 'bottom',
           transitionDuration: 0,
@@ -171,7 +172,6 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
             }
           })
         }),
-      ],
       label: [
         name,
       ],
@@ -276,7 +276,7 @@ const SettingsModule: m.Component<{}> = {
             ? m.route.get() === `/${app.activeId()}/settings`
             : m.route.get() === '/settings',
         }),
-        m(ListItem, {
+        app.activeId() && m(ListItem, {
           contentLeft: m(Icon, { name: Icons.BELL }),
           label: 'Notifications',
           onclick: (e) => m.route.set(
@@ -288,7 +288,7 @@ const SettingsModule: m.Component<{}> = {
             ? m.route.get() === `/${app.activeId()}/notification-settings`
             : m.route.get() === '/notification-settings',
         }),
-        m(ListItem, {
+        app.activeId() && m(ListItem, {
           contentLeft: m(Icon, { name: Icons.BELL }),
           label: 'Chain Notifications',
           onclick: (e) => m.route.set(
