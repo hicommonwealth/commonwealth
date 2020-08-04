@@ -48,12 +48,17 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
     });
 
     // verify signature
-    const verified = await models.Address.verifySignature(
-        models, chain, addressToBeMerged, user.id, signature,
-    );
 
-    if (!verified) return next(new Error(Errors.InvalidSignature));
-
+    try {
+        const verified = await models.Address.verifySignature(
+            models, chain, addressToBeMerged, user.id, signature,
+        );
+    
+        if (!verified) return next(new Error(Errors.InvalidSignature));    
+    } catch {
+        return next(new Error(Errors.InvalidSignature));
+    }
+ 
     // Get threads to be transfered
     const threadsToBeMerged = await models.OffchainThread.findAll({
         where: {

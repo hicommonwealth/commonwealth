@@ -220,6 +220,31 @@ describe('Merge Account tests', () => {
       expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned); 
     });
 
+    it('should fail to merge if there is no signature', async () => {
+      const res = await chai.request(app)
+        .post('/api/mergeAccounts')
+        .set('Accept', 'application/json')
+        .send({
+          'newAddress': userAddress1,
+          'oldAddress': notOwned.address,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.be.equal(mergeErrors.NeedSignature); 
+    });
+
+    it('should fail to merge if there is an invalid signature', async () => {
+      const res = await chai.request(app)
+        .post('/api/mergeAccounts')
+        .set('Accept', 'application/json')
+        .send({
+          'newAddress': userAddress1,
+          'oldAddress': userAddress2,
+          'signature': 'bad-signature',
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.be.equal(mergeErrors.InvalidSignature); 
+    });
+
     it('should merge accounts with status Success', async () => {
       const res = await chai.request(app)
         .post('/api/mergeAccounts')
@@ -230,7 +255,6 @@ describe('Merge Account tests', () => {
           'signature': signature,
           'jwt': userJWT,
         });
-      console.log(res.body);
       expect(res.body.status).to.be.equal('Success');
     });
   });
