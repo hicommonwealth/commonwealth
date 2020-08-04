@@ -108,9 +108,52 @@ describe('Merge Account tests', () => {
         tagId: undefined,
         kind: 'forum',
       });
+      const thread2 = await modelUtils.createThread({
+        chainId: chain,
+        communityId: community,
+        address: userAddress2,
+        jwt: userJWT,
+        title: 'hello 2',
+        body: 'world 2',
+        tagName: 'test tag',
+        tagId: undefined,
+        kind: 'forum',
+      });
+
+      console.log(thread2);
+
+      // add comments 
+      const comment = await modelUtils.createComment({
+        chain,
+        address: userAddress2,
+        jwt: userJWT,
+        text: 'hi ho',
+        root_id: `discussion_${thread.id}`,
+      });
+
+      const comment2 = await modelUtils.createComment({
+        chain,
+        address: userAddress2,
+        jwt: userJWT,
+        text: 'hi ho no go!',
+        root_id: `discussion_${thread2.id}`,
+      });
+
+      // add reactions directly
+      const reaction1 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: thread2.id,
+        proposal_id: null,
+        comment_id: null,
+        reaction: 'like',
+        community: community,
+      });
+
+      console.dir(reaction1);
+
     });
 
-    it('should merge accounts ???', async () => {
+    it('should merge accounts with status Success', async () => {
       const res = await chai.request(app)
         .post('/api/mergeAccounts')
         .set('Accept', 'application/json')
@@ -119,7 +162,7 @@ describe('Merge Account tests', () => {
           'oldAddress': userAddress2,
           'jwt': userJWT,
         });
-      console.dir(res.body);
+      expect(res.body.status).to.be.equal('Success');
     });
   });
 });
