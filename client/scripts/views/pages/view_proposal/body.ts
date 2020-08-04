@@ -265,7 +265,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
           isThread ? 'Delete this entire thread?' : 'Delete this comment?'
         )();
         if (!confirmed) return;
-        (isThread ? app.threads : app.comments).delete(item).then((r) => {
+        (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
           refresh();
           m.redraw();
