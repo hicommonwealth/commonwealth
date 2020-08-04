@@ -124,17 +124,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         }
     }
 
-    // Transfer Roles
-    // await Promise.all(
-    //     rolesToBeMerged.map((role) => {
-    //         return role.update({
-    //             address_id: addressToBeOwner.id,
-    //         });
-    //     }),
-    // );
-    // Prune Roles
-
-
+    // Transfer and prune roles
     const compare = (role1, role2) => {
         if (role1.permission === 'admin'
             || (role1.permission === 'moderator' && role2.permission !== 'admin')
@@ -146,7 +136,6 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             return role1.destroy();
         }
     }
-
 
     const alreadyOwnedRoles = await models.Role.findAll({
         where: {
