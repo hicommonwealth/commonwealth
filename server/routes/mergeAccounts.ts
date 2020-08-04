@@ -55,14 +55,14 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
     const reactionsToBeMerged = await models.OffchainReaction.findAll({
         where: {
             address_id: addressToBeMerged.id,
-        }
-    })
+        },
+    });
 
     // Get roles to be transfered
     const rolesToBeMerged = await models.Role.findAll({
         where: {
             address_id: addressToBeMerged.id,
-        }
+        },
     });
 
     // Get Address to be new owner
@@ -83,7 +83,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             return thread.update({
                 address_id: addressToBeOwner.id,
             });
-        })
+        }),
     );
 
     // Transfer Comments
@@ -92,8 +92,8 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             return comment.update({
                 address_id: addressToBeOwner.id,
             });
-        })
-    )
+        }),
+    );
 
     // Transfer Reactions
     await Promise.all(
@@ -101,8 +101,9 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             return reaction.update({
                 address_id: addressToBeOwner.id,
             });
-        })
-    )
+        }),
+    );
+
     // Prune Reactions (doubled on object)
     const allReactions = await models.OffchainReaction.findAll({
         where: {
@@ -135,7 +136,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         ) {
             return role1.destroy();
         }
-    }
+    };
 
     const alreadyOwnedRoles = await models.Role.findAll({
         where: {
