@@ -3,60 +3,26 @@ import 'pages/subscriptions.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import { Checkbox, Table, SelectList, Icons, Button, ListItem } from 'construct-ui';
-
-import { ChainInfo, CommunityInfo } from 'models';
-import app from 'state';
-import { NotificationCategories } from 'types';
 import {
   SubstrateEvents, SubstrateTypes, IChainEventKind, EventSupportingChains, TitlerFilter
 } from '@commonwealth/chain-events';
 
+import { ChainInfo, CommunityInfo } from 'models';
+import app from 'state';
+import { NotificationCategories } from 'types';
+
 import Sublayout from 'views/sublayout';
-import { EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes } from 'helpers/chain_notification_types';
+import {
+  EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes
+} from 'helpers/chain_notification_types';
 
-
-interface IIndividualEventSubscriptionsState {
-  chain: string;
-  eventKinds: IChainEventKind[];
-  allSupportedChains: string[];
-  isSubscribedAll: boolean;
-  isEmailAll: boolean;
-}
-
-const IndividualEventSubscriptions: m.Component<{}, IIndividualEventSubscriptionsState> = {
-  view: (vnode) => {
-    let titler;
-    if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
-      titler = SubstrateEvents.Title;
-      vnode.state.eventKinds = SubstrateTypes.EventKinds;
-    } else {
-      titler = null;
-      vnode.state.eventKinds = [];
-    }   
-
-    const supportedChains = app.loginStatusLoaded
-    ? app.config.chains.getAll()
-      .filter((c) => vnode.state.allSupportedChains.includes(c.id))
-      .sort((a, b) => a.id.localeCompare(b.id))
-    : [];
-
-    return [
-      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
-      ? vnode.state.eventKinds.map((kind) => m(
-        EventSubscriptionRow,
-        { chain: vnode.state.chain, kind, titler, key: kind },
-      ))
-      : m('No events available on this chain.'),
-    ]
-  },
-};
 
 interface IEventSubscriptionRowAttrs {
     chain: string;
     kind: IChainEventKind;
     titler: TitlerFilter;
 }
-  
+
 const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
   view: (vnode) => {
     const { chain, kind } = vnode.attrs;
@@ -105,10 +71,10 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
 };
 
 interface IEventSubscriptionTypeRowAttrs {
-    title: string;
-    notificationTypeArray: string[];
-  }
-  
+  title: string;
+  notificationTypeArray: string[];
+}
+
 const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
   view: (vnode) => {
     const { title, notificationTypeArray, } = vnode.attrs;
@@ -120,7 +86,7 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
     });
     const everySubscriptionActive = subscriptions.every((s) => s.isActive);
     const someSubscriptionsActive = subscriptions.some((s) => s.isActive);
-    const everySubscriptionEmail = subscriptions.every((s) => s.immediateEmail)
+    const everySubscriptionEmail = subscriptions.every((s) => s.immediateEmail);
     const someSubscriptionsEmail = subscriptions.some((s) => s.immediateEmail);
     const allSubscriptionsCreated = subscriptions.length === notificationTypeArray.length;
     return m('tr.EventSubscriptionTypeRow', [
@@ -141,7 +107,7 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
                 notificationTypeArray.map((obj) => {
                   return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
                 })
-              )
+              );
             }
             m.redraw();
           }
@@ -169,7 +135,7 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
 };
 
 const EdgewareChainEvents: m.Component = {
-  view: (vnode) =>{
+  view: (vnode) => {
     return [
       m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: EdgewareChainNotificationTypes.Council, }),
       m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: EdgewareChainNotificationTypes.Democracy, }),
@@ -183,7 +149,7 @@ const EdgewareChainEvents: m.Component = {
 };
 
 const KusamaChainEvents: m.Component = {
-  view: (vnode) =>{
+  view: (vnode) => {
     return [
       m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: KusamaChainNotificationTypes.Council, }),
       m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, }),
@@ -210,8 +176,6 @@ const PolkadotChainEvents: m.Component = {
   }
 };
 
-
-  
 const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
   view: (vnode) => {
     const { chain } = vnode.attrs;
@@ -220,9 +184,9 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
       m('h2', vnode.attrs.chain.name),
       m(Table, {}, [
         m('tr', [
-            m('th', null),
-            m('th', 'In app'),
-            m('th', 'By email'),
+          m('th', null),
+          m('th', 'In app'),
+          m('th', 'By email'),
         ]),
         (chain.id === 'edgeware') && m(EdgewareChainEvents),
         (chain.id === 'kusama') && m(KusamaChainEvents),
@@ -231,59 +195,97 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
     ]);
   }
 };
-  
+
 const ChainNotificationManagementPage: m.Component<{chains: ChainInfo[],}, { selectedChain: ChainInfo,}> = {
-    oninit: (vnode) => {
-      const { chains } = vnode.attrs;
-      const scope = m.route.param('scope');
-      vnode.state.selectedChain = chains.find((c) => c.id === scope) || chains.find((c) => c.id === 'edgeware');
-    },
-    view: (vnode) => {
-      const { chains } = vnode.attrs;
-      const chainIds = chains.map((c) => c.id);
-      if (chains.length < 1) return;
-      const validChains = ['edgeware', 'polkadot', 'kusama'];
-      const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a,b) => (a.id > b.id) ? 1 : -1);
-      return m('ChainNotificationManagementPage', [
-        m('h2', 'Subscribe to Chain Events'),
-        m(SelectList, {
-          class: 'CommunitySelectList',
-          filterable: false,
-          checkmark: false,
-          emptyContent: null,
-          inputAttrs: {
-            class: 'CommunitySelectRow',
-          },
-          itemRender: (chain: ChainInfo) => {
-            return m(ListItem, {
-              label: chain.name,
-              selected: (vnode.state.selectedChain === chain),
-            });
-          },
-          items: filteredChains,
-          trigger: m(Button, {
-            align: 'left',
-            compact: true,
-            iconRight: Icons.CHEVRON_DOWN,
-            label: vnode.state.selectedChain
-              ? vnode.state.selectedChain.name
-              : 'Select Chain',
-          }),
-          onSelect: (chain: ChainInfo) => {
-            vnode.state.selectedChain = chain;
-            m.redraw();
-          }
+  oninit: (vnode) => {
+    const { chains } = vnode.attrs;
+    const scope = m.route.param('scope');
+    vnode.state.selectedChain = chains.find((c) => c.id === scope) || chains.find((c) => c.id === 'edgeware');
+  },
+  view: (vnode) => {
+    const { chains } = vnode.attrs;
+    const chainIds = chains.map((c) => c.id);
+    if (chains.length < 1) return;
+    const validChains = ['edgeware', 'polkadot', 'kusama'];
+    const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a,b) => (a.id > b.id) ? 1 : -1);
+    return m('ChainNotificationManagementPage', [
+      m('h2', 'Subscribe to Chain Events'),
+      m(SelectList, {
+        class: 'CommunitySelectList',
+        filterable: false,
+        checkmark: false,
+        emptyContent: null,
+        inputAttrs: {
+          class: 'CommunitySelectRow',
+        },
+        itemRender: (chain: ChainInfo) => {
+          return m(ListItem, {
+            label: chain.name,
+            selected: (vnode.state.selectedChain === chain),
+          });
+        },
+        items: filteredChains,
+        trigger: m(Button, {
+          align: 'left',
+          compact: true,
+          iconRight: Icons.CHEVRON_DOWN,
+          label: vnode.state.selectedChain
+            ? vnode.state.selectedChain.name
+            : 'Select Chain',
         }),
-        m(EventSubscriptions, {
-          chain: vnode.state.selectedChain,
-        }),
-      ]);
-    },
-  };
+        onSelect: (chain: ChainInfo) => {
+          vnode.state.selectedChain = chain;
+          m.redraw();
+        }
+      }),
+      m(EventSubscriptions, {
+        chain: vnode.state.selectedChain,
+      }),
+    ]);
+  },
+};
+
+interface IIndividualEventSubscriptionsState {
+  chain: string;
+  eventKinds: IChainEventKind[];
+  allSupportedChains: string[];
+  isSubscribedAll: boolean;
+  isEmailAll: boolean;
+}
+
+const IndividualEventSubscriptions: m.Component<{}, IIndividualEventSubscriptionsState> = {
+  view: (vnode) => {
+    let titler;
+    if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
+      titler = SubstrateEvents.Title;
+      vnode.state.eventKinds = SubstrateTypes.EventKinds;
+    } else {
+      titler = null;
+      vnode.state.eventKinds = [];
+    }
+
+    const supportedChains = app.loginStatusLoaded
+      ? app.config.chains.getAll()
+        .filter((c) => vnode.state.allSupportedChains.includes(c.id))
+        .sort((a, b) => a.id.localeCompare(b.id))
+      : [];
+
+    return [
+      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
+        ? vnode.state.eventKinds.map((kind) => m(EventSubscriptionRow, {
+          chain: vnode.state.chain,
+          kind,
+          titler,
+          key: kind
+        }))
+        : m('No events available on this chain.'),
+    ];
+  },
+};
 
 interface IChainEventSettingsPageState {
-    chains: ChainInfo[];
-  }
+  chains: ChainInfo[];
+}
 
 const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
   oninit: (vnode) => {
@@ -299,8 +301,8 @@ const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
     }, [
       m('.forum-container', [
         m(ChainNotificationManagementPage, {
-            chains,
-          }),
+          chains,
+        }),
       ]),
     ]);
   },

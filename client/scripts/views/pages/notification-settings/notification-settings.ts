@@ -13,7 +13,10 @@ import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import { sortSubscriptions } from 'helpers/notifications';
 
-const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscription, subscriptions?: NotificationSubscription[]}> = {
+const ImmediateEmailCheckbox: m.Component<{
+  subscription?: NotificationSubscription,
+  subscriptions?: NotificationSubscription[]
+}> = {
   view: (vnode) => {
     const { subscription, subscriptions } = vnode.attrs;
     if (subscription) {
@@ -51,9 +54,7 @@ const ImmediateEmailCheckbox: m.Component<{subscription?: NotificationSubscripti
             m.redraw();
           },
         }),
-      ])
-    } else {
-      return;
+      ]);
     }
   },
 };
@@ -72,7 +73,7 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-        ? m('a',{
+        ? m('a', {
           href: '#',
           onclick: (e) => {
             e.preventDefault();
@@ -88,14 +89,14 @@ const singleLabel = (subscription: NotificationSubscription) => {
           ? decodeURIComponent(subscription.OffchainComment.id)
           : subscription.objectId;
       return subscription.OffchainThread
-      ? m('a',{
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
-        }
-      },`New Reactions on '${String(threadOrComment)}'`)
-      : `New Reactions on '${String(threadOrComment)}'`;
+        ? m('a', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscription.OffchainThread.id}`);
+          }
+        }, `New Reactions on '${String(threadOrComment)}'`)
+        : `New Reactions on '${String(threadOrComment)}'`;
     }
     default:
       break;
@@ -110,21 +111,21 @@ const batchLabel = (subscriptions: NotificationSubscription[]) => {
       : null;
 
   const threadOrComment = subscriptions[0].OffchainThread
-  ? decodeURIComponent(subscriptions[0].OffchainThread.title)
-  : subscriptions[0].OffchainComment
-    ? decodeURIComponent(subscriptions[0].OffchainComment.id)
-    : subscriptions[0].objectId;
-  
+    ? decodeURIComponent(subscriptions[0].OffchainThread.title)
+    : subscriptions[0].OffchainComment
+      ? decodeURIComponent(subscriptions[0].OffchainComment.id)
+      : subscriptions[0].objectId;
+
   return subscriptions[0].OffchainThread
-  ? m('a',{
-    href: '#',
-    onclick: (e) => {
-      e.preventDefault();
-      m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
-    }
-  }, `New Comments & Reactions on '${String(threadOrComment)}'`)
-  : `New Comments & Reactions on 'Comment ${String(threadOrComment)}'`;
-}
+    ? m('a', {
+      href: '#',
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(`/${chainOrCommunityId}/proposal/discussion/${subscriptions[0].OffchainThread.id}`);
+      }
+    }, `New Comments & Reactions on '${String(threadOrComment)}'`)
+    : `New Comments & Reactions on 'Comment ${String(threadOrComment)}'`;
+};
 
 interface IBatchedSubscriptionRowAttrs {
   subscriptions: NotificationSubscription[];
@@ -152,7 +153,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
         class: bold ? 'bold' : null,
       }, [
         (label) ? label
-          : (subscriptions?.length > 1) 
+          : (subscriptions?.length > 1)
             ? batchLabel(subscriptions)
             : singleLabel(subscriptions[0]),
       ]),
@@ -185,7 +186,11 @@ const NewThreadRow: m.Component<{ subscriptions: NotificationSubscription[], com
     const subscription = subscriptions.find(
       (s) => (s.category === NotificationCategories.NewThread && s.objectId === community.id)
     );
-    return subscription && m(BatchedSubscriptionRow, { subscriptions: [subscription], label: 'New Threads', bold: true });
+    return subscription && m(BatchedSubscriptionRow, {
+      subscriptions: [subscription],
+      label: 'New Threads',
+      bold: true
+    });
   },
 };
 
@@ -204,11 +209,11 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         && s.category !== NotificationCategories.ChainEvent
         && !s.OffchainComment
     );
-    const onComments = subscriptions.filter((s) => 
-      (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id)
-        && s.OffchainComment);
+    const onComments = subscriptions.filter((s) => {
+      return (s.OffchainCommunity?.id === community.id || s.Chain?.id === community.id) && s.OffchainComment;
+    });
     const batchedSubscriptions = sortSubscriptions(filteredSubscriptions, 'objectId');
-    if (filteredSubscriptions.length < 1 && onComments.length < 1) return; 
+    if (filteredSubscriptions.length < 1 && onComments.length < 1) return;
     return [
       m(NewThreadRow, { community, subscriptions }),
       onComments.length > 0 && m(BatchedSubscriptionRow, {
@@ -217,7 +222,10 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
       }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
       batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
-        return m(BatchedSubscriptionRow, { subscriptions, key: subscriptions[0].id });
+        return m(BatchedSubscriptionRow, {
+          subscriptions,
+          key: subscriptions[0].id
+        });
       })
     ];
   },
@@ -264,12 +272,13 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     const { subscriptions, communities } = vnode.attrs;
     const mentionsSubscription = subscriptions.find((s) => s.category === NotificationCategories.NewMention);
     const chainIds = app.config.chains.getAll().map((c) => c.id);
-    const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => !chainIds.includes(s.objectId)
-      && s.category !== NotificationCategories.NewMention
-      && s.category !== NotificationCategories.NewThread
-      && s.category !== NotificationCategories.ChainEvent
-      && !s.OffchainComment
-    ), 'objectId');
+    const batchedSubscriptions = sortSubscriptions(subscriptions.filter((s) => {
+      return !chainIds.includes(s.objectId)
+        && s.category !== NotificationCategories.NewMention
+        && s.category !== NotificationCategories.NewThread
+        && s.category !== NotificationCategories.ChainEvent
+        && !s.OffchainComment;
+    }), 'objectId');
     return [
       mentionsSubscription
         && m('tr.mentions.SubscriptionRow', [
@@ -355,7 +364,8 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
               : 'All communities',
           }),
           onSelect: (community: string) => {
-            vnode.state.selectedCommunity = communities.find((c) => c.name === community) || chains.find((c) => c.name === community);
+            vnode.state.selectedCommunity = communities.find((c) => c.name === community)
+              || chains.find((c) => c.name === community);
             vnode.state.selectedCommunityId = vnode.state.selectedCommunity?.name || 'All communities';
             m.redraw();
           }
