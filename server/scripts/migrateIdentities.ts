@@ -6,30 +6,20 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents } from '@commonwealth/chain-events';
-import { OffchainProfileAttributes, OffchainProfileInstance } from '../models/offchain_profile';
+import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
-
+import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export async function migrateIdentities(models, chain?: string): Promise<void> {
+export default async function (models, chain?: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info('Fetching node info for identity migrations...');
-  const nodes = [];
-  if (!chain) {
-    // query one node for each supported chain
-    for (const supportedChain of SubstrateTypes.EventChains) {
-      // eslint-disable-next-line no-await-in-loop
-      nodes.push(await models.ChainNode.findOne({
-        where: { chain: supportedChain }
-      }));
-    }
-  } else {
-    // query one node for provided chain
-    nodes.push(await models.ChainNode.findOne({
-      where: { chain }
-    }));
-  }
+  const chains = !chain ? SubstrateTypes.EventChains : [ chain ];
+  // query one node for each supported chain
+  const nodes = (await Promise.all(chains.map((c) => {
+    return models.ChainNode.findOne({ where: { chain: c } });
+  }))).filter((n) => !!n);
   if (!nodes) {
     throw new Error('no nodes found for identity migration');
   }
@@ -51,16 +41,7 @@ export async function migrateIdentities(models, chain?: string): Promise<void> {
 
     // 2b. connect to chain and query all identities of found addresses
     log.info(`Fetching identities on chain ${node.chain} at url ${node.url}...`);
-    let nodeUrl = node.url;
-    const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
-    nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
-    const isInsecureProtocol = nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1
-      && nodeUrl.indexOf('rpc.polkadot.io') === -1;
-    const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
-    if (nodeUrl.indexOf(':9944') !== -1) {
-      nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
-    }
-    nodeUrl = protocol + nodeUrl;
+    const nodeUrl = constructSubstrateUrl(node.url);
     const provider = await SubstrateEvents.createProvider(nodeUrl);
     const api = await SubstrateEvents.createApi(provider, node.chain).isReady;
     const fetcher = new SubstrateEvents.StorageFetcher(api);

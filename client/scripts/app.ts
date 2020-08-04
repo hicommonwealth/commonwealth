@@ -3,9 +3,11 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
+import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import NProgress from 'nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -322,6 +324,8 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
+      console.log('onmatch called, for:', path);
+      NProgress.start();
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -331,6 +335,8 @@ $(() => {
     render: (vnode) => {
       const { scoped } = attrs;
       let deferChain = attrs.deferChain;
+      console.log('render called, for:', path);
+      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped

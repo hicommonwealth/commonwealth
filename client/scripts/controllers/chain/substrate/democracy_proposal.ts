@@ -7,7 +7,7 @@ import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
 import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
-import { ISubstrateDemocracyProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, ChainBase, Account, ChainEntity, ChainEvent
@@ -150,7 +150,7 @@ class SubstrateDemocracyProposal extends Proposal<
         if (preimage) {
           this._method = preimage.method;
           this._section = preimage.section;
-          this._title = `${this._section}.${this.method}(${preimage.args.join(', ')})`;
+          this._title = formatCall(preimage);
         }
         break;
       }

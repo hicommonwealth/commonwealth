@@ -75,7 +75,7 @@ export default class extends IEventHandler {
       const dbEntity = await this._models.ChainEntity.create({
         type: type.toString(), type_id, chain: this._chain, completed
       });
-      log.info(`Created db entity, ${type.toString()}: ${type_id}.`);
+      log.trace(`Created db entity, ${type.toString()}: ${type_id}.`);
 
       dbEvent.entity_id = dbEntity.id;
       await dbEvent.save();
@@ -95,7 +95,7 @@ export default class extends IEventHandler {
         log.error(`no relevant db entity found for ${type}: ${type_id}`);
         return;
       }
-      log.info(`Updated db entity, ${type}: ${type_id}.`);
+      log.trace(`Updated db entity, ${type}: ${type_id}.`);
 
       // link ChainEvent to entity
       dbEvent.entity_id = dbEntity.id;
