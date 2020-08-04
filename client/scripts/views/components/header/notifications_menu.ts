@@ -40,8 +40,8 @@ const NotificationsMenu: m.Component = {
       ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
-    const sortedNotifications = sortNotifications(notifications, 'subscription', 'objectId');
-
+    const sortedNotifications = sortNotifications(notifications);
+    console.dir(sortedNotifications);
     return m(PopoverMenu, {
       transitionDuration: 0,
       hoverCloseDelay: 0,
