@@ -12,6 +12,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 
 import Sublayout from 'views/sublayout';
+import PageLoading from 'views/pages/loading';
 import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes
 } from 'helpers/chain_notification_types';
@@ -181,7 +182,6 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
     const { chain } = vnode.attrs;
     console.dir(chain);
     return m('.EventSubscriptions', [
-      m('h2', vnode.attrs.chain.name),
       m(Table, {}, [
         m('tr', [
           m('th', null),
@@ -209,7 +209,6 @@ const ChainNotificationManagementPage: m.Component<{chains: ChainInfo[],}, { sel
     const validChains = ['edgeware', 'polkadot', 'kusama'];
     const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a,b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
-      m('h2', 'Subscribe to Chain Events'),
       m(SelectList, {
         class: 'CommunitySelectList',
         filterable: false,
@@ -295,9 +294,10 @@ const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
   },
   view: (vnode) => {
     const { chains } = vnode.state;
-    if (!app.loginStatusLoaded()) return;
+    if (!app.loginStatusLoaded()) return m(PageLoading);
     return m(Sublayout, {
       class: 'SubscriptionsPage',
+      title: 'Chain Notifications',
     }, [
       m('.forum-container', [
         m(ChainNotificationManagementPage, {

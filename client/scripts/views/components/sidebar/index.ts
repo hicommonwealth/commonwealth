@@ -261,12 +261,12 @@ const SettingsModule: m.Component<{}> = {
     return m('.SettingsModule.SidebarModule', [
       m(List, { size: 'lg' }, [
         m(ListItem, {
-          label: 'Account',
+          label: 'Settings',
           class: 'section-header',
         }),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER }),
-          label: 'Settings',
+          label: 'Account Settings',
           onclick: (e) => m.route.set(
             app.activeId()
               ? `/${app.activeId()}/settings`
@@ -277,8 +277,8 @@ const SettingsModule: m.Component<{}> = {
             : m.route.get() === '/settings',
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2 }),
-          label: 'Community Notifications',
+          contentLeft: m(Icon, { name: Icons.BELL }),
+          label: 'Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
               ? `/${app.activeId()}/notification-settings`
@@ -289,8 +289,8 @@ const SettingsModule: m.Component<{}> = {
             : m.route.get() === '/notification-settings',
         }),
         m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2 }),
-          label: 'Chain Event Notifications',
+          contentLeft: m(Icon, { name: Icons.BELL }),
+          label: 'Chain Notifications',
           onclick: (e) => m.route.set(
             app.activeId()
               ? `/${app.activeId()}/chain-event-settings`

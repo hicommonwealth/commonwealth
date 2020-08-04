@@ -339,7 +339,6 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
     if (!communities || !subscriptions) return;
     return m('.CommunityNotifications', [
       m('.header', [
-        m('h2', 'Discussions Notifications'),
         m(SelectList, {
           class: 'CommunitySelectList',
           filterable: false,
@@ -428,10 +427,10 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   },
   view: (vnode) => {
     const { chains, communities, subscriptions } = vnode.state;
-    if (!app.loginStatusLoaded()) return m(PageLoading);
-    if (subscriptions.length < 1) return m(PageLoading);
+    if (!app.loginStatusLoaded() || subscriptions.length < 1) return m(PageLoading);
     return m(Sublayout, {
       class: 'SubscriptionsPage',
+      title: 'Notifications',
     }, [
       m('.forum-container', [
         m(CommunityNotifications, { subscriptions, communities, chains, }),
