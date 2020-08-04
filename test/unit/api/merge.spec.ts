@@ -12,9 +12,7 @@ import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 const ethUtil = require('ethereumjs-util');
 
-import { Errors as createErrors } from '../../../server/routes/createRole';
-import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
-import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
+import { Errors as mergeErrors } from '../../../server/routes/mergeAccounts';
 
 
 chai.use(chaiHttp);
@@ -29,6 +27,7 @@ describe('Merge Account tests', () => {
     let userJWT;
     let userAddress1;
     let userAddress2;
+    let notOwned;
     const chain = 'ethereum';
     const community = 'staking';
   
@@ -73,6 +72,9 @@ describe('Merge Account tests', () => {
       // console.log('user_id', user_id);
       const email = res3.body.result.user.email;
       userAddress2 = address;
+
+      // create un-owned address
+      notOwned = await modelUtils.createAndVerifyAddress({ chain });
 
       // add roles
       const role1 = await modelUtils.assignRole({
@@ -202,10 +204,18 @@ describe('Merge Account tests', () => {
         community: community,
         address_id: res.address_id, 
       });
+    });
 
-
-
-
+    it('should fail to merge if doesn\'n own both addresses', async () => {
+      const res = await chai.request(app)
+        .post('/api/mergeAccounts')
+        .set('Accept', 'application/json')
+        .send({
+          'newAddress': userAddress1,
+          'oldAddress': notOwned.address,
+          'jwt': userJWT,
+        });
+      expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned); 
     });
 
     it('should merge accounts with status Success', async () => {
