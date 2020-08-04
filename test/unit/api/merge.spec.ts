@@ -28,6 +28,7 @@ describe('Merge Account tests', () => {
     let userAddress1;
     let userAddress2;
     let notOwned;
+    let signature;
     const chain = 'ethereum';
     const community = 'staking';
   
@@ -39,7 +40,7 @@ describe('Merge Account tests', () => {
   
       // generate first address & user
       let res = await modelUtils.createAndVerifyAddress({ chain });
-      console.log('first address', res);
+      // console.log('first address', res);
       userAddress1 = res.address;
       let userEmail = res.email;
       userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
@@ -58,7 +59,7 @@ describe('Merge Account tests', () => {
       const token = res2.verification_token;
       const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
       const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
-      const signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+      signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
       let res3 = await chai.request.agent(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
@@ -213,6 +214,7 @@ describe('Merge Account tests', () => {
         .send({
           'newAddress': userAddress1,
           'oldAddress': notOwned.address,
+          'signature': signature,
           'jwt': userJWT,
         });
       expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned); 
@@ -225,8 +227,10 @@ describe('Merge Account tests', () => {
         .send({
           'newAddress': userAddress1,
           'oldAddress': userAddress2,
+          'signature': signature,
           'jwt': userJWT,
         });
+      console.log(res.body);
       expect(res.body.status).to.be.equal('Success');
     });
   });

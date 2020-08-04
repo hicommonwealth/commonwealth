@@ -6,10 +6,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
     AddressesNotOwned: 'User does not own both addresses',
+    NeedSignature: 'Must provide signature',
+    InvalidSignature: 'Signature is invalid',
 };
 
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
-    const { oldAddress, newAddress, } = req.body;
+    const { oldAddress, newAddress, signature } = req.body;
+
+    if (!signature) return next(new Error(Errors.NeedSignature));
 
     // get User model with Addresses
     const user = await models.User.findOne({
@@ -36,6 +40,19 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
             { model: models.OffchainProfile, },
         ],
     });
+
+    const chain = await models.Chain.findOne({
+        where: {
+            id: addressToBeMerged.chain,
+        },
+    });
+
+    // verify signature
+    const verified = await models.Address.verifySignature(
+        models, chain, addressToBeMerged, user.id, signature,
+    );
+
+    if (!verified) return next(new Error(Errors.InvalidSignature));
 
     // Get threads to be transfered
     const threadsToBeMerged = await models.OffchainThread.findAll({
