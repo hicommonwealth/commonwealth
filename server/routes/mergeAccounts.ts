@@ -116,9 +116,9 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
         const reaction1 = allReactions[i];
         for (let j=i+1; j<allReactions.length; j++) {
             const reaction2 = allReactions[j];
-            if (reaction1.proposal_id === reaction2.proposal_id
-                || reaction1.thread_id === reaction2.proposal_id
-                || reaction1.comment_id === reaction2.comment_id
+            if ((reaction1.proposal_id && reaction1.proposal_id === reaction2.proposal_id)
+                || (reaction1.thread_id && reaction1.thread_id === reaction2.thread_id)
+                || (reaction1.comment_id && reaction1.comment_id === reaction2.comment_id)
             ) {
                 await reaction2.destroy();
             }

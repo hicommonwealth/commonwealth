@@ -120,15 +120,13 @@ describe('Merge Account tests', () => {
         kind: 'forum',
       });
 
-      console.log(thread2);
-
       // add comments 
       const comment = await modelUtils.createComment({
         chain,
         address: userAddress2,
         jwt: userJWT,
         text: 'hi ho',
-        root_id: `discussion_${thread.id}`,
+        root_id: `discussion_${thread.result.id}`,
       });
 
       const comment2 = await modelUtils.createComment({
@@ -136,20 +134,77 @@ describe('Merge Account tests', () => {
         address: userAddress2,
         jwt: userJWT,
         text: 'hi ho no go!',
-        root_id: `discussion_${thread2.id}`,
+        root_id: `discussion_${thread2.result.id}`,
       });
 
-      // add reactions directly
+      // add reactions directly to thread
       const reaction1 = await models['OffchainReaction'].create({
         chain: null,
-        thread_id: thread2.id,
+        thread_id: thread2.result.id,
         proposal_id: null,
         comment_id: null,
         reaction: 'like',
         community: community,
+        address_id: address_id, 
       });
 
-      console.dir(reaction1);
+      // add conflicting reaction (thread) to be deleted in route.
+      const reaction2 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: thread2.result.id,
+        proposal_id: null,
+        comment_id: null,
+        reaction: 'like',
+        community: community,
+        address_id: res.address_id, 
+      });
+
+      // add reaction to comment
+      const reaction3 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: null,
+        proposal_id: null,
+        comment_id: comment2.result.id,
+        reaction: 'like',
+        community: community,
+        address_id: address_id, 
+      });
+
+      // add conflicting reaction (comment) to be deleted in route.
+      const reaction4 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: null,
+        proposal_id: null,
+        comment_id: comment2.result.id,
+        reaction: 'like',
+        community: community,
+        address_id: res.address_id, 
+      });
+
+      // add reaction to proposal
+      const reaction5 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: null,
+        proposal_id: '12',
+        comment_id: comment2.result.id,
+        reaction: 'like',
+        community: community,
+        address_id: address_id, 
+      });
+
+      // add conflicting reaction (proposal) to be deleted in route.
+      const reaction6 = await models['OffchainReaction'].create({
+        chain: null,
+        thread_id: null,
+        proposal_id: '12',
+        comment_id: null,
+        reaction: 'like',
+        community: community,
+        address_id: res.address_id, 
+      });
+
+
+
 
     });
 
