@@ -10,7 +10,6 @@ import Sublayout from 'views/sublayout';
 import EmailWell from './email_well';
 import AccountsWell from './accounts_well';
 import SettingsWell from './settings_well';
-import SendEDGWell from './send_edg_well';
 
 const SettingsPage: m.Component<{}> = {
   oncreate: (vnode) => {
@@ -31,9 +30,6 @@ const SettingsPage: m.Component<{}> = {
           m(EmailWell, { github: true }),
           m('br'),
           m(SettingsWell),
-          m('br'),
-          !app.community && app.user.activeAccount && app.user.activeAccount instanceof SubstrateAccount
-            && m(SendEDGWell, { sender: app.user.activeAccount }),
         ])
     ]);
   }
