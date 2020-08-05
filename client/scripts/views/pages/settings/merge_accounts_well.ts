@@ -44,7 +44,6 @@ const AddressSelectList: m.Component<IAddressSelectListAttrs, { selectedAddress:
         iconRight: Icons.CHEVRON_DOWN,
         label: vnode.state.selectedAddress
           ? [
-            // m(Icon, { name: Icons.CHEVRON_DOWN, }),
             m('span.tag-name', vnode.state.selectedAddress.address)
           ]
           : vnode.attrs.label,
@@ -54,8 +53,6 @@ const AddressSelectList: m.Component<IAddressSelectListAttrs, { selectedAddress:
 };
 
 const MergeAccountsWell: m.Component<{}, {address1: AddressInfo; address2: AddressInfo;}> = {
-  oninit: (vnode) => {
-  },
   view: (vnode) => {
     const addresses = app.user.addresses;
 
