@@ -54,8 +54,6 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
   } catch (e) {
     return next(new Error(e));
   }
-
-  // Todo: dispatch notifications conditional on a new mention
 };
 
 export default setPrivacy;
