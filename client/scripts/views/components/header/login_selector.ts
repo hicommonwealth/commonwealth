@@ -187,7 +187,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: [ 'Add ', app.chain ? `a ${app.chain.meta.chain.symbol}` : 'an', ' address', ],
+              label: [ 'Connect ', app.chain ? `new ${app.chain.meta.chain.symbol}` : 'a new', ' address', ],
             }),
             m(MenuDivider),
           ],

@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { VoteOutcome, VoteRecord } from '@edgeware/node-types/interfaces';
+import { VoteOutcome, VoteRecord } from '@edgeware/node-types';
 import { ApiRx } from '@polkadot/api';
 import { Option } from '@polkadot/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';

@@ -1,4 +1,4 @@
-import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
+import { Mainnet } from '@edgeware/node-types';
 
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import EdgewareChain from 'controllers/chain/edgeware/shared';
@@ -53,25 +53,7 @@ class Edgeware extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   }
 
   public async initApi() {
-    const edgTypes = Object.values(edgewareDefinitions)
-      .reduce((res, { types }): object => ({ ...res, ...types }), {});
-    await this.chain.resetApi(this.meta, {
-      types: {
-        ...edgTypes,
-        // aliases that don't do well as part of interfaces
-        'voting::VoteType': 'VoteType',
-        'voting::TallyType': 'TallyType',
-        // chain-specific overrides
-        Address: 'GenericAddress',
-        Keys: 'SessionKeys4',
-        StakingLedger: 'StakingLedgerTo223',
-        Votes: 'VotesTo230',
-        ReferendumInfo: 'ReferendumInfoTo239',
-        Weight: 'u32',
-      },
-      // override duplicate type name
-      typesAlias: { voting: { Tally: 'VotingTally' } },
-    });
+    await this.chain.resetApi(this.meta, Mainnet);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     await super.initApi();
