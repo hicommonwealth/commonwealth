@@ -11,7 +11,7 @@ import { OffchainThread } from 'models';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import Tabs from 'views/components/widgets/tabs';
-import graphs from './graphs'
+import graphs from './graphs';
 import ProfileHeader from './profile_header';
 import ProfileContent from './profile_content';
 import ProfileBio from './profile_bio';
@@ -220,14 +220,14 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
       .sort((a, b) => +b.createdAt - +a.createdAt);
     const allContent = [].concat(proposals || []).concat(comments || [])
       .sort((a, b) => +b.createdAt - +a.createdAt);
-  
+
 
     const allTabTitle = (proposals && comments) ? `All (${proposals.length + comments.length})` : 'All';
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
-    const graphsTabTitle =  'Graphs';
-    const xValues= ['a','b','c','d','e','f'];
-    const yValues= [1,2,3,2,1,0];
+    const graphsTabTitle = 'Graphs';
+    const xValues = [1, 2, 3, 2, 1, 0];
+    const yValues = [1, 2, 300, 2, 1, 0];
 
     return m(Sublayout, {
       class: 'ProfilePage',
@@ -256,23 +256,26 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
                 account,
                 type: UserContent.Comments,
                 content: { comments }
-              }
-              ),
-            },
-            {
-              name: graphsTabTitle,
-              content: m(graphs, {
-                xValues,yValues
               }),
+            }, {
+              name: graphsTabTitle,
+              content: [
+                m(graphs, {
+                  xValues, yValues
+                }),
+                m(graphs, {
+                  xValues, yValues
+                }),
+              ],
             }
-          ]),
+            ]),
           ]),
           m('.col-xs-4', [
             m(ProfileBio, { account }),
           ]),
         ]),
       ]),
-    ]);
+    ],);
   },
 };
 
