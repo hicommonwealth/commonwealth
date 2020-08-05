@@ -39,9 +39,11 @@ class ExampleEventHandler extends IEventHandler {
 }
 
 async function subscribe(url) {
+  // Populate with chain-specific types, see listener.ts for edgeware example
+  const types = {};
+  const api = await SubstrateEvents.createApi(url, types);
+
   const handlers = [ new ExampleEventHandler() ];
-  const provider = await SubstrateEvents.createProvider(url);
-  const api = await SubstrateEvents.createApi(provider, 'edgeware').isReady;
   const subscriber = await SubstrateEvents.subscribeEvents({
     api,
     chain: 'edgeware',

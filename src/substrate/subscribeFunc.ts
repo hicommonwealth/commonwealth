@@ -1,5 +1,6 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
+import { RegistryTypes } from '@polkadot/types/types';
 
 import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
 
@@ -13,50 +14,28 @@ import { StorageFetcher } from './storageFetcher';
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export async function createProvider(url: string): Promise<WsProvider> {
-  const provider = new WsProvider(url);
-  let unsubscribe: () => void;
-  await new Promise((resolve) => {
-    unsubscribe = provider.on('connected', () => resolve());
-  });
-
-  // auto-unsubscribe once we establish a connection, then reconnect at API construction time
-  // TODO: remove this logic.
-  if (unsubscribe) unsubscribe();
-  return provider;
-}
-
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export function createApi(provider: WsProvider, chain: string): ApiPromise {
+export async function createApi(url: string, types?: RegistryTypes): Promise<ApiPromise> {
+  // construct provider
+  const provider = new WsProvider(url);
+  let unsubscribe: () => void;
+  await new Promise((resolve) => {
+    unsubscribe = provider.on('connected', () => resolve());
+  });
+  if (unsubscribe) unsubscribe();
+
+  // construct API using provider
   const registry = new TypeRegistry();
-  if (chain.startsWith('edgeware')) {
-    const edgewareTypes = Object.values(edgewareDefinitions)
-      // .map((v) => v.default)
-      .reduce((res, { types }): object => ({ ...res, ...types }), {});
-    return new ApiPromise({
-      provider,
-      types: {
-        ...edgewareTypes,
-        'voting::VoteType': 'VoteType',
-        'voting::TallyType': 'TallyType',
-        // chain-specific overrides
-        Address: 'GenericAddress',
-        Keys: 'SessionKeys4',
-        StakingLedger: 'StakingLedgerTo223',
-        Votes: 'VotesTo230',
-        ReferendumInfo: 'ReferendumInfoTo239',
-        Weight: 'u32',
-        OpenTip: 'OpenTipTo225'
-      },
-      registry
-    });
-  } else {
-    return new ApiPromise({ provider, registry });
-  }
+  const api = new ApiPromise({
+    provider,
+    types,
+    registry
+  });
+  return api.isReady;
 }
 
 /**
