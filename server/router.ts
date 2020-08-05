@@ -98,10 +98,11 @@ import createWebhook from './routes/webhooks/createWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
+import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
 
-function setupRouter(app, models, viewCountCache: ViewCountCache) {
+function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
 
@@ -242,7 +243,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
 
   // offchain profiles
   // TODO: Change to PUT /profile
-  router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models));
+  router.post('/updateProfile', passport.authenticate('jwt', { session: false }), updateProfile.bind(this, models, identityFetchCache));
   // TODO: Change to GET /profiles
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
@@ -263,7 +264,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache) {
 
   // notifications
   // TODO: Change to GET /subscriptions
-  router.get('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
+  router.post('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
     viewSubscriptions.bind(this, models));
   // TODO: Change to POST /subscription
   router.post('/createSubscription', passport.authenticate('jwt', { session: false }),

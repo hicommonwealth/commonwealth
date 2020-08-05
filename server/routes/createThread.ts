@@ -156,12 +156,18 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
+      offchain_thread_id: finalThread.id,
+      community_id: finalThread.community || null,
+      chain_id: finalThread.chain || null,
       is_active: true,
     });
     await models.Subscription.create({
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
+      offchain_thread_id: finalThread.id,
+      community_id: finalThread.community || null,
+      chain_id: finalThread.chain || null,
       is_active: true,
     });
   } catch (err) {

@@ -1,5 +1,6 @@
 import 'components/sidebar/notification_row.scss';
 
+import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
 
@@ -15,12 +16,13 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import { SubstrateTypes, MolochTypes, SubstrateEvents, MolochEvents, IEventLabel } from '@commonwealth/chain-events';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import UserGallery from './widgets/user_gallery';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
-    decoded_comment_text = m(QuillFormattedText, { doc: sliceQuill(doc, 140), hideFormatting: true });
+    decoded_comment_text = m(QuillFormattedText, { doc, hideFormatting: true });
   } catch (e) {
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
@@ -80,7 +82,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
-    author: [author_address, author_chain],
+    authorInfo: [[author_chain, author_address]],
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -89,13 +91,17 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   });
 };
 
-const getBatchNotificationFields = (category, data: IPostNotificationData, length) => {
-  if (length === 1) {
-    return getNotificationFields(category, data);
+const getBatchNotificationFields = (category, data: IPostNotificationData[]) => {
+  if (data.length === 1) {
+    return getNotificationFields(category, data[0]);
   }
-  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
-    parent_comment_text, chain_id, community_id, author_address, author_chain } = data;
 
+  const { created_at, root_id, root_title, root_type, comment_id, comment_text, parent_comment_id,
+    parent_comment_text, chain_id, community_id, author_address, author_chain } = data[0];
+
+  const authorInfo = _.uniq(data.map((d) => `${d.author_chain}#${d.author_address}`))
+    .map((u) => u.split('#'));
+  const length = authorInfo.length - 1;
   const community_name = community_id
     ? (app.config.communities.getById(community_id)?.name || 'Unknown community')
     : (app.config.chains.getById(chain_id)?.name || 'Unknown chain');
@@ -139,7 +145,7 @@ const getBatchNotificationFields = (category, data: IPostNotificationData, lengt
   const pageJump = comment_id ? () => jumpHighlightComment(comment_id) : () => jumpHighlightComment('parent');
 
   return ({
-    author: [author_address, author_chain],
+    authorInfo,
     createdAt: moment.utc(created_at),
     notificationHeader,
     notificationBody,
@@ -209,17 +215,17 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
         ]),
       ]);
     } else {
-      const notificationData = typeof notification.data === 'string'
-        ? JSON.parse(notification.data)
-        : notification.data;
+      const notificationData = notifications.map((notif) => typeof notif.data === 'string'
+        ? JSON.parse(notif.data)
+        : notif.data);
       const {
-        author,
+        authorInfo,
         createdAt,
         notificationHeader,
         notificationBody,
         path,
         pageJump
-      } = getBatchNotificationFields(category, notificationData, notifications.length);
+      } = getBatchNotificationFields(category, notificationData);
       return m('li.NotificationRow', {
         class: notifications[0].isRead ? '' : 'unread',
         onclick: async () => {
@@ -230,11 +236,17 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           if (pageJump) setTimeout(() => pageJump(), 1);
         },
       }, [
-        m(User, {
-          user: new AddressInfo(null, (author as [string, string])[0], (author as [string, string])[1], null),
-          avatarOnly: true,
-          avatarSize: 36
-        }),
+        authorInfo.length === 1
+          ? m(User, {
+            user: new AddressInfo(null, (authorInfo[0] as [string, string])[1], (authorInfo[0] as [string, string])[0], null),
+            avatarOnly: true,
+            avatarSize: 36
+          })
+          : m(UserGallery, {
+            users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
+            avatarSize: 36,
+            tooltip: true,
+          }),
         m('.comment-body', [
           m('.comment-body-title', notificationHeader),
           notificationBody

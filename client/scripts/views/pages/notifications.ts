@@ -6,13 +6,17 @@ import app from 'state';
 import { Button, ButtonGroup } from 'construct-ui';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
+import { sortNotifications } from '../../helpers/notifications';
 
 const Notifications = {
   view: (vnode) => {
     if (!app.isLoggedIn()) {
       return m('div', 'Must be logged in to view notifications.');
     }
+
     const notifications = app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix());
+    const sortedNotifications = sortNotifications(notifications).reverse();
+
     return m('.Notifications', [
       m('.forum-container', [
         m('h3', 'Notifications'),
@@ -36,7 +40,7 @@ const Notifications = {
           }),
         ]),
         m('.NotificationsList', [
-          notifications.map((notification) => m(NotificationRow, { notifications: [ notification ] })),
+          sortedNotifications.map((data) => m(NotificationRow, { notifications: (data as any[]) })),
         ])
       ]),
     ]);

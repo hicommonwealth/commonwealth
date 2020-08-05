@@ -46,6 +46,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types/submittable';
 import { u128, TypeRegistry } from '@polkadot/types';
+import { constructSubstrateUrl } from 'substrate';
 import { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
@@ -57,17 +58,10 @@ export type HandlerId = number;
 
 // creates a substrate API provider and waits for it to emit a connected event
 async function createApiProvider(node: NodeInfo): Promise<WsProvider> {
-  let nodeUrl = node.url;
-  const hasProtocol = nodeUrl.indexOf('wss://') !== -1 || nodeUrl.indexOf('ws://') !== -1;
-  nodeUrl = hasProtocol ? nodeUrl.split('://')[1] : nodeUrl;
-  const isInsecureProtocol = nodeUrl.indexOf('edgewa.re') === -1
-    && nodeUrl.indexOf('kusama-rpc.polkadot.io') === -1
-    && nodeUrl.indexOf('rpc.polkadot.io') === -1;
-  const protocol = isInsecureProtocol ? 'ws://' : 'wss://';
-  if (nodeUrl.indexOf(':9944') !== -1) {
-    nodeUrl = isInsecureProtocol ? nodeUrl : nodeUrl.split(':9944')[0];
-  }
-  const provider = new WsProvider(protocol + nodeUrl, 10 * 1000);
+  const nodeUrl = constructSubstrateUrl(node.url, [
+    'edgewa.re', 'kusama-rpc.polkadot.io', 'rpc.polkadot.io',
+  ]);
+  const provider = new WsProvider(nodeUrl, 10 * 1000);
   let unsubscribe: () => void;
   await new Promise((resolve) => {
     unsubscribe = provider.on('connected', () => resolve());
