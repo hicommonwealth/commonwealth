@@ -30,7 +30,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   // only locate unread notifications if specified
-  const includeParams: any = {
+  const notificationParams: any = {
     model: models.Notification,
     as: 'Notifications',
     include: [{
@@ -41,11 +41,11 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
         model: models.ChainEventType,
         required: false,
         as: 'ChainEventType',
-      }],
-    }]
+      }, ],
+    },]
   };
   if (req.body.unread_only) {
-    includeParams.where = { is_read: false };
+    notificationParams.where = { is_read: false };
   }
 
   // perform the query
@@ -53,7 +53,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     where: {
       [Op.and]: searchParams
     },
-    include: [ includeParams ],
+    include: [ notificationParams ],
   });
 
   // TODO: flatten? sort by date?

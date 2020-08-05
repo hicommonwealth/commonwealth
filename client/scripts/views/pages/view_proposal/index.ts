@@ -256,7 +256,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 m(ProposalBodyEditMenuItem, {
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                m(ProposalBodyDeleteMenuItem, { item: comment }),
+                m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
                 // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
                 // && m(ProposalBodyReplyMenuItem, {
                 //   item: comment,

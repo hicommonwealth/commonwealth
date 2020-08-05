@@ -137,7 +137,7 @@ export const createComment = async (args: CommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       'author_chain': chain,
-      'chain': chain,
+      'chain': community ? undefined : chain,
       'community': community,
       'address': address,
       'parent_id': parentCommentId,
