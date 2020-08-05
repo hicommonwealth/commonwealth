@@ -25,8 +25,8 @@ import { ChainClass } from 'models';
 
 export interface ISignalingPageState {
   voteOutcomes: any[];
-  voteType: string;
-  tallyType: string;
+  voteType: 'binary' | 'multioption' | 'rankedchoice';
+  tallyType: 'onecoin' | 'oneperson';
   form: any;
   error: string;
 }
