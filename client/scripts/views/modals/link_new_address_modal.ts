@@ -97,6 +97,40 @@ const accountVerifiedCallback = async (account, vnode) => {
   }
 };
 
+const EthereumLinkAccountItem: m.Component<{
+  address,
+  accountVerifiedCallback,
+  errorCallback,
+  parentVnode
+}, { linking }> = {
+  view: (vnode) => {
+    // TODO: implement vnode.state.linking
+    const { address, accountVerifiedCallback, errorCallback, parentVnode } = vnode.attrs;
+    return m('.EthereumLinkAccountItem.account-item', {
+      onclick: async (e) => {
+        e.preventDefault();
+        const api = (app.chain as Ethereum);
+        const webWallet = api.webWallet;
+
+        // Sign with the method on eth_webwallet, because we don't have access to the private key
+        const signerAccount = await createUserWithAddress(address) as EthereumAccount;
+        const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
+
+        signerAccount.validate(webWalletSignature)
+          .then(() => {
+            return accountVerifiedCallback(signerAccount, parentVnode);
+          })
+          .then(() => m.redraw())
+          .catch(errorCallback);
+      },
+    }, [
+      m('.account-user', [
+        m(User, { user: app.chain.accounts.get(address) }),
+      ]),
+    ]);
+  }
+};
+
 const SubstrateLinkAccountItem: m.Component<{
   account,
   accountVerifiedCallback,
@@ -126,7 +160,7 @@ const SubstrateLinkAccountItem: m.Component<{
         const verified = await signerAccount.isValidSignature(token, signature);
         if (!verified) {
           vnode.state.linking = false;
-          return errorCallback('Verification failed.');
+          errorCallback('Verification failed.');
         }
         signerAccount.validate(signature).then(() => {
           vnode.state.linking = false;
@@ -213,7 +247,7 @@ const LinkNewAddressModal: m.Component<{
       }
     }
 
-    const linkAddressHeader = m('.link-address-step-header', [
+    const linkAddressHeader = m('.compact-modal-title', [
       vnode.attrs.loggingInWithAddress
         ? m('h3', `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`)
         : m('h3', `New ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
@@ -488,12 +522,12 @@ const LinkNewAddressModal: m.Component<{
                 m.redraw();
               },
               label: (app.chain as Substrate || app.chain as Ethereum).webWallet.available
-                ? 'Connect to extension' : 'No extension detected',
+                ? 'Connect to wallet' : 'No wallet detected',
             }),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
-              m('p', 'Wallet connected! Select an account to link.'),
+              m('p', 'Select an account to link.'),
               m('p.small-text', 'If a popup does not appear, click your browser extension.'),
             ] : [
               m('p', 'Wallet connected, but no accounts were found.'),
@@ -503,31 +537,18 @@ const LinkNewAddressModal: m.Component<{
             m('.accounts-list-unavailable', 'Must be connected to chain')
           ] : [
             [ChainBase.Ethereum
-            ].indexOf(app.chain.base) !== -1 && (app.chain as Ethereum).webWallet.accounts.map((address) => m('.account-item', {
-              onclick: async (e) => {
-                e.preventDefault();
-                const api = (app.chain as Ethereum);
-                const webWallet = api.webWallet;
-
-                // Sign with the method on eth_webwallet, because we don't have access to the private key
-                const signerAccount = await createUserWithAddress(address) as EthereumAccount;
-                const webWalletSignature = await webWallet.signMessage(signerAccount.validationToken);
-
-                signerAccount.validate(webWalletSignature).then(() => {
-                  return accountVerifiedCallback(signerAccount, vnode);
-                })
-                  .then(() => m.redraw())
-                  .catch((err) => {
-                    vnode.state.error = 'Verification failed. There was an inconsistency error; '
-                  + 'please report this to the developers.';
-                    m.redraw();
-                  });
-              },
-            }, [
-              m('.account-user', [
-                m(User, { user: app.chain.accounts.get(address) }),
-              ]),
-            ])),
+            ].indexOf(app.chain.base) !== -1 && (app.chain as Ethereum).webWallet.accounts.map(
+              (address) => m(EthereumLinkAccountItem, {
+                address,
+                accountVerifiedCallback,
+                errorCallback: (err) => {
+                  vnode.state.error = 'Verification failed. There was an inconsistency error; '
+                    + 'please report this to the developers.';
+                  m.redraw();
+                },
+                parentVnode: vnode,
+              })
+            ),
             [ChainBase.Substrate
             ].indexOf(app.chain.base) !== -1 && (app.chain as Substrate).webWallet.accounts.map(
               (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
