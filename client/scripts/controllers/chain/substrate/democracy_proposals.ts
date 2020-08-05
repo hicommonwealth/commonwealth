@@ -100,15 +100,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   }
 
   public async createTx(author: SubstrateAccount, action: Call, proposalHash: Hash, deposit: SubstrateCoin) {
-    if (deposit.lt(this.minimumDeposit)) {
-      throw new Error(`deposit must be greater than ${+this.minimumDeposit}`);
-    }
-
     const txFunc = (api: ApiRx) => api.tx.democracy.propose(proposalHash, deposit.asBN);
-    if (!(await this._Chain.canPayFee(author, txFunc, deposit))) {
-      throw new Error('insufficient funds');
-    }
-
     const title = this._Chain.methodToTitle(action);
     return this._Chain.createTXModalData(author, txFunc, 'createDemocracyProposal', title);
   }
