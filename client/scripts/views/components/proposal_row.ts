@@ -259,9 +259,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug !== ProposalType.SubstrateTreasuryProposal
           && slug !== ProposalType.SubstrateDemocracyProposal
           && slug !== ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', (app.chain?.base === ChainBase.Substrate)
-            ? proposal.title.split('(')[0]
-            : proposal.title),
+          m('.proposal-row-title', proposal.title),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
             !!statusText && m('span.metadata-divider', ' · '),
@@ -271,9 +269,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         // Case 1. Democracy Proposal
         (slug === ProposalType.SubstrateDemocracyProposal) && [
           m('.proposal-row-title', [
-            formatProposalHashShort((proposal as SubstrateDemocracyProposal)
-              .title
-              .split('(')[0]),
+            formatProposalHashShort((proposal as SubstrateDemocracyProposal).title)
           ]),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),

@@ -4,7 +4,7 @@ import { takeWhile } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
-import { ISubstrateCollectiveProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ISubstrateCollectiveProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
@@ -78,7 +78,7 @@ export class SubstrateCollectiveProposal
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;
-    this._title = `${eventData.call.section}.${eventData.call.method}(${eventData.call.args.join(', ')})`;
+    this._title = formatCall(eventData.call);
     this.createdAt = entity.createdAt;
 
     entity.chainEvents.forEach((e) => this.update(e));
