@@ -76,7 +76,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Manage linked addresses'),
+        m('h3', 'Manage addresses'),
       ]),
       m('.compact-modal-body', [
         m('.select-address-options', [
