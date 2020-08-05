@@ -169,7 +169,12 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               align: 'left',
               basic: true,
               onclick: (e) => {
-                setActiveAccount(account);
+                const currentActive = app.user.activeAccount;
+                setActiveAccount(account).then(() => {
+                  if (!isSameAccount(currentActive, app.user.activeAccount)) {
+                    m.redraw();
+                  }
+                });
               },
               label: m(UserBlock, {
                 user: account,
