@@ -226,8 +226,11 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
     const threadsTabTitle = (proposals) ? `Threads (${proposals.length})` : 'Threads';
     const commentsTabTitle = (comments) ? `Comments (${comments.length})` : 'Comments';
     const graphsTabTitle = 'Graphs';
-    const xValues = [1, 2, 3, 2, 1, 0];
+
+    const xValues = [1, 2, 3, 2, 1, 0]; // nested arrays or json will be implemented for actual different graphs
     const yValues = [1, 2, 300, 2, 1, 0];
+
+
 
     return m(Sublayout, {
       class: 'ProfilePage',
@@ -260,9 +263,6 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
             }, {
               name: graphsTabTitle,
               content: [
-                m(graphs, {
-                  xValues, yValues
-                }),
                 m(graphs, {
                   xValues, yValues
                 }),

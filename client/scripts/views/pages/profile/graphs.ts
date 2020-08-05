@@ -16,7 +16,7 @@ const graphContent: m.Component<{ xValues: number[], yValues: number[]}> = {
     const { xValues, yValues } = vnode.attrs;
     return [
       m('.columns', [
-        renderChart(lineModel, xValues, yValues),
+        renderChart(lineModel, xValues, yValues)
       ]),
     ];
   }
