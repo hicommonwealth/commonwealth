@@ -48,32 +48,6 @@ enum LinkNewAddressWallets {
   Hedgehog,
 }
 
-interface ILinkNewAddressAttrs {
-  loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
-  alreadyInitializedAccount?: Account<any>; // skips the verification steps, and goes straight to profile creation
-}
-
-interface ILinkNewAddressState {
-  // meta
-  step;
-  error;
-  // step 1 - select a wallet, then press continue
-  selectedWallet: LinkNewAddressWallets;
-  // step 2 - enter a new address, then validate a signature with the address
-  validSig: string;
-  secretPhraseSaved: boolean;
-  newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
-  // step 3 - create a profile
-  isNewLogin: boolean;
-  // step 4 - complete
-  hasName: boolean;
-  hasHeadline: boolean;
-  uploadsInProgress: boolean;
-  isEd25519?: boolean;
-  enteredAddress?: string;
-  cosmosStdTx?: object;
-}
-
 // Step 2 -> Step 3
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
@@ -123,7 +97,12 @@ const accountVerifiedCallback = async (account, vnode) => {
   }
 };
 
-const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, errorCallback, parentVnode }, { linking }> = {
+const SubstrateLinkAccountItem: m.Component<{
+  account,
+  accountVerifiedCallback,
+  errorCallback,
+  parentVnode
+}, { linking }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
     return m('.SubstrateLinkAccountItem.account-item', {
@@ -168,7 +147,31 @@ const SubstrateLinkAccountItem: m.Component<{ account, accountVerifiedCallback, 
   }
 };
 
-const LinkNewAddressModal = {
+const LinkNewAddressModal: m.Component<{
+  loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
+  alreadyInitializedAccount?: Account<any>; // skips the verification steps, and goes straight to profile creation
+}, {
+  // meta
+  step;
+  error;
+  // step 1 - select a wallet, then press continue
+  selectedWallet: LinkNewAddressWallets;
+  // step 2 - enter a new address, then validate a signature with the address
+  validSig: string;
+  secretPhraseSaved: boolean;
+  newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
+  // step 3 - create a profile
+  isNewLogin: boolean;
+  // step 4 - complete
+  hasName: boolean;
+  hasHeadline: boolean;
+  uploadsInProgress: boolean;
+  isEd25519?: boolean;
+  enteredAddress?: string;
+  cosmosStdTx?: object;
+  initializingWallet: boolean;
+  onpopstate;
+}> = {
   oncreate: (vnode) => {
     vnode.state.onpopstate = (e) => {
       $('.LinkNewAddressModal').trigger('modalexit');
@@ -462,27 +465,31 @@ const LinkNewAddressModal = {
         m('.link-address-step-narrow', [
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts
-            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length === 0 && [
-            m('button.account-adder', {
-              type: 'submit',
-              class: (app.chain as Substrate || app.chain as Ethereum).webWallet.available ? '' : 'disabled',
+            && (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length === 0
+            && m(Button, {
+              class: 'account-adder',
+              intent: 'primary',
+              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet.available,
+              loading: vnode.state.initializingWallet,
               oncreate: async (e) => {
                 // initialize API if needed before starting webwallet
+                vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                vnode.state.initializingWallet = false;
                 m.redraw();
               },
               onclick: async (e) => {
                 // initialize API if needed before starting webwallet
+                vnode.state.initializingWallet = true;
                 await app.chain.initApi();
                 await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                vnode.state.initializingWallet = false;
                 m.redraw();
-              }
-            }, [
-              (app.chain as Substrate || app.chain as Ethereum).webWallet.available
+              },
+              label: (app.chain as Substrate || app.chain as Ethereum).webWallet.available
                 ? 'Connect to extension' : 'No extension detected',
-            ]),
-          ],
+            }),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
             (app.chain as Substrate || app.chain as Ethereum).webWallet.accounts.length ? [
