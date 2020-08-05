@@ -277,7 +277,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         (slug === ProposalType.SubstrateCollectiveProposal) && [
           m('.proposal-row-main-large.item', [
             m('.proposal-row-subheading', 'Actions'),
-            m('.proposal-row-metadata', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+            m('.proposal-row-metadata', (proposal as SubstrateCollectiveProposal).title),
           ]),
         ],
         // Case 3 Treasury Proposal. 3 main divs Value, Bond, Beneficiary, Proposer Comemnt 1 1 1 2
