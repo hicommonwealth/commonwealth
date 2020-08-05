@@ -216,11 +216,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
-  // Also, load basic API data immediately (connected/disconnected, etc)
-  await Promise.all([
-    app.chain.initServer(),
-    app.chain.initApi(),
-  ]);
+  await app.chain.initServer();
 
   // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
@@ -244,6 +240,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 // and not already initialized.
 export async function initChain(): Promise<void> {
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
+  if (!app.chain.apiInitialized) {
+    await app.chain.initApi();
+  }
   app.chain.deferred = false;
   const n = app.chain.meta;
   await app.chain.initData();
@@ -373,7 +372,10 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/:scope/notification-settings': importRoute('views/pages/notification-settings', { scoped: true }),
+    '/notification-settings':    redirectRoute(() => `/edgeware/notification-settings`),
+    '/:scope/notification-settings': importRoute('views/pages/notification-settings/notification-settings', { scoped: true }),
+    '/chain-event-settings':    redirectRoute(() => `/edgeware/notification-settings/chain-event-settings`),
+    '/:scope/chain-event-settings': importRoute('views/pages/notification-settings/chain-event-settings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),

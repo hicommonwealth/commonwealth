@@ -12,6 +12,12 @@ import {
 } from '../../shared/types';
 import { createNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
+import { ChainAttributes } from './chain';
+import { OffchainCommunityAttributes } from './offchain_community';
+import { OffchainThreadAttributes } from './offchain_thread';
+import { OffchainCommentAttributes } from './offchain_comment';
+import { ChainEventTypeAttributes } from './chain_event_type';
+import { ChainEntityAttributes } from './chain_entity';
 const sgMail = require('@sendgrid/mail');
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -28,9 +34,22 @@ export interface SubscriptionAttributes {
   immediate_email?: boolean;
   created_at?: Date;
   updated_at?: Date;
+  chain_id?: string;
+  community_id?: string;
+  offchain_thread_id?: number;
+  offchain_comment_id?: number;
+  chain_event_type_id?: string;
+  chain_entity_id?: number;
+
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   Notifications?: NotificationAttributes[];
+  Chain?: ChainAttributes;
+  OffchainCommunity?: OffchainCommunityAttributes;
+  OffchainThread?: OffchainThreadAttributes;
+  OffchainComment?: OffchainCommentAttributes;
+  ChainEventType?: ChainEventTypeAttributes;
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface SubscriptionInstance
@@ -55,6 +74,12 @@ export default (
       object_id: { type: dataTypes.STRING, allowNull: false },
       is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
       immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+      chain_id: { type: dataTypes.STRING, allowNull: true },
+      community_id: { type: dataTypes.STRING, allowNull: true },
+      offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
+      chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
       underscored: true,
       paranoid: true,
@@ -185,6 +210,12 @@ export default (
     models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.Notification);
+    models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainCommunity, { foreignKey: 'community_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainThread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
   };
 
   return Subscription;

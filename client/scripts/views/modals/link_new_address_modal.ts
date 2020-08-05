@@ -466,11 +466,17 @@ const LinkNewAddressModal = {
             m('button.account-adder', {
               type: 'submit',
               class: (app.chain as Substrate || app.chain as Ethereum).webWallet.available ? '' : 'disabled',
-              oncreate: (e) => {
-                (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
+              oncreate: async (e) => {
+                // initialize API if needed before starting webwallet
+                await app.chain.initApi();
+                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                m.redraw();
               },
-              onclick: (e) => {
-                (app.chain as Substrate || app.chain as Ethereum).webWallet.enable().then(() => m.redraw());
+              onclick: async (e) => {
+                // initialize API if needed before starting webwallet
+                await app.chain.initApi();
+                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                m.redraw();
               }
             }, [
               (app.chain as Substrate || app.chain as Ethereum).webWallet.available

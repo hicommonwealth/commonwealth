@@ -151,8 +151,9 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
     const getTagRow = (id, name, description) => m(ListItem, {
       key: id,
       contentLeft: m('.proposal-tag-icon'),
-      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}` && [
-        m(PopoverMenu, {
+      contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
+        && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
+        && m(PopoverMenu, {
           class: 'sidebar-edit-tag',
           position: 'bottom',
           transitionDuration: 0,
@@ -171,7 +172,6 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
             }
           })
         }),
-      ],
       label: [
         name,
       ],
@@ -261,20 +261,44 @@ const SettingsModule: m.Component<{}> = {
     return m('.SettingsModule.SidebarModule', [
       m(List, { size: 'lg' }, [
         m(ListItem, {
-          label: 'Account',
+          label: 'Settings',
           class: 'section-header',
         }),
         m(ListItem, {
           contentLeft: m(Icon, { name: Icons.USER }),
-          label: 'Settings',
-          onclick: (e) => m.route.set('/settings'),
-          active: m.route.get() === '/settings',
+          label: 'Account Settings',
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/settings`
+              : '/settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/settings`
+            : m.route.get() === '/settings',
         }),
-        m(ListItem, {
-          contentLeft: m(Icon, { name: Icons.VOLUME_2, }),
+        app.activeId() && m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.BELL }),
           label: 'Notifications',
-          onclick: (e) => m.route.set('/notification-settings'),
-          active: m.route.get() === '/notification-settings',
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/notification-settings`
+              : '/notification-settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/notification-settings`
+            : m.route.get() === '/notification-settings',
+        }),
+        app.activeId() && m(ListItem, {
+          contentLeft: m(Icon, { name: Icons.BELL }),
+          label: 'Chain Notifications',
+          onclick: (e) => m.route.set(
+            app.activeId()
+              ? `/${app.activeId()}/chain-event-settings`
+              : '/chain-event-settings'
+          ),
+          active: app.activeId()
+            ? m.route.get() === `/${app.activeId()}/chain-event-settings`
+            : m.route.get() === '/chain-event-settings',
         }),
       ]),
     ]);
