@@ -6,6 +6,7 @@
 
 import _ from 'underscore';
 import { SubstrateTypes, SubstrateEvents } from '@commonwealth/chain-events';
+import { Mainnet } from '@edgeware/node-types';
 
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
@@ -32,8 +33,11 @@ export default async function (models, chain?: string): Promise<void> {
     const entityArchivalHandler = new EntityArchivalHandler(models, node.chain);
 
     const nodeUrl = constructSubstrateUrl(node.url);
-    const provider = await SubstrateEvents.createProvider(nodeUrl);
-    const api = await SubstrateEvents.createApi(provider, node.chain).isReady;
+    const api = await SubstrateEvents.createApi(
+      nodeUrl,
+      node.chain.includes('edgeware') ? Mainnet.types : {},
+      node.chain.includes('edgeware') ? Mainnet.typesAlias : {},
+    );
 
     // fetch all events and run through handlers in sequence then exit
     const fetcher = new SubstrateEvents.StorageFetcher(api);
