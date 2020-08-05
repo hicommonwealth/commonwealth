@@ -8,7 +8,10 @@ export default {
     model.config.data.labels = vnode.attrs.x; // values sent to module for X axis
     model.config.data.datasets[0].data = vnode.attrs.y;// values sent to module for Y axis
 
-    return m(`.${model.config.type}`, [      
+    return m(`.${model.config.type}`, [
+       m('.row', [
+         
+        m('.col-xs-6', [
       m('#canvas-holder', [
         m('canvas#chart', {
           oncreate(vnode) {
@@ -18,17 +21,33 @@ export default {
             m.redraw();
           }
         }),
-        m('canvas#chart1', {
-          oncreate(vnode) {
-            const canvas = <HTMLCanvasElement> document.getElementById('chart1'); 
-            const ctx = canvas.getContext('2d');
-            model.instance = new Chart(ctx, model.config);
-            m.redraw();
-          }
-        })
+      ])
+    ])   
+        ,
+
+        m('.col-xs-6', [
+      m('#canvas-holder', [
+      m('canvas#chart1', {
+        oncreate(vnode) {
+          const canvas = <HTMLCanvasElement> document.getElementById('chart1'); 
+          const ctx = canvas.getContext('2d');
+          model.instance = new Chart(ctx, model.config);
+          m.redraw();
+        }
+      })
+    ])
+   ])
+    
+      ,
+    ])
+
+    
+    
+    
 
 
-      ]),
-    ]);
+
+
+  ]);
   }
 };
