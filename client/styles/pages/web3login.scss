@@ -1,4 +1,16 @@
 @import 'client/styles/shared';
 
 .Web3LoginPage {
+    .web3login-options {
+        margin: 0 auto;
+        margin-top: calc(50vh - 120px);
+        text-align: center;
+        width: 200px;
+        .cui-button {
+            margin-bottom: 15px;
+        }
+        .web3login-go-home {
+            color: #aaa;
+        }
+    }
 }

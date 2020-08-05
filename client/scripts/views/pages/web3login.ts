@@ -1,8 +1,9 @@
 import 'pages/web3login.scss';
 
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
+import { Spinner, Button } from 'construct-ui';
 import app from 'state';
+import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
 
 const Web3LoginPage: m.Component<{}> = {
@@ -19,7 +20,21 @@ const Web3LoginPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'Web3LoginPage',
     }, [
-      m(Spinner, { fill: true, size: 'xl', style: 'visibility: visible; opacity: 1;' }),
+      m('.web3login-options', [
+        m(Button, {
+          intent: 'primary',
+          label: app.isLoggedIn() ? 'Finish connecting address' : 'Finish login',
+          fluid: true,
+          onclick: (e) => {
+            if (app.isLoggedIn()) {
+              app.modals.lazyCreate('link_new_address_modal');
+            } else {
+              app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
+            }
+          },
+        }),
+        link('a.web3login-go-home', `/${app.activeId()}`, 'Go home'),
+      ]),
     ]);
   }
 };

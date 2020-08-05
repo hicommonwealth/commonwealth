@@ -185,7 +185,7 @@ export function formatDuration(duration : moment.Duration) {
 export function formatAddressShort(addr : string) {
   if (!addr) return;
   if (addr.length < 16) return addr;
-  return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
+  return `${addr.slice(0, 5)}…`;
 }
 
 export function formatProposalHashShort(hash : string) {

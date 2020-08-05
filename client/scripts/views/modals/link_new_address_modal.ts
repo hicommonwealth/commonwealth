@@ -7,9 +7,10 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Button, Icon, Icons } from 'construct-ui';
+import { Button, Icon, Icons, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
+import { formatAddressShort } from 'helpers';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -124,8 +125,14 @@ const EthereumLinkAccountItem: m.Component<{
           .catch(errorCallback);
       },
     }, [
-      m('.account-user', [
-        m(User, { user: app.chain.accounts.get(address) }),
+      // m('.account-item-left', [
+      //   m('.account-item-name', account.meta.name),
+      //   m('.account-item-address', account.meta.name),
+      // ]),
+      m('.account-item-right', [
+        vnode.state.linking
+          ? m('.account-waiting', 'Waiting for signature...')
+          : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
       ]),
     ]);
   }
@@ -142,40 +149,60 @@ const SubstrateLinkAccountItem: m.Component<{
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
-        const signerAccount = await createUserWithAddress(AddressSwapper({
-          address: account.address,
-          currentPrefix: (app.chain as Substrate).chain.ss58Format,
-        })) as SubstrateAccount;
-        const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
-        vnode.state.linking = true;
-        m.redraw();
 
-        const token = signerAccount.validationToken;
-        const payload: SignerPayloadRaw = {
-          address: signerAccount.address,
-          data: stringToHex(token),
-          type: 'bytes',
-        };
-        const signature = (await signer.signRaw(payload)).signature;
-        const verified = await signerAccount.isValidSignature(token, signature);
-        if (!verified) {
+        try {
+          const signerAccount = await createUserWithAddress(AddressSwapper({
+            address: account.address,
+            currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          })) as SubstrateAccount;
+          const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+          vnode.state.linking = true;
+          m.redraw();
+
+          const token = signerAccount.validationToken;
+          const payload: SignerPayloadRaw = {
+            address: signerAccount.address,
+            data: stringToHex(token),
+            type: 'bytes',
+          };
+          const signature = (await signer.signRaw(payload)).signature;
+          const verified = await signerAccount.isValidSignature(token, signature);
+
+          if (!verified) {
+            vnode.state.linking = false;
+            errorCallback('Verification failed.');
+          }
+          signerAccount.validate(signature).then(() => {
+            vnode.state.linking = false;
+            accountVerifiedCallback(signerAccount, vnode.attrs.parentVnode);
+          }, (err) => {
+            vnode.state.linking = false;
+            errorCallback('Verification failed.');
+          }).then(() => {
+            m.redraw();
+          }).catch((err) => {
+            vnode.state.linking = false;
+            errorCallback('Verification failed.');
+          });
+        } catch (err) {
+          // catch when the user rejects the sign message prompt
           vnode.state.linking = false;
           errorCallback('Verification failed.');
         }
-        signerAccount.validate(signature).then(() => {
-          vnode.state.linking = false;
-          accountVerifiedCallback(signerAccount, vnode.attrs.parentVnode);
-        }, (err) => {
-          vnode.state.linking = false;
-          errorCallback('Verification failed.');
-        });
       }
-    }, vnode.state.linking ? [
-      m('.account-waiting', 'Waiting for signature...'),
-    ] : [
-      m('.account-name', account.meta.name),
-      m('.account-user', [
-        m(User, { user: app.chain.accounts.get(account.address) }),
+    }, [
+      m('.account-item-left', [
+        m('.account-item-name', account.meta.name),
+        // TODO: format this address correctly
+        m('.account-item-address', formatAddressShort(AddressSwapper({
+          address: account.address,
+          currentPrefix: (app.chain as Substrate).chain.ss58Format,
+        }))),
+      ]),
+      m('.account-item-right', [
+        vnode.state.linking
+          ? m('.account-waiting', m(Spinner, { size: 'xs', active: true }))
+          : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
       ]),
     ]);
   }
@@ -505,15 +532,15 @@ const LinkNewAddressModal: m.Component<{
               intent: 'primary',
               disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet.available,
               loading: vnode.state.initializingWallet,
-              oncreate: async (e) => {
+              oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
-                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
+                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable()
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
-              onclick: async (e) => {
+              onclick: async (vvnode) => {
                 // initialize API if needed before starting webwallet
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();

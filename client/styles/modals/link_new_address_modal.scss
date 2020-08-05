@@ -177,8 +177,6 @@
     }
     .accounts-list {
         margin: 26px auto;
-        max-width: 240px;
-        max-height: 420px;
         overflow-y: scroll;
         border-radius: 5px;
     }
@@ -196,9 +194,17 @@
         padding: 10px 18px;
         border: 1px solid $background-color-border;
         border-bottom: none;
-        .account-waiting {
+        text-align: left;
+        display: flex;
+        .account-item-left {
+        }
+        .account-item-right {
+            text-align: right;
+            flex: 1;
             margin: 11px 0;
         }
+
+
         &:hover {
             background: $background-color-white-hover;
         }
