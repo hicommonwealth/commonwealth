@@ -172,7 +172,7 @@ const PolkadotChainEvents: m.Component = {
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkdotChainNotificationTypes.Validator, }),
       m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkdotChainNotificationTypes.Vote, }),
-    ]
+    ];
   }
 };
 
@@ -278,11 +278,9 @@ const IndividualEventSubscriptions: m.Component<{}, {
   },
 };
 
-interface IChainEventSettingsPageState {
+const ChainEventSettingsPage: m.Component<{}, {
   chains: ChainInfo[];
-}
-
-const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
+}> = {
   oninit: (vnode) => {
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()

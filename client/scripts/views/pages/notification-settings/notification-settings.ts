@@ -222,10 +222,10 @@ const CommunitySpecificNotifications: m.Component<ICommunitySpecificNotification
         subscriptions: onComments,
       }),
       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
-      batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
+      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
         return m(BatchedSubscriptionRow, {
-          subscriptions,
-          key: subscriptions[0].id
+          subscriptions: subscriptions2,
+          key: subscriptions2[0].id,
         });
       })
     ];
@@ -302,8 +302,8 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
           m(ImmediateEmailCheckbox, { subscription: mentionsSubscription }),
         ]),
       m(GeneralNewThreadsAndComments, { communities, subscriptions }),
-      batchedSubscriptions.map((subscriptions: NotificationSubscription[]) => {
-        return m(BatchedSubscriptionRow, { subscriptions });
+      batchedSubscriptions.map((subscriptions2: NotificationSubscription[]) => {
+        return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
       })
       // m(GeneralPastThreadsAndComments, { subscriptions }),
     ];
@@ -389,14 +389,12 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
   }
 };
 
-interface INotificationSettingsState {
+const NotificationSettingsPage: m.Component<{}, {
   selectedFilter: string;
   chains: ChainInfo[];
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
-}
-
-const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
+}> = {
   oninit: (vnode) => {
     vnode.state.chains = _.uniq(
       app.config.chains.getAll()
