@@ -56,6 +56,16 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       tag.destroy();
     }
 
+    // find and delete all associated subscriptions
+    const subscriptions = await models.Subscription.findAll({
+      where: {
+        offchain_thread_id: thread.id,
+      },
+    });
+    await Promise.all(subscriptions.map((s) => {
+      return s.destroy();
+    }));
+  
     await thread.destroy();
     return res.json({ status: 'Success' });
   } catch (e) {

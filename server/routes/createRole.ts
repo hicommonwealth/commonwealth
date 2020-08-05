@@ -48,11 +48,20 @@ const createRole = async (models, req, res: Response, next: NextFunction) => {
     permission: 'member',
   });
 
-  const subscription = await models.Subscription.create({
-    subscriber_id: req.user.id,
-    category_id: NotificationCategories.NewThread,
-    object_id: (chain) ? chain.id : community.id,
-    is_active: true,
+  const subscription = await models.Subscription.findOrCreate({
+    where: chain ? {
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewThread,
+      chain_id: chain.id,
+      object_id: chain.id,
+      is_active: true,
+    } : {
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewThread,
+      community_id: community.id,
+      object_id: community.id,
+      is_active: true,
+    }
   });
 
   return res.json({ status: 'Success', result: { newRole, subscription } });

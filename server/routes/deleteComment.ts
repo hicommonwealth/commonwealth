@@ -30,6 +30,16 @@ const deleteComment = async (models, req: Request, res: Response, next: NextFunc
     if (!comment) {
       return next(new Error(Errors.NotOwned))
     }
+    // find and delete all associated subscriptions
+    const subscriptions = await models.Subscription.findAll({
+      where: {
+        offchain_comment_id: comment.id,
+      },
+    });
+    await Promise.all(subscriptions.map((s) => {
+      return s.destroy();
+    }));
+
     // actually delete
     await comment.destroy();
     return res.json({ status: 'Success' });

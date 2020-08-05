@@ -158,6 +158,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewReaction,
     object_id: `comment-${finalComment.id}`,
+    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
+    offchain_comment_id: finalComment.id,
     is_active: true,
   });
 
@@ -165,6 +168,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
+    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
+    offchain_comment_id: finalComment.id,
     is_active: true,
   });
 
