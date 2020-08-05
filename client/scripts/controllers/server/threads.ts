@@ -154,15 +154,15 @@ class ThreadsController {
     });
   }
 
-  public async setPrivacy({ threadId, privacy, readOnly }: { threadId: Number; privacy: boolean; readOnly: boolean; }) {
+  public async setPrivacy(args: { threadId: number, privacy: boolean, readOnly: boolean, }) {
     return $.ajax({
       url: `${app.serverUrl()}/setPrivacy`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
-        'thread_id': threadId,
-        'privacy': privacy,
-        'read_only': readOnly,
+        'thread_id': args.threadId,
+        'privacy': args.privacy,
+        'read_only': args.readOnly,
       },
       success: (response) => {
         const result = modelFromServer(response.result);
