@@ -1,15 +1,12 @@
 import { WsProvider, ApiPromise } from '@polkadot/api';
 import { TypeRegistry } from '@polkadot/types';
-import { RegistryTypes } from '@polkadot/types/types';
-
-import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
+import { RegistryTypes, OverrideModuleType } from '@polkadot/types/types';
 
 import { IDisconnectedRange, CWEvent, SubscribeFunc, ISubscribeOptions } from '../interfaces';
 import { Subscriber } from './subscriber';
 import { Poller } from './poller';
 import { Processor } from './processor';
 import { Block, IEventData } from './types';
-import { StorageFetcher } from './storageFetcher';
 
 import { factory, formatFilename } from '../logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -19,7 +16,11 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param url websocket endpoing to connect to, including ws[s]:// and port
  * @returns a promise resolving to an ApiPromise once the connection has been established
  */
-export async function createApi(url: string, types?: RegistryTypes): Promise<ApiPromise> {
+export async function createApi(
+  url: string,
+  types?: RegistryTypes,
+  typesAlias?: Record<string, OverrideModuleType>,
+): Promise<ApiPromise> {
   // construct provider
   const provider = new WsProvider(url);
   let unsubscribe: () => void;
@@ -33,6 +34,7 @@ export async function createApi(url: string, types?: RegistryTypes): Promise<Api
   const api = new ApiPromise({
     provider,
     types,
+    typesAlias,
     registry
   });
   return api.isReady;

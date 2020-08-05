@@ -28,6 +28,7 @@ Please submit any enhancements or bug fixes as a Pull Request on the [project's 
 The easiest usage of the package involves calling `subscribeEvents` directly, which initializes the various components automatically. Do this for Substrate as follows.
 
 ```typescript
+import { Mainnet } from '@edgeware/node-types';
 import { SubstrateEvents, CWEvent, IEventHandler } from '@commonwealth/chain-events';
 
 // This is an example event handler that processes events as they are emitted.
@@ -39,9 +40,10 @@ class ExampleEventHandler extends IEventHandler {
 }
 
 async function subscribe(url) {
-  // Populate with chain-specific types, see listener.ts for edgeware example
-  const types = {};
-  const api = await SubstrateEvents.createApi(url, types);
+  // Populate with chain-specific types
+  const types = Mainnet.types;
+  const typesAlias = Mainnet.typesAlias;
+  const api = await SubstrateEvents.createApi(url, types, typesAlias);
 
   const handlers = [ new ExampleEventHandler() ];
   const subscriber = await SubstrateEvents.subscribeEvents({

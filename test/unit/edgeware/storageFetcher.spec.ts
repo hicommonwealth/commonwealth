@@ -6,7 +6,7 @@ import { Vec, Data, TypeRegistry } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
 import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import {

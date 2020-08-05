@@ -12,7 +12,7 @@ import { BalanceOf, AccountId, Hash, BlockNumber, Registration } from '@polkadot
 import { Codec } from '@polkadot/types/types';
 import { DeriveProposalImage, DeriveCollectiveProposal } from '@polkadot/api-derive/types';
 import { isFunction } from '@polkadot/util';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces/types';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 
 import { CWEvent, IStorageFetcher } from '../interfaces';
 import {

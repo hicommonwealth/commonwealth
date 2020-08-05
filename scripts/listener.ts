@@ -1,4 +1,4 @@
-import * as edgewareDefinitions from '@edgeware/node-types/interfaces/definitions';
+import { Mainnet } from '@edgeware/node-types';
 import { IEventHandler, CWEvent, SubstrateEvents, MolochEvents } from '../dist/index';
 
 import { factory, formatFilename } from '../src/logging';
@@ -33,28 +33,14 @@ const skipCatchup = false;
 
 const url = networks[chain];
 
-// This only works for edgeware v1, not for the updated version v3.0.5
-const edgImportedTypes = Object.values(edgewareDefinitions)
-  .reduce((res, { types }): object => ({ ...res, ...types }), {});
-const edgTypes = {
-  ...edgImportedTypes,
-
-  // aliases that don't do well as part of interfaces
-  'voting::VoteType': 'VoteType',
-  'voting::TallyType': 'TallyType',
-
-  // chain-specific overrides
-  Address: 'GenericAddress',
-  Keys: 'SessionKeys4',
-  StakingLedger: 'StakingLedgerTo223',
-  Votes: 'VotesTo230',
-  ReferendumInfo: 'ReferendumInfoTo239',
-  Weight: 'u32',
-}
-
 if (!url) throw new Error(`no url for chain ${chain}`);
 if (SubstrateEvents.Types.EventChains.includes(chain)) {
-  SubstrateEvents.createApi(url, chain.includes('edgeware') ? edgTypes : {})
+  // TODO: update this for Beresheet
+  SubstrateEvents.createApi(
+    url,
+    chain.includes('edgeware') ? Mainnet.types : {},
+    chain.includes('edgeware') ? Mainnet.typesAlias : {},
+  )
   .then(async (api) => {
     const fetcher = new SubstrateEvents.StorageFetcher(api);
     await fetcher.fetch();

@@ -8,7 +8,7 @@ import { DeriveDispatch, DeriveProposalImage } from '@polkadot/api-derive/types'
 import { Vec, bool, Data, TypeRegistry } from '@polkadot/types';
 import { ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { ProposalRecord, VoteRecord } from '@edgeware/node-types/interfaces';
+import { ProposalRecord, VoteRecord } from '@edgeware/node-types';
 import { Enrich } from '../../../src/substrate/filters/enricher';
 import { constructFakeApi, constructOption, constructIdentityJudgement } from './testUtil';
 import { EventKind, IdentityJudgement } from '../../../src/substrate/types';
