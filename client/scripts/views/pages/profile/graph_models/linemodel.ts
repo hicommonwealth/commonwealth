@@ -49,11 +49,16 @@ export default {
           }
         }],
         yAxes: [{
+          ticks: {
+            fontSize: 10
+        },
           display: true,
           scaleLabel: {
             display: true,
-            labelString: 'Yvalues'
+            labelString: 'Yvalues',
+           
           }
+          
         }]
       }
     }

@@ -39,14 +39,86 @@ export default {
    ])
     
       ,
+    ]),
+    m('.row', [
+         
+      m('.col-xs-6', [
+    m('#canvas-holder', [
+      m('canvas#chart2', {
+        oncreate(vnode) {
+          const canvas = <HTMLCanvasElement> document.getElementById('chart2'); // access created canvas
+          const ctx = canvas.getContext('2d');
+          model.instance = new Chart(ctx, model.config);
+          m.redraw();
+        }
+      }),
     ])
+  ])   
+      ,
 
-    
-    
-    
+      m('.col-xs-6', [
+    m('#canvas-holder', [
+    m('canvas#chart3', {
+      oncreate(vnode) {
+        const canvas = <HTMLCanvasElement> document.getElementById('chart3'); 
+        const ctx = canvas.getContext('2d');
+        model.instance = new Chart(ctx, model.config);
+        m.redraw();
+      }
+    })
+  ])
+ ])
+  
+    ,
+  ]),
+  m('.row', [
+         
+    m('.col-xs-6', [
+  m('#canvas-holder', [
+    m('canvas#chart4', {
+      oncreate(vnode) {
+        const canvas = <HTMLCanvasElement> document.getElementById('chart4'); // access created canvas
+        const ctx = canvas.getContext('2d');
+        model.instance = new Chart(ctx, model.config);
+        m.redraw();
+      }
+    }),
+  ])
+])   
+    ,
 
+    m('.col-xs-6', [
+  m('#canvas-holder', [
+  m('canvas#chart5', {
+    oncreate(vnode) {
+      const canvas = <HTMLCanvasElement> document.getElementById('chart5'); 
+      const ctx = canvas.getContext('2d');
+      model.instance = new Chart(ctx, model.config);
+      m.redraw();
+    }
+  })
+])
+])
 
-
+  ,
+]),
+m('.row', [
+         
+  m('.col-xs-6', [
+m('#canvas-holder', [
+  m('canvas#chart6', {
+    oncreate(vnode) {
+      const canvas = <HTMLCanvasElement> document.getElementById('chart6'); // access created canvas
+      const ctx = canvas.getContext('2d');
+      model.instance = new Chart(ctx, model.config);
+      m.redraw();
+    }
+  }),
+])
+])   
+  ,
+,
+])
 
   ]);
   }
