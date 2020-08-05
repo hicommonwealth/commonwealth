@@ -11,6 +11,7 @@ import { NotificationCategories } from 'types';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import PageError from 'views/pages/error';
 import { sortSubscriptions } from 'helpers/notifications';
 
 const ImmediateEmailCheckbox: m.Component<{
@@ -427,7 +428,12 @@ const NotificationSettingsPage: m.Component<{}, INotificationSettingsState> = {
   },
   view: (vnode) => {
     const { chains, communities, subscriptions } = vnode.state;
-    if (!app.loginStatusLoaded() || subscriptions.length < 1) return m(PageLoading);
+    if (!app.loginStatusLoaded()) return m(PageLoading);
+    if (!app.isLoggedIn()) return m(PageError, {
+      message: 'This page requires you to be logged in.'
+    });
+    if (subscriptions.length < 1) return m(PageLoading);
+
     return m(Sublayout, {
       class: 'SubscriptionsPage',
       title: 'Notifications',

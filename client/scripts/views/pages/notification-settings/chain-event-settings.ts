@@ -13,6 +13,7 @@ import { NotificationCategories } from 'types';
 
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
+import PageError from 'views/pages/error';
 import {
   EdgewareChainNotificationTypes, KusamaChainNotificationTypes, PolkdotChainNotificationTypes
 } from 'helpers/chain_notification_types';
@@ -156,7 +157,6 @@ const KusamaChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: KusamaChainNotificationTypes.Democracy, }),
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: KusamaChainNotificationTypes.Preimage, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: KusamaChainNotificationTypes.Treasury, }),
-      // m(EventSubscriptionTypeRow, { title: 'Signaling events', notificationTypeArray: KusamaChainNotificationTypes.Signaling, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: KusamaChainNotificationTypes.Validator, }),
       m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: KusamaChainNotificationTypes.Vote, }),
     ];
@@ -169,7 +169,6 @@ const PolkadotChainEvents: m.Component = {
       m(EventSubscriptionTypeRow, { title: 'Council events', notificationTypeArray: PolkdotChainNotificationTypes.Council, }),
       m(EventSubscriptionTypeRow, { title: 'Democracy events', notificationTypeArray: PolkdotChainNotificationTypes.Democracy, }),
       m(EventSubscriptionTypeRow, { title: 'Preimage events', notificationTypeArray: PolkdotChainNotificationTypes.Preimage, }),
-      // m(EventSubscriptionTypeRow, { title: 'Signaling events', notificationTypeArray: PolkdotChainNotificationTypes.Signaling, }),
       // m(EventSubscriptionTypeRow, { title: 'Treasury events', notificationTypeArray: PolkdotChainNotificationTypes.Treasury, }),
       m(EventSubscriptionTypeRow, { title: 'Validator events', notificationTypeArray: PolkdotChainNotificationTypes.Validator, }),
       m(EventSubscriptionTypeRow, { title: 'Vote events', notificationTypeArray: PolkdotChainNotificationTypes.Vote, }),
@@ -180,7 +179,6 @@ const PolkadotChainEvents: m.Component = {
 const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
   view: (vnode) => {
     const { chain } = vnode.attrs;
-    console.dir(chain);
     return m('.EventSubscriptions', [
       m(Table, {}, [
         m('tr', [
@@ -196,7 +194,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
   }
 };
 
-const ChainNotificationManagementPage: m.Component<{chains: ChainInfo[],}, { selectedChain: ChainInfo,}> = {
+const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { selectedChain: ChainInfo }> = {
   oninit: (vnode) => {
     const { chains } = vnode.attrs;
     const scope = m.route.param('scope');
@@ -207,7 +205,7 @@ const ChainNotificationManagementPage: m.Component<{chains: ChainInfo[],}, { sel
     const chainIds = chains.map((c) => c.id);
     if (chains.length < 1) return;
     const validChains = ['edgeware', 'polkadot', 'kusama'];
-    const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a,b) => (a.id > b.id) ? 1 : -1);
+    const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {
         class: 'CommunitySelectList',
@@ -244,15 +242,13 @@ const ChainNotificationManagementPage: m.Component<{chains: ChainInfo[],}, { sel
   },
 };
 
-interface IIndividualEventSubscriptionsState {
+const IndividualEventSubscriptions: m.Component<{}, {
   chain: string;
   eventKinds: IChainEventKind[];
   allSupportedChains: string[];
   isSubscribedAll: boolean;
   isEmailAll: boolean;
-}
-
-const IndividualEventSubscriptions: m.Component<{}, IIndividualEventSubscriptionsState> = {
+}> = {
   view: (vnode) => {
     let titler;
     if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
@@ -295,6 +291,10 @@ const ChainEventSettingsPage: m.Component<{}, IChainEventSettingsPageState> = {
   view: (vnode) => {
     const { chains } = vnode.state;
     if (!app.loginStatusLoaded()) return m(PageLoading);
+    if (!app.isLoggedIn()) return m(PageError, {
+      message: 'This page requires you to be logged in.'
+    });
+
     return m(Sublayout, {
       class: 'SubscriptionsPage',
       title: 'Chain Notifications',
