@@ -150,9 +150,20 @@ export const AppModals = {
     if (app.modals.getList().length > 0 && !vnode.state.modalOpenSet) {
       vnode.state.modalOpenSet = true;
       $('body').addClass('modal-open');
+
+      // fix scrolling
+      // https://css-tricks.com/prevent-page-scrolling-when-a-modal-is-open/
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${window.scrollY}px`;
     } else if (app.modals.getList().length === 0 && vnode.state.modalOpenSet) {
       vnode.state.modalOpenSet = false;
       $('body').removeClass('modal-open');
+
+      // unfix scrolling
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
   },
   view: (vnode) => {

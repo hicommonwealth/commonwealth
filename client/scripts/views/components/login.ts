@@ -123,6 +123,7 @@ const Login: m.Component<{}, {
                 class: 'login-with-web3',
                 label: 'Continue with wallet',
               }),
+              addToStack: true,
               class: 'LoginPopoverMenu',
               transitionDuration: 0,
               content: app.config.chains.getAll().map((chain) => {
