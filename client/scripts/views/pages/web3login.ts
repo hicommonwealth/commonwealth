@@ -17,11 +17,14 @@ const Web3LoginPage: m.Component<{}> = {
           label: 'Continue',
           fluid: true,
           onclick: (e) => {
-            if (app.isLoggedIn()) {
-              app.modals.lazyCreate('link_new_address_modal');
-            } else {
-              app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
-            }
+            app.modals.lazyCreate('link_new_address_modal', {
+              loggingInWithAddress: app.isLoggedIn(),
+              successCallback: () => {
+                m.route.set(
+                  m.route.param('prev') ? m.route.param('prev') : app.activeId() ? `/${app.activeId()}` : '/'
+                );
+              }
+            });
           },
         }),
         m.route.param('prev')

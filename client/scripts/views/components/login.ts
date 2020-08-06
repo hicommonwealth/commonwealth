@@ -107,7 +107,13 @@ const Login: m.Component<{}, {
               onclick: (e) => {
                 $(e.target).trigger('modalexit');
                 m.route.set(`/${app.chain.id}/web3login`, { prev: m.route.get() });
-                app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
+                const redirectRoute = m.route.get();
+                app.modals.lazyCreate('link_new_address_modal', {
+                  loggingInWithAddress: true,
+                  successCallback: () => {
+                    m.route.set(redirectRoute);
+                  }
+                });
               }
             })
             : m(PopoverMenu, {
@@ -128,11 +134,17 @@ const Login: m.Component<{}, {
                   onclick: (e) => {
                     $('.Login').trigger('modalexit');
                     m.route.set(`/${chain.id}/web3login`, { prev: m.route.get() });
-                    app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
+                    const redirectRoute = m.route.get();
+                    app.modals.lazyCreate('link_new_address_modal', {
+                      loggingInWithAddress: true,
+                      successCallback: () => {
+                        m.route.set(redirectRoute);
+                      }
+                    });
                   }
                 });
               }),
-          }),
+            }),
         ]),
       ]),
     ]);

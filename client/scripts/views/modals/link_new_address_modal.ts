@@ -68,6 +68,7 @@ const accountVerifiedCallback = async (account, vnode) => {
     });
     notifySuccess('Success! Logged in');
     $(vnode.dom).trigger('modalexit');
+    if (vnode.attrs.successCallback) vnode.attrs.successCallback();
   } else {
     // log in as the new user
     await initAppState(false);
@@ -85,7 +86,8 @@ const accountVerifiedCallback = async (account, vnode) => {
     // if we're logging in and have a profile, we can just close out the modal
     if (account.profile && account.profile.initialized && account.profile.name) {
       $(vnode.dom).trigger('modalexit');
-      notifySuccess('Logged in');
+      if (vnode.attrs.successCallback) vnode.attrs.successCallback();
+      notifySuccess('Success! Logged in');
     } else {
       vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     }
@@ -100,11 +102,11 @@ const EthereumLinkAccountItem: m.Component<{
   address,
   accountVerifiedCallback,
   errorCallback,
-  parentVnode
+  linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
     // TODO: implement vnode.state.linking
-    const { address, accountVerifiedCallback, errorCallback, parentVnode } = vnode.attrs;
+    const { address, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
     return m('.EthereumLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -117,7 +119,7 @@ const EthereumLinkAccountItem: m.Component<{
 
         signerAccount.validate(webWalletSignature)
           .then(() => {
-            return accountVerifiedCallback(signerAccount, parentVnode);
+            return accountVerifiedCallback(signerAccount, linkNewAddressModalVnode);
           })
           .then(() => m.redraw())
           .catch(errorCallback);
@@ -140,7 +142,7 @@ const SubstrateLinkAccountItem: m.Component<{
   account,
   accountVerifiedCallback,
   errorCallback,
-  parentVnode
+  linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
@@ -172,7 +174,7 @@ const SubstrateLinkAccountItem: m.Component<{
           }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
-            accountVerifiedCallback(signerAccount, vnode.attrs.parentVnode);
+            accountVerifiedCallback(signerAccount, vnode.attrs.linkNewAddressModalVnode);
           }, (err) => {
             vnode.state.linking = false;
             errorCallback('Verification failed.');
@@ -209,6 +211,7 @@ const SubstrateLinkAccountItem: m.Component<{
 const LinkNewAddressModal: m.Component<{
   loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
   alreadyInitializedAccount?: Account<any>; // skips the verification steps, and goes straight to profile creation
+  successCallback;
 }, {
   // meta
   step;
@@ -231,6 +234,7 @@ const LinkNewAddressModal: m.Component<{
   initializingWallet: boolean;
   onpopstate;
 }> = {
+  // close the modal if the user moves away from the page
   oncreate: (vnode) => {
     vnode.state.onpopstate = (e) => {
       $('.LinkNewAddressModal').trigger('modalexit');
@@ -513,16 +517,6 @@ const LinkNewAddressModal: m.Component<{
                  && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'Wallet not found'
                 : 'Continue'
         }),
-        m.route.get().endsWith('/web3login') && m('.link-address-options-back', [
-          m('a.back-text', {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-              window.history.back();
-            }
-          }, 'Back'),
-        ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step2VerifyWithWebWallet ? m('.link-address-step', [
         linkAddressHeader,
         m('.link-address-step-narrow', [
@@ -575,7 +569,7 @@ const LinkNewAddressModal: m.Component<{
                     + 'please report this to the developers.';
                   m.redraw();
                 },
-                parentVnode: vnode,
+                linkNewAddressModalVnode: vnode,
               })
             ),
             [ChainBase.Substrate
@@ -584,7 +578,7 @@ const LinkNewAddressModal: m.Component<{
                 account,
                 accountVerifiedCallback,
                 errorCallback: (error) => { vnode.state.error = error; m.redraw(); },
-                parentVnode: vnode,
+                linkNewAddressModalVnode: vnode,
               })
             ),
           ]),
@@ -763,7 +757,7 @@ const LinkNewAddressModal: m.Component<{
           m('h3', 'Log in with username and password'),
         ]),
         m('.link-address-step-narrow', [
-          m(HedgehogLoginForm, { accountVerifiedCallback, parentVnode: vnode }),
+          m(HedgehogLoginForm, { accountVerifiedCallback, linkNewAddressModalVnode: vnode }),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step3CreateProfile ? m('.link-address-step', [
         linkAddressHeader,
@@ -883,7 +877,7 @@ const LinkNewAddressModal: m.Component<{
             onclick: (e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
-              notifySuccess('Success!!');
+              if (vnode.attrs.successCallback) vnode.attrs.successCallback();
             },
             label: 'Close'
           }),

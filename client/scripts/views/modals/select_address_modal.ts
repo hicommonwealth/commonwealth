@@ -122,7 +122,11 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           fluid: true,
           disabled: vnode.state.loading,
           onclick: (e) => {
-            app.modals.lazyCreate('link_new_address_modal');
+            app.modals.lazyCreate('link_new_address_modal', {
+              successCallback: () => {
+                // TODO XX: set membership
+              }
+            });
           },
         }),
       ]),

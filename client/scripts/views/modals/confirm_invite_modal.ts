@@ -149,8 +149,12 @@ const ConfirmInviteModal = {
               href: '#',
               onclick: (e) => {
                 e.preventDefault();
-                app.modals.lazyCreate('link_new_address_modal');
-                $(vnode.dom).trigger('modalexit');
+                app.modals.lazyCreate('link_new_address_modal', {
+                  successCallback: () => {
+                    // TODO XX: set membership
+                    $(vnode.dom).trigger('modalexit');
+                  }
+                });
               }
             }, `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
           ],
