@@ -10,9 +10,9 @@ import app, { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
+import { Errors as mergeErrors } from '../../../server/routes/mergeAccounts';
 const ethUtil = require('ethereumjs-util');
 
-import { Errors as mergeErrors } from '../../../server/routes/mergeAccounts';
 
 
 chai.use(chaiHttp);
@@ -31,28 +31,25 @@ describe('Merge Account tests', () => {
     let signature;
     const chain = 'ethereum';
     const community = 'staking';
-  
+
     before('set up user with addresses', async () => {
       // 1. create first address in order to create the new User/get user id
       // 2. create JWT with user id
       // 3. create second address and pass in JWT
-  
-  
+
+
       // generate first address & user
-      let res = await modelUtils.createAndVerifyAddress({ chain });
+      const res = await modelUtils.createAndVerifyAddress({ chain });
       // console.log('first address', res);
       userAddress1 = res.address;
-      let userEmail = res.email;
+      const userEmail = res.email;
       userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
-      // console.log('userAddress1:', userAddress1);
-      // console.log('user_id:', res.user_id);
-      // console.log('userJWT:', userJWT);
-  
+
       // generate second address with user JWT
       const { keypair, address } = await modelUtils.generateEthAddress();
       const res2 = await models['Address'].createWithToken(
-        res.user_id, chain, address, 
-      )
+        res.user_id, chain, address,
+      );
       // console.log('res2', res2);
       // console.log('address2:', res2.body.result);
       const address_id = res2.id;
@@ -60,13 +57,13 @@ describe('Merge Account tests', () => {
       const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
       const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
       signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
-      let res3 = await chai.request.agent(app)
+      const res3 = await chai.request.agent(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({
-          address: address,
-          chain: chain,
-          signature: signature,
+          address,
+          chain,
+          signature,
           jwt: userJWT
         });
       const user_id = res3.body.result.user.id;
@@ -79,12 +76,12 @@ describe('Merge Account tests', () => {
 
       // add roles
       const role1 = await modelUtils.assignRole({
-        address_id: address_id,
+        address_id,
         chainOrCommObj: { offchain_community_id: community },
         role: 'admin',
       });
       const role2 = await modelUtils.assignRole({
-        address_id: address_id,
+        address_id,
         chainOrCommObj: { chain_id: 'edgeware' },
         role: 'moderator',
       });
@@ -123,7 +120,7 @@ describe('Merge Account tests', () => {
         kind: 'forum',
       });
 
-      // add comments 
+      // add comments
       const comment = await modelUtils.createComment({
         chain,
         address: userAddress2,
@@ -147,8 +144,8 @@ describe('Merge Account tests', () => {
         proposal_id: null,
         comment_id: null,
         reaction: 'like',
-        community: community,
-        address_id: address_id, 
+        community,
+        address_id,
       });
 
       // add conflicting reaction (thread) to be deleted in route.
@@ -158,8 +155,8 @@ describe('Merge Account tests', () => {
         proposal_id: null,
         comment_id: null,
         reaction: 'like',
-        community: community,
-        address_id: res.address_id, 
+        community,
+        address_id: res.address_id,
       });
 
       // add reaction to comment
@@ -169,8 +166,8 @@ describe('Merge Account tests', () => {
         proposal_id: null,
         comment_id: comment2.result.id,
         reaction: 'like',
-        community: community,
-        address_id: address_id, 
+        community,
+        address_id,
       });
 
       // add conflicting reaction (comment) to be deleted in route.
@@ -180,8 +177,8 @@ describe('Merge Account tests', () => {
         proposal_id: null,
         comment_id: comment2.result.id,
         reaction: 'like',
-        community: community,
-        address_id: res.address_id, 
+        community,
+        address_id: res.address_id,
       });
 
       // add reaction to proposal
@@ -191,8 +188,8 @@ describe('Merge Account tests', () => {
         proposal_id: '12',
         comment_id: comment2.result.id,
         reaction: 'like',
-        community: community,
-        address_id: address_id, 
+        community,
+        address_id, 
       });
 
       // add conflicting reaction (proposal) to be deleted in route.
@@ -202,8 +199,8 @@ describe('Merge Account tests', () => {
         proposal_id: '12',
         comment_id: null,
         reaction: 'like',
-        community: community,
-        address_id: res.address_id, 
+        community,
+        address_id: res.address_id,
       });
     });
 
@@ -217,7 +214,7 @@ describe('Merge Account tests', () => {
           'signature': signature,
           'jwt': userJWT,
         });
-      expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned); 
+      expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned);
     });
 
     it('should fail to merge if there is no signature', async () => {
@@ -229,7 +226,7 @@ describe('Merge Account tests', () => {
           'oldAddress': notOwned.address,
           'jwt': userJWT,
         });
-      expect(res.body.error).to.be.equal(mergeErrors.NeedSignature); 
+      expect(res.body.error).to.be.equal(mergeErrors.NeedSignature);
     });
 
     it('should fail to merge if there is an invalid signature', async () => {
