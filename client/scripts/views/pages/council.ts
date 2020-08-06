@@ -222,15 +222,16 @@ const CouncilPage: m.Component<{}> = {
           // m('.stats-tile', app.chain && `${candidacyBond || '--'}`)
         ]),
         m(Col, { span: 3 }, [
-          m('.stats-tile', app.chain && `${votingBond || '--'}`),
-        ]),
-        m(Col, { span: 3 }, [
-          m('.stats-tile', app.chain && pluralize(candidates.length, 'candidate'))
-        ]),
-        m(Col, { span: 3 }, [
           m('.stats-tile', [
-            m(CountdownUntilBlock, { block: nextRoundStartBlock }),
+            m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+            ' till next council'
           ])
+        ]),
+        m(Col, { span: 3 }, [
+          m('.stats-tile', app.chain && `${candidacyBond || '--'} candidacy bond`)
+        ]),
+        m(Col, { span: 3 }, [
+          m('.stats-tile', app.chain && `${votingBond || '--'} voting bond`),
         ]),
       ]),
       // councillors
