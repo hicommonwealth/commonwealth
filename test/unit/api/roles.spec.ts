@@ -51,7 +51,6 @@ describe('Roles Test', () => {
           community,
           address_id: user.address_id,
         });
-      console.dir(res.body.result.subscription);
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.newRole.address_id).to.be.equal(user.address_id);
       expect(res.body.result.newRole.offchain_community_id).to.be.equal(community);
