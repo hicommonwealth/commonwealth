@@ -337,17 +337,19 @@ describe('Subscriptions Tests', () => {
 
 
     it('should check /viewSubscriptions for all', async () => {
-      let res = await modelUtils.createSubscription({
+      const res1 = await modelUtils.createSubscription({
         object_id: community,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
       });
-      res = await chai.request(app)
+      const res = await chai.request(app)
         .get('/api/viewSubscriptions')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken });
+        .send({ jwt: jwtToken, auth: true, });
       expect(res.body).to.not.be.null;
+      // console.dir(res);
+      console.dir(res.body);
       expect(res.body.status).to.be.equal('Success');
     });
   });
