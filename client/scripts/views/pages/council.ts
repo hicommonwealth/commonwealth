@@ -22,6 +22,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
+import { Grid, Col } from 'construct-ui';
 
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
@@ -208,43 +209,30 @@ const CouncilPage: m.Component<{}> = {
       class: 'CouncilPage',
       title: 'Council',
       showNewButton: true,
-      rightSidebar: [
-        // stats
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Candidacy Bond'),
-          m('.stats-tile-figure-major', app.chain
-            && `${candidacyBond || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Voting Bond'),
-          m('.stats-tile-figure-major', app.chain
-            && `${votingBond || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Councillors'),
-          m('.stats-tile-figure-major', app.chain ? councillors.length : '--'),
-          m('.stats-tile-figure-minor', app.chain
-            && `Target council size: ${nSeats || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', !app.chain ? [
-          m('.stats-tile-label', 'Current Election'),
-          m('.stats-tile-figure-major', '--'),
-        ] : [
-          m('.stats-tile-label', 'Current Election'),
-          m('.stats-tile-figure-major', 'Voting open'),
-          m('.stats-tile-figure-minor', pluralize(candidates.length, 'candidate')),
-        ]),
-        m('.forum-container.stats-tile', !app.chain ? [
-          m('.stats-tile-label', 'Voting Ends'),
-          m('.stats-tile-figure-major', '--'),
-        ] : [
-          m('.stats-tile-label', 'Voting Ends'),
-          m('.stats-tile-figure-major',
-            m(CountdownUntilBlock, { block: nextRoundStartBlock })),
-          m('.stats-tile-figure-minor', `Block ${nextRoundStartBlock}`),
-        ]),
-      ],
     }, [
+      // stats
+      m(Grid, {
+        align: 'middle',
+        class: 'stats-container',
+        gutter: 5,
+        justify: 'space-between'
+      }, [
+        m(Col, { span: 3 }, [
+          `${app.chain ? councillors.length : '--'} councillors`
+          // m('.stats-tile', app.chain && `${candidacyBond || '--'}`)
+        ]),
+        m(Col, { span: 3 }, [
+          m('.stats-tile', app.chain && `${votingBond || '--'}`),
+        ]),
+        m(Col, { span: 3 }, [
+          m('.stats-tile', app.chain && pluralize(candidates.length, 'candidate'))
+        ]),
+        m(Col, { span: 3 }, [
+          m('.stats-tile', [
+            m(CountdownUntilBlock, { block: nextRoundStartBlock }),
+          ])
+        ]),
+      ]),
       // councillors
       m('h4.proposals-subheader', 'Councillors'),
       councillors.length === 0
