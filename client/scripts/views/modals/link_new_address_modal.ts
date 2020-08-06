@@ -7,7 +7,7 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Button, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
+import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { formatAddressShort } from 'helpers';
@@ -299,12 +299,13 @@ const LinkNewAddressModal: m.Component<{
         ] : app.user.activeAccounts.length === 0 ? [
           'Select a wallet:'
         ] : [
-          m('.link-address-combined-warning', [
-            m('.link-address-combined-warning-icon', '⚠️'),
-            m('.link-address-combined-warning-text', [
-              'Anyone with the private keys for this address will be able to log into your Commonwealth account.'
-            ]),
-          ]),
+          m(Callout, {
+            intent: 'primary',
+            size: 'sm',
+            icon: Icons.ALERT_TRIANGLE,
+            header: 'Security warning',
+            content: 'Anyone with the private keys for this address will be able to log into your Commonwealth account.'
+          }),
           'Select a wallet:'
         ]),
         // wallet options
@@ -793,6 +794,7 @@ const LinkNewAddressModal: m.Component<{
             name: 'name',
             placeholder: 'Name',
             fluid: true,
+            autocomplete: 'off',
             oncreate: (vvnode) => {
               // prefill preexisting name, or default name
               if (vnode.state.newAddress && vnode.state.newAddress.profile && vnode.state.newAddress.profile.name) {
@@ -814,6 +816,7 @@ const LinkNewAddressModal: m.Component<{
             name: 'headline',
             placeholder: 'Headline (optional)',
             fluid: true,
+            autocomplete: 'off',
             oncreate: (vvnode) => {
               // prefile preexisting headline
               if (vnode.state.newAddress && vnode.state.newAddress.profile) {
