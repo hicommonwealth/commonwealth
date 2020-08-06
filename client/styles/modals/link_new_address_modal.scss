@@ -195,6 +195,11 @@
     }
     .account-adder {
         margin-top: 162px;
+        .cui-spinner {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
     }
     .account-item {
         cursor: pointer;

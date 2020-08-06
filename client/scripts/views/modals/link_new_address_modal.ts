@@ -326,7 +326,9 @@ const LinkNewAddressModal: m.Component<{
               + (((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available) ? '' : 'disabled'),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.PolkadotJS;
-              $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              setTimeout(() => {
+                $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              }, 10);
             }
           }, [
             m('.link-address-option-inner', [
@@ -360,7 +362,9 @@ const LinkNewAddressModal: m.Component<{
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.Metamask;
               if (!(app.chain as Ethereum).webWallet || !(app.chain as Ethereum).webWallet.available) return;
-              $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              setTimeout(() => {
+                $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              }, 0);
             }
           }, [
             m('.link-address-option-inner', [
@@ -393,7 +397,9 @@ const LinkNewAddressModal: m.Component<{
             class: (vnode.state.selectedWallet === LinkNewAddressWallets.CLIWallet ? 'selected' : ''),
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.CLIWallet;
-              $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              setTimeout(() => {
+                $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              }, 0);
             }
           }, [
             m('.link-address-option-inner', [
@@ -428,7 +434,9 @@ const LinkNewAddressModal: m.Component<{
             onclick: (e) => {
               vnode.state.selectedWallet = LinkNewAddressWallets.NEARWallet;
               // Don't proceed to next immediately, because NEAR login redirects to an external site
-              // $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              // setTimeout(() => {
+              //   $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+              // }, 0);
             }
           }, [
             m('.link-address-option-inner', [
@@ -453,6 +461,9 @@ const LinkNewAddressModal: m.Component<{
           //   onclick: (e) => {
           //     vnode.state.selectedWallet = LinkNewAddressWallets.Hedgehog;
           //     $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+          //     // setTimeout(() => {
+          //     //   $(e.target).closest('.link-address-options').next('button.link-address-options-continue').click();
+          //     // }, 0);
           //   }
           // }, [
           //   m('.link-address-option-inner', [
@@ -526,13 +537,13 @@ const LinkNewAddressModal: m.Component<{
             && m(Button, {
               class: 'account-adder',
               intent: 'primary',
-              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet.available,
-              loading: vnode.state.initializingWallet,
+              disabled: !(app.chain as Substrate || app.chain as Ethereum).webWallet.available // disable if unavailable
+                || vnode.state.initializingWallet !== false, // disable if loading, or loading state hasn't been set
               oninit: async (vvnode) => {
                 // initialize API if needed before starting webwallet
                 vnode.state.initializingWallet = true;
                 await app.chain.initApi();
-                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable()
+                await (app.chain as Substrate || app.chain as Ethereum).webWallet.enable();
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
@@ -544,8 +555,10 @@ const LinkNewAddressModal: m.Component<{
                 vnode.state.initializingWallet = false;
                 m.redraw();
               },
-              label: (app.chain as Substrate || app.chain as Ethereum).webWallet.available
-                ? 'Connect to wallet' : 'No wallet detected',
+              label: vnode.state.initializingWallet !== false
+                ? [ m(Spinner, { size: 'xs', active: true }), ' Connecting to chain...' ]
+                : (app.chain as Substrate || app.chain as Ethereum).webWallet.available
+                  ? 'Connect to wallet' : 'No wallet detected',
             }),
           (app.chain as Substrate || app.chain as Ethereum).webWallet
             && (app.chain as Substrate || app.chain as Ethereum).webWallet.enabled && m('.accounts-caption', [
