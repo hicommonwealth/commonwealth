@@ -875,13 +875,15 @@ const LinkNewAddressModal: m.Component<{
               : m('.error-message', 'There was an issue fetching your new account'),
           ]),
           m('br'),
-          m('button.btn-finished-action', {
+          m(Button, {
+            class: 'btn-finished-action',
             onclick: (e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
               notifySuccess('Success!!');
-            }
-          }, 'Close'),
+            },
+            label: 'Close'
+          }),
         ]),
       ]) : m('.link-address-step', [
         m('.link-address-step-header', [
