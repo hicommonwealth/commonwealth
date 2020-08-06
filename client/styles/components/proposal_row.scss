@@ -1,5 +1,8 @@
 @import 'client/styles/shared';
 
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
+
 @mixin proposal-stats-data {
     .proposal-row-support,
     .proposal-row-turnout,
@@ -49,11 +52,8 @@
 
 .ProposalRow {
     display: flex;
-    margin: 25px 0;
-    flex-direction: row;
-
+    padding: 12px 0;
     cursor: pointer;
-    @include hoverFloat;
 
     .proposal-pre {
         margin-top: 4px;
@@ -72,29 +72,18 @@
         }
     }
 
-    .proposal-row-main {
-        flex: 1 0;
-    }
-    .proposal-row-responsive-clear {
-        display: none;
-    }
-    .proposal-row-right-chart {
-        min-width: 120px;
-        width: 120px;
-        padding-left: 26px;
-    }
-
     // main
     .proposal-row-main {
         display: flex;
         flex-direction: column;
+        flex: 1;
 
         @include xs-max {
             display: block;
         }
 
         .proposal-row-title {
-            font-size: 19px;
+            font-size: $text-size-item-header;
             font-weight: 500;
             margin-bottom: 3px;
             word-break: break-word;
@@ -115,7 +104,7 @@
 
         .proposal-row-metadata {
             color: $text-color-lightest;
-            font-size: 17px;
+            font-size: $text-size-item-meta;
             display: flex;
 
             @include xs-max {
@@ -146,28 +135,32 @@
                 top: 2px;
             }
         }
-
-        .proposal-row-grid {
-
-        }
-
-
     }
     // right
     .proposal-row-right {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        min-width: 200;
-        width: 200px;
-        padding-left: 30px;
-        flex: 0 0 auto;
+        padding-left: 10px;
         color: $text-color-light;
-        font-size: 17px;
-        font-weight: 400;
-        .cui-icon {
-            padding-left: 2px;
+        .proposal-comments {
+            min-width: 100px;
+            padding-left: 10px;
+            padding-right: 20px;
+            text-align: right;
+            white-space: nowrap;
             color: inherit;
+            .cui-icon {
+                color: inherit;
+            }
+        }
+        .ReactionButton {
+            margin-left: 48px;
+        }
+        .proposal-timestamp {
+            min-width: 80px;
+            padding-left: 14px;
+            text-align: right;
+            font-size: $text-size-item-meta;
         }
         .proposal-row-right-text {
             padding-top: 4px;

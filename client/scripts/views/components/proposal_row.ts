@@ -249,6 +249,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
       ];
 
     return m('.ProposalRow', {
+      key: proposal.identifier,
       onclick: (e) => {
         e.preventDefault();
         m.route.set(`/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`);

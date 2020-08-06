@@ -25,6 +25,19 @@ import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 
+const ProposalRowHeader: m.Component<{ title: string }> = {
+  view: (vnode) => {
+    const { title } = vnode.attrs;
+    return m('.ProposalRowHeader', [
+      m('.proposal-row-header-col.proposal-row-header-title', title),
+      m('.proposal-row-header-col.proposal-row-header-replies', 'Replies'),
+      m('.proposal-row-header-col', 'Likes'),
+      m('.proposal-row-header-col', 'Activity'),
+      app.isLoggedIn() && m('.proposal-row-header-col.proposal-row-menu'),
+    ]);
+  }
+};
+
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
@@ -173,7 +186,7 @@ const ProposalsPage: m.Component<{}> = {
           ]),
         ]),
       ]),
-      m('.proposal-section-header', 'Active Proposals'),
+      m(ProposalRowHeader, { title: 'Active Proposals' }),
       m(List, { class: 'active-proposals' }, [
         !!activeDemocracyReferenda.length
         && activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
@@ -193,12 +206,12 @@ const ProposalsPage: m.Component<{}> = {
         && !activeMolochProposals
         && m('.no-proposals', 'None'),
       ]),
-      m('.proposal-section-header', 'Active Treasury Proposals'),
+      m(ProposalRowHeader, { title: 'Active Treasury Proposals' }),
       !!activeTreasuryProposals.length
       && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
       !activeTreasuryProposals
       && m('.no-proposals', 'None'),
-      m('.proposal-section-header', 'Inactive Proposals'),
+      m(ProposalRowHeader, { title: 'Inactive Proposals' }),
       m(List, { class: 'inactive-proposals' }, [
         !!inactiveDemocracyReferenda.length
         && inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
@@ -218,7 +231,7 @@ const ProposalsPage: m.Component<{}> = {
         && !inactiveMolochProposals
         && m('.no-proposals', 'None'),
       ]),
-      m('.proposal-section-header', 'Inactive Treasury Proposals'),
+      m(ProposalRowHeader, { title: 'Inactive Treasury Proposals' }),
       !!inactiveTreasuryProposals.length
       && inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
       !inactiveTreasuryProposals
