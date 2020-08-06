@@ -85,6 +85,24 @@ const MergeAccountsWell: m.Component<{}, {address1: Account<any>; address2: Acco
           if (!vnode.state.address1 || !vnode.state.address2) return;
           const signatureData = await getSignatureForMessage(vnode.state.address1, 'Merge Verification', 'NO???');
           console.dir(signatureData);
+          await $.ajax({
+            url: `${app.serverUrl()}/mergeAccounts`,
+            data: {
+              jwt: app.user.jwt,
+              oldAddress: vnode.state.address1.address,
+              newAddress: vnode.state.address2.address,
+              signature: signatureData,
+            },
+            type: 'POST',
+            success: (result) => {
+              console.dir(result);
+              m.redraw();
+            },
+            error: (err) => {
+              console.dir(err);
+              m.redraw();
+            },
+          });
         },
       })
     ]);
