@@ -348,8 +348,6 @@ describe('Subscriptions Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, auth: true, });
       expect(res.body).to.not.be.null;
-      // console.dir(res);
-      console.dir(res.body);
       expect(res.body.status).to.be.equal('Success');
     });
   });
