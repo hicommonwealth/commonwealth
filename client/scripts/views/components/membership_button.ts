@@ -89,7 +89,11 @@ const MembershipButton: m.Component<{
             iconLeft: Icons.PLUS,
             label: 'New address',
             onclick: (e) => {
-              app.modals.lazyCreate('link_new_address_modal');
+              app.modals.lazyCreate('link_new_address_modal', {
+                successCallback: () => {
+                  // TODO XX: set membership
+                }
+              });
             }
           }),
         ],

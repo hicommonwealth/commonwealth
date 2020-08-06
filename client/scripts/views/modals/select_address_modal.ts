@@ -76,7 +76,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
 
     return m('.SelectAddressModal', [
       m('.compact-modal-title', [
-        m('h3', 'Manage linked addresses'),
+        m('h3', 'Manage addresses'),
       ]),
       m('.compact-modal-body', [
         m('.select-address-options', [
@@ -122,7 +122,11 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           fluid: true,
           disabled: vnode.state.loading,
           onclick: (e) => {
-            app.modals.lazyCreate('link_new_address_modal');
+            app.modals.lazyCreate('link_new_address_modal', {
+              successCallback: () => {
+                // TODO XX: set membership
+              }
+            });
           },
         }),
       ]),

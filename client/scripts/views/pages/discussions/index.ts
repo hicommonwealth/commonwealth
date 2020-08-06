@@ -234,14 +234,14 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           : [
             m(DiscussionRowHeader),
             getRecentPostsSortedByWeek(),
+            vnode.state.postsDepleted
+              ? m('.infinite-scroll-reached-end', [
+                `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+              ])
+              : m('.infinite-scroll-spinner-wrap', [
+                m(Spinner, { active: !vnode.state.postsDepleted })
+              ])
           ],
-        vnode.state.postsDepleted
-          ? m('.infinite-scroll-reached-end', [
-            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
-          ])
-          : m('.infinite-scroll-spinner-wrap', [
-            m(Spinner, { active: !vnode.state.postsDepleted })
-          ])
       ]);
     };
 

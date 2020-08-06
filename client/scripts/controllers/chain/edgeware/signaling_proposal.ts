@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import { takeWhile, switchMap, flatMap, take } from 'rxjs/operators';
 import { SubstrateTypes } from '@commonwealth/chain-events';
-import { VoteOutcome, VoteRecord } from '@edgeware/node-types/interfaces';
+import { VoteOutcome, VoteRecord } from '@edgeware/node-types';
 import { ApiRx } from '@polkadot/api';
 import { Option } from '@polkadot/types';
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
@@ -245,21 +245,6 @@ export class EdgewareSignalingProposal
   }
 
   public submitVoteTx(vote: SignalingVote) {
-    if (this.stage !== SignalingProposalStage.Voting) {
-      throw new Error('Proposal not in voting stage');
-    }
-    if (vote.choices.find((p) => !this.data.choices.map((d) => d.toHex()).includes(p.toHex()))) {
-      throw new Error('invalid choice in vote');
-    }
-    if (this.data.voteType.toString() === 'RankedChoice') {
-      if (vote.choices.length !== this.data.choices.length) {
-        throw new Error('must provide rankings for all choices');
-      }
-    } else {
-      if (vote.choices.length !== 1) {
-        throw new Error('can only vote for one option');
-      }
-    }
     return this._Chain.createTXModalData(
       vote.account,
       (api: ApiRx) => api.tx.voting.reveal(this.data.voteIndex, vote.choices, null),

@@ -33,7 +33,17 @@ nvm install
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
 
 Now, download a copy of the production database if necessary, and
-set up any environment variables
+set up any environment variables.
+
+## Development Style Guide
+
+You should set up global linters (e.g. eslint and stylelint) to make sure your code is formatted properly.
+
+Components should be namespaced by class name, e.g. a component called MembersBox should be:
+
+- placed in client/scripts/views/components/members_box.ts, as a default export
+- styled in client/styles/components/members_box.scss
+- exported as a Mithril component with parent class .MembersBox
 
 ## Production Database
 
@@ -153,7 +163,7 @@ Each `Network` has a distinct set of modules in the
 controllers directory, e.g. identity, governance, treasury.
 For example, Edgeware, Polkadot, and Cosmos are networks.
 
-Each `Chain` is a specific instance of a blockchain network that 
+Each `Chain` is a specific instance of a blockchain network that
 Commonwealth may connect to. Currently, chains are only identified
 by the nodes that serve them, and not by genesis block or returned
 chain ID.

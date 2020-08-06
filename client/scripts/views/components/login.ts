@@ -107,7 +107,13 @@ const Login: m.Component<{}, {
               onclick: (e) => {
                 $(e.target).trigger('modalexit');
                 m.route.set(`/${app.chain.id}/web3login`, { prev: m.route.get() });
-                app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
+                const redirectRoute = m.route.get();
+                app.modals.lazyCreate('link_new_address_modal', {
+                  loggingInWithAddress: true,
+                  successCallback: () => {
+                    m.route.set(redirectRoute);
+                  }
+                });
               }
             })
             : m(PopoverMenu, {
@@ -117,9 +123,12 @@ const Login: m.Component<{}, {
                 class: 'login-with-web3',
                 label: 'Continue with wallet',
               }),
+              addToStack: true,
               class: 'LoginPopoverMenu',
               transitionDuration: 0,
-              content: app.config.chains.getAll().map((chain) => {
+              content: app.config.chains.getAll().sort((a, b) => {
+                return a.name.localeCompare(b.name);
+              }).map((chain) => {
                 return m(MenuItem, {
                   label: m('.chain-login-label', [
                     m(ChainIcon, { chain, size: 20 }),
@@ -128,11 +137,17 @@ const Login: m.Component<{}, {
                   onclick: (e) => {
                     $('.Login').trigger('modalexit');
                     m.route.set(`/${chain.id}/web3login`, { prev: m.route.get() });
-                    app.modals.lazyCreate('link_new_address_modal', { loggingInWithAddress: true });
+                    const redirectRoute = m.route.get();
+                    app.modals.lazyCreate('link_new_address_modal', {
+                      loggingInWithAddress: true,
+                      successCallback: () => {
+                        m.route.set(redirectRoute);
+                      }
+                    });
                   }
                 });
               }),
-          }),
+            }),
         ]),
       ]),
     ]);

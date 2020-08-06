@@ -105,12 +105,8 @@ class ThreadsController {
     proposal: OffchainThread,
     body?: string,
     attachments?: string[],
-    readOnly?: boolean,
-    privacy?: boolean
   ) {
     const newBody = body || proposal.body;
-    const newReadOnly = (typeof readOnly === 'boolean') ? readOnly : proposal.readOnly;
-    const newPrivacy = (typeof privacy === 'boolean') ? privacy : proposal.privacy;
     const recentEdit : any = { timestamp: moment(), body };
     const versionHistory = JSON.stringify(recentEdit);
     await $.ajax({
@@ -122,8 +118,6 @@ class ThreadsController {
         'body': encodeURIComponent(newBody),
         'version_history': versionHistory,
         'attachments[]': attachments,
-        'read_only': newReadOnly,
-        'privacy': newPrivacy,
         'jwt': app.user.jwt
       },
       success: (response) => {
@@ -157,6 +151,30 @@ class ThreadsController {
         notifyError('Could not delete thread');
         reject(e);
       });
+    });
+  }
+
+  public async setPrivacy(args: { threadId: number, privacy: boolean, readOnly: boolean, }) {
+    return $.ajax({
+      url: `${app.serverUrl()}/setPrivacy`,
+      type: 'POST',
+      data: {
+        'jwt': app.user.jwt,
+        'thread_id': args.threadId,
+        'privacy': args.privacy,
+        'read_only': args.readOnly,
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
+      },
+      error: (err) => {
+        console.error(err);
+      },
     });
   }
 
