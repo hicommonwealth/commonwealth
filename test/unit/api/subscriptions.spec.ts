@@ -337,13 +337,13 @@ describe('Subscriptions Tests', () => {
 
 
     it('should check /viewSubscriptions for all', async () => {
-      let res = await modelUtils.createSubscription({
+      const res1 = await modelUtils.createSubscription({
         object_id: community,
         jwt: jwtToken,
         is_active: true,
         category: NotificationCategories.NewThread,
       });
-      res = await chai.request(app)
+      const res = await chai.request(app)
         .get('/api/viewSubscriptions')
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken });
