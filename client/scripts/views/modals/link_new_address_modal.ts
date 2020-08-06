@@ -7,7 +7,7 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
-import { Button, Icon, Icons, Spinner } from 'construct-ui';
+import { Button, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { formatAddressShort } from 'helpers';
@@ -26,8 +26,6 @@ import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
 import { TextInputFormField, CheckboxFormField } from 'views/components/forms';
 import HedgehogLoginForm from 'views/components/hedgehog_login_form';
-import CharacterLimitedTextInput from 'views/components/widgets/character_limited_text_input';
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import User, { UserBlock } from 'views/components/widgets/user';
 import AvatarUpload from 'views/components/avatar_upload';
 import AddressSwapper from '../components/addresses/address_swapper';
@@ -476,12 +474,14 @@ const LinkNewAddressModal: m.Component<{
           // ]),
 
         ]),
-        m('button.link-address-options-continue.formular-button-primary', {
-          class: vnode.state.selectedWallet === undefined ? 'disabled'
+        m(Button, {
+          intent: 'primary',
+          class: 'link-address-options-continue',
+          disabled: vnode.state.selectedWallet === undefined ? true
             : (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
-             && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'disabled'
+             && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? true
               : (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask
-             && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'disabled' : '',
+              && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? true : false,
           onclick: async (e) => {
             e.preventDefault();
             if (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
@@ -504,13 +504,14 @@ const LinkNewAddressModal: m.Component<{
             } else {
               throw new Error('Unexpected wallet, we should never get here');
             }
-          }
-        }, vnode.state.selectedWallet === undefined ? 'Select a wallet'
-          : (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
-           && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'Wallet not found'
-            : (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask
-           && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'Wallet not found'
-              : 'Continue'),
+          },
+          label: vnode.state.selectedWallet === undefined ? 'Select a wallet'
+            : (vnode.state.selectedWallet === LinkNewAddressWallets.PolkadotJS
+               && !((app.chain as Substrate).webWallet && (app.chain as Substrate).webWallet.available)) ? 'Wallet not found'
+              : (vnode.state.selectedWallet === LinkNewAddressWallets.Metamask
+                 && !((app.chain as Ethereum).webWallet && (app.chain as Ethereum).webWallet.available)) ? 'Wallet not found'
+                : 'Continue'
+        }),
         m.route.get().endsWith('/web3login') && m('.link-address-options-back', [
           m('a.back-text', {
             href: '#',
@@ -767,8 +768,8 @@ const LinkNewAddressModal: m.Component<{
         linkAddressHeader,
         m('.link-address-step-narrow', [
           m('.create-profile-instructions', vnode.state.isNewLogin
-            ? 'Logged in! Now, create a profile:'
-            : 'Address verified! Now, create a profile:'),
+            ? 'Logged in! Now create a profile:'
+            : 'Address verified! Now create a profile:'),
           m('.avatar-wrap', [
             m(AvatarUpload, {
               uploadStartedCallback: () => {
@@ -787,11 +788,11 @@ const LinkNewAddressModal: m.Component<{
               },
             }),
           ]),
-          m(CharacterLimitedTextInput, {
+          m(Input, {
             title: 'Name',
             name: 'name',
             placeholder: 'Name',
-            limit: 40,
+            fluid: true,
             oncreate: (vvnode) => {
               // prefill preexisting name, or default name
               if (vnode.state.newAddress && vnode.state.newAddress.profile && vnode.state.newAddress.profile.name) {
@@ -808,11 +809,11 @@ const LinkNewAddressModal: m.Component<{
               vnode.state.hasName = !!e.target.value;
             },
           }),
-          m(CharacterLimitedTextInput, {
+          m(Input, {
             title: 'Headline',
             name: 'headline',
             placeholder: 'Headline (optional)',
-            limit: 80,
+            fluid: true,
             oncreate: (vvnode) => {
               // prefile preexisting headline
               if (vnode.state.newAddress && vnode.state.newAddress.profile) {
@@ -828,41 +829,41 @@ const LinkNewAddressModal: m.Component<{
             type: 'hidden',
             name: 'avatarUrl',
           }),
-          m(ResizableTextarea, {
+          m(TextArea, {
             class: 'new-profile-bio',
             name: 'bio',
             placeholder: 'Short Bio (optional)',
+            fluid: true,
             oncreate: (vvnode) => {
               if (vnode.state.newAddress && vnode.state.newAddress.profile)
                 $(vvnode.dom).val(vnode.state.newAddress.profile.bio);
             },
           }),
           m('.error-message', vnode.state.error),
-          vnode.state.uploadsInProgress || !vnode.state.hasName ? [
-            m('button.formular-button-primary.disabled', 'Save profile to continue'),
-          ] : [
-            m('button.formular-button-primary', {
-              onclick: async (e) => {
-                e.preventDefault();
-                const $form = $('.LinkNewAddressModal');
-                const data = {
-                  name: `${$form.find('input[name=name]').val()}`,
-                  headline: `${$form.find('input[name=headline]').val()}`,
-                  bio: `${$form.find('textarea[name=bio]').val()}`,
-                  avatarUrl: `${$form.find('input[name=avatarUrl]').val()}`,
-                };
-                app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
-                  vnode.state.step = LinkNewAddressSteps.Step4Complete;
-                  vnode.state.error = null;
-                  $form.trigger('modalcomplete');
-                  m.redraw();
-                }).catch((err) => {
-                  vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Unable to create profile';
-                  m.redraw();
-                });
-              }
-            }, 'Save profile to continue'),
-          ],
+          m(Button, {
+            intent: 'primary',
+            disabled: (vnode.state.uploadsInProgress || !vnode.state.hasName),
+            onclick: async (e) => {
+              e.preventDefault();
+              const $form = $('.LinkNewAddressModal');
+              const data = {
+                name: `${$form.find('input[name=name]').val()}`,
+                headline: `${$form.find('input[name=headline]').val()}`,
+                bio: `${$form.find('textarea[name=bio]').val()}`,
+                avatarUrl: `${$form.find('input[name=avatarUrl]').val()}`,
+              };
+              app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
+                vnode.state.step = LinkNewAddressSteps.Step4Complete;
+                vnode.state.error = null;
+                $form.trigger('modalcomplete');
+                m.redraw();
+              }).catch((err) => {
+                vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Unable to create profile';
+                m.redraw();
+              });
+            },
+            label: 'Save profile to continue'
+          }),
         ]),
       ]) : vnode.state.step === LinkNewAddressSteps.Step4Complete ? m('.link-address-step', [
         linkAddressHeader,
