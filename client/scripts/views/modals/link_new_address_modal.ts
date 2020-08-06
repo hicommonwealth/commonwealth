@@ -22,6 +22,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { Account, ChainBase, ChainNetwork } from 'models';
 
+import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
 import CodeBlock from 'views/components/widgets/code_block';
 import { TextInputFormField, CheckboxFormField } from 'views/components/forms';
@@ -130,7 +131,10 @@ const EthereumLinkAccountItem: m.Component<{
       // ]),
       m('.account-item-right', [
         vnode.state.linking
-          ? m('.account-waiting', 'Waiting for signature...')
+          ? m('.account-waiting', [
+            // TODO: show a (?) icon with a tooltip explaining to check your wallet
+            m(Spinner, { size: 'xs', active: true })
+          ])
           : m('.account-user', m(User, { user: app.chain.accounts.get(address) })),
       ]),
     ]);
@@ -200,7 +204,10 @@ const SubstrateLinkAccountItem: m.Component<{
       ]),
       m('.account-item-right', [
         vnode.state.linking
-          ? m('.account-waiting', m(Spinner, { size: 'xs', active: true }))
+          ? m('.account-waiting', [
+            // TODO: show a (?) icon with a tooltip explaining to check your wallet
+            m(Spinner, { size: 'xs', active: true })
+          ])
           : m('.account-user', m(User, { user: app.chain.accounts.get(account.address) })),
       ]),
     ]);
@@ -577,8 +584,9 @@ const LinkNewAddressModal: m.Component<{
                 address,
                 accountVerifiedCallback,
                 errorCallback: (err) => {
-                  vnode.state.error = 'Verification failed. There was an inconsistency error; '
-                    + 'please report this to the developers.';
+                  vnode.state.error = 'Verification failed due to an inconsistency error. '
+                    + 'Please report this to the developers.';
+                  notifyError(vnode.state.error);
                   m.redraw();
                 },
                 linkNewAddressModalVnode: vnode,
@@ -589,7 +597,7 @@ const LinkNewAddressModal: m.Component<{
               (account: InjectedAccountWithMeta) => m(SubstrateLinkAccountItem, {
                 account,
                 accountVerifiedCallback,
-                errorCallback: (error) => { vnode.state.error = error; m.redraw(); },
+                errorCallback: (error) => { notifyError(error); vnode.state.error = error; m.redraw(); },
                 linkNewAddressModalVnode: vnode,
               })
             ),
@@ -897,5 +905,8 @@ const LinkNewAddressModal: m.Component<{
     ]);
   }
 };
+
+// inject confirmExit property
+LinkNewAddressModal['confirmExit'] = confirmationModalWithText('Cancel out of this process?');
 
 export default LinkNewAddressModal;
