@@ -183,19 +183,21 @@ const ProposalsPage: m.Component<{}> = {
         && activeCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
         !!activeSignalingProposals.length
         && activeSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!activeTreasuryProposals.length
-        && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
         !!activeCosmosProposals.length
         && activeCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
         !activeDemocracyReferenda
         && !activeDemocracyProposals
         && !activeCouncilProposals
         && !activeSignalingProposals
-        && !activeTreasuryProposals
         && !activeCosmosProposals
         && !activeMolochProposals
         && m('.no-proposals', 'None'),
       ]),
+      m('.proposal-section-header', 'Active Treasury Proposals'),
+      !!activeTreasuryProposals.length
+      && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
+      !activeTreasuryProposals
+      && m('.no-proposals', 'None'),
       m('.proposal-section-header', 'Inactive Proposals'),
       m(List, { class: 'inactive-proposals' }, [
         !!inactiveDemocracyReferenda.length
@@ -206,19 +208,22 @@ const ProposalsPage: m.Component<{}> = {
         && inactiveCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
         !!inactiveSignalingProposals.length
         && inactiveSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!inactiveTreasuryProposals.length
-        && inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
         !!inactiveCosmosProposals.length
         && inactiveCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
         !inactiveDemocracyReferenda
         && !inactiveDemocracyProposals
         && !inactiveCouncilProposals
         && !inactiveSignalingProposals
-        && !inactiveTreasuryProposals
         && !inactiveCosmosProposals
         && !inactiveMolochProposals
         && m('.no-proposals', 'None'),
       ]),
+      m('.proposal-section-header', 'Inactive Treasury Proposals'),
+      !!inactiveTreasuryProposals.length
+      && inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
+      !inactiveTreasuryProposals
+      && m('.no-proposals', 'None'),
+
     ]);
   }
 };
