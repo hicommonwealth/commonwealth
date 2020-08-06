@@ -36,7 +36,6 @@ enum LinkNewAddressSteps {
   Step2VerifyWithWebWallet,
   Step2VerifyWithHedgehog,
   Step3CreateProfile,
-  Step4Complete,
 }
 
 enum LinkNewAddressWallets {
@@ -778,6 +777,9 @@ const LinkNewAddressModal: m.Component<{
           m('.create-profile-instructions', vnode.state.isNewLogin
             ? 'Logged in! Now create a profile:'
             : 'Address verified! Now create a profile:'),
+          m('.new-account-userblock', [
+            m(UserBlock, { user: vnode.state.newAddress }),
+          ]),
           m('.avatar-wrap', [
             m(AvatarUpload, {
               uploadStartedCallback: () => {
@@ -863,36 +865,17 @@ const LinkNewAddressModal: m.Component<{
                 avatarUrl: `${$form.find('input[name=avatarUrl]').val()}`,
               };
               app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
-                vnode.state.step = LinkNewAddressSteps.Step4Complete;
                 vnode.state.error = null;
                 $form.trigger('modalcomplete');
+                $form.trigger('modalexit');
+                if (vnode.attrs.successCallback) vnode.attrs.successCallback();
                 m.redraw();
               }).catch((err) => {
                 vnode.state.error = err.responseJSON ? err.responseJSON.error : 'Unable to create profile';
                 m.redraw();
               });
             },
-            label: 'Save profile to continue'
-          }),
-        ]),
-      ]) : vnode.state.step === LinkNewAddressSteps.Step4Complete ? m('.link-address-step', [
-        linkAddressHeader,
-        m('.link-address-step-narrow', [
-          m('p', vnode.state.isNewLogin ? 'Logged in:' : 'Profile created:'),
-          m('.profile-block-preview', [
-            vnode.state.newAddress
-              ? m(UserBlock, { user: vnode.state.newAddress })
-              : m('.error-message', 'There was an issue fetching your new account'),
-          ]),
-          m('br'),
-          m(Button, {
-            class: 'btn-finished-action',
-            onclick: (e) => {
-              e.preventDefault();
-              $(e.target).trigger('modalexit');
-              if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-            },
-            label: 'Close'
+            label: 'Save and finish'
           }),
         ]),
       ]) : m('.link-address-step', [
