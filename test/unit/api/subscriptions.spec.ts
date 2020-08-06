@@ -346,7 +346,7 @@ describe('Subscriptions Tests', () => {
       const res = await chai.request(app)
         .get('/api/viewSubscriptions')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, auth: true, });
+        .send({ jwt: jwtToken });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.be.equal('Success');
     });
