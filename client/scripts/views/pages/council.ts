@@ -217,27 +217,27 @@ const CouncilPage: m.Component<{}> = {
         gutter: 5,
         justify: 'space-between'
       }, [
-        m(Col, { span: 3 }, [
+        m(Col, [
           `${app.chain ? councillors.length : '--'} councillors`
           // m('.stats-tile', app.chain && `${candidacyBond || '--'}`)
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, [
           m('.stats-tile', [
             m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
             ' till next council'
           ])
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, [
           m('.stats-tile', app.chain && `${candidacyBond || '--'} candidacy bond`)
         ]),
-        m(Col, { span: 3 }, [
+        m(Col, [
           m('.stats-tile', app.chain && `${votingBond || '--'} voting bond`),
         ]),
       ]),
       // councillors
-      m('h4.proposals-subheader', 'Councillors'),
+      m('.council-section-header', 'Active Councillors'),
       councillors.length === 0
-        ? m('.no-proposals', 'No members')
+        ? m('.no-proposals', 'None')
         : m('.councillors', [
           councillors.map(
             (account) => m(CollectiveMember, { account, title: 'Councillor' })
@@ -245,13 +245,13 @@ const CouncilPage: m.Component<{}> = {
           m('.clear'),
         ]),
       // candidates
-      m('h4.proposals-subheader', [
+      m('.council-section-header', [
         'Candidates',
         m(CollectiveVotingButton, { candidates }),
         m(CandidacyButton, { activeAccountIsCandidate, candidates }),
       ]),
       candidates.length === 0
-        ? m('.no-proposals', 'No candidates')
+        ? m('.no-proposals', 'None')
         : m('.council-candidates', [
           candidates
             .filter(([ account ]) => !councillors.includes(account))

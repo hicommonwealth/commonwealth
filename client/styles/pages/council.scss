@@ -22,6 +22,30 @@
     }
 }
 
+.CouncilPage {
+    .stats-container {
+        display: flex;
+        align-items: flex-start;
+        margin-top: 25px;
+        padding: 10px 20px;
+        background-color: $background-color-light;
+        border-radius: 5px;
+        .stats-tile {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+        }
+    }
+    .council-section-header {
+        font-size: 15px;
+        font-weight: 400;
+        color: $text-color-lightest;
+        padding: 10px 0;
+        margin: 22px 0 0;
+        border-bottom: 1px solid #ededed;
+    }
+}
+
 .CollectiveMember, .CouncilCandidate, .CouncilElectionVoter {
     display: flex;
     border: 1px solid $background-color-light;
