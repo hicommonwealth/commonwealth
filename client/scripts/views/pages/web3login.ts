@@ -14,7 +14,7 @@ const Web3LoginPage: m.Component<{}> = {
       m('.web3login-options', [
         m(Button, {
           intent: 'primary',
-          label: app.isLoggedIn() ? 'Finish connecting address' : 'Finish login',
+          label: 'Continue',
           fluid: true,
           onclick: (e) => {
             if (app.isLoggedIn()) {
