@@ -213,9 +213,9 @@ const LinkNewAddressModal: m.Component<{
   // meta
   step;
   error;
-  // step 1 - select a wallet, then press continue
+  // step 1 - select a wallet
   selectedWallet: LinkNewAddressWallets;
-  // step 2 - enter a new address, then validate a signature with the address
+  // step 2 - validate address with a signature
   validSig: string;
   secretPhraseSaved: boolean;
   newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
