@@ -94,7 +94,7 @@
         }
 
         .proposal-row-title {
-            font-size: 17px;
+            font-size: 19px;
             font-weight: 500;
             margin-bottom: 3px;
             word-break: break-word;
@@ -104,7 +104,7 @@
         }
 
         .proposal-row-subheading {
-            font-size: 13px;
+            font-size: 0.94rem;
             font-weight: 500;
             margin-bottom: 3px;
             word-break: break-word;
@@ -115,7 +115,7 @@
 
         .proposal-row-metadata {
             color: $text-color-lightest;
-            font-size: 15px;
+            font-size: 17px;
             display: flex;
 
             @include xs-max {
@@ -163,28 +163,11 @@
         padding-left: 30px;
         flex: 0 0 auto;
         color: $text-color-light;
-        font-size: 15px;
+        font-size: 17px;
         font-weight: 400;
         .cui-icon {
             padding-left: 2px;
             color: inherit;
-        }
-        .ReactionButton {
-            border: none;
-            color: inherit;
-            font-weight: inherit;
-            margin: 0;
-            padding: 0;
-            .reactions-count {
-                font-weight: inherit;
-                color: inherit;
-                margin: inherit;
-                padding: inherit;
-            }
-            .reactions-icon {
-                margin: inherit;
-                padding: inherit;
-            }
         }
         .proposal-row-right-text {
             padding-top: 4px;
