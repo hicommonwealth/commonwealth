@@ -26,13 +26,12 @@ import { Grid, Col } from 'construct-ui';
 
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
-  title: string;
 }
 
 const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
-    const { account, title } = vnode.attrs;
+    const { account } = vnode.attrs;
     const election = (app.chain as Substrate).phragmenElections;
 
     const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
@@ -46,28 +45,9 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
         app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
       }
     }, [
-      m('.proposal-row-left', [
-        m('.proposal-pre', [
-          m(User, {
-            user: account,
-            avatarOnly: true,
-            avatarSize: 36,
-            tooltip: true,
-          }),
-        ]),
-        m('.proposal-pre-mobile', [
-          m(User, {
-            user: account,
-            avatarOnly: true,
-            avatarSize: 16,
-            tooltip: true,
-          }),
-        ]),
-      ]),
       m('.proposal-row-main', [
         // Case One Councillor 3 same size divs
         m('.item', [
-          m('.proposal-row-subheading', title),
           m('.proposal-row-metadata', [
             m('.proposal-user', [
               m(User, {
@@ -86,7 +66,6 @@ const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
           ]),
         ]),
         m('.item', [
-          m('.proposal-row-subheading', 'Backing'),
           m('.proposal-row-metadata', election.isMember(account)
             ? election.backing(account).format(true)
             : votes.length),
@@ -240,7 +219,7 @@ const CouncilPage: m.Component<{}> = {
         ? m('.no-proposals', 'None')
         : m('.councillors', [
           councillors.map(
-            (account) => m(CollectiveMember, { account, title: 'Councillor' })
+            (account) => m(CollectiveMember, { account })
           ),
           m('.clear'),
         ]),
@@ -255,7 +234,7 @@ const CouncilPage: m.Component<{}> = {
         : m('.council-candidates', [
           candidates
             .filter(([ account ]) => !councillors.includes(account))
-            .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
+            .map(([account, slot]) => m(CollectiveMember, { account })),
           m('.clear'),
         ]),
     ]);
