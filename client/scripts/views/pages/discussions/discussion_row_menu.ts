@@ -109,7 +109,11 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIs
             class: 'read-only-toggle',
             onclick: (e) => {
               e.preventDefault();
-              app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
+              app.threads.setPrivacy({
+                threadId: proposal.id,
+                privacy: null,
+                readOnly: !proposal.readOnly,
+              }).then(() => m.redraw());
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),

@@ -5,10 +5,10 @@
 }
 html, body {
     box-sizing: border-box;
-}
-html {
     height: 100%;
     width: 100%;
+}
+html {
     font-family: $fonts;
     font-size: 17px;
     line-height: 1.3;
@@ -16,9 +16,6 @@ html {
     -webkit-font-smoothing: antialiased;
     background: #fff;
     overflow-y: scroll;
-    &.modal-open {
-        overflow-y: hidden;
-    }
 }
 .mithril-app {
     height: 100%;

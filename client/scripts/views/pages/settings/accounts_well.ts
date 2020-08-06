@@ -91,7 +91,11 @@ const AccountsWell: m.Component<{}> = {
       m(Button, {
         intent: 'primary',
         class: 'add-account',
-        onclick: () => app.modals.lazyCreate('link_new_address_modal'),
+        onclick: () => app.modals.lazyCreate('link_new_address_modal', {
+          successCallback: () => {
+            // TODO XX: set membership
+          }
+        }),
         label: `Link new ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`
       }),
     ]);

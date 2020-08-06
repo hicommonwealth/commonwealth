@@ -4,6 +4,20 @@
     display: block;
     padding: 0 32px;
 
+    .sublayout-grid {
+        position: relative;
+        display: flex;
+        margin: 0 auto;
+        max-width: $layout-max-width;
+    }
+    .sublayout-grid-col {
+        &.sublayout-grid-col-narrow {
+            padding-right: 30px;
+        }
+        &.sublayout-grid-col-wide {
+        }
+    }
+
     .sublayout-header {
         display: flex;
         margin-top: 28px;
@@ -26,21 +40,9 @@
             }
         }
     }
-    .sublayout-content {
-        &.sublayout-content-narrow {
-            padding-right: 30px;
-        }
-        &.sublayout-content-wide {
-        }
-    }
-    .sublayout-main {
+    .sublayout-body {
         position: relative;
-        display: flex;
-        margin: 0 auto;
-        min-height: calc(100vh - 60px);
-        max-width: $layout-max-width;
-    }
-    .left-sidebar {
-        padding-right: 45px;
+        min-height: calc(100vh - 140px);
+        padding: 1px;
     }
 }

@@ -18,7 +18,7 @@ export default class extends IEventHandler {
    * Handles an event by creating a ChainEvent in the database.
    */
   public async handle(event: CWEvent) {
-    log.info(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.trace(`Received event: ${JSON.stringify(event, null, 2)}`);
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
       chain: this._chain,

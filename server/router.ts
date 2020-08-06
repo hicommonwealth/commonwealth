@@ -90,6 +90,7 @@ import updateTags from './routes/updateTags';
 import editTag from './routes/editTag';
 import deleteTag from './routes/deleteTag';
 import bulkTags from './routes/bulkTags';
+import setPrivacy from './routes/setPrivacy';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
 import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
@@ -148,6 +149,8 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
+  
+  router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
 
 
   // offchain discussion drafts
@@ -261,7 +264,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // notifications
   // TODO: Change to GET /subscriptions
-  router.get('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
+  router.post('/viewSubscriptions', passport.authenticate('jwt', { session: false }),
     viewSubscriptions.bind(this, models));
   // TODO: Change to POST /subscription
   router.post('/createSubscription', passport.authenticate('jwt', { session: false }),

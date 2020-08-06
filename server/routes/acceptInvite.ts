@@ -70,6 +70,7 @@ const acceptInvite = async (models, req: Request, res: Response, next: NextFunct
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewThread,
     object_id: community.id,
+    community_id: community.id,
     is_active: true,
   });
 

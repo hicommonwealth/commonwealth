@@ -25,31 +25,37 @@ const Sublayout: m.Component<{ class: string, title?: string, showNewButton?: bo
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [
-      m(Grid, { class: 'sublayout-main' }, [
+      m(Grid, { class: 'sublayout-grid' }, [
         rightSidebar ? [
-          m(Col, { span: 9, class: 'sublayout-content sublayout-content-narrow' }, [
+          m(Col, { span: 9, class: 'sublayout-grid-col sublayout-grid-col-narrow' }, [
             title && m('.sublayout-header', [
               m('.sublayout-header-left', [
                 m('h4.sublayout-header-heading', title),
               ]),
             ]),
-            vnode.children,
+            m('.sublayout-body', [
+              vnode.children,
+            ]),
           ]),
           m(Col, { span: 3, class: 'sublayout-right-sidebar' }, [
             m('.sublayout-header', [
               sublayoutHeaderRight,
             ]),
-            rightSidebar,
+            m('.sublayout-sidebar', [
+              rightSidebar,
+            ]),
           ]),
         ] : [
-          m(Col, { span: 12, class: 'sublayout-content sublayout-content-wide' }, [
+          m(Col, { span: 12, class: 'sublayout-grid-col sublayout-grid-col-wide' }, [
             m('.sublayout-header', [
               m('.sublayout-header-left', [
                 title && m('h4.sublayout-header-heading', title),
               ]),
               sublayoutHeaderRight,
             ]),
-            vnode.children,
+            m('.sublayout-body', [
+              vnode.children,
+            ]),
           ]),
         ],
       ]),

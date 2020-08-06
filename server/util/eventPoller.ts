@@ -107,7 +107,6 @@ export const updateEvents = (app, models) => {
       const balances = await Promise.all(
         addrKeys.map(async (addr) => {
           const balance = await web3.eth.getBalance(addr, addresses[addr]);
-          console.log(addr, balance);
           return balance;
         })
       );
@@ -148,7 +147,6 @@ export const updateBalances = async (app, models, blocknum = 8461046) => {
       console.log('Updated', entry.address, ':', entry.balance, '->', balance);
     }
   }
-  console.log('done');
   process.exit(0);
 };
 

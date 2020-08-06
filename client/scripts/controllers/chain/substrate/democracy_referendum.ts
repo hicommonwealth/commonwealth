@@ -6,7 +6,8 @@ import BN from 'bn.js';
 import {
   ISubstrateDemocracyReferendum,
   SubstrateCoin,
-  DemocracyThreshold
+  DemocracyThreshold,
+  formatCall,
 } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
@@ -223,7 +224,7 @@ export class SubstrateDemocracyReferendum
       case SubstrateTypes.EventKind.PreimageNoted: {
         const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
         if (preimage) {
-          this._title = `${preimage.section}.${preimage.method}(${preimage.args.join(', ')})`;
+          this._title = formatCall(preimage);
         }
         break;
       }
@@ -391,9 +392,6 @@ export class SubstrateDemocracyReferendum
   }
 
   public unvote(who: SubstrateAccount, target?: SubstrateAccount) {
-    if (!this._Democracy.isRedesignLogic) {
-      throw new Error('unvote unsupported');
-    }
     // you can remove someone else's vote if their unvote scope is set properly,
     // but we don't support that in the UI right now (it requires their vote
     // to be "expired", or for the proxy configuration to allow removing their vote)
@@ -426,17 +424,7 @@ export class SubstrateDemocracyReferendum
   // }
 
   public async notePreimage(author: SubstrateAccount, action: Call) {
-    const hash = action.hash;
-    if (hash !== this.data.hash) {
-      throw new Error('preimage does not match proposal hash');
-    }
-    const hexCall = action.toHex();
-    const preimageDeposit = (this._Chain.coins(this._Democracy.preimageByteDeposit)).muln(hexCall.length / 2);
-
-    const txFunc = (api: ApiRx) => api.tx.democracy.notePreimage(hexCall);
-    if (!(await this._Chain.canPayFee(author, txFunc, this._Chain.coins(preimageDeposit)))) {
-      throw new Error('insufficient funds');
-    }
+    const txFunc = (api: ApiRx) => api.tx.democracy.notePreimage(action.toHex());
     return this._Chain.createTXModalData(
       author,
       txFunc,
@@ -446,14 +434,6 @@ export class SubstrateDemocracyReferendum
   }
 
   public noteImminentPreimage(author: SubstrateAccount, action: Call) {
-    const hash = action.hash;
-    if (hash !== this.data.hash) {
-      throw new Error('preimage does not match proposal hash');
-    }
-    // if the preimage is needed for a call in the dispatch queue, it is free to note
-    if (!this._passed.value) {
-      throw new Error('referendum is not yet in the dispatch queue');
-    }
     return this._Chain.createTXModalData(
       author,
       (api: ApiRx) => api.tx.democracy.noteImminentPreimage(action.toHex()),

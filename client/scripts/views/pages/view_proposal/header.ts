@@ -116,7 +116,11 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
         class: 'read-only-toggle',
         onclick: (e) => {
           e.preventDefault();
-          app.threads.edit(proposal, null, null, !proposal.readOnly).then(() => m.redraw());
+          app.threads.setPrivacy({
+            threadId: proposal.id,
+            privacy: null,
+            readOnly: !proposal.readOnly,
+          }).then(() => m.redraw());
         },
         label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
       }),
@@ -125,7 +129,11 @@ export const ProposalHeaderPrivacyButtons: m.Component<{ proposal: AnyProposal |
         class: 'privacy-to-public-toggle',
         onclick: (e) => {
           e.preventDefault();
-          app.threads.edit(proposal, null, null, false, true).then(() => m.redraw());
+          app.threads.setPrivacy({
+            threadId: proposal.id,
+            privacy: false,
+            readOnly: null,
+          }).then(() => m.redraw());
         },
         label: 'Reveal to public',
       }),
