@@ -268,9 +268,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ],
         // Case 1. Democracy Proposal
         (slug === ProposalType.SubstrateDemocracyProposal) && [
-          m('.proposal-row-title', [
-            formatProposalHashShort((proposal as SubstrateDemocracyProposal).title)
-          ]),
+          m('.proposal-row-title', proposal.title),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
             !!statusText && m('span.metadata-divider', ' · '),
@@ -281,7 +279,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ],
         // Case 2 Council Motion
         (slug === ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', (proposal as SubstrateCollectiveProposal).title.split('(')[0]),
+          m('.proposal-row-title', proposal.title),
           m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
             !!statusText && m('span.metadata-divider', ' · '),
