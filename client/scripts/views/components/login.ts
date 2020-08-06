@@ -126,7 +126,9 @@ const Login: m.Component<{}, {
               addToStack: true,
               class: 'LoginPopoverMenu',
               transitionDuration: 0,
-              content: app.config.chains.getAll().map((chain) => {
+              content: app.config.chains.getAll().sort((a, b) => {
+                return a.name.localeCompare(b.name);
+              }).map((chain) => {
                 return m(MenuItem, {
                   label: m('.chain-login-label', [
                     m(ChainIcon, { chain, size: 20 }),
