@@ -6,7 +6,10 @@ import app from 'state';
 
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { notifyInfo } from 'controllers/app/notifications';
+
+import PageLoading from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
+
 import EmailWell from './email_well';
 import AccountsWell from './accounts_well';
 import SettingsWell from './settings_well';
@@ -20,17 +23,16 @@ const SettingsPage: m.Component<{}> = {
       m.route.set('/', {}, { replace: true });
       return;
     }
+    if (!app.loginStatusLoaded()) return m(PageLoading);
+
     return m(Sublayout, {
       class: 'SettingsPage',
+      title: 'Settings',
     }, [
-      !app.loginStatusLoaded()
-        ? m('.forum-container', 'Loading...')
-        : m('.forum-container', [
-          m('h2.page-title', 'Settings'),
-          m(EmailWell, { github: true }),
-          m('br'),
-          m(SettingsWell),
-        ])
+      m('br'),
+      m(EmailWell, { github: true }),
+      m('br'),
+      m(SettingsWell),
     ]);
   }
 };
