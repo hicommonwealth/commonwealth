@@ -8,8 +8,8 @@ import app from 'state';
 
 interface IRowAttrs {
   contentLeft: IContentLeft;
-  key: number;
   metadata: Vnode[];
+  key?: number;
   onclick?: Function;
 }
 

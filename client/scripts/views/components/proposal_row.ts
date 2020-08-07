@@ -300,7 +300,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
       && m('.proposal-timestamp', moment().diff(proposal.createdAt, 'days') > 30
         ? proposal.createdAt.format('MMM  D')
         : proposal.createdAt.fromNow())
-    ]
+    ];
 
     const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)
       ? m(Row, {
