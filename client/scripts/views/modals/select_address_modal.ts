@@ -49,9 +49,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       const activeEntityInfo = app.community ? app.community.meta : app.chain.meta.chain;
 
       // confirm
-      const confirmed = await confirmationModalWithText(
-        `Are you sure you want to remove ${formatAddressShort(addressInfo.address)} from this community?`
-      )();
+      const confirmed = await confirmationModalWithText('Remove this address from the community?')();
       if (!confirmed) {
         vnode.state.loading = false;
         m.redraw();
@@ -65,8 +63,17 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();
-        vnode.state.selectedIndex = null; // TODO: the newly added address instead
-        // TODO: select the address
+        vnode.state.selectedIndex = null;
+        // unset activeAccount, or set it to the next activeAccount
+        if (app.user.activeAccount === account) {
+          const remainingAccounts = app.user.activeAccounts.filter((a) => a !== account);
+          if (remainingAccounts[0]) {
+            app.user.setActiveAccount(remainingAccounts[0]);
+          } else {
+            app.user.setActiveAccount(null);
+          }
+          app.user.setActiveAccounts(remainingAccounts);
+        }
       }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
@@ -80,6 +87,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
       ]),
       m('.compact-modal-body', [
         m('.select-address-options', [
+          activeAccountsByRole.length === 0 && m('.select-address-placeholder', [
+            'No linked addresses'
+          ]),
           activeAccountsByRole.map(([account, role], index) => role && m('.select-address-option.existing', [
             m(UserBlock, { user: account, showRole: true }),
             m('.role-remove', [
