@@ -22,18 +22,19 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import TagCaratMenu from './tag_carat_menu';
+import Listing, { ListingHeaderCols } from '../listing';
 
-const DiscussionRowHeader = {
-  view: (vnode) => {
-    return m('.DiscussionRowHeader', [
-      m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
-      m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
-      m('.discussion-row-header-col', 'Likes'),
-      m('.discussion-row-header-col', 'Activity'),
-      app.isLoggedIn() && m('.discussion-row-header-col.discussion-row-menu'),
-    ]);
-  }
-};
+// const DiscussionRowHeader = {
+//   view: (vnode) => {
+//     return m('.DiscussionRowHeader', [
+//       m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
+//       m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
+//       m('.discussion-row-header-col', 'Likes'),
+//       m('.discussion-row-header-col', 'Activity'),
+//       app.isLoggedIn() && m('.discussion-row-header-col.discussion-row-menu'),
+//     ]);
+//   }
+// };
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -140,8 +141,15 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         }
         if (list.length > 0) {
           return m('.discussions-main', [
-            m(DiscussionRowHeader),
-            list
+            m(Listing, {
+              content: list,
+              columnLabels: [
+                ListingHeaderCols.TITLE,
+                ListingHeaderCols.GALLERY,
+                ListingHeaderCols.LIKES,
+                ListingHeaderCols.ACTIVITY
+              ],
+            }),
           ]);
         }
       }
