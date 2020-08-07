@@ -14,6 +14,7 @@ import User from 'views/components/widgets/user';
 
 import DiscussionRowMenu from './discussion_row_menu';
 import UserGallery from '../../components/widgets/user_gallery';
+import Row from '../../components/row';
 
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -53,65 +54,77 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    return m('.DiscussionRow', { key: proposal.identifier }, [
-      link('a.discussion-row', discussionLink, [
-        m('.discussion-top', [
-          m('.discussion-top-left', [
-            m('.discussion-title', [
-              (propType === OffchainThreadKind.Link && proposal.url)
-                ? externalLink(
-                  'a.discussion-link',
-                  proposal.url,
-                  [ proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK }) ]
-                )
-                : link('a', discussionLink, proposal.title),
-            ]),
-            m('.discussion-meta', [
-              proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-                m('span.proposal-tag-icon'),
-                m('span.proposal-tag-name', `${proposal.tag.name}`),
-              ]),
-              (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
-                `Link: ${extractDomain(proposal.url)}`
-              ]),
-              m(User, {
-                user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
-                linkify: true,
-                tooltip: true,
-                hideAvatar: true,
-              }),
-            ]),
-          ]),
-          m('.discussion-top-right', [
-            proposal.readOnly && m('.discussion-locked', [
-              m(Tag, {
-                size: 'xs',
-                label: [
-                  m(Icon, { name: Icons.LOCK, size: 'xs' }),
-                  ' Locked'
-                ],
-              }),
-            ]),
-            m('.discussion-commenters', [
-              m(UserGallery, {
-                avatarSize: 24,
-                tooltip: true,
-                users: app.comments.uniqueCommenters(proposal, proposal.author, proposal.authorChain)
-              }),
-            ]),
-            m(ReactionButton, { post: proposal, type: ReactionType.Like, tooltip: true }),
-            m('.discussion-last-updated', {
-              class: lastUpdated.isBefore(moment().subtract(365, 'days')) ? 'older' : '',
-            }, [
-              link('a', discussionLink, formatLastUpdated(lastUpdated)),
-            ]),
-            app.isLoggedIn() && m('.discussion-row-menu', [
-              m(DiscussionRowMenu, { proposal }),
-            ]),
-          ]),
-        ]),
+    const rowTitle = (propType === OffchainThreadKind.Link && proposal.url)
+      ? externalLink('a.discussion-link', proposal.url, [
+        proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
+      ])
+      : link('a', discussionLink, proposal.title);
+
+    const rowMetadata = [
+      m(UserGallery, {
+        avatarSize: 24,
+        tooltip: true,
+        users: app.comments.uniqueCommenters(
+          proposal,
+          proposal.author,
+          proposal.authorChain
+        )
+      }),
+      m(ReactionButton, {
+        post: proposal,
+        type: ReactionType.Like,
+        tooltip: true
+      }),
+      m('.last-updated', {
+        class: lastUpdated.isBefore(moment().subtract(365, 'days'))
+          ? 'older'
+          : ''
+      }, link('a', discussionLink, formatLastUpdated(lastUpdated))),
+      app.isLoggedIn() && m('.discussion-row-menu', [
+        m(DiscussionRowMenu, { proposal }),
       ]),
-    ]);
+    ];
+
+    return m(Row, {
+      contentLeft: {
+        header: rowTitle,
+        subheader: null,
+      },
+      key: proposal.id,
+      metadata: rowMetadata,
+      onclick: (e) => {
+        e.preventDefault();
+        m.route.set(discussionLink);
+      },
+    });
+
+
+    // m('.discussion-meta', [
+    //   proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
+    //     m('span.proposal-tag-icon'),
+    //     m('span.proposal-tag-name', `${proposal.tag.name}`),
+    //   ]),
+    //   (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
+    //     `Link: ${extractDomain(proposal.url)}`
+    //   ]),
+    //   m(User, {
+    //     user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+    //     linkify: true,
+    //     tooltip: true,
+    //     hideAvatar: true,
+    //   }),
+    // ]),
+
+  // m('.discussion-top-right', [
+  //   proposal.readOnly && m('.discussion-locked', [
+  //     m(Tag, {
+  //       size: 'xs',
+  //       label: [
+  //         m(Icon, { name: Icons.LOCK, size: 'xs' }),
+  //         ' Locked'
+  //       ],
+  //     }),
+  //   ]),
   }
 };
 
