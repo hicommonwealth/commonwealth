@@ -67,7 +67,7 @@ const accountVerifiedCallback = async (account, vnode) => {
       'Last Address Created': new Date().toISOString()
     });
     notifySuccess('Success! Logged in');
-    $(vnode.dom).trigger('modalexit');
+    $(vnode.dom).trigger('modalforceexit');
     if (vnode.attrs.successCallback) vnode.attrs.successCallback();
   } else {
     // log in as the new user
@@ -85,7 +85,7 @@ const accountVerifiedCallback = async (account, vnode) => {
     }
     // if we're logging in and have a profile, we can just close out the modal
     if (account.profile && account.profile.initialized && account.profile.name) {
-      $(vnode.dom).trigger('modalexit');
+      $(vnode.dom).trigger('modalforceexit');
       if (vnode.attrs.successCallback) vnode.attrs.successCallback();
       notifySuccess('Success! Logged in');
     } else {
@@ -119,6 +119,8 @@ const EthereumLinkAccountItem: m.Component<{
 
         signerAccount.validate(webWalletSignature)
           .then(() => {
+            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            linkNewAddressModalVnode.state.linkingComplete = true;
             return accountVerifiedCallback(signerAccount, linkNewAddressModalVnode);
           })
           .then(() => m.redraw())
@@ -148,7 +150,7 @@ const SubstrateLinkAccountItem: m.Component<{
   linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
-    const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -177,6 +179,8 @@ const SubstrateLinkAccountItem: m.Component<{
           }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
+            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            linkNewAddressModalVnode.state.linkingComplete = true;
             accountVerifiedCallback(signerAccount, vnode.attrs.linkNewAddressModalVnode);
           }, (err) => {
             vnode.state.linking = false;
@@ -228,6 +232,7 @@ const LinkNewAddressModal: m.Component<{
   validSig: string;
   secretPhraseSaved: boolean;
   newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
+  linkingComplete: boolean;
   // step 3 - create a profile
   isNewLogin: boolean;
   // step 4 - complete
@@ -243,7 +248,7 @@ const LinkNewAddressModal: m.Component<{
   // close the modal if the user moves away from the page
   oncreate: (vnode) => {
     vnode.state.onpopstate = (e) => {
-      $('.LinkNewAddressModal').trigger('modalexit');
+      $('.LinkNewAddressModal').trigger('modalforceexit');
     };
     $(window).on('popstate', vnode.state.onpopstate);
   },
@@ -265,7 +270,7 @@ const LinkNewAddressModal: m.Component<{
       //       label: 'Go home',
       //       intent: 'primary',
       //       onclick: (e) => {
-      //         $(e.target).trigger('modalexit');
+      //         $(e.target).trigger('modalforceexit');
       //         m.route.set('/');
       //       }
       //     }),
@@ -874,8 +879,7 @@ const LinkNewAddressModal: m.Component<{
               };
               app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
                 vnode.state.error = null;
-                $form.trigger('modalcomplete');
-                $form.trigger('modalexit');
+                $form.trigger('modalforceexit');
                 if (vnode.attrs.successCallback) vnode.attrs.successCallback();
                 m.redraw();
               }).catch((err) => {
