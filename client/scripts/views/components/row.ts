@@ -32,4 +32,6 @@ const Row: m.Component<IRowAttrs> = {
       ])
     ]);
   }
-}
+};
+
+export default Row;
