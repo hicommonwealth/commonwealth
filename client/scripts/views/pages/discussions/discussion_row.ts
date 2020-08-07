@@ -54,11 +54,13 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
 
-    const rowTitle = (propType === OffchainThreadKind.Link && proposal.url)
+    const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
       ? externalLink('a.discussion-link', proposal.url, [
         proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
       ])
       : link('a', discussionLink, proposal.title);
+
+    const rowSubheader = null;
 
     const rowMetadata = [
       m(UserGallery, {
@@ -87,8 +89,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
 
     return m(Row, {
       contentLeft: {
-        header: rowTitle,
-        subheader: null,
+        header: rowHeader,
+        subheader: rowSubheader,
       },
       key: proposal.id,
       metadata: rowMetadata,

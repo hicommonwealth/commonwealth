@@ -19,6 +19,8 @@ import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substra
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
+import Row from './row';
+import { link } from 'client/scripts/helpers';
 
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;
@@ -248,108 +250,119 @@ const ProposalRow: m.Component<IRowAttrs> = {
         ]),
       ];
 
-    return m('.ProposalRow', {
-      key: proposal.identifier,
-      onclick: (e) => {
-        e.preventDefault();
-        m.route.set(`/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}-${slugify(proposal.title)}`);
-      }
-    }, [
-      m('.proposal-row-main', [
-        // Case 0. Referendum + other types of proposals
-        (slug !== ProposalType.SubstrateTreasuryProposal
-          && slug !== ProposalType.SubstrateDemocracyProposal
-          && slug !== ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', proposal.title),
-          m('.proposal-row-metadata', [
-            m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' · '),
-            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-          ]),
-        ],
-        // Case 1. Democracy Proposal
-        (slug === ProposalType.SubstrateDemocracyProposal) && [
-          m('.proposal-row-title', proposal.title),
-          m('.proposal-row-metadata', [
-            m('span.proposal-id', getProposalId(proposal)),
-            !!statusText && m('span.metadata-divider', ' · '),
-            !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
-            m('span.metadata-divider', ' · '),
-            m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
-          ]),
-        ],
+
+    const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
+      + `-${slugify(proposal.title)}`;
+
+    const rowHeader = link('a', proposalLink, proposal.title);
+
+    const rowSubheader = (
+      slug !== ProposalType.SubstrateTreasuryProposal
+      && slug !== ProposalType.SubstrateDemocracyProposal
+      && slug !== ProposalType.SubstrateCollectiveProposal)
+      ? m('.proposal-row-metadata', [
+        m('span.proposal-id', getProposalId(proposal)),
+        !!statusText && m('span.metadata-divider', ' · '),
+        !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
+      ])
+      // Case 1. Democracy Proposal
+      : (slug === ProposalType.SubstrateDemocracyProposal)
+        ?  m('.proposal-row-metadata', [
+          m('span.proposal-id', getProposalId(proposal)),
+          !!statusText && m('span.metadata-divider', ' · '),
+          !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
+          m('span.metadata-divider', ' · '),
+          m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
+        ])
         // Case 2 Council Motion
-        (slug === ProposalType.SubstrateCollectiveProposal) && [
-          m('.proposal-row-title', proposal.title),
-          m('.proposal-row-metadata', [
+        : (slug === ProposalType.SubstrateCollectiveProposal)
+          ? m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),
             !!statusText && m('span.metadata-divider', ' · '),
             !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
           ])
-        ],
-        // Case 3 Treasury Proposal
-        (slug === ProposalType.SubstrateTreasuryProposal) && [
-          m('.proposal-row-title', proposal.title),
-          m(Grid, { class: '.proposal-row-grid' }, [
-            m(Col, { span: 4 }, [
-              m('.proposal-row-subheading', 'Value'),
-              m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
+          : null;
+
+    const rowMetadata = [
+      m('span.proposal-comments', [
+        nComments,
+        m(Icon, {
+          name: Icons.MESSAGE_SQUARE
+        })
+      ]),
+      m(ReactionButton, {
+        post: proposal,
+        type: ReactionType.Like,
+        tooltip: true
+      }),
+      createdAt
+      && createdAt instanceof moment
+      && m('.proposal-timestamp', moment().diff(proposal.createdAt, 'days') > 30
+        ? proposal.createdAt.format('MMM  D')
+        : proposal.createdAt.fromNow())
+    ]
+
+    const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)
+      ? m(Row, {
+        contentLeft: {
+          header: rowHeader,
+          subheader: rowSubheader,
+        },
+        metadata: rowMetadata,
+        onclick: (e) => {
+          e.preventDefault();
+          m.route.set(proposalLink);
+        },
+      })
+      : null;
+
+    const treasuryProposal = (slug === ProposalType.SubstrateTreasuryProposal)
+      ? [
+        m('.proposal-row-title', proposal.title),
+        m(Grid, { class: '.proposal-row-grid' }, [
+          m(Col, { span: 4 }, [
+            m('.proposal-row-subheading', 'Value'),
+            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
+          ]),
+          m(Col, { span: 4 }, [
+            m('.proposal-row-subheading', 'Bond'),
+            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
+          ]),
+          m(Col, { span: 4 }, [
+            m('.proposal-row-subheading', 'Author'),
+            m('.proposal-row-metadata .proposal-user', [
+              m(User, {
+                user: new AddressInfo(
+                  null,
+                  (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
+                  app.chain.id,
+                  null
+                ),
+                hideAvatar: true,
+                tooltip: true,
+              }),
             ]),
-            m(Col, { span: 4 }, [
-              m('.proposal-row-subheading', 'Bond'),
-              m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
+            m('.proposal-row-metadata .proposal-user-mobile', [
+              m(User, {
+                user: new AddressInfo(
+                  null,
+                  (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
+                  app.chain.id,
+                  null
+                ),
+                hideAvatar: true,
+                tooltip: true,
+              }),
             ]),
-            m(Col, { span: 4 }, [
-              m('.proposal-row-subheading', 'Author'),
-              m('.proposal-row-metadata .proposal-user', [
-                m(User, {
-                  user: new AddressInfo(
-                    null,
-                    (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
-                    app.chain.id,
-                    null
-                  ),
-                  hideAvatar: true,
-                  tooltip: true,
-                }),
-              ]),
-              m('.proposal-row-metadata .proposal-user-mobile', [
-                m(User, {
-                  user: new AddressInfo(
-                    null,
-                    (proposal as SubstrateTreasuryProposal).beneficiaryAddress,
-                    app.chain.id,
-                    null
-                  ),
-                  hideAvatar: true,
-                  tooltip: true,
-                }),
-              ]),
-            ])
           ])
-        ],
-      ]),
-      m('.proposal-row-xs-clear'),
-      m('.proposal-row-right', [
-        m('span.proposal-comments', [
-          nComments,
-          m(Icon, {
-            name: Icons.MESSAGE_SQUARE
-          })
-        ]),
-        m(ReactionButton, {
-          post: proposal,
-          type: ReactionType.Like,
-          tooltip: true
-        }),
-        createdAt
-        && createdAt instanceof moment
-        && m('.proposal-timestamp', moment().diff(proposal.createdAt, 'days') > 30
-          ? proposal.createdAt.format('MMM  D')
-          : proposal.createdAt.fromNow())
-      ]),
-      m('.clear'),
-    ]);
+        ])
+      ]
+      : null;
+
+    return regularProposal || treasuryProposal;
+    // TODO: Handle xs clears that buffered right-hand metadata from left-hand main 
+    // m('.proposal-row-xs-clear'),
+    // m('.clear'),
   }
 };
 

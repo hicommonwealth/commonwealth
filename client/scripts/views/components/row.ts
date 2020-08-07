@@ -14,8 +14,8 @@ interface IRowAttrs {
 }
 
 interface IContentLeft {
-  header: VnodeDOM;
-  subheader: VnodeDOM;
+  header: Vnode;
+  subheader: Vnode;
 }
 
 const Row: m.Component<IRowAttrs> = {
