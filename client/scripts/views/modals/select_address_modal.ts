@@ -72,7 +72,6 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           } else {
             app.user.setActiveAccount(null);
           }
-          app.user.setActiveAccounts(remainingAccounts);
         }
       }).catch((err: any) => {
         vnode.state.loading = false;

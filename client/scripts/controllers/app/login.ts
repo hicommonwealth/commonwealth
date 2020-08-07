@@ -37,6 +37,9 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
         notifySuccess('Switched account');
       }
       app.user.setActiveAccount(account);
+      if (app.user.activeAccounts.indexOf(account) === -1) {
+        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      }
       resolve();
     } else {
       $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
@@ -61,6 +64,9 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           notifySuccess('Switched account');
         }
         app.user.setActiveAccount(account);
+        if (app.user.activeAccounts.indexOf(account) === -1) {
+          app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+        }
         resolve();
       }).catch((err) => reject());
     }
