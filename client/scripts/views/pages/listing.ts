@@ -16,9 +16,8 @@ export enum ListingHeaderCols {
 
 interface IListingAttrs {
   contentLeft: IContentLeft;
-  header: string[]; // Ordered array of header labels, e.g. ['title', 'replies']
+  columnLabels: ListingHeaderCols[]; // Ordered array of header labels, e.g. ['title', 'replies']
   metadata: VnodeDOM[] | string[];
-  onclick: Function;
 }
 
 interface IContentLeft {
@@ -28,8 +27,11 @@ interface IContentLeft {
 
 const Listing: m.Component<IListingAttrs> = {
   view: (vnode) => {
-    m(ListingHeader, metadata);
+    const { contentLeft, columnLabels, metadata } = vnode.attrs;
+    return m('.Listing', [
+      m(ListingHeader, columnLabels),
+    ]);
   }
 };
 
-export default Row;
+export default Listing;
