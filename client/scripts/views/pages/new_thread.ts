@@ -26,9 +26,9 @@ const NewThreadPage: m.Component = {
 
     return m(Sublayout, {
       class: 'NewThreadPage',
+      title: 'New Thread',
     }, [
       m('.forum-container', [
-        m('h2', 'New Thread'),
         m(NewThreadForm, {
           isModal: false
         }),

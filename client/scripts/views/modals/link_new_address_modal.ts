@@ -51,7 +51,7 @@ enum LinkNewAddressWallets {
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
-    setActiveAccount(account, true);
+    setActiveAccount(account, true); // TODO - this address must be forced to join the right community
     vnode.state.newAddress = account;
     vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     vnode.state.error = null;
