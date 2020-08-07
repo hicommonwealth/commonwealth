@@ -1,6 +1,6 @@
 import 'components/row.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m, { VnodeDOM, Vnode } from 'mithril';
 import Chart from 'chart.js';
 import moment from 'moment-twitter';
 
@@ -15,13 +15,8 @@ export enum ListingHeaderCols {
 }
 
 interface IListingAttrs {
-  content: VnodeDOM[];
+  content: Vnode[];
   columnLabels: ListingHeaderCols[]; // Ordered array of header labels, e.g. ['title', 'replies']
-}
-
-interface IContentLeft {
-  header: VnodeDOM;
-  subheader: VnodeDOM;
 }
 
 const Listing: m.Component<IListingAttrs> = {

@@ -140,17 +140,15 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           });
         }
         if (list.length > 0) {
-          return m('.discussions-main', [
-            m(Listing, {
-              content: list,
-              columnLabels: [
-                ListingHeaderCols.TITLE,
-                ListingHeaderCols.GALLERY,
-                ListingHeaderCols.LIKES,
-                ListingHeaderCols.ACTIVITY
-              ],
-            }),
-          ]);
+          return m(Listing, {
+            content: list,
+            columnLabels: [
+              ListingHeaderCols.TITLE,
+              ListingHeaderCols.GALLERY,
+              ListingHeaderCols.LIKES,
+              ListingHeaderCols.ACTIVITY
+            ],
+          });
         }
       }
 

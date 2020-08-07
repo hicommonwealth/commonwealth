@@ -24,6 +24,8 @@ import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
 import { Grid, Col } from 'construct-ui';
 import CouncillorRow from './council_row';
+import ListingHeader from '../../components/listing_header';
+import Listing, { ListingHeaderCols } from '../listing';
 
 interface ICouncilElectionVoterAttrs {
   vote: PhragmenElectionVote;
@@ -163,15 +165,22 @@ const CouncilPage: m.Component<{}> = {
         ]),
       ]),
       // councillors
-      m('.council-section-header', 'Active Councillors'),
-      councillors.length === 0
-        ? m('.no-proposals', 'None')
-        : m('.councillors', [
-          councillors.map(
-            (account) => m(CouncillorRow, { account })
-          ),
-          m('.clear'),
-        ]),
+      m(Listing, {
+        content: councillors.length === 0
+          ? [ m('.no-proposals', 'None') ]
+          : [m('.councillors', [
+            councillors.map(
+              (account) => m(CouncillorRow, { account })
+            ),
+            m('.clear'),
+          ])],
+        columnLabels: [
+          ListingHeaderCols.TITLE,
+          ListingHeaderCols.GALLERY,
+          ListingHeaderCols.LIKES,
+          ListingHeaderCols.ACTIVITY
+        ],
+      }),
       // candidates
       m('.council-section-header', [
         'Candidates',
