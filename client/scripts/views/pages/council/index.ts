@@ -22,79 +22,8 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
-
-interface ICollectiveMemberAttrs {
-  account: SubstrateAccount;
-  title: string;
-}
-
-const CollectiveMember: m.Component<ICollectiveMemberAttrs> = {
-  view: (vnode) => {
-    if (!vnode.attrs.account) return;
-    const { account, title } = vnode.attrs;
-    const election = (app.chain as Substrate).phragmenElections;
-
-    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection.getVotes()
-      .filter((v) => v.votes.includes(account.address));
-
-    const hasMyVote = app.user.activeAccount && votes.filter((v) => v.account === app.user.activeAccount);
-
-    return m('.CollectiveMember', {
-      onclick: (e) => {
-        e.preventDefault();
-        app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
-      }
-    }, [
-      m('.proposal-row-left', [
-        m('.proposal-pre', [
-          m(User, {
-            user: account,
-            avatarOnly: true,
-            avatarSize: 36,
-            tooltip: true,
-          }),
-        ]),
-        m('.proposal-pre-mobile', [
-          m(User, {
-            user: account,
-            avatarOnly: true,
-            avatarSize: 16,
-            tooltip: true,
-          }),
-        ]),
-      ]),
-      m('.proposal-row-main', [
-        // Case One Councillor 3 same size divs
-        m('.item', [
-          m('.proposal-row-subheading', title),
-          m('.proposal-row-metadata', [
-            m('.proposal-user', [
-              m(User, {
-                user: account,
-                hideAvatar: true,
-                tooltip: true,
-              }),
-            ]),
-            m('.proposal-user-mobile', [
-              m(User, {
-                user: account,
-                hideAvatar: true,
-                tooltip: true,
-              }),
-            ]),
-          ]),
-        ]),
-        m('.item', [
-          m('.proposal-row-subheading', 'Backing'),
-          m('.proposal-row-metadata', election.isMember(account)
-            ? election.backing(account).format(true)
-            : votes.length),
-        ]),
-      ]),
-      m('.proposal-row-xs-clear'),
-    ]);
-  }
-};
+import { Grid, Col } from 'construct-ui';
+import CouncillorRow from './council_row';
 
 interface ICouncilElectionVoterAttrs {
   vote: PhragmenElectionVote;
@@ -208,65 +137,53 @@ const CouncilPage: m.Component<{}> = {
       class: 'CouncilPage',
       title: 'Council',
       showNewButton: true,
-      rightSidebar: [
-        // stats
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Candidacy Bond'),
-          m('.stats-tile-figure-major', app.chain
-            && `${candidacyBond || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Voting Bond'),
-          m('.stats-tile-figure-major', app.chain
-            && `${votingBond || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', [
-          m('.stats-tile-label', 'Councillors'),
-          m('.stats-tile-figure-major', app.chain ? councillors.length : '--'),
-          m('.stats-tile-figure-minor', app.chain
-            && `Target council size: ${nSeats || '--'}`),
-        ]),
-        m('.forum-container.stats-tile', !app.chain ? [
-          m('.stats-tile-label', 'Current Election'),
-          m('.stats-tile-figure-major', '--'),
-        ] : [
-          m('.stats-tile-label', 'Current Election'),
-          m('.stats-tile-figure-major', 'Voting open'),
-          m('.stats-tile-figure-minor', pluralize(candidates.length, 'candidate')),
-        ]),
-        m('.forum-container.stats-tile', !app.chain ? [
-          m('.stats-tile-label', 'Voting Ends'),
-          m('.stats-tile-figure-major', '--'),
-        ] : [
-          m('.stats-tile-label', 'Voting Ends'),
-          m('.stats-tile-figure-major',
-            m(CountdownUntilBlock, { block: nextRoundStartBlock })),
-          m('.stats-tile-figure-minor', `Block ${nextRoundStartBlock}`),
-        ]),
-      ],
     }, [
+      // stats
+      m(Grid, {
+        align: 'middle',
+        class: 'stats-container',
+        gutter: 5,
+        justify: 'space-between'
+      }, [
+        m(Col, [
+          `${app.chain ? councillors.length : '--'} councillors`
+          // m('.stats-tile', app.chain && `${candidacyBond || '--'}`)
+        ]),
+        m(Col, [
+          m('.stats-tile', [
+            m(CountdownUntilBlock, { block: nextRoundStartBlock, includeSeconds: false }),
+            ' till next council'
+          ])
+        ]),
+        m(Col, [
+          m('.stats-tile', app.chain && `${candidacyBond || '--'} candidacy bond`)
+        ]),
+        m(Col, [
+          m('.stats-tile', app.chain && `${votingBond || '--'} voting bond`),
+        ]),
+      ]),
       // councillors
-      m('h4.proposals-subheader', 'Councillors'),
+      m('.council-section-header', 'Active Councillors'),
       councillors.length === 0
-        ? m('.no-proposals', 'No members')
+        ? m('.no-proposals', 'None')
         : m('.councillors', [
           councillors.map(
-            (account) => m(CollectiveMember, { account, title: 'Councillor' })
+            (account) => m(CouncillorRow, { account })
           ),
           m('.clear'),
         ]),
       // candidates
-      m('h4.proposals-subheader', [
+      m('.council-section-header', [
         'Candidates',
         m(CollectiveVotingButton, { candidates }),
         m(CandidacyButton, { activeAccountIsCandidate, candidates }),
       ]),
       candidates.length === 0
-        ? m('.no-proposals', 'No candidates')
+        ? m('.no-proposals', 'None')
         : m('.council-candidates', [
           candidates
             .filter(([ account ]) => !councillors.includes(account))
-            .map(([account, slot]) => m(CollectiveMember, { account, title: 'Candidate' })),
+            .map(([account, slot]) => m(CouncillorRow, { account })),
           m('.clear'),
         ]),
     ]);
