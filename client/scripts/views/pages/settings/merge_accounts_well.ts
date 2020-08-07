@@ -12,6 +12,8 @@ import { AddressInfo, Account } from 'models';
 import { Icon, Icons, Button, Input, SelectList, ListItem } from 'construct-ui';
 import SelectAddressModal from '../../modals/select_address_modal';
 import { getSignatureForMessage } from '../../modals/message_signing_modal';
+import { getSignalsForAddress } from 'server/routes/getEdgewareLockdropLookup';
+import { getSignatureFromAccount } from '../../modals/account_signature_modal';
 
 interface IAccountSelectListAttrs {
   accounts: Account<any>[];
@@ -83,7 +85,7 @@ const MergeAccountsWell: m.Component<{}, {address1: Account<any>; address2: Acco
         label: 'Confirm?',
         onclick: async () => {
           if (!vnode.state.address1 || !vnode.state.address2) return;
-          const signatureData = await getSignatureForMessage(vnode.state.address1, 'Merge Verification', 'NO???');
+          const signatureData = await getSignatureFromAccount(vnode.state.address1, 'Merge Verification');
           console.dir(signatureData);
           await $.ajax({
             url: `${app.serverUrl()}/mergeAccounts`,
