@@ -69,8 +69,9 @@ class OffchainAccounts implements IOffchainAccountsModule<Coin, OffchainAccount>
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new OffchainAccount(this.app, chain, address);
+      // need to initialize a new OffchainAccount
     }
+    return new OffchainAccount(this.app, chain, address);
   }
 }
 

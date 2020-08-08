@@ -50,17 +50,22 @@ enum LinkNewAddressWallets {
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
+
+    // initialize role
     try {
-      // add AddressInfo object to app.user
+      // initialize AddressInfo
       // TODO: do this in a more well-defined way...
-      const addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
+      let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
       if (!addressInfo) {
-        app.user.addresses.push(new AddressInfo(account.id, account.address, account.chain, account.keytype));
+        addressInfo = new AddressInfo(account.id, account.address, account.chain.id, account.keytype);
+        app.user.addresses.push(addressInfo);
       }
       // link the address to the community
-      if (vnode.attrs.joiningChain) {
+      if (vnode.attrs.joiningChain
+          && !app.user.getRoleInCommunity({ chain: vnode.attrs.joiningChain })) {
         await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
-      } else if (vnode.attrs.joiningCommunity) {
+      } else if (vnode.attrs.joiningCommunity
+                 && !app.user.getRoleInCommunity({ community: vnode.attrs.joiningCommunity })) {
         await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
       }
       // set the address as active if possible
@@ -70,6 +75,7 @@ const accountVerifiedCallback = async (account, vnode) => {
       // if the address' role wasn't initialized correctly,
       // setActiveAccount will throw an exception but we should continue
     }
+
     vnode.state.newAddress = account;
     vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     vnode.state.error = null;
