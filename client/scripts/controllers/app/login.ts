@@ -186,6 +186,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
   }
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
@@ -194,6 +195,7 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
@@ -203,6 +205,7 @@ export async function createUserWithAddress(address: string, keytype?: string): 
   const response = await createAccount(account);
   const token = response.result.verification_token;
   account.setValidationToken(token);
+  account.setAddressId(response.result.id);
   return account;
 }
 

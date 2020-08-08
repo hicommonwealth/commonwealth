@@ -10,7 +10,7 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort, isSameAccount } from 'helpers';
 import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
@@ -47,29 +47,41 @@ enum LinkNewAddressWallets {
   Hedgehog,
 }
 
-const accountVerifiedCallback = async (account, vnode) => {
+const accountVerifiedCallback = async (account: Account<any>, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
 
     // initialize role
     try {
       // initialize AddressInfo
-      // TODO: do this in a more well-defined way...
       let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
-      if (!addressInfo) {
-        addressInfo = new AddressInfo(account.id, account.address, account.chain.id, account.keytype);
+      //
+      // TODO: do this in a more well-defined way...
+      //
+      // account.addressId is set by all createAccount methods in controllers/login.ts. this means that all cases should
+      // be covered (either the account comes from the backend and the address is also loaded via AddressInfo, or the
+      // account is created on the frontend and the id is available here).
+      //
+      // either way, we should refactor to always hold addressId on Account<any> models
+      if (!addressInfo && account.addressId) {
+        // TODO: add keytype
+        addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
         app.user.addresses.push(addressInfo);
       }
       // link the address to the community
       if (vnode.attrs.joiningChain
-          && !app.user.getRoleInCommunity({ chain: vnode.attrs.joiningChain })) {
+          && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
         await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
       } else if (vnode.attrs.joiningCommunity
-                 && !app.user.getRoleInCommunity({ community: vnode.attrs.joiningCommunity })) {
+                 && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
         await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
       }
-      // set the address as active if possible
-      await setActiveAccount(account, true);
+      // set the address as active
+      app.user.setActiveAccount(account);
+      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      }
+      // TODO: set the address as default
     } catch (e) {
       console.trace(e);
       // if the address' role wasn't initialized correctly,
