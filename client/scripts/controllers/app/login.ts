@@ -32,7 +32,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
     const community = app.activeCommunityId();
     const role = app.user.getRoleInCommunity({ chain, community });
 
-    if (!role) {
+    if (!role || role.is_user_default) {
       if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
         notifySuccess('Switched account');
       }
