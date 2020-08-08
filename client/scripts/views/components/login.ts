@@ -97,7 +97,12 @@ const Login: m.Component<{}, {
       ]),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 12 }, [
-          m(LoginWithWalletDropdown),
+          m(LoginWithWalletDropdown, {
+            label: app.chain ? `Continue with ${(app.chain.chain.denom) || ''} wallet` : 'Continue with wallet',
+            joiningChain: null,
+            joiningCommunity: null,
+            loggingInWithAddress: true,
+          }),
         ]),
       ]),
     ]);

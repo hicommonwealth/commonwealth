@@ -10,6 +10,7 @@ import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
+import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
 const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: boolean }> = {
   view: (vnode) => {
@@ -124,19 +125,15 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
           disabled: vnode.state.selectedIndex === undefined || vnode.state.loading,
           onclick: createRole.bind(this),
         }),
-        m(Button, {
+        m(LoginWithWalletDropdown, {
+          loggingInWithAddress: false,
+          joiningCommunity: app.activeCommunityId(),
+          joiningChain: app.activeChainId(),
           label: 'Connect a new address',
-          intent: 'none',
-          compact: true,
-          fluid: true,
-          disabled: vnode.state.loading,
-          onclick: (e) => {
-            app.modals.lazyCreate('link_new_address_modal', {
-              successCallback: () => {
-                // TODO XX: set membership
-              }
-            });
-          },
+          // compact: true,
+          // fluid: true,
+          // disabled: vnode.state.loading,
+          // intent: 'none',
         }),
       ]),
     ]);

@@ -51,7 +51,22 @@ enum LinkNewAddressWallets {
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
-    setActiveAccount(account, true); // TODO - this address must be forced to join the right community
+    try {
+      // link the address to the community
+      const addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
+      if (!addressInfo) throw new Error('Missing address');
+      if (vnode.attrs.joiningChain) {
+        await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+      } else if (vnode.attrs.joiningCommunity) {
+        await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
+      }
+      // set the address as active if possible
+      await setActiveAccount(account, true);
+    } catch (e) {
+      console.trace(e);
+      // if the address' role wasn't initialized correctly,
+      // setActiveAccount will throw an exception but we should continue
+    }
     vnode.state.newAddress = account;
     vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     vnode.state.error = null;
@@ -175,7 +190,7 @@ const SubstrateLinkAccountItem: m.Component<{
 
           if (!verified) {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
@@ -184,17 +199,17 @@ const SubstrateLinkAccountItem: m.Component<{
             accountVerifiedCallback(signerAccount, vnode.attrs.linkNewAddressModalVnode);
           }, (err) => {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           }).then(() => {
             m.redraw();
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           });
         } catch (err) {
           // catch when the user rejects the sign message prompt
           vnode.state.linking = false;
-          errorCallback('Verification failed.');
+          errorCallback('Verification failed');
         }
       }
     }, [
@@ -220,7 +235,9 @@ const SubstrateLinkAccountItem: m.Component<{
 
 const LinkNewAddressModal: m.Component<{
   loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
-  alreadyInitializedAccount?: Account<any>; // skips the verification steps, and goes straight to profile creation
+  joiningCommunity: string,       // join community after verification
+  joiningChain: string,           // join chain after verification
+  alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   successCallback;
 }, {
   // meta
