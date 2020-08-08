@@ -11,6 +11,7 @@ import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construc
 
 import { initAppState } from 'app';
 import { formatAddressShort } from 'helpers';
+import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -20,7 +21,6 @@ import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
-import { Account, ChainBase, ChainNetwork } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
@@ -47,14 +47,17 @@ enum LinkNewAddressWallets {
   Hedgehog,
 }
 
-// Step 2 -> Step 3
 const accountVerifiedCallback = async (account, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
     try {
-      // link the address to the community
+      // add AddressInfo object to app.user
+      // TODO: do this in a more well-defined way...
       const addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
-      if (!addressInfo) throw new Error('Missing address');
+      if (!addressInfo) {
+        app.user.addresses.push(new AddressInfo(account.id, account.address, account.chain, account.keytype));
+      }
+      // link the address to the community
       if (vnode.attrs.joiningChain) {
         await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
       } else if (vnode.attrs.joiningCommunity) {
