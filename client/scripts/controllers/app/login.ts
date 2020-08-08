@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import app from 'state';
+import { isSameAccount } from 'helpers';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import {
@@ -37,7 +38,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
         notifySuccess('Switched account');
       }
       app.user.setActiveAccount(account);
-      if (app.user.activeAccounts.indexOf(account) === -1) {
+      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
       resolve();
@@ -64,7 +65,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           notifySuccess('Switched account');
         }
         app.user.setActiveAccount(account);
-        if (app.user.activeAccounts.indexOf(account) === -1) {
+        if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
           app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
         }
         resolve();
