@@ -11,7 +11,6 @@ export const chartColors = {
   grey: 'rgb(201, 203, 207)'
 };
 
-
 export default {
   loaded: true,
   config: {
@@ -19,11 +18,10 @@ export default {
     data: {
       xValues: [],
       datasets: [{
-        label: 'values',
-        backgroundColor: chartColors.red,
+        label: '',
+        backgroundColor: "rgba(255, 10, 13, 0.1)",
         borderColor: chartColors.red,
         yValues: [1, 2],
-        fill: false,
       }, ]
     },
     options: {
@@ -40,12 +38,15 @@ export default {
         mode: 'point',
         intersect: true
       },
+      legend:{
+        display:false
+      },
       scales: {
         xAxes: [{
           display: true,
           scaleLabel: {
             display: true,
-            labelString: 'Xvalues'
+            labelString: ''
           }
         }],
         yAxes: [{
@@ -55,7 +56,7 @@ export default {
           display: true,
           scaleLabel: {
             display: true,
-            labelString: 'Yvalues',
+            labelString: '',
            
           }
           
@@ -64,3 +65,5 @@ export default {
     }
   }
 };
+
+
