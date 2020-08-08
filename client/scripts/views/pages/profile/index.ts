@@ -229,6 +229,7 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
 
     const xValues = [1, 2, 3, 2, 1, 0]; // nested arrays or json will be implemented for actual different graphs
     const yValues = [1, 2, 300, 2, 1, 0];
+    const titles = ['REWARDS OVER TIME','SLASHES OVER TIME','NOMINATIONS OVER TIME','ELECTED STAKE','OFFENCES OVER TIME','IM ONLINE EVENTS OVER TIME','NOMINATORS OVER TIME']
 
 
 
@@ -264,7 +265,7 @@ const ProfilePage: m.Component<{ address: string }, { }> = {
               name: graphsTabTitle,
               content: [
                 m(graphs, {
-                  xValues, yValues
+                  xValues, yValues ,titles
                 }),
               ],
             }

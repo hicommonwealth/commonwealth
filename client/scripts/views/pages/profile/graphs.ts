@@ -5,18 +5,18 @@ import lineModel from './graph_models/linemodel';
 
 import chartComponent from '../../components/chart';
 
-function renderChart(model, xValues, yValues) {
+function renderChart(model, xValues, yValues,titles) {
   return model.loaded
-    ? m('.column', m(chartComponent, { model, x:xValues, y:yValues }))
+    ? m('.column', m(chartComponent, { model, x:xValues, y:yValues,names:titles }))
     : m('.column.has-text-centered', 'Loading...');
 }
 
-const graphContent: m.Component<{ xValues: number[], yValues: number[]}> = {
+const graphContent: m.Component<{ xValues: number[], yValues: number[],titles:string[] }> = {
   view(vnode) {
-    const { xValues, yValues } = vnode.attrs;
+    const { xValues, yValues,titles } = vnode.attrs;
     return [
       m('.columns', [
-        renderChart(lineModel, xValues, yValues)
+        renderChart(lineModel, xValues, yValues,titles)
       ]),
     ];
   }
