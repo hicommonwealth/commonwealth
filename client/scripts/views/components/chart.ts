@@ -2,6 +2,16 @@
 import m from 'mithril';
 import Chart from 'chart.js';
 
+export const chartColors = {
+  red: 'rgb(255, 99, 132)',
+  orange: 'rgb(255, 159, 64)',
+  yellow: 'rgb(255, 205, 86)',
+  green: 'rgb(75, 192, 192)',
+  blue: 'rgb(54, 162, 235)',
+  purple: 'rgb(153, 102, 255)',
+  grey: 'rgb(201, 203, 207)'
+};
+
 export default {
   view(vnode) {
     const model = vnode.attrs.model;
@@ -17,6 +27,7 @@ export default {
           oncreate(vnode) {
             const canvas = <HTMLCanvasElement> document.getElementById('chart'); // access created canvas
             const ctx = canvas.getContext('2d');
+            model.config.data.datasets[0].borderColor = chartColors.green;
             model.instance = new Chart(ctx, model.config);
             m.redraw();
           }
@@ -31,6 +42,7 @@ export default {
         oncreate(vnode) {
           const canvas = <HTMLCanvasElement> document.getElementById('chart1'); 
           const ctx = canvas.getContext('2d');
+          model.config.data.datasets[0].borderColor = chartColors.red;
           model.instance = new Chart(ctx, model.config);
           m.redraw();
         }
@@ -48,6 +60,7 @@ export default {
         oncreate(vnode) {
           const canvas = <HTMLCanvasElement> document.getElementById('chart2'); // access created canvas
           const ctx = canvas.getContext('2d');
+          model.config.data.datasets[0].borderColor = chartColors.purple;
           model.instance = new Chart(ctx, model.config);
           m.redraw();
         }
@@ -62,6 +75,7 @@ export default {
       oncreate(vnode) {
         const canvas = <HTMLCanvasElement> document.getElementById('chart3'); 
         const ctx = canvas.getContext('2d');
+        model.config.data.datasets[0].borderColor = chartColors.yellow;
         model.instance = new Chart(ctx, model.config);
         m.redraw();
       }
@@ -79,6 +93,7 @@ export default {
       oncreate(vnode) {
         const canvas = <HTMLCanvasElement> document.getElementById('chart4'); // access created canvas
         const ctx = canvas.getContext('2d');
+        model.config.data.datasets[0].borderColor = chartColors.orange;
         model.instance = new Chart(ctx, model.config);
         m.redraw();
       }
@@ -93,6 +108,7 @@ export default {
     oncreate(vnode) {
       const canvas = <HTMLCanvasElement> document.getElementById('chart5'); 
       const ctx = canvas.getContext('2d');
+      model.config.data.datasets[0].borderColor = chartColors.blue;
       model.instance = new Chart(ctx, model.config);
       m.redraw();
     }
@@ -110,6 +126,7 @@ m('#canvas-holder', [
     oncreate(vnode) {
       const canvas = <HTMLCanvasElement> document.getElementById('chart6'); // access created canvas
       const ctx = canvas.getContext('2d');
+      model.config.data.datasets[0].borderColor = chartColors.grey;
       model.instance = new Chart(ctx, model.config);
       m.redraw();
     }
