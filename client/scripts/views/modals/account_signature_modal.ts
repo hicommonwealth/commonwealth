@@ -25,11 +25,38 @@ enum LinkNewAddressWallets {
   // Hedgehog,
 }
 
+const sendSignatureToServer = async (
+  account1: Account<any>,
+  account2: Account<any>,
+  signature: string,
+  message: string
+) => {
+  await $.ajax({
+    url: `${app.serverUrl()}/mergeAccounts`,
+    data: {
+      jwt: app.user.jwt,
+      oldAddress: account1.address,
+      newAddress: account2.address,
+      signature,
+      message,
+    },
+    type: 'POST',
+    success: (result) => {
+      console.dir(result);
+      return result;
+    },
+    error: (err) => {
+      console.dir(err);
+      return err;
+    },
+  });
+};
+
 const SubstrateAccountSigning: m.Component<{
-  account,
+  account: Account<any>,
+  message: string,
   accountVerifiedCallback,
   errorCallback,
-  linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
@@ -62,44 +89,18 @@ const AccountSigningModal = {
         m('h3', vnode.attrs.title || 'Signature requested'),
       ]),
       m('.compact-modal-body', [
-        // // message
-        // m('p', 'Sign this message to continue:'),
-        // m(CodeBlock, account.validationToken),
-        // // instructions
-        // m('p', 'Select an option:'),
-        // m(HorizontalTabs, [{
-        //   name: 'Command line',
-        //   content: m(MessageSigningCLIOption, { account }),
-        // }, {
-        //   name: 'Key phrase',
-        //   content: m(MessageSigningSeedOrMnemonicOption, { account }),
-        //   selected: (account.getSeed() || account.getMnemonic()),
-        // }]),
+        (account1.chain.id === 'edgeware')
+          && m(SubstrateAccountSigning, {
+            account: account1,
+            message,
+            accountVerifiedCallback: async (signature) => {
+              await sendSignatureToServer(account1, account2, signature, message);
+            },
+            errorCallback: (err) => { console.log(err); },
+          })
       ]),
     ]);
   }
-};
-
-const sendSignatureToServer = async (account1: Account<any>, account2: Account<any>, signature, message) => {
-  await $.ajax({
-    url: `${app.serverUrl()}/mergeAccounts`,
-    data: {
-      jwt: app.user.jwt,
-      oldAddress: account1.address,
-      newAddress: account2.address,
-      signature,
-      message,
-    },
-    type: 'POST',
-    success: (result) => {
-      console.dir(result);
-      return result;
-    },
-    error: (err) => {
-      console.dir(err);
-      return err;
-    },
-  });
 };
 
 export const getSignatureFromAccount = (account1: Account<any>, account2: Account<any>, title?: string,) => {
