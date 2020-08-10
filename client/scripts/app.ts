@@ -19,7 +19,7 @@ import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
-import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
@@ -94,7 +94,8 @@ export async function deinitChainOrCommunity() {
     app.community = null;
   }
   app.user.setSelectedNode(null);
-  clearActiveAddresses();
+  app.user.setActiveAccounts([]);
+  app.user.ephemerallySetActiveAccount(null);
 }
 
 export function handleInviteLinkRedirect() {

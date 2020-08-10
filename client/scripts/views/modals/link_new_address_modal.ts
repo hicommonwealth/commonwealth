@@ -77,7 +77,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
         await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
       }
       // set the address as active
-      app.user.setActiveAccount(account);
+      setActiveAccount(account);
       if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
