@@ -27,16 +27,13 @@ function createAccount(account: Account<any>) {
   });
 }
 
-export async function setActiveAccount(account: Account<any>, suppressNotification?) {
+export async function setActiveAccount(account: Account<any>) {
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
     const role = app.user.getRoleInCommunity({ chain, community });
 
     if (!role || role.is_user_default) {
-      if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
-        notifySuccess('Switched account');
-      }
       app.user.setActiveAccount(account);
       if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
@@ -61,9 +58,6 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           .forEach((r) => { r.is_user_default = false; });
         role.is_user_default = true;
 
-        if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
-          notifySuccess('Switched account');
-        }
         app.user.setActiveAccount(account);
         if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
           app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
