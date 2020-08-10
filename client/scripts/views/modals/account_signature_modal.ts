@@ -54,7 +54,9 @@ const EthereumAccountSigning: m.Component<{
 
 const AccountSigningModal = {
   view: (vnode) => {
-    const account: Account<any> = vnode.attrs.account;
+    const account1: Account<any> = vnode.attrs.account1;
+    const account2: Account<any> = vnode.attrs.account2;
+    const message = `Confirming that I would like to move Commonwealth data from ${account1.address} to ${account2.address}`;
     return m('.AccountSigningModal', [
       m('.compact-modal-title', [
         m('h3', vnode.attrs.title || 'Signature requested'),
