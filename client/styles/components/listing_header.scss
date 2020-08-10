@@ -9,11 +9,14 @@
       font-size: 0.94rem;
       text-align: right;
       width: 84px;
-      padding: 10px 0;
+      padding: 10px 6px 10px 0;
       &.listing-header-col-1 {
         flex: 1;
         width: initial;
         text-align: left;
+      }
+      &:last-child {
+        padding-right: 0px;
       }
       // &.discussion-row-header-replies {
       //     padding-right: 6px;

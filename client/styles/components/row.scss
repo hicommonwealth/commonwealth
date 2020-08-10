@@ -5,7 +5,10 @@ $text-size-item-meta: 17px;
 
 .Row {
     display: flex;
-    padding: 12px 0;
+    padding: 12px 20px;
+    &:hover {
+        background: $background-color-white-hover;
+    }
     .row-left {
         line-height: 1.1;
         flex: 1;
@@ -36,6 +39,19 @@ $text-size-item-meta: 17px;
         .UserGallery {
             .overflow-users {
                 font-size: 13.5px;
+            }
+        }
+        .last-updated {
+            min-width: 80px;
+            padding-left: 14px;
+            text-align: right;
+            font-size: $text-size-item-meta;
+            &.older {
+                min-width: 116px;
+            }
+            a {
+                font-size: $text-size-item-meta;
+                color: $text-color-light;
             }
         }
     }

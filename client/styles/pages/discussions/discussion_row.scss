@@ -8,24 +8,23 @@ $discussion-meta-padding: 18px;
     display: block;
     margin: 0 -20px;
 
-    // wrapper
-    a.discussion-row {
-        display: block;
-        text-decoration: none;
-        padding: 0 20px;
-        border-radius: 6px;
-        &:hover {
-            background: $background-color-white-hover;
-        }
-    }
-
     .row-left {
-        .subheader {
+        .row-subheader {
             // Styling specific to DiscussionRow subheader content
+            color: #9a9da4;
             a.proposal-tag {
-                margin-right: $discussion-meta-padding;
                 @include proposal-tag-inline;
+                margin-right: $discussion-meta-padding;
                 color: $text-color-light;
+                span.proposal-tag-icon {
+                    display: inline-block;
+                    background: transparent;
+                    border: 1.5px solid #b5b7b9;
+                    border-radius: 99px;
+                    width: 9px;
+                    height: 9px;
+                    margin-right: 6px;
+                }
             }
             .User a {
                 display: inline-block;
@@ -63,7 +62,7 @@ $discussion-meta-padding: 18px;
         .ReactionButton {
             margin-left: 48px;
         }
-        .discussion-last-updated {
+        .last-updated {
             min-width: 80px;
             padding-left: 14px;
             text-align: right;
@@ -81,6 +80,7 @@ $discussion-meta-padding: 18px;
         }
     }
 
+    // TODO: Replace functionality below:
     // a.discussion-created, a.discussion-replies {
     //     text-decoration: none;
     //     color: $text-color-light;
