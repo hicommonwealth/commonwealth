@@ -18,6 +18,10 @@ const LoginWithWalletDropdown: m.Component<{
   view: (vnode) => {
     const { label, loggingInWithAddress, joiningChain, joiningCommunity, successCallback } = vnode.attrs;
 
+    const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
+    const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
+      ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
+
     return app.chain
       ? m(Button, {
         intent: 'primary',
@@ -26,9 +30,7 @@ const LoginWithWalletDropdown: m.Component<{
         label,
         onclick: (e) => {
           $(e.target).trigger('modalexit');
-          m.route.set(`/${app.chain.id}/web3login`, {
-            prev: m.route.param('prev') ? m.route.param('prev') : m.route.get()
-          });
+          m.route.set(`/${app.chain.id}/web3login`, web3loginParams);
           const redirectRoute = m.route.get();
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
@@ -63,9 +65,7 @@ const LoginWithWalletDropdown: m.Component<{
             ]),
             onclick: (e) => {
               $('.Login').trigger('modalexit');
-              m.route.set(`/${chain.id}/web3login`, {
-                prev: m.route.param('prev') ? m.route.param('prev') : m.route.get()
-              });
+              m.route.set(`/${chain.id}/web3login`, web3loginParams)
               const redirectRoute = m.route.get();
               app.modals.lazyCreate('link_new_address_modal', {
                 loggingInWithAddress,
