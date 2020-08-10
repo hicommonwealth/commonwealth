@@ -8,7 +8,11 @@ import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import SubkeyInstructions from 'views/components/subkey_instructions';
 import { Account, ChainBase } from 'models';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import Substrate from 'controllers/chain/substrate/main';
+import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { isU8a, isHex, stringToHex } from '@polkadot/util';
+import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 enum SignForAccountSteps {
   Step1SelectWallet,
@@ -55,29 +59,67 @@ const sendSignatureToServer = async (
 const SubstrateAccountSigning: m.Component<{
   account: Account<any>,
   message: string,
-  accountVerifiedCallback,
-  errorCallback,
-}, { linking }> = {
+  accountVerifiedCallback: Function,
+  errorCallback: Function,
+}, { signing }> = {
   view: (vnode) => {
     const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
-    return m('.SubstrateAccountSigning', [
+    return m('.SubstrateAccountSigning', {
+      onclick: async (e) => {
+        e.preventDefault();
 
-    ]);
+        try {
+          const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+          vnode.state.signing = true;
+          m.redraw();
+
+          const token = account.validationToken;
+          const payload: SignerPayloadRaw = {
+            address: account.address,
+            data: stringToHex(token),
+            type: 'bytes',
+          };
+          const signature = (await signer.signRaw(payload)).signature;
+          const verified = await account.isValidSignature(token, signature);
+
+          if (!verified) {
+            vnode.state.signing = false;
+            errorCallback('Verification failed.');
+          }
+          account.validate(signature).then(() => {
+            vnode.state.signing = false;
+            accountVerifiedCallback(signature);
+          }, (err) => {
+            vnode.state.signing = false;
+            errorCallback('Verification failed.');
+          }).then(() => {
+            m.redraw();
+          }).catch((err) => {
+            vnode.state.signing = false;
+            errorCallback('Verification failed.');
+          });
+        } catch (err) {
+          // catch when the user rejects the sign message prompt
+          vnode.state.signing = false;
+          errorCallback('Verification failed.');
+        }
+      }
+    });
   },
 };
 
-const EthereumAccountSigning: m.Component<{
-  address,
-  accountVerifiedCallback,
-  errorCallback,
-  linkNewAddressModalVnode
-}, { linking }> = {
-  view: (vnode) => {
-    return m('.EthereumAccountSigning', [
+// const EthereumAccountSigning: m.Component<{
+//   address,
+//   accountVerifiedCallback,
+//   errorCallback,
+//   linkNewAddressModalVnode
+// }, { linking }> = {
+//   view: (vnode) => {
+//     return m('.EthereumAccountSigning', [
 
-    ]);
-  },
-};
+//     ]);
+//   },
+// };
 
 const AccountSigningModal = {
   view: (vnode) => {
@@ -96,7 +138,7 @@ const AccountSigningModal = {
             accountVerifiedCallback: async (signature) => {
               await sendSignatureToServer(account1, account2, signature, message);
             },
-            errorCallback: (err) => { console.log(err); },
+            errorCallback: (err: string) => { console.log(err); },
           })
       ]),
     ]);
