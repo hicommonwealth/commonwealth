@@ -67,7 +67,6 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
-import registerWaitingList from './routes/registerWaitingList';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
@@ -149,7 +148,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
-  
+
   router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
 
 
@@ -257,10 +256,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // attachments
   // TODO: Change to POST /uploadSignature
   router.post('/getUploadSignature', passport.authenticate('jwt', { session: false }), getUploadSignature.bind(this, models));
-
-  // homepage and waiting lists
-  // TODO: Change to POST /waitingList
-  router.post('/registerWaitingList', registerWaitingList.bind(this, models));
 
   // notifications
   // TODO: Change to GET /subscriptions
