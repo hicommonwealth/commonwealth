@@ -6,7 +6,7 @@ import moment from 'moment-twitter';
 
 import app from 'state';
 import { Coin } from 'adapters/currency';
-import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate } from 'helpers';
+import { pluralize, slugify, formatPercentShort, blocknumToDuration, byAscendingCreationDate, link } from 'helpers';
 import { ProposalStatus, VotingType, AnyProposal, ChainBase, AddressInfo } from 'models';
 
 import Countdown from 'views/components/countdown';
@@ -20,7 +20,6 @@ import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/
 import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
 import Row from './row';
-import { link } from 'client/scripts/helpers';
 
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;

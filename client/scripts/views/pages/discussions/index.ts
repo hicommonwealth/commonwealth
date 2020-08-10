@@ -237,17 +237,23 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         // m(InlineThreadComposer),
         allProposals.length === 0
           ? m(EmptyTagPlaceholder, { communityName })
-          : [
-            m(DiscussionRowHeader),
-            getRecentPostsSortedByWeek(),
-            vnode.state.postsDepleted
-              ? m('.infinite-scroll-reached-end', [
-                `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
-              ])
-              : m('.infinite-scroll-spinner-wrap', [
-                m(Spinner, { active: !vnode.state.postsDepleted })
-              ])
-          ],
+          : m(Listing, {
+            content: getRecentPostsSortedByWeek(),
+            columnLabels: [
+              ListingHeaderCols.TITLE,
+              ListingHeaderCols.GALLERY,
+              ListingHeaderCols.LIKES,
+              ListingHeaderCols.ACTIVITY
+            ],
+          }),
+        // TODO: Incorporate infinite scroll into generic Listing component
+        vnode.state.postsDepleted
+          ? m('.infinite-scroll-reached-end', [
+            `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
+          ])
+          : m('.infinite-scroll-spinner-wrap', [
+            m(Spinner, { active: !vnode.state.postsDepleted })
+          ])
       ]);
     };
 
