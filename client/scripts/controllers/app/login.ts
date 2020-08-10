@@ -31,7 +31,7 @@ export async function setActiveAccount(account: Account<any>) {
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ chain, community });
+    const role = app.user.getRoleInCommunity({ account, chain, community });
 
     if (!role || role.is_user_default) {
       app.user.ephemerallySetActiveAccount(account);
