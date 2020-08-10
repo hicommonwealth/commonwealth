@@ -25,6 +25,33 @@ enum LinkNewAddressWallets {
   // Hedgehog,
 }
 
+const SubstrateAccountSigning: m.Component<{
+  account,
+  accountVerifiedCallback,
+  errorCallback,
+  linkNewAddressModalVnode
+}, { linking }> = {
+  view: (vnode) => {
+    const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
+    return m('.SubstrateAccountSigning', [
+
+    ]);
+  },
+};
+
+const EthereumAccountSigning: m.Component<{
+  address,
+  accountVerifiedCallback,
+  errorCallback,
+  linkNewAddressModalVnode
+}, { linking }> = {
+  view: (vnode) => {
+    return m('.EthereumAccountSigning', [
+
+    ]);
+  },
+};
+
 const AccountSigningModal = {
   view: (vnode) => {
     const account: Account<any> = vnode.attrs.account;
@@ -51,17 +78,40 @@ const AccountSigningModal = {
   }
 };
 
-export const getSignatureFromAccount = (account: Account<any>, title?: string,) => {
+const sendSignatureToServer = async (account1: Account<any>, account2: Account<any>, signature, message) => {
+  await $.ajax({
+    url: `${app.serverUrl()}/mergeAccounts`,
+    data: {
+      jwt: app.user.jwt,
+      oldAddress: account1.address,
+      newAddress: account2.address,
+      signature,
+      message,
+    },
+    type: 'POST',
+    success: (result) => {
+      console.dir(result);
+      return result;
+    },
+    error: (err) => {
+      console.dir(err);
+      return err;
+    },
+  });
+};
+
+export const getSignatureFromAccount = (account1: Account<any>, account2: Account<any>, title?: string,) => {
   return new Promise((resolve, reject) => {
     let complete = false;
-    console.log(account);
-    if (account.chain.id !== 'edgeware') { resolve(); return; }
+    console.log(account1);
+    if (account1.chain.id !== 'edgeware') { resolve(); return; }
     app.modals.create({
       modal: AccountSigningModal,
       completeCallback: (data) => { complete = true; },
       exitCallback: (data) => { complete ? resolve(data) : reject(data); },
       data: {
-        account,
+        account1,
+        account2,
         title,
       },
     });
