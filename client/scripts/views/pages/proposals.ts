@@ -39,6 +39,84 @@ const ProposalRowHeader: m.Component<{ title: string }> = {
   }
 };
 
+const ProposalsStats: m.Component<{ onMoloch: boolean, onSubstrate: boolean }, {}> = {
+  view: (vnode) => {
+    const { onMoloch, onSubstrate } = vnode.attrs;
+    return m(Grid, {
+      align: 'middle',
+      class: 'stats-container',
+      gutter: 5,
+      justify: 'space-between'
+    }, [
+      m(Col, { span: 4 }, [
+        onSubstrate && m('.stats-tile', [
+          onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
+            ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock, includeSeconds: false })
+            : '--',
+          ' till next referendum',
+        ]),
+        onSubstrate && m('.stats-tile', [
+          app.chain && (app.chain as Substrate).treasury.nextSpendBlock
+            ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock, includeSeconds: false })
+            : '--',
+          ' till next treasury spend',
+        ]),
+      ]),
+      m(Col, { span: 4 }, [
+        onSubstrate && m('.stats-tile', [
+          app.chain
+          && (app.chain as Substrate).treasury.bondMinimum
+            ? (app.chain as Substrate).treasury.bondMinimum.format()
+            : '--',
+          ' proposal bond'
+        ]),
+        onSubstrate && m('.stats-tile', [
+          app.chain
+          && (app.chain as Substrate).democracyProposals.minimumDeposit
+          && (app.chain as Substrate).treasury.computeBond
+            ? (app.chain as Substrate).treasury.computeBond(
+              (app.chain as Substrate).democracyProposals.minimumDeposit
+            ).format()
+            : '--',
+          ' treasury proposal bond'
+        ])
+      ]),
+      m(Col, { span: 4 }, [
+        onSubstrate && m('.stats-tile', [
+          app.chain
+          && (app.chain as Substrate).democracy.enactmentPeriod
+            ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
+            : '--',
+          'd enactment delay after approval'
+        ]),
+        // TODO: Pot is under construction
+        onSubstrate && m('.stats-tile', [
+          app.chain && formatCoin((app.chain as Substrate).treasury.pot),
+          ' in the treasury',
+        ]),
+      ]),
+    ]);
+    // onMoloch && m('.stats-tile', [
+    //   m('.stats-tile-label', 'DAO Basics'),
+    //   m('.stats-tile-figure-minor', [
+    //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
+    //   ]),
+    //   m('.stats-tile-figure-minor', [
+    //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
+    //   ]),
+    // ]),
+  }
+};
+
 const ProposalsPage: m.Component<{}> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', { 'Page Name': 'ProposalsPage' });
@@ -67,6 +145,23 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
+    const activeProposalContent = !activeDemocracyReferenda
+      && !activeDemocracyProposals
+      && !activeCouncilProposals
+      && !activeSignalingProposals
+      && !activeCosmosProposals
+      && !activeMolochProposals
+      ? [ m('.no-proposals', 'None') ]
+      : activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal }))
+        .concat(activeDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(activeCouncilProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(activeSignalingProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(activeCosmosProposals.map((proposal) => m(ProposalRow, { proposal })));
+
+    const activeTreasuryContent = activeTreasuryProposals.length
+      ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      : [ m('.no-proposals', 'None') ];
+
     // inactive proposals
     const inactiveDemocracyReferenda = onSubstrate
       && (app.chain as Substrate).democracy.store.getAll().filter((p) => p.completed);
@@ -85,6 +180,23 @@ const ProposalsPage: m.Component<{}> = {
     const inactiveMolochProposals = onMoloch
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+
+    const inactiveProposalContent = !activeDemocracyReferenda
+      && !inactiveDemocracyProposals
+      && !inactiveCouncilProposals
+      && !inactiveSignalingProposals
+      && !inactiveCosmosProposals
+      && !inactiveMolochProposals
+      ? [ m('.no-proposals', 'None') ]
+      : inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal }))
+        .concat(inactiveDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(inactiveCouncilProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(inactiveSignalingProposals.map((proposal) => m(ProposalRow, { proposal })))
+        .concat(inactiveCosmosProposals.map((proposal) => m(ProposalRow, { proposal })));
+
+    const inactiveTreasuryContent = inactiveTreasuryProposals.length
+      ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
+      : [ m('.no-proposals', 'None') ];
 
     // XXX: display these
     const visibleTechnicalCommitteeProposals = app.chain
@@ -115,125 +227,23 @@ const ProposalsPage: m.Component<{}> = {
       title: 'Proposals',
       showNewButton: true,
     }, [
-      m(Grid, {
-        align: 'middle',
-        class: 'stats-container',
-        gutter: 5,
-        justify: 'space-between'
-      }, [
-        // onMoloch && m('.stats-tile', [
-        //   m('.stats-tile-label', 'DAO Basics'),
-        //   m('.stats-tile-figure-minor', [
-        //     `Voting Period Length: ${onMoloch && (app.chain as Moloch).governance.votingPeriodLength}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Total Shares: ${onMoloch && (app.chain as Moloch).governance.totalShares}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Summoned At: ${onMoloch && (app.chain as Moloch).governance.summoningTime}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Proposal Count: ${onMoloch && (app.chain as Moloch).governance.proposalCount}`
-        //   ]),
-        //   m('.stats-tile-figure-minor', [
-        //     `Proposal Deposit: ${onMoloch && (app.chain as Moloch).governance.proposalDeposit}`
-        //   ]),
-        // ]),
-        m(Col, { span: 4 }, [
-          onSubstrate && m('.stats-tile', [
-            onSubstrate && (app.chain as Substrate).democracyProposals.nextLaunchBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).democracyProposals.nextLaunchBlock, includeSeconds: false })
-              : '--',
-            ' till next referendum',
-          ]),
-          onSubstrate && m('.stats-tile', [
-            app.chain && (app.chain as Substrate).treasury.nextSpendBlock
-              ? m(CountdownUntilBlock, { block: (app.chain as Substrate).treasury.nextSpendBlock, includeSeconds: false })
-              : '--',
-            ' till next treasury spend',
-          ]),
-        ]),
-        m(Col, { span: 4 }, [
-          onSubstrate && m('.stats-tile', [
-            app.chain
-            && (app.chain as Substrate).treasury.bondMinimum
-              ? (app.chain as Substrate).treasury.bondMinimum.format()
-              : '--',
-            ' proposal bond'
-          ]),
-          onSubstrate && m('.stats-tile', [
-            app.chain
-            && (app.chain as Substrate).democracyProposals.minimumDeposit
-            && (app.chain as Substrate).treasury.computeBond
-              ? (app.chain as Substrate).treasury.computeBond(
-                (app.chain as Substrate).democracyProposals.minimumDeposit
-              ).format()
-              : '--',
-            ' treasury proposal bond'
-          ])
-        ]),
-        m(Col, { span: 4 }, [
-          onSubstrate && m('.stats-tile', [
-            app.chain
-            && (app.chain as Substrate).democracy.enactmentPeriod
-              ? blockperiodToDuration((app.chain as Substrate).democracy.enactmentPeriod).asDays()
-              : '--',
-            'd enactment delay after approval'
-          ]),
-          // TODO: Pot is under construction
-          onSubstrate && m('.stats-tile', [
-            app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-            ' in the treasury',
-          ]),
-        ]),
-      ]),
+      m(ProposalsStats, { onMoloch, onSubstrate }),
       m(Listing, {
-        content: !activeDemocracyReferenda
-          && !activeDemocracyProposals
-          && !activeCouncilProposals
-          && !activeSignalingProposals
-          && !activeCosmosProposals
-          && !activeMolochProposals
-          ? [ m('.no-proposals', 'None') ]
-          : activeDemocracyReferenda
-            .concat(activeDemocracyProposals as any)
-            .concat(activeCouncilProposals as any)
-            .concat(activeSignalingProposals as any)
-            .concat(activeCosmosProposals as any)
-            .map((proposal) => m(ProposalRow, { proposal })),
+        content: activeProposalContent,
         header: 'Active Proposals'
       }),
-      m(ProposalRowHeader, { title: 'Active Treasury Proposals' }),
-      !!activeTreasuryProposals.length
-      && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
-      !activeTreasuryProposals
-      && m('.no-proposals', 'None'),
-      m(ProposalRowHeader, { title: 'Inactive Proposals' }),
-      m(List, { class: 'inactive-proposals' }, [
-        !!inactiveDemocracyReferenda.length
-        && inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
-        !!inactiveDemocracyProposals.length
-        && inactiveDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!inactiveCouncilProposals.length
-        && inactiveCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!inactiveSignalingProposals.length
-        && inactiveSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!inactiveCosmosProposals.length
-        && inactiveCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !inactiveDemocracyReferenda
-        && !inactiveDemocracyProposals
-        && !inactiveCouncilProposals
-        && !inactiveSignalingProposals
-        && !inactiveCosmosProposals
-        && !inactiveMolochProposals
-        && m('.no-proposals', 'None'),
-      ]),
-      m(ProposalRowHeader, { title: 'Inactive Treasury Proposals' }),
-      !!inactiveTreasuryProposals.length
-      && inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),
-      !inactiveTreasuryProposals
-      && m('.no-proposals', 'None'),
-
+      m(Listing, {
+        content: activeTreasuryContent,
+        header: 'Active Treasury Proposals'
+      }),
+      m(Listing, {
+        content: inactiveProposalContent,
+        header: 'Inactive Proposals'
+      }),
+      m(Listing, {
+        content: inactiveTreasuryContent,
+        header: 'Inactive Treasury Proposals'
+      })
     ]);
   }
 };

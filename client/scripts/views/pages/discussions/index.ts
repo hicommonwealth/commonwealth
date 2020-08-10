@@ -242,12 +242,14 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           ? m(EmptyTagPlaceholder, { communityName })
           : m(Listing, {
             content: getRecentPostsSortedByWeek(),
-            columnLabels: [
-              ListingHeaderCols.TITLE,
-              ListingHeaderCols.GALLERY,
-              ListingHeaderCols.LIKES,
-              ListingHeaderCols.ACTIVITY
-            ],
+            header: m(ListingHeader, {
+              metadata: [
+                ListingHeaderCols.TITLE,
+                ListingHeaderCols.GALLERY,
+                ListingHeaderCols.LIKES,
+                ListingHeaderCols.ACTIVITY
+              ]
+            }),
           }),
         // TODO: Incorporate infinite scroll into generic Listing component
         vnode.state.postsDepleted
