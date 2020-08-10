@@ -84,7 +84,7 @@ const MergeAccountsWell: m.Component<{}, {address1: Account<any>; address2: Acco
       m(Button, {
         label: 'Confirm?',
         onclick: async () => {
-          if (!vnode.state.address1 || !vnode.state.address2) return;
+          if (!vnode.state.address1 || !vnode.state.address2) {console.dir('no!'); return; };
           const status = await getSignatureFromAccount(vnode.state.address1, vnode.state.address2, 'Merge Verification');
         },
       })

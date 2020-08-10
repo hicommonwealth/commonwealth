@@ -13,6 +13,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import { Button } from 'construct-ui';
 
 enum SignForAccountSteps {
   Step1SelectWallet,
@@ -63,48 +64,48 @@ const SubstrateAccountSigning: m.Component<{
   errorCallback: Function,
 }, { signing }> = {
   view: (vnode) => {
-    const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
-    return m('.SubstrateAccountSigning', {
-      onclick: async (e) => {
-        e.preventDefault();
-
-        try {
-          const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
-          vnode.state.signing = true;
-          m.redraw();
-
-          const token = account.validationToken;
-          const payload: SignerPayloadRaw = {
-            address: account.address,
-            data: stringToHex(token),
-            type: 'bytes',
-          };
-          const signature = (await signer.signRaw(payload)).signature;
-          const verified = await account.isValidSignature(token, signature);
-
-          if (!verified) {
+    const { account, message, accountVerifiedCallback, errorCallback } = vnode.attrs;
+    console.dir('Substrate Account Siging Component Rendered');
+    return m('.SubstrateAccountSigning', [
+      m('p', `Please that you would like to merge the contents from ${account.address}.`),
+      m(Button, {
+        label: 'Open Polkadot.js to confirm',
+        onclick: async (e) => {
+          e.preventDefault();
+          try {
+            console.dir('1');
+            await (app.chain as Substrate).webWallet.enable();
+            const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
+            console.log('signer: ', signer);
+            vnode.state.signing = true;
+            m.redraw();
+  
+            const payload: SignerPayloadRaw = {
+              address: account.address,
+              data: stringToHex(message),
+              type: 'bytes',
+            };
+            console.dir('2');
+            const signature = (await signer.signRaw(payload)).signature;
+            console.dir('3');
+            console.log('signature: ', signature);
+            const verified = await account.isValidSignature(message, signature);
+            console.log('verified: ', verified);
+  
+            if (!verified) {
+              vnode.state.signing = false;
+              errorCallback('Verification failed.');
+            }
+            accountVerifiedCallback(signature);
+          } catch (err) {
+            // catch when the user rejects the sign message prompt
             vnode.state.signing = false;
+            console.dir(err);
             errorCallback('Verification failed.');
           }
-          account.validate(signature).then(() => {
-            vnode.state.signing = false;
-            accountVerifiedCallback(signature);
-          }, (err) => {
-            vnode.state.signing = false;
-            errorCallback('Verification failed.');
-          }).then(() => {
-            m.redraw();
-          }).catch((err) => {
-            vnode.state.signing = false;
-            errorCallback('Verification failed.');
-          });
-        } catch (err) {
-          // catch when the user rejects the sign message prompt
-          vnode.state.signing = false;
-          errorCallback('Verification failed.');
         }
-      }
-    });
+      }),
+    ]);
   },
 };
 
@@ -126,6 +127,7 @@ const AccountSigningModal = {
     const account1: Account<any> = vnode.attrs.account1;
     const account2: Account<any> = vnode.attrs.account2;
     const message = `Confirming that I would like to move Commonwealth data from ${account1.address} to ${account2.address}`;
+    console.dir('Address Signing Modal Rendered');
     return m('.AccountSigningModal', [
       m('.compact-modal-title', [
         m('h3', vnode.attrs.title || 'Signature requested'),
