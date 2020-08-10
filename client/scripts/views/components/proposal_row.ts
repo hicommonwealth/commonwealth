@@ -20,6 +20,7 @@ import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/
 import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
 import Row from './row';
+import UserGallery from './widgets/user_gallery';
 
 export const formatProposalHashShort = (pHash : string) => {
   if (!pHash) return;
@@ -283,12 +284,11 @@ const ProposalRow: m.Component<IRowAttrs> = {
           : null;
 
     const rowMetadata = [
-      m('span.proposal-comments', [
-        nComments,
-        m(Icon, {
-          name: Icons.MESSAGE_SQUARE
-        })
-      ]),
+      m(UserGallery, {
+        tooltip: true,
+        avatarSize: 24,
+        users: app.comments.uniqueCommenters(proposal)
+      }),
       m(ReactionButton, {
         post: proposal,
         type: ReactionType.Like,
@@ -303,6 +303,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
 
     const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)
       ? m(Row, {
+        class: 'ProposalRow',
         contentLeft: {
           header: rowHeader,
           subheader: rowSubheader,
@@ -316,20 +317,20 @@ const ProposalRow: m.Component<IRowAttrs> = {
       : null;
 
     const treasuryProposal = (slug === ProposalType.SubstrateTreasuryProposal)
-      ? [
-        m('.proposal-row-title', proposal.title),
-        m(Grid, { class: '.proposal-row-grid' }, [
+      ? m('.TreasuryRow', [
+        m('.treasury-row-title', proposal.title),
+        m(Grid, [
           m(Col, { span: 4 }, [
-            m('.proposal-row-subheading', 'Value'),
-            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
+            m('.treasury-row-subheading', 'Value'),
+            m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
           ]),
           m(Col, { span: 4 }, [
-            m('.proposal-row-subheading', 'Bond'),
-            m('.proposal-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
+            m('.treasury-row-subheading', 'Bond'),
+            m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
           ]),
           m(Col, { span: 4 }, [
-            m('.proposal-row-subheading', 'Author'),
-            m('.proposal-row-metadata .proposal-user', [
+            m('.treasury-row-subheading', 'Author'),
+            m('.treasury-row-metadata .treasury-user', [
               m(User, {
                 user: new AddressInfo(
                   null,
@@ -341,7 +342,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
                 tooltip: true,
               }),
             ]),
-            m('.proposal-row-metadata .proposal-user-mobile', [
+            m('.treasury-row-metadata .treasury-user-mobile', [
               m(User, {
                 user: new AddressInfo(
                   null,
@@ -355,7 +356,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
             ]),
           ])
         ])
-      ]
+      ])
       : null;
 
     return regularProposal || treasuryProposal;

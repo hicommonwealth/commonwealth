@@ -16,14 +16,14 @@ export enum ListingHeaderCols {
 
 interface IListingAttrs {
   content: Vnode[];
-  columnLabels: ListingHeaderCols[]; // Ordered array of header labels, e.g. ['title', 'replies']
+  header: any;
 }
 
 const Listing: m.Component<IListingAttrs> = {
   view: (vnode) => {
-    const { content, columnLabels } = vnode.attrs;
+    const { header, content } = vnode.attrs;
     return m('.Listing', [
-      m(ListingHeader, { metadata: columnLabels }),
+      header,
       content
     ]);
   }

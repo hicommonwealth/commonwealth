@@ -23,6 +23,7 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import TagCaratMenu from './tag_carat_menu';
 import Listing, { ListingHeaderCols } from '../listing';
+import ListingHeader from '../../components/listing_header';
 
 // const DiscussionRowHeader = {
 //   view: (vnode) => {
@@ -142,12 +143,14 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         if (list.length > 0) {
           return m(Listing, {
             content: list,
-            columnLabels: [
-              ListingHeaderCols.TITLE,
-              ListingHeaderCols.GALLERY,
-              ListingHeaderCols.LIKES,
-              ListingHeaderCols.ACTIVITY
-            ],
+            header: m(ListingHeader, {
+              metadata: [
+                ListingHeaderCols.TITLE,
+                ListingHeaderCols.GALLERY,
+                ListingHeaderCols.LIKES,
+                ListingHeaderCols.ACTIVITY
+              ]
+            }),
           });
         }
       }

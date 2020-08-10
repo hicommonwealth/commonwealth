@@ -24,6 +24,7 @@ import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import NewProposalPage from 'views/pages/new_proposal/index';
 import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
+import Listing from './listing';
 
 const ProposalRowHeader: m.Component<{ title: string }> = {
   view: (vnode) => {
@@ -186,26 +187,22 @@ const ProposalsPage: m.Component<{}> = {
           ]),
         ]),
       ]),
-      m(ProposalRowHeader, { title: 'Active Proposals' }),
-      m(List, { class: 'active-proposals' }, [
-        !!activeDemocracyReferenda.length
-        && activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal })),
-        !!activeDemocracyProposals.length
-        && activeDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!activeCouncilProposals.length
-        && activeCouncilProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!activeSignalingProposals.length
-        && activeSignalingProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !!activeCosmosProposals.length
-        && activeCosmosProposals.map((proposal) => m(ProposalRow, { proposal })),
-        !activeDemocracyReferenda
-        && !activeDemocracyProposals
-        && !activeCouncilProposals
-        && !activeSignalingProposals
-        && !activeCosmosProposals
-        && !activeMolochProposals
-        && m('.no-proposals', 'None'),
-      ]),
+      m(Listing, {
+        content: !activeDemocracyReferenda
+          && !activeDemocracyProposals
+          && !activeCouncilProposals
+          && !activeSignalingProposals
+          && !activeCosmosProposals
+          && !activeMolochProposals
+          ? [ m('.no-proposals', 'None') ]
+          : activeDemocracyReferenda
+            .concat(activeDemocracyProposals as any)
+            .concat(activeCouncilProposals as any)
+            .concat(activeSignalingProposals as any)
+            .concat(activeCosmosProposals as any)
+            .map((proposal) => m(ProposalRow, { proposal })),
+        header: 'Active Proposals'
+      }),
       m(ProposalRowHeader, { title: 'Active Treasury Proposals' }),
       !!activeTreasuryProposals.length
       && activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal })),

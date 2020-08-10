@@ -51,10 +51,74 @@ $text-size-item-meta: 17px;
 }
 
 .ProposalRow {
-    display: flex;
-    padding: 12px 0;
+    .row-left {
+        .row-header a {
+            word-break: break-word;
+            text-overflow: ellipsis;
+        }
+        .row-subheader {
+
+        }
+    }
+    .row-right {
+
+    }
+}
+
+.TreasuryRow {
+    display: block;
+    padding: 12px 20px;
+    margin: 0 -20px;
     cursor: pointer;
 
+    .treasury-row-title {
+        color: $text-color-dark;
+        font-size: $text-size-item-header;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .treasury-row-subheading {
+        font-size: 0.94rem;
+        font-weight: 500;
+        margin-bottom: 3px;
+        line-height: 1.2;
+        text-overflow: ellipsis;
+        color: $text-color-lightest;
+    }
+    .treasury-row-metadata {
+        color: $text-color-lightest;
+        font-size: $text-size-item-meta;
+        display: flex;
+        @include xs-max {
+            display: block;
+        }
+        .metadata-divider {
+            padding: 0 5px;
+        }
+        .User a {
+            margin-top: 4px;
+            color: #bdbdbd;
+            .username {
+                color: #bdbdbd;
+                font-weight: 400;
+            }
+        }
+        &.treasury-user-mobile {
+            display: none;
+            color: #bdbdbd;
+            .user-display-name username {
+                position: relative;
+                color: #bdbdbd;
+                font-weight: 400;
+                top: 2px;
+            }
+        }
+    }
+}
+
+
+
+.ProposalRow {
     .proposal-pre {
         margin-top: 4px;
         @include xs-max {
@@ -81,60 +145,7 @@ $text-size-item-meta: 17px;
         @include xs-max {
             display: block;
         }
-
-        .proposal-row-title {
-            font-size: $text-size-item-header;
-            font-weight: 500;
-            margin-bottom: 3px;
-            word-break: break-word;
-            line-height: 1.2;
-            text-overflow: ellipsis;
-            color: $text-color-dark;
-        }
-
-        .proposal-row-subheading {
-            font-size: 0.94rem;
-            font-weight: 500;
-            margin-bottom: 3px;
-            word-break: break-word;
-            line-height: 1.2;
-            text-overflow: ellipsis;
-            color: #bdbdbd;
-        }
-
-        .proposal-row-metadata {
-            color: $text-color-lightest;
-            font-size: $text-size-item-meta;
-            display: flex;
-
-            @include xs-max {
-                display: block;
-            }
-
-            .metadata-divider {
-                padding: 0 5px;
-            }
-
-        }
-    
-        .proposal-user {
-            margin-top: 4px;
-            color: #bdbdbd;
-            .username {
-                color: #bdbdbd;
-                font-weight: 400;
-            }
-        }
-        .proposal-user-mobile {
-            display: none;
-            color: #bdbdbd;
-            .user-display-name username {
-                position: relative;
-                color: #bdbdbd;
-                font-weight: 400;
-                top: 2px;
-            }
-        }
+        
     }
     // right
     .proposal-row-right {
@@ -152,15 +163,6 @@ $text-size-item-meta: 17px;
             .cui-icon {
                 color: inherit;
             }
-        }
-        .ReactionButton {
-            margin-left: 48px;
-        }
-        .proposal-timestamp {
-            min-width: 80px;
-            padding-left: 14px;
-            text-align: right;
-            font-size: $text-size-item-meta;
         }
         .proposal-row-right-text {
             padding-top: 4px;

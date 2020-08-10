@@ -7,6 +7,8 @@ $text-size-item-meta: 17px;
     display: flex;
     padding: 12px 20px;
     margin: 0 -20px;
+    cursor: pointer;
+
     &:hover {
         background: $background-color-white-hover;
     }
@@ -31,6 +33,7 @@ $text-size-item-meta: 17px;
             color: $text-color-light;
             font-size: $text-size-item-meta;
             margin-top: 2px;
+            line-height: 1.2;
         }
     }
     .row-right {
