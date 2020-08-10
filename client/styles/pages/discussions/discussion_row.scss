@@ -5,9 +5,6 @@ $text-size-item-meta: 17px;
 $discussion-meta-padding: 18px;
 
 .DiscussionRow {
-    display: block;
-    margin: 0 -20px;
-
     .row-left {
         .row-subheader {
             // Styling specific to DiscussionRow subheader content
@@ -50,29 +47,6 @@ $discussion-meta-padding: 18px;
             margin-left: 10px;
             .cui-tag .cui-icon {
                 margin-right: 3px;
-            }
-        }
-        .UserGallery {
-            min-width: 100px;
-            padding-left: 10px;
-            padding-right: 20px;
-            text-align: right;
-            white-space: nowrap;
-        }
-        .ReactionButton {
-            margin-left: 48px;
-        }
-        .last-updated {
-            min-width: 80px;
-            padding-left: 14px;
-            text-align: right;
-            font-size: $text-size-item-meta;
-            &.older {
-                min-width: 116px;
-            }
-            a {
-                font-size: $text-size-item-meta;
-                color: $text-color-light;
             }
         }
         .discussion-row-menu {

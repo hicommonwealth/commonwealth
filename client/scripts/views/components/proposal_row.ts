@@ -296,7 +296,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
       }),
       createdAt
       && createdAt instanceof moment
-      && m('.proposal-timestamp', moment().diff(proposal.createdAt, 'days') > 30
+      && m('.last-updated', moment().diff(proposal.createdAt, 'days') > 30
         ? proposal.createdAt.format('MMM  D')
         : proposal.createdAt.fromNow())
     ];
