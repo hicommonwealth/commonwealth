@@ -7,10 +7,10 @@ $text-size-item-meta: 17px;
     display: flex;
     padding: 12px 0;
     .row-left {
+        line-height: 1.1;
+        flex: 1;
         .row-header,
         .row-header a {
-            line-height: 1.1;
-            flex: 1;
             color: $text-color-dark;
             font-size: $text-size-item-header;
             text-decoration: none;
@@ -22,7 +22,8 @@ $text-size-item-meta: 17px;
                 stroke: $text-color-light;
             }
         }
-        .row-subheader {
+        .row-subheader,
+        .row-subheader a {
             color: $text-color-light;
             font-size: $text-size-item-meta;
             margin-top: 2px;

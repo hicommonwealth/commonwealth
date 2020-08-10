@@ -99,9 +99,19 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       app.isLoggedIn() && m('.discussion-row-menu', [
         m(DiscussionRowMenu, { proposal }),
       ]),
+      proposal.readOnly && m('.discussion-locked', [
+        m(Tag, {
+          size: 'xs',
+          label: [
+            m(Icon, { name: Icons.LOCK, size: 'xs' }),
+            ' Locked'
+          ],
+        }),
+      ]),
     ];
 
     return m(Row, {
+      class: 'DiscussionRow',
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
@@ -113,17 +123,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
         m.route.set(discussionLink);
       },
     });
-
-  // m('.discussion-top-right', [
-  //   proposal.readOnly && m('.discussion-locked', [
-  //     m(Tag, {
-  //       size: 'xs',
-  //       label: [
-  //         m(Icon, { name: Icons.LOCK, size: 'xs' }),
-  //         ' Locked'
-  //       ],
-  //     }),
-  //   ]),
   }
 };
 

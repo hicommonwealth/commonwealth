@@ -9,6 +9,7 @@ import app from 'state';
 interface IRowAttrs {
   contentLeft: IContentLeft;
   metadata: Vnode[];
+  class?: string;
   key?: number;
   onclick?: Function;
 }
@@ -24,6 +25,7 @@ const Row: m.Component<IRowAttrs> = {
     const attrs = {};
     if (onclick) attrs['onclick'] = onclick;
     if (key) attrs['key'] = key;
+    if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
     return m('.Row', attrs, [
       m('.row-left', [
         m('.row-header', contentLeft.header),

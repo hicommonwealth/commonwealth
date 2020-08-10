@@ -19,97 +19,74 @@ $discussion-meta-padding: 18px;
         }
     }
 
-    .Row {
-        .row-left {
-            .subheader {
-                // Styling specific to DiscussionRow subheader content
-                a.proposal-tag {
-                    margin-right: $discussion-meta-padding;
-                    @include proposal-tag-inline;
-                    color: $text-color-light;
+    .row-left {
+        .subheader {
+            // Styling specific to DiscussionRow subheader content
+            a.proposal-tag {
+                margin-right: $discussion-meta-padding;
+                @include proposal-tag-inline;
+                color: $text-color-light;
+            }
+            .User a {
+                display: inline-block;
+                text-decoration: none;
+                color: $text-color-light;
+                &:hover {
+                    color: darken($text-color-light, 8%);
+                    text-decoration: underline;
                 }
-                .User a {
-                    display: inline-block;
-                    text-decoration: none;
-                    color: $text-color-light;
-                    &:hover {
-                        color: darken($text-color-light, 8%);
-                        text-decoration: underline;
-                    }
-                    a.user-display-name {
-                        color: $theme-base-color;
-                    }
-                }
-                .external-discussion-link {
-                    display: inline;
-                    // TODO: Investigate $discussion-meta-padding
-                    margin-right: $discussion-meta-padding;
+                a.user-display-name {
+                    color: $theme-base-color;
                 }
             }
-        }
-        .row-right {
-
+            .external-discussion-link {
+                display: inline;
+                // TODO: Investigate $discussion-meta-padding
+                margin-right: $discussion-meta-padding;
+            }
         }
     }
-
-    // content
-    .discussion-top {
-        .discussion-top-left {
-            .discussion-meta {
-
-                
-                
-                a.discussion-created, a.discussion-replies {
-                    text-decoration: none;
-                    color: $text-color-light;
-                    &:hover {
-                        color: darken($text-color-light, 8%);
-                        text-decoration: underline;
-                    }
-                }
+    .row-right {
+        .discussion-locked {
+            margin-left: 10px;
+            .cui-tag .cui-icon {
+                margin-right: 3px;
             }
         }
-        .discussion-top-right {
-            // display: flex;
-            // align-items: center;
-            // padding-left: 10px;
-            // .UserGallery {
-            //     .overflow-users {
-            //         font-size: 13.5px;
-            //     }
-            // }
-            .discussion-locked {
-                margin-left: 10px;
-                .cui-tag .cui-icon {
-                    margin-right: 3px;
-                }
+        .UserGallery {
+            min-width: 100px;
+            padding-left: 10px;
+            padding-right: 20px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .ReactionButton {
+            margin-left: 48px;
+        }
+        .discussion-last-updated {
+            min-width: 80px;
+            padding-left: 14px;
+            text-align: right;
+            font-size: $text-size-item-meta;
+            &.older {
+                min-width: 116px;
             }
-            .discussion-commenters {
-                min-width: 100px;
-                padding-left: 10px;
-                padding-right: 20px;
-                text-align: right;
-                white-space: nowrap;
-            }
-            .ReactionButton {
-                margin-left: 48px;
-            }
-            .discussion-last-updated {
-                min-width: 80px;
-                padding-left: 14px;
-                text-align: right;
+            a {
                 font-size: $text-size-item-meta;
-                &.older {
-                    min-width: 116px;
-                }
-                a {
-                    font-size: $text-size-item-meta;
-                    color: $text-color-light;
-                }
-            }
-            .discussion-row-menu {
-                width: 28px;
+                color: $text-color-light;
             }
         }
+        .discussion-row-menu {
+            width: 28px;
+        }
     }
+
+    // a.discussion-created, a.discussion-replies {
+    //     text-decoration: none;
+    //     color: $text-color-light;
+    //     &:hover {
+    //         color: darken($text-color-light, 8%);
+    //         text-decoration: underline;
+    //     }
+    // }
 }
