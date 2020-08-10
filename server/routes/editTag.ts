@@ -49,8 +49,8 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
   try {
     const tag = await models.OffchainTag.findOne({ where: { id } });
     if (!tag) return next(new Error(Errors.TagNotFound));
-    if (description) tag.description = description;
     if (name) tag.name = name;
+    if (name || description) tag.description = description;
     await tag.save();
 
     if (featured_order) {

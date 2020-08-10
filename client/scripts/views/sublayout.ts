@@ -9,9 +9,15 @@ import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
 
-const Sublayout: m.Component<{ class: string, title?: string, showNewButton?: boolean, rightSidebar? }> = {
+const Sublayout: m.Component<{
+  class: string,
+  title?: string,
+  description?: string,
+  showNewButton?: boolean,
+  rightSidebar?
+}> = {
   view: (vnode) => {
-    const { title, rightSidebar, showNewButton } = vnode.attrs;
+    const { title, description, rightSidebar, showNewButton } = vnode.attrs;
 
     const sublayoutHeaderRight = m('.sublayout-header-right', [
       m(LoginSelector),                                                 // login selector
@@ -28,9 +34,10 @@ const Sublayout: m.Component<{ class: string, title?: string, showNewButton?: bo
       m(Grid, { class: 'sublayout-grid' }, [
         rightSidebar ? [
           m(Col, { span: 9, class: 'sublayout-grid-col sublayout-grid-col-narrow' }, [
-            title && m('.sublayout-header', [
+            (title || description) && m('.sublayout-header', [
               m('.sublayout-header-left', [
-                m('h4.sublayout-header-heading', title),
+                title && m('h4.sublayout-header-heading', title),
+                description && m('.sublayout-header-description', description),
               ]),
             ]),
             m('.sublayout-body', [
@@ -50,6 +57,7 @@ const Sublayout: m.Component<{ class: string, title?: string, showNewButton?: bo
             m('.sublayout-header', [
               m('.sublayout-header-left', [
                 title && m('h4.sublayout-header-heading', title),
+                description && m('.sublayout-header-description', description),
               ]),
               sublayoutHeaderRight,
             ]),

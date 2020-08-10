@@ -73,7 +73,7 @@ const EditTagModal : m.Component<{
               vnode.state.form.name = value;
             },
           }),
-          m(TextareaFormField, {
+          m(TextInputFormField, {
             title: 'Description',
             options: {
               class: 'tag-form-description',

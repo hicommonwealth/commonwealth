@@ -63,11 +63,11 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
+    const { tag } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: 'Discussions', narrow: true });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: tag || 'Discussions', narrow: true });
 
-    const { tag } = vnode.attrs;
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
       .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
 
@@ -245,9 +245,17 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       ]);
     };
 
+    let tagDescription;
+    if (tag && app.activeId()) {
+      const tags = app.tags.getByCommunity(app.activeId());
+      const tagObject = tags.find((t) => t.name === tag);
+      tagDescription = tagObject?.description;
+    }
+
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: 'Discussions',
+      title: tag || 'Discussions',
+      description: tagDescription,
       showNewButton: true,
     }, [
       (app.chain || app.community) && [
