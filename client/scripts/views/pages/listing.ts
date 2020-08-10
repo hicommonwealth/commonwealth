@@ -23,7 +23,7 @@ const Listing: m.Component<IListingAttrs> = {
   view: (vnode) => {
     const { content, columnLabels } = vnode.attrs;
     return m('.Listing', [
-      m(ListingHeader, columnLabels),
+      m(ListingHeader, { metadata: columnLabels }),
       content
     ]);
   }

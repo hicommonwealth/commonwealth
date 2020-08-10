@@ -1,0 +1,17 @@
+.Row {
+    display: flex;
+    padding: 12px 0;
+    .row-left {
+        .row-header {
+
+        }
+        .row-subheader {
+
+        }
+    }
+    .row-right {
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+    }
+}

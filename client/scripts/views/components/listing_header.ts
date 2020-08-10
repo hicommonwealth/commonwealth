@@ -1,10 +1,12 @@
+import 'components/listing_header.scss';
+
 import m from 'mithril';
 import app from 'state';
 import { ListingHeaderCols } from '../pages/listing';
 
 // title: boolean, replies: boolean, likes: boolean, activity: boolean
 
-const ListingHeader : m.Component<{ metadata: [] }> = {
+const ListingHeader : m.Component<{ metadata: ListingHeaderCols[] }> = {
   view: (vnode) => {
     // const { title, replies, likes, activity } = vnode.attrs;
     return m('.ListingHeader', vnode.attrs.metadata.map((col) => {
