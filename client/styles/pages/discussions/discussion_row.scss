@@ -2,6 +2,7 @@
 
 $text-size-item-header: 19px;
 $text-size-item-meta: 17px;
+$discussion-meta-padding: 18px;
 
 .DiscussionRow {
     display: block;
@@ -18,30 +19,10 @@ $text-size-item-meta: 17px;
         }
     }
 
-    // content
-    .discussion-top {
-        display: flex;
-        padding: 12px 0;
-        .discussion-top-left {
-            line-height: 1.1;
-            flex: 1;
-            .discussion-title a {
-                color: $text-color-dark;
-                font-size: $text-size-item-header;
-                text-decoration: none;
-                font-weight: 500;
-                .cui-icon svg {
-                    position: relative;
-                    margin-left: 2px;
-                    top: -2px;
-                    stroke: $text-color-light;
-                }
-            }
-            .discussion-meta {
-                color: $text-color-light;
-                font-size: $text-size-item-meta;
-                margin-top: 2px;
-                $discussion-meta-padding: 18px;
+    .Row {
+        .row-left {
+            .subheader {
+                // Styling specific to DiscussionRow subheader content
                 a.proposal-tag {
                     margin-right: $discussion-meta-padding;
                     @include proposal-tag-inline;
@@ -59,10 +40,25 @@ $text-size-item-meta: 17px;
                         color: $theme-base-color;
                     }
                 }
-                .discussion-link {
+                .external-discussion-link {
                     display: inline;
+                    // TODO: Investigate $discussion-meta-padding
                     margin-right: $discussion-meta-padding;
                 }
+            }
+        }
+        .row-right {
+
+        }
+    }
+
+    // content
+    .discussion-top {
+        .discussion-top-left {
+            .discussion-meta {
+
+                
+                
                 a.discussion-created, a.discussion-replies {
                     text-decoration: none;
                     color: $text-color-light;
@@ -74,14 +70,14 @@ $text-size-item-meta: 17px;
             }
         }
         .discussion-top-right {
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            .UserGallery {
-                .overflow-users {
-                    font-size: 13.5px;
-                }
-            }
+            // display: flex;
+            // align-items: center;
+            // padding-left: 10px;
+            // .UserGallery {
+            //     .overflow-users {
+            //         font-size: 13.5px;
+            //     }
+            // }
             .discussion-locked {
                 margin-left: 10px;
                 .cui-tag .cui-icon {

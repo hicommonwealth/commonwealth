@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .ListingHeader {
   display: flex;
   border-bottom: 1px solid $background-color-light;
@@ -8,16 +10,16 @@
       text-align: right;
       width: 84px;
       padding: 10px 0;
-      &.discussion-row-header-replies {
-          padding-right: 6px;
+      &.listing-header-col-1 {
+        flex: 1;
+        width: initial;
+        text-align: left;
       }
-      &.discussion-row-header-title {
-          flex: 1;
-          width: initial;
-          text-align: left;
-      }
-      &.discussion-row-menu {
-          width: 28px;
-      }
+      // &.discussion-row-header-replies {
+      //     padding-right: 6px;
+      // }
+      // &.discussion-row-menu {
+      //     width: 28px;
+      // }
   }
 }

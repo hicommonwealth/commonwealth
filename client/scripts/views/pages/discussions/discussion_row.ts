@@ -55,12 +55,26 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       + `${slugify(proposal.title)}`;
 
     const rowHeader = (propType === OffchainThreadKind.Link && proposal.url)
-      ? externalLink('a.discussion-link', proposal.url, [
+      ? externalLink('a.external-discussion-link', proposal.url, [
         proposal.title, m.trust('&nbsp;'), m(Icon, { name: Icons.EXTERNAL_LINK })
       ])
       : link('a', discussionLink, proposal.title);
 
-    const rowSubheader = null;
+    const rowSubheader = [
+      proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
+        m('span.proposal-tag-icon'),
+        m('span.proposal-tag-name', `${proposal.tag.name}`),
+      ]),
+      (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
+        `Link: ${extractDomain(proposal.url)}`
+      ]),
+      m(User, {
+        user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
+        linkify: true,
+        tooltip: true,
+        hideAvatar: true,
+      }),
+    ];
 
     const rowMetadata = [
       m(UserGallery, {
@@ -99,23 +113,6 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
         m.route.set(discussionLink);
       },
     });
-
-
-    // m('.discussion-meta', [
-    //   proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-    //     m('span.proposal-tag-icon'),
-    //     m('span.proposal-tag-name', `${proposal.tag.name}`),
-    //   ]),
-    //   (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
-    //     `Link: ${extractDomain(proposal.url)}`
-    //   ]),
-    //   m(User, {
-    //     user: new AddressInfo(null, proposal.author, proposal.authorChain, null),
-    //     linkify: true,
-    //     tooltip: true,
-    //     hideAvatar: true,
-    //   }),
-    // ]),
 
   // m('.discussion-top-right', [
   //   proposal.readOnly && m('.discussion-locked', [

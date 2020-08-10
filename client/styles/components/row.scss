@@ -1,17 +1,41 @@
+@import 'client/styles/shared';
+
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
+
 .Row {
     display: flex;
     padding: 12px 0;
     .row-left {
-        .row-header {
-
+        .row-header,
+        .row-header a {
+            line-height: 1.1;
+            flex: 1;
+            color: $text-color-dark;
+            font-size: $text-size-item-header;
+            text-decoration: none;
+            font-weight: 500;
+            .cui-icon svg {
+                position: relative;
+                margin-left: 2px;
+                top: -2px;
+                stroke: $text-color-light;
+            }
         }
         .row-subheader {
-
+            color: $text-color-light;
+            font-size: $text-size-item-meta;
+            margin-top: 2px;
         }
     }
     .row-right {
         display: flex;
         align-items: center;
         padding-left: 10px;
+        .UserGallery {
+            .overflow-users {
+                font-size: 13.5px;
+            }
+        }
     }
 }
