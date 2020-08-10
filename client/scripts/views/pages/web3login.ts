@@ -3,6 +3,7 @@ import 'pages/web3login.scss';
 import m from 'mithril';
 import { Spinner, Button } from 'construct-ui';
 import app from 'state';
+
 import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
 

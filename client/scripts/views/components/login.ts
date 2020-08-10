@@ -5,8 +5,7 @@ import $ from 'jquery';
 import { Button, Input, Form, FormGroup, PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase } from 'models';
-import { ChainIcon, CommunityIcon } from 'views/components/chain_icon';
+import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
 const Login: m.Component<{}, {
   disabled: boolean;
@@ -98,56 +97,12 @@ const Login: m.Component<{}, {
       ]),
       m(Form, { gutter: 10 }, [
         m(FormGroup, { span: 12 }, [
-          app.chain
-            ? m(Button, {
-              intent: 'primary',
-              fluid: true,
-              class: 'login-with-web3',
-              label: `Continue with ${(app.chain.chain.denom) || ''} wallet`,
-              onclick: (e) => {
-                $(e.target).trigger('modalexit');
-                m.route.set(`/${app.chain.id}/web3login`, { prev: m.route.get() });
-                const redirectRoute = m.route.get();
-                app.modals.lazyCreate('link_new_address_modal', {
-                  loggingInWithAddress: true,
-                  successCallback: () => {
-                    m.route.set(redirectRoute);
-                  }
-                });
-              }
-            })
-            : m(PopoverMenu, {
-              trigger: m(Button, {
-                intent: 'primary',
-                fluid: true,
-                class: 'login-with-web3',
-                label: 'Continue with wallet',
-              }),
-              addToStack: true,
-              class: 'LoginPopoverMenu',
-              transitionDuration: 0,
-              content: app.config.chains.getAll().sort((a, b) => {
-                return a.name.localeCompare(b.name);
-              }).map((chain) => {
-                return m(MenuItem, {
-                  label: m('.chain-login-label', [
-                    m(ChainIcon, { chain, size: 20 }),
-                    m('.chain-login-label-name', chain.name),
-                  ]),
-                  onclick: (e) => {
-                    $('.Login').trigger('modalexit');
-                    m.route.set(`/${chain.id}/web3login`, { prev: m.route.get() });
-                    const redirectRoute = m.route.get();
-                    app.modals.lazyCreate('link_new_address_modal', {
-                      loggingInWithAddress: true,
-                      successCallback: () => {
-                        m.route.set(redirectRoute);
-                      }
-                    });
-                  }
-                });
-              }),
-            }),
+          m(LoginWithWalletDropdown, {
+            label: app.chain ? `Continue with ${(app.chain.chain.denom) || ''} wallet` : 'Continue with wallet',
+            joiningChain: null,
+            joiningCommunity: null,
+            loggingInWithAddress: true,
+          }),
         ]),
       ]),
     ]);

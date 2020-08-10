@@ -225,9 +225,9 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
               class: 'section-callout',
               label: m(Callout, {
                 size: 'sm',
-                intent: 'negative',
+                intent: 'primary',
                 icon: Icons.ALERT_TRIANGLE,
-                content: 'This community has not been configured with tags yet',
+                content: 'The admin has not configured this community with tags yet',
               }),
             })
             : m(ListItem, {

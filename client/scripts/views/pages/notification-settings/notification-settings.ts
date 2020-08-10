@@ -405,7 +405,7 @@ const NotificationSettingsPage: m.Component<{}, {
   },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
-    $.post(`${app.serverUrl()}/viewSubscriptions`, {
+    $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
       vnode.state.subscriptions = [];

@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import app from 'state';
+import { isSameAccount } from 'helpers';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import {
@@ -32,11 +33,14 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
     const community = app.activeCommunityId();
     const role = app.user.getRoleInCommunity({ chain, community });
 
-    if (!role) {
+    if (!role || role.is_user_default) {
       if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
         notifySuccess('Switched account');
       }
       app.user.setActiveAccount(account);
+      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      }
       resolve();
     } else {
       $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
@@ -61,6 +65,9 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           notifySuccess('Switched account');
         }
         app.user.setActiveAccount(account);
+        if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+          app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+        }
         resolve();
       }).catch((err) => reject());
     }
@@ -179,6 +186,7 @@ export async function createUserWithSeed(seed: string): Promise<Account<any>> {
   }
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
@@ -187,6 +195,7 @@ export async function createUserWithMnemonic(mnemonic: string): Promise<Account<
   const account = (app.chain.accounts as any).fromMnemonic(mnemonic);
   const response = await createAccount(account);
   account.setValidationToken(response.result.verification_token);
+  account.setAddressId(response.result.id);
   await account.validate();
   return account;
 }
@@ -196,6 +205,7 @@ export async function createUserWithAddress(address: string, keytype?: string): 
   const response = await createAccount(account);
   const token = response.result.verification_token;
   account.setValidationToken(token);
+  account.setAddressId(response.result.id);
   return account;
 }
 

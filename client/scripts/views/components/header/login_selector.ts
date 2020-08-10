@@ -123,21 +123,24 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
     if (shouldShowHint) {
       vnode.state.showAddressSelectionHint = true;
     }
-    const wrapHint = (component) => m(Popover, {
-      class: 'login-selector-hint-popover',
-      closeOnContentClick: true,
-      closeOnOutsideClick: false,
-      transitionDuration: 0,
-      hoverCloseDelay: 0,
-      position: 'top-end',
-      onInteraction: () => {
-        vnode.state.showAddressSelectionHint = false;
-      },
-      isOpen: vnode.state.showAddressSelectionHint,
-      content: 'Select an address to start posting or commenting',
-      inline: true,
-      trigger: component
-    });
+    const wrapHint = (component) => {
+      return component;
+      // return m(Popover, {
+      //   class: 'login-selector-hint-popover',
+      //   closeOnContentClick: true,
+      //   closeOnOutsideClick: false,
+      //   transitionDuration: 0,
+      //   hoverCloseDelay: 0,
+      //   position: 'top-end',
+      //   onInteraction: () => {
+      //     vnode.state.showAddressSelectionHint = false;
+      //   },
+      //   isOpen: vnode.state.showAddressSelectionHint,
+      //   content: 'Select an address to start posting or commenting',
+      //   inline: true,
+      //   trigger: component
+      // });
+    };
 
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
@@ -187,7 +190,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: [ 'Connect ', app.chain ? `new ${app.chain.meta.chain.symbol}` : 'a new', ' address', ],
+              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'New address',
             }),
             m(MenuDivider),
           ],

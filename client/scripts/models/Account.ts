@@ -29,6 +29,7 @@ abstract class Account<C extends Coin> {
   protected mnemonic?: string;
   // validation token sent by server
   private _validationToken?: string;
+  private _addressId?: number;
 
   // A helper for encoding
   private _encoding: number;
@@ -72,6 +73,14 @@ abstract class Account<C extends Coin> {
   public setEncoding(encoding: number) {
     this._encoding = encoding;
   }
+
+  get addressId() {
+    return this._addressId;
+  }
+  public setAddressId(id: number) {
+    this._addressId = id;
+  }
+
   get validationToken() {
     return this._validationToken;
   }

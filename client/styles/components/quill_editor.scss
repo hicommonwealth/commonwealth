@@ -27,6 +27,16 @@
         line-height: 1.3;
         padding: 20px 22px 28px;
         max-height: 360px;
+        code,
+        kbd,
+        samp {
+            font-family: $monospace-fonts;
+            font-size: 0.75rem;
+            background: $background-color-light;
+            padding: 2px 5px;
+            margin: 0 1px;
+            border-radius: 3px;
+        }
         pre {
             font-family: $monospace-fonts;
             margin-bottom: 8px;
