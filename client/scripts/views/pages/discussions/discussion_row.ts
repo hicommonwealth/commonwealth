@@ -36,20 +36,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
     const proposal: OffchainThread = vnode.attrs.proposal;
     if (!proposal) return;
     const propType: OffchainThreadKind = proposal.kind;
-    const lastUpdated = app.comments.lastCommented(proposal)
-      || proposal.createdAt;
-
-    const tagSortByName = (a, b) => {
-      if (a.name > b.name) {
-        return 1;
-      } else if (a.name < b.name) {
-        return -1;
-      } else {
-        return 0;
-      }
-    };
-
-    const tagColor = '#72b483';
+    const lastUpdated = app.comments.lastCommented(proposal) || proposal.createdAt;
 
     const discussionLink = `/${app.activeId()}/proposal/${proposal.slug}/${proposal.identifier}-`
       + `${slugify(proposal.title)}`;
@@ -61,6 +48,14 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       : link('a', discussionLink, proposal.title);
 
     const rowSubheader = [
+      proposal.readOnly && m('.discussion-locked', [
+        m(Tag, {
+          size: 'xs',
+          label: [
+            m(Icon, { name: Icons.LOCK, size: 'xs' }),
+          ],
+        }),
+      ]),
       proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
         m('span.proposal-tag-icon'),
         m('span.proposal-tag-name', `${proposal.tag.name}`),
@@ -99,15 +94,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       app.isLoggedIn() && m('.discussion-row-menu', [
         m(DiscussionRowMenu, { proposal }),
       ]),
-      proposal.readOnly && m('.discussion-locked', [
-        m(Tag, {
-          size: 'xs',
-          label: [
-            m(Icon, { name: Icons.LOCK, size: 'xs' }),
-            ' Locked'
-          ],
-        }),
-      ]),
+
     ];
 
     return m(Row, {

@@ -11,18 +11,14 @@
             font-size: $text-size-item-header;
             text-decoration: none;
             font-weight: 500;
-            .cui-icon svg {
-                position: relative;
-                margin-left: 2px;
-                top: -2px;
-                stroke: $text-color-light;
-            }
         }
-        .row-subheader,
+        .row-subheader {
+            display: flex;
+            margin-top: 3px;
+        }
         .row-subheader a {
             color: $text-color-light;
             font-size: $text-size-item-meta;
-            margin-top: 2px;
             line-height: 1.2;
         }
     }
