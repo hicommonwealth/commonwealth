@@ -36,13 +36,13 @@ const sendSignatureToServer = async (
   signature: string,
   message: string
 ) => {
-  const payload = {
-    address: account1.address,
-    chain: account1.chain.id,
-    signature,
-    // message,
-    jwt: app.user.jwt,
-  };
+  // const payload = {
+  //   address: account1.address,
+  //   chain: account1.chain.id,
+  //   signature,
+  //   message,
+  //   jwt: app.user.jwt,
+  // };
 
   await $.ajax({
     url: `${app.serverUrl()}/mergeAccounts`,
@@ -51,7 +51,7 @@ const sendSignatureToServer = async (
       oldAddress: account1.address,
       newAddress: account2.address,
       signature,
-      payload,
+      message,
     },
     type: 'POST',
     success: (result) => {

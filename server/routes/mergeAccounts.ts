@@ -1,18 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 
-import { ApiRx } from '@polkadot/api';
-import { DeriveStakingValidators, DeriveAccountInfo } from '@polkadot/api-derive/types';
-import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { KeyringPair, KeyringOptions } from '@polkadot/keyring/types';
-import {
-  AccountData, Balance, BalanceLock, BalanceLockTo212, EraIndex,
-  AccountId, Exposure, Conviction, StakingLedger, Registration
-} from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
-import { mnemonicValidate } from '@polkadot/util-crypto';
+
+import Keyring from '@polkadot/keyring';
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
-import { Codec } from '@polkadot/types/types';
 
 
 import { factory, formatFilename } from '../../shared/logging';
@@ -27,31 +18,35 @@ export const Errors = {
 
 const validateSignature = async (address, signature, message) => {
   if (address.chain === 'edgeware'
-  // || address.chain === 'kusama'
+  //  || address.chain === 'kusama' // commented bc untested but should work;
+  //  || address.chain === 'polkadot'
   ) {
+    const ss58Format = address.chain === 'edgeware' ? 7
+      : address.chain === 'kusama' ? 2
+        : address.chain === 'polkadot' ? 0 : NaN;
     const signatureU8a = signature.slice(0, 2) === '0x'
       ? hexToU8a(signature)
       : hexToU8a(`0x${signature}`);
     const keyring1 = new Keyring({
       type: 'sr25519',
-      ss58Format: this._ss58Format,
+      ss58Format,
     }).addFromAddress(address.address);
     const valid = keyring1.verify(stringToU8a(message), signatureU8a);
     if (valid) return true;
     // if it fails, check if it's a keyring type issue
-    const keyring2 = (new Keyring({
+    const keyring2 = await (new Keyring({
       type: 'ed25519',
-      ss58Format: this._ss58Format,
+      ss58Format,
     })).addFromAddress(address.address);
     return keyring2.verify(stringToU8a(message), signatureU8a);
   } else if (address.chain === 'ethereum') {
-
+    return false;
   }
   return false;
 };
 
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { oldAddress, newAddress, signature, payload } = req.body;
+  const { oldAddress, newAddress, signature, message } = req.body;
 
   if (!signature) return next(new Error(Errors.NeedSignature));
 
@@ -90,9 +85,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
   // verify signature
 
   try {
-    const verified = await models.Address.verifySignature(
-      models, chain, addressToBeMerged, user.id, signature, payload
-    );
+    const verified = await validateSignature(addressToBeMerged, signature, message);
     if (!verified) return next(new Error(Errors.InvalidSignature));
   } catch {
     return next(new Error(Errors.InvalidSignature));
