@@ -339,9 +339,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
       : null;
 
     return regularProposal || treasuryProposal;
-    // TODO: Handle xs clears that buffered right-hand metadata from left-hand main 
-    // m('.proposal-row-xs-clear'),
-    // m('.clear'),
   }
 };
 

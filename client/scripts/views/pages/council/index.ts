@@ -177,7 +177,7 @@ const CouncilPage: m.Component<{}> = {
         rightColSpacing: [4],
         columnHeaders: [
           'Title',
-          'Last updated'
+          'Votes'
         ],
       }),
       // candidates

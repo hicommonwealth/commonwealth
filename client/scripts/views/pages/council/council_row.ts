@@ -34,7 +34,7 @@ const CouncillorRow: m.Component<ICollectiveMemberAttrs> = {
       ? election.backing(account).format(true)
       : votes.length);
 
-    const rowRight = [ m('.vote-count', `${votes} votes`) ];
+    const rowRight = [ m('.vote-count', `${votes.length} votes`) ];
 
     return m(Row, {
       contentLeft: {
