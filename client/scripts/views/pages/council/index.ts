@@ -23,7 +23,7 @@ import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
 import { Grid, Col } from 'construct-ui';
-import CouncillorRow from './council_row';
+import CouncilRow from './council_row';
 import ListingHeader from '../../components/listing_header';
 import Listing from '../listing';
 
@@ -170,7 +170,7 @@ const CouncilPage: m.Component<{}> = {
           ? [ m('.no-proposals', 'None') ]
           : [m('.councillors', [
             councillors.map(
-              (account) => m(CouncillorRow, { account })
+              (account) => m(CouncilRow, { account })
             ),
             m('.clear'),
           ])],
@@ -186,7 +186,7 @@ const CouncilPage: m.Component<{}> = {
           ? [ m('.no-proposals', 'None') ]
           : [
             candidates.filter(([ account ]) => !councillors.includes(account))
-              .map(([account, slot]) => m(CouncillorRow, { account })),
+              .map(([account, slot]) => m(CouncilRow, { account })),
             m('.clear'),
           ],
         rightColSpacing: [4, 6],

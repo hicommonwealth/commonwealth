@@ -272,11 +272,13 @@ const ProposalRow: m.Component<IRowAttrs> = {
         type: ReactionType.Like,
         tooltip: true
       }),
-      createdAt
-      && createdAt instanceof moment
-      && m('.last-updated', moment().diff(proposal.createdAt, 'days') > 30
-        ? proposal.createdAt.format('MMM  D')
-        : proposal.createdAt.fromNow())
+      !proposal.completed
+        ? m('.last-updated', 'Active')
+        : createdAt && createdAt instanceof moment
+          ? m('.last-updated', moment().diff(proposal.createdAt, 'days') > 30
+            ? proposal.createdAt.format('MMM  D')
+            : proposal.createdAt.fromNow())
+          : null
     ];
 
     const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)

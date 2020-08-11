@@ -13,7 +13,7 @@ interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
 }
 
-const CouncillorRow: m.Component<ICollectiveMemberAttrs> = {
+const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
   view: (vnode) => {
     if (!vnode.attrs.account) return;
     const { account } = vnode.attrs;
@@ -50,4 +50,4 @@ const CouncillorRow: m.Component<ICollectiveMemberAttrs> = {
   }
 };
 
-export default CouncillorRow;
+export default CouncilRow;
