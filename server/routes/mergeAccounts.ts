@@ -11,7 +11,7 @@ export const Errors = {
 };
 
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { oldAddress, newAddress, signature } = req.body;
+  const { oldAddress, newAddress, signature, payload } = req.body;
 
   if (!signature) return next(new Error(Errors.NeedSignature));
 
@@ -51,7 +51,7 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
 
   try {
     const verified = await models.Address.verifySignature(
-      models, chain, addressToBeMerged, user.id, signature,
+      models, chain, addressToBeMerged, user.id, signature, payload
     );
     if (!verified) return next(new Error(Errors.InvalidSignature));
   } catch {

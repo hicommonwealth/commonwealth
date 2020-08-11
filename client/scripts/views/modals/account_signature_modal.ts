@@ -36,6 +36,14 @@ const sendSignatureToServer = async (
   signature: string,
   message: string
 ) => {
+  const payload = {
+    address: account1.address,
+    chain: account1.chain.id,
+    signature,
+    // message,
+    jwt: app.user.jwt,
+  };
+
   await $.ajax({
     url: `${app.serverUrl()}/mergeAccounts`,
     data: {
@@ -43,15 +51,13 @@ const sendSignatureToServer = async (
       oldAddress: account1.address,
       newAddress: account2.address,
       signature,
-      message,
+      payload,
     },
     type: 'POST',
     success: (result) => {
-      console.dir(result);
       return result;
     },
     error: (err) => {
-      console.dir(err);
       return err;
     },
   });
@@ -73,25 +79,20 @@ const SubstrateAccountSigning: m.Component<{
         onclick: async (e) => {
           e.preventDefault();
           try {
-            console.dir('1');
             await (app.chain as Substrate).webWallet.enable();
             const signer = await (app.chain as Substrate).webWallet.getSigner(account.address);
-            console.log('signer: ', signer);
             vnode.state.signing = true;
             m.redraw();
-  
+
             const payload: SignerPayloadRaw = {
               address: account.address,
               data: stringToHex(message),
               type: 'bytes',
             };
-            console.dir('2');
             const signature = (await signer.signRaw(payload)).signature;
-            console.dir('3');
-            console.log('signature: ', signature);
+            console.dir(signature);
             const verified = await account.isValidSignature(message, signature);
-            console.log('verified: ', verified);
-  
+
             if (!verified) {
               vnode.state.signing = false;
               errorCallback('Verification failed.');
@@ -127,7 +128,6 @@ const AccountSigningModal = {
     const account1: Account<any> = vnode.attrs.account1;
     const account2: Account<any> = vnode.attrs.account2;
     const message = `Confirming that I would like to move Commonwealth data from ${account1.address} to ${account2.address}`;
-    console.dir('Address Signing Modal Rendered');
     return m('.AccountSigningModal', [
       m('.compact-modal-title', [
         m('h3', vnode.attrs.title || 'Signature requested'),
@@ -150,7 +150,6 @@ const AccountSigningModal = {
 export const getSignatureFromAccount = (account1: Account<any>, account2: Account<any>, title?: string,) => {
   return new Promise((resolve, reject) => {
     let complete = false;
-    console.log(account1);
     if (account1.chain.id !== 'edgeware') { resolve(); return; }
     app.modals.create({
       modal: AccountSigningModal,
