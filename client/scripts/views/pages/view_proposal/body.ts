@@ -13,7 +13,6 @@ import {
   Account,
   Profile,
   ChainBase,
-  OffchainTag
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 

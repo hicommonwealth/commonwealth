@@ -1,39 +1,39 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
-import { TagStore } from 'stores';
-import { OffchainTag } from 'models';
+import { TopicStore } from 'stores';
+import { OffchainTopic } from 'models';
 import app from 'state';
 
-const modelFromServer = (tag) => {
-  return new OffchainTag(
-    tag.name,
-    tag.id,
-    tag.description,
-    tag.community_id,
-    tag.chain_id,
+const modelFromServer = (topic) => {
+  return new OffchainTopic(
+    topic.name,
+    topic.id,
+    topic.description,
+    topic.community_id,
+    topic.chain_id,
   );
 };
 
-class TagsController {
-  private _store: TagStore = new TagStore();
+class TopicsController {
+  private _store: TopicStore = new TopicStore();
   private _initialized: boolean = false;
   public get store() { return this._store; }
   public get initialized() { return this._initialized; }
   public getByIdentifier(id) { return this._store.getById(id); }
   public getByCommunity(communityId) { return this._store.getByCommunity(communityId); }
   public getByName(name, communityId) { return this._store.getByName(name, communityId); }
-  public addToStore(tag: OffchainTag) { return this._store.add(modelFromServer(tag)); }
+  public addToStore(topic: OffchainTopic) { return this._store.add(modelFromServer(topic)); }
 
-  public async edit(tag: OffchainTag, featured_order?: boolean) {
+  public async edit(topic: OffchainTopic, featured_order?: boolean) {
     try {
-      // TODO: Change to PUT /tag
-      const response = await $.post(`${app.serverUrl()}/editTag`, {
-        'id': tag.id,
-        'community': tag.communityId,
-        'chain': tag.chainId,
-        'name': tag.name,
-        'description': tag.description,
+      // TODO: Change to PUT /topic
+      const response = await $.post(`${app.serverUrl()}/editTopic`, {
+        'id': topic.id,
+        'community': topic.communityId,
+        'chain': topic.chainId,
+        'name': topic.name,
+        'description': topic.description,
         'featured_order': featured_order,
         'address': app.user.activeAccount.address,
         'jwt': app.user.jwt
@@ -45,20 +45,20 @@ class TagsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to edit tag');
+      console.log('Failed to edit topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to edit tag');
+        : 'Failed to edit topic');
     }
   }
 
-  public async update(threadId: number, tagName: string, tagId?: number) {
+  public async update(threadId: number, topicName: string, topicId?: number) {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateTags`, {
+      const response = await $.post(`${app.serverUrl()}/updateTopics`, {
         'jwt': app.user.jwt,
         'thread_id': threadId,
-        'tag_id': tagId,
-        'tag_name': tagName,
+        'topic_id': topicId,
+        'topic_name': topicName,
         'address': app.user.activeAccount.address,
       });
       const result = modelFromServer(response.result);
@@ -68,10 +68,10 @@ class TagsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to update tag');
+      console.log('Failed to update topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update tag');
+        : 'Failed to update topic');
     }
   }
 
@@ -80,8 +80,8 @@ class TagsController {
       const chainOrCommObj = (app.activeChainId())
         ? { 'chain': app.activeChainId() }
         : { 'community': app.activeCommunityId() };
-      // TODO: Change to POST /tag
-      const response = await $.post(`${app.serverUrl()}/createTag`, {
+      // TODO: Change to POST /topic
+      const response = await $.post(`${app.serverUrl()}/createTopic`, {
         ...chainOrCommObj,
         'name': name,
         'description': description,
@@ -94,35 +94,35 @@ class TagsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to edit tag');
+      console.log('Failed to edit topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to edit tag');
+        : 'Failed to edit topic');
     }
   }
 
-  public async remove(tag) {
+  public async remove(topic) {
     try {
-      // TODO: Change to DELETE /tag
-      const response = await $.post(`${app.serverUrl()}/deleteTag`, {
-        'id': tag.id,
-        'community': tag.communityId,
-        'chain': tag.chainId,
+      // TODO: Change to DELETE /topic
+      const response = await $.post(`${app.serverUrl()}/deleteTopic`, {
+        'id': topic.id,
+        'community': topic.communityId,
+        'chain': topic.chainId,
         'jwt': app.user.jwt
       });
-      this._store.remove(this._store.getById(tag.id));
+      this._store.remove(this._store.getById(topic.id));
     } catch (err) {
-      console.log('Failed to delete tag');
+      console.log('Failed to delete topic');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to delete tag');
+        : 'Failed to delete topic');
     }
   }
 
   public async refreshAll(chainId, communityId, reset = false) {
     try {
-      // TODO: Change to GET /tags
-      const response = await $.get(`${app.serverUrl()}/bulkTags`, {
+      // TODO: Change to GET /topics
+      const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
         chain: chainId || app.activeChainId(),
         community: communityId || app.activeCommunityId(),
       });
@@ -132,26 +132,26 @@ class TagsController {
       if (reset) {
         this._store.clear();
       }
-      const tags = (app.chain) ? response.result.filter((tag) => !tag.communityId) : response.result;
-      tags.forEach((t) => this._store.add(modelFromServer(t)));
+      const topics = (app.chain) ? response.result.filter((topic) => !topic.communityId) : response.result;
+      topics.forEach((t) => this._store.add(modelFromServer(t)));
       this._initialized = true;
     } catch (err) {
-      console.log('Failed to load offchain tags');
+      console.log('Failed to load offchain topics');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Error loading offchain tags');
+        : 'Error loading offchain topics');
     }
   }
 
-  public getTagListing = (tag, activeTag) => {
-    // Iff a tag is already in the TagStore, e.g. due to app.tags.edit, it will be excluded from
-    // addition to the TagStore, since said store will be more up-to-date
-    const existing = this.getByIdentifier(tag.id);
-    if (!existing) this.addToStore(tag);
-    const { id, name, description } = existing || tag;
-    const selected = name === activeTag;
+  public getTopicListing = (topic, activeTopic) => {
+    // Iff a topic is already in the TopicStore, e.g. due to app.topics.edit, it will be excluded from
+    // addition to the TopicStore, since said store will be more up-to-date
+    const existing = this.getByIdentifier(topic.id);
+    if (!existing) this.addToStore(topic);
+    const { id, name, description } = existing || topic;
+    const selected = name === activeTopic;
     return { id, name, description, selected };
   }
 }
 
-export default TagsController;
+export default TopicsController;

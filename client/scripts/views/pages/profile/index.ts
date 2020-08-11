@@ -70,7 +70,7 @@ const threadModelFromServer = (thread) => {
     attachments,
     thread.id,
     moment(thread.created_at),
-    thread.tag,
+    thread.topic,
     thread.kind,
     thread.version_history,
     thread.community,

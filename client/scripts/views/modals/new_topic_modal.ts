@@ -1,4 +1,4 @@
-import 'modals/new_tag_modal.scss';
+import 'modals/new_topic_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -9,19 +9,19 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from 'views/modal';
 import { TextInputFormField, CheckboxFormField, TextareaFormField } from 'views/components/forms';
 
-interface INewTagModalForm {
+interface INewTopicModalForm {
   description: string,
   id: number,
   name: string,
 }
 
-const NewTagModal: m.Component<{
+const NewTopicModal: m.Component<{
   description: string,
   id: number,
   name: string,
 }, {
   error: any,
-  form: INewTagModalForm,
+  form: INewTopicModalForm,
   saving: boolean,
 }> = {
   view: (vnode) => {
@@ -31,9 +31,9 @@ const NewTagModal: m.Component<{
       vnode.state.form = { description, id, name };
     }
 
-    return m('.NewTagModal', [
+    return m('.NewTopicModal', [
       m('.compact-modal-title', [
-        m('h3', 'New tag'),
+        m('h3', 'New topic'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -41,7 +41,7 @@ const NewTagModal: m.Component<{
           m(TextInputFormField, {
             title: 'Name',
             options: {
-              class: 'tag-form-name',
+              class: 'topic-form-name',
               tabindex: 1,
               value: vnode.state?.form?.name,
               autofocus: true,
@@ -53,7 +53,7 @@ const NewTagModal: m.Component<{
           m(TextareaFormField, {
             title: 'Description',
             options: {
-              class: 'tag-form-description',
+              class: 'topic-form-description',
               tabindex: 2,
               value: vnode.state.form.description,
             },
@@ -72,17 +72,17 @@ const NewTagModal: m.Component<{
               e.preventDefault();
               const { name, description } = vnode.state.form;
               if (!name.trim()) return;
-              app.tags.add(name, description).then(() => {
+              app.topics.add(name, description).then(() => {
                 vnode.state.saving = false;
                 m.redraw();
                 $(e.target).trigger('modalexit');
               }).catch(() => {
-                vnode.state.error = 'Error creating tag';
+                vnode.state.error = 'Error creating topic';
                 vnode.state.saving = false;
                 m.redraw();
               });
             },
-            label: 'Create tag',
+            label: 'Create topic',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),
@@ -91,4 +91,4 @@ const NewTagModal: m.Component<{
   }
 };
 
-export default NewTagModal;
+export default NewTopicModal;

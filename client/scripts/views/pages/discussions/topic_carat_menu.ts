@@ -2,16 +2,16 @@ import m from 'mithril';
 import { PopoverMenu, MenuItem, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import EditTagModal from 'views/modals/edit_tag_modal';
+import EditTopicModal from 'views/modals/edit_topic_modal';
 
-const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> = {
+const TopicCaratMenu: m.Component<{ topic: string }, { topicEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     if (!app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })) return;
 
-    const { tag } = vnode.attrs;
-    if (!tag) return;
-    const tagObject = app.tags.getByIdentifier(tag);
+    const { topic } = vnode.attrs;
+    if (!topic) return;
+    const topicObject = app.topics.getByIdentifier(topic);
 
     return [
       m(PopoverMenu, {
@@ -21,14 +21,14 @@ const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> =
         menuAttrs: {},
         content: [
           m(MenuItem, {
-            label: 'Edit tag',
+            label: 'Edit topic',
             onclick: (e) => {
               app.modals.create({
-                modal: EditTagModal,
+                modal: EditTopicModal,
                 data: {
-                  description: tagObject.description,
-                  id: tagObject.id,
-                  name: tagObject.name,
+                  description: topicObject.description,
+                  id: topicObject.id,
+                  name: topicObject.name,
                 }
               });
             }
@@ -43,4 +43,4 @@ const TagCaratMenu: m.Component<{ tag: string }, { tagEditorIsOpen: boolean }> =
   },
 };
 
-export default TagCaratMenu;
+export default TopicCaratMenu;

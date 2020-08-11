@@ -13,7 +13,7 @@ import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
-import TagsController from './controllers/server/tags';
+import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 
@@ -41,7 +41,7 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
-  tags: TagsController;
+  topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
   // XXX: replace this with some app.chain helper
@@ -82,7 +82,7 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
-  tags: new TagsController(),
+  topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 

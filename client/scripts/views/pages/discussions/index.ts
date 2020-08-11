@@ -16,12 +16,12 @@ import { OffchainThreadKind, NodeInfo, CommunityInfo, AddressInfo } from 'models
 import { updateLastVisited } from 'controllers/app/login';
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
-import EmptyTagPlaceholder from 'views/components/empty_tag_placeholder';
+import EmptyTopicPlaceholder from 'views/components/empty_topic_placeholder';
 import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import TagCaratMenu from './tag_carat_menu';
+import TopicCaratMenu from './topic_carat_menu';
 
 const DiscussionRowHeader = {
   view: (vnode) => {
@@ -43,7 +43,7 @@ interface IDiscussionPageState {
   defaultLookback: number;
 }
 
-const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
+const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
   oncreate: (vnode) => {
     mixpanel.track('PageVisit', {
       'Page Name': 'DiscussionsPage',
@@ -63,10 +63,10 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
     $(window).on('scroll', onscroll);
   },
   view: (vnode) => {
-    const { tag } = vnode.attrs;
+    const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: tag || 'Discussions', narrow: true });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions', narrow: true });
 
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
       .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
@@ -100,7 +100,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return tsB - tsA;
     };
 
-    const getSingleTagListing = (tag_) => {
+    const getSingleTopicListing = (topic_) => {
       if (!activeEntity || !activeEntity.serverLoaded) {
         return m('.discussions-main', [
           m(ProposalsLoadingRow),
@@ -115,7 +115,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       let list = [];
       const divider = m('.LastSeenDivider', [ m('hr'), m('span', 'Last Visited'), m('hr') ]);
       const sortedThreads = app.threads.getType(OffchainThreadKind.Forum, OffchainThreadKind.Link)
-        .filter((thread) => thread.tag && thread.tag.name === tag_)
+        .filter((thread) => thread.topic && thread.topic.name === topic_)
         .sort(orderDiscussionsbyLastComment);
 
       if (sortedThreads.length > 0) {
@@ -147,7 +147,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       }
 
       return m('.discussions-main', [
-        m(EmptyTagPlaceholder, { tagName: tag }),
+        m(EmptyTopicPlaceholder, { topicName: topic }),
       ]);
     };
 
@@ -230,7 +230,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       return m('.discussions-main', [
         // m(InlineThreadComposer),
         allProposals.length === 0
-          ? m(EmptyTagPlaceholder, { communityName })
+          ? m(EmptyTopicPlaceholder, { communityName })
           : [
             m(DiscussionRowHeader),
             getRecentPostsSortedByWeek(),
@@ -245,22 +245,22 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
       ]);
     };
 
-    let tagDescription;
-    if (tag && app.activeId()) {
-      const tags = app.tags.getByCommunity(app.activeId());
-      const tagObject = tags.find((t) => t.name === tag);
-      tagDescription = tagObject?.description;
+    let topicDescription;
+    if (topic && app.activeId()) {
+      const topics = app.topics.getByCommunity(app.activeId());
+      const topicObject = topics.find((t) => t.name === topic);
+      topicDescription = topicObject?.description;
     }
 
     return m(Sublayout, {
       class: 'DiscussionsPage',
-      title: tag || 'Discussions',
-      description: tagDescription,
+      title: topic || 'Discussions',
+      description: topicDescription,
       showNewButton: true,
     }, [
       (app.chain || app.community) && [
-        tag
-          ? getSingleTagListing(tag)
+        topic
+          ? getSingleTopicListing(topic)
           : getHomepageListing(),
       ]
     ]);

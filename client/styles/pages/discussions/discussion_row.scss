@@ -42,9 +42,9 @@ $text-size-item-meta: 17px;
                 font-size: $text-size-item-meta;
                 margin-top: 2px;
                 $discussion-meta-padding: 18px;
-                a.proposal-tag {
+                a.proposal-topic {
                     margin-right: $discussion-meta-padding;
-                    @include proposal-tag-inline;
+                    @include proposal-topic-inline;
                     color: $text-color-light;
                 }
                 .User a {

@@ -4,17 +4,17 @@ import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUs
 export const Errors = {
   InvalidChainOrCommunity: 'Invalid chain or community',
   NotLoggedIn: 'Not logged in',
-  TagRequired: 'Tag name required',
+  TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
 };
 
-const createTag = async (models, req, res: Response, next: NextFunction) => {
+const createTopic = async (models, req, res: Response, next: NextFunction) => {
   const { Op } = models.sequelize;
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!chain && !community) return next(new Error(Errors.InvalidChainOrCommunity));
   if (chain && community) return next(new Error(Errors.InvalidChainOrCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.name) return next(new Error(Errors.TagRequired));
+  if (!req.body.name) return next(new Error(Errors.TopicRequired));
 
   const chainOrCommObj = community ? { offchain_community_id: community.id } : { chain_id: chain.id };
   const userAddressIds = await req.user.getAddresses().filter((addr) => !!addr.verified).map((addr) => addr.id);
@@ -36,12 +36,12 @@ const createTag = async (models, req, res: Response, next: NextFunction) => {
     ...chainOrCommObj2,
   };
 
-  const newTag = await models.OffchainTag.findOrCreate({
+  const newTopic = await models.OffchainTopic.findOrCreate({
     where: options,
     default: options,
   });
 
-  return res.json({ status: 'Success', result: newTag[0] });
+  return res.json({ status: 'Success', result: newTopic[0] });
 };
 
-export default createTag;
+export default createTopic;

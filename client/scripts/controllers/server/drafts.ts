@@ -17,7 +17,7 @@ const modelFromServer = (draft) => {
     draft.chain,
     draft.title,
     draft.body,
-    draft.tag,
+    draft.topic,
     attachments,
   );
 };
@@ -34,7 +34,7 @@ class DraftsController {
   public async create(
     title: string,
     body: string,
-    tagName: string,
+    topicName: string,
     attachments?: string[],
   ) {
     try {
@@ -45,7 +45,7 @@ class DraftsController {
         'community': app.activeCommunityId(),
         'title': title,
         'body': body,
-        'tag': tagName,
+        'topic': topicName,
         'attachments[]': attachments,
         'jwt': app.user.jwt,
       });
@@ -63,7 +63,7 @@ class DraftsController {
     id: number,
     title: string,
     body: string,
-    tagName: string,
+    topicName: string,
     attachments?: string[],
   ) {
     // Todo: handle attachments
@@ -78,7 +78,7 @@ class DraftsController {
           'id': id,
           'title': title,
           'body': body,
-          'tag': tagName,
+          'topic': topicName,
           'attachments[]': attachments,
           'jwt': app.user.jwt
         }

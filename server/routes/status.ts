@@ -13,7 +13,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     chains,
     nodes,
     publicCommunities,
-    offchainTags,
+    offchainTopics,
     contractCategories,
     notificationCategories
   ] = await Promise.all([
@@ -21,8 +21,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       where: { active: true },
       include: [
         {
-          model: models.OffchainTag,
-          as: 'tags',
+          model: models.OffchainTopic,
+          as: 'topics',
         },
       ]
     }),
@@ -37,11 +37,11 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     models.OffchainCommunity.findAll({
       where: { privacyEnabled: false },
       include: {
-        model: models.OffchainTag,
-        as: 'tags',
+        model: models.OffchainTopic,
+        as: 'topics',
       }
     }),
-    models.OffchainTag.findAll(),
+    models.OffchainTopic.findAll(),
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
@@ -51,7 +51,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     return res.json({
       chains,
       nodes,
-      offchainTags,
+      offchainTopics,
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
@@ -96,8 +96,8 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       },
     },
     include: [{
-      model: models.OffchainTag,
-      as: 'tags',
+      model: models.OffchainTopic,
+      as: 'topics',
     }],
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
@@ -165,7 +165,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     chains,
     nodes,
     communities: allCommunities,
-    offchainTags,
+    offchainTopics,
     contractCategories,
     notificationCategories,
     roles,

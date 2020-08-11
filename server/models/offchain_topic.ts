@@ -4,7 +4,7 @@ import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainThreadAttributes } from './offchain_thread';
 
-export interface OffchainTagAttributes {
+export interface OffchainTopicAttributes {
   id?: number;
   name: string;
   description?: string;
@@ -17,23 +17,23 @@ export interface OffchainTagAttributes {
   // associations
   community?: OffchainCommunityAttributes;
   chain?: ChainAttributes;
-  threads?: OffchainThreadAttributes[] | OffchainTagAttributes['id'][];
+  threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
 }
 
-export interface OffchainTagInstance extends Sequelize.Instance<OffchainTagAttributes>, OffchainTagAttributes {
+export interface OffchainTopicInstance extends Sequelize.Instance<OffchainTopicAttributes>, OffchainTopicAttributes {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
 }
 
-export interface OffchainTagModel extends Sequelize.Model<OffchainTagInstance, OffchainTagAttributes> {
+export interface OffchainTopicModel extends Sequelize.Model<OffchainTopicInstance, OffchainTopicAttributes> {
 
 }
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: Sequelize.DataTypes,
-): OffchainTagModel => {
-  const OffchainTag = sequelize.define<OffchainTagInstance, OffchainTagAttributes>('OffchainTag', {
+): OffchainTopicModel => {
+  const OffchainTopic = sequelize.define<OffchainTopicInstance, OffchainTopicAttributes>('OffchainTopic', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
@@ -47,22 +47,22 @@ export default (
     paranoid: true,
   });
 
-  OffchainTag.associate = (models) => {
-    models.OffchainTag.belongsTo(models.OffchainCommunity, {
+  OffchainTopic.associate = (models) => {
+    models.OffchainTopic.belongsTo(models.OffchainCommunity, {
       as: 'community',
       foreignKey: 'community_id',
       targetKey: 'id',
     });
-    models.OffchainTag.belongsTo(models.Chain, {
+    models.OffchainTopic.belongsTo(models.Chain, {
       as: 'chain',
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.OffchainTag.hasMany(models.OffchainThread, {
+    models.OffchainTopic.hasMany(models.OffchainThread, {
       as: 'threads',
-      foreignKey: 'tag_id',
+      foreignKey: 'topic_id',
     });
   };
 
-  return OffchainTag;
+  return OffchainTopic;
 };

@@ -54,12 +54,12 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           visible: community.visible,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
-          featuredTags: community.featured_tags,
-          tags: community.tags,
+          featuredTopics: community.featured_topics,
+          topics: community.topics,
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
+      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -387,7 +387,7 @@ $(() => {
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),

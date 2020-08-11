@@ -34,21 +34,21 @@ const setPrivacy = async (models, req: Request, res: Response, next: NextFunctio
           address_id: { [Op.in]: userOwnedAddressIds, },
         }
       });
-      const role = userRoles.find((r) => 
-        r.offchain_community_id === thread.community || r.chain_id === thread.chain
-      );
-      if (!role) return next(new Error(Errors.NotAdmin));  
+      const role = userRoles.find((r) => {
+        return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+      });
+      if (!role) return next(new Error(Errors.NotAdmin));
     }
-    
+
     if (read_only) thread.read_only = read_only;
     // threads can be changed from private to public, but not the other way around
     if (thread.private) thread.private = privacy;
     await thread.save();
-  
+
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread_id, },
-      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTag, as: 'tag' } ],
-    })
+      include: [ models.Address, models.OffchainAttachment, { model: models.OffchainTopic, as: 'topic' } ],
+    });
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
