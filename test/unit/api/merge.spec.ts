@@ -11,8 +11,8 @@ import models from '../../../server/database';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import { Errors as mergeErrors } from '../../../server/routes/mergeAccounts';
-const ethUtil = require('ethereumjs-util');
-
+import { Keyring } from '@polkadot/api';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 
 chai.use(chaiHttp);
@@ -29,7 +29,8 @@ describe('Merge Account tests', () => {
     let userAddress2;
     let notOwned;
     let signature;
-    const chain = 'ethereum';
+    const message = 'Hello World';
+    const chain = 'edgeware';
     const community = 'staking';
 
     before('set up user with addresses', async () => {
@@ -39,37 +40,34 @@ describe('Merge Account tests', () => {
 
 
       // generate first address & user
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      // console.log('first address', res);
+      const res = await modelUtils.createAndVerifyAddress({ chain: 'edgeware' });
       userAddress1 = res.address;
       const userEmail = res.email;
       userJWT = jwt.sign({ id: res.user_id, email: userEmail }, JWT_SECRET);
 
       // generate second address with user JWT
-      const { keypair, address } = await modelUtils.generateEthAddress();
+      const keyPair = new Keyring({
+        type: 'sr25519',
+        ss58Format: 42,
+      }).addFromMnemonic('In Wonderland');
+      const address = keyPair.address;
       const res2 = await models['Address'].createWithToken(
-        res.user_id, chain, address,
+        res.user_id, 'edgeware', address, keyPair.type,
       );
-      // console.log('res2', res2);
-      // console.log('address2:', res2.body.result);
       const address_id = res2.id;
       const token = res2.verification_token;
-      const msgHash = ethUtil.hashPersonalMessage(Buffer.from(token));
-      const sig = ethUtil.ecsign(msgHash, Buffer.from(keypair.getPrivateKey(), 'hex'));
-      signature = ethUtil.toRpcSig(sig.v, sig.r, sig.s);
+      const u8aSignature = keyPair.sign(stringToU8a(token));
+      const siggy = u8aToHex(u8aSignature).slice(2);
       const res3 = await chai.request.agent(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
-        .send({
-          address,
-          chain,
-          signature,
-          jwt: userJWT
-        });
+        .send({ address, chain, signature: siggy, jwt: userJWT });
       const user_id = res3.body.result.user.id;
-      // console.log('user_id', user_id);
       const email = res3.body.result.user.email;
       userAddress2 = address;
+
+      // sign message from userAddress2
+      signature = keyPair.sign(stringToU8a(message));
 
       // create un-owned address
       notOwned = await modelUtils.createAndVerifyAddress({ chain });
@@ -189,7 +187,7 @@ describe('Merge Account tests', () => {
         comment_id: comment2.result.id,
         reaction: 'like',
         community,
-        address_id, 
+        address_id,
       });
 
       // add conflicting reaction (proposal) to be deleted in route.
@@ -212,6 +210,7 @@ describe('Merge Account tests', () => {
           'newAddress': userAddress1,
           'oldAddress': notOwned.address,
           'signature': signature,
+          'message': message,
           'jwt': userJWT,
         });
       expect(res.body.error).to.be.equal(mergeErrors.AddressesNotOwned);
@@ -224,6 +223,7 @@ describe('Merge Account tests', () => {
         .send({
           'newAddress': userAddress1,
           'oldAddress': notOwned.address,
+          'message': message,
           'jwt': userJWT,
         });
       expect(res.body.error).to.be.equal(mergeErrors.NeedSignature);
@@ -237,9 +237,10 @@ describe('Merge Account tests', () => {
           'newAddress': userAddress1,
           'oldAddress': userAddress2,
           'signature': 'bad-signature',
+          'message': message,
           'jwt': userJWT,
         });
-      expect(res.body.error).to.be.equal(mergeErrors.InvalidSignature); 
+      expect(res.body.error).to.be.equal(mergeErrors.InvalidSignature);
     });
 
     it('should merge accounts with status Success', async () => {
@@ -250,6 +251,7 @@ describe('Merge Account tests', () => {
           'newAddress': userAddress1,
           'oldAddress': userAddress2,
           'signature': signature,
+          'message': message,
           'jwt': userJWT,
         });
       expect(res.body.status).to.be.equal('Success');

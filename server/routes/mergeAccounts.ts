@@ -12,7 +12,7 @@ import role from '../models/role';
 
 export const Errors = {
   AddressesNotOwned: 'User does not own both addresses',
-  NeedSignature: 'Must provide signature',
+  NeedSignature: 'Must provide signature and message',
   InvalidSignature: 'Signature is invalid',
 };
 
@@ -48,7 +48,7 @@ const validateSignature = async (address, signature, message) => {
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
   const { oldAddress, newAddress, signature, message } = req.body;
 
-  if (!signature) return next(new Error(Errors.NeedSignature));
+  if (!signature || !message) return next(new Error(Errors.NeedSignature));
 
   // get User model with Addresses
   const user = await models.User.findOne({
