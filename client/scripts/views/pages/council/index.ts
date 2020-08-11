@@ -174,10 +174,9 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        rightColSpacing: [4],
+        rightColSpacing: [0],
         columnHeaders: [
           'Title',
-          'Votes'
         ],
       }),
       // candidates

@@ -5,6 +5,7 @@ import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/acc
 import Substrate from 'client/scripts/controllers/chain/substrate/main';
 import app from 'state';
 import { PhragmenElectionVote } from 'client/scripts/controllers/chain/substrate/phragmen_election';
+import { pluralize } from 'helpers';
 import ViewVotersModal from '../../modals/view_voters_modal';
 import User from '../../components/widgets/user';
 import Row from '../../components/row';
@@ -31,15 +32,14 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
     });
 
     const rowSubheader = m('.council-row-subheader', election.isMember(account)
-      ? election.backing(account).format(true)
-      : votes.length);
+      ? `${account.address.slice(0, 5)}... ${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
+      : `${votes.length} votes`);
 
     return m(Row, {
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
       },
-      // TODO: Hookup keys via array indexes for Gov, Council, Disc
       contentRight: [],
       rightColSpacing: [0],
       onclick: (e) => {
