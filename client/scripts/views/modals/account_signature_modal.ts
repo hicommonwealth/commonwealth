@@ -15,36 +15,12 @@ import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Button } from 'construct-ui';
 
-enum SignForAccountSteps {
-  Step1SelectWallet,
-  Step2VerifyWithCLI,
-  Step2VerifyWithWebWallet,
-  Step3SubmitQuery,
-}
-
-enum LinkNewAddressWallets {
-  Metamask,
-  PolkadotJS,
-  // NEARWallet,
-  CLIWallet,
-  // Hedgehog,
-}
-
 const sendSignatureToServer = async (
   account1: Account<any>,
   account2: Account<any>,
   signature: string,
   message: string
 ) => {
-  // const payload = {
-  //   address: account1.address,
-  //   chain: account1.chain.id,
-  //   signature,
-  //   message,
-  //   jwt: app.user.jwt,
-  // };
-  console.log('singature before route', signature);
-
   await $.ajax({
     url: `${app.serverUrl()}/mergeAccounts`,
     data: {
@@ -91,7 +67,6 @@ const SubstrateAccountSigning: m.Component<{
               type: 'bytes',
             };
             const signature = (await signer.signRaw(payload)).signature;
-            console.dir(signature);
             const verified = await account.isValidSignature(message, signature);
 
             if (!verified) {
