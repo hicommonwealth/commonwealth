@@ -43,6 +43,7 @@ const sendSignatureToServer = async (
   //   message,
   //   jwt: app.user.jwt,
   // };
+  console.log('singature before route', signature);
 
   await $.ajax({
     url: `${app.serverUrl()}/mergeAccounts`,
