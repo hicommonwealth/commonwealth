@@ -26,19 +26,6 @@ import { Grid, Col, List } from 'construct-ui';
 import moment from 'moment';
 import Listing from './listing';
 
-const ProposalRowHeader: m.Component<{ title: string }> = {
-  view: (vnode) => {
-    const { title } = vnode.attrs;
-    return m('.ProposalRowHeader', [
-      m('.proposal-row-header-col.proposal-row-header-title', title),
-      m('.proposal-row-header-col.proposal-row-header-replies', 'Replies'),
-      m('.proposal-row-header-col', 'Likes'),
-      m('.proposal-row-header-col', 'Activity'),
-      app.isLoggedIn() && m('.proposal-row-header-col.proposal-row-menu'),
-    ]);
-  }
-};
-
 const ProposalsStats: m.Component<{ onMoloch: boolean, onSubstrate: boolean }, {}> = {
   view: (vnode) => {
     const { onMoloch, onSubstrate } = vnode.attrs;

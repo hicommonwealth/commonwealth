@@ -185,12 +185,11 @@ const CouncilPage: m.Component<{}> = {
         content: candidates.length === 0
           ? [ m('.no-proposals', 'None') ]
           : [
-            candidates
-              .filter(([ account ]) => !councillors.includes(account))
+            candidates.filter(([ account ]) => !councillors.includes(account))
               .map(([account, slot]) => m(CouncillorRow, { account })),
             m('.clear'),
           ],
-        rightColSpacing: [4, 4],
+        rightColSpacing: [4, 6],
         columnHeaders: [
           'Candidates',
           m(CollectiveVotingButton, { candidates }),

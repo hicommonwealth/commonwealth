@@ -63,6 +63,9 @@
                     a {
                         font-size: inherit;
                         color: inherit;
+                        &:hover {
+                            color: darken($text-color-light, 8%);
+                        }
                     }
                 }
             }

@@ -4,16 +4,17 @@ import m, { VnodeDOM, Vnode } from 'mithril';
 import ListingHeader from '../components/listing_header';
 
 interface IListingAttrs {
-  content: any[];
   columnHeaders: any[];
+  content: any[];
   rightColSpacing: number[];
+  menuCarat?: boolean;
 }
 
 const Listing: m.Component<IListingAttrs> = {
   view: (vnode) => {
-    const { columnHeaders, content, rightColSpacing } = vnode.attrs;
+    const { columnHeaders, content, rightColSpacing, menuCarat } = vnode.attrs;
     return m('.Listing', [
-      m(ListingHeader, { columnHeaders, rightColSpacing }),
+      m(ListingHeader, { columnHeaders, rightColSpacing, showMenu: menuCarat }),
       content
     ]);
   }

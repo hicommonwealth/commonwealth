@@ -21,21 +21,7 @@ import ProposalsLoadingRow from 'views/components/proposals_loading_row';
 import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
-import TagCaratMenu from './tag_carat_menu';
 import Listing from '../listing';
-import ListingHeader from '../../components/listing_header';
-
-// const DiscussionRowHeader = {
-//   view: (vnode) => {
-//     return m('.DiscussionRowHeader', [
-//       m('.discussion-row-header-col.discussion-row-header-title', 'Title'),
-//       m('.discussion-row-header-col.discussion-row-header-replies', 'Replies'),
-//       m('.discussion-row-header-col', 'Likes'),
-//       m('.discussion-row-header-col', 'Activity'),
-//       app.isLoggedIn() && m('.discussion-row-header-col.discussion-row-menu'),
-//     ]);
-//   }
-// };
 
 interface IDiscussionPageState {
   lookback?: number;
@@ -149,7 +135,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
               'Replies',
               'Likes',
               'Last updated'
-            ]
+            ],
+            menuCarat: true,
           });
         }
       }
@@ -247,7 +234,8 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
               'Replies',
               'Likes',
               'Last updated'
-            ]
+            ],
+            menuCarat: true,
           }),
         // TODO: Incorporate infinite scroll into generic Listing component
         vnode.state.postsDepleted

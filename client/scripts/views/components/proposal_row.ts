@@ -299,15 +299,15 @@ const ProposalRow: m.Component<IRowAttrs> = {
       ? m('.TreasuryRow', [
         m('.treasury-row-title', proposal.title),
         m(Grid, [
-          m(Col, { span: 4 }, [
+          m(Col, { span: 3 }, [
             m('.treasury-row-subheading', 'Value'),
             m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).value.format(true)),
           ]),
-          m(Col, { span: 4 }, [
+          m(Col, { span: 3 }, [
             m('.treasury-row-subheading', 'Bond'),
             m('.treasury-row-metadata', (proposal as SubstrateTreasuryProposal).bond.format(true))
           ]),
-          m(Col, { span: 4 }, [
+          m(Col, { span: 3 }, [
             m('.treasury-row-subheading', 'Author'),
             m('.treasury-row-metadata .treasury-user', [
               m(User, {

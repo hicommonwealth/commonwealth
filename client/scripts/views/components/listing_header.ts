@@ -4,9 +4,11 @@ import m from 'mithril';
 import app from 'state';
 import { Grid, Col } from 'construct-ui';
 
-// title: boolean, replies: boolean, likes: boolean, activity: boolean
-
-const ListingHeader : m.Component<{ columnHeaders: any[], showMenu?: boolean, rightColSpacing: number[] }> = {
+const ListingHeader : m.Component<{
+  columnHeaders: any[],
+  showMenu?: boolean,
+  rightColSpacing: number[]
+}> = {
   view: (vnode) => {
     const { columnHeaders, showMenu, rightColSpacing } = vnode.attrs;
     const leftColumn = columnHeaders[0];
@@ -28,8 +30,10 @@ const ListingHeader : m.Component<{ columnHeaders: any[], showMenu?: boolean, ri
         }),
         app.isLoggedIn()
         && showMenu
-        && m('.proposal-row-header-col.proposal-row-menu')
-      ])
+        && m(Col, { span: 1 }, [
+          m('.proposal-row-header-col.proposal-row-menu')
+        ])
+      ]),
     ]);
   }
 };

@@ -1,7 +1,5 @@
 @import 'client/styles/shared';
 
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
 $discussion-meta-padding: 18px;
 
 .DiscussionRow {
@@ -53,14 +51,4 @@ $discussion-meta-padding: 18px;
             width: 28px;
         }
     }
-
-    // TODO: Replace functionality below:
-    // a.discussion-created, a.discussion-replies {
-    //     text-decoration: none;
-    //     color: $text-color-light;
-    //     &:hover {
-    //         color: darken($text-color-light, 8%);
-    //         text-decoration: underline;
-    //     }
-    // }
 }

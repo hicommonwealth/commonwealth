@@ -34,16 +34,14 @@ const CouncillorRow: m.Component<ICollectiveMemberAttrs> = {
       ? election.backing(account).format(true)
       : votes.length);
 
-    const rowRight = [ m('.vote-count', `${votes.length} votes`) ];
-
     return m(Row, {
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
       },
       // TODO: Hookup keys via array indexes for Gov, Council, Disc
-      contentRight: rowRight,
-      rightColSpacing: [4],
+      contentRight: [],
+      rightColSpacing: [0],
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({ modal: ViewVotersModal, data: { account, votes } });
