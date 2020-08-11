@@ -6,13 +6,13 @@ import 'chai/register-should';
 import jwt, { sign } from 'jsonwebtoken';
 import { NotificationCategories } from 'types';
 import { NotificationSubscription } from 'models';
+import { Keyring } from '@polkadot/api';
+import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 import app, { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 import { Errors as mergeErrors } from '../../../server/routes/mergeAccounts';
-import { Keyring } from '@polkadot/api';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
 
 
 chai.use(chaiHttp);
@@ -33,6 +33,7 @@ describe('Merge Account tests', () => {
     const chain = 'edgeware';
     const community = 'staking';
 
+
     before('set up user with addresses', async () => {
       // 1. create first address in order to create the new User/get user id
       // 2. create JWT with user id
@@ -52,7 +53,7 @@ describe('Merge Account tests', () => {
       }).addFromMnemonic('In Wonderland');
       const address = keyPair.address;
       const res2 = await models['Address'].createWithToken(
-        res.user_id, 'edgeware', address, keyPair.type,
+        res.user_id, 'edgeware', address,
       );
       const address_id = res2.id;
       const token = res2.verification_token;
@@ -67,7 +68,7 @@ describe('Merge Account tests', () => {
       userAddress2 = address;
 
       // sign message from userAddress2
-      signature = keyPair.sign(stringToU8a(message));
+      signature = u8aToHex(keyPair.sign(stringToU8a(message)));
 
       // create un-owned address
       notOwned = await modelUtils.createAndVerifyAddress({ chain });
