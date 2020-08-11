@@ -174,14 +174,12 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        header: m(ListingHeader, {
-          metadata: [
-            ListingHeaderCols.TITLE,
-            ListingHeaderCols.GALLERY,
-            ListingHeaderCols.LIKES,
-            ListingHeaderCols.ACTIVITY
-          ],
-        }),
+        headerColumns: [
+          ListingHeaderCols.TITLE,
+          ListingHeaderCols.GALLERY,
+          ListingHeaderCols.LIKES,
+          ListingHeaderCols.ACTIVITY
+        ],
       }),
       // candidates
       m('.council-section-header', [

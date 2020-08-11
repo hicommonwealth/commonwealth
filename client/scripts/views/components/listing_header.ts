@@ -8,11 +8,10 @@ import { ListingHeaderCols } from '../pages/listing';
 
 const ListingHeader : m.Component<{ metadata: ListingHeaderCols[] }> = {
   view: (vnode) => {
-    // const { title, replies, likes, activity } = vnode.attrs;
     return m('.ListingHeader', [
-      vnode.attrs.metadata.map((col, idx) => {
+      vnode.attrs.metadata.map((colName, idx) => {
         idx += 1;
-        switch (col) {
+        switch (colName) {
           case ListingHeaderCols.TITLE:
             return m('.listing-header-col', {
               class: `listing-header-col-${idx}`
@@ -30,7 +29,9 @@ const ListingHeader : m.Component<{ metadata: ListingHeaderCols[] }> = {
               class: `listing-header-col-${idx}`
             }, 'Likes');
           default:
-            return null;
+            return m('.listing-header-col', {
+              class: `listing-header-col-${idx}`
+            }, colName);
         }
       }),
       app.isLoggedIn() && m('.proposal-row-header-col.proposal-row-menu')

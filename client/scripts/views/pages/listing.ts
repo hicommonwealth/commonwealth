@@ -1,4 +1,4 @@
-import 'components/row.scss';
+import 'components/listing.scss';
 
 import m, { VnodeDOM, Vnode } from 'mithril';
 import Chart from 'chart.js';
@@ -16,14 +16,14 @@ export enum ListingHeaderCols {
 
 interface IListingAttrs {
   content: Vnode[];
-  header: any;
+  headerColumns: any;
 }
 
 const Listing: m.Component<IListingAttrs> = {
   view: (vnode) => {
-    const { header, content } = vnode.attrs;
+    const { headerColumns, content } = vnode.attrs;
     return m('.Listing', [
-      header,
+      m(ListingHeader, { metadata: headerColumns }),
       content
     ]);
   }
