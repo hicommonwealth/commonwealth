@@ -1,8 +1,5 @@
 @import 'client/styles/shared';
 
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
-
 .Row {
     display: flex;
     padding: 12px 20px;
@@ -14,7 +11,7 @@ $text-size-item-meta: 17px;
     }
     .row-left {
         line-height: 1.1;
-        flex: 1;
+        flex: $listing-left-flex;
         .row-header,
         .row-header a {
             color: $text-color-dark;
@@ -38,33 +35,42 @@ $text-size-item-meta: 17px;
     }
     .row-right {
         display: flex;
+        flex: $listing-right-flex;
         align-items: center;
         padding-left: 10px;
-        .UserGallery {
-            min-width: 100px;
-            padding-left: 10px;
-            padding-right: 20px;
-            text-align: right;
-            white-space: nowrap;
-            .overflow-users {
-                font-size: 13.5px;
-            }
-        }
-        .ReactionButton {
-            margin-left: 48px;
-        }
-        .last-updated {
-            min-width: 80px;
-            padding-left: 14px;
-            text-align: right;
-            font-size: $text-size-item-meta;
-            color: $text-color-light;
-            &.older {
-                min-width: 116px;
-            }
-            a {
-                font-size: inherit;
-                color: inherit;
+        .cui-grid {
+            width: 100%;
+            div {
+                display: flex;
+                justify-content: flex-end;
+                .UserGallery {
+                    min-width: 100px;
+                    padding-left: 10px;
+                    padding-right: 20px;
+                    text-align: right;
+                    white-space: nowrap;
+                    .overflow-users {
+                        font-size: 13.5px;
+                    }
+                }
+                .ReactionButton {
+                    width: min-content;
+                    height: min-content;
+                }
+                .last-updated {
+                    min-width: 80px;
+                    padding-left: 14px;
+                    text-align: right;
+                    font-size: $text-size-item-meta;
+                    color: $text-color-light;
+                    &.older {
+                        min-width: 116px;
+                    }
+                    a {
+                        font-size: inherit;
+                        color: inherit;
+                    }
+                }
             }
         }
     }

@@ -118,7 +118,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
       },
       key: proposal.id,
       contentRight: rowMetadata,
-      colSizing: [2, 2, 2],
+      rightColSpacing: [4, 4, 3, 1],
       onclick: (e) => {
         e.preventDefault();
         m.route.set(discussionLink);

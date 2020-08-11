@@ -143,6 +143,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         if (list.length > 0) {
           return m(Listing, {
             content: list,
+            rightColSpacing: [4, 4, 4],
             columnHeaders: [
               'Title',
               'Replies',
@@ -240,6 +241,7 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           ? m(EmptyTagPlaceholder, { communityName })
           : m(Listing, {
             content: getRecentPostsSortedByWeek(),
+            rightColSpacing: [4, 4, 4],
             columnHeaders: [
               'Title',
               'Replies',

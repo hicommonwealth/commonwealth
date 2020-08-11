@@ -43,7 +43,7 @@ const CouncillorRow: m.Component<ICollectiveMemberAttrs> = {
       },
       // TODO: Hookup keys via array indexes for Gov, Council, Disc
       contentRight: rowRight,
-      colSizing: [],
+      rightColSpacing: [4],
       onclick: (e) => {
         e.preventDefault();
         app.modals.create({ modal: ViewVotersModal, data: { account, votes } });

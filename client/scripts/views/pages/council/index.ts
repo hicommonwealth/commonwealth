@@ -174,6 +174,7 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
+        rightColSpacing: [4],
         columnHeaders: [
           'Title',
           'Last updated'
@@ -189,6 +190,7 @@ const CouncilPage: m.Component<{}> = {
               .map(([account, slot]) => m(CouncillorRow, { account })),
             m('.clear'),
           ],
+        rightColSpacing: [4, 4],
         columnHeaders: [
           'Candidates',
           m(CollectiveVotingButton, { candidates }),
