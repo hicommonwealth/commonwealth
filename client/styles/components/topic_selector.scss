@@ -1,14 +1,14 @@
 @import 'client/styles/shared';
 
-.tag-selection-drop-menu {
-    @include proposal-tag-inline;
-    .proposal-tag-icon {
+.topic-selection-drop-menu {
+    @include proposal-topic-inline;
+    .proposal-topic-icon {
         margin-right: 8px;
     }
 }
 
-.TagSelector {
-    .no-matching-tags {
+.TopicSelector {
+    .no-matching-topics {
         max-width: 190px;
     }
     .cui-popover-content {
@@ -16,8 +16,8 @@
         min-width: 178px;
         .cui-list {
             border-radius: 3px;
-            @include proposal-tag-inline;
-            .proposal-tag-icon {
+            @include proposal-topic-inline;
+            .proposal-topic-icon {
                 margin-right: 9px;
             }
         }

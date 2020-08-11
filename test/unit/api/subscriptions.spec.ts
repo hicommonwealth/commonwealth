@@ -72,8 +72,8 @@ describe('Subscriptions Tests', () => {
         title: 't',
         body: 't',
         kind: 'forum',
-        tagName: 't',
-        tagId: undefined
+        topicName: 't',
+        topicId: undefined
       });
       const object_id = `discussion_${res.result.id}`;
       const is_active = true;
@@ -98,8 +98,8 @@ describe('Subscriptions Tests', () => {
         title: 't2',
         body: 't2',
         kind: 'forum',
-        tagName: 't',
-        tagId: undefined
+        topicName: 't',
+        topicId: undefined
       });
       const object_id = `discussion_${res.result.id}`;
       const is_active = true;
@@ -124,8 +124,8 @@ describe('Subscriptions Tests', () => {
         title: 't2',
         body: 't2',
         kind: 'forum',
-        tagName: 't',
-        tagId: undefined
+        topicName: 't',
+        topicId: undefined
       });
       let res = await modelUtils.createComment({
         chain,
@@ -158,8 +158,8 @@ describe('Subscriptions Tests', () => {
         title: 't3',
         body: 't3',
         kind: 'forum',
-        tagName: 't',
-        tagId: undefined
+        topicName: 't',
+        topicId: undefined
       });
       res = await modelUtils.createComment({
         chain,
@@ -604,8 +604,8 @@ describe('Subscriptions Tests', () => {
         title: 'hi',
         body: 'hi you!',
         kind: 'forum',
-        tagName: 't',
-        tagId: undefined
+        topicName: 't',
+        topicId: undefined
       });
       expect(subscription).to.not.be.null;
       expect(thread).to.not.be.null;

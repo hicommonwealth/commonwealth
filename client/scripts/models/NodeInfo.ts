@@ -16,8 +16,8 @@ class NodeInfo {
     return new NodeInfo(json.id, json.chain, json.url, json.address);
   }
 
-  public get tags() {
-    return this.chain.tags;
+  public get topics() {
+    return this.chain.topics;
   }
 }
 

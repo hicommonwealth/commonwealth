@@ -1,12 +1,12 @@
 @import 'client/styles/shared';
 
-.TagSelector {
+.TopicSelector {
     @include dragula;
-    .tag-count {
+    .topic-count {
         display: inline-block;
         width: 60px;
     }
-    .ToggleFeaturedTagButton {
+    .ToggleFeaturedTopicButton {
         margin-right: 10px;
     }
 }

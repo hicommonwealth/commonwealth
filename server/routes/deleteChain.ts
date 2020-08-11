@@ -35,8 +35,8 @@ const deleteChain = async (models, req: Request, res: Response, next: NextFuncti
     return next(new Error(Errors.CannotDeleteChain));
   }
 
-  const chainTags = await chain.getTags();
-  chain.removeTags(chainTags);
+  const chainTopics = await chain.getTopics();
+  chain.removeTopics(chainTopics);
 
   // delete all nodes first
   const nodes = await chain.getChainNodes();

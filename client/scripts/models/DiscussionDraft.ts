@@ -9,8 +9,8 @@ class DiscussionDraft {
   public readonly body: string;
   public readonly attachments: OffchainAttachment[];
   public readonly createdAt: moment.Moment;
-  // Draft tags are not created as tag objects yet, so they are just strings
-  public readonly tag: string;
+  // Draft topics are not created as topic objects yet, so they are just strings
+  public readonly topic: string;
   public readonly community: string;
   public readonly chain: string;
 
@@ -21,7 +21,7 @@ class DiscussionDraft {
     chain: string,
     title: string,
     body: string,
-    tag: string,
+    topic: string,
     attachments: OffchainAttachment[],
     authorChain?: string,
   ) {
@@ -30,7 +30,7 @@ class DiscussionDraft {
     this.body = body;
     this.attachments = attachments;
     this.id = id;
-    this.tag = tag;
+    this.topic = topic;
     this.community = community;
     this.chain = chain;
     this.authorChain = authorChain;

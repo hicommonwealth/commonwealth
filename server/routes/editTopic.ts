@@ -7,16 +7,16 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  NoTagId: 'Must supply tag ID',
-  NotAdmin: 'Must be an admin to edit or feature tags',
-  NotVerified: 'Must have a verified address to edit or feature tags',
-  TagNotFound: 'Tag not found'
+  NoTopicId: 'Must supply topic ID',
+  NotAdmin: 'Must be an admin to edit or feature topics',
+  NotVerified: 'Must have a verified address to edit or feature topics',
+  TopicNotFound: 'Topic not found'
 };
 
-const editTag = async (models, req: Request, res: Response, next: NextFunction) => {
+const editTopic = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   if (!req.body.id) {
-    return next(new Error(Errors.NoTagId));
+    return next(new Error(Errors.NoTopicId));
   }
 
   const adminAddress = await models.Address.findOne({
@@ -47,31 +47,31 @@ const editTag = async (models, req: Request, res: Response, next: NextFunction) 
 
   const { description, featured_order, id, name } = req.body;
   try {
-    const tag = await models.OffchainTag.findOne({ where: { id } });
-    if (!tag) return next(new Error(Errors.TagNotFound));
-    if (name) tag.name = name;
-    if (name || description) tag.description = description;
-    await tag.save();
+    const topic = await models.OffchainTopic.findOne({ where: { id } });
+    if (!topic) return next(new Error(Errors.TopicNotFound));
+    if (name) topic.name = name;
+    if (name || description) topic.description = description;
+    await topic.save();
 
     if (featured_order) {
       const activeEntity = community
         ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
         : await models.Chain.findOne({ where: { id: chain.id } });
-      let { featured_tags } = activeEntity;
-      if (featured_order === 'true' && !featured_tags.includes(`${id}`)) {
-        featured_tags.push(`${id}`);
-      } else if (featured_order === 'false' && featured_tags.includes(`${id}`)) {
-        const idx = featured_tags.indexOf(`${id}`);
-        featured_tags = featured_tags.slice(0, idx).concat(featured_tags.slice(idx + 1));
+      let { featured_topics } = activeEntity;
+      if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
+        featured_topics.push(`${id}`);
+      } else if (featured_order === 'false' && featured_topics.includes(`${id}`)) {
+        const idx = featured_topics.indexOf(`${id}`);
+        featured_topics = featured_topics.slice(0, idx).concat(featured_topics.slice(idx + 1));
       }
-      activeEntity.featured_tags = featured_tags;
+      activeEntity.featured_topics = featured_topics;
       await activeEntity.save();
     }
 
-    return res.json({ status: 'Success', result: tag.toJSON() });
+    return res.json({ status: 'Success', result: topic.toJSON() });
   } catch (e) {
     return next(e);
   }
 };
 
-export default editTag;
+export default editTopic;

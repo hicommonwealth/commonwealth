@@ -26,8 +26,8 @@ describe('Thread Tests', () => {
 
   const title = 'test title';
   const body = 'test body';
-  const tagName = 'test tag';
-  const tagId = undefined;
+  const topicName = 'test topic';
+  const topicId = undefined;
   const kind = 'forum';
 
   const markdownThread = require('../../util/fixtures/markdownThread');
@@ -77,8 +77,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -97,8 +97,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -114,8 +114,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title: '',
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -131,8 +131,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title: '',
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -148,8 +148,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title: '',
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -165,8 +165,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title: '',
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         url: 'http://commonwealth.im',
         jwt: userJWT,
@@ -183,8 +183,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         url: null,
         jwt: userJWT,
@@ -194,15 +194,15 @@ describe('Thread Tests', () => {
       expect(tRes.error).to.be.equal(ThreadErrors.LinkMissingTitleOrUrl);
     });
 
-    it('should fail to create a thread without a tag name', async () => {
+    it('should fail to create a thread without a topic name', async () => {
       const tRes = await modelUtils.createThread({
         address: userAddress,
         kind,
         chainId: chain,
         communityId: community,
         title,
-        tagName: undefined,
-        tagId,
+        topicName: undefined,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -217,8 +217,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         readOnly,
         jwt: userJWT,
@@ -244,8 +244,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         mentions: ['0x1234'],
         jwt: userJWT,
@@ -311,8 +311,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -431,8 +431,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: undefined,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: adminJWT,
       });
@@ -580,8 +580,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
         privacy: true,
@@ -689,8 +689,8 @@ describe('Thread Tests', () => {
         jwt: userJWT,
         title,
         body,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         kind,
       });
       const cRes = await modelUtils.createComment({
@@ -725,8 +725,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: undefined,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
@@ -774,8 +774,8 @@ describe('Thread Tests', () => {
         chainId: chain,
         communityId: community,
         title,
-        tagName,
-        tagId,
+        topicName,
+        topicId,
         body,
         jwt: userJWT,
       });
