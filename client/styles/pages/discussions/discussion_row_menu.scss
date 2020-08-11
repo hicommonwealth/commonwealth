@@ -14,8 +14,7 @@
         cursor: pointer;
         stroke: $text-color-light;
         position: relative;
-        top: 2px;
-        right: 2px;
+        top: -2px;
     }
     &:hover {
         background: $background-color-light;

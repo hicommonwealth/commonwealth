@@ -6,7 +6,6 @@ $discussion-meta-padding: 18px;
     .row-left {
         .row-subheader {
             // Styling specific to DiscussionRow subheader content
-            color: #9a9da4;
             a.proposal-tag {
                 @include proposal-tag-inline;
                 margin-right: $discussion-meta-padding;

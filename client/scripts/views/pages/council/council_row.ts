@@ -1,4 +1,4 @@
-import 'pages/councillor_row.scss';
+import 'pages/council_row.scss';
 
 import m from 'mithril';
 import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
