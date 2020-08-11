@@ -176,25 +176,25 @@ const CouncilPage: m.Component<{}> = {
           ])],
         columnHeaders: [
           'Title',
-          'Replies',
-          'Likes',
           'Last updated'
         ],
       }),
       // candidates
-      m('.council-section-header', [
-        'Candidates',
-        m(CollectiveVotingButton, { candidates }),
-        m(CandidacyButton, { activeAccountIsCandidate, candidates }),
-      ]),
-      candidates.length === 0
-        ? m('.no-proposals', 'None')
-        : m('.council-candidates', [
-          candidates
-            .filter(([ account ]) => !councillors.includes(account))
-            .map(([account, slot]) => m(CouncillorRow, { account })),
-          m('.clear'),
-        ]),
+      m(Listing, {
+        content: candidates.length === 0
+          ? [ m('.no-proposals', 'None') ]
+          : [
+            candidates
+              .filter(([ account ]) => !councillors.includes(account))
+              .map(([account, slot]) => m(CouncillorRow, { account })),
+            m('.clear'),
+          ],
+        columnHeaders: [
+          'Candidates',
+          m(CollectiveVotingButton, { candidates }),
+          m(CandidacyButton, { activeAccountIsCandidate, candidates }),
+        ]
+      })
     ]);
   },
 };

@@ -22,7 +22,7 @@ import DiscussionRow from 'views/pages/discussions/discussion_row';
 
 import WeeklyDiscussionListing, { getLastUpdate } from './weekly_listing';
 import TagCaratMenu from './tag_carat_menu';
-import Listing, { ListingHeaderCols } from '../listing';
+import Listing from '../listing';
 import ListingHeader from '../../components/listing_header';
 
 // const DiscussionRowHeader = {

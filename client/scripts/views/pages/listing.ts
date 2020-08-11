@@ -8,7 +8,7 @@ import app from 'state';
 import ListingHeader from '../components/listing_header';
 
 interface IListingAttrs {
-  content: Vnode[];
+  content: any[];
   columnHeaders: any[];
 }
 

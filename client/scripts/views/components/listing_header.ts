@@ -2,7 +2,6 @@ import 'components/listing_header.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { ListingHeaderCols } from '../pages/listing';
 
 // title: boolean, replies: boolean, likes: boolean, activity: boolean
 
