@@ -47,6 +47,7 @@ const validateSignature = async (address, signature, message) => {
 
 const mergeAccounts = async (models, req: Request, res: Response, next: NextFunction) => {
   const { oldAddress, newAddress, signature, message } = req.body;
+  console.log('signature inside route', signature);
 
   if (!signature || !message) return next(new Error(Errors.NeedSignature));
 
@@ -83,7 +84,6 @@ const mergeAccounts = async (models, req: Request, res: Response, next: NextFunc
   });
 
   // verify signature
-
   try {
     const verified = await validateSignature(addressToBeMerged, signature, message);
     if (!verified) return next(new Error(Errors.InvalidSignature));
