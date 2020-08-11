@@ -117,7 +117,8 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
         subheader: rowSubheader,
       },
       key: proposal.id,
-      metadata: rowMetadata,
+      contentRight: rowMetadata,
+      colSizing: [2, 2, 2],
       onclick: (e) => {
         e.preventDefault();
         m.route.set(discussionLink);

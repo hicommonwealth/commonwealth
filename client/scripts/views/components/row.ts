@@ -5,10 +5,12 @@ import Chart from 'chart.js';
 import moment from 'moment-twitter';
 
 import app from 'state';
+import { Grid, Col } from 'construct-ui';
 
 interface IRowAttrs {
   contentLeft: IContentLeft;
-  metadata: Vnode[];
+  contentRight: Vnode[];
+  colSizing: number[];
   class?: string;
   key?: number;
   onclick?: Function;
@@ -21,18 +23,26 @@ interface IContentLeft {
 
 const Row: m.Component<IRowAttrs> = {
   view: (vnode) => {
-    const { key, onclick, metadata, contentLeft } = vnode.attrs;
+    const { key, onclick, contentLeft, contentRight, colSizing } = vnode.attrs;
     const attrs = {};
     if (onclick) attrs['onclick'] = onclick;
     if (key) attrs['key'] = key;
     if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
+    const initialOffset = 12 - colSizing.reduce((t, n) => t + n);
     return m('.Row', attrs, [
       m('.row-left', [
         m('.row-header', contentLeft.header),
         m('.row-subheader', contentLeft.subheader),
       ]),
       m('.row-right', [
-        metadata
+        m(Grid, contentRight.map((ele, idx) => {
+          return m(Col, {
+            span: colSizing[idx],
+            offset: initialOffset > 0 && idx === 0
+              ? initialOffset
+              : 0
+          }, ele);
+        }))
       ])
     ]);
   }

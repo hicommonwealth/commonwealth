@@ -286,7 +286,8 @@ const ProposalRow: m.Component<IRowAttrs> = {
           header: rowHeader,
           subheader: rowSubheader,
         },
-        metadata: rowMetadata,
+        contentRight: rowMetadata,
+        colSizing: [2, 2, 2],
         onclick: (e) => {
           e.preventDefault();
           m.route.set(proposalLink);
