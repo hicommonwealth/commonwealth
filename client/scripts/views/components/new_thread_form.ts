@@ -116,6 +116,9 @@ export const loadDraft = async (dom, state, draft) => {
   state.activeTag = draft.tag;
   state.form.tagName = draft.tag;
   state.fromDraft = draft.id;
+  if (state.quillEditorState?.alteredText) {
+    state.quillEditorState.alteredText = false;
+  }
   m.redraw();
 };
 
@@ -232,7 +235,7 @@ export const NewThreadForm: m.Component<{
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
     const { fromDraft, newType, saving } = vnode.state;
-    console.log(vnode.state.quillEditorState);
+
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} `
         + `${newType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -457,7 +460,7 @@ export const NewThreadForm: m.Component<{
               class: !author
                 || saving
                 || vnode.state.uploadsInProgress > 0
-                || !vnode.state.quillEditorState.alteredText
+                || (fromDraft && !vnode.state.quillEditorState?.alteredText)
                 ? 'disabled'
                 : '',
               intent: 'none',

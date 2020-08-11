@@ -741,9 +741,12 @@ const instantiateEditor = (
 
   // Save editor content in localStorage
   state.unsavedChanges = new Delta();
-  quill.on('text-change', (delta) => {
+  quill.on('text-change', (delta, oldDelta, source) => {
     state.unsavedChanges = state.unsavedChanges.compose(delta);
-    if (!state.alteredText) state.alteredText = true;
+    if (source === 'user' && !state.alteredText) {
+      state.alteredText = true;
+      m.redraw();
+    }
   });
 
   setInterval(() => {
