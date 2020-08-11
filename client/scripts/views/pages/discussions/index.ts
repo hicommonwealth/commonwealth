@@ -143,11 +143,11 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
         if (list.length > 0) {
           return m(Listing, {
             content: list,
-            headerColumns: [
-              ListingHeaderCols.TITLE,
-              ListingHeaderCols.GALLERY,
-              ListingHeaderCols.LIKES,
-              ListingHeaderCols.ACTIVITY
+            columnHeaders: [
+              'Title',
+              'Replies',
+              'Likes',
+              'Last updated'
             ]
           });
         }
@@ -240,11 +240,11 @@ const DiscussionsPage: m.Component<{ tag?: string }, IDiscussionPageState> = {
           ? m(EmptyTagPlaceholder, { communityName })
           : m(Listing, {
             content: getRecentPostsSortedByWeek(),
-            headerColumns: [
-              ListingHeaderCols.TITLE,
-              ListingHeaderCols.GALLERY,
-              ListingHeaderCols.LIKES,
-              ListingHeaderCols.ACTIVITY
+            columnHeaders: [
+              'Title',
+              'Replies',
+              'Likes',
+              'Last updated'
             ]
           }),
         // TODO: Incorporate infinite scroll into generic Listing component

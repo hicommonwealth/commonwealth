@@ -232,19 +232,19 @@ const ProposalsPage: m.Component<{}> = {
       m(ProposalsStats, { onMoloch, onSubstrate }),
       m(Listing, {
         content: activeProposalContent,
-        headerColumns: ['Active Proposals']
+        columnHeaders: ['Active Proposals']
       }),
       m(Listing, {
         content: activeTreasuryContent,
-        headerColumns: ['Active Treasury Proposals']
+        columnHeaders: ['Active Treasury Proposals']
       }),
       m(Listing, {
         content: inactiveProposalContent,
-        headerColumns: ['Inactive Proposals']
+        columnHeaders: ['Inactive Proposals']
       }),
       m(Listing, {
         content: inactiveTreasuryContent,
-        headerColumns: ['Inactive Treasury Proposals']
+        columnHeaders: ['Inactive Treasury Proposals']
       })
     ]);
   }

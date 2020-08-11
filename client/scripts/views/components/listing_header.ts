@@ -6,35 +6,19 @@ import { ListingHeaderCols } from '../pages/listing';
 
 // title: boolean, replies: boolean, likes: boolean, activity: boolean
 
-const ListingHeader : m.Component<{ metadata: ListingHeaderCols[] }> = {
+const ListingHeader : m.Component<{ columnHeaders: any[], showMenu?: boolean }> = {
   view: (vnode) => {
+    const { columnHeaders, showMenu } = vnode.attrs;
     return m('.ListingHeader', [
-      vnode.attrs.metadata.map((colName, idx) => {
+      columnHeaders.map((column, idx) => {
         idx += 1;
-        switch (colName) {
-          case ListingHeaderCols.TITLE:
-            return m('.listing-header-col', {
-              class: `listing-header-col-${idx}`
-            }, 'Title');
-          case ListingHeaderCols.GALLERY:
-            return m('.listing-header-col', {
-              class: `listing-header-col-${idx}`
-            }, 'Replies');
-          case ListingHeaderCols.ACTIVITY:
-            return m('.listing-header-col', {
-              class: `listing-header-col-${idx}`
-            }, 'Activity');
-          case ListingHeaderCols.LIKES:
-            return m('.listing-header-col', {
-              class: `listing-header-col-${idx}`
-            }, 'Likes');
-          default:
-            return m('.listing-header-col', {
-              class: `listing-header-col-${idx}`
-            }, colName);
-        }
+        return m('.listing-header-col', {
+          class: `listing-header-col-${idx}`
+        }, column);
       }),
-      app.isLoggedIn() && m('.proposal-row-header-col.proposal-row-menu')
+      app.isLoggedIn()
+      && showMenu
+      && m('.proposal-row-header-col.proposal-row-menu')
     ]);
   }
 };

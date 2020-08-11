@@ -63,31 +63,6 @@ $text-size-item-meta: 17px;
     .row-right {
 
     }
-    // TODO: Investigate responsive code to see what's still relevant
-    // responsive
-    @include sm-max {
-        .row-right {
-            display: block;
-            width: initial;
-            min-width: initial;
-            padding-left: 24px;
-            padding-right: 6px;
-        }
-    }
-    @include xs-max {
-        display: block;
-        padding: 20px 22px;
-        margin: 15px 0;
-        .row-right {
-            display: flex;
-            padding: 0;
-        }
-        // TODO: xs-clear
-        .proposal-row-xs-clear {
-            display: block;
-            clear: both;
-        }
-    }
 }
 
 .TreasuryRow {
@@ -114,9 +89,6 @@ $text-size-item-meta: 17px;
         color: $text-color-lightest;
         font-size: $text-size-item-meta;
         display: flex;
-        @include xs-max {
-            display: block;
-        }
         .metadata-divider {
             padding: 0 5px;
         }

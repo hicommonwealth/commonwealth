@@ -25,7 +25,7 @@ import ViewVotersModal from 'views/modals/view_voters_modal';
 import { Grid, Col } from 'construct-ui';
 import CouncillorRow from './council_row';
 import ListingHeader from '../../components/listing_header';
-import Listing, { ListingHeaderCols } from '../listing';
+import Listing from '../listing';
 
 interface ICouncilElectionVoterAttrs {
   vote: PhragmenElectionVote;
@@ -174,11 +174,11 @@ const CouncilPage: m.Component<{}> = {
             ),
             m('.clear'),
           ])],
-        headerColumns: [
-          ListingHeaderCols.TITLE,
-          ListingHeaderCols.GALLERY,
-          ListingHeaderCols.LIKES,
-          ListingHeaderCols.ACTIVITY
+        columnHeaders: [
+          'Title',
+          'Replies',
+          'Likes',
+          'Last updated'
         ],
       }),
       // candidates
