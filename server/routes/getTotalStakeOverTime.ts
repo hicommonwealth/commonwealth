@@ -7,7 +7,7 @@ const Op = Sequelize.Op;
 interface IEventData {
     stash_id: AccountId;
     exposure: Exposure;
-    block_number: ValidatorPrefs;
+    block_number: BlockNumber;
 }
 
 const getOwnStakeOverTime = async (models, req: Request, res: Response, next: NextFunction) => {

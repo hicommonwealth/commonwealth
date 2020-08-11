@@ -18,7 +18,7 @@ interface IEventData {
 }
 
 const getRewards = async (models, req: Request, res: Response, next: NextFunction) => {
-  const { chain } = req.query;
+  const { chain, stash_id } = req.query;
   let { startDate, endDate } = req.query;
 
   if (!chain) return next(new Error(Errors.ChainIdNotFound));
@@ -60,7 +60,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
     ]
   });
 
-  const validators: { [key: string]: any[] } = {}
+  const validators: { [key: string]: any[] } = {};
   // No rewards
   if (!rewards.length)
     return next(new Error(Errors.NoRecordsFound));
@@ -80,7 +80,7 @@ const getRewards = async (models, req: Request, res: Response, next: NextFunctio
   return res.json({
     status: 'Success',
     result: {
-      validators,
+      validators
     }
   });
 };

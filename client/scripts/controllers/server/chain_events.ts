@@ -10,13 +10,39 @@ class ChainEventsController {
 
   public offences() {
     return new Promise((resolve) => {
-      return get('/getOffences', { chain: app.chain.id }, resolve);
+      return get('/getOffences/:stash_id?', {
+        chain: app.chain.id
+      }, resolve);
     });
   }
 
   public rewards() {
     return new Promise((resolve) => {
-      return get('/getRewards', {
+      return get('/getRewards/:stash_id?', {
+        chain: app.chain.id,
+      }, resolve);
+    });
+  }
+
+  public getOwnStakeOverTime() {
+    return new Promise((resolve) => {
+      return get('/getOwnStakeOverTime/:stash_id?', {
+        chain: app.chain.id,
+      }, resolve);
+    });
+  }
+
+  public getTotalStakeOverTime() {
+    return new Promise((resolve) => {
+      return get('/getTotalStakeOverTime/:stash_id?', {
+        chain: app.chain.id,
+      }, resolve);
+    });
+  }
+
+  public getOtherStakeOverTime() {
+    return new Promise((resolve) => {
+      return get('/getOtherStakeOverTime/:stash_id?', {
         chain: app.chain.id,
       }, resolve);
     });
