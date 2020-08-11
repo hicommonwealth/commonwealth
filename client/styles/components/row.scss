@@ -1,14 +1,7 @@
 @import 'client/styles/shared';
 
 .Row {
-    display: flex;
-    padding: 12px 20px;
-    margin: 0 -20px;
-    cursor: pointer;
-
-    &:hover {
-        background: $background-color-white-hover;
-    }
+    @include listing-row-base;
     .row-left {
         line-height: 1.1;
         flex: $listing-left-flex;
@@ -47,6 +40,7 @@
                     min-width: 100px;
                     padding-left: 10px;
                     padding-right: 20px;
+                    margin-right: 8px;
                     text-align: right;
                     white-space: nowrap;
                     .overflow-users {

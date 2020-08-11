@@ -232,8 +232,8 @@ const ProposalsPage: m.Component<{}> = {
       m(ProposalsStats, { onMoloch, onSubstrate }),
       m(Listing, {
         content: activeProposalContent,
-        columnHeaders: ['Active Proposals'],
-        rightColSpacing: [0]
+        columnHeaders: ['Active Proposals', 'Replies', 'Likes', 'Updated'],
+        rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
         content: activeTreasuryContent,
@@ -242,8 +242,8 @@ const ProposalsPage: m.Component<{}> = {
       }),
       m(Listing, {
         content: inactiveProposalContent,
-        columnHeaders: ['Inactive Proposals'],
-        rightColSpacing: [0]
+        columnHeaders: ['Inactive Proposals', 'Replies', 'Likes', 'Updated'],
+        rightColSpacing: [4, 4, 4]
       }),
       m(Listing, {
         content: inactiveTreasuryContent,

@@ -66,10 +66,8 @@ $text-size-item-meta: 17px;
 }
 
 .TreasuryRow {
-    display: block;
-    padding: 12px 20px;
-    margin: 0 -20px;
-    cursor: pointer;
+    @include listing-row-base;
+    display: block !important;
 
     .treasury-row-title {
         color: $text-color-dark;
