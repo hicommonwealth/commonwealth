@@ -231,8 +231,8 @@ export const NewThreadForm: m.Component<{
     };
 
     const discussionDrafts = app.user.discussionDrafts.store.getByCommunity(app.activeId());
-    const { fromDraft,newType, saving } = vnode.state;
-
+    const { fromDraft, newType, saving } = vnode.state;
+    console.log(vnode.state.quillEditorState);
     return m('.NewThreadForm', {
       class: `${newType === PostType.Link ? 'link-post' : ''} `
         + `${newType !== PostType.Link && discussionDrafts.length > 0 ? 'has-drafts' : ''} `
@@ -432,8 +432,7 @@ export const NewThreadForm: m.Component<{
                 try {
                   await newThread(form, quillEditorState, author);
                   vnode.state.saving = false;
-                  const { fromDraft } = vnode.state;
-                  if (fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
+                  if (vnode.state.fromDraft && !vnode.state.recentlyDeletedDrafts.includes(fromDraft)) {
                     await app.user.discussionDrafts.delete(fromDraft);
                   }
                   if (isModal) {
@@ -455,8 +454,12 @@ export const NewThreadForm: m.Component<{
               tabindex: 4
             }),
             m(Button, {
-              class: !author || saving || vnode.state.uploadsInProgress > 0
-                ? 'disabled' : '',
+              class: !author
+                || saving
+                || vnode.state.uploadsInProgress > 0
+                || !vnode.state.quillEditorState.alteredText
+                ? 'disabled'
+                : '',
               intent: 'none',
               onclick: async (e) => {
                 const { form, quillEditorState } = vnode.state;
@@ -486,7 +489,9 @@ export const NewThreadForm: m.Component<{
                   notifyError(err.message);
                 }
               },
-              label: 'Save as draft',
+              label: fromDraft
+                ? 'Update saved draft'
+                : 'Save draft',
               name: 'save',
               tabindex: 5
             }),

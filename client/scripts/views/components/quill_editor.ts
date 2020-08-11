@@ -743,6 +743,7 @@ const instantiateEditor = (
   state.unsavedChanges = new Delta();
   quill.on('text-change', (delta) => {
     state.unsavedChanges = state.unsavedChanges.compose(delta);
+    if (!state.alteredText) state.alteredText = true;
   });
 
   setInterval(() => {
@@ -766,6 +767,7 @@ interface IQuillEditorAttrs {
   theme?: string;
   onkeyboardSubmit?;
   editorNamespace: string;
+  onkeyup?;
 }
 
 interface IQuillEditorState {
@@ -774,6 +776,7 @@ interface IQuillEditorState {
   uploading?: boolean;
   // for localStorage drafts:
   beforeunloadHandler;
+  alteredText;
   unsavedChanges;
   clearUnsavedChanges;
 }
@@ -814,7 +817,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
     if (!contentsDoc
       && !vnode.state.markdownMode
       && localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`) !== null) {
-        try {
+      try {
         contentsDoc = JSON.parse(localStorage.getItem(`${app.activeId()}-${editorNamespace}-storedText`));
         vnode.state.markdownMode = false;
       } catch (e) {
@@ -822,7 +825,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         vnode.state.markdownMode = true;
       }
     } else if (vnode.state.markdownMode === undefined) {
-        if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+      if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
         vnode.state.markdownMode = true;
       } else if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false') {
         vnode.state.markdownMode = false;
@@ -855,7 +858,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         // once editor is instantiated, it can be updated with a tabindex
         $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
         if (contentsDoc && typeof contentsDoc === 'string') {
-                const res = vnode.state.editor.setText(contentsDoc);
+          const res = vnode.state.editor.setText(contentsDoc);
           vnode.state.markdownMode = true;
         } else if (contentsDoc && typeof contentsDoc === 'object') {
           const res = vnode.state.editor.setContents(contentsDoc);
