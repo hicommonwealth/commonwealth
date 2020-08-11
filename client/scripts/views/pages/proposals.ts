@@ -152,11 +152,12 @@ const ProposalsPage: m.Component<{}> = {
       && !activeCosmosProposals
       && !activeMolochProposals
       ? [ m('.no-proposals', 'None') ]
-      : activeDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal }))
-        .concat(activeDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(activeCouncilProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(activeSignalingProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(activeCosmosProposals.map((proposal) => m(ProposalRow, { proposal })));
+      : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
+        .concat((activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((activeMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
     const activeTreasuryContent = activeTreasuryProposals.length
       ? activeTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))
@@ -188,11 +189,12 @@ const ProposalsPage: m.Component<{}> = {
       && !inactiveCosmosProposals
       && !inactiveMolochProposals
       ? [ m('.no-proposals', 'None') ]
-      : inactiveDemocracyReferenda.map((proposal) => m(ProposalRow, { proposal }))
-        .concat(inactiveDemocracyProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(inactiveCouncilProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(inactiveSignalingProposals.map((proposal) => m(ProposalRow, { proposal })))
-        .concat(inactiveCosmosProposals.map((proposal) => m(ProposalRow, { proposal })));
+      : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
+        .concat((inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveCouncilProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveSignalingProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveCosmosProposals || []).map((proposal) => m(ProposalRow, { proposal })))
+        .concat((inactiveMolochProposals || []).map((proposal) => m(ProposalRow, { proposal })));
 
     const inactiveTreasuryContent = inactiveTreasuryProposals.length
       ? inactiveTreasuryProposals.map((proposal) => m(ProposalRow, { proposal }))

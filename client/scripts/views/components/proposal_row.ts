@@ -229,28 +229,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
       supportText = null;
     }
 
-    const proposalIdentifier = (slug === ProposalType.SubstrateDemocracyReferendum || proposal.author === null)
-      ? m('.proposal-display-id', proposal.shortIdentifier)
-      : [
-        m('.proposal-pre', [
-          m(User, {
-            user: proposal.author,
-            avatarOnly: true,
-            avatarSize: 36,
-            tooltip: true,
-          }),
-        ]),
-        m('.proposal-pre-mobile', [
-          m(User, {
-            user: proposal.author,
-            avatarOnly: true,
-            avatarSize: 16,
-            tooltip: true,
-          }),
-        ]),
-      ];
-
-
     const proposalLink = `/${app.activeChainId()}/proposal/${proposal.slug}/${proposal.identifier}`
       + `-${slugify(proposal.title)}`;
 
