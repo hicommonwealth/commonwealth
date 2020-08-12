@@ -106,6 +106,15 @@ import IdentityFetchCache from './util/identityFetchCache';
 
 import bulkEntities from './routes/bulkEntities';
 
+//validator routes
+import addValidator from './routes/addValidator';
+import udpateValidator from './routes/updateValidator';
+
+//upsertHistoricalValidatorStats
+
+import upsertHistoricalValidatorStats from './routes/upsertHistoricalValidatorStats';
+
+
 function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchCache: IdentityFetchCache) {
   const router = express.Router();
   router.get('/status', status.bind(this, models));
@@ -302,7 +311,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // settings
   // TODO: Change to POST /userSetting
   router.post('/writeUserSetting', passport.authenticate('jwt', { session: false }),
-              writeUserSetting.bind(this, models));
+    writeUserSetting.bind(this, models));
 
   // send feedback button
   // TODO: Change to POST /feedback
@@ -329,6 +338,14 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
+
+
+  // Create/Update validator
+  router.post('/addValidator', addValidator.bind(this, models));
+  router.post('/updateValidator', udpateValidator.bind(this, models));
+
+  //upsertHistoricalValidatorStats
+  router.post('/upsertHistoricalValidatorStats', upsertHistoricalValidatorStats.bind(this, models));
 
   app.use('/api', router);
 }
