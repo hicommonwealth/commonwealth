@@ -258,7 +258,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
       class: 'DiscussionsPage',
       title: topic || 'Discussions',
       description: topicDescription,
-      showNewButton: true,
+      showNewProposalButton: true,
     }, [
       (app.chain || app.community) && [
         topic

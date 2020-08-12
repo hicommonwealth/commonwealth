@@ -22,7 +22,7 @@ import { createTXModal } from 'views/modals/tx_signing_modal';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import PageLoading from 'views/pages/loading';
 import ViewVotersModal from 'views/modals/view_voters_modal';
-import { Grid, Col } from 'construct-ui';
+import { Grid, Col, Button } from 'construct-ui';
 import CouncilRow from './council_row';
 import ListingHeader from '../../components/listing_header';
 import Listing from '../listing';
@@ -70,19 +70,32 @@ const CouncilElectionVoter: m.Component<ICouncilElectionVoterAttrs> = {
   }
 };
 
-const CollectiveVotingButton: m.Component<{ candidates }> = {
+export const CollectiveVotingButton: m.Component<{ candidates, buttonStyle?: boolean }> = {
   view: (vnode) => {
-    const { candidates } = vnode.attrs;
-    return m('a.proposals-action.CollectiveVotingButton', {
-      class: !app.user.activeAccount ? 'disabled' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: CouncilVotingModal,
-          data: { candidates },
-        });
-      }
-    }, 'Vote');
+    const { buttonStyle, candidates } = vnode.attrs;
+    return buttonStyle
+      ? m(Button, {
+        disabled: !app.user.activeAccount,
+        intent: 'primary',
+        label: 'Set council vote',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: CouncilVotingModal,
+            data: { candidates },
+          });
+        },
+      })
+      : m('a.proposals-action.CollectiveVotingButton', {
+        class: !app.user.activeAccount ? 'disabled' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: CouncilVotingModal,
+            data: { candidates },
+          });
+        }
+      }, 'Vote');
   }
 };
 
@@ -138,7 +151,8 @@ const CouncilPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'CouncilPage',
       title: 'Council',
-      showNewButton: true,
+      showCouncilVoteButton: true,
+      councilCandidates: candidates,
     }, [
       // stats
       m(Grid, {

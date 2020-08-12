@@ -214,7 +214,7 @@ const ProposalsPage: m.Component<{}> = {
     return m(Sublayout, {
       class: 'ProposalsPage',
       title: 'Proposals',
-      showNewButton: true,
+      showNewProposalButton: true,
     }, [
       m(ProposalsStats, { onMoloch, onSubstrate }),
       m(Listing, {
