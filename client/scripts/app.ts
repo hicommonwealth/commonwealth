@@ -374,9 +374,9 @@ $(() => {
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
     '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
-    '/:scope/notification-settings': importRoute('views/pages/notification-settings/notification-settings', { scoped: true }),
-    '/chain-event-settings':    redirectRoute(() => '/edgeware/notification-settings/chain-event-settings'),
-    '/:scope/chain-event-settings': importRoute('views/pages/notification-settings/chain-event-settings', { scoped: true }),
+    '/:scope/notification-settings': importRoute('views/pages/subscriptions/notificationSettings', { scoped: true }),
+    '/chain-event-settings':    redirectRoute(() => '/edgeware/chain-event-settings'),
+    '/:scope/chain-event-settings': importRoute('views/pages/subscriptions/chainEventSettings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
