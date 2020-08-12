@@ -37,6 +37,11 @@ class EthWebWalletController {
     return signature;
   }
 
+  public async signMessageWithAccount(message: string, account): Promise<string> {
+    const signature = await this._web3.eth.personal.sign(message, account);
+    return signature;
+  }
+
   // ACTIONS
   public async enable() {
     console.log('Attempting to enable ETH web wallet');
