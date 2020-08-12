@@ -16,7 +16,6 @@ import {
   Account,
   Profile,
   ChainBase,
-  OffchainTag
 } from 'models';
 import { NotificationCategories } from 'types';
 
@@ -44,19 +43,19 @@ export const ProposalHeaderSpacer: m.Component<{}> = {
   }
 };
 
-export const ProposalHeaderTags: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
+export const ProposalHeaderTopics: m.Component<{ proposal: AnyProposal | OffchainThread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     if (!(proposal instanceof OffchainThread)) return;
-    if (!proposal.tag) return;
+    if (!proposal.topic) return;
 
-    const tagColor = '#72b483';
+    const topicColor = '#72b483';
 
-    return m('.ProposalHeaderTags', [
-      link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-        m('span.proposal-tag-icon'),
-        m('span.proposal-tag-name', `${proposal.tag?.name}`),
+    return m('.ProposalHeaderTopics', [
+      link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
+        m('span.proposal-topic-icon'),
+        m('span.proposal-topic-name', `${proposal.topic?.name}`),
       ]),
     ]);
   }

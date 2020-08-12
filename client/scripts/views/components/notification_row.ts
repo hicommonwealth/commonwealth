@@ -240,11 +240,12 @@ const NotificationRow: m.Component<{ notifications: Notification[] }, {
           ? m(User, {
             user: new AddressInfo(null, (authorInfo[0] as [string, string])[1], (authorInfo[0] as [string, string])[0], null),
             avatarOnly: true,
-            avatarSize: 36
+            avatarSize: 26,
+            tooltip: true,
           })
           : m(UserGallery, {
             users: authorInfo.map((auth) => new AddressInfo(null, auth[1], auth[0], null)),
-            avatarSize: 36,
+            avatarSize: 26,
             tooltip: true,
           }),
         m('.comment-body', [

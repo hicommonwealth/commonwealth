@@ -1,79 +1,79 @@
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, Classes, Dialog, Icon, Icons, Tag, TagInput, MenuItem } from 'construct-ui';
+import { Button, Classes, Dialog, Icon, Icons, MenuItem } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThread, OffchainTag } from 'models';
-import TagSelector from './tag_selector';
+import { OffchainThread, OffchainTopic } from 'models';
+import TopicSelector from './topic_selector';
 
-interface ITagEditorAttrs {
+interface ITopicEditorAttrs {
   thread: OffchainThread;
   popoverMenu?: boolean;
   onChangeHandler: Function;
   openStateHandler: Function;
 }
 
-interface ITagEditorState {
-  tagName: string;
-  tagId: number;
+interface ITopicEditorState {
+  topicName: string;
+  topicId: number;
   isOpen: boolean;
 }
 
-const TagWindow: m.Component<{
+const TopicWindow: m.Component<{
   thread: OffchainThread,
   onChangeHandler: Function
 }, {
-  activeTag: OffchainTag | string
+  activeTopic: OffchainTopic | string
 }> = {
   view: (vnode) => {
     const activeMeta = app.chain ? app.chain.meta.chain : app.community.meta;
-    const featuredTags = activeMeta.featuredTags.map((t) => {
-      return app.tags.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
+    const featuredTopics = activeMeta.featuredTopics.map((t) => {
+      return app.topics.getByCommunity(app.activeId()).find((t_) => Number(t) === t_.id);
     });
-    if (!vnode.state.activeTag) {
-      vnode.state.activeTag = vnode.attrs.thread.tag;
+    if (!vnode.state.activeTopic) {
+      vnode.state.activeTopic = vnode.attrs.thread.topic;
     }
 
-    const onChangeHandler = (tagName, tagId?) => {
-      vnode.attrs.onChangeHandler(tagName, tagId);
-      vnode.state.activeTag = tagName;
+    const onChangeHandler = (topicName, topicId?) => {
+      vnode.attrs.onChangeHandler(topicName, topicId);
+      vnode.state.activeTopic = topicName;
     };
 
-    const { activeTag } = vnode.state;
+    const { activeTopic } = vnode.state;
 
-    return m(TagSelector, {
-      featuredTags,
-      activeTag,
-      tags: app.tags.getByCommunity(app.activeId()),
+    return m(TopicSelector, {
+      featuredTopics,
+      activeTopic,
+      topics: app.topics.getByCommunity(app.activeId()),
       updateFormData: onChangeHandler,
     });
   }
 };
 
-const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
+const TopicEditor: m.Component<ITopicEditorAttrs, ITopicEditorState> = {
   oncreate: (vnode) => {
-    if (!vnode.attrs.thread.tag) return;
-    vnode.state.tagName = vnode.attrs.thread.tag.name;
-    vnode.state.tagId = vnode.attrs.thread.tag.id;
+    if (!vnode.attrs.thread.topic) return;
+    vnode.state.topicName = vnode.attrs.thread.topic.name;
+    vnode.state.topicId = vnode.attrs.thread.topic.id;
   },
   oninit: (vnode) => {
     vnode.state.isOpen = !!vnode.attrs.popoverMenu;
   },
   view: (vnode) => {
-    return m('.TagEditor', [
+    return m('.TopicEditor', [
       !vnode.attrs.popoverMenu && m('a', {
         href: '#',
         onclick: (e) => { e.preventDefault(); vnode.state.isOpen = true; },
-      }, 'Move to another tag'),
+      }, 'Move to another topic'),
       m(Dialog, {
         basic: false,
         closeOnEscapeKey: true,
         closeOnOutsideClick: true,
-        content: m(TagWindow, {
+        content: m(TopicWindow, {
           thread: vnode.attrs.thread,
-          onChangeHandler: (tagName, tagId?) => {
-            vnode.state.tagName = tagName;
-            vnode.state.tagId = tagId;
+          onChangeHandler: (topicName, topicId?) => {
+            vnode.state.topicName = topicName;
+            vnode.state.topicId = topicId;
           }
         }),
         hasBackdrop: true,
@@ -86,7 +86,7 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             vnode.state.isOpen = false;
           }
         },
-        title: 'Edit tag',
+        title: 'Edit topic',
         transitionDuration: 200,
         footer: m(`.${Classes.ALIGN_RIGHT}`, [
           m(Button, {
@@ -103,16 +103,16 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
             label: 'Save changes',
             intent: 'primary',
             onclick: async () => {
-              const { tagName, tagId } = vnode.state;
+              const { topicName, topicId } = vnode.state;
               const { thread } = vnode.attrs;
               try {
-                const tag: OffchainTag = await app.tags.update(thread.id, tagName, tagId);
-                vnode.attrs.onChangeHandler(tag);
+                const topic: OffchainTopic = await app.topics.update(thread.id, topicName, topicId);
+                vnode.attrs.onChangeHandler(topic);
               } catch (err) {
-                console.log('Failed to update tag');
+                console.log('Failed to update topic');
                 throw new Error((err.responseJSON && err.responseJSON.error)
                   ? err.responseJSON.error
-                  : 'Failed to update tag');
+                  : 'Failed to update topic');
               }
               if (vnode.attrs.popoverMenu) {
                 vnode.attrs.openStateHandler(false);
@@ -127,4 +127,4 @@ const TagEditor: m.Component<ITagEditorAttrs, ITagEditorState> = {
   }
 };
 
-export default TagEditor;
+export default TopicEditor;

@@ -13,10 +13,15 @@ const LoginWithWalletDropdown: m.Component<{
   loggingInWithAddress,
   joiningChain,
   joiningCommunity,
-  successCallback?
 }> = {
   view: (vnode) => {
-    const { label, loggingInWithAddress, joiningChain, joiningCommunity, successCallback } = vnode.attrs;
+    const { label, loggingInWithAddress, joiningChain, joiningCommunity } = vnode.attrs;
+
+    const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
+    const next = (m.route.param('prev') && m.route.param('prev').indexOf('web3login') === -1) ? m.route.param('prev')
+      : joiningChain ? `/${joiningChain}` : joiningCommunity ? `/${joiningCommunity}` : '/';
+    const web3loginParams = loggingInWithAddress ? { prev, loggingInWithAddress } : joiningChain
+      ? { prev, joiningChain } : joiningCommunity ? { prev, joiningCommunity } : { prev };
 
     return app.chain
       ? m(Button, {
@@ -26,17 +31,13 @@ const LoginWithWalletDropdown: m.Component<{
         label,
         onclick: (e) => {
           $(e.target).trigger('modalexit');
-          m.route.set(`/${app.chain.id}/web3login`, {
-            prev: m.route.param('prev') ? m.route.param('prev') : m.route.get()
-          });
-          const redirectRoute = m.route.get();
+          m.route.set(`/${app.chain.id}/web3login`, web3loginParams);
           app.modals.lazyCreate('link_new_address_modal', {
             loggingInWithAddress,
             joiningChain,
             joiningCommunity,
             successCallback: () => {
-              m.route.set(redirectRoute);
-              if (successCallback) successCallback();
+              m.route.set(next);
             },
           });
         }
@@ -63,17 +64,13 @@ const LoginWithWalletDropdown: m.Component<{
             ]),
             onclick: (e) => {
               $('.Login').trigger('modalexit');
-              m.route.set(`/${chain.id}/web3login`, {
-                prev: m.route.param('prev') ? m.route.param('prev') : m.route.get()
-              });
-              const redirectRoute = m.route.get();
+              m.route.set(`/${chain.id}/web3login`, web3loginParams);
               app.modals.lazyCreate('link_new_address_modal', {
                 loggingInWithAddress,
                 joiningChain,
                 joiningCommunity,
                 successCallback: () => {
-                  m.route.set(redirectRoute);
-                  if (successCallback) successCallback();
+                  m.route.set(next);
                 }
               });
             }

@@ -77,7 +77,7 @@ const accountVerifiedCallback = async (account: Account<any>, vnode) => {
         await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
       }
       // set the address as active
-      app.user.setActiveAccount(account);
+      setActiveAccount(account);
       if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
@@ -326,9 +326,7 @@ const LinkNewAddressModal: m.Component<{
     }
 
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress
-        ? m('h3', `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`)
-        : m('h3', `New ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Link new address'),
     ]);
 
     const isMobile = $(window).width() <= 440;
@@ -949,6 +947,8 @@ const LinkNewAddressModal: m.Component<{
 };
 
 // inject confirmExit property
-LinkNewAddressModal['confirmExit'] = confirmationModalWithText('Cancel out of this process?');
+LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
+  app.isLoggedIn() ? 'Cancel out of linking address?' : 'Cancel out of logging in?'
+);
 
 export default LinkNewAddressModal;

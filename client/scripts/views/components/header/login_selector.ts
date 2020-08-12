@@ -154,15 +154,16 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           intent: 'none',
           fluid: true,
           compact: true,
+          disabled: !(app.chain || app.community),
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? 'Logged in'
+            (!app.chain && !app.community) ? 'Select a community'
               : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
                 : 'Select an address',
           ],
-          iconRight: Icons.CHEVRON_DOWN,
+          iconRight: !(app.chain || app.community) ? null : Icons.CHEVRON_DOWN,
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
           // address list
@@ -173,11 +174,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               basic: true,
               onclick: (e) => {
                 const currentActive = app.user.activeAccount;
-                setActiveAccount(account).then(() => {
-                  if (!isSameAccount(currentActive, app.user.activeAccount)) {
-                    m.redraw();
-                  }
-                });
+                setActiveAccount(account).then(() => { m.redraw(); });
               },
               label: m(UserBlock, {
                 user: account,

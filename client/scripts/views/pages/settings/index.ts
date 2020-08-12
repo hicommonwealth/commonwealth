@@ -11,7 +11,7 @@ import PageLoading from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 
 import EmailWell from './email_well';
-import AccountsWell from './accounts_well';
+import LinkedAddressesWell from './linked_addresses_well';
 import SettingsWell from './settings_well';
 
 const SettingsPage: m.Component<{}> = {
@@ -31,6 +31,8 @@ const SettingsPage: m.Component<{}> = {
     }, [
       m('br'),
       m(EmailWell, { github: true }),
+      m('br'),
+      m(LinkedAddressesWell),
       m('br'),
       m(SettingsWell),
     ]);

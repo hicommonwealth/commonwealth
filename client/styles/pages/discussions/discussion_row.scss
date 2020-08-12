@@ -9,11 +9,11 @@ $discussion-meta-padding: 18px;
             .discussion-locked {
                 margin-right: 12px;
             }
-            a.proposal-tag {
-                @include proposal-tag-inline;
+            a.proposal-topic {
+                @include proposal-topic-inline;
                 margin-right: $discussion-meta-padding;
                 color: $text-color-light;
-                span.proposal-tag-icon {
+                span.proposal-topic-icon {
                     display: inline-block;
                     background: transparent;
                     border: 1.5px solid #b5b7b9;

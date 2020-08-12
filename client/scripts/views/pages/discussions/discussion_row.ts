@@ -8,7 +8,7 @@ import { Icon, Icons, Tag } from 'construct-ui';
 import app from 'state';
 import { pluralize, slugify, link, externalLink, extractDomain } from 'helpers';
 
-import { OffchainThread, OffchainThreadKind, OffchainTag, AddressInfo } from 'models';
+import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
 import User from 'views/components/widgets/user';
 
@@ -56,9 +56,9 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
           ],
         }),
       ]),
-      proposal.tag && link('a.proposal-tag', `/${app.activeId()}/discussions/${proposal.tag.name}`, [
-        m('span.proposal-tag-icon'),
-        m('span.proposal-tag-name', `${proposal.tag.name}`),
+      proposal.topic && link('a.proposal-topic', `/${app.activeId()}/discussions/${proposal.topic.name}`, [
+        m('span.proposal-topic-icon'),
+        m('span.proposal-topic-name', `${proposal.topic.name}`),
       ]),
       (propType === OffchainThreadKind.Link && proposal.url) && m('.discussion-link', [
         `Link: ${extractDomain(proposal.url)}`

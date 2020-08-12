@@ -29,7 +29,7 @@ import {
 } from 'views/components/forms';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import TagSelector from 'views/components/tag_selector';
+import TopicSelector from 'views/components/topic_selector';
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
@@ -51,7 +51,7 @@ const NewProposalForm = {
     let hasToggle : boolean;
     let hasPreimageInput : boolean;
     let hasTitleAndDescription : boolean;
-    let hasTags : boolean;
+    let hasTopics : boolean;
     let hasBeneficiaryAndAmount : boolean;
     let hasPhragmenInfo : boolean;
     let hasDepositChooser : boolean;
@@ -90,7 +90,7 @@ const NewProposalForm = {
       hasTitleAndDescription = true;
     } else if (proposalTypeEnum === ProposalType.OffchainThread) {
       hasTitleAndDescription = true;
-      hasTags = true;
+      hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
       hasBeneficiaryAndAmount = true;
       const treasury = (app.chain as Substrate).treasury;
@@ -126,8 +126,8 @@ const NewProposalForm = {
         app.threads.create(
           author.address,
           OffchainThreadKind.Forum,
-          vnode.state.form.tagName,
-          vnode.state.form.tagId,
+          vnode.state.form.topicName,
+          vnode.state.form.topicId,
           vnode.state.form.title,
           vnode.state.form.description,
           vnode.state.form.categoryId,
@@ -334,13 +334,13 @@ const NewProposalForm = {
           ],
           // actions
           hasAction && m(EdgewareFunctionPicker),
-          hasTags
-            && m(TagSelector, {
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: (tagName: string, tagId?: number) => {
-                vnode.state.form.tagName = tagName;
-                vnode.state.form.tagId = tagId;
+          hasTopics
+            && m(TopicSelector, {
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: (topicName: string, topicId?: number) => {
+                vnode.state.form.topicName = topicName;
+                vnode.state.form.topicId = topicId;
               },
               tabindex: 3,
             }),

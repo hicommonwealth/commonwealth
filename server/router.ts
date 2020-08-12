@@ -67,7 +67,6 @@ import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
 
 import getUploadSignature from './routes/getUploadSignature';
-import registerWaitingList from './routes/registerWaitingList';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
 import deleteThread from './routes/deleteThread';
@@ -85,11 +84,11 @@ import updateProfile from './routes/updateProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
-import createTag from './routes/createTag';
-import updateTags from './routes/updateTags';
-import editTag from './routes/editTag';
-import deleteTag from './routes/deleteTag';
-import bulkTags from './routes/bulkTags';
+import createTopic from './routes/createTopic';
+import updateTopics from './routes/updateTopics';
+import editTopic from './routes/editTopic';
+import deleteTopic from './routes/deleteTopic';
+import bulkTopics from './routes/bulkTopics';
 import setPrivacy from './routes/setPrivacy';
 
 import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
@@ -149,7 +148,7 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   router.get('/bulkThreads', bulkThreads.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
-  
+
   router.post('/setPrivacy', passport.authenticate('jwt', { session: false }), setPrivacy.bind(this, models));
 
 
@@ -171,17 +170,17 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // TODO: Change to GET /comments
   router.get('/bulkComments', bulkComments.bind(this, models));
 
-  // offchain tags
-  // TODO: Change to POST /tag
-  router.post('/createTag', passport.authenticate('jwt', { session: false }), createTag.bind(this, models));
-  // TODO: Change to PUT /tags
-  router.post('/updateTags', passport.authenticate('jwt', { session: false }), updateTags.bind(this, models));
-  // TODO: Change to PUT /tag
-  router.post('/editTag', passport.authenticate('jwt', { session: false }), editTag.bind(this, models));
-  // TODO: Change to DELETE /tag
-  router.post('/deleteTag', passport.authenticate('jwt', { session: false }), deleteTag.bind(this, models));
-  // TODO: Change to GET /tags
-  router.get('/bulkTags', bulkTags.bind(this, models));
+  // offchain topics
+  // TODO: Change to POST /topic
+  router.post('/createTopic', passport.authenticate('jwt', { session: false }), createTopic.bind(this, models));
+  // TODO: Change to PUT /topics
+  router.post('/updateTopics', passport.authenticate('jwt', { session: false }), updateTopics.bind(this, models));
+  // TODO: Change to PUT /topic
+  router.post('/editTopic', passport.authenticate('jwt', { session: false }), editTopic.bind(this, models));
+  // TODO: Change to DELETE /topic
+  router.post('/deleteTopic', passport.authenticate('jwt', { session: false }), deleteTopic.bind(this, models));
+  // TODO: Change to GET /topics
+  router.get('/bulkTopics', bulkTopics.bind(this, models));
 
   // offchain reactions
   // TODO: Change to POST /reaction
@@ -257,10 +256,6 @@ function setupRouter(app, models, viewCountCache: ViewCountCache, identityFetchC
   // attachments
   // TODO: Change to POST /uploadSignature
   router.post('/getUploadSignature', passport.authenticate('jwt', { session: false }), getUploadSignature.bind(this, models));
-
-  // homepage and waiting lists
-  // TODO: Change to POST /waitingList
-  router.post('/registerWaitingList', registerWaitingList.bind(this, models));
 
   // notifications
   // TODO: Change to GET /subscriptions

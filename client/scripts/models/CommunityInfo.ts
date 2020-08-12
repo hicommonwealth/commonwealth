@@ -2,7 +2,7 @@ import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import ChainInfo from './ChainInfo';
-import OffchainTag from './OffchainTag';
+import OffchainTopic from './OffchainTopic';
 
 interface CommunityData {
   name: string,
@@ -28,13 +28,13 @@ class CommunityInfo {
   public readonly visible: boolean;
   public invitesEnabled: boolean;
   public privacyEnabled: boolean;
-  public readonly featuredTags: string[];
-  public readonly tags: OffchainTag[];
+  public readonly featuredTopics: string[];
+  public readonly topics: OffchainTopic[];
   public adminsAndMods: RoleInfo[];
 
   constructor(
     id, name, description, website, chat, telegram, github, defaultChain,
-    visible, invitesEnabled, privacyEnabled, featuredTags, tags, adminsAndMods?
+    visible, invitesEnabled, privacyEnabled, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.name = name;
@@ -47,8 +47,8 @@ class CommunityInfo {
     this.visible = visible;
     this.invitesEnabled = invitesEnabled;
     this.privacyEnabled = privacyEnabled;
-    this.featuredTags = featuredTags || [];
-    this.tags = tags || [];
+    this.featuredTopics = featuredTopics || [];
+    this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
@@ -65,8 +65,8 @@ class CommunityInfo {
       json.visible,
       json.invitesEnabled,
       json.privacyEnabled,
-      json.featuredTags,
-      json.tags,
+      json.featuredTopics,
+      json.topics,
       json.adminsAndMods,
     );
   }
@@ -133,29 +133,29 @@ class CommunityInfo {
     this.invitesEnabled = updatedCommunity.invitesEnabled;
   }
 
-  public addFeaturedTag(tag: string) {
-    this.featuredTags.push(tag);
+  public addFeaturedTopic(topic: string) {
+    this.featuredTopics.push(topic);
   }
 
-  public removeFeaturedTag(tag: string) {
-    if (this.featuredTags.includes(tag)) {
-      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+  public removeFeaturedTopic(topic: string) {
+    if (this.featuredTopics.includes(topic)) {
+      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
     }
   }
 
-  public async updateFeaturedTags(tags: string[]) {
+  public async updateFeaturedTopics(topics: string[]) {
     try {
       // TODO: Change to PUT /community
       await $.post(`${app.serverUrl()}/updateCommunity`, {
         'id': app.activeCommunityId(),
-        'featured_tags[]': tags,
+        'featured_topics[]': topics,
         'jwt': app.user.jwt
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update featured topics');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update featured topics');
     }
   }
 }
