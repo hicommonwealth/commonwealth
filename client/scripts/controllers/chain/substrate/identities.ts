@@ -190,9 +190,6 @@ class SubstrateIdentities implements StorageModule {
   // TODO: add helper for mashalling substrate Data fields
   public async setIdentityTx(who: SubstrateAccount, data: IdentityInfoProps) {
     const info = this._Chain.createType('IdentityInfo', data);
-    if (info.additional.length > this.maxAddlFields) {
-      throw new Error('too many additional fields');
-    }
 
     // compute the basic required balance for the registration
     let requiredBalance = this.basicDeposit.add(this.fieldDeposit.muln(info.additional.length));
@@ -207,9 +204,6 @@ class SubstrateIdentities implements StorageModule {
 
     // verify the account has sufficient funds based on above computation
     const txFunc = (api: ApiRx) => api.tx.identity.setIdentity(info);
-    if (!(await this._Chain.canPayFee(who, txFunc, this._Chain.coins(requiredBalance)))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       who,
       txFunc,
@@ -219,12 +213,6 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarFeeTx(who: SubstrateAccount, regIdx: number, fee: SubstrateCoin) {
-    if (!this.registrars[regIdx] || !this.registrars[regIdx].account) {
-      throw new Error('invalid registrar');
-    }
-    if (this.registrars[regIdx].account.toString() !== who.address) {
-      throw new Error('invalid account');
-    }
     return this._Chain.createTXModalData(
       who,
       (api: ApiRx) => api.tx.identity.setFee(regIdx, fee),
@@ -234,12 +222,6 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarAccountTx(who: SubstrateAccount, regIdx: number, newAcct: SubstrateAccount) {
-    if (!this.registrars[regIdx] || !this.registrars[regIdx].account) {
-      throw new Error('invalid registrar');
-    }
-    if (this.registrars[regIdx].account.toString() !== who.address) {
-      throw new Error('invalid account');
-    }
     return this._Chain.createTXModalData(
       who,
       (api: ApiRx) => api.tx.identity.setAccountId(regIdx, newAcct.address),
@@ -249,12 +231,6 @@ class SubstrateIdentities implements StorageModule {
   }
 
   public setRegistrarFieldsTx(who: SubstrateAccount, regIdx: number, fields: IdentityFields) {
-    if (!this.registrars[regIdx] || !this.registrars[regIdx].account) {
-      throw new Error('invalid registrar');
-    }
-    if (this.registrars[regIdx].account.toString() !== who.address) {
-      throw new Error('invalid account');
-    }
     return this._Chain.createTXModalData(
       who,
       (api: ApiRx) => api.tx.identity.setFields(regIdx, fields),
@@ -269,18 +245,6 @@ class SubstrateIdentities implements StorageModule {
     target: SubstrateIdentity,
     judgement: IdentityJudgement
   ) {
-    if (!this.registrars[regIdx] || !this.registrars[regIdx].account) {
-      throw new Error('invalid registrar');
-    }
-    if (this.registrars[regIdx].account.toString() !== who.address) {
-      throw new Error('invalid account');
-    }
-    if (!target.exists) {
-      throw new Error('target identity does not exist');
-    }
-    if (judgement.isFeePaid) {
-      throw new Error('invalid judgement');
-    }
     return this._Chain.createTXModalData(
       who,
       (api: ApiRx) => api.tx.identity.provideJudgement(regIdx, target.account.address, judgement),

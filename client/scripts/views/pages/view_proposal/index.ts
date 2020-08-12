@@ -17,14 +17,14 @@ import {
   OffchainThread,
   OffchainThreadKind,
   OffchainComment,
-  OffchainTag,
+  OffchainTopic,
   AnyProposal,
   Account,
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import TagEditor from 'views/components/tag_editor';
-import { TagEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
+import TopicEditor from 'views/components/topic_editor';
+import { TopicEditorButton, ThreadSubscriptionButton } from 'views/pages/discussions/discussion_row_menu';
 import ProposalVotingActions from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import User from 'views/components/widgets/user';
@@ -32,7 +32,7 @@ import PageLoading from 'views/pages/loading';
 import PageNotFound from 'views/pages/404';
 
 import {
-  ProposalHeaderExternalLink, ProposalHeaderTags, ProposalHeaderTitle,
+  ProposalHeaderExternalLink, ProposalHeaderTopics, ProposalHeaderTitle,
   ProposalHeaderOnchainId, ProposalHeaderOnchainStatus, ProposalHeaderSpacer, ProposalHeaderViewCount,
   ProposalHeaderPrivacyButtons
 } from './header';
@@ -57,7 +57,7 @@ interface IProposalHeaderState {
   saving: boolean;
   quillEditorState: any;
   currentText: any;
-  tagEditorIsOpen: boolean;
+  topicEditorIsOpen: boolean;
 }
 
 const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = {
@@ -100,7 +100,7 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
         m('.proposal-top-left', [
           m('.proposal-title', m(ProposalHeaderTitle, { proposal })),
           m('.proposal-body-meta', proposal instanceof OffchainThread ? [
-            m(ProposalHeaderTags, { proposal }),
+            m(ProposalHeaderTopics, { proposal }),
             m(ProposalBodyAuthor, { item: proposal }),
             m(ProposalBodyCreated, { item: proposal, link: proposalLink }),
             m(ProposalHeaderViewCount, { viewCount }),
@@ -136,9 +136,9 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
                   item: proposal, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
                 canEdit && m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                canEdit && proposal instanceof OffchainThread && m(TagEditorButton, {
-                  openTagEditor: () => {
-                    vnode.state.tagEditorIsOpen = true;
+                canEdit && proposal instanceof OffchainThread && m(TopicEditorButton, {
+                  openTopicEditor: () => {
+                    vnode.state.topicEditorIsOpen = true;
                   }
                 }),
                 canEdit && m(ProposalHeaderPrivacyButtons, { proposal }),
@@ -148,11 +148,11 @@ const ProposalHeader: m.Component<IProposalHeaderAttrs, IProposalHeaderState> = 
               inline: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
             }),
-            vnode.state.tagEditorIsOpen && proposal instanceof OffchainThread && m(TagEditor, {
+            vnode.state.topicEditorIsOpen && proposal instanceof OffchainThread && m(TopicEditor, {
               thread: vnode.attrs.proposal as OffchainThread,
               popoverMenu: true,
-              onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-              openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
+              onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
+              openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
             })
           ]),
 
@@ -256,7 +256,7 @@ const ProposalComment: m.Component<IProposalCommentAttrs, IProposalCommentState>
                 m(ProposalBodyEditMenuItem, {
                   item: comment, getSetGlobalReplyStatus, getSetGlobalEditingStatus, parentState: vnode.state,
                 }),
-                m(ProposalBodyDeleteMenuItem, { item: comment }),
+                m(ProposalBodyDeleteMenuItem, { item: comment, refresh: () => callback(), }),
                 // parentType === CommentParent.Proposal // For now, we are limiting threading to 1 level deep
                 // && m(ProposalBodyReplyMenuItem, {
                 //   item: comment,

@@ -1,7 +1,7 @@
 .NotificationRow {
     display: flex;
     flex-direction: column;
-    padding: 15px 18px;
+    padding: 18px 22px 19px;
     line-height: 1.2;
     margin: 0;
     cursor: pointer;
@@ -12,8 +12,9 @@
     &.unread {
         background: #ffffe0;
     }
-    :first-child {
-        margin-bottom: 7px;
+    > .User,
+    > .UserGallery {
+        margin-bottom: 10px;
     }
     .comment-body {
         flex: 1;

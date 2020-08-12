@@ -70,7 +70,7 @@ const threadModelFromServer = (thread) => {
     attachments,
     thread.id,
     moment(thread.created_at),
-    thread.tag,
+    thread.topic,
     thread.kind,
     thread.version_history,
     thread.community,
@@ -128,8 +128,12 @@ const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
           vnode.state.loading = false;
           const a = result.account;
           const profile = new Profile(a.chain, a.address);
-          const profileData = JSON.parse(a.OffchainProfile.data);
-          profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+          if (a.OffchainProfile) {
+            const profileData = JSON.parse(a.OffchainProfile.data);
+            profile.initialize(profileData.name, profileData.headline, profileData.bio, profileData.avatarUrl);
+          } else {
+            profile.initializeEmpty();
+          }
           const account = {
             profile,
             chain: a.chain,

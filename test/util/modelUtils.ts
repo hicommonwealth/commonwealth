@@ -78,8 +78,8 @@ export interface ThreadArgs {
   chainId: string,
   communityId: string,
   title: string,
-  tagName: string,
-  tagId: number,
+  topicName: string,
+  topicId: number,
   body?: string,
   url?: string,
   attachments?: string[],
@@ -88,7 +88,7 @@ export interface ThreadArgs {
   readOnly?: boolean
 }
 export const createThread = async (args: ThreadArgs) => {
-  const { chainId, communityId, address, jwt, title, body, tagName, tagId,
+  const { chainId, communityId, address, jwt, title, body, topicName, topicId,
     privacy, readOnly, kind, url, mentions, attachments } = args;
   const timestamp = moment();
   const firstVersion : any = { timestamp, body };
@@ -106,8 +106,8 @@ export const createThread = async (args: ThreadArgs) => {
       'kind': kind,
       'versionHistory': versionHistory,
       'attachments[]': undefined,
-      'tag_name': tagName,
-      'tag_id': tagId,
+      'topic_name': topicName,
+      'topic_id': topicId,
       'mentions[]': mentions,
       'url': url,
       'privacy': privacy || false,
@@ -137,7 +137,7 @@ export const createComment = async (args: CommentArgs) => {
     .set('Accept', 'application/json')
     .send({
       'author_chain': chain,
-      'chain': chain,
+      'chain': community ? undefined : chain,
       'community': community,
       'address': address,
       'parent_id': parentCommentId,
@@ -181,7 +181,7 @@ export const editComment = async (args: EditCommentArgs) => {
   return res.body;
 };
 
-export interface EditTagArgs {
+export interface EditTopicArgs {
   jwt: any;
   address: string;
   id: number;
@@ -192,10 +192,10 @@ export interface EditTagArgs {
   community?: string;
 }
 
-export const editTag = async (args: EditTagArgs) => {
+export const editTopic = async (args: EditTopicArgs) => {
   const { jwt, address, id, name, description, featured_order, chain, community } = args;
   const res = await chai.request.agent(app)
-    .post('/api/editTag')
+    .post('/api/editTopic')
     .set('Accept', 'application/json')
     .send({
       'id': id,

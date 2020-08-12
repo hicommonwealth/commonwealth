@@ -20,7 +20,7 @@ export const Errors = {
 const createThread = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { tag_name, tag_id, title, body, kind, url, privacy, readOnly } = req.body;
+  const { topic_name, topic_id, title, body, kind, url, privacy, readOnly } = req.body;
 
   const mentions = typeof req.body['mentions[]'] === 'string'
     ? [req.body['mentions[]']]
@@ -87,25 +87,25 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     read_only: readOnly || false,
   };
 
-  // New Tag table entries created
-  if (tag_id) {
-    threadContent['tag_id'] = Number(tag_id);
-  } else if (tag_name) {
-    let offchainTag;
+  // New Topic table entries created
+  if (topic_id) {
+    threadContent['topic_id'] = Number(topic_id);
+  } else if (topic_name) {
+    let offchainTopic;
     try {
-      [offchainTag] = await models.OffchainTag.findOrCreate({
+      [offchainTopic] = await models.OffchainTopic.findOrCreate({
         where: {
-          name: tag_name,
+          name: topic_name,
           community_id: community?.id || null,
           chain_id: chain?.id || null,
         },
       });
-      threadContent['tag_id'] = offchainTag.id;
+      threadContent['topic_id'] = offchainTopic.id;
     } catch (err) {
       return next(err);
     }
   } else {
-    return next(Error('Must pass a tag_name string and/or a numeric tag_id'));
+    return next(Error('Must pass a topic_name string and/or a numeric topic_id'));
   }
 
   let thread;
@@ -115,7 +115,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
     return next(new Error(err));
   }
 
-  // TODO: attachments can likely be handled like tags & mentions (see lines 11-14)
+  // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({
@@ -143,7 +143,7 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       include: [
         models.Address,
         models.OffchainAttachment,
-        { model: models.OffchainTag, as: 'tag' }
+        { model: models.OffchainTopic, as: 'topic' }
       ],
     });
   } catch (err) {
@@ -156,12 +156,18 @@ const createThread = async (models, req: Request, res: Response, next: NextFunct
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
+      offchain_thread_id: finalThread.id,
+      community_id: finalThread.community || null,
+      chain_id: finalThread.chain || null,
       is_active: true,
     });
     await models.Subscription.create({
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
+      offchain_thread_id: finalThread.id,
+      community_id: finalThread.community || null,
+      chain_id: finalThread.chain || null,
       is_active: true,
     });
   } catch (err) {

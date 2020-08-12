@@ -106,7 +106,7 @@ const resetServer = (debug=false): Promise<void> => {
         id: 'edgeware',
         network: 'edgeware',
         symbol: 'EDG',
-        name: 'Edgeware Mainnet',
+        name: 'Edgeware',
         icon_url: '/static/img/protocols/edg.png',
         active: true,
         type: 'chain',

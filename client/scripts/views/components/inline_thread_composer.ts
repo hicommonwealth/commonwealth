@@ -7,12 +7,12 @@ import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, OffchainTag } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
 import { notifyError } from 'controllers/app/notifications';
-import TagSelector from './tag_selector';
+import TopicSelector from './topic_selector';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -31,8 +31,8 @@ interface ILinkPostState {
 }
 
 interface IThreadForm {
-  tagName?: string;
-  tagId?: number;
+  topicName?: string;
+  topicId?: number;
   url?: string;
   title?: string;
 }
@@ -94,12 +94,12 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         editorNamespace: `${app.activeId()}-new-link-inline`,
         onkeyboardSubmit: createLink,
       }),
-      m(TagSelector, {
-        tags: app.tags.getByCommunity(app.activeId()),
-        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tagName: string, tagId?: number) => {
-          vnode.state.form.tagName = tagName;
-          vnode.state.form.tagId = tagId;
+      m(TopicSelector, {
+        topics: app.topics.getByCommunity(app.activeId()),
+        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        updateFormData: (topicName: string, topicId?: number) => {
+          vnode.state.form.topicName = topicName;
+          vnode.state.form.topicId = topicId;
         },
         tabindex: 3,
       }),
@@ -141,7 +141,7 @@ interface ITextPostAttrs {
 interface ITextPostState {
   readOnly: boolean;
   privacy: boolean;
-  tags: string[];
+  topics: string[];
   uploadsInProgress: number;
   closed: boolean;
   error: any;
@@ -183,12 +183,12 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         editorNamespace: 'new-thread-inline',
         onkeyboardSubmit: createThread,
       }),
-      m(TagSelector, {
-        tags: app.tags.getByCommunity(app.activeId()),
-        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tagName: string, tagId?: number) => {
-          vnode.state.form.tagName = tagName;
-          vnode.state.form.tagId = tagId;
+      m(TopicSelector, {
+        topics: app.topics.getByCommunity(app.activeId()),
+        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        updateFormData: (topicName: string, topicId?: number) => {
+          vnode.state.form.topicName = topicName;
+          vnode.state.form.topicId = topicId;
         },
         tabindex: 3,
       }),
@@ -261,7 +261,7 @@ interface IInlineThreadComposerAttrs {
 
 interface IInlineThreadComposerState {
   open: boolean;
-  tags: string[];
+  topics: string[];
   threadType: string | boolean;
   timeout: any;
   textTitle: string;

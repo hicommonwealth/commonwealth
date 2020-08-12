@@ -1,0 +1,25 @@
+@import 'client/styles/shared';
+
+.topic-selection-drop-menu {
+    @include proposal-topic-inline;
+    .proposal-topic-icon {
+        margin-right: 8px;
+    }
+}
+
+.TopicSelector {
+    .no-matching-topics {
+        max-width: 190px;
+    }
+    .cui-popover-content {
+        padding: 0 !important;
+        min-width: 178px;
+        .cui-list {
+            border-radius: 3px;
+            @include proposal-topic-inline;
+            .proposal-topic-icon {
+                margin-right: 9px;
+            }
+        }
+    }
+}

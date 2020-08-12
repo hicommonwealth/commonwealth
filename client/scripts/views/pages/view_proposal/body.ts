@@ -13,7 +13,6 @@ import {
   Account,
   Profile,
   ChainBase,
-  OffchainTag
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 
@@ -251,9 +250,9 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any>, refresh?: Function, }> = {
   view: (vnode) => {
-    const { item } = vnode.attrs;
+    const { item, refresh } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
@@ -267,6 +266,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
+          refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
         });

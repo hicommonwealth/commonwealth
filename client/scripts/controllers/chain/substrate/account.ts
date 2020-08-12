@@ -439,13 +439,9 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public async sendBalanceTx(recipient: SubstrateAccount, amount: SubstrateCoin) {
-    const txFunc = (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount);
-    if (!(await this._Chain.canPayFee(this, txFunc, amount))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       this,
-      txFunc,
+      (api: ApiRx) => api.tx.balances.transfer(recipient.address, amount),
       'balanceTransfer',
       `${formatCoin(amount)} to ${recipient.address}`
     );
@@ -540,9 +536,6 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   }
 
   public unlockTx() {
-    if (this.chainClass !== ChainClass.Kusama && this.chainClass !== ChainClass.Polkadot) {
-      throw new Error('unlock only supported on Kusama');
-    }
     return this._Chain.createTXModalData(
       this,
       (api: ApiRx) => api.tx.democracy.unlock(this.address),

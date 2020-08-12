@@ -13,7 +13,7 @@ import CommentsController from './controllers/server/comments';
 import ThreadsController from './controllers/server/threads';
 import ReactionsController from './controllers/server/reactions';
 import WebsocketController from './controllers/server/socket';
-import TagsController from './controllers/server/tags';
+import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ChainEventsController from './controllers/server/chain_events';
 import ChainEntityController from './controllers/server/chain_entities';
@@ -43,9 +43,9 @@ export interface IApp {
   comments: CommentsController;
   threads: ThreadsController;
   reactions: ReactionsController;
-  tags: TagsController;
   chainEntities: ChainEntityController;
   chainEvents: ChainEventsController;
+  topics: TopicsController;
   communities: CommunitiesController;
   user: UserController;
   // XXX: replace this with some app.chain helper
@@ -86,9 +86,9 @@ const app: IApp = {
   comments: new CommentsController(),
   threads: new ThreadsController(),
   reactions: new ReactionsController(),
-  tags: new TagsController(),
   chainEntities: new ChainEntityController(),
   chainEvents: new ChainEventsController(),
+  topics: new TopicsController(),
   communities: new CommunitiesController(),
   user: new UserController(),
 

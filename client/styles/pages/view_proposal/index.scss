@@ -151,14 +151,14 @@ $discussion-title-font-size: 1.45rem;
         }
     }
 
-    .ProposalHeaderTags {
-        .proposal-tag {
-            @include proposal-tag-inline;
+    .ProposalHeaderTopics {
+        .proposal-topic {
+            @include proposal-topic-inline;
         }
     }
 
     // proposal-meta
-    .ProposalHeaderTags,
+    .ProposalHeaderTopics,
     .ProposalHeaderOnchainId,
     .ProposalHeaderOnchainStatus,
     .ProposalBodyAuthor,

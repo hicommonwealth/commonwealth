@@ -30,8 +30,8 @@ const deleteCommunity = async (models, req: Request, res: Response, next: NextFu
   //       address_id: { [Op.in]: userOwnedAddressIds },
   //     },
   //   });
-  //   const communityTags = await community.getTags();
-  //   community.removeTags(communityTags);
+  //   const communityTopics = await community.getTopics();
+  //   community.removeTopics(communityTopics);
   //   // actually delete
   //   await community.destroy();
   //   return res.json({ status: 'Success' });

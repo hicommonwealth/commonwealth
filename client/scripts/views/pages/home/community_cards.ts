@@ -60,10 +60,12 @@ const CommunityCard : m.Component<{ community, justJoinedCommunities }> = {
         community.name,
         community.privacyEnabled && m('span.icon-lock'),
       ]),
-      app.user.isMember({ account: app.user.activeAccount, community: community.id}) && justJoinedCommunities.indexOf(community.id) === -1 && [
-        app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
-        updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
-      ],
+      app.user.isMember({ account: app.user.activeAccount, community: community.id })
+        && justJoinedCommunities.indexOf(community.id) === -1
+        && [
+          app.isLoggedIn() && !visitedCommunity && m('.chain-new', m('.new-threads', 'New')),
+          updatedThreads > 0 && m('.chain-new', m('.new-threads', `${updatedThreads} new`)),
+        ],
       m('p.card-description', community.description),
       m(Button, {
         interactive: true,

@@ -47,14 +47,24 @@ const deleteThread = async (models, req: Request, res: Response, next: NextFunct
       return next(new Error(DeleteThreadErrors.NoPermission));
     }
 
-    const tag = await models.OffchainTag.findOne({
-      where: { id: thread.tag_id },
+    const topic = await models.OffchainTopic.findOne({
+      where: { id: thread.topic_id },
       include: [ { model: models.OffchainThread, as: 'threads' } ]
     });
-    const featuredTags = (thread.Chain || thread.OffchainCommunity).featured_tags;
-    if (tag && !featuredTags.includes(`${tag.id}`) && tag.threads.length <= 1) {
-      tag.destroy();
+    const featuredTopics = (thread.Chain || thread.OffchainCommunity).featured_topics;
+    if (topic && !featuredTopics.includes(`${topic.id}`) && topic.threads.length <= 1) {
+      topic.destroy();
     }
+
+    // find and delete all associated subscriptions
+    const subscriptions = await models.Subscription.findAll({
+      where: {
+        offchain_thread_id: thread.id,
+      },
+    });
+    await Promise.all(subscriptions.map((s) => {
+      return s.destroy();
+    }));
 
     await thread.destroy();
     return res.json({ status: 'Success' });

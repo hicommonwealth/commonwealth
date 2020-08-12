@@ -37,7 +37,8 @@ import setupAPI from './server/router';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import { fetchStats } from './server/routes/getEdgewareLockdropStats';
-import { migrateIdentities } from './server/scripts/migrateIdentities';
+import migrateChainEntities from './server/scripts/migrateChainEntities';
+import migrateIdentities from './server/scripts/migrateIdentities';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -50,7 +51,7 @@ const SHOULD_UPDATE_SUPERNOVA_STATS = process.env.UPDATE_SUPERNOVA === 'true';
 const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS = process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-const RUN_ENTITY_MIGRATION = process.env.RUN_ENTITY_MIGRATION;
+const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
 const NO_EVENTS = process.env.NO_EVENTS === 'true';
 
@@ -186,16 +187,23 @@ async function main() {
       setupServer(app, wss, sessionParser);
     } else {
       // handle various chain-event cases
+      if (ENTITY_MIGRATION) {
+        // "all" means run for all supported chains, otherwise we pass in the name of
+        // the specific chain to migrate
+        await migrateChainEntities(models, ENTITY_MIGRATION === 'all' ? undefined : ENTITY_MIGRATION);
+        log.info('Finished migrating chain entities into the DB');
+        process.exit(0);
+      }
+
       if (IDENTITY_MIGRATION) {
         await migrateIdentities(models);
         log.info('Finished migrating chain identities into the DB');
         process.exit(0);
       }
 
-      // TODO: remove the entity migration option from this call and make it another top-level function
       let exitCode = 0;
       try {
-        const subscribers = await setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP, RUN_ENTITY_MIGRATION);
+        const subscribers = await setupChainEventListeners(models, wss, SKIP_EVENT_CATCHUP);
 
         // construct storageFetchers needed for the identity cache
         const fetchers = {};
@@ -207,13 +215,9 @@ async function main() {
         identityFetchCache.start(models, fetchers);
       } catch (e) {
         exitCode = 1;
-        if (RUN_ENTITY_MIGRATION) {
-          console.error(`Entity migration failed: ${e.message}`);
-        } else {
-          console.error(`Chain event listener setup failed: ${e.message}`);
-        }
+        console.error(`Chain event listener setup failed: ${e.message}`);
       }
-      if (RUN_ENTITY_MIGRATION || exitCode) {
+      if (exitCode) {
         await models.sequelize.close();
         await closeMiddleware();
         process.exit(exitCode);

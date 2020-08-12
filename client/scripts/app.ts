@@ -3,9 +3,11 @@ import 'lib/toastr.css';
 import 'lib/flexboxgrid.css';
 import 'lity/dist/lity.min.css';
 import 'construct.scss';
+import 'nprogress.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
+import NProgress from 'nprogress';
 import { FocusManager } from 'construct-ui';
 
 import app, { ApiStatus, LoginState } from 'state';
@@ -17,7 +19,7 @@ import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
-import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
@@ -52,12 +54,12 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           visible: community.visible,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
-          featuredTags: community.featured_tags,
-          tags: community.tags,
+          featuredTopics: community.featured_topics,
+          topics: community.topics,
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
+      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -92,7 +94,8 @@ export async function deinitChainOrCommunity() {
     app.community = null;
   }
   app.user.setSelectedNode(null);
-  clearActiveAddresses();
+  app.user.setActiveAccounts([]);
+  app.user.ephemerallySetActiveAccount(null);
 }
 
 export function handleInviteLinkRedirect() {
@@ -214,11 +217,7 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
   app.chain.deferred = deferred;
 
   // Load server data without initializing modules/chain connection.
-  // Also, load basic API data immediately (connected/disconnected, etc)
-  await Promise.all([
-    app.chain.initServer(),
-    app.chain.initApi(),
-  ]);
+  await app.chain.initServer();
 
   // Instantiate active addresses before chain fully loads
   updateActiveAddresses(n.chain);
@@ -242,6 +241,9 @@ export async function selectNode(n?: NodeInfo, deferred = false): Promise<void> 
 // and not already initialized.
 export async function initChain(): Promise<void> {
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
+  if (!app.chain.apiInitialized) {
+    await app.chain.initApi();
+  }
   app.chain.deferred = false;
   const n = app.chain.meta;
   await app.chain.initData();
@@ -322,6 +324,8 @@ $(() => {
 
   const importRoute = (path: string, attrs: RouteAttrs) => ({
     onmatch: () => {
+      console.log('onmatch called, for:', path);
+      NProgress.start();
       return import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "route-[request]" */
@@ -331,6 +335,8 @@ $(() => {
     render: (vnode) => {
       const { scoped } = attrs;
       let deferChain = attrs.deferChain;
+      console.log('render called, for:', path);
+      NProgress.done();
       const scope = typeof scoped === 'string'
         // string => scope is defined by route
         ? scoped
@@ -367,7 +373,10 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/:scope/notification-settings': importRoute('views/pages/notification-settings', { scoped: true }),
+    '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
+    '/:scope/notification-settings': importRoute('views/pages/notification-settings/notification-settings', { scoped: true }),
+    '/chain-event-settings':    redirectRoute(() => '/edgeware/notification-settings/chain-event-settings'),
+    '/:scope/chain-event-settings': importRoute('views/pages/notification-settings/chain-event-settings', { scoped: true }),
 
     // Edgeware lockdrop
     '/edgeware/unlock':          importRoute('views/pages/unlock_lockdrop', { scoped: false }),
@@ -378,7 +387,7 @@ $(() => {
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),

@@ -86,7 +86,8 @@ export default class {
 
   constructor() {}
 
-  public setActiveAccount(account: Account<any>): void { this._setActiveAccount(account); }
+  // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
+  public ephemerallySetActiveAccount(account: Account<any>): void { this._setActiveAccount(account); }
   public setEmail(email: string): void { this._setEmail(email); }
   public setEmailInterval(emailInterval: string): void { this._setEmailInterval(emailInterval); }
   public setEmailVerified(verified: boolean): void { this._setEmailVerified(verified); }
