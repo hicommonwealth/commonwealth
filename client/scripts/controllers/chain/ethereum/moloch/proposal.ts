@@ -1,9 +1,9 @@
 import BN from 'bn.js';
 import moment from 'moment';
 
-import { MolochShares } from 'adapters/chain/ethereum/types';
-import { IMolochProposalResponse, IMolochVote } from 'adapters/chain/moloch/types';
-import { ICompletable } from 'adapters/shared';
+import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
+import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
+import { MolochTypes } from '@commonwealth/chain-events';
 
 import {
   Proposal,
@@ -12,7 +12,9 @@ import {
   VotingType,
   VotingUnit,
   ProposalStatus,
-  ProposalEndTime
+  ProposalEndTime,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 
 import MolochMember from './member';
@@ -35,7 +37,7 @@ export enum MolochProposalState {
   Processed
 }
 
-export class MolochProposalVote implements IVote<MolochShares> {
+export class MolochProposalVote implements IVote<EthereumCoin> {
   public readonly account: MolochMember;
   public readonly choice: MolochVote;
 
@@ -45,38 +47,95 @@ export class MolochProposalVote implements IVote<MolochShares> {
   }
 }
 
+const backportEntityToAdapter = (
+  Gov: MolochGovernance,
+  entity: ChainEntity
+): IMolochProposalResponse => {
+  const startEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.SubmitProposal);
+  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
+  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
+  if (!startEvent) {
+    throw new Error('Proposal start event not found!');
+  }
+  const identifier = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
+  const id = identifier;
+  const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
+  const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;
+  const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
+  const delegateKey = (startEvent.data as MolochTypes.ISubmitProposal).member;
+  const applicantAddress = (startEvent.data as MolochTypes.ISubmitProposal).applicant;
+  const tokenTribute = (startEvent.data as MolochTypes.ISubmitProposal).tokenTribute;
+  const sharesRequested = (startEvent.data as MolochTypes.ISubmitProposal).sharesRequested;
+  const processed = !!processEvent;
+  const proposal: IMolochProposalResponse = {
+    identifier,
+    id,
+    details,
+    timestamp,
+    startingPeriod,
+    delegateKey,
+    applicantAddress,
+    tokenTribute,
+    sharesRequested,
+    processed,
+    votes: [],
+  };
+
+  // optional properties
+  if (processEvent) {
+    proposal.didPass = (processEvent.data as MolochTypes.IProcessProposal).didPass;
+    proposal.aborted = false;
+    proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).yesVotes;
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).noVotes;
+  }
+  if (abortEvent) {
+    proposal.didPass = false;
+    proposal.aborted = true;
+    proposal.status = 'ABORTED';
+  }
+  return proposal;
+};
+
+
 export default class MolochProposal extends Proposal<
   MolochAPI,
-  MolochShares,
+  EthereumCoin,
   IMolochProposalResponse,
   MolochProposalVote
 > {
   private _Members: MolochMembers;
   private _Gov: MolochGovernance;
 
-  private _yesShares: number;
-  private _noShares: number;
+  private _yesShares: number = 0;
+  private _noShares: number = 0;
 
-  public get shortIdentifier() { return 'MGP-' + this.data.identifier; }
-  public get title() {
+  public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
+  public get title(): string {
     try {
       const parsed = JSON.parse(this.data.details);
-      if (parsed.hasOwnProperty('title')) {
-        return parsed.title;
+      // eslint-disable-next-line no-prototype-builtins
+      if (parsed && parsed.hasOwnProperty('title')) {
+        return parsed.title as string;
+      } else {
+        return this.data.details;
       }
     } catch {
       if (this.data.details) {
         return this.data.details;
       } else {
-        return 'Moloch Proposal #' + this.data.identifier;
+        return `Moloch Proposal #${this.data.identifier}`;
       }
     }
   }
-  public get description() {
+  public get description(): string {
     try {
       const parsed = JSON.parse(this.data.details);
-      if (parsed.hasOwnProperty('description')) {
-        return parsed.description;
+      // eslint-disable-next-line no-prototype-builtins
+      if (parsed && parsed.hasOwnProperty('description')) {
+        return parsed.description as string;
+      } else {
+        return '';
       }
     } catch {
       return '';
@@ -141,7 +200,9 @@ export default class MolochProposal extends Proposal<
 
   public get isPassing() {
     if (this.data.status === 'PASSED' || this.data.didPass) return ProposalStatus.Passed;
-    if (this.data.status === 'FAILED' || this.data.status === 'ABORTED' || this.data.aborted || this.data.processed) return ProposalStatus.Failed;
+    if (this.data.status === 'FAILED' || this.data.status === 'ABORTED' || this.data.aborted || this.data.processed) {
+      return ProposalStatus.Failed;
+    }
     if (this.state === MolochProposalState.Voting || this.state === MolochProposalState.NotStarted) {
       return new BN(this._yesShares).gt(new BN(this._noShares)) ? ProposalStatus.Passing : ProposalStatus.Failing;
     } else {
@@ -174,32 +235,67 @@ export default class MolochProposal extends Proposal<
   }
 
   constructor(
-    MolochMembers: MolochMembers,
-    MolochProposals: MolochGovernance,
-    data: IMolochProposalResponse
+    Members: MolochMembers,
+    Gov: MolochGovernance,
+    entity: ChainEntity,
   ) {
     // must set identifier before super() because of how response object is named
-    data.identifier = data.id;
-    super('molochproposal', data);
+    super('molochproposal', backportEntityToAdapter(Gov, entity));
 
-    this._Members = MolochMembers;
-    this._Gov = MolochProposals;
+    this._Members = Members;
+    this._Gov = Gov;
 
-    this._yesShares = data.yesVotes
-      ? +data.yesVotes
-      : data.votes.reduce((n, v) => v.uintVote === 1 ? n + (+v.member.shares) : n, 0);
-    this._noShares = data.noVotes
-      ? +data.noVotes
-      : data.votes.reduce((n, v) => v.uintVote === 2 ? n + (+v.member.shares) : n, 0);
-
-    // populate votes from member data
-    this._addOrUpdateVotes(data.votes);
-
+    entity.chainEvents.sort((e1, e2) => e1.blockNumber - e2.blockNumber).forEach((e) => this.update(e));
+    this._initialized.next(true);
     this._Gov.store.add(this);
   }
 
-  public update() {
-    throw new Error('unimplemented');
+  public update(e: ChainEvent) {
+    if (this.completed) {
+      return;
+    }
+    switch (e.data.kind) {
+      case MolochTypes.EventKind.SubmitProposal: {
+        break;
+      }
+      case MolochTypes.EventKind.SubmitVote: {
+        const memberJson = {
+          id: e.data.member,
+          delegateKey: e.data.delegateKey,
+          shares: e.data.shares,
+          highestIndexYesVote: `${e.data.highestIndexYesVote}`,
+        };
+        const member = this._Members.getFromJSON(memberJson);
+        const choice = e.data.vote === 1 ? MolochVote.YES : e.data.vote === 2 ? MolochVote.NO : MolochVote.NULL;
+        this.addOrUpdateVote(new MolochProposalVote(member, choice));
+        if (choice === MolochVote.YES) {
+          this._yesShares += +e.data.shares;
+        } else if (choice === MolochVote.NO) {
+          this._noShares += +e.data.shares;
+        }
+        break;
+      }
+      case MolochTypes.EventKind.Abort: {
+        this.data.aborted = true;
+        this.data.didPass = false;
+        this.data.status = 'ABORTED';
+        this.complete(this._Gov.store);
+        break;
+      }
+      case MolochTypes.EventKind.ProcessProposal: {
+        this.data.processed = true;
+        this.data.aborted = false;
+        this.data.didPass = e.data.didPass;
+        this.data.status = e.data.didPass ? 'PASSED' : 'FAILED';
+        this._yesShares = +e.data.yesVotes;
+        this._noShares = +e.data.noVotes;
+        this.complete(this._Gov.store);
+        break;
+      }
+      default: {
+        throw new Error('invalid event update');
+      }
+    }
   }
 
   public canVoteFrom(account: MolochMember) {
@@ -246,9 +342,6 @@ export default class MolochProposal extends Proposal<
     if (txReceipt.status !== 1) {
       throw new Error('failed to submit vote');
     }
-
-    // trigger update to refresh vote stats
-    await this.refreshData();
     return txReceipt;
   }
 
@@ -274,9 +367,6 @@ export default class MolochProposal extends Proposal<
     if (txReceipt.status !== 1) {
       throw new Error('failed to process proposal');
     }
-
-    // trigger update to refresh vote stats
-    await this.refreshData();
     return txReceipt;
   }
 
@@ -289,7 +379,7 @@ export default class MolochProposal extends Proposal<
       throw new Error('proposal not in abort window');
     }
 
-    if (this._Gov.api.userAddress !== this.applicantAddress) {
+    if (this._Gov.api.userAddress.toLowerCase() !== this.applicantAddress.toLowerCase()) {
       throw new Error('only applicant can abort');
     }
 
@@ -301,44 +391,6 @@ export default class MolochProposal extends Proposal<
     if (txReceipt.status !== 1) {
       throw new Error('failed to abort proposal');
     }
-
-    // trigger update to refresh vote stats
-    await this.refreshData();
     return txReceipt;
-  }
-
-  // re-fetches data from the chain, either on the server or client
-  private async refreshData() {
-    if (this._Gov.useChainProposalData) {
-      const rawProposal = await this._Gov.api.Contract.proposalQueue(this.data.identifier);
-      this._data = this._Gov.convertChainProposal(+this.data.id, rawProposal);
-    } else {
-      const newObjects = await this._Gov.fetcher.forceUpdate('UPDATE');
-      const thisObj = newObjects.find((p) => p.objectData.id === this.data.id);
-      if (thisObj) {
-        this._data = thisObj.objectData;
-        this._addOrUpdateVotes(this.data.votes);
-      } else {
-        console.error('did not find updated votes in graphql fetch');
-      }
-    }
-
-    // compute new vote % data
-    this._yesShares = this.data.yesVotes
-      ? +this.data.yesVotes
-      : this.data.votes.reduce((n, v) => v.uintVote === 1 ? n + (+v.member.shares) : n, 0);
-    this._noShares = this.data.noVotes
-      ? +this.data.noVotes
-      : this.data.votes.reduce((n, v) => v.uintVote === 2 ? n + (+v.member.shares) : n, 0);
-  }
-
-  // updates multiple votes at once
-  private _addOrUpdateVotes(votes: IMolochVote[]) {
-    for (const vote of votes) {
-      this.addOrUpdateVote(new MolochProposalVote(
-        this._Members.getFromJSON(vote.member),
-        vote.uintVote === 1 ? MolochVote.YES : vote.uintVote === 2 ? MolochVote.NO : MolochVote.NULL,
-      ));
-    }
   }
 }

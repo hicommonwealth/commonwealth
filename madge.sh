@@ -1,0 +1,1 @@
+madge -i out.png --exclude '^state\.ts$|^identifiers\.ts$|app\/notifications|(node_modules\/@types)|rxjs|construct-ui|models\/|stores\/|shared\/adapters\/|helpers' client/scripts/app.ts

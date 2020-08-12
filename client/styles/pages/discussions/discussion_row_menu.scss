@@ -1,0 +1,25 @@
+@import 'client/styles/shared';
+
+.DiscussionRowMenu {
+    display: inline-block;
+    position: relative;
+    left: 9px;
+    border-radius: 9999px;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    top: 1px;
+    text-align: center;
+    svg {
+        cursor: pointer;
+        stroke: $text-color-light;
+        position: relative;
+        top: -2px;
+    }
+    &:hover {
+        background: $background-color-light;
+        svg {
+            stroke: $text-color-medium;
+        }
+    }
+}

@@ -1,43 +1,48 @@
 @import 'client/styles/shared';
 
+.DiscussionRowHeader {
+    display: flex;
+    border-bottom: 1px solid $background-color-light;
+    margin-bottom: 2px;
+    color: $text-color-light;
+    .discussion-row-header-col {
+        font-size: 0.94rem;
+        text-align: right;
+        width: 84px;
+        padding: 10px 0;
+        &.discussion-row-header-replies {
+            padding-right: 6px;
+        }
+        &.discussion-row-header-title {
+            flex: 1;
+            width: initial;
+            text-align: left;
+        }
+        &.discussion-row-menu {
+            width: 28px;
+        }
+    }
+}
+
 .DiscussionsPage {
     .discussions-main {
         position: relative;
         flex: 1;
-        max-width: 800px;
         margin: 0px auto;
-        background: #fff;
-        box-shadow: 0 0 6px rgba(0,0,0,0.07);
-        border-radius: 3px;
+        padding: 24px 0 36px;
         &.empty-list {
             height: calc(100vh - 200px);
-        }
-    }
-
-    // sidebar
-    .CommunitySidebar {
-        padding-left: 12px;
-        h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 26px 0 12px;
-            &:first-child {
-                margin-top: 12px;
-            }
-        }
-        p {
-            margin: 12px 0;
         }
     }
 
     // content
     .LastSeenDivider {
         display: flex;
-        padding: 12px 0 10px;
+        padding: 12px 0;
         span {
             color: #ea7a60;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 0.94rem;
+            font-weight: 500;
             width: max-content;
             text-align: center;
             padding: 0 10px;
@@ -49,5 +54,19 @@
             border-bottom: 1px solid lighten(#ea7a60, 11%);
             width: -webkit-fill-available;
         }
+    }
+
+    .infinite-scroll-reached-end {
+        color: #aaa;
+        font-size: 0.94rem;
+        margin: 20px 0;
+        text-align: center;
+    }
+    .infinite-scroll-spinner-wrap {
+        height: 70px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }

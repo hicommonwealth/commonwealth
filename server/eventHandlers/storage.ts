@@ -1,7 +1,7 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { IEventHandler, CWEvent } from '../../shared/events/interfaces';
+import { IEventHandler, CWEvent } from '@commonwealth/chain-events';
 
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,7 +18,7 @@ export default class extends IEventHandler {
    * Handles an event by creating a ChainEvent in the database.
    */
   public async handle(event: CWEvent) {
-    log.info(`Received event: ${JSON.stringify(event, null, 2)}`);
+    log.trace(`Received event: ${JSON.stringify(event, null, 2)}`);
     // locate event type and add event to database
     const dbEventType = await this._models.ChainEventType.findOne({ where: {
       chain: this._chain,
@@ -31,19 +31,24 @@ export default class extends IEventHandler {
       log.trace(`found chain event type: ${dbEventType.id}`);
     }
 
-    // create event in db
-    const [ dbEvent, created ] = await this._models.ChainEvent.findOrCreate({
+    // check for duplicate event
+    const exists = await this._models.ChainEvent.findOne({
       where: {
         chain_event_type_id: dbEventType.id,
-        block_number: event.blockNumber,
-      },
-      defaults: { event_data: event.data }
+        event_data: event.data,
+      }
     });
-
-    if (!created) {
-      log.error('Received duplicate event!');
+    if (exists) {
+      log.error(`Received duplicate event: ${JSON.stringify(event)}`);
       return;
     }
+
+    // create event in db
+    const dbEvent = await this._models.ChainEvent.create({
+      chain_event_type_id: dbEventType.id,
+      block_number: event.blockNumber,
+      event_data: event.data
+    });
 
     return dbEvent;
   }

@@ -7,12 +7,15 @@
         left: 0;
         right: 0;
         position: fixed;
-        background: rgba(0,0,0,0.3);
-        z-index: 19;
+        background: rgba(0,0,0,0.2);
+        z-index: 51;
 
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    &:last-child .overlay {
+        background: rgba(0,0,0,0.2);
     }
     .popup {
         @include popout();
@@ -27,34 +30,20 @@
         border-radius: 3px;
         z-index: 20;
     }
-    .modal-title {
-        padding: 22px 28px 19px;
-        border-bottom: 1px solid #eee;
-    }
-    .modal-title h1,
-    .modal-title h2,
-    .modal-title h3 {
-        font-size: 20px;
-        font-weight: 400;
-        margin: 0;
-        padding: 0;
-    }
-    .modal-body {
-        padding: 28px;
-        border-bottom: 1px solid #eee;
-    }
-    .modal-actions {
-        padding: 22px 28px;
-        float: right;
+    @include xs-max {
+        .popup {
+            min-width: 310px;
+        }
     }
 
     .compact-modal-title {
-        padding: 24px 28px 20px;
-        background: #272524;
+        padding: 18px 27px;
+        background: #4f63be;
         color: #fff;
+        line-height: 1.2;
         h1, h2, h3 {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 500;
             margin: 0;
             padding: 0;
         }
@@ -64,18 +53,15 @@
         }
     }
     .compact-modal-body {
-        padding: 16px 28px 0;
+        padding: 20px 28px 0;
         &:last-child {
-            padding-bottom: 16px;
+            padding-bottom: 18px;
         }
     }
     .compact-modal-actions {
-        padding: 6px 28px 28px;
+        padding: 2px 28px 28px;
     }
     @include xs-max {
-        .popup {
-            min-width: 310px;
-        }
         .compact-modal-title {
             padding: 14px 20px 12px;
             h1, h2, h3 {
@@ -90,22 +76,15 @@
     }
 }
 
-.ModalExitButton,
 .CompactModalExitButton {
     position: absolute;
-    top: 8px;
-    right: 17px;
-    font-size: 22px;
+    top: 0.35em;
+    right: 0.75em;
+    font-size: 1.65rem;
     cursor: pointer;
+    color: #fff;
     opacity: 0.4;
     &:hover {
         opacity: 0.6;
     }
-}
-
-.ModalExitButton {
-    color: #777;
-}
-.CompactModalExitButton {
-    color: #fff;
 }

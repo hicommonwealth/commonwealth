@@ -2,7 +2,7 @@ import 'pages/view_proposal/create_comment.scss';
 
 import m from 'mithril';
 import mixpanel from 'mixpanel-browser';
-import { Button } from 'construct-ui';
+import { Button, Callout } from 'construct-ui';
 
 import app from 'state';
 
@@ -14,24 +14,21 @@ import User from 'views/components/widgets/user';
 
 import { GlobalStatus } from './body';
 
-interface ICreateCommentAttrs {
-  callback: CallableFunction;
-  cancellable?: boolean;
-  getSetGlobalEditingStatus: CallableFunction;
-  getSetGlobalReplyStatus: CallableFunction;
-  parentComment?: OffchainComment<any>;
-  rootProposal: AnyProposal | OffchainThread;
-  tabindex?: number;
-}
-
-interface ICreateCommentState {
-  quillEditorState: any;
-  uploadsInProgress;
-  error;
-  sendingComment;
-}
-
-const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
+const CreateComment: m.Component<{
+  callback: CallableFunction,
+  cancellable?: boolean,
+  getSetGlobalEditingStatus: CallableFunction,
+  getSetGlobalReplyStatus: CallableFunction,
+  parentComment?: OffchainComment<any>,
+  rootProposal: AnyProposal | OffchainThread,
+  tabindex?: number,
+}, {
+  quillEditorState: any,
+  uploadsInProgress,
+  error,
+  saving: boolean,
+  sendingComment,
+}> = {
   view: (vnode) => {
     const {
       callback,
@@ -60,10 +57,11 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         return;
       }
 
+      const { quillEditorState } = vnode.state;
+
       const mentionsEle = document.getElementsByClassName('ql-mention-list-container')[0];
       if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-      const { quillEditorState } = vnode.state;
 
       const commentText = quillEditorState.markdownMode
         ? quillEditorState.editor.getText()
@@ -80,6 +78,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;
+      quillEditorState.editor.enable(false);
       const chainId = app.activeCommunityId() ? null : app.activeChainId();
       const communityId = app.activeCommunityId();
       try {
@@ -87,6 +86,7 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
           chainId, communityId, commentText, parentComment?.id, attachments, mentions);
         callback();
         if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
           vnode.state.quillEditorState.editor.setContents();
           vnode.state.quillEditorState.clearUnsavedChanges();
         }
@@ -96,11 +96,14 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
         await app.user.notifications.refresh();
         m.redraw();
       } catch (err) {
+        if (vnode.state.quillEditorState.editor) {
+          vnode.state.quillEditorState.editor.enable();
+        }
         vnode.state.error = err.message;
         vnode.state.sendingComment = false;
         m.redraw();
       }
-
+      vnode.state.saving = false;
       mixpanel.track('Proposal Funnel', {
         'Step No': 2,
         'Step': 'Create Comment',
@@ -120,40 +123,52 @@ const CreateComment: m.Component<ICreateCommentAttrs, ICreateCommentState> = {
     return m('.CreateComment', {
       class: parentType === CommentParent.Comment ? 'new-comment-child' : 'new-thread-child'
     }, [
-      m(User, { user: author, tooltip: true }),
-      m(QuillEditor, {
-        contentsDoc: '',
-        oncreateBind: (state) => {
-          vnode.state.quillEditorState = state;
-        },
-        editorNamespace: `${document.location.pathname}-commenting`,
-        onkeyboardSubmit: submitComment,
-        tabindex: vnode.attrs.tabindex,
-      }),
-      m('.form-bottom', [
-        m(Button, {
-          intent: 'primary',
-          type: 'submit',
-          compact: true,
-          disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
-          onclick: submitComment,
-          label: (uploadsInProgress > 0)
-            ? 'Uploading...'
-            : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
-        }),
-        cancellable
-          && m(Button, {
-            intent: 'none',
-            type: 'cancel',
-            compact: true,
-            onclick: (e) => {
-              e.preventDefault();
-              getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
-            },
-            label: 'Cancel'
-          }),
-        error
-          && m('.new-comment-error', error),
+      m('.create-comment-avatar', [
+        m(User, { user: author, tooltip: true, avatarOnly: true, avatarSize: 36 }),
+      ]),
+      m('.create-comment-body', [
+        m(User, { user: author, tooltip: true, hideAvatar: true }),
+        (rootProposal instanceof OffchainThread && rootProposal.readOnly)
+          ? m(Callout, {
+            intent: 'primary',
+            content: 'Commenting is disabled because this post has been locked.',
+          })
+          : [
+            m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: `${document.location.pathname}-commenting`,
+              onkeyboardSubmit: submitComment,
+              tabindex: vnode.attrs.tabindex,
+            }),
+            m('.form-bottom', [
+              m(Button, {
+                intent: 'primary',
+                type: 'submit',
+                compact: true,
+                disabled: getSetGlobalEditingStatus(GlobalStatus.Get) || sendingComment || uploadsInProgress > 0,
+                onclick: submitComment,
+                label: (uploadsInProgress > 0)
+                  ? 'Uploading...'
+                  : parentType === CommentParent.Proposal ? 'Post comment' : 'Post reply'
+              }),
+              cancellable
+                && m(Button, {
+                  intent: 'none',
+                  type: 'cancel',
+                  compact: true,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    getSetGlobalReplyStatus(GlobalStatus.Set, false, true);
+                  },
+                  label: 'Cancel'
+                }),
+              error
+                && m('.new-comment-error', error),
+            ])
+          ]
       ])
     ]);
   }

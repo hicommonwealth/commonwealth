@@ -7,11 +7,12 @@ import { Button, Input, RadioGroup, Radio } from 'construct-ui';
 
 import app from 'state';
 
-import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo, OffchainTag } from 'models';
+import { OffchainThread, Account, OffchainThreadKind, AddressInfo, RoleInfo } from 'models';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 import { formDataIncomplete, detectURL, getLinkTitle, newLink, newThread } from 'views/pages/threads';
-import AutoCompleteTagForm from './autocomplete_tag_form';
+import { notifyError } from 'controllers/app/notifications';
+import TopicSelector from './topic_selector';
 
 interface ILinkPostAttrs {
   author: Account<any>;
@@ -30,8 +31,8 @@ interface ILinkPostState {
 }
 
 interface IThreadForm {
-  tagName?: string;
-  tagId?: number;
+  topicName?: string;
+  topicId?: number;
   url?: string;
   title?: string;
 }
@@ -90,20 +91,15 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
         placeholder: 'Add a description (optional)',
         tabindex: 2,
         theme: 'bubble',
-        editorNamespace: 'new-link-inline',
+        editorNamespace: `${app.activeId()}-new-link-inline`,
         onkeyboardSubmit: createLink,
       }),
-      m(AutoCompleteTagForm, {
-        tags: app.tags.getByCommunity(app.activeId()),
-        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tagName: string, tagId?: number) => {
-          vnode.state.form.tagName = tagName;
-          vnode.state.form.tagId = tagId;
-        },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
+      m(TopicSelector, {
+        topics: app.topics.getByCommunity(app.activeId()),
+        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        updateFormData: (topicName: string, topicId?: number) => {
+          vnode.state.form.topicName = topicName;
+          vnode.state.form.topicId = topicId;
         },
         tabindex: 3,
       }),
@@ -115,7 +111,7 @@ const LinkPost: m.Component<ILinkPostAttrs, ILinkPostState> = {
             intent: 'primary',
             onclick: createLink,
             tabindex: 4,
-            label: 'Create link'
+            label: 'Create thread'
           }),
           m(Button, {
             class: !author ? 'disabled' : '',
@@ -145,7 +141,7 @@ interface ITextPostAttrs {
 interface ITextPostState {
   readOnly: boolean;
   privacy: boolean;
-  tags: string[];
+  topics: string[];
   uploadsInProgress: number;
   closed: boolean;
   error: any;
@@ -187,17 +183,12 @@ const TextPost: m.Component<ITextPostAttrs, ITextPostState> = {
         editorNamespace: 'new-thread-inline',
         onkeyboardSubmit: createThread,
       }),
-      m(AutoCompleteTagForm, {
-        tags: app.tags.getByCommunity(app.activeId()),
-        featuredTags: app.tags.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-        updateFormData: (tagName: string, tagId?: number) => {
-          vnode.state.form.tagName = tagName;
-          vnode.state.form.tagId = tagId;
-        },
-        updateParentErrors: (err: string) => {
-          if (err) vnode.state.error = err;
-          else delete vnode.state.error;
-          m.redraw();
+      m(TopicSelector, {
+        topics: app.topics.getByCommunity(app.activeId()),
+        featuredTopics: app.topics.getByCommunity(app.activeId()).filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+        updateFormData: (topicName: string, topicId?: number) => {
+          vnode.state.form.topicName = topicName;
+          vnode.state.form.topicId = topicId;
         },
         tabindex: 3,
       }),
@@ -270,7 +261,7 @@ interface IInlineThreadComposerAttrs {
 
 interface IInlineThreadComposerState {
   open: boolean;
-  tags: string[];
+  topics: string[];
   threadType: string | boolean;
   timeout: any;
   textTitle: string;
@@ -290,9 +281,13 @@ const InlineThreadComposer: m.Component<IInlineThreadComposerAttrs, IInlineThrea
     if (!author) return null;
 
     const getTitleForLinkPost = _.debounce(async () => {
-      vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
-      if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
-      vnode.state.textTitle = null;
+      try {
+        vnode.state.linkTitle = await getLinkTitle(vnode.state.url);
+        if (!vnode.state.linkTitle) vnode.state.linkTitle = 'No title found';
+        vnode.state.textTitle = null;
+      } catch (err) {
+        notifyError(err.message);
+      }
       m.redraw();
     }, 750);
     const closeComposer = (e, clear) => {

@@ -1,3 +1,5 @@
+@import 'client/styles/shared';
+
 .ProposalVotingResults {
     .vote {
         display: flex;
@@ -8,7 +10,7 @@
         .vote-choice {
             display: inline-block;
             padding: 2px 6px;
-            background: #eee;
+            background: $background-color-light;
             border-radius: 9999px;
             margin-left: 4px;
         }

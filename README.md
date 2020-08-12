@@ -33,7 +33,17 @@ nvm install
 - Lint your styles: `yarn stylelint` or `stylelint client/styles/*`
 
 Now, download a copy of the production database if necessary, and
-set up any environment variables
+set up any environment variables.
+
+## Development Style Guide
+
+You should set up global linters (e.g. eslint and stylelint) to make sure your code is formatted properly.
+
+Components should be namespaced by class name, e.g. a component called MembersBox should be:
+
+- placed in client/scripts/views/components/members_box.ts, as a default export
+- styled in client/styles/components/members_box.scss
+- exported as a Mithril component with parent class .MembersBox
 
 ## Production Database
 
@@ -153,7 +163,7 @@ Each `Network` has a distinct set of modules in the
 controllers directory, e.g. identity, governance, treasury.
 For example, Edgeware, Polkadot, and Cosmos are networks.
 
-Each `Chain` is a specific instance of a blockchain network that 
+Each `Chain` is a specific instance of a blockchain network that
 Commonwealth may connect to. Currently, chains are only identified
 by the nodes that serve them, and not by genesis block or returned
 chain ID.
@@ -185,26 +195,12 @@ npm install -g ganache-cli@latest
 
 - You may need to create a Moloch endpoint in Metamask using the `127.0.0.1:9545` url. You can then add the summoner account to Metamask for testing using private key `0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d` (corresponding public key `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1`). It should display "100 ETH" in the Metamask window.
   - If you make any transactions and then reset the chain, you will need to reset the Metamask transaction history via "Settings -> Advanced -> Reset Account".
-- The other accounts available for testing can be found in the `contractbase/eth/migrations/3_moloch_v1.js`. They are the 2nd through 6th accounts printed at the top of the `ganache-cli` output. They all have 100 ETH and 5 tokens that can be used as tribute. These private keys can also be added to Metamask.
+- The other accounts available for testing can be found in the `eth/migrations/3_moloch_v1.js`. They are the 2nd through 6th accounts printed at the top of the `ganache-cli` output. They all have 100 ETH and 5 tokens that can be used as tribute. These private keys can also be added to Metamask.
 - You may need to transfer extra tokens (TKN) from `0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1` (the summoner) to other accounts if you wish to test delegate or creating proposals on behalf of other participants. If you do this, you'll need to go to the Commonwealth Moloch settings page and authorize additional token.
 - The "moloch-local" chain is always configured to fetch data from the chain directly.
-  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `contractbase/eth/`.
-  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `contractbase/eth/`.
-  - Initialize the app using the `NO_ARCHIVE=true yarn start` flag to avoid fetching chain data on the backend.
-- On production, the chain data is fetched from thegraph. Testing the production setup requires configuring a local graph endpoint. This is a more involved process, performed as follows:
-  - Follow this guide to set up a local subgraph for a local moloch contract:
-    https://github.com/MolochVentures/moloch-monorepo/blob/master/README.md
-    with the following modifications:
-    - Thegraph requires a postgres database and attempts to expose ports that will conflict with your local (commonwealth)
-      postgres installation. In the `docker-compose.yml`, you should change the ports for postgres to "5433:5432" to avoid
-      this overlap.
-    - Your ethereum port in the `docker-compose.yml` file should be 9545 instead of 8545.
-    - Your `ganache-cli` invocation should instead be `ganache-cli -p 9545 -h 0.0.0.0 -d --allowUnlimitedContractSize -l 100000000`
-    - Instead of running the truffle tests, you will run `truffle deploy` in `contractbase/eth/` in the commonwealth directory.
-      - Ensure that under `Deploying 'Moloch1'`, the contract address is `0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7`.
-        You will use this contract address to populate the `subgraph.yml` file.
-  - Initialize the app with `QUERY_URL_OVERRIDE=http://localhost:8000/subgraphs/name/moloch yarn start` to point the server at the correct graphql endpoint.
-  - To restart the test setup: delete the `docker/data` directory in the moloch monorepo.
+  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
+  - To start the test chain, invoke `ganache-cli -p 9545 -d --allowUnlimitedContractSize -l 100000000` and run `truffle deploy` in `eth/`.
+  - Initialize the app with `yarn start`.
 
 Cosmos Hub (Gaia):
 

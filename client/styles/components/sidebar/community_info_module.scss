@@ -1,0 +1,61 @@
+@import 'client/styles/shared';
+
+.CommunityInfoModule {
+    // position at bottom of sidebar
+    position: absolute;
+    bottom: 14px;
+    margin-bottom: 0 !important;
+    width: calc(100% - 34px);
+    max-width: calc(100% - 34px);
+    user-select: none;
+
+    // background
+    background: $background-color-light-hover;
+    padding: 16px 18px 18px;
+    border-radius: 4px;
+    line-height: 1.2;
+    font-size: 0.94rem;
+
+    .community-config {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        svg {
+            stroke: #333;
+        }
+    }
+    .community-name {
+        color: $text-color-medium;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .community-description {
+        margin-bottom: 16px;
+    }
+    .community-info {
+        display: flex;
+        margin: 3px 0;
+        .community-info-text {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .cui-icon {
+            margin-right: 10px;
+            svg {
+                stroke: #111;
+                position: relative;
+                top: 3px;
+                // icon size
+                height: 14px;
+                width: 14px;
+                min-width: 14px;
+                min-height: 14px;
+            }
+        }
+    }
+    .cui-button:last-child {
+        margin-top: 6px;
+    }
+}

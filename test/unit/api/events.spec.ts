@@ -6,7 +6,6 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import sleep from 'sleep-promise';
 import moment from 'moment';
-import { Errors as TagErrors } from 'server/routes/editTag';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';

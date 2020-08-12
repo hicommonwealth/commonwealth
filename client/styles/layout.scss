@@ -4,21 +4,18 @@
     box-sizing: border-box;
 }
 html, body {
-    height: 100%;
     box-sizing: border-box;
+    height: 100%;
     width: 100%;
 }
 html {
     font-family: $fonts;
-    font-size: 15px;
-    line-height: 1.4;
+    font-size: 17px;
+    line-height: 1.3;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-    background: #fafafa;
+    background: #fff;
     overflow-y: scroll;
-    &.modal-open {
-        overflow-y: hidden;
-    }
 }
 .mithril-app {
     height: 100%;
@@ -26,7 +23,7 @@ html {
 }
 .container {
     position: relative;
-    max-width: 1180px;
+    max-width: $layout-max-width;
     width: 100%;
     margin: 0 auto;
     padding: 0 20px;
@@ -34,17 +31,19 @@ html {
         padding: 0 1rem;
     }
 }
-.layout-container {
-    padding-top: $header-height + $vertical-padding;
-    padding-bottom: $vertical-padding;
-    margin-left: $horizontal-padding;
-    margin-right: $horizontal-padding;
-}
 .forum-container {
-    background: #fff;
-    padding: 20px 32px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.07);
-    margin-bottom: 16px;
+    padding: 20px 0;
+}
+.Sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: $sidebar-width;
+    height: 100%;
+    background: $background-color-light;
+}
+.layout-container {
+    padding-left: $sidebar-width;
 }
 
 //
@@ -52,10 +51,10 @@ html {
 //
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
+    font-weight: 500;
 }
 strong {
-    font-weight: 700;
+    font-weight: 500;
 }
 a {
     color: $theme-accent-dark;
@@ -109,7 +108,7 @@ input[type="button"],
 button,
 a.btn {
     font-size: 14.75px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.5;
     padding: 6px 15px;
     border-radius: 4px;
@@ -117,7 +116,7 @@ a.btn {
     outline: none;
     border: none;
     box-shadow: none;
-    background: #eee;
+    background: $background-color-light;
     color: #111;
     transition: 0.07s background ease-in-out;
     text-align: center;
@@ -125,7 +124,7 @@ a.btn {
     overflow: hidden;
     text-overflow: ellipsis;
     &:hover {
-        background: #f2f2f2;
+        background: $background-color-light-hover;
     }
     &:disabled,
     &.disabled, {
@@ -244,120 +243,4 @@ table {
 td, th {
     padding: 8px 0;
     border-bottom: 1px solid #e5e5e5;
-}
-
-//
-// construct-ui overrides
-// TODO: move to construct.scss
-//
-
-// Small changes to input styles
-.cui-input input,
-.cui-input textarea {
-    font-size: 15px;
-    &::placeholder {
-        color: #aaa;
-    }
-    &:focus::placeholder {
-        color: #999;
-    }
-}
-
-// The declarative construct-ui toaster doesn't allow
-// position to be set by default, so we just override it here
-.cui-toaster.cui-toaster-top {
-    top: auto;
-    bottom: 0;
-    z-index: 99999;
-}
-
-.cui-tag.cui-none.cui-xs {
-    border-color: #f1f3f5;
-    padding-top: 0;
-    padding-bottom: 0;
-    cursor: pointer;
-    position: relative;
-    top: -1px;
-    &:hover {
-        border-color: darken(#f1f3f5, 2%);
-        background: darken(#f1f3f5, 2%);
-    }
-}
-
-// reduce padding on menus
-.cui-menu {
-    padding: 2px 0;
-}
-.cui-menu > .cui-menu-divider {
-    margin: 2px 0;
-}
-
-// darken color on menus
-.cui-menu > .cui-button.cui-basic {
-    color: #546e7c;
-}
-
-// allow menus to be wider by default
-.cui-menu {
-    max-width: 240px;
-}
-
-// align text in menus to the left by default
-.cui-menu.cui-align-left > .cui-list.cui-align-left > .cui-button-label {
-    text-align: left;
-}
-
-// adjust dialog headers
-.cui-dialog-header {
-    padding: 15px 15px 15px 25px;
-}
-.cui-dialog-header h3 {
-    margin: 4px 0 0;
-    font-weight: 600;
-}
-.cui-dialog-header > button.cui-dialog-close-button {
-    position: relative;
-    top: 1px;
-}
-
-// fix .cui-switch styling
-.cui-switch .cui-control-indicator {
-    height: 18px;
-    width: 34px;
-}
-
-// button styles
-.cui-button {
-    font-weight: 600 !important;
-}
-.cui-button.cui-menu-item {
-    font-weight: 400 !important;
-}
-
-// menu styles
-.cui-menu {
-    > .cui-button.cui-basic {
-        color: #333;
-        .cui-icon svg {
-            stroke: #333;
-        }
-    }
-}
-
-// icon styles
-.cui-icon.filled-icon svg {
-    fill: currentColor;
-}
-
-// select list styles
-.cui-popover.cui-select-list .cui-popover-content {
-    padding: 10px;
-}
-
-// empty state override
-.cui-empty-state.cui-empty-state-fill {
-    z-index: initial;
-}
-.cui-spinner.cui-spinner-fill {
-    z-index: initial;
 }

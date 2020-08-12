@@ -2,7 +2,7 @@ import moment from 'moment-twitter';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind } from './types';
 import OffchainAttachment from './OffchainAttachment';
-import OffchainTag from './OffchainTag';
+import OffchainTopic from './OffchainTopic';
 
 class OffchainThread implements IUniqueId {
   public readonly author: string;
@@ -20,7 +20,7 @@ class OffchainThread implements IUniqueId {
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: moment.Moment;
-  public tag: OffchainTag;
+  public topic: OffchainTopic;
   public readonly slug = 'discussion';
   public readonly url: string;
   public readonly versionHistory: string[];
@@ -37,7 +37,7 @@ class OffchainThread implements IUniqueId {
     attachments: OffchainAttachment[],
     id: number,
     createdAt: moment.Moment,
-    tag: OffchainTag,
+    topic: OffchainTopic,
     kind: OffchainThreadKind,
     versionHistory: string[],
     community: string,
@@ -56,7 +56,7 @@ class OffchainThread implements IUniqueId {
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = createdAt;
-    this.tag = tag;
+    this.topic = topic;
     this.kind = kind;
     this.authorChain = authorChain;
     this.pinned = pinned;

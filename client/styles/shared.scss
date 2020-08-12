@@ -1,96 +1,77 @@
-@import 'construct-ui/src/_shared/_colors';
+@import 'mixins/animation';
+@import 'mixins/responsive';
+@import 'mixins/dragula';
 
-$fonts: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$fonts: Metric, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 $monospace-fonts: 'iA Writer Duospace', monospace;
+
+$base-bg-color:     #ffffff;
+$primary-bg-color:  #4f62bd;
+$positive-bg-color: #4caf50;
+$negative-bg-color: #d4302f;
+$base-border-radius: 4px;
 
 $theme-base-color: #5b7bf6;
 $theme-accent-dark: darken(#5b7bf6, 7%);
 $theme-focus-border: #3960f4;
 
-$offwhite-extralight: #fcfbfa;
-$offwhite-light: #f9f8f6;
-$offwhite-dark: #282625;
-$badge-red: #de243b;    // radish red for badges
-$error-red: $red800;
-$success-green: $light_green800;
+$header-color: #4f62bd;           // ?? (TODO)
+$header-text-color: #ffffff;      // ??
 
-$primary-green: #41a360;
+$background-color-white: #ffffff;       // white background
+$background-color-white-hover: #f9fafd; // white background with hover
+$background-color-light: #eef1fa;       // light background - used in sidebar, most styles
+$background-color-light-hover: #e5e8f7; // light background with hover
+$background-color-border: #e0e4f1;      // border color
+$background-color-placeholder: #adb7d5; // placeholder color
 
-$form-border-radius: 3px;
+$text-color-lightest: #b5b7b9;          // light text on white background
+$text-color-lighter: #a3a4a7;           // light text on white background - used for most styles
+$text-color-light: #9a9da4;             // light text on light background
+$text-color-medium: #777;               // medium text on any background
+$text-color-dark: #222;                 // black text on any background
+
 $form-border-color: #c5cdd1;
 $form-active-color: #08c;
 
-$lighttextgrey: #999;
-$electricblue: #229bd6;
+$positive-text-color: $positive-bg-color;
+$negative-text-color: $negative-bg-color;
 
-$header-height: 60px;
-$sidebar-width: 240px;
-$sublayout-max-width: 1340px;
+$sidebar-width: 230px;
+$layout-max-width: 970px;
 
-$vertical-padding: 30px; // padding between header and content
-$horizontal-padding: 30px; // padding on sides of the page
-$gutter-width: 24px; // padding between columns
-$header-spacing: 14px; // padding between header items
-
-@mixin popout {
-    animation: popout 0.05s ease;
-    -webkit-animation: popout 0.05s ease;
-}
-@keyframes popout {
-    from { transform: scale(0.975); }
-    80% { transform: scale(1); }
-    to { transform: scale(1); }
-}
-@-webkit-keyframes popout {
-    from { -webkit-transform: scale(0.975); }
-    80% { -webkit-transform: scale(1); }
-    to { -webkit-transform: scale(1); }
+@mixin formfield-base {
+    display: block;
+    width: 100%;
+    border: 1px solid $form-border-color;
+    border-radius: $base-border-radius;
+    outline: none;
+    box-shadow: none;
+    &:focus {
+        border-color: $form-active-color;
+    }
 }
 
-@mixin hoverFloat {
-    transition: transform 50ms ease-in-out;
-    &:hover {
-        transform: translate(0, -1px);
+@mixin formfield-text {
+    @include formfield-base;
+    padding: 10px;
+    &::placeholder {
+        color: $text-color-light;
+    }
+    &:focus::placeholder {
+        color: $text-color-light;
     }
 }
 
 @mixin error-text {
-    font-weight: 700;
-    color: $error-red;
+    font-weight: 500;
+    color: $negative-bg-color;
 }
 @mixin success-text {
-    font-weight: 700;
-    color: $success-green;
-}
-@mixin profile-notice($background, $text-color) {
-    display: inline-block;
-    margin-bottom: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    background: $background;
-    color: $text-color;
-    // text
-    font-size: 14px;
     font-weight: 500;
-    text-align: left;
-    a {
-        color: $text-color;
-        cursor: pointer;
-        text-decoration: underline;
-    }
-    @include xs-max {
-        padding: 8px 12px;
-    }
+    color: $positive-bg-color;
 }
-@mixin category-icon {
-    display: inline-block;
-    background: #ccc;
-    width: 10px;
-    height: 10px;
-    margin-top: 2px;
-    margin-right: 8px;
-    border-radius: 2px;
-}
+
 @mixin attachments {
     p {
         font-weight: 700;
@@ -114,201 +95,14 @@ $header-spacing: 14px; // padding between header items
     }
 }
 
-@mixin clearfix {
-    *zoom: 1;
-    &:before,
-    &:after {
-        display: table;
-        content: "";
-        line-height: 0;
-    }
-    &:after {
-        clear: both;
-    }
-}
-
-@mixin xxs-max {
-    @media only screen and (max-width: 42em) { @content; }
-}
-@mixin xs-max {
-    @media only screen and (max-width: 48em) { @content; }
-}
-@mixin sm-max {
-    @media only screen and (max-width: 62em) { @content; }
-}
-@mixin md-max {
-    @media only screen and (max-width: 75em) { @content; }
-}
-@mixin sm-min {
-    @media only screen and (min-width: 48em) { @content; }
-}
-@mixin md-min {
-    @media only screen and (min-width: 62em) { @content; }
-}
-@mixin lg-min {
-    @media only screen and (min-width: 75em) { @content; }
-}
-
-@mixin formfield-base {
-    display: block;
-    width: 100%;
-    border: 1px solid $form-border-color;
-    border-radius: $form-border-radius;
-    outline: none;
-    box-shadow: none;
-    &:focus {
-        border-color: $form-active-color;
-    }
-}
-
-@mixin formfield-text {
-    @include formfield-base;
-    padding: 10px 10px;
-    &::placeholder {
-        color: #aaa;
-    }
-    &:focus::placeholder {
-        color: #999;
-    }
-}
-
-@mixin dark-menu-styles {
-    color: #fff;
-    z-index: 9999;
-    background: #343434;
-    border-radius: 0 0 2px 2px;
-    ul {
-        padding: 4px 0;
-        margin: 0;
-    }
-    ul a {
-        text-decoration: none;
-        color: #fff;
-    }
-    ul li {
-        margin: 0;
-        padding: 6px 16px;
-        list-style: none;
-        cursor: pointer;
-    }
-    ul li:last-child {
-        border-bottom: none;
-    }
-    ul li:hover {
-        background: #454545;
-        color: #fff;
-    }
-    ul a li:hover {
-        color: #fff;
-    }
-    ul li.disabled {
-        opacity: 0.4;
-        pointer-events: none;
-    }
-    ul li.divider {
-        height: 1px;
-        padding: 0;
-        margin: 6px 0;
-        border-bottom: 1px solid #474747;
-    }
-}
-
-@mixin menu-styles {
-    color: #111;
-    z-index: 9999;
-    background: #fff;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.04);
-    ul {
-        padding: 2px 0;
-        margin: 0;
-    }
-    ul a {
-        text-decoration: none;
-        color: $offwhite-dark;
-    }
-    ul li {
-        margin: 0;
-        padding: 6px 16px;
-        list-style: none;
-        cursor: pointer;
-    }
-    ul li:last-child {
-        border-bottom: none;
-    }
-    ul li:hover {
-        background: #08c;
-        color: $offwhite-extralight;
-    }
-    ul a li:hover {
-        color: $offwhite-extralight;;
-    }
-    ul li.disabled {
-        opacity: 0.4;
-        pointer-events: none;
-    }
-    ul li.divider {
-        height: 1px;
-        padding: 0;
-        margin: 2px 0;
-        border-bottom: 1px solid #ececec;
-    }
-}
-
-@mixin clean-button {
-    background-color: white !important;
-    border: 1px solid $electricblue !important;
-    background-image: none !important;
-    color: $electricblue;
-    border-radius: $form-border-radius;
-    padding: 8px 20px;
-}
-
-@mixin clean-button-2 {
-    background-color: $electricblue !important;
-    background-image: none !important;
-    border: 0px solid transparent !important;
-    color: white !important;
-    font-weight: 700;
-    border-radius: $form-border-radius;
-    padding: 8px 20px;
-}
-
-@mixin clean-button-2 {
-    background-color: $electricblue !important;
-    background-image: none !important;
-    border: 0px solid transparent !important;
-    color: white !important;
-    font-weight: 700;
-    border-radius: 4px;
-    padding: 8px 20px;
-}
-
-@mixin dragula {
-    .gu-mirror {
-        cursor: pointer;
-        position: fixed !important;
-        margin: 0 !important;
-        z-index: 9999 !important;
-        opacity: 0.8;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-        filter: alpha(opacity=80);
-    }
-    .gu-hide {
-        display: none !important;
-    }
-    .gu-unselectable {
-        cursor: default;
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
-    }
-    .gu-transit {
-        cursor: pointer;
-        opacity: 0.5;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-        filter: alpha(opacity=20);
+@mixin proposal-topic-inline {
+    .proposal-topic-icon {
+        display: inline-block;
+        background: transparent;
+        border: 1.5px solid $text-color-lightest;
+        border-radius: 99px;
+        width: 9px;
+        height: 9px;
+        margin-right: 6px;
     }
 }

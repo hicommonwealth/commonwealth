@@ -87,14 +87,14 @@
         }
     }
     .TXSigningTransactionBox {
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         padding: 24px 28px 12px;
         border-radius: 4px;
         text-align: left;
         width: 360px;
         margin: 5px 0;
         .txbox-header {
-            font-weight: 700;
+            font-weight: 500;
             margin-bottom: 1px;
         }
         .txbox-content {
@@ -102,10 +102,10 @@
             word-break: break-word;
         }
         .txbox-content.txbox-success {
-            color: $success-green;
+            color: $positive-text-color;
         }
         .txbox-content.txbox-fail {
-            color: $error-red;
+            color: $negative-text-color;
         }
     }
 }

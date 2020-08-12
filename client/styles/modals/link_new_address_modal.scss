@@ -5,12 +5,12 @@
 
     .link-address-step-header {
         margin: 0 auto;
-        padding: 28px 40px;
-        background: #282625;
-        color: #fff;
+        padding: 20px 40px 18px;
+        background: $theme-base-color;
+        color: $background-color-white;
         h3 {
             margin: 0;
-            font-size: 21px;
+            font-size: 17px;
         }
     }
     .link-address-step-narrow {
@@ -46,14 +46,14 @@
         margin: 15px 0;
     }
     .mobile-error-message {
-        color: #444;
+        color: $text-color-medium;
         margin: 26px 40px;
         p {
             margin: 8px 0;
         }
     }
     a.back-text {
-        color: #888;
+        color: $text-color-medium;
         text-decoration: none;
         margin-top: 20px;
         &:hover {
@@ -62,56 +62,22 @@
     }
 
     // for step 0 - chain selection
-    .chains {
-        padding: 18px 22px;
-        max-width: 566px;
-        text-align: center;
-        @include xs-max {
-            width: initial;
-        }
-    }
-    .chain-card {
-        display: inline-block;
-        cursor: pointer;
-        text-align: center;
-        // layout
-        width: 160px;
-        height: 145px;
-        border-radius: 4px;
-        padding: 20px 22px 12px;
-        margin: 7px;
-        border: 1px solid #eee;
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.07);
-        @include xs-max {
-            width: 142px;
-            height: 142px;
-            margin: 4px 5px;
-            padding: 18px 12px 12px;
-            &.hidden-mobile {
-                display: none;
-            }
-        }
-    }
-    .chain-info {
-        .ChainIcon {
-        }
-        h3 {
-            font-size: 15px;
-            margin: 6px 0 4px;
-        }
-        p {
-            color: #999;
-            font-size: 13px;
-            line-height: 1.32;
-            margin: 7px 0 4px;
+    .select-chain-step {
+        padding: 55px 0 60px;
+        .cui-button {
+            margin-top: 15px;
         }
     }
 
     // for step 1
+    .cui-callout {
+        text-align: left;
+        margin-bottom: 24px;
+    }
     .link-address-precopy {
         display: block;
         font-size: 15px;
-        color: #444;
+        color: $text-color-medium;
         margin: 26px auto 4px;
         max-width: 480px;
         @include xs-max {
@@ -120,12 +86,12 @@
     }
     .link-address-combined-warning {
         display: flex;
-        background: #fafafa;
+        background: $background-color-light;
         padding: 10px 14px;
         margin: 0 20px;
         margin-bottom: 28px;
         text-align: left;
-        border: 1px solid #e8e8e8;
+        border: 1px solid $background-color-border;
         font-size: 14px;
         .link-address-combined-warning-icon {
             margin-right: 6px;
@@ -148,11 +114,11 @@
             width: 230px;
             height: 190px;
             border-radius: 3px;
-            border: 1px solid #eee;
-            background: #fff;
+            border: 1px solid $background-color-border;
+            background: $background-color-white;
             box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
             &.selected {
-                border-color: #08c;
+                border-color: $theme-base-color;
             }
             @include xs-max {
                 height: initial;
@@ -161,7 +127,7 @@
         }
         .link-address-header {
             text-align: center;
-            background: #f4f4f4;
+            background: $background-color-white-hover;
             padding: 15px 0 0;
             border-radius: 4px 4px 0 0;
             @include xs-max {
@@ -169,7 +135,7 @@
             }
         }
         .link-address-title {
-            font-weight: 700;
+            font-weight: 500;
         }
         .link-address-icon {
             height: 36px;
@@ -179,20 +145,20 @@
         }
         .link-address-title {
             padding: 9px 15px;
-            color: #555;
+            color: $text-color-medium;
         }
         .link-address-description {
             font-size: 13px;
             margin: 16px 20px 10px;
-            color: #555;
+            color: $text-color-medium;
         }
         .link-address-link {
             font-size: 13px;
             margin: 10px 20px 16px;
-            color: #555;
+            color: $text-color-medium;
         }
         .link-address-link a {
-            color: #999;
+            color: $text-color-medium;
             text-decoration: none;
             &:hover {
                 text-decoration: underline;
@@ -215,44 +181,65 @@
     }
     .accounts-list {
         margin: 26px auto;
-        max-width: 240px;
-        max-height: 420px;
-        overflow-y: scroll;
         border-radius: 5px;
     }
     .accounts-list-unavailable {
         text-align: center;
-        color: #999;
+        color: $text-color-light;
         margin: 100px 20px;
     }
     .accounts-caption p.small-text {
         font-size: 13px;
-        color: #aaa;
+        color: $text-color-light;
+    }
+    .account-adder {
+        margin-top: 150px;
+        .cui-spinner {
+            position: relative;
+            top: -1px;
+            margin-right: 4px;
+        }
     }
     .account-item {
         cursor: pointer;
-        padding: 10px 18px;
-        border: 1px solid #ccc;
+        padding: 10px 18px 11px;
+        border: 1px solid $background-color-border;
         border-bottom: none;
-        .account-waiting {
+        text-align: left;
+        display: flex;
+        .account-item-address {
+            color: #999;
+        }
+        .account-item-left {
+        }
+        .account-item-right {
+            text-align: right;
+            flex: 1;
             margin: 11px 0;
         }
+        .account-waiting {
+            .cui-spinner {
+                position: relative;
+                top: -2px;
+            }
+        }
+
         &:hover {
-            background: #fafafa;
+            background: $background-color-white-hover;
         }
         &:first-child {
             border-top-right-radius: 6px;
             border-top-left-radius: 6px;
         }
         &:last-child {
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid $background-color-border;
             border-bottom-right-radius: 6px;
             border-bottom-left-radius: 6px;
         }
     }
     .CheckboxFormField.FormField {
         label {
-            color: #555;
+            color: $text-color-medium;
         }
     }
 
@@ -268,7 +255,7 @@
             border: 1px solid #ccc;
             border-bottom: none;
             &:hover {
-                background: #f8f8f8;
+                background: $background-color-white-hover;
             }
             &:first-child {
                 border-top-right-radius: 6px;
@@ -295,8 +282,8 @@
             margin: 8px 0;
         }
     }
-    .CharacterLimitedTextInput {
-        margin: 12px 0;
+    .cui-input {
+        margin: 4px 0;
     }
 
     // for step 3
@@ -309,14 +296,21 @@
     .profile-block-preview {
         display: inline-block;
         text-align: left;
-        padding: 12px 16px 7px 12px;
+        padding: 12px 15px 15px;
         margin: 24px 0 30px;
-        border: 1px solid #eee;
+        border: 1px solid $background-color-light;
         border-radius: 4px;
     }
     .btn-finished-action {
         width: 300px;
         margin: 5px 0;
+    }
+    .new-account-userblock {
+        display: inline-block;
+        margin-bottom: 30px;
+        border: 1px solid #eee;
+        border-radius: 3px;
+        padding: 9px 13px 12px;
     }
     .avatar-wrap {
         display: flex;

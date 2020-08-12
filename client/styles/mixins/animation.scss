@@ -1,0 +1,21 @@
+@mixin popout {
+    animation: popout 0.05s ease;
+    -webkit-animation: popout 0.05s ease;
+}
+@keyframes popout {
+    from { transform: scale(0.975); }
+    80% { transform: scale(1); }
+    to { transform: scale(1); }
+}
+@-webkit-keyframes popout {
+    from { -webkit-transform: scale(0.975); }
+    80% { -webkit-transform: scale(1); }
+    to { -webkit-transform: scale(1); }
+}
+
+@mixin hoverFloat {
+    transition: transform 50ms ease-in-out;
+    &:hover {
+        transform: translate(0, -1px);
+    }
+}

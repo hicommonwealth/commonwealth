@@ -101,7 +101,7 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     await parentComment.save();
   }
 
-  // To-do: attachments can likely be handled like mentions (see lines 10 & 11)
+  // TODO: attachments can likely be handled like mentions (see lines 10 & 11)
   try {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
       await models.OffchainAttachment.create({
@@ -158,6 +158,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewReaction,
     object_id: `comment-${finalComment.id}`,
+    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
+    offchain_comment_id: finalComment.id,
     is_active: true,
   });
 
@@ -165,6 +168,9 @@ const createComment = async (models, req: Request, res: Response, next: NextFunc
     subscriber_id: req.user.id,
     category_id: NotificationCategories.NewComment,
     object_id: `comment-${finalComment.id}`,
+    chain_id: finalComment.chain || null,
+    community_id: finalComment.community || null,
+    offchain_comment_id: finalComment.id,
     is_active: true,
   });
 

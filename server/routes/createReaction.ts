@@ -19,9 +19,11 @@ export const Errors = {
 const createReaction = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { reaction, comment_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  let proposal;
+  let root_type;
 
-  if (!thread_id && !comment_id) {
+  if (!thread_id && !proposal_id && !comment_id) {
     return next(new Error(Errors.NoPostId));
   }
   if (!reaction) {
@@ -35,8 +37,14 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
 
   if (community) options['community'] = community.id;
   else if (chain) options['chain'] = chain.id;
+
   if (thread_id) options['thread_id'] = thread_id;
-  else if (comment_id) options['comment_id'] = comment_id;
+  else if (proposal_id) {
+    proposal = await proposalIdToEntity(models, chain.id, proposal_id);
+    if (!proposal) return next(new Error(Errors.NoProposalMatch));
+    root_type = proposal_id.split('_')[0];
+    options['proposal_id'] = proposal_id;
+  } else if (comment_id) options['comment_id'] = comment_id;
 
   let finalReaction;
   let created;
@@ -56,8 +64,6 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
 
   let comment;
   let cwUrl;
-  let root_type;
-  let proposal;
   try {
     if (comment_id) {
       comment = await models.OffchainComment.findByPk(Number(comment_id));
@@ -72,7 +78,7 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
       }
       cwUrl = getProposalUrl(prefix, proposal, comment);
       root_type = prefix;
-    } else {
+    } else if (thread_id) {
       proposal = await models.OffchainThread.findByPk(Number(thread_id));
       cwUrl = getProposalUrl('discussion', proposal, comment);
       root_type = 'discussion';
@@ -98,7 +104,9 @@ const createReaction = async (models, req: Request, res: Response, next: NextFun
     notification_data['comment_text'] = comment.text;
   }
 
-  const location = thread_id ? `discussion_${thread_id}` : `comment-${comment_id}`;
+  const location = thread_id
+    ? `discussion_${thread_id}`
+    : proposal_id || `comment-${comment_id}`;
   await models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,

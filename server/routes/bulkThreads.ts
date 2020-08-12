@@ -15,7 +15,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
     const publicThreads = await models.OffchainThread.findAll({
       where: publicThreadsQuery,
-      include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
+      include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
       order: [['created_at', 'DESC']],
     });
 
@@ -28,7 +28,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
 
   const allThreads = await models.OffchainThread.findAll({
     where: allThreadsQuery,
-    include: [ models.Address, { model: models.OffchainTag, as: 'tag' } ],
+    include: [ models.Address, { model: models.OffchainTopic, as: 'topic' } ],
     order: [['created_at', 'DESC']],
   });
 
@@ -46,7 +46,7 @@ const bulkThreads = async (models, req: Request, res: Response, next: NextFuncti
   const filteredThreads = await allThreads.filter((thread) => {
     if (thread.private === false) {
       return true;
-    } else if (userAddressIds.includes(thread.author_id)) {
+    } else if (userAddressIds.includes(thread.address_id)) {
       return true;
     } else if (adminRoles.length > 0) {
       return true;

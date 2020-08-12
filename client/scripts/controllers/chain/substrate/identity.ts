@@ -199,24 +199,7 @@ export default class SubstrateIdentity
 
   // arg is mapping from sub address to name
   public async setSubsTx(subs: { [address: string]: string }) {
-    const nSubs = Object.keys(subs).length;
-    if (nSubs > this._Identities.maxSubAccts) {
-      throw new Error('too many sub accounts');
-    }
-
-    // compute required deposit, if necessary
-    let requiredDeposit = this._Identities.subAcctDeposit.muln(nSubs);
-    if (nSubs > 0) {
-      const { deposit } = await this.subs().pipe(first()).toPromise();
-      if (deposit.lt(requiredDeposit)) {
-        requiredDeposit = requiredDeposit.sub(deposit);
-      }
-    }
-
     const txFunc = (api: ApiRx) => api.tx.identity.setSubs(Object.entries(subs));
-    if (!(await this._Chain.canPayFee(this.account, txFunc, this._Chain.coins(requiredDeposit)))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       this.account,
       txFunc,
@@ -236,23 +219,7 @@ export default class SubstrateIdentity
 
   public async requestJudgementTx(regIdx: number, maxFee: SubstrateCoin) {
     if (!this._judgements) throw new Error('judgements not yet loaded');
-    // check that maxFee > judgement cost, and that account has enough funds
-    const registrar = this._Identities.registrars[regIdx];
-    if (!registrar) {
-      throw new Error('registrar does not exist');
-    }
-    const fee = registrar.fee;
-    if (fee.gt(maxFee)) {
-      throw new Error('registrar fee greater than provided maxFee');
-    }
-    const previousJudgement = this._judgements.find(([ idx ]) => +idx === regIdx);
-    if (previousJudgement && (previousJudgement[1].isErroneous || previousJudgement[1].isFeePaid)) {
-      throw new Error('judgement is sticky and cannot be re-requested');
-    }
     const txFunc = (api: ApiRx) => api.tx.identity.requestJudgement(regIdx, maxFee);
-    if (!(await this._Chain.canPayFee(this.account, txFunc, this._Chain.coins(fee)))) {
-      throw new Error('insufficient funds');
-    }
     return this._Chain.createTXModalData(
       this.account,
       txFunc,
@@ -263,14 +230,6 @@ export default class SubstrateIdentity
 
   public canceljudgementRequestTx(regIdx: number) {
     if (!this._judgements) throw new Error('judgements not yet loaded');
-    const judgement = this._judgements.find(([ idx ]) => +idx === regIdx);
-    if (!judgement) {
-      throw new Error('judgement not found');
-    } else {
-      if (!judgement[1].isFeePaid) {
-        throw new Error('judgement already given');
-      }
-    }
     return this._Chain.createTXModalData(
       this.account,
       (api: ApiRx) => api.tx.identity.cancelRequest(regIdx),

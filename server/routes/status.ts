@@ -13,33 +13,35 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     chains,
     nodes,
     publicCommunities,
-    offchainTags,
+    offchainTopics,
     contractCategories,
     notificationCategories
   ] = await Promise.all([
     models.Chain.findAll({
+      where: { active: true },
       include: [
         {
-          model: models.OffchainTag,
-          as: 'tags',
+          model: models.OffchainTopic,
+          as: 'topics',
         },
-        {
-          model: models.ChainObjectVersion,
-          as: 'ChainObjectVersion',
-          required: false,
-          attributes: ['id'],
-        }
       ]
     }),
-    models.ChainNode.findAll(),
+    models.ChainNode.findAll({
+      include: [
+        {
+          model: models.Chain,
+          where: { active: true },
+        }
+      ],
+    }),
     models.OffchainCommunity.findAll({
       where: { privacyEnabled: false },
       include: {
-        model: models.OffchainTag,
-        as: 'tags',
+        model: models.OffchainTopic,
+        as: 'topics',
       }
     }),
-    models.OffchainTag.findAll(),
+    models.OffchainTopic.findAll(),
     models.ContractCategory.findAll(),
     models.NotificationCategory.findAll(),
   ]);
@@ -49,7 +51,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     return res.json({
       chains,
       nodes,
-      offchainTags,
+      offchainTopics,
       contractCategories,
       communities: publicCommunities,
       notificationCategories,
@@ -72,7 +74,20 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     where: {
       address_id: { [Op.in]: myAddressIds },
     },
+    include: [
+      models.Address
+    ]
   });
+  const discussionDrafts = await models.DiscussionDraft.findAll({
+    where: {
+      address_id: { [Op.in]: myAddressIds }
+    },
+    include: [
+      models.Address,
+      models.OffchainAttachment,
+    ]
+  });
+
   const visiblePrivateCommunityIds = Array.from(roles.map((role) => role.offchain_community_id));
   const privateCommunities = await models.OffchainCommunity.findAll({
     where: {
@@ -81,21 +96,21 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       },
     },
     include: [{
-      model: models.OffchainTag,
-      as: 'tags',
+      model: models.OffchainTopic,
+      as: 'topics',
     }],
   });
   const allCommunities = _.uniqBy(publicCommunities.concat(privateCommunities), 'id');
 
   // get starred communities for user
   const starredCommunities = await models.StarredCommunity.findAll({
-    where: { user_id: req.user.id }
+    where: { user_id: user.id }
   });
 
   // get invites for user
   const invites = await models.InviteCode.findAll({
     where: {
-      invited_email: req.user.email,
+      invited_email: user.email,
       used: false,
     },
   });
@@ -150,7 +165,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
     chains,
     nodes,
     communities: allCommunities,
-    offchainTags,
+    offchainTopics,
     contractCategories,
     notificationCategories,
     roles,
@@ -168,6 +183,7 @@ const status = async (models, req: Request, res: Response, next: NextFunction) =
       disableRichText,
       lastVisited: JSON.parse(lastVisited),
       starredCommunities,
+      discussionDrafts,
       unseenPosts
     }
   });

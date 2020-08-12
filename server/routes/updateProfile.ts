@@ -1,3 +1,4 @@
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { Request, Response, NextFunction } from 'express';
 import {
   PROFILE_BIO_MAX_CHARS,
@@ -6,6 +7,7 @@ import {
   PROFILE_NAME_MIN_CHARS
 } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
+import IdentityFetchCache from '../util/identityFetchCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -20,7 +22,9 @@ export const Errors = {
   BioTooLong: `Bio must be less than ${PROFILE_BIO_MAX_CHARS} characters`,
 };
 
-const updateProfile = async (models, req: Request, res: Response, next: NextFunction) => {
+const updateProfile = async (
+  models, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
+) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
   }
@@ -83,6 +87,12 @@ const updateProfile = async (models, req: Request, res: Response, next: NextFunc
       address_id: address.id,
       data: req.body.data,
     });
+
+    // new profiles on substrate chains get added to the identity cache
+    // to be fetched on a timer job
+    if (!req.body.skipChainFetch && SubstrateTypes.EventChains.includes(req.body.chain)) {
+      await identityFetchCache.add(req.body.chain, req.body.address);
+    }
   }
 
   return res.json({ status: 'Success', result: profile.toJSON() });

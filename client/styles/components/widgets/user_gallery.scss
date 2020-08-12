@@ -1,0 +1,21 @@
+@import 'client/styles/components/widgets/user';
+@import 'client/styles/shared';
+
+.UserGallery {
+    .User {
+        margin-top: 5px;
+        margin-right: -16px;
+    }
+    .overflow-users-wrap {
+        @include circledAvatar();
+        display: inline-block;
+        margin-right: -16px;
+        margin-top: 5px;
+        white-space: nowrap;
+        background-color: $text-color-lightest;
+        .overflow-users {
+            text-align: center;
+            color: white;
+        }
+    }
+}

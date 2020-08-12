@@ -1,7 +1,23 @@
 import BN from 'bn.js';
 import { u128, Compact } from '@polkadot/types';
+import { Codec } from '@polkadot/types/types';
+import { Call } from '@polkadot/types/interfaces';
 import { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
+
+export function formatCall(c: Call | { section: string, method: string, args: string[] }): string {
+  // build args string
+  const args: (string | Codec)[] = c.args;
+  const argsStr = args.map((v: Codec | string): string => {
+    if (!v) return '[unknown]';
+    const vStr = v.toString();
+    if (vStr.length < 16) return vStr;
+    return `${vStr.slice(0, 5)}…${vStr.slice(vStr.length - 3)}`;
+  }).join(', ');
+
+  // finish format
+  return `${c.section}.${c.method}(${argsStr})`;
+}
 
 export class SubstrateCoin extends Coin {
   constructor(

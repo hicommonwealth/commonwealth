@@ -3,11 +3,11 @@ import { ApiRx } from '@polkadot/api';
 import { BlockNumber, BalanceOf, Balance } from '@polkadot/types/interfaces';
 
 import { IEdgewareSignalingProposal } from 'adapters/chain/edgeware/types';
-import { ProposalModule, ChainEntity, } from 'models';
+import { ProposalModule } from 'models';
 import SubstrateChain from 'controllers/chain/substrate/shared';
 import SubstrateAccounts, { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { SubstrateEntityKind } from 'events/edgeware/types';
+import { SubstrateTypes } from '@commonwealth/chain-events';
 import { EdgewareSignalingProposal, SignalingProposalStage } from './signaling_proposal';
 
 class EdgewareSignaling extends ProposalModule<
@@ -46,7 +46,7 @@ class EdgewareSignaling extends ProposalModule<
         this._votingPeriod = +votinglength;
         this._proposalBond = this._Chain.coins(proposalcreationbond as Balance);
 
-        const entities = this.app.chainEntities.store.getByType(SubstrateEntityKind.SignalingProposal);
+        const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.SignalingProposal);
         const constructorFunc = (e) => new EdgewareSignalingProposal(this._Chain, this._Accounts, this, e);
         const proposals = entities.map((e) => this._entityConstructor(constructorFunc, e));
         this._initialized = true;
@@ -61,19 +61,12 @@ class EdgewareSignaling extends ProposalModule<
     title: string,
     description: string,
     voteOutcomes: any[] = [0, 1],
-    voteType: string = 'binary',
-    tallyType: string = 'onecoin',
+    voteType: 'binary' | 'multioption' | 'rankedchoice' = 'binary',
+    tallyType: 'onecoin' | 'oneperson' = 'onecoin',
   ) {
-    const vOutcomes = (voteOutcomes.length >= 2)
-      ? voteOutcomes.map((o) => this._Chain.createType('VoteOutcome', o))
-      : null;
-    const vType = (voteType === 'binary' || voteType === 'multioption' || voteType === 'rankedchoice')
-      ? this._Chain.createType('VoteType', voteType)
-      : null;
-    const tType = (tallyType === 'onecoin' || tallyType === 'oneperson')
-      ? this._Chain.createType('TallyType', tallyType)
-      : null;
-    if (!vOutcomes || !vType || !tType) return;
+    const vOutcomes = voteOutcomes.map((o) => this._Chain.createType('VoteOutcome', o));
+    const vType = this._Chain.createType('VoteType', voteType);
+    const tType = this._Chain.createType('TallyType', tallyType);
     return this._Chain.createTXModalData(
       author,
       (api: ApiRx) => api.tx.signaling.createProposal(title, description, vOutcomes, vType, tType),
@@ -81,13 +74,8 @@ class EdgewareSignaling extends ProposalModule<
       title
     );
   }
+
   public advance(author: SubstrateAccount, proposal: EdgewareSignalingProposal) {
-    if (proposal.stage === SignalingProposalStage.Completed) {
-      throw new Error('Proposal already completed');
-    }
-    if (proposal.data.author !== author.address) {
-      throw new Error('Only the original author can advance the proposal');
-    }
     return this._Chain.createTXModalData(
       author,
       (api: ApiRx) => api.tx.signaling.advanceProposal(proposal.data.hash),

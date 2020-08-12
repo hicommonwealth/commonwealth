@@ -3,7 +3,7 @@ const SequelizeLib = require('sequelize');
 const Op = SequelizeLib.Op;
 
 // TODO: if we can use typescript in migrations, we can simply get these
-//   from the shared/events/edgeware/types file.
+//   from the shared/commonwealth-chain-events/dist/src/substrate/types file.
 
 const SubstrateEventKinds = {
   Slash: 'slash',

@@ -3,18 +3,13 @@ import 'components/widgets/user.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
-import { formatAddressShort, link, formatAsTitleCase } from 'helpers';
-import { Tooltip, Tag } from 'construct-ui';
+import { formatAddressShort, link } from 'helpers';
+import { Tooltip, Tag, Icon, Icons } from 'construct-ui';
 
 import app from 'state';
-import { Account, Profile, AddressInfo } from 'models';
+import { Account, AddressInfo, ChainInfo, ChainBase } from 'models';
 
-import { makeDynamicComponent } from 'models/mithril';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
-import SubstrateIdentity, { IdentityQuality } from 'controllers/chain/substrate/identity';
-
-interface IAttrs {
+const User: m.Component<{
   user: Account<any> | AddressInfo;
   avatarSize?: number;
   avatarOnly?: boolean; // avatarOnly overrides most other properties
@@ -24,61 +19,12 @@ interface IAttrs {
   onclick?: any;
   tooltip?: boolean;
   showRole?: boolean;
-}
-
-export interface ISubstrateIdentityAttrs {
-  account: Account<any>;
-  linkify: boolean;
-  profile: Profile;
-  hideIdentityIcon: boolean; // only applies to substrate identities
-}
-
-export interface ISubstrateIdentityState {
-  dynamic: {
-    identity: SubstrateIdentity | null;
-  },
-}
-
-const SubstrateIdentityWidget = makeDynamicComponent<ISubstrateIdentityAttrs, ISubstrateIdentityState>({
-  getObservables: (attrs) => ({
-    groupKey: attrs.account.address,
-    identity: (attrs.account instanceof SubstrateAccount)
-      ? (app.chain as Substrate).identities.get(attrs.account)
-      : null,
-  }),
+}, {
+  identityWidgetLoading: boolean;
+  IdentityWidget: any;
+}> = {
   view: (vnode) => {
-    const { profile, linkify, account } = vnode.attrs;
-    // return polkadot identity if possible
-    const identity = vnode.state.dynamic.identity;
-    const displayName = identity?.exists ? identity.username : undefined;
-    const quality = identity?.exists ? identity.quality : undefined;
-    if (displayName && quality) {
-      const name = [ displayName, m(`span.identity-icon${
-        quality === IdentityQuality.Good ? '.icon-ok-circled' : '.icon-minus-circled'
-      }${quality === IdentityQuality.Good
-        ? '.green' : quality === IdentityQuality.Bad
-          ? '.red' : '.gray'}`) ];
-
-      return linkify
-        ? link(
-          'a.user-display-name.username.onchain-username',
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-          name
-        )
-        : m('a.user-display-name.username.onchain-username', name);
-    }
-
-    // return offchain name while identity is loading
-    return linkify
-      ? link(`a.user-display-name${(profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-        profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
-        profile ? profile.displayName : '--',)
-      : m('a.user-display-name.username', profile ? profile.displayName : '--');
-  }
-});
-
-const User : m.Component<IAttrs> = {
-  view: (vnode) => {
+    // TODO: Fix showRole logic to fetch the role from chain
     const { avatarOnly, hideAvatar, hideIdentityIcon, user, linkify, tooltip, showRole } = vnode.attrs;
     const avatarSize = vnode.attrs.avatarSize || 16;
     const showAvatar = !hideAvatar;
@@ -87,28 +33,41 @@ const User : m.Component<IAttrs> = {
     let account : Account<any>;
     let profile; // profile is used to retrieve the chain and address later
     let role;
+    const adminsAndMods =
+      app.chain ? app.chain.meta.chain.adminsAndMods : app.community ? app.community.meta.adminsAndMods : [];
+
+    if (app.chain?.base === ChainBase.Substrate && !vnode.state.identityWidgetLoading && !vnode.state.IdentityWidget) {
+      vnode.state.identityWidgetLoading = true;
+      import(
+        /* webpackMode: "lazy" */
+        /* webpackChunkName: "substrate-identity-widget" */
+        './substrate_identity'
+      ).then((mod) => {
+        vnode.state.IdentityWidget = mod.default;
+        vnode.state.identityWidgetLoading = false;
+      });
+    }
 
     if (vnode.attrs.user instanceof AddressInfo) {
       const chainId = vnode.attrs.user.chain;
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
-      const chain = app.config.chains.getById(chainId);
       // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId) {
+      if (app.chain?.loaded && app.chain.id === chainId) {
         account = app.chain.accounts.get(address);
       }
       profile = app.profiles.getProfile(chainId, address);
-      role = app.user.isAdminOrMod({ account: vnode.attrs.user });
+      role = adminsAndMods.find((r) => r.address === address && r.address_chain === chainId);
     } else {
       account = vnode.attrs.user;
       profile = app.profiles.getProfile(account.chain.id, account.address);
-      role = app.user.isAdminOrMod({ account });
+      role = adminsAndMods.find((r) => r.address === account.address && r.address_chain == account.chain.id);
     }
     const roleTag = role ? m(Tag, {
-      class: 'roleTag',
+      class: 'role-tag',
       label: role.permission,
       rounded: true,
-      size: 'sm',
+      size: 'xs',
     }) : null;
 
     const userFinal = avatarOnly
@@ -129,14 +88,14 @@ const User : m.Component<IAttrs> = {
         showAvatar && m('.user-avatar', {
           style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         }, profile && profile.getAvatar(avatarSize)),
-        (account instanceof SubstrateAccount && app.chain?.loaded)
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
           // substrate name
-          ? m(SubstrateIdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
+          ? m(vnode.state.IdentityWidget, { account, linkify, profile, hideIdentityIcon }) : [
             // non-substrate name
             linkify
               ? link(`a.user-display-name${
                 (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-              profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+              profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
               profile ? profile.displayName : '--',)
               : m('a.user-display-name.username', profile ? profile.displayName : '--')
           ],
@@ -155,15 +114,15 @@ const User : m.Component<IAttrs> = {
             : profile.getAvatar(32)
       ]),
       m('.user-name', [
-        (account instanceof SubstrateAccount && app.chain?.loaded)
-          ? m(SubstrateIdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
+        (app.chain?.loaded && app.chain.base === ChainBase.Substrate && vnode.state.IdentityWidget && account)
+          ? m(vnode.state.IdentityWidget, { account, linkify: true, profile, hideIdentityIcon })
           : link(`a.user-display-name${
             (profile && profile.displayName !== 'Anonymous') ? '.username' : '.anonymous'}`,
-          profile ? `/${profile.chain}/account/${profile.address}` : 'javascript:',
+          profile ? `/${m.route.param('scope')}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
           profile ? profile.displayName : '--',)
       ]),
       m('.user-address', formatAddressShort(profile.address)),
-      roleTag,
+      showRole && roleTag,
     ]);
 
     return tooltip
@@ -173,26 +132,39 @@ const User : m.Component<IAttrs> = {
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any>,
-  avatarSize?: number,
+  user: Account<any> | AddressInfo,
   hideIdentityIcon?: boolean,
   tooltip?: boolean,
-  showRole?: boolean
+  showRole?: boolean,
+  selected?: boolean,
+  compact?: boolean,
 }> = {
   view: (vnode) => {
-    const { user, avatarSize, hideIdentityIcon, tooltip, showRole } = vnode.attrs;
+    const { user, hideIdentityIcon, tooltip, showRole, selected, compact } = vnode.attrs;
 
-    return m('.UserBlock', [
-      m('.profile-block-left', [
+    let profile;
+    if (user instanceof AddressInfo) {
+      if (!user.chain || !user.address) return;
+      profile = app.profiles.getProfile(user.chain, user.address);
+    } else {
+      profile = app.profiles.getProfile(user.chain.id, user.address);
+    }
+
+    return m('.UserBlock', {
+      class: compact ? 'compact' : ''
+    }, [
+      m('.user-block-left', [
         m(User, {
           user,
           avatarOnly: true,
-          avatarSize: avatarSize || 36,
+          avatarSize: 28,
           tooltip,
         }),
+        // TODO: this is weird...symbol display should not depend on user being an Account
+        user.chain instanceof ChainInfo && m('.user-block-symbol', user.chain.symbol),
       ]),
-      m('.profile-block-right', [
-        m('.profile-block-name', [
+      m('.user-block-center', [
+        m('.user-block-name', [
           m(User, {
             user,
             hideAvatar: true,
@@ -201,12 +173,14 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m('.profile-block-address', {
-          class: user.profile?.address ? '' : 'no-address',
+        m('.user-block-address', {
+          class: profile?.address ? '' : 'no-address',
         }, [
-          user.profile?.address && formatAddressShort(user.profile.address),
-          !app.chain && ` (${user.chain.id})`,
+          profile?.address && formatAddressShort(profile.address),
         ]),
+      ]),
+      m('.user-block-right', [
+        m('.user-block-selected', selected ? m(Icon, { name: Icons.CHECK }) : ''),
       ]),
     ]);
   }

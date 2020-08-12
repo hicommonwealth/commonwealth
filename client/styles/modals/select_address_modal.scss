@@ -1,42 +1,68 @@
 @import 'client/styles/shared';
 
 .SelectAddressModal {
-    .compact-modal-title h3 {
-        font-size: 17px;
-    }
-    .modal-header {
-        margin-bottom: 20px;
-    }
     .compact-modal-body {
+        width: 480px;
         padding: 24px 28px 32px !important;
     }
-}
 
-.SelectAddressOption {
-    position: relative;
-    display: block;
-    padding: 12px 20px 10px;
-    border: 1px solid #eee;
-    border-bottom: none;
-    &:last-child {
-        border: 1px solid #eee;
+    .select-address-options {
+        border-bottom: 1px solid $background-color-border;
+        margin-bottom: 10px;
     }
-    &:hover {
-        background: #fafafa;
+    .select-address-placeholder {
+        padding: 20px;
+        text-align: center;
+        border: 1px solid $background-color-border;
+        border-bottom: none;
+        color: $text-color-light;
+    }
+    .select-address-option {
+        position: relative;
+        border: 1px solid $background-color-border;
+        border-bottom: none;
         cursor: pointer;
-    }
-    .UserBlock span.balance {
-        display: block;
-        float: right;
-        color: #aaa;
-    }
-    .role-permission {
-        position: absolute;
-        top: 21px;
-        right: 20px;
-        color: #aaa;
-        .cui-tag {
-            font-weight: 600;
+        &:hover {
+            background: $background-color-light;
         }
+        &.selected {
+            background: $background-color-light-hover !important;
+        }
+        &.existing {
+            background: initial !important;
+            cursor: initial;
+            .UserBlock {
+                opacity: 0.4;
+            }
+            .role-remove {
+                position: absolute;
+                right: 16px;
+                top: 18px;
+                .already-connected {
+                    position: relative;
+                    margin-right: 11px;
+                    font-size: 13.5px;
+                    color: $text-color-medium;
+                }
+                .cui-icon svg {
+                    cursor: pointer;
+                    stroke: $text-color-medium;
+                }
+                .cui-icon:hover svg {
+                    stroke: $negative-text-color;
+                }
+            }
+        }
+        > .UserBlock {
+            padding: 10px 16px 14px;
+        }
+    }
+    .select-address-explanation {
+        font-size: 14px;
+        color: $text-color-dark;
+        margin: 15px 0 18px;
+    }
+    button {
+        margin-top: 10px;
     }
 }

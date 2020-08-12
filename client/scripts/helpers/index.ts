@@ -2,7 +2,6 @@ import m from 'mithril';
 import moment from 'moment-twitter';
 
 import app from 'state';
-import { Account } from 'models';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -26,12 +25,20 @@ export function link(selector: string, target: string, children, extraAttrs?: ob
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       e.preventDefault();
       e.stopPropagation();
-      m.route.set(target);
+      if (window.location.href.split('?')[0] === target.split('?')[0]) {
+        m.route.set(target, {}, { replace: true });
+      } else {
+        m.route.set(target);
+      }
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);
   return m(selector, attrs, children);
 }
+
+/*
+ * general links
+ */
 
 export function extractDomain(url) {
   const re = new RegExp('^(?:https?:)?(?://)?(?:www.)?([^:/]+)');
@@ -178,7 +185,7 @@ export function formatDuration(duration : moment.Duration) {
 export function formatAddressShort(addr : string) {
   if (!addr) return;
   if (addr.length < 16) return addr;
-  return `${addr.slice(0, 5)}…${addr.slice(addr.length - 3)}`;
+  return `${addr.slice(0, 5)}…`;
 }
 
 export function formatProposalHashShort(hash : string) {

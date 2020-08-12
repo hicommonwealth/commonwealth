@@ -47,7 +47,7 @@
                 margin: 0 0 0 12px;
             }
         }
-        .AutoCompleteTagForm {
+        .TopicSelector {
             @include xs-max {
                 margin-left: 20px;
             }
@@ -72,7 +72,7 @@
     }
     .new-thread-right, .new-link-right {
         h3 {
-            font-weight: 700;
+            font-weight: 500;
             font-size: 13px;
             color: #aaa;
             letter-spacing: 0.3px;
@@ -87,7 +87,7 @@
             padding: 16px 18px 14px;
             h4 {
                 margin: 0 0 8px 0;
-                font-weight: 700;
+                font-weight: 500;
             }
             p {
                 margin: 0 0 6px 0;
@@ -103,9 +103,6 @@
     .error-message {
         @include error-text();
         margin-top: 18px;
-    }
-    .empty-profile-notification {
-        @include profile-notice(#fdf3e1, #111);
     }
 
     .bottom-panel {

@@ -5,7 +5,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 import { createUserWithAddress } from 'controllers/app/login';
-import { EthereumAccount } from 'client/scripts/controllers/chain/ethereum/account';
+import EthereumAccount from 'client/scripts/controllers/chain/ethereum/account';
 
 const messages = {
   // signedIn: {
@@ -90,7 +90,7 @@ const checkHedgehogWalletStatus = (vnode) => {
   }
 };
 
-const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
+const getHedgehogLoginOrSignupButton = (vnode, linkNewAddressModalVnode, isLogin = true) => {
   return m('a.btn', {
     class: `login-with-web3${vnode.state.disabled ? ' disabled' : ''}`,
     onclick: async (e) => {
@@ -122,7 +122,7 @@ const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
           try {
             await signerAccount.validate(signature);
             vnode.state.loading = false;
-            vnode.attrs.accountVerifiedCallback(signerAccount, parentVnode); // done!
+            vnode.attrs.accountVerifiedCallback(signerAccount, linkNewAddressModalVnode); // done!
             m.redraw();
           } catch (err) {
             vnode.state.error = 'Verification failed. There was an inconsistency error; '
@@ -145,7 +145,7 @@ const getHedgehogLoginOrSignupButton = (vnode, parentVnode, isLogin = true) => {
   }, isLogin ? 'Login' : 'Create new wallet');
 };
 
-const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, parentVnode }, { hedgehog, error }> = {
+const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, linkNewAddressModalVnode }, { hedgehog, error }> = {
   oninit: (vnode) => {
     import('@audius/hedgehog').then((Hedgehog) => {
       vnode.state.hedgehog = new Hedgehog(
@@ -156,7 +156,7 @@ const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, parentVnode }, {
     });
   },
   view: (vnode) => {
-    const parentVnode = vnode.attrs.parentVnode;
+    const linkNewAddressModalVnode = vnode.attrs.linkNewAddressModalVnode;
     return m('.HedgehogLoginForm', [
       m('.hedgehog-note', [
         m('p', 'We will use these credentials to generate an Ethereum private key, '
@@ -174,8 +174,8 @@ const HedgehogLoginForm: m.Component<{ accountVerifiedCallback, parentVnode }, {
         name: 'password',
         placeholder: 'Password',
       }),
-      getHedgehogLoginOrSignupButton(vnode, parentVnode, true), // login btn
-      getHedgehogLoginOrSignupButton(vnode, parentVnode, false), // signup btn
+      getHedgehogLoginOrSignupButton(vnode, linkNewAddressModalVnode, true), // login btn
+      getHedgehogLoginOrSignupButton(vnode, linkNewAddressModalVnode, false), // signup btn
       vnode.state.error && m('.error-message', vnode.state.error),
     ]);
   }

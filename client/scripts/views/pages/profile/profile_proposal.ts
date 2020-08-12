@@ -1,15 +1,16 @@
 import m from 'mithril';
 import lity from 'lity';
 import app from 'state';
+
 import { OffchainThread, OffchainThreadKind, AddressInfo } from 'models';
-import User from '../../components/widgets/user';
-import { link, slugify } from '../../../helpers';
+import { link, slugify } from 'helpers';
+import User from 'views/components/widgets/user';
 
 const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThread: boolean } > = {
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
-    const { attachments, author, body, title, createdAt } = proposal;
+    const { attachments, author, body, title, createdAt, chain, community } = proposal;
 
     return m('.ProfileProposal', [
       m('.summary', [
@@ -21,39 +22,9 @@ const ProfileProposal : m.Component< { proposal: OffchainThread }, { revealThrea
       ]),
       m('.activity.proposal', [
         proposal.kind === OffchainThreadKind.Forum
-          ? link('a.proposal-title', `/${app.activeChainId()}/proposal/${slug}/${identifier}-${slugify(title)}`, title)
+          ? link('a.proposal-title', `/${chain || community}/proposal/${slug}/${identifier}-${slugify(title)}`, title)
           : m('a.proposal-title', title),
         // TODO: show a truncated thread once we have a good formatting stripping helper
-        // proposal.kind === OffchainThreadKind.Forum && body && vnode.state.revealThread &&
-        //   m('.proposal-description', (() => {
-        //     const previewLength = 150;
-        //     const truncatedThread = body.length > previewLength && vnode.state.revealThread !== proposal);
-        //     try {
-        //       let doc = JSON.parse(body);
-        //       if (truncatedThread) doc = sliceQuill(doc, previewLength);
-        //       return ([
-        //         m(QuillFormattedText, { doc }),
-        //         // truncatedThread && m('a', {
-        //         //   href: '#',
-        //         //   onclick: (e) => {
-        //         //     e.preventDefault();
-        //         //     vnode.state.revealThread = proposal;
-        //         //   }
-        //         // }, 'more')
-        //       ]);
-        //     } catch (e) {
-        //       return ([
-        //         m(MarkdownFormattedText, { doc: body }),
-        //         // truncatedThread && m('a', {
-        //         //   href: '#',
-        //         //   onclick: (e) => {
-        //         //     e.preventDefault();
-        //         //     vnode.state.revealThread = proposal;
-        //         //   }
-        //         // }, 'more')
-        //       ]);
-        //     }
-        //   })()),
         attachments && attachments.length > 0 && m('.proposal-attachments', [
           m('p', `Attachments (${attachments.length})`),
           attachments.map((attachment) => m('a.attachment-item', {

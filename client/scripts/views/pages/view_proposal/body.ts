@@ -1,5 +1,3 @@
-import 'pages/view_proposal/body.scss';
-
 import m from 'mithril';
 import moment from 'moment';
 import lity from 'lity';
@@ -15,7 +13,6 @@ import {
   Account,
   Profile,
   ChainBase,
-  OffchainTag
 } from 'models';
 import { CommentParent } from 'controllers/server/comments';
 
@@ -27,7 +24,7 @@ import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import ReactionButton, { ReactionType } from 'views/components/reaction_button';
-import { MenuItem } from 'construct-ui';
+import { MenuItem, Button } from 'construct-ui';
 
 export enum GlobalStatus {
   Get = 'get',
@@ -41,94 +38,108 @@ export const activeQuillEditorHasText = () => {
   return (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)?.innerText.length > 1;
 };
 
-export const ProposalBodyAuthor: m.Component<{ comment: OffchainComment<any> }> = {
+export const ProposalBodyAvatar: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
-    const { comment } = vnode.attrs;
-    if (!comment) return;
-    if (!comment.author) return;
+    const { item } = vnode.attrs;
+    if (!item) return;
+    if (!item.author) return;
 
     const author : Account<any> = app.community
-      ? app.community.accounts.get(comment.author, comment.authorChain)
-      : app.chain.accounts.get(comment.author);
+      ? app.community.accounts.get(item.author, item.authorChain)
+      : app.chain.accounts.get(item.author);
+
+    return m('.ProposalBodyAvatar', [
+      m(User, {
+        user: author,
+        tooltip: true,
+        avatarOnly: true,
+        avatarSize: 40,
+      }),
+    ]);
+  }
+};
+
+export const ProposalBodyAuthor: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
+  view: (vnode) => {
+    const { item } = vnode.attrs;
+    if (!item) return;
+    if (!item.author) return;
+
+    const author : Account<any> = (item instanceof OffchainThread || item instanceof OffchainComment)
+      ? (app.community
+         ? app.community.accounts.get(item.author, item.authorChain)
+         : app.chain.accounts.get(item.author))
+      : item.author;
 
     return m('.ProposalBodyAuthor', [
       m(User, {
         user: author,
         tooltip: true,
         linkify: true,
+        hideAvatar: true,
       }),
     ]);
   }
 };
 
-export const ProposalBodyCreated: m.Component<{ item: OffchainThread | OffchainComment<any>, link: string }> = {
+export const ProposalBodyCreated: m.Component<{
+  item: AnyProposal | OffchainThread | OffchainComment<any>, link: string
+}> = {
   view: (vnode) => {
     const { item, link } = vnode.attrs;
     if (!item) return;
     if (!item.createdAt) return;
     const isThread = item instanceof OffchainThread;
 
-    return m('.ProposalBodyCreated', [
-      m('a', {
-        href: isThread ? `${link}?comment=body` : link,
-        onclick: (e) => {
-          e.preventDefault();
-          updateRoute(isThread ? `${link}?comment=body` : link);
-          jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
-        }
-      }, item.createdAt.fromNow())
-    ]);
+    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+      return m('.ProposalBodyCreated', [
+        m('a', {
+          href: isThread ? `${link}?comment=body` : link,
+          onclick: (e) => {
+            e.preventDefault();
+            const target = isThread ? `${link}?comment=body` : link;
+            if (target === document.location.href) return;
+            // use updateRoute instead of m.route.set to avoid resetting scroll point
+            updateRoute(target, {}, { replace: true });
+            jumpHighlightComment((isThread ? 'body' : item.id), false, 500);
+          }
+        }, item.createdAt.fromNow())
+      ]);
+    } else {
+      return null;
+    }
   }
 };
 
-export const ProposalBodyLastEdited: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyLastEdited: m.Component<{ item: AnyProposal | OffchainThread | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-    if (item.versionHistory.length === 0) return;
-    const isThread = item instanceof OffchainThread;
-    const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
-    if (!lastEdit) return;
 
-    return m('.ProposalBodyLastEdited', [
-      m('a', {
-        href: '#',
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: VersionHistoryModal,
-            data: isThread ? { proposal: item } : { comment: item }
-          });
-        }
-      }, [
-        'Edited ',
-        moment(lastEdit.timestamp).fromNow()
-      ])
-    ]);
-  }
-};
+    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+      if (item.versionHistory.length === 0) return;
+      const isThread = item instanceof OffchainThread;
+      const lastEdit = item.versionHistory?.length > 1 ? JSON.parse(item.versionHistory[0]) : null;
+      if (!lastEdit) return;
 
-export const ProposalBodyReply: m.Component<{
-  item: OffchainComment<any>, getSetGlobalReplyStatus, parentType?, parentState
-}> = {
-  view: (vnode) => {
-    const { item, parentType, parentState, getSetGlobalReplyStatus } = vnode.attrs;
-    if (!item) return;
-
-    return m('.ProposalBodyReply', [
-      m('a', {
-        class: 'reply',
-        href: '#',
-        onclick: async (e) => {
-          e.preventDefault();
-          if (getSetGlobalReplyStatus(GlobalStatus.Get) && activeQuillEditorHasText()) {
-            const confirmed = await confirmationModalWithText('Unsubmitted replies will be lost. Continue?')();
-            if (!confirmed) return;
+      return m('.ProposalBodyLastEdited', [
+        m('a', {
+          href: '#',
+          onclick: (e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: VersionHistoryModal,
+              data: isThread ? { proposal: item } : { comment: item }
+            });
           }
-          getSetGlobalReplyStatus(GlobalStatus.Set, item.id);
-        },
-      }, 'Reply'),
-    ]);
+        }, [
+          'Edited ',
+          moment(lastEdit.timestamp).fromNow()
+        ])
+      ]);
+    } else {
+      return null;
+    }
   }
 };
 
@@ -239,9 +250,9 @@ export const ProposalBodyDelete: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | OffchainComment<any>, refresh?: Function, }> = {
   view: (vnode) => {
-    const { item } = vnode.attrs;
+    const { item, refresh } = vnode.attrs;
     if (!item) return;
     const isThread = item instanceof OffchainThread;
 
@@ -255,6 +266,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{ item: OffchainThread | Of
         if (!confirmed) return;
         (isThread ? app.threads : app.comments).delete(item).then(() => {
           if (isThread) m.route.set(`/${app.activeId()}/`);
+          refresh();
           m.redraw();
           // TODO: set notification bar for 'thread deleted/comment deleted'
         });
@@ -268,9 +280,11 @@ export const ProposalBodyCancelEdit: m.Component<{ getSetGlobalEditingStatus, pa
     const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
     return m('.ProposalBodyCancelEdit', [
-      m('a', {
+      m(Button, {
         class: 'cancel-editing',
-        href: '#',
+        label: 'Cancel',
+        disabled: parentState.saving,
+        intent: 'none',
         onclick: async (e) => {
           e.preventDefault();
           let confirmed = true;
@@ -302,17 +316,24 @@ export const ProposalBodySaveEdit: m.Component<{
     const isThread = item instanceof OffchainThread;
 
     return m('.ProposalBodySaveEdit', [
-      m('a', {
-        href: '#',
+      m(Button, {
+        class: 'save-editing',
+        label: 'Save',
+        disabled: parentState.saving,
+        intent: 'primary',
         onclick: (e) => {
           e.preventDefault();
+          parentState.saving = true;
+          parentState.quillEditorState.editor.enable(false);
           const itemText = parentState.quillEditorState.markdownMode
             ? parentState.quillEditorState.editor.getText()
             : JSON.stringify(parentState.quillEditorState.editor.getContents());
+          parentState.saving = true;
           if (item instanceof OffchainThread) {
             app.threads.edit(item, itemText).then(() => {
               m.route.set(`/${app.activeId()}/proposal/${item.slug}/${item.id}`);
               parentState.editing = false;
+              parentState.saving = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               m.redraw();
               // TODO: set notification bar for 'thread edited' (?)
@@ -320,6 +341,7 @@ export const ProposalBodySaveEdit: m.Component<{
           } else if (item instanceof OffchainComment) {
             app.comments.edit(item, itemText).then((c) => {
               parentState.editing = false;
+              parentState.saving = false;
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
               callback();
             });
@@ -422,7 +444,7 @@ export const ProposalBodyEditor: m.Component<{ item: OffchainThread | OffchainCo
   }
 };
 
-export const ProposalBodyReaction: m.Component<{ item: OffchainThread | OffchainComment<any> }> = {
+export const ProposalBodyReaction: m.Component<{ item: OffchainThread | AnyProposal | OffchainComment<any> }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;

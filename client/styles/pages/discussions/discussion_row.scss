@@ -1,123 +1,119 @@
 @import 'client/styles/shared';
 
-$discussion-row-color: #999;
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
 
 .DiscussionRow {
     display: block;
-    padding: 28px 32px;
-    border-bottom: 1px solid #ececec;
+    margin: 0 -20px;
 
-    a.discussion-tag {
-        display: inline-block;
+    // wrapper
+    a.discussion-row {
+        display: block;
         text-decoration: none;
-        margin-right: 10px;
-        color: $discussion-row-color;
+        padding: 0 20px;
+        border-radius: 6px;
         &:hover {
-            color: darken($discussion-row-color, 8%);
-            text-decoration: underline;
+            background: $background-color-white-hover;
         }
-    }
-    .discussion-row {
-        display: flex;
     }
 
-    .discussion-content {
-        position: relative;
-        flex: 1;
-        .discussion-tags {
-            margin-bottom: 6px;
-        }
-        .discussion-title {
-            margin-bottom: 4px;
-            a {
-                color: #111;
-                font-size: 21.5px;
+    // content
+    .discussion-top {
+        display: flex;
+        padding: 12px 0;
+        .discussion-top-left {
+            line-height: 1.1;
+            flex: 1;
+            .discussion-title a {
+                color: $text-color-dark;
+                font-size: $text-size-item-header;
                 text-decoration: none;
-                font-weight: 600;
-                line-height: 1.3;
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-            a.discussion-replies {
-                text-decoration: none;
-                margin-left: 8px;
-                color: #888;
-                user-select: none;
-                white-space: nowrap;
-                .cui-icon {
+                font-weight: 500;
+                .cui-icon svg {
                     position: relative;
-                    top: -1px;
-                    color: #888;
-                    margin-left: 3px;
+                    margin-left: 2px;
+                    top: -2px;
+                    stroke: $text-color-light;
+                }
+            }
+            .discussion-meta {
+                color: $text-color-light;
+                font-size: $text-size-item-meta;
+                margin-top: 2px;
+                $discussion-meta-padding: 18px;
+                a.proposal-topic {
+                    margin-right: $discussion-meta-padding;
+                    @include proposal-topic-inline;
+                    color: $text-color-light;
+                }
+                .User a {
+                    display: inline-block;
+                    text-decoration: none;
+                    color: $text-color-light;
+                    &:hover {
+                        color: darken($text-color-light, 8%);
+                        text-decoration: underline;
+                    }
+                    a.user-display-name {
+                        color: $theme-base-color;
+                    }
+                }
+                .discussion-link {
+                    display: inline;
+                    margin-right: $discussion-meta-padding;
+                }
+                a.discussion-created, a.discussion-replies {
+                    text-decoration: none;
+                    color: $text-color-light;
+                    &:hover {
+                        color: darken($text-color-light, 8%);
+                        text-decoration: underline;
+                    }
                 }
             }
         }
-    }
-
-    // content left
-    .discussion-meta {
-        color: $discussion-row-color;
-        font-size: 15px;
-        .User a {
-            display: inline-block;
-            text-decoration: none;
-            color: $discussion-row-color;
-            &:hover {
-                color: darken($discussion-row-color, 8%);
-                text-decoration: underline;
+        .discussion-top-right {
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            .UserGallery {
+                .overflow-users {
+                    font-size: 13.5px;
+                }
+            }
+            .discussion-locked {
+                margin-left: 10px;
+                .cui-tag .cui-icon {
+                    margin-right: 3px;
+                }
+            }
+            .discussion-commenters {
+                min-width: 100px;
+                padding-left: 10px;
+                padding-right: 20px;
+                text-align: right;
+                white-space: nowrap;
+            }
+            .ReactionButton {
+                margin-left: 48px;
+            }
+            .discussion-last-updated {
+                min-width: 80px;
+                padding-left: 14px;
+                text-align: right;
+                font-size: $text-size-item-meta;
+                &.older {
+                    min-width: 116px;
+                }
+                a {
+                    font-size: $text-size-item-meta;
+                    color: $text-color-light;
+                }
+            }
+            .discussion-row-menu {
+                width: 28px;
             }
         }
-        .discussion-last-updated {
-            display: inline;
-            margin-left: 10px;
-        }
-        a.discussion-created, a.discussion-replies {
-            text-decoration: none;
-            color: $discussion-row-color;
-            &:hover {
-                color: darken($discussion-row-color, 8%);
-                text-decoration: underline;
-            }
-        }
-    }
-    .discussion-commenters {
-        display: flex;
-        margin: 24px 0 0;
-        a {
-            color: #aaa;
-        }
-        .commenters-avatars {
-            .User {
-                margin-right: -8px;
-            }
-        }
-        .commenters-label {
-            margin-left: 20px;
-        }
-        .commenters-label,
-        .no-commenters-label {
-            color: #aaa;
-        }
-    }
-    a.discussion-link {
-        display: inline-block;
-        color: $primary-green;
-        text-decoration: none;
-        font-weight: 600;
-        margin: 10px 0;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-    .discussion-excerpt {
-        margin-top: 18px;
-    }
-    .no-title {
-        padding-top: 0;
-        margin-top: -6px;
-    }
-    .no-title .discussion-title {
-        display: none;
     }
 }
