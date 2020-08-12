@@ -243,7 +243,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
         !!statusText && m('span.metadata-divider', ' · '),
         !!statusText && m('span.proposal-status', { class: statusClass }, statusText),
       ])
-      // Case 1. Democracy Proposal
       : (slug === ProposalType.SubstrateDemocracyProposal)
         ?  m('.proposal-row-metadata', [
           m('span.proposal-id', getProposalId(proposal)),
@@ -252,7 +251,6 @@ const ProposalRow: m.Component<IRowAttrs> = {
           m('span.metadata-divider', ' · '),
           m('span.proposal-votes', `${(proposal as SubstrateDemocracyProposal).getVoters().length} votes`),
         ])
-        // Case 2 Council Motion
         : (slug === ProposalType.SubstrateCollectiveProposal)
           ? m('.proposal-row-metadata', [
             m('span.proposal-id', getProposalId(proposal)),

@@ -7,21 +7,19 @@ import moment from 'moment-twitter';
 import app from 'state';
 import { Grid, Col } from 'construct-ui';
 
-interface IRowAttrs {
+interface IContentLeft {
+  header: Vnode | Vnode[];
+  subheader: Vnode | Vnode[];
+}
+
+const Row: m.Component<{
   contentLeft: IContentLeft;
   contentRight: Vnode[];
   rightColSpacing: number[];
   class?: string;
   key?: number;
   onclick?: Function;
-}
-
-interface IContentLeft {
-  header: Vnode | Vnode[];
-  subheader: Vnode | Vnode[];
-}
-
-const Row: m.Component<IRowAttrs> = {
+}> = {
   view: (vnode) => {
     const { key, onclick, contentLeft, contentRight, rightColSpacing } = vnode.attrs;
     const attrs = {};

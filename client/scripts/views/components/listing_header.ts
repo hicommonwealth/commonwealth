@@ -4,7 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import { Grid, Col } from 'construct-ui';
 
-const ListingHeader : m.Component<{
+const ListingHeader: m.Component<{
   columnHeaders: any[],
   showMenu?: boolean,
   rightColSpacing: number[]
