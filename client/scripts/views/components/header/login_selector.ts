@@ -123,21 +123,24 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
     if (shouldShowHint) {
       vnode.state.showAddressSelectionHint = true;
     }
-    const wrapHint = (component) => m(Popover, {
-      class: 'login-selector-hint-popover',
-      closeOnContentClick: true,
-      closeOnOutsideClick: false,
-      transitionDuration: 0,
-      hoverCloseDelay: 0,
-      position: 'top-end',
-      onInteraction: () => {
-        vnode.state.showAddressSelectionHint = false;
-      },
-      isOpen: vnode.state.showAddressSelectionHint,
-      content: 'Select an address to start posting or commenting',
-      inline: true,
-      trigger: component
-    });
+    const wrapHint = (component) => {
+      return component;
+      // return m(Popover, {
+      //   class: 'login-selector-hint-popover',
+      //   closeOnContentClick: true,
+      //   closeOnOutsideClick: false,
+      //   transitionDuration: 0,
+      //   hoverCloseDelay: 0,
+      //   position: 'top-end',
+      //   onInteraction: () => {
+      //     vnode.state.showAddressSelectionHint = false;
+      //   },
+      //   isOpen: vnode.state.showAddressSelectionHint,
+      //   content: 'Select an address to start posting or commenting',
+      //   inline: true,
+      //   trigger: component
+      // });
+    };
 
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
@@ -151,15 +154,16 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
           intent: 'none',
           fluid: true,
           compact: true,
+          disabled: !(app.chain || app.community),
           onclick: (e) => {
             vnode.state.showAddressSelectionHint = false;
           },
           label: [
-            (!app.chain && !app.community) ? 'Logged in'
+            (!app.chain && !app.community) ? 'Select a community'
               : (app.user.activeAccount !== null) ? m(User, { user: app.user.activeAccount, showRole: true })
                 : 'Select an address',
           ],
-          iconRight: Icons.CHEVRON_DOWN,
+          iconRight: !(app.chain || app.community) ? null : Icons.CHEVRON_DOWN,
         }),
         content: m(Menu, { class: 'LoginSelectorMenu' }, [
           // address list
@@ -170,11 +174,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               basic: true,
               onclick: (e) => {
                 const currentActive = app.user.activeAccount;
-                setActiveAccount(account).then(() => {
-                  if (!isSameAccount(currentActive, app.user.activeAccount)) {
-                    m.redraw();
-                  }
-                });
+                setActiveAccount(account).then(() => { m.redraw(); });
               },
               label: m(UserBlock, {
                 user: account,
@@ -187,7 +187,7 @@ const LoginSelector : m.Component<{}, { showAddressSelectionHint: boolean }> = {
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),
-              label: [ 'Connect ', app.chain ? `new ${app.chain.meta.chain.symbol}` : 'a new', ' address', ],
+              label: activeAddressesWithRole.length > 0 ? 'Manage addresses' : 'New address',
             }),
             m(MenuDivider),
           ],

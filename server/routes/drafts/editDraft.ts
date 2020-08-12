@@ -20,7 +20,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     return next(new Error(Errors.NoId));
   }
 
-  const { id, title, body, tag } = req.body;
+  const { id, title, body, topic } = req.body;
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
@@ -55,7 +55,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
     if (!draft) return next(new Error(Errors.NotFound));
     if (body) draft.body = body;
     if (title) draft.title = title;
-    if (tag) draft.tag = tag;
+    if (topic) draft.topic = topic;
     await draft.save();
     await attachFiles();
 

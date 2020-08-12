@@ -8,8 +8,8 @@ import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinn
 import app from 'state';
 import { ProposalType } from 'identifiers';
 import { ChainClass, ChainBase, AddressInfo } from 'models';
-import NewTagModal from 'views/modals/new_tag_modal';
-import EditTagModal from 'views/modals/edit_tag_modal';
+import NewTopicModal from 'views/modals/new_topic_modal';
+import EditTopicModal from 'views/modals/edit_topic_modal';
 
 import CommunitySelector from './community_selector';
 import CommunityInfoModule from './community_info_module';
@@ -142,19 +142,19 @@ const NavigationModule: m.Component<{}, {}> = {
   }
 };
 
-const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
+const TopicsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
   view: (vnode) => {
-    const featuredTags = {};
-    const otherTags = {};
-    const featuredTagIds = app.community?.meta?.featuredTags || app.chain?.meta?.chain?.featuredTags;
+    const featuredTopics = {};
+    const otherTopics = {};
+    const featuredTopicIds = app.community?.meta?.featuredTopics || app.chain?.meta?.chain?.featuredTopics;
 
-    const getTagRow = (id, name, description) => m(ListItem, {
+    const getTopicRow = (id, name, description) => m(ListItem, {
       key: id,
-      contentLeft: m('.proposal-tag-icon'),
+      contentLeft: m('.proposal-topic-icon'),
       contentRight: m.route.get() === `/${app.activeId()}/discussions/${encodeURI(name)}`
         && app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
         && m(PopoverMenu, {
-          class: 'sidebar-edit-tag',
+          class: 'sidebar-edit-topic',
           position: 'bottom',
           transitionDuration: 0,
           hoverCloseDelay: 0,
@@ -163,10 +163,10 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
             name: Icons.CHEVRON_DOWN,
           }),
           content: m(MenuItem, {
-            label: 'Edit tag',
+            label: 'Edit topic',
             onclick: (e) => {
               app.modals.create({
-                modal: EditTagModal,
+                modal: EditTopicModal,
                 data: { description, id, name }
               });
             }
@@ -182,52 +182,52 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
       },
     });
 
-    app.tags.getByCommunity(app.activeId()).forEach((tag) => {
-      const { id, name, description } = tag;
-      if (featuredTagIds.includes(`${tag.id}`)) {
-        featuredTags[tag.name] = { id, name, description, featured_order: featuredTagIds.indexOf(`${id}`) };
+    app.topics.getByCommunity(app.activeId()).forEach((topic) => {
+      const { id, name, description } = topic;
+      if (featuredTopicIds.includes(`${topic.id}`)) {
+        featuredTopics[topic.name] = { id, name, description, featured_order: featuredTopicIds.indexOf(`${id}`) };
       } else {
-        otherTags[tag.name] = { id, name, description };
+        otherTopics[topic.name] = { id, name, description };
       }
     });
-    const otherTagListItems = Object.keys(otherTags)
-      .sort((a, b) => otherTags[a].name.localeCompare(otherTags[b].name))
-      .map((name, idx) => getTagRow(otherTags[name].id, name, otherTags[name].description));
-    const featuredTagListItems = Object.keys(featuredTags)
-      .sort((a, b) => Number(featuredTags[a].featured_order) - Number(featuredTags[b].featured_order))
-      .map((name, idx) => getTagRow(featuredTags[name].id, name, featuredTags[name].description));
+    const otherTopicListItems = Object.keys(otherTopics)
+      .sort((a, b) => otherTopics[a].name.localeCompare(otherTopics[b].name))
+      .map((name, idx) => getTopicRow(otherTopics[name].id, name, otherTopics[name].description));
+    const featuredTopicListItems = Object.keys(featuredTopics)
+      .sort((a, b) => Number(featuredTopics[a].featured_order) - Number(featuredTopics[b].featured_order))
+      .map((name, idx) => getTopicRow(featuredTopics[name].id, name, featuredTopics[name].description));
 
-    return m('.TagsModule.SidebarModule', [
+    return m('.TopicsModule.SidebarModule', [
       m(List, { size: 'lg' }, [
         m(ListItem, {
           class: 'section-header',
-          label: 'Discussion Tags',
+          label: 'Discussion Topics',
           contentRight: app.user.isAdminOfEntity({ chain: app.activeChainId(), community: app.activeCommunityId() })
             && m(PopoverMenu, {
-              class: 'sidebar-add-tag',
+              class: 'sidebar-add-topic',
               position: 'bottom',
               transitionDuration: 0,
               hoverCloseDelay: 0,
               closeOnContentClick: true,
               trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
               content: m(MenuItem, {
-                label: 'New tag',
+                label: 'New topic',
                 onclick: (e) => {
                   e.preventDefault();
-                  app.modals.create({ modal: NewTagModal });
+                  app.modals.create({ modal: NewTopicModal });
                 }
               }),
             }),
         }),
-        featuredTagListItems.length === 0 && otherTagListItems.length === 0 && [
+        featuredTopicListItems.length === 0 && otherTopicListItems.length === 0 && [
           app.threads.initialized
             ? m(ListItem, {
               class: 'section-callout',
               label: m(Callout, {
                 size: 'sm',
-                intent: 'negative',
+                intent: 'primary',
                 icon: Icons.ALERT_TRIANGLE,
-                content: 'This community has not been configured with tags yet',
+                content: 'The admin has not configured this community with topics yet',
               }),
             })
             : m(ListItem, {
@@ -246,12 +246,12 @@ const TagsModule: m.Component<{}, { dragulaInitialized: boolean }> = {
               const reorder = Array.from(source.children).map((child) => {
                 return (child as HTMLElement).id;
               });
-              await app.community.meta.updateFeaturedTags(reorder);
+              await app.community.meta.updateFeaturedTopics(reorder);
             });
           }
         }
-      }, featuredTagListItems),
-      m(List, { size: 'lg', class: 'more-tags-list' }, otherTagListItems),
+      }, featuredTopicListItems),
+      m(List, { size: 'lg', class: 'more-topics-list' }, otherTopicListItems),
     ]);
   }
 };
@@ -310,7 +310,7 @@ const Sidebar: m.Component<{}> = {
     return m('.Sidebar', [
       m('.SidebarHeader', m(CommunitySelector)),
       (app.chain || app.community) && m(NavigationModule),
-      (app.chain || app.community) && m(TagsModule),
+      (app.chain || app.community) && m(TopicsModule),
       app.isLoggedIn() && m(SettingsModule),
       (app.chain || app.community) && m(CommunityInfoModule),
     ]);

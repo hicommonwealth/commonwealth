@@ -12,9 +12,9 @@ const removeUrlPrefix = (url) => {
   return url.replace(/^https?:\/\//, '');
 };
 
-const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string , tag?: string }> = {
+const CommunityInfoModule: m.Component<{ communityName: string, communityDescription: string, topic?: string }> = {
   view: (vnode) => {
-    const { communityName, communityDescription, tag } = vnode.attrs;
+    const { communityName, communityDescription, topic } = vnode.attrs;
     if (!app.chain && !app.community) return;
 
     const isAdmin = app.user.isRoleOfCommunity({
@@ -27,10 +27,10 @@ const CommunityInfoModule: m.Component<{ communityName: string, communityDescrip
     const { name, description, website, chat, telegram, github } = meta;
 
     return m('.CommunityInfoModule.SidebarModule', [
-      // m(TagCaratMenu, { tag }),
-      // tag && [
-      //   m(Subheader, { text: `About #${tag}` }),
-      //   m('p', app.tags.store.getByName(tag, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
+      // m(TopicCaratMenu, { topic }),
+      // topic && [
+      //   m(Subheader, { text: `About #${topic}` }),
+      //   m('p', app.topics.store.getByName(topic, app.chain ? app.chain.meta.id : app.community.meta.id)?.description),
       // ],
 
       m('.community-name', name),

@@ -50,20 +50,6 @@ const setDefaultRole = async (models, req, res: Response, next: NextFunction) =>
   existingRole.is_user_default = true;
   await existingRole.save();
 
-  await models.Subscription.findOrCreate({
-    where: chain ? {
-      subscriber_id: req.user.id,
-      category_id: 'new-thread-creation',
-      object_id: chain.id,
-      chain_id: chain.id,
-    } : {
-      subscriber_id: req.user.id,
-      category_id: 'new-thread-creation',
-      object_id: community.id,
-      community_id: community.id,
-    }
-  });
-
   return res.json({ status: 'Success' });
 };
 

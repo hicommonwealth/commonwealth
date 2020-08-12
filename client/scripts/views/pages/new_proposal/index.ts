@@ -16,9 +16,9 @@ const NewProposalPage = {
     vnode.state.titlePre = 'Create';
     return m(Sublayout, {
       class: 'NewProposalPage',
+      title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`,
     }, [
       m('.forum-container', [
-        m('h2.page-title', `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(vnode.state.typeEnum)}`),
         m(NewProposalForm, {
           typeEnum: vnode.attrs.type,
           onChangeSlugEnum: (value) => {

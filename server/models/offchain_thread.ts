@@ -3,7 +3,7 @@ import * as Sequelize from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { OffchainCommunityAttributes } from './offchain_community';
-import { OffchainTagAttributes } from './offchain_tag';
+import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 
 export interface OffchainThreadAttributes {
@@ -13,7 +13,7 @@ export interface OffchainThreadAttributes {
   body?: string;
   kind: string;
   url?: string;
-  tag_id: number;
+  topic_id: number;
   pinned?: boolean;
   chain?: string;
   community?: string;
@@ -50,7 +50,7 @@ export default (
     body: { type: dataTypes.TEXT, allowNull: true },
     kind: { type: dataTypes.TEXT, allowNull: false },
     url: { type: dataTypes.TEXT, allowNull: true },
-    tag_id: { type: dataTypes.INTEGER, allowNull: false },
+    topic_id: { type: dataTypes.INTEGER, allowNull: false },
     pinned: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     chain: { type: dataTypes.STRING, allowNull: true },
     community: { type: dataTypes.STRING, allowNull: true },
@@ -77,9 +77,9 @@ export default (
       constraints: false,
       scope: { attachable: 'thread' },
     });
-    models.OffchainThread.belongsTo(models.OffchainTag, {
-      as: 'tag',
-      foreignKey: 'tag_id',
+    models.OffchainThread.belongsTo(models.OffchainTopic, {
+      as: 'topic',
+      foreignKey: 'topic_id',
     });
     models.OffchainThread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',

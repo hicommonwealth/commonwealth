@@ -95,8 +95,8 @@ $layout-max-width: 970px;
     }
 }
 
-@mixin proposal-tag-inline {
-    .proposal-tag-icon {
+@mixin proposal-topic-inline {
+    .proposal-topic-icon {
         display: inline-block;
         background: transparent;
         border: 1.5px solid $text-color-lightest;

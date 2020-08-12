@@ -19,7 +19,7 @@ import moment from 'moment-twitter';
 import mixpanel from 'mixpanel-browser';
 
 import { WebsocketMessageType, IWebsocketsPayload } from 'types';
-import { clearActiveAddresses, updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 import Community from './controllers/chain/community/main';
 import WebsocketController from './controllers/server/socket/index';
 import ConfirmInviteModal from './views/modals/confirm_invite_modal';
@@ -54,12 +54,12 @@ export async function initAppState(updateSelectedNode = true): Promise<void> {
           visible: community.visible,
           invitesEnabled: community.invitesEnabled,
           privacyEnabled: community.privacyEnabled,
-          featuredTags: community.featured_tags,
-          tags: community.tags,
+          featuredTopics: community.featured_topics,
+          topics: community.topics,
         }));
       });
       app.user.setRoles(data.roles);
-      // app.config.tags = data.tags.map((json) => OffchainTag.fromJSON(json));
+      // app.config.topics = data.topics.map((json) => OffchainTopic.fromJSON(json));
       app.config.notificationCategories = data.notificationCategories
         .map((json) => NotificationCategory.fromJSON(json));
       app.config.invites = data.invites;
@@ -94,7 +94,8 @@ export async function deinitChainOrCommunity() {
     app.community = null;
   }
   app.user.setSelectedNode(null);
-  clearActiveAddresses();
+  app.user.setActiveAccounts([]);
+  app.user.ephemerallySetActiveAccount(null);
 }
 
 export function handleInviteLinkRedirect() {
@@ -372,9 +373,9 @@ $(() => {
     '/login':                    importRoute('views/pages/login', { scoped: false }),
     '/settings':                 importRoute('views/pages/settings', { scoped: false }),
     '/notifications':            importRoute('views/pages/notifications', { scoped: false }),
-    '/notification-settings':    redirectRoute(() => `/edgeware/notification-settings`),
+    '/notification-settings':    redirectRoute(() => '/edgeware/notification-settings'),
     '/:scope/notification-settings': importRoute('views/pages/notification-settings/notification-settings', { scoped: true }),
-    '/chain-event-settings':    redirectRoute(() => `/edgeware/notification-settings/chain-event-settings`),
+    '/chain-event-settings':    redirectRoute(() => '/edgeware/notification-settings/chain-event-settings'),
     '/:scope/chain-event-settings': importRoute('views/pages/notification-settings/chain-event-settings', { scoped: true }),
 
     // Edgeware lockdrop
@@ -386,7 +387,7 @@ $(() => {
     '/:scope/discussions':       redirectRoute((attrs) => `/${attrs.scope}/`),
 
     '/:scope':                   importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
-    '/:scope/discussions/:tag': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
+    '/:scope/discussions/:topic': importRoute('views/pages/discussions', { scoped: true, deferChain: true }),
     // '/:scope/chat':              importRoute('views/pages/chat', { scoped: true }),
     '/:scope/proposals':         importRoute('views/pages/proposals', { scoped: true }),
     '/:scope/proposal/:type/:identifier': importRoute('views/pages/view_proposal/index', { scoped: true }),
@@ -406,8 +407,6 @@ $(() => {
         : `/${attrs.scope}/`;
     }),
 
-    // '/:scope/questions':         importRoute('views/pages/questions', { scoped: true }),
-    // '/:scope/requests':          importRoute('views/pages/requests', { scoped: true }),
     // '/:scope/validators':        importRoute('views/pages/validators', { scoped: true }),
 
     // NEAR login

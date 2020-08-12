@@ -28,7 +28,7 @@ export default class extends Base {
       ...options,
     }).then((result) => {
       // handle state updates
-      this.addRole(result.result);
+      this.addRole(result.result.newRole);
     });
   }
 

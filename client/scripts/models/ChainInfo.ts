@@ -2,7 +2,7 @@ import $ from 'jquery';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork } from './types';
-import OffchainTag from './OffchainTag';
+import OffchainTopic from './OffchainTopic';
 
 class ChainInfo {
   public readonly id: string;
@@ -15,14 +15,14 @@ class ChainInfo {
   public chat: string;
   public telegram: string;
   public github: string;
-  public readonly featuredTags: string[];
-  public readonly tags: OffchainTag[];
+  public readonly featuredTopics: string[];
+  public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
 
   constructor(
     id, network, symbol, name, iconUrl, description, website, chat, telegram,
-    github, featuredTags, tags, adminsAndMods?
+    github, featuredTopics, topics, adminsAndMods?
   ) {
     this.id = id;
     this.network = network;
@@ -34,8 +34,8 @@ class ChainInfo {
     this.chat = chat;
     this.telegram = telegram;
     this.github = github;
-    this.featuredTags = featuredTags || [];
-    this.tags = tags || [];
+    this.featuredTopics = featuredTopics || [];
+    this.topics = topics || [];
     this.adminsAndMods = adminsAndMods || [];
   }
 
@@ -51,8 +51,8 @@ class ChainInfo {
       json.chat,
       json.telegram,
       json.github,
-      json.featured_tags,
-      json.tags,
+      json.featured_topics,
+      json.topics,
       json.adminsAndMods,
     );
   }
@@ -108,29 +108,29 @@ class ChainInfo {
     this.github = github;
   }
 
-  public addFeaturedTag(tag: string) {
-    this.featuredTags.push(tag);
+  public addFeaturedTopic(topic: string) {
+    this.featuredTopics.push(topic);
   }
 
-  public removeFeaturedTag(tag: string) {
-    if (this.featuredTags.includes(tag)) {
-      this.featuredTags.splice(this.featuredTags.indexOf(tag), 1);
+  public removeFeaturedTopic(topic: string) {
+    if (this.featuredTopics.includes(topic)) {
+      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
     }
   }
 
-  public async updateFeaturedTags(tags: string[]) {
+  public async updateFeaturedTopics(topics: string[]) {
     try {
       // TODO: Change to PUT /chain
       await $.post(`${app.serverUrl()}/updateChain`, {
         'id': app.activeChainId(),
-        'featured_tags[]': tags,
+        'featured_topics[]': topics,
         'jwt': app.user.jwt
       });
     } catch (err) {
-      console.log('Failed to update featured tags');
+      console.log('Failed to update featured topics');
       throw new Error((err.responseJSON && err.responseJSON.error)
         ? err.responseJSON.error
-        : 'Failed to update featured tags');
+        : 'Failed to update featured topics');
     }
   }
 }

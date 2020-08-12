@@ -10,6 +10,13 @@
         border-bottom: 1px solid $background-color-border;
         margin-bottom: 10px;
     }
+    .select-address-placeholder {
+        padding: 20px;
+        text-align: center;
+        border: 1px solid $background-color-border;
+        border-bottom: none;
+        color: $text-color-light;
+    }
     .select-address-option {
         position: relative;
         border: 1px solid $background-color-border;

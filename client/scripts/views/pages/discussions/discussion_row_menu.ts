@@ -4,8 +4,8 @@ import m from 'mithril';
 import app from 'state';
 
 import { NotificationCategories } from 'types';
-import { OffchainThread, OffchainTag } from 'models';
-import TagEditor from 'views/components/tag_editor';
+import { OffchainThread, OffchainTopic } from 'models';
+import TopicEditor from 'views/components/topic_editor';
 import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
@@ -56,23 +56,23 @@ export const ThreadDeletionButton: m.Component<{ proposal: OffchainThread }> = {
   }
 };
 
-export const TagEditorButton: m.Component<{ openTagEditor: Function }, { isOpen: boolean }> = {
+export const TopicEditorButton: m.Component<{ openTopicEditor: Function }, { isOpen: boolean }> = {
   view: (vnode) => {
-    const { openTagEditor } = vnode.attrs;
-    return m('.TagEditorButton', [
+    const { openTopicEditor } = vnode.attrs;
+    return m('.TopicEditorButton', [
       m(MenuItem, {
         fluid: true,
-        label: 'Move to another tag',
+        label: 'Move to another topic',
         onclick: (e) => {
           e.preventDefault();
-          openTagEditor();
+          openTopicEditor();
         },
       })
     ]);
   }
 };
 
-const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIsOpen: boolean }> = {
+const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditorIsOpen: boolean }> = {
   view: (vnode) => {
     if (!app.isLoggedIn()) return;
     const { proposal } = vnode.attrs;
@@ -103,7 +103,7 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIs
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
-          canEditThread && m(TagEditorButton, { openTagEditor: () => { vnode.state.tagEditorIsOpen = true; } }),
+          canEditThread && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
           canEditThread && m(ThreadDeletionButton, { proposal }),
           canEditThread && m(MenuItem, {
             class: 'read-only-toggle',
@@ -124,11 +124,11 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { tagEditorIs
           name: Icons.CHEVRON_DOWN,
         }),
       }),
-      vnode.state.tagEditorIsOpen && m(TagEditor, {
+      vnode.state.topicEditorIsOpen && m(TopicEditor, {
         thread: vnode.attrs.proposal,
         popoverMenu: true,
-        onChangeHandler: (tag: OffchainTag) => { proposal.tag = tag; m.redraw(); },
-        openStateHandler: (v) => { vnode.state.tagEditorIsOpen = v; m.redraw(); },
+        onChangeHandler: (topic: OffchainTopic) => { proposal.topic = topic; m.redraw(); },
+        openStateHandler: (v) => { vnode.state.topicEditorIsOpen = v; m.redraw(); },
       })
     ]);
   },

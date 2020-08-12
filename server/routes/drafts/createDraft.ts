@@ -12,7 +12,7 @@ export const Errors = {
 const createDraft = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, community] = await lookupCommunityIsVisibleToUser(models, req.body, req.user, next);
   const author = await lookupAddressIsOwnedByUser(models, req, next);
-  const { title, body, tag } = req.body;
+  const { title, body, topic } = req.body;
 
   if (!title && !body && !req.body['attachments[]']?.length) {
     return next(new Error(Errors.InsufficientData));
@@ -23,18 +23,18 @@ const createDraft = async (models, req: Request, res: Response, next: NextFuncti
     address_id: author.id,
     title,
     body,
-    tag
+    topic
   } : {
     chain: chain.id,
     address_id: author.id,
     title,
     body,
-    tag
+    topic
   };
 
   const draft = await models.DiscussionDraft.create(draftContent);
 
-  // TODO: attachments can likely be handled like tags & mentions (see lines 11-14)
+  // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
   if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
     await models.OffchainAttachment.create({
       attachable: 'draft',

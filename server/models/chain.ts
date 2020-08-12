@@ -3,7 +3,7 @@ import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { AddressAttributes } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
-import { OffchainTagAttributes } from './offchain_tag';
+import { OffchainTopicAttributes } from './offchain_topic';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
@@ -16,7 +16,7 @@ export interface ChainAttributes {
   website?: string;
   telegram?: string;
   github?: string;
-  featured_tags: string[];
+  featured_topics: string[];
   symbol: string;
   network: string;
   icon_url: string;
@@ -27,7 +27,7 @@ export interface ChainAttributes {
   ChainNodes?: ChainNodeAttributes[] | ChainNodeAttributes['id'][];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   StarredCommunities?: StarredCommunityAttributes[] | StarredCommunityAttributes['id'][];
-  tags?: OffchainTagAttributes[] | OffchainTagAttributes['id'][];
+  topics?: OffchainTopicAttributes[] | OffchainTopicAttributes['id'][];
   OffchainThreads?: OffchainThreadAttributes[] | OffchainThreadAttributes['id'][];
   OffchainComments?: OffchainCommentAttributes[] | OffchainCommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
@@ -55,7 +55,7 @@ export default (
     chat: { type: dataTypes.STRING, allowNull: true },
     telegram: { type: dataTypes.STRING, allowNull: true },
     github: { type: dataTypes.STRING, allowNull: true },
-    featured_tags: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
+    featured_topics: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: false, defaultValue: [] },
     symbol: { type: dataTypes.STRING, allowNull: false },
     network: { type: dataTypes.STRING, allowNull: false },
     icon_url: { type: dataTypes.STRING },
@@ -69,7 +69,7 @@ export default (
   Chain.associate = (models) => {
     models.Chain.hasMany(models.ChainNode, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.OffchainTag, { as: 'tags', foreignKey: 'chain_id', });
+    models.Chain.hasMany(models.OffchainTopic, { as: 'topics', foreignKey: 'chain_id', });
     models.Chain.hasMany(models.OffchainThread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.OffchainComment, { foreignKey: 'chain' });
     models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });

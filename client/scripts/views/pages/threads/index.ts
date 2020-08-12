@@ -9,7 +9,7 @@ import { updateLastVisited } from '../../../controllers/app/login';
 
 enum NewThreadErrors {
   NoBody = 'Thread body cannot be blank',
-  NoTag = 'Thread must have a tag',
+  NoTopic = 'Thread must have a topic',
   NoTitle = 'Title cannot be blank',
   NoUrl = 'URL cannot be blank',
 }
@@ -20,7 +20,7 @@ enum NewDraftErrors {
 
 export const formDataIncomplete = (state) : string => {
   if (!state.form.title) return NewThreadErrors.NoTitle;
-  if (!state.form.tag) return NewThreadErrors.NoTag;
+  if (!state.form.topic) return NewThreadErrors.NoTopic;
 };
 
 export const parseMentionsForServer = (text, isMarkdown) => {
@@ -56,7 +56,7 @@ export const saveDraft = async (
     : quillEditorState.markdownMode
       ? quillEditorState.editor.getText()
       : JSON.stringify(quillEditorState.editor.getContents());
-  const { threadTitle, tagName } = form;
+  const { threadTitle, topicName } = form;
   if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
     throw new Error(NewDraftErrors.InsufficientData);
   }
@@ -68,7 +68,7 @@ export const saveDraft = async (
         existingDraft,
         threadTitle,
         bodyText,
-        tagName,
+        topicName,
         attachments
       );
     } catch (err) {
@@ -84,7 +84,7 @@ export const saveDraft = async (
       result = await app.user.discussionDrafts.create(
         threadTitle,
         bodyText,
-        tagName,
+        topicName,
         attachments
       );
     } catch (err) {
@@ -118,8 +118,8 @@ export const newThread = async (
       throw new Error(NewThreadErrors.NoUrl);
     }
   }
-  if (!form.tagName) {
-    throw new Error(NewThreadErrors.NoTag);
+  if (!form.topicName) {
+    throw new Error(NewThreadErrors.NoTopic);
   }
   if (kind === OffchainThreadKind.Forum && quillEditorState.editor.editor.isBlank()) {
     throw new Error(NewThreadErrors.NoBody);
@@ -138,7 +138,7 @@ export const newThread = async (
       ? parseMentionsForServer(quillEditorState.editor.getText(), true)
       : parseMentionsForServer(quillEditorState.editor.getContents(), false);
 
-  const { tagName, tagId, threadTitle, linkTitle, url } = form;
+  const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
   const attachments = [];
   // const $textarea = $(vnode.dom).find('.DropzoneTextarea textarea');
@@ -160,8 +160,8 @@ export const newThread = async (
       chainId,
       communityId,
       title,
-      tagName,
-      tagId,
+      topicName,
+      topicId,
       bodyText,
       url,
       attachments,
@@ -182,14 +182,14 @@ export const newThread = async (
   m.route.set(`/${app.activeId()}/proposal/discussion/${result.id}`);
 
   try {
-    const tagNames = Array.isArray(activeEntity?.meta?.tags)
-      ? activeEntity.meta.tags.map((t) => t.name)
+    const topicNames = Array.isArray(activeEntity?.meta?.topics)
+      ? activeEntity.meta.topics.map((t) => t.name)
       : [];
-    if (!tagNames.includes(result.tag.name)) {
-      activeEntity.meta.tags.push(result.tag);
+    if (!topicNames.includes(result.topic.name)) {
+      activeEntity.meta.topics.push(result.topic);
     }
   } catch (e) {
-    console.log(`Error adding new tag to ${activeEntity}.`);
+    console.log(`Error adding new topic to ${activeEntity}.`);
   }
 
   mixpanel.track('Create Thread', {

@@ -10,7 +10,8 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { Button, Callout, Input, TextArea, Icon, Icons, Spinner } from 'construct-ui';
 
 import { initAppState } from 'app';
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort, isSameAccount } from 'helpers';
+import { AddressInfo, Account, ChainBase, ChainNetwork } from 'models';
 import app, { ApiStatus } from 'state';
 import { keyToMsgSend, VALIDATION_CHAIN_DATA } from 'adapters/chain/cosmos/keys';
 import { updateActiveAddresses, createUserWithAddress, setActiveAccount } from 'controllers/app/login';
@@ -20,7 +21,6 @@ import Ethereum from 'controllers/chain/ethereum/main';
 import Near from 'controllers/chain/near/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EthereumAccount from 'controllers/chain/ethereum/account';
-import { Account, ChainBase, ChainNetwork } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { ChainIcon } from 'views/components/chain_icon';
@@ -47,11 +47,47 @@ enum LinkNewAddressWallets {
   Hedgehog,
 }
 
-// Step 2 -> Step 3
-const accountVerifiedCallback = async (account, vnode) => {
+const accountVerifiedCallback = async (account: Account<any>, vnode) => {
   if (app.isLoggedIn()) {
     // existing user
-    setActiveAccount(account, true);
+
+    // initialize role
+    try {
+      // initialize AddressInfo
+      let addressInfo = app.user.addresses.find((a) => a.address === account.address && a.chain === account.chain.id);
+      //
+      // TODO: do this in a more well-defined way...
+      //
+      // account.addressId is set by all createAccount methods in controllers/login.ts. this means that all cases should
+      // be covered (either the account comes from the backend and the address is also loaded via AddressInfo, or the
+      // account is created on the frontend and the id is available here).
+      //
+      // either way, we should refactor to always hold addressId on Account<any> models
+      if (!addressInfo && account.addressId) {
+        // TODO: add keytype
+        addressInfo = new AddressInfo(account.addressId, account.address, account.chain.id, undefined);
+        app.user.addresses.push(addressInfo);
+      }
+      // link the address to the community
+      if (vnode.attrs.joiningChain
+          && !app.user.getRoleInCommunity({ account, chain: vnode.attrs.joiningChain })) {
+        await app.user.createRole({ address: addressInfo, chain: vnode.attrs.joiningChain });
+      } else if (vnode.attrs.joiningCommunity
+                 && !app.user.getRoleInCommunity({ account, community: vnode.attrs.joiningCommunity })) {
+        await app.user.createRole({ address: addressInfo, community: vnode.attrs.joiningCommunity });
+      }
+      // set the address as active
+      setActiveAccount(account);
+      if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+        app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+      }
+      // TODO: set the address as default
+    } catch (e) {
+      console.trace(e);
+      // if the address' role wasn't initialized correctly,
+      // setActiveAccount will throw an exception but we should continue
+    }
+
     vnode.state.newAddress = account;
     vnode.state.step = LinkNewAddressSteps.Step3CreateProfile;
     vnode.state.error = null;
@@ -67,7 +103,7 @@ const accountVerifiedCallback = async (account, vnode) => {
       'Last Address Created': new Date().toISOString()
     });
     notifySuccess('Success! Logged in');
-    $(vnode.dom).trigger('modalexit');
+    $(vnode.dom).trigger('modalforceexit');
     if (vnode.attrs.successCallback) vnode.attrs.successCallback();
   } else {
     // log in as the new user
@@ -85,7 +121,7 @@ const accountVerifiedCallback = async (account, vnode) => {
     }
     // if we're logging in and have a profile, we can just close out the modal
     if (account.profile && account.profile.initialized && account.profile.name) {
-      $(vnode.dom).trigger('modalexit');
+      $(vnode.dom).trigger('modalforceexit');
       if (vnode.attrs.successCallback) vnode.attrs.successCallback();
       notifySuccess('Success! Logged in');
     } else {
@@ -119,6 +155,8 @@ const EthereumLinkAccountItem: m.Component<{
 
         signerAccount.validate(webWalletSignature)
           .then(() => {
+            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            linkNewAddressModalVnode.state.linkingComplete = true;
             return accountVerifiedCallback(signerAccount, linkNewAddressModalVnode);
           })
           .then(() => m.redraw())
@@ -148,7 +186,7 @@ const SubstrateLinkAccountItem: m.Component<{
   linkNewAddressModalVnode
 }, { linking }> = {
   view: (vnode) => {
-    const { account, accountVerifiedCallback, errorCallback } = vnode.attrs;
+    const { account, accountVerifiedCallback, errorCallback, linkNewAddressModalVnode } = vnode.attrs;
     return m('.SubstrateLinkAccountItem.account-item', {
       onclick: async (e) => {
         e.preventDefault();
@@ -173,24 +211,26 @@ const SubstrateLinkAccountItem: m.Component<{
 
           if (!verified) {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           }
           signerAccount.validate(signature).then(() => {
             vnode.state.linking = false;
+            if (linkNewAddressModalVnode.state.linkingComplete) return; // return if user signs for two addresses
+            linkNewAddressModalVnode.state.linkingComplete = true;
             accountVerifiedCallback(signerAccount, vnode.attrs.linkNewAddressModalVnode);
           }, (err) => {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           }).then(() => {
             m.redraw();
           }).catch((err) => {
             vnode.state.linking = false;
-            errorCallback('Verification failed.');
+            errorCallback('Verification failed');
           });
         } catch (err) {
           // catch when the user rejects the sign message prompt
           vnode.state.linking = false;
-          errorCallback('Verification failed.');
+          errorCallback('Verification failed');
         }
       }
     }, [
@@ -216,7 +256,9 @@ const SubstrateLinkAccountItem: m.Component<{
 
 const LinkNewAddressModal: m.Component<{
   loggingInWithAddress?: boolean; // determines whether the header says "Link new address" or "Login with address"
-  alreadyInitializedAccount?: Account<any>; // skips the verification steps, and goes straight to profile creation
+  joiningCommunity: string,       // join community after verification
+  joiningChain: string,           // join chain after verification
+  alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
   successCallback;
 }, {
   // meta
@@ -228,6 +270,7 @@ const LinkNewAddressModal: m.Component<{
   validSig: string;
   secretPhraseSaved: boolean;
   newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
+  linkingComplete: boolean;
   // step 3 - create a profile
   isNewLogin: boolean;
   // step 4 - complete
@@ -243,7 +286,7 @@ const LinkNewAddressModal: m.Component<{
   // close the modal if the user moves away from the page
   oncreate: (vnode) => {
     vnode.state.onpopstate = (e) => {
-      $('.LinkNewAddressModal').trigger('modalexit');
+      $('.LinkNewAddressModal').trigger('modalforceexit');
     };
     $(window).on('popstate', vnode.state.onpopstate);
   },
@@ -265,7 +308,7 @@ const LinkNewAddressModal: m.Component<{
       //       label: 'Go home',
       //       intent: 'primary',
       //       onclick: (e) => {
-      //         $(e.target).trigger('modalexit');
+      //         $(e.target).trigger('modalforceexit');
       //         m.route.set('/');
       //       }
       //     }),
@@ -283,9 +326,7 @@ const LinkNewAddressModal: m.Component<{
     }
 
     const linkAddressHeader = m('.compact-modal-title', [
-      vnode.attrs.loggingInWithAddress
-        ? m('h3', `Log in with ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} wallet`)
-        : m('h3', `New ${(app.chain && app.chain.chain && app.chain.chain.denom) || ''} address`),
+      vnode.attrs.loggingInWithAddress ? m('h3', 'Log in with address') : m('h3', 'Link new address'),
     ]);
 
     const isMobile = $(window).width() <= 440;
@@ -874,8 +915,7 @@ const LinkNewAddressModal: m.Component<{
               };
               app.profiles.updateProfileForAccount(vnode.state.newAddress, data).then((args) => {
                 vnode.state.error = null;
-                $form.trigger('modalcomplete');
-                $form.trigger('modalexit');
+                $form.trigger('modalforceexit');
                 if (vnode.attrs.successCallback) vnode.attrs.successCallback();
                 m.redraw();
               }).catch((err) => {
@@ -907,6 +947,8 @@ const LinkNewAddressModal: m.Component<{
 };
 
 // inject confirmExit property
-LinkNewAddressModal['confirmExit'] = confirmationModalWithText('Cancel out of this process?');
+LinkNewAddressModal['confirmExit'] = confirmationModalWithText(
+  app.isLoggedIn() ? 'Cancel out of linking address?' : 'Cancel out of logging in?'
+);
 
 export default LinkNewAddressModal;

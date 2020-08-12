@@ -1,4 +1,4 @@
-import 'modals/edit_tag_modal.scss';
+import 'modals/edit_topic_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
@@ -9,19 +9,19 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { CompactModalExitButton } from '../modal';
 import { TextInputFormField, CheckboxFormField, TextareaFormField } from '../components/forms';
 
-interface IEditTagModalForm {
+interface IEditTopicModalForm {
   description: string,
   id: number,
   name: string,
 }
 
-const EditTagModal : m.Component<{
+const EditTopicModal : m.Component<{
   description: string,
   id: number,
   name: string,
 }, {
   error: any,
-  form: IEditTagModalForm,
+  form: IEditTopicModalForm,
   saving: boolean,
 }> = {
   view: (vnode) => {
@@ -31,30 +31,30 @@ const EditTagModal : m.Component<{
       vnode.state.form = { description, id, name };
     }
 
-    const updateTag = async (form) => {
-      const tagInfo = {
+    const updateTopic = async (form) => {
+      const topicInfo = {
         id,
         description: form.description,
         name: form.name,
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
-      await app.tags.edit(tagInfo);
+      await app.topics.edit(topicInfo);
       m.redraw();
     };
 
-    const deleteTag = async (form) => {
-      const tagInfo = {
+    const deleteTopic = async (form) => {
+      const topicInfo = {
         id,
         communityId: app.activeCommunityId(),
         chainId: app.activeChainId(),
       };
-      await app.tags.remove(tagInfo);
+      await app.topics.remove(topicInfo);
     };
 
-    return m('.EditTagModal', [
+    return m('.EditTopicModal', [
       m('.compact-modal-title', [
-        m('h3', 'Edit tag'),
+        m('h3', 'Edit topic'),
         m(CompactModalExitButton),
       ]),
       m('.compact-modal-body', [
@@ -65,7 +65,7 @@ const EditTagModal : m.Component<{
               oncreate: (vvnode) => {
                 $(vvnode.dom).focus().select();
               },
-              class: 'tag-form-name',
+              class: 'topic-form-name',
               tabindex: 1,
               value: vnode.state?.form?.name,
             },
@@ -73,10 +73,10 @@ const EditTagModal : m.Component<{
               vnode.state.form.name = value;
             },
           }),
-          m(TextareaFormField, {
+          m(TextInputFormField, {
             title: 'Description',
             options: {
-              class: 'tag-form-description',
+              class: 'topic-form-description',
               tabindex: 2,
               value: vnode.state.form.description,
             },
@@ -93,7 +93,7 @@ const EditTagModal : m.Component<{
             class: vnode.state.saving ? 'disabled' : '',
             onclick: async (e) => {
               e.preventDefault();
-              await updateTag(vnode.state.form);
+              await updateTopic(vnode.state.form);
               if (!vnode.state.error) $(e.target).trigger('modalexit');
               vnode.state.saving = false;
             },
@@ -104,14 +104,14 @@ const EditTagModal : m.Component<{
             class: vnode.state.saving ? 'disabled' : '',
             onclick: async (e) => {
               e.preventDefault();
-              const confirmed = await confirmationModalWithText('Delete this tag?')();
+              const confirmed = await confirmationModalWithText('Delete this topic?')();
               if (!confirmed) return;
-              await deleteTag(id);
+              await deleteTopic(id);
               if (!vnode.state.error) $(e.target).trigger('modalexit');
               vnode.state.saving = false;
               m.redraw();
             },
-            label: 'Delete tag',
+            label: 'Delete topic',
           }),
         ]),
         vnode.state.error && m('.error-message', vnode.state.error),
@@ -120,4 +120,4 @@ const EditTagModal : m.Component<{
   }
 };
 
-export default EditTagModal;
+export default EditTopicModal;

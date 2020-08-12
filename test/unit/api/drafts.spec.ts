@@ -20,7 +20,7 @@ describe('Draft Tests', () => {
 
   const title = 'test title';
   const body = 'test body';
-  const tag = 'test tag';
+  const topic = 'test topic';
 
   let userJWT;
   let userAddress;
@@ -53,7 +53,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
@@ -76,7 +76,7 @@ describe('Draft Tests', () => {
           'chain': null,
           'community': community,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
@@ -99,7 +99,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': null,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
@@ -107,12 +107,12 @@ describe('Draft Tests', () => {
       expect(res).to.have.status(200);
       expect(result).to.not.be.null;
       expect(result.body).to.equal(body);
-      expect(result.tag).to.equal(tag);
+      expect(result.topic).to.equal(topic);
       expect(result.Address).to.not.be.null;
       expect(result.Address.address).to.equal(userAddress);
     });
 
-    it('should create a discussion draft without a tag', async () => {
+    it('should create a discussion draft without a topic', async () => {
       const res = await chai.request(app)
         .post('/api/drafts')
         .set('Accept', 'application/json')
@@ -122,7 +122,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': title,
-          'tag': null,
+          'topic': null,
           'body': body,
           'jwt': userJWT,
         });
@@ -145,7 +145,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': null,
-          'tag': tag,
+          'topic': topic,
           'body': null,
           'attachments[]': null,
           'jwt': userJWT,
@@ -167,7 +167,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
@@ -186,14 +186,14 @@ describe('Draft Tests', () => {
           'community': null,
           'id': firstDraft.id,
           'title': `${title} edited`,
-          'tag': `${tag} edited`,
+          'topic': `${topic} edited`,
           'body': `${body} edited`,
           'jwt': userJWT,
         });
       const { result } = res.body;
       expect(res).to.have.status(200);
       expect(result.title).to.equal(`${title} edited`);
-      expect(result.tag).to.equal(`${tag} edited`);
+      expect(result.topic).to.equal(`${topic} edited`);
       expect(result.body).to.equal(`${body} edited`);
     });
 
@@ -208,7 +208,7 @@ describe('Draft Tests', () => {
           'community': null,
           'id': null,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
@@ -228,7 +228,7 @@ describe('Draft Tests', () => {
           'community': null,
           'id': firstDraft.id,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': user2JWT,
         });
@@ -250,7 +250,7 @@ describe('Draft Tests', () => {
           'chain': chain,
           'community': null,
           'title': title,
-          'tag': tag,
+          'topic': topic,
           'body': body,
           'jwt': userJWT,
         });
