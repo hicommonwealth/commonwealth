@@ -14,6 +14,7 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { isU8a, isHex, stringToHex } from '@polkadot/util';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Button } from 'construct-ui';
+import Ethereum from 'client/scripts/controllers/chain/ethereum/main';
 
 const sendSignatureToServer = async (
   account1: Account<any>,
@@ -86,18 +87,44 @@ const SubstrateAccountSigning: m.Component<{
   },
 };
 
-// const EthereumAccountSigning: m.Component<{
-//   address,
-//   accountVerifiedCallback,
-//   errorCallback,
-//   linkNewAddressModalVnode
-// }, { linking }> = {
-//   view: (vnode) => {
-//     return m('.EthereumAccountSigning', [
+const EthereumAccountSigning: m.Component<{
+  account,
+  message,
+  accountVerifiedCallback,
+  errorCallback,
+}, { signing }> = {
+  view: (vnode) => {
+    const { account, message, accountVerifiedCallback, errorCallback } = vnode.attrs;
+    return m('.EthereumAccountSigning', [
+      m('p', `Please that you would like to merge the contents from ${account.address}.`),
+      m(Button, {
+        label: 'Open Metamask to confirm',
+        onclick: async (e) => {
+          e.preventDefault();
+          try {
+            await (app.chain as Ethereum).webWallet.enable();
+            const signature = await (app.chain as Ethereum).webWallet.signMessageWithAccount(message, account);
+            vnode.state.signing = true;
+            m.redraw();
+            console.dir(signature);
+            const verified = await account.isValidSignature(message, signature);
 
-//     ]);
-//   },
-// };
+            if (!verified) {
+              vnode.state.signing = false;
+              errorCallback('Verification failed.');
+            }
+            accountVerifiedCallback(signature);
+          } catch (err) {
+            // catch when the user rejects the sign message prompt
+            vnode.state.signing = false;
+            console.dir(err);
+            errorCallback('Verification failed.');
+          }
+        }
+      }),
+    ]);
+  },
+};
 
 const AccountSigningModal = {
   view: (vnode) => {
@@ -109,8 +136,20 @@ const AccountSigningModal = {
         m('h3', vnode.attrs.title || 'Signature requested'),
       ]),
       m('.compact-modal-body', [
-        (account1.chain.id === 'edgeware')
+        (account1.chain.id === 'edgeware'
+          || account1.chain.id === 'polkadot'
+          || account1.chain.id === 'kusama'
+        )
           && m(SubstrateAccountSigning, {
+            account: account1,
+            message,
+            accountVerifiedCallback: async (signature) => {
+              await sendSignatureToServer(account1, account2, signature, message);
+            },
+            errorCallback: (err: string) => { console.log(err); },
+          }),
+        (account1.chain.id === 'ethereum')
+          && m(EthereumAccountSigning, {
             account: account1,
             message,
             accountVerifiedCallback: async (signature) => {
