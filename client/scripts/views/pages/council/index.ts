@@ -167,6 +167,7 @@ const CouncilPage: m.Component<{}> = {
       class: 'CouncilPage',
       title: 'Council',
       showCouncilVoteButton: true,
+      showCandidacyButton: true,
       councilCandidates: candidates,
     }, [
       // stats

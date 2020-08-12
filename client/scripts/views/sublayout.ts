@@ -17,7 +17,7 @@ const Sublayout: m.Component<{
   description?: string,
   showNewProposalButton?: boolean,
   showCouncilVoteButton?: boolean,
-  showSubmitCandidacyButton?: boolean,
+  showCandidacyButton?: boolean,
   councilCandidates?: Array<[SubstrateAccount, number]>,
   rightSidebar?
 }> = {
@@ -28,7 +28,7 @@ const Sublayout: m.Component<{
       rightSidebar,
       showNewProposalButton,
       showCouncilVoteButton,
-      showSubmitCandidacyButton,
+      showCandidacyButton,
       councilCandidates
     } = vnode.attrs;
 
@@ -42,7 +42,7 @@ const Sublayout: m.Component<{
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
       showNewProposalButton && m(NewProposalButton, { fluid: false }),
       showCouncilVoteButton && m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
-      showSubmitCandidacyButton && m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
+      showCandidacyButton && m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [
