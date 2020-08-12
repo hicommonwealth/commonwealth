@@ -2,49 +2,23 @@ import $ from 'jquery';
 import BN from 'bn.js';
 import m from 'mithril';
 import app from 'state';
-import { ITXModalData } from 'models';
 import { makeDynamicComponent } from 'models/mithril';
 import Bond from 'views/pages/manage_staking/substrate/bond';
-import Nominate from 'views/pages/manage_staking/substrate/nominate';
+import Validate from 'views/pages/manage_staking/substrate/validate';
+import SessionKey from 'views/pages/manage_staking/substrate/session_key';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SiDef } from '@polkadot/util/types';
 import { getValuesFromBn } from 'views/pages/manage_staking/substrate/validate_amount';
 import Substrate from 'controllers/chain/substrate/main';
-import { createTXModal } from 'views/modals/tx_signing_modal';
+import { BN_ZERO } from '@polkadot/util';
+import { openTXModal, IModelPartial } from './new_nominator';
 
 const MAX_STEP = 2;
 const MIN_STEP = 1;
 
-export function openTXModal(txFunc: ITXModalData) {
-  try {
-    createTXModal(txFunc)
-      .then((modalData: ITXModalData) => {
-        return (app.chain as Substrate).app.chainEvents.createChainStake({
-          stash: modalData.author.address
-        });
-      })
-      .then(() => {
-        m.route.set(`/${app.activeChainId()}`);
-      });
-  } catch (e) {
-    m.route.set(`/${app.activeChainId()}`);
-  }
-}
+interface NewValidatorState { dynamic: {} }
 
-export interface IModelPartial {
-  error: boolean,
-  bonded: IBonded | null,
-  step: number,
-  txSuccess: boolean,
-  onBondedChange(bonded: IBonded, noError: boolean): void,
-  next(): void,
-  bond(): void,
-  txCallback(success: boolean): void
-}
-
-interface NewNominatorState { dynamic: {} }
-
-interface NewNominatorAttrs {}
+interface NewValidatorAttrs {}
 
 interface IBonded {
   controller: SubstrateAccount,
@@ -58,8 +32,10 @@ interface IBonded {
 }
 
 interface IModel extends IModelPartial {
-  nominates: string[],
-  onNominateChange(selected: string[]): void,
+  commission: { value: number, valid: boolean },
+  key: { value: string, valid: boolean },
+  onValidateChange(commission: number, valid?: boolean): void,
+  onKeyChange(key: string, valid?: boolean): void,
 }
 
 const model: IModel = {
@@ -67,13 +43,23 @@ const model: IModel = {
   error: true,
   bonded: null,
   step: MIN_STEP,
-  nominates: [],
+  commission: {
+    value: null,
+    valid: false
+  },
+  key: {
+    value: null,
+    valid: false
+  },
   onBondedChange: (bonded: IBonded, noError: boolean) => {
     model.bonded = bonded;
     model.error = !noError;
   },
-  onNominateChange: (selected: string[]) => {
-    model.nominates = selected;
+  onValidateChange: (commission: number, valid?: boolean) => {
+    model.commission = { value: commission, valid };
+  },
+  onKeyChange: (key: string, valid?: boolean) => {
+    model.key = { value: key, valid };
   },
   next: () => {
     if (model.step < MAX_STEP)
@@ -81,7 +67,9 @@ const model: IModel = {
   },
   bond: () => {
     let amount = new BN(0);
+    const COMM_MUL = new BN(1e7);
     amount = getValuesFromBn(model.bonded.balance, model.bonded.si);
+    const commission: BN = (new BN(model.commission.value) || BN_ZERO).mul(COMM_MUL);
     const stashId = model.bonded.stash.address;
     const controllerId = model.bonded.controller.address;
     const destination = model.bonded.payment.value;
@@ -89,11 +77,18 @@ const model: IModel = {
     const bondOwnTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(stashId, amount, destination);
     const bondTx = (app.chain as Substrate).chain.getTxMethod('staking', 'bond')(controllerId, amount, destination);
     const controllerTx = (app.chain as Substrate).chain.getTxMethod('staking', 'setController')(controllerId);
-    const nominateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'nominate')(model.nominates);
-
+    const sessionTx = (app.chain as Substrate).chain.getTxMethod('session', 'setKeys')(
+      model.key.value as any, new Uint8Array()
+    );
+    const validateTx = (app.chain as Substrate).chain.getTxMethod('staking', 'validate')({
+      commission: commission.isZero()
+        // small non-zero set to avoid isEmpty
+        ? 1
+        : commission
+    });
     const params = stashId === controllerId
-      ? [bondTx, nominateTx]
-      : [bondOwnTx, nominateTx, controllerTx];
+      ? [bondTx, sessionTx, validateTx]
+      : [bondOwnTx, sessionTx, validateTx, controllerTx];
     const txFunc = (model.bonded.stash as SubstrateAccount).batchTx(params);
     txFunc.cb = model.txCallback;
     openTXModal(txFunc);
@@ -103,10 +98,10 @@ const model: IModel = {
   }
 };
 
-const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>({
+const NewValidator = makeDynamicComponent<NewValidatorAttrs, NewValidatorState>({
   oncreate: () => {
     model.step = MIN_STEP;
-    model.nominates = [];
+    model.commission = { value: null, valid: false };
     model.bonded = null;
     model.error = true;
   },
@@ -114,10 +109,10 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
     groupKey: app.chain.class.toString()
   }),
   view: (vnode) => {
-    return m('.NewNominator.manage-staking', [
+    return m('.NewValidator.manage-staking', [
       m('.compact-modal-title.center-lg', [
         m('h5', [ `Step ${model.step} of ${MAX_STEP}` ]),
-        m('h3', [ 'Setup Nominator' ]),
+        m('h3', [ 'Setup Validator' ]),
       ]),
       m('.compact-modal-body',
         model.step === MIN_STEP
@@ -134,15 +129,18 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
         ]),
         model.step === MAX_STEP
         && m('span.second-step', [
-          m(Nominate, {
-            onChange: model.onNominateChange
+          m(SessionKey, {
+            onChange: model.onKeyChange
+          }),
+          m(Validate, {
+            onChange: model.onValidateChange
           }),
           m('div.center-lg.padding-t-10', [
             !model.txSuccess
             && m('button.cui-button.cui-align-center.cui-primary', {
-              disabled: !model.nominates.length,
+              disabled: !model.commission.valid || !model.key.valid,
               onclick: model.bond,
-            }, 'Bond & Nominate'),
+            }, 'Bond & Validate'),
             model.txSuccess
             && m('button.cui-button.cui-align-center.cui-default', {
               onclick: (e) => {
@@ -156,4 +154,4 @@ const NewNominator = makeDynamicComponent<NewNominatorAttrs, NewNominatorState>(
   },
 });
 
-export default NewNominator;
+export default NewValidator;

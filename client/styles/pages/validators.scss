@@ -150,8 +150,13 @@
     }
 }
 
+.manage-staking-settings {
+    .cui-menu.cui-xs{
+        max-width: 240px !important;
+    }
+}
 
-.NewNominator {
+.manage-staking {
     max-width: 550px;
     min-width: 500px;
     .warning{

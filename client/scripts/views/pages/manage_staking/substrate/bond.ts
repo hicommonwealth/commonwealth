@@ -3,12 +3,10 @@ import m from 'mithril';
 import User from 'views/components/widgets/user';
 import { makeDynamicComponent } from 'models/mithril';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { formatBalance, BN_TEN, BN_ZERO } from '@polkadot/util';
+import { formatBalance } from '@polkadot/util';
 import { Col, Grid, SelectList, Button, Icons, Icon, Tooltip, ListItem, Input, Intent } from 'construct-ui';
 import { truncate } from 'lodash';
 import { SiDef } from '@polkadot/util/types';
-import BN from 'bn.js';
-
 import FormatBalance from './format_balance';
 import ValidateController from './validate_controller';
 import ValidateAmount from './validate_amount';
@@ -93,7 +91,7 @@ interface IBondedModel {
   itemPredicate(query: string, item: SiDef): boolean,
   handleSelect(item: SiDef): void,
   label(): m.Vnode<any, any>,
-  balanceChange(e:any): void,
+  balanceChange(e:Event): void,
   intent: Intent,
   balance: string
 }
@@ -118,13 +116,15 @@ const bondedModel: IBondedModel = {
       return null;
     return m('span', [ this.selectedItem.text ]);
   },
-  balanceChange: (e) => {
-    const balance = Number(e.target.value);
+  balanceChange: (e: Event) => {
+    const target = e.target as HTMLTextAreaElement;
+    const balance = Number(target.value);
+
     bondedModel.intent = Number.isNaN(balance)
       ? Intent.NEGATIVE
       : Intent.POSITIVE;
 
-    bondedModel.balance = e.target.value;
+    bondedModel.balance = target.value;
   },
   intent: null,
   balance: null

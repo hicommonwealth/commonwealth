@@ -83,6 +83,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
       m('td.val-settings',
         m('span.right',
           m(PopoverMenu, {
+            overlayClass: 'manage-staking-settings',
             content: [
               m(MenuItem, { label: 'Bond more funds' }),
               m(MenuItem, { label: 'Unbond funds' }),
@@ -96,7 +97,7 @@ const AccountActionsRow = makeDynamicComponent<AccountActionsAttrs, IAccountActi
               m(MenuItem, { label: 'Set nominees' }),
               m(MenuItem, { label: 'Inject session keys (advanced)' }),
             ],
-            menuAttrs: { size: 'sm' },
+            menuAttrs: { size: 'xs' },
             trigger: m(Icon, { name: Icons.SETTINGS, size: 'lg' })
           })))
     ]);

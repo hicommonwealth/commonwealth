@@ -331,8 +331,7 @@ function setupRouter(app, models, fetcher, viewCountCache: ViewCountCache) {
   // chain_stake
   router.post('/createChainStake', passport.authenticate('jwt', { session: false }),
     createChainStake.bind(this, models));
-  router.get('/getChainStake', passport.authenticate('jwt', { session: false }),
-    getChainStake.bind(this, models));
+  router.get('/getChainStake', getChainStake.bind(this, models));
 
   app.use('/api', router);
 }

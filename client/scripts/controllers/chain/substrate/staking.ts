@@ -507,9 +507,9 @@ class SubstrateStaking implements StorageModule {
         from(this._app.chainEvents.getChainStake({})),
       )),
       flatMap(([api, allAccounts] :
-        [ApiRx, {author: string}[]]) => {
+        [ApiRx, {stash: string}[]]) => {
         allAccounts = allAccounts || [];
-        const authors: string[] = allAccounts.map((account) => account.author);
+        const authors: string[] = allAccounts.map((account) => account.stash);
         return combineLatest(
           api.query.staking?.bonded.multi(authors),
           api.query.staking?.ledger.multi(authors),

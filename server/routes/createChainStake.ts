@@ -4,12 +4,12 @@ import { Errors as AddressErrors } from './createAddress';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  Author: 'Must provide author'
+  Stash: 'Must provide stash'
 };
 
 const createChainStake = async (models, req: Request, res: Response, next: NextFunction) => {
-  if (!req.body.author) {
-    return next(new Error(Errors.Author));
+  if (!req.body.stash) {
+    return next(new Error(Errors.Stash));
   }
   if (!req.body.chain) {
     return next(new Error(AddressErrors.NeedChain));
@@ -20,13 +20,20 @@ const createChainStake = async (models, req: Request, res: Response, next: NextF
   if (!chain) {
     return next(new Error(AddressErrors.InvalidChain));
   }
+  const query = {
+    stash: req.body.stash,
+    chain: req.body.chain
+  };
+
+  const chainStake = await models.ChainStake.findOne({
+    where: query
+  });
+
+  if (chainStake)
+    return res.json({ status: 'Success', result: chainStake.toJSON() });
 
   try {
-    const newObj = await models.ChainStake.create({
-      author: req.body.author,
-      chain: req.body.chain,
-      user_id: req.user.id
-    });
+    const newObj = await models.ChainStake.create(query);
     return res.json({ status: 'Success', result: newObj.toJSON() });
   } catch (e) {
     return next(e);

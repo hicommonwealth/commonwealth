@@ -15,10 +15,7 @@ const getChainStake = async (models, req: Request, res: Response, next: NextFunc
   }
 
   const list = await models.ChainStake.findAll({
-    where: {
-      user_id: req.user.id,
-      chain: req.query.chain
-    }
+    where: { chain: req.query.chain }
   });
 
   return res.json({ status: 'Success', result: list || [] });
