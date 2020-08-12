@@ -290,7 +290,7 @@ export const NewThreadForm: m.Component<{
           m(FormGroup, { span: 8 }, [
             m(Input, {
               placeholder: 'https://',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.form.url = value;
                 localStorage.setItem(`${app.activeId()}-new-link-storedLink`, vnode.state.form.url);
@@ -315,7 +315,7 @@ export const NewThreadForm: m.Component<{
               class: 'new-thread-title',
               placeholder: 'Title',
               name: 'new-link-title',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = e.target as any;
                 vnode.state.autoTitleOverride = true;
                 vnode.state.form.linkTitle = value;
@@ -387,10 +387,13 @@ export const NewThreadForm: m.Component<{
             m(Input, {
               name: 'new-thread-title',
               placeholder: 'Title',
-              onchange: (e) => {
+              oninput: (e) => {
                 const { value } = (e as any).target;
+                if (!vnode.state.quillEditorState?.alteredText) {
+                  vnode.state.quillEditorState.alteredText = true;
+                  m.redraw();
+                }
                 vnode.state.form.threadTitle = value;
-
                 localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, vnode.state.form.threadTitle);
               },
               defaultValue: vnode.state.form.threadTitle,
