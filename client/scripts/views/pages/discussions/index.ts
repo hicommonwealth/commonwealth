@@ -66,7 +66,7 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
     const { topic } = vnode.attrs;
     const activeEntity = app.community ? app.community : app.chain;
     // add chain compatibility (node info?)
-    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions', narrow: true });
+    if (!activeEntity?.serverLoaded) return m(PageLoading, { title: topic || 'Discussions' });
 
     const activeAddressInfo = app.user.activeAccount && app.user.addresses
       .find((a) => a.address === app.user.activeAccount.address && a.chain === app.user.activeAccount.chain?.id);
