@@ -8,7 +8,7 @@ import NewProposalButton from 'views/components/new_proposal_button';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import NotificationsMenu from 'views/components/header/notifications_menu';
 import LoginSelector from 'views/components/header/login_selector';
-import { CollectiveVotingButton } from './pages/council/index';
+import { CollectiveVotingButton, CandidacyButton } from './pages/council/index';
 import { SubstrateAccount } from '../controllers/chain/substrate/account';
 
 const Sublayout: m.Component<{
@@ -17,6 +17,7 @@ const Sublayout: m.Component<{
   description?: string,
   showNewProposalButton?: boolean,
   showCouncilVoteButton?: boolean,
+  showSubmitCandidacyButton?: boolean,
   councilCandidates?: Array<[SubstrateAccount, number]>,
   rightSidebar?
 }> = {
@@ -27,6 +28,7 @@ const Sublayout: m.Component<{
       rightSidebar,
       showNewProposalButton,
       showCouncilVoteButton,
+      showSubmitCandidacyButton,
       councilCandidates
     } = vnode.attrs;
 
@@ -39,7 +41,8 @@ const Sublayout: m.Component<{
       }),
       app.isLoggedIn() && m(NotificationsMenu),                         // notifications menu
       showNewProposalButton && m(NewProposalButton, { fluid: false }),
-      showCouncilVoteButton && m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates })
+      showCouncilVoteButton && m(CollectiveVotingButton, { buttonStyle: true, candidates: councilCandidates }),
+      showSubmitCandidacyButton && m(CandidacyButton, { buttonStyle: true, candidates: councilCandidates }),
     ]);
 
     return m('.Sublayout', { class: vnode.attrs.class }, [

@@ -99,9 +99,14 @@ export const CollectiveVotingButton: m.Component<{ candidates, buttonStyle?: boo
   }
 };
 
-export const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates, buttonStyle?: boolean }> = {
+export const CandidacyButton: m.Component<{ candidates, buttonStyle?: boolean }> = {
   view: (vnode) => {
-    const { activeAccountIsCandidate, buttonStyle, candidates } = vnode.attrs;
+    const { buttonStyle, candidates } = vnode.attrs;
+
+    const activeAccountIsCandidate = app.chain
+      && app.user.activeAccount
+      && app.user.activeAccount.chainBase === ChainBase.Substrate
+      && !!candidates.find(([ who ]) => who.address === app.user.activeAccount.address);
 
     // TODO: Retract candidacy buttons
     return buttonStyle
@@ -157,9 +162,6 @@ const CouncilPage: m.Component<{}> = {
     const candidacyBond = app.chain && formatCoin((app.chain as Substrate).phragmenElections.candidacyBond);
     const voters = app.chain && (app.chain as Substrate).phragmenElections.activeElection.getVoters();
     const electionIndex = app.chain && (app.chain as Substrate).phragmenElections.round;
-    const activeAccountIsCandidate = app.chain && app.user.activeAccount
-      && app.user.activeAccount.chainBase === ChainBase.Substrate
-        && !!candidates.find(([ who ]) => who.address === app.user.activeAccount.address);
 
     return m(Sublayout, {
       class: 'CouncilPage',
@@ -219,7 +221,7 @@ const CouncilPage: m.Component<{}> = {
         columnHeaders: [
           'Candidates',
           m(CollectiveVotingButton, { candidates }),
-          m(CandidacyButton, { activeAccountIsCandidate, candidates }),
+          m(CandidacyButton, { candidates }),
         ]
       })
     ]);
