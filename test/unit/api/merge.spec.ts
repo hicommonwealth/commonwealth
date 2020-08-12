@@ -71,7 +71,7 @@ describe('Merge Account tests', () => {
       signature = u8aToHex(keyPair.sign(stringToU8a(message)));
 
       // create un-owned address
-      notOwned = await modelUtils.createAndVerifyAddress({ chain });
+      notOwned = await modelUtils.createAndVerifyAddress({ chain }, 'Grapefruit');
 
       // add roles
       const role1 = await modelUtils.assignRole({
@@ -208,8 +208,8 @@ describe('Merge Account tests', () => {
         .post('/api/mergeAccounts')
         .set('Accept', 'application/json')
         .send({
-          'newAddress': userAddress1,
-          'oldAddress': notOwned.address,
+          'newAddress': notOwned.address,
+          'oldAddress': userAddress2,
           'signature': signature,
           'message': message,
           'jwt': userJWT,
