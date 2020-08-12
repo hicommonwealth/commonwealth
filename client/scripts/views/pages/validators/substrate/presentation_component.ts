@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import Substrate from 'controllers/chain/substrate/main';
 import { ChainBase } from 'models';
 import { formatNumber } from '@polkadot/util';
-import { Icon, Icons } from 'construct-ui';
+import { Icon, Icons, Spinner } from 'construct-ui';
 import PageLoading from 'views/pages/loading';
 import Tabs from '../../../components/widgets/tabs';
 import ValidatorRow from './validator_row';
@@ -55,7 +55,12 @@ const PresentationComponent = (state, chain: Substrate) => {
   const { validators, annualPercentRate } = state.dynamic;
 
   if (!validators)
-    return m(PageLoading, { message: 'Loading Validators...' });
+    return m(Spinner, {
+      fill: true,
+      message: 'Loading Validators...',
+      size: 'xl',
+      style: 'visibility: visible; opacity: 1;'
+    });
 
   const lastHeaders = (app.chain.base === ChainBase.Substrate)
     ? (app.chain as Substrate).staking.lastHeaders

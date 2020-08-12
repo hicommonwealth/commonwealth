@@ -9,13 +9,11 @@ import { Option, StorageKey, Vec } from '@polkadot/types';
 import { formatNumber } from '@polkadot/util';
 import { Observable, combineLatest, of, from } from 'rxjs';
 import { HeaderExtended } from '@polkadot/api-derive';
-import { map, flatMap, auditTime, switchMap } from 'rxjs/operators';
-import Substrate from 'controllers/chain/substrate/main';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { map, flatMap, auditTime, switchMap, catchError } from 'rxjs/operators';
 import { EraIndex, AccountId, Exposure,
-  SessionIndex, EraRewardPoints, Nominations, Balance } from '@polkadot/types/interfaces';
-import { InterfaceTypes, Codec } from '@polkadot/types/types';
-import { DeriveStakingValidators, DeriveStakingQuery,
+  SessionIndex, EraRewardPoints, Nominations } from '@polkadot/types/interfaces';
+import { InterfaceTypes } from '@polkadot/types/types';
+import { DeriveStakingValidators, DeriveStakingQuery, DeriveSessionInfo,
   DeriveSessionProgress, DeriveAccountInfo, DeriveAccountRegistration,
   DeriveHeartbeatAuthor, DeriveStakingElected } from '@polkadot/api-derive/types';
 import { IValidators } from './account';
@@ -107,8 +105,20 @@ class SubstrateStaking implements StorageModule {
   public get validatorCount(): Observable<SessionIndex> {
     return this._Chain.query((api: ApiRx) => api.query.staking.validatorCount());
   }
-  public get sessionInfo(): Observable<DeriveSessionProgress> {
-    return this._Chain.query((api: ApiRx) => api.derive.session.progress());
+  public get sessionInfo(): Observable<DeriveSessionProgress | DeriveSessionInfo> {
+    return this._Chain.api.pipe(
+      switchMap((api: ApiRx) => {
+        return combineLatest(
+          api.derive.session.progress()
+        );
+      }),
+      map(([info]: [DeriveSessionProgress]) => {
+        return info;
+      }),
+      catchError(() => {
+        return this._Chain.query((api: ApiRx) => api.derive.session.info());
+      })
+    );
   }
   public info(address: string): Observable<IAccountInfo> {
     return this._Chain.query(
