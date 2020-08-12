@@ -132,12 +132,12 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const activeProposalContent = !activeDemocracyReferenda
-      && !activeDemocracyProposals
-      && !activeCouncilProposals
-      && !activeSignalingProposals
-      && !activeCosmosProposals
-      && !activeMolochProposals
+    const activeProposalContent = !activeDemocracyReferenda?.length
+      && !activeDemocracyProposals?.length
+      && !activeCouncilProposals?.length
+      && !activeSignalingProposals?.length
+      && !activeCosmosProposals?.length
+      && !activeMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
       : (activeDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((activeDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))
@@ -169,12 +169,12 @@ const ProposalsPage: m.Component<{}> = {
       && (app.chain as Moloch).governance.store.getAll().filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
 
-    const inactiveProposalContent = !activeDemocracyReferenda
-      && !inactiveDemocracyProposals
-      && !inactiveCouncilProposals
-      && !inactiveSignalingProposals
-      && !inactiveCosmosProposals
-      && !inactiveMolochProposals
+    const inactiveProposalContent = !inactiveDemocracyReferenda?.length
+      && !inactiveDemocracyProposals?.length
+      && !inactiveCouncilProposals?.length
+      && !inactiveSignalingProposals?.length
+      && !inactiveCosmosProposals?.length
+      && !inactiveMolochProposals?.length
       ? [ m('.no-proposals', 'None') ]
       : (inactiveDemocracyReferenda || []).map((proposal) => m(ProposalRow, { proposal }))
         .concat((inactiveDemocracyProposals || []).map((proposal) => m(ProposalRow, { proposal })))

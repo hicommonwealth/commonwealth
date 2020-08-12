@@ -99,20 +99,33 @@ export const CollectiveVotingButton: m.Component<{ candidates, buttonStyle?: boo
   }
 };
 
-const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
+export const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates, buttonStyle?: boolean }> = {
   view: (vnode) => {
-    const { activeAccountIsCandidate, candidates } = vnode.attrs;
+    const { activeAccountIsCandidate, buttonStyle, candidates } = vnode.attrs;
 
     // TODO: Retract candidacy buttons
-    return m('a.proposals-action.CandidacyButton', {
-      class: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected)
-        ? 'disabled' : '',
-      onclick: (e) => {
-        e.preventDefault();
-        if (app.modals.getList().length > 0) return;
-        m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy});
-      },
-    }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
+    return buttonStyle
+      ? m(Button, {
+        disabled: !app.user.activeAccount,
+        intent: 'primary',
+        label: 'Set council vote',
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: CouncilVotingModal,
+            data: { candidates },
+          });
+        },
+      })
+      : m('a.proposals-action.CandidacyButton', {
+        class: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected)
+          ? 'disabled' : '',
+        onclick: (e) => {
+          e.preventDefault();
+          if (app.modals.getList().length > 0) return;
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy});
+        },
+      }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
   }
 };
 
