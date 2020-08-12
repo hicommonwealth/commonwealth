@@ -16,7 +16,7 @@ const ListingHeader : m.Component<{
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
     return m('.ListingHeader', [
       m('.listing-header-col', {
-        class: `listing-header-col-${1}`
+        class: 'listing-header-col-1'
       }, leftColumn),
       m(Grid, { class: 'listing-header-right' }, [
         rightColumns.map((column, idx) => {
@@ -31,7 +31,7 @@ const ListingHeader : m.Component<{
         app.isLoggedIn()
         && showMenu
         && m(Col, { span: 1 }, [
-          m('.proposal-row-header-col.proposal-row-menu')
+          m('.proposal-row-menu')
         ])
       ]),
     ]);
