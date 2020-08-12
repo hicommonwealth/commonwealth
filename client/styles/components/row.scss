@@ -16,7 +16,7 @@
             display: flex;
             margin-top: 3px;
         }
-        .row-subheader a {
+        .row-subheader a, span {
             color: $text-color-light;
             font-size: $text-size-item-meta;
             line-height: 1.2;

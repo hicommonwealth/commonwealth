@@ -31,7 +31,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
       tooltip: true,
     });
 
-    const rowSubheader = m('.council-row-subheader', election.isMember(account)
+    const rowSubheader = m('span.council-row-subheader', election.isMember(account)
       ? `${account.address.slice(0, 5)}... ${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
       : `${votes.length} votes`);
 
