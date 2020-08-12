@@ -1,6 +1,11 @@
 @import 'client/styles/shared';
 
-.PageNotFound .cui-empty-state {
-    height: 100%;
-    width: 100%;
+.PageNotFound {
+    .page-not-found-container {
+        position: relative;
+    }
+    .cui-empty-state {
+        height: 100%;
+        width: 100%;
+    }
 }
