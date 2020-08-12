@@ -20,6 +20,9 @@
 
     .sublayout-header {
         display: flex;
+        @include sm-max {
+            display: none;
+        }
         margin-top: 28px;
         margin-bottom: 8px;
         .sublayout-header-left {

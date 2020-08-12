@@ -4,15 +4,22 @@
     // only content styles here. layout styles are in layout.scss
     background: $background-color-light;
     border-bottom: 1px solid $background-color-border;
-    padding: 11px 0;
     .mobile-sidebar-left {
-        padding: 7px 24px;
+        padding: 18px 24px;
     }
     .mobile-sidebar-center {
+        padding: 8px 0;
         flex: 1;
         text-align: center;
         .community-label {
             display: inline-block;
+        }
+        .CommunitySelector .cui-button {
+            background: #fff;
+            padding: 20px 14px 22px;
+            .cui-icon-menu {
+                display: none;
+            }
         }
     }
     .mobile-sidebar-right {
@@ -34,7 +41,7 @@
             position: relative;
             top: 2px;
         }
-        padding: 4px 0;
+        padding: 15px 0;
         padding-right: 16px;
     }
 }

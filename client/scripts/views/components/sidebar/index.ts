@@ -333,9 +333,10 @@ const MobileSidebarHeader: m.Component<{ parentVnode }> = {
         m(Icon, { name: Icons.MENU }),
       ]),
       m('.mobile-sidebar-center', [
-        m('.community-label', app.chain
-          ? m(CommunityLabel, { chain: app.chain.meta.chain })
-          : app.community ? m(CommunityLabel, { community: app.community.meta }) : null),
+        // m('.community-label', app.chain
+        //   ? m(CommunityLabel, { chain: app.chain.meta.chain })
+        //   : app.community ? m(CommunityLabel, { community: app.community.meta }) : null),
+        m('.community-label', m(CommunitySelector)),
       ]),
       m('.mobile-sidebar-right', [
         app.isLoggedIn() && m(NotificationsMenu, { small: true }),
