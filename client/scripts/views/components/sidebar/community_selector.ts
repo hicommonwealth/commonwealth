@@ -176,6 +176,7 @@ const CommunitySelector = {
               m(Icon, { name: Icons.MENU, size: 'sm' }),
             ],
           }),
+          class: 'CommunitySelectList',
           content: [
             app.isLoggedIn() && m('h4', 'Joined'),
             app.isLoggedIn() && joinedCommunities.map(renderCommunity),
