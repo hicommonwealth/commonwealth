@@ -27,17 +27,14 @@ function createAccount(account: Account<any>) {
   });
 }
 
-export async function setActiveAccount(account: Account<any>, suppressNotification?) {
+export async function setActiveAccount(account: Account<any>) {
   return new Promise((resolve, reject) => {
     const chain = app.activeChainId();
     const community = app.activeCommunityId();
-    const role = app.user.getRoleInCommunity({ chain, community });
+    const role = app.user.getRoleInCommunity({ account, chain, community });
 
     if (!role || role.is_user_default) {
-      if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
-        notifySuccess('Switched account');
-      }
-      app.user.setActiveAccount(account);
+      app.user.ephemerallySetActiveAccount(account);
       if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
         app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
       }
@@ -61,10 +58,7 @@ export async function setActiveAccount(account: Account<any>, suppressNotificati
           .forEach((r) => { r.is_user_default = false; });
         role.is_user_default = true;
 
-        if (!suppressNotification && app.user.activeAccount && app.user.activeAccount !== account) {
-          notifySuccess('Switched account');
-        }
-        app.user.setActiveAccount(account);
+        app.user.ephemerallySetActiveAccount(account);
         if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
           app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
         }
@@ -92,11 +86,6 @@ export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo,
     console.log(e);
     notifyError('Could not update lastVisited');
   }
-}
-
-export function clearActiveAddresses() {
-  app.user.setActiveAccounts([]);
-  app.user.setActiveAccount(null);
 }
 
 export function updateActiveAddresses(chain?: ChainInfo) {
@@ -151,7 +140,7 @@ export function updateActiveUser(data) {
     app.user.setLastVisited({});
     app.user.setUnseenPosts({});
     app.user.setActiveAccounts([]);
-    app.user.setActiveAccount(null);
+    app.user.ephemerallySetActiveAccount(null);
   } else {
     app.user.setEmail(data.email);
     app.user.setEmailInterval(data.emailInterval);
@@ -210,6 +199,7 @@ export async function createUserWithAddress(address: string, keytype?: string): 
 }
 
 export function unlinkLogin(account) {
+  // TODO: make this an async function, and properly wait for ajax request, setActiveAccount, etc
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
   return $.post(`${app.serverUrl()}/deleteAddress`, {
@@ -226,6 +216,10 @@ export function unlinkLogin(account) {
     app.user.addresses.splice(index, 1);
 
     if (!unlinkingCurrentlyActiveAccount) return;
-    app.user.setActiveAccount(app.user.activeAccounts.length > 0 ? app.user.activeAccounts[0] : null);
+    if (app.user.activeAccounts.length > 0) {
+      setActiveAccount(app.user.activeAccounts[0]);
+    } else {
+      app.user.ephemerallySetActiveAccount(null);
+    }
   });
 }

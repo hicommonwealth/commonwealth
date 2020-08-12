@@ -11,19 +11,19 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { OffchainTag } from 'models';
+import { OffchainTopic } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
-import TagSelector from 'views/components/tag_selector';
+import TopicSelector from 'views/components/topic_selector';
 import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pages/threads';
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
 
 interface IThreadForm {
-  tagName?: string;
-  tagId?: number;
+  topicName?: string;
+  topicId?: number;
   threadTitle?: string;
   linkTitle?: string;
   url?: string;
@@ -113,8 +113,8 @@ export const loadDraft = async (dom, state, draft) => {
   state.form.threadTitle = draft.title;
 
   localStorage.setItem(`${app.activeId()}-new-discussion-storedTitle`, state.form.threadTitle);
-  state.activeTag = draft.tag;
-  state.form.tagName = draft.tag;
+  state.activeTopic = draft.tag;
+  state.form.topicName = draft.tag;
   state.fromDraft = draft.id;
   if (state.quillEditorState?.alteredText) {
     state.quillEditorState.alteredText = false;
@@ -134,7 +134,7 @@ export const loadDraft = async (dom, state, draft) => {
 //   if (!confirmed) return;
 //   state.form.body = '';
 //   state.form.title = '';
-//   state.activeTag = undefined;
+//   state.activeTopic = undefined;
 //   state.fromDraft = NaN;
 //   (titleInput as HTMLInputElement).value = '';
 //   state.quillEditorState.editor.setText('\n');
@@ -144,7 +144,7 @@ export const loadDraft = async (dom, state, draft) => {
 export const NewThreadForm: m.Component<{
   isModal: boolean
 }, {
-  activeTag: OffchainTag | string | boolean,
+  activeTopic: OffchainTopic | string | boolean,
   autoTitleOverride,
   form: IThreadForm,
   fromDraft?: number,
@@ -189,11 +189,11 @@ export const NewThreadForm: m.Component<{
       m.redraw();
     }, 750);
 
-    const updateTagState = (tagName: string, tagId?: number) => {
-      localStorage.setItem(`${app.activeId()}-active-tag`, tagName);
-      vnode.state.activeTag = tagName;
-      vnode.state.form.tagName = tagName;
-      vnode.state.form.tagId = tagId;
+    const updateTopicState = (topicName: string, topicId?: number) => {
+      localStorage.setItem(`${app.activeId()}-active-tag`, topicName);
+      vnode.state.activeTopic = topicName;
+      vnode.state.form.topicName = topicName;
+      vnode.state.form.topicId = topicId;
     };
 
     const saveToLocalStorage = (type: PostType) => {
@@ -301,12 +301,12 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
           m(FormGroup, { span: 4 }, [
-            m(TagSelector, {
-              activeTag: vnode.state.activeTag || localStorage.getItem(`${app.activeId()}-active-tag`),
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: updateTagState,
+            m(TopicSelector, {
+              activeTopic: vnode.state.activeTopic || localStorage.getItem(`${app.activeId()}-active-tag`),
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: updateTopicState,
               tabindex: 2,
             }),
           ]),
@@ -398,14 +398,14 @@ export const NewThreadForm: m.Component<{
             }),
           ]),
           m(FormGroup, { span: fromDraft ? 3 : 4 }, [
-            m(TagSelector, {
-              activeTag:(vnode.state.activeTag === false || vnode.state.activeTag)
-                ? vnode.state.activeTag
+            m(TopicSelector, {
+              activeTopic:(vnode.state.activeTopic === false || vnode.state.activeTopic)
+                ? vnode.state.activeTopic
                 : localStorage.getItem(`${app.activeId()}-active-tag`),
-              tags: app.tags.getByCommunity(app.activeId()),
-              featuredTags: app.tags.getByCommunity(app.activeId())
-                .filter((ele) => activeEntityInfo.featuredTags.includes(`${ele.id}`)),
-              updateFormData: updateTagState,
+              topics: app.topics.getByCommunity(app.activeId()),
+              featuredTopics: app.topics.getByCommunity(app.activeId())
+                .filter((ele) => activeEntityInfo.featuredTopics.includes(`${ele.id}`)),
+              updateFormData: updateTopicState,
               tabindex: 2,
             }),
           ]),
@@ -483,7 +483,7 @@ export const NewThreadForm: m.Component<{
                   clearLocalStorage(PostType.Discussion);
                   vnode.state.quillEditorState.editor.setContents([{ insert: '\n' }]);
                   title.val('');
-                  vnode.state.activeTag = false;
+                  vnode.state.activeTopic = false;
                   delete vnode.state.fromDraft;
                   vnode.state.form = {};
                   m.redraw();

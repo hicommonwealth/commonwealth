@@ -1,4 +1,4 @@
-import 'pages/settings/accounts_well.scss';
+import 'pages/settings/linked_addresses_well.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
@@ -13,7 +13,7 @@ import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 
-const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
+const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {
     const { account } = vnode.attrs;
     const isActiveAccount = app.user.activeAccount
@@ -75,11 +75,11 @@ const AccountRow : m.Component<{ account: AddressInfo, onclick?: (e: Event) => a
   },
 };
 
-const AccountsWell: m.Component<{}> = {
+const LinkedAddressesWell: m.Component<{}> = {
   view: () => {
     const addressGroups = Object.entries(_.groupBy(app.user.addresses, (account) => account.chain));
 
-    return m('.AccountsWell', [
+    return m('.LinkedAddressesWell', [
       m('h4', 'Linked Addresses'),
       m('.address-listing-explanation', 'Log into your account using any of these addresses'),
       addressGroups.map(([chain_id, addresses]) => m('.address-group', [
@@ -102,4 +102,4 @@ const AccountsWell: m.Component<{}> = {
   },
 };
 
-export default AccountsWell;
+export default LinkedAddressesWell;

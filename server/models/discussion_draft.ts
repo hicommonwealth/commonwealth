@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address_id: { type: DataTypes.INTEGER, allowNull: false },
     title: { type: DataTypes.TEXT, allowNull: true },
-    tag: { type: DataTypes.STRING, allowNull: true },
+    topic: { type: DataTypes.STRING, allowNull: true },
     body: { type: DataTypes.TEXT, allowNull: true },
     chain: { type: DataTypes.STRING, allowNull: true },
     community: { type: DataTypes.STRING, allowNull: true },

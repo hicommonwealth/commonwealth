@@ -373,29 +373,29 @@ const resetServer = (models, closeMiddleware) => {
     // Make sure to maintain this list if you make any changes!
     const [staking, governance, meta] = communities;
 
-    // OffchainTags
+    // OffchainTopics
     await Promise.all(
-      chains.map((chain) => models.OffchainTag.create({
+      chains.map((chain) => models.OffchainTopic.create({
         name: 'General',
         description: 'General discussion about this blockchain\'s chain development and governance',
         chain_id: chain.id,
       }))
         .concat(
-          chains.map((chain) => models.OffchainTag.create({
+          chains.map((chain) => models.OffchainTopic.create({
             name: 'Random',
             description: 'Non-work banter and water cooler conversation',
             chain_id: chain.id,
           }))
         )
         .concat(
-          communities.map((community) => models.OffchainTag.create({
+          communities.map((community) => models.OffchainTopic.create({
             name: 'General',
             description: 'General discussion',
             community_id: community.id,
           }))
         )
         .concat(
-          communities.map((community) => models.OffchainTag.create({
+          communities.map((community) => models.OffchainTopic.create({
             name: 'Random',
             description: 'Non-work banter and water cooler conversation',
             community_id: community.id,

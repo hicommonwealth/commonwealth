@@ -51,7 +51,7 @@ const updateCommunity = async (models, req: Request, res: Response, next: NextFu
   }
 
   if (req.body.name) community.name = req.body.name;
-  if (req.body['featured_tags[]']) community.featured_tags = req.body['featured_tags[]'];
+  if (req.body['featured_topics[]']) community.featured_topics = req.body['featured_topics[]'];
   community.description = description;
   community.website = website;
   community.chat = chat;

@@ -1,4 +1,4 @@
-class OffchainTag {
+class OffchainTopic {
   public readonly name: string;
   public readonly id: number;
   public readonly description: string;
@@ -13,8 +13,8 @@ class OffchainTag {
     this.chainId = chainId;
   }
   public static fromJSON(json) {
-    return new OffchainTag(json.name, json.id, json.description, json.communityId, json.chainId);
+    return new OffchainTopic(json.name, json.id, json.description, json.communityId, json.chainId);
   }
 }
 
-export default OffchainTag;
+export default OffchainTopic;

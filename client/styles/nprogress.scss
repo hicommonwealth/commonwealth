@@ -10,7 +10,7 @@ $nprogress-color: $theme-base-color;
         background: $nprogress-color;
 
         position: fixed;
-        z-index: 1031;
+        z-index: 10001;
         top: 0;
         left: 0;
 
@@ -21,10 +21,11 @@ $nprogress-color: $theme-base-color;
     // Fancy blur effect
     .peg {
         display: block;
-        position: absolute;
+        position: fixed;
         right: 0px;
         width: 100px;
         height: 100%;
+        z-index: 10000;
         box-shadow: 0 0 10px $nprogress-color, 0 0 5px $nprogress-color;
         opacity: 1.0;
 
@@ -37,7 +38,7 @@ $nprogress-color: $theme-base-color;
     .spinner {
         display: block;
         position: fixed;
-        z-index: 1031;
+        z-index: 10001;
         top: 15px;
         right: 15px;
     }
@@ -63,7 +64,7 @@ $nprogress-color: $theme-base-color;
 
     .nprogress-custom-parent & .spinner,
     .nprogress-custom-parent & .bar {
-        position: absolute;
+        position: fixed;
     }
 
     @-webkit-keyframes nprogress-spinner {

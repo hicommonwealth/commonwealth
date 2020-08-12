@@ -9,6 +9,7 @@ import { Account, RoleInfo, RolePermission } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase, formatAddressShort } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 
@@ -33,7 +34,7 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         vnode.state.selectedIndex = null;
         // select the address, and close the form
         notifySuccess(`Joined with ${formatAddressShort(addressInfo.address)}`);
-        app.user.setActiveAccount(account);
+        setActiveAccount(account);
         $(e.target).trigger('modalexit');
       }).catch((err: any) => {
         vnode.state.loading = false;
@@ -69,9 +70,9 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         if (app.user.activeAccount === account) {
           const remainingAccounts = app.user.activeAccounts.filter((a) => a !== account);
           if (remainingAccounts[0]) {
-            app.user.setActiveAccount(remainingAccounts[0]);
+            setActiveAccount(remainingAccounts[0]);
           } else {
-            app.user.setActiveAccount(null);
+            app.user.ephemerallySetActiveAccount(null);
           }
         }
       }).catch((err: any) => {

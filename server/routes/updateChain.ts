@@ -60,7 +60,7 @@ const updateChain = async (models, req: Request, res: Response, next: NextFuncti
   chain.chat = chat;
   chain.telegram = telegram;
   chain.github = github;
-  if (req.body['featured_tags[]']) chain.featured_tags = req.body['featured_tags[]'];
+  if (req.body['featured_topics[]']) chain.featured_topics = req.body['featured_topics[]'];
 
   await chain.save();
 
