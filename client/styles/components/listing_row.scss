@@ -1,6 +1,6 @@
 @import 'client/styles/shared';
 
-.Row {
+.ListingRow {
     @include listing-row-base;
     .row-left {
         line-height: 1.1;

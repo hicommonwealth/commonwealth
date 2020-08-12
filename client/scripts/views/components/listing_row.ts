@@ -1,4 +1,4 @@
-import 'components/row.scss';
+import 'components/listing_row.scss';
 
 import m, { VnodeDOM, Vnode } from 'mithril';
 import Chart from 'chart.js';
@@ -12,7 +12,7 @@ interface IContentLeft {
   subheader: Vnode | Vnode[];
 }
 
-const Row: m.Component<{
+const ListingRow: m.Component<{
   contentLeft: IContentLeft;
   contentRight: Vnode[];
   rightColSpacing: number[];
@@ -27,7 +27,7 @@ const Row: m.Component<{
     if (key) attrs['key'] = key;
     if (vnode.attrs.class) attrs['class'] = vnode.attrs.class;
     const initialOffset = 12 - rightColSpacing.reduce((t, n) => t + n);
-    return m('.Row', attrs, [
+    return m('.ListingRow', attrs, [
       m('.row-left', [
         m('.row-header', contentLeft.header),
         m('.row-subheader', contentLeft.subheader),
@@ -46,4 +46,4 @@ const Row: m.Component<{
   }
 };
 
-export default Row;
+export default ListingRow;

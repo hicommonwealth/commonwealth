@@ -14,7 +14,7 @@ import User from 'views/components/widgets/user';
 
 import DiscussionRowMenu from './discussion_row_menu';
 import UserGallery from '../../components/widgets/user_gallery';
-import Row from '../../components/row';
+import ListingRow from '../../components/listing_row';
 
 const formatLastUpdated = (timestamp) => {
   if (timestamp.isBefore(moment().subtract(365, 'days'))) return timestamp.format('MMM D YYYY');
@@ -97,7 +97,7 @@ const DiscussionRow: m.Component<{ proposal: OffchainThread }, { expanded: boole
 
     ];
 
-    return m(Row, {
+    return m(ListingRow, {
       class: 'DiscussionRow',
       contentLeft: {
         header: rowHeader,

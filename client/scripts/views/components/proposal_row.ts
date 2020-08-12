@@ -19,7 +19,7 @@ import SubstrateDemocracyProposal from 'client/scripts/controllers/chain/substra
 import MolochProposal, { MolochProposalState } from 'controllers/chain/ethereum/moloch/proposal';
 import { Icon, Icons, Grid, Col } from 'construct-ui';
 import ReactionButton, { ReactionType } from './reaction_button';
-import Row from './row';
+import ListingRow from './listing_row';
 import UserGallery from './widgets/user_gallery';
 
 export const formatProposalHashShort = (pHash : string) => {
@@ -280,7 +280,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
     ];
 
     const regularProposal = (slug !== ProposalType.SubstrateTreasuryProposal)
-      ? m(Row, {
+      ? m(ListingRow, {
         class: 'ProposalRow',
         contentLeft: {
           header: rowHeader,
@@ -289,6 +289,7 @@ const ProposalRow: m.Component<IRowAttrs> = {
         contentRight: rowMetadata,
         rightColSpacing: [4, 4, 4],
         onclick: (e) => {
+          e.stopPropagation();
           e.preventDefault();
           m.route.set(proposalLink);
         },
@@ -296,7 +297,13 @@ const ProposalRow: m.Component<IRowAttrs> = {
       : null;
 
     const treasuryProposal = (slug === ProposalType.SubstrateTreasuryProposal)
-      ? m('.TreasuryRow', [
+      ? m('.TreasuryRow', {
+        onclick: (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          m.route.set(proposalLink);
+        },
+      }, [
         m('.treasury-row-title', proposal.title),
         m(Grid, [
           m(Col, { span: 3 }, [

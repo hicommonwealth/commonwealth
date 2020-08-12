@@ -8,7 +8,7 @@ import { PhragmenElectionVote } from 'client/scripts/controllers/chain/substrate
 import { pluralize } from 'helpers';
 import ViewVotersModal from '../../modals/view_voters_modal';
 import User from '../../components/widgets/user';
-import Row from '../../components/row';
+import ListingRow from '../../components/listing_row';
 
 interface ICollectiveMemberAttrs {
   account: SubstrateAccount;
@@ -35,7 +35,7 @@ const CouncilRow: m.Component<ICollectiveMemberAttrs> = {
       ? `${account.address.slice(0, 5)}... ${election.backing(account).format(true)} from ${pluralize(votes.length, 'account')}`
       : `${votes.length} votes`);
 
-    return m(Row, {
+    return m(ListingRow, {
       contentLeft: {
         header: rowHeader,
         subheader: rowSubheader,
