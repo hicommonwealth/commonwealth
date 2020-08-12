@@ -1,6 +1,9 @@
 @import 'client/styles/shared';
 
 .CommunityInfoModule {
+    @include sm-max {
+        display: none;
+    }
     // position at bottom of sidebar
     position: absolute;
     bottom: 14px;

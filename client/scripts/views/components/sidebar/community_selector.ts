@@ -28,7 +28,7 @@ export const getSelectableCommunities = () => {
     });
 };
 
-const CommunityLabel: m.Component<{
+export const CommunityLabel: m.Component<{
   chain?: ChainInfo,
   community?: CommunityInfo,
   showStatus?: boolean,
