@@ -111,15 +111,14 @@ export const CandidacyButton: m.Component<{ candidates, buttonStyle?: boolean }>
     // TODO: Retract candidacy buttons
     return buttonStyle
       ? m(Button, {
-        disabled: !app.user.activeAccount,
+        class: '.CandidacyButton',
+        disabled: (!app.user.activeAccount || activeAccountIsCandidate || app.chain.networkStatus !== ApiStatus.Connected),
         intent: 'primary',
-        label: 'Set council vote',
+        label: activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy',
         onclick: (e) => {
           e.preventDefault();
-          app.modals.create({
-            modal: CouncilVotingModal,
-            data: { candidates },
-          });
+          if (app.modals.getList().length > 0) return;
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
         },
       })
       : m('a.proposals-action.CandidacyButton', {
@@ -128,7 +127,7 @@ export const CandidacyButton: m.Component<{ candidates, buttonStyle?: boolean }>
         onclick: (e) => {
           e.preventDefault();
           if (app.modals.getList().length > 0) return;
-          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy});
+          m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
         },
       }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
   }
