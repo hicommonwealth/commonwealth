@@ -103,9 +103,8 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     const { subscriptions } = vnode.state;
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
-    const allEmail = subscriptions.every((s) => s.immediateEmail);
-    console.log('allEmail', allEmail);
-    if (everyActive && allEmail) {
+    const someEmail = subscriptions.some((s) => s.immediateEmail);
+    if (everyActive && someEmail) {
       vnode.state.option = 'Notifications on (app + email)';
     } else if (everyActive) {
       vnode.state.option = 'Notifications on (app only)';
@@ -146,11 +145,11 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
           onSelect: async (option: string) => {
             vnode.state.option = option;
             if (option === 'Notifications off') {
-              if (allEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
-              await app.user.notifications.disableSubscriptions(subscriptions);
+              if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
+              if (someActive) await app.user.notifications.disableSubscriptions(subscriptions);
             } else if (option === 'Notifications on (app only)') {
               await app.user.notifications.enableSubscriptions(subscriptions);
-              if (allEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
+              if (someEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
             } else if (option === 'Notifications on (app + email)') {
               if (!everyActive) await app.user.notifications.enableSubscriptions(subscriptions);
               await app.user.notifications.enableImmediateEmails(subscriptions);
