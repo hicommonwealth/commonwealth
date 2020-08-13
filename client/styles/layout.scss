@@ -34,6 +34,9 @@ html {
 .forum-container {
     padding: 20px 0;
 }
+.MobileSidebarHeader {
+    display: none;
+}
 .Sidebar {
     position: fixed;
     top: 0;
@@ -44,6 +47,42 @@ html {
 }
 .layout-container {
     padding-left: $sidebar-width;
+}
+@include sm-max {
+    $mobile-sidebar-height: 60px;
+    html {
+        overflow-y: hidden;
+    }
+    .MobileSidebarHeader {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99;
+        height: $mobile-sidebar-height;
+        user-select: none;
+        cursor: pointer;
+    }
+    .Sidebar {
+        display: none;
+        position: fixed;
+        top: $mobile-sidebar-height;
+        left: 0;
+        width: 100%;
+        padding: 20px 0;
+        z-index: 99;
+        &.open {
+            display: block;
+        }
+    }
+    .layout-container {
+        position: fixed;
+        top: $mobile-sidebar-height;
+        bottom: 0;
+        width: 100%;
+        padding-left: 0;
+    }
 }
 
 //

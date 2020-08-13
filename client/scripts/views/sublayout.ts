@@ -33,7 +33,11 @@ const Sublayout: m.Component<{
     return m('.Sublayout', { class: vnode.attrs.class }, [
       m(Grid, { class: 'sublayout-grid' }, [
         rightSidebar ? [
-          m(Col, { span: { xs: 12, md: 3 }, order: { xs: 1, md: 2 }, class: 'sublayout-right-sidebar' }, [
+          m(Col, {
+            span: { xs: 12, md: 3 },
+            order: { xs: 1, md: 2 },
+            class: 'sublayout-right-sidebar'
+          }, [
             m('.sublayout-header', [
               sublayoutHeaderRight,
             ]),
@@ -41,7 +45,11 @@ const Sublayout: m.Component<{
               rightSidebar,
             ]),
           ]),
-          m(Col, { span: { xs: 12, md: 9 }, order: { xs: 2, md: 1 }, class: 'sublayout-grid-col sublayout-grid-col-narrow' }, [
+          m(Col, {
+            span: { xs: 12, md: 9 },
+            order: { xs: 2, md: 1 },
+            class: 'sublayout-grid-col sublayout-grid-col-narrow'
+          }, [
             (title || description) && m('.sublayout-header', [
               m('.sublayout-header-left', [
                 title && m('h4.sublayout-header-heading', title),
@@ -53,7 +61,10 @@ const Sublayout: m.Component<{
             ]),
           ]),
         ] : [
-          m(Col, { span: 12, class: 'sublayout-grid-col sublayout-grid-col-wide' }, [
+          m(Col, {
+            span: 12,
+            class: 'sublayout-grid-col sublayout-grid-col-wide'
+          }, [
             m('.sublayout-header', [
               m('.sublayout-header-left', [
                 title && m('h4.sublayout-header-heading', title),
