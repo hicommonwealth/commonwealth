@@ -47,6 +47,7 @@
 }
 
 .Sidebar {
+    z-index: 1;
     @include sm-max {
         .SidebarHeader {
             display: none;

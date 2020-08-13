@@ -5,33 +5,38 @@
 
 .CommunitySelectList {
     .cui-popover-content {
-        padding: 0;
-    }
-    .cui-list {
-        max-height: 100vh;
+        padding: 20px 0;
+        text-align: left;
     }
     .cui-menu {
         border: none;
-        max-width: 280px;
-    }
-    button.cui-button.cui-menu-item {
-        text-align: left;
-        padding: 0 14px;
-        height: initial;
-        max-height: initial;
-        .cui-button-label {
-            display: flex;
+        max-width: 300px;
+        width: 300px;
+        h4 {
+            margin: 20px 24px 10px;
+            color: #999;
+            font-weight: 400;
+            font-size: 16px;
         }
-        // for address selection
-        .UserBlock {
-            padding: 6px 0 8px;
-            width: 100%;
+        h4:first-child {
+            margin-top: 0;
         }
-        // for community selection
-        .CommunityLabel {
-            padding: 2px 0;
+        .community-placeholder {
+            margin: 0 24px;
+            font-size: 16px;
+            color: #999;
         }
     }
+    .cui-list-item {
+        padding: 6px 20px 6px 24px;
+        border: none;
+        user-select: none;
+        &.cui-selected {
+            color: #111;
+        }
+    }
+
+    // stars
     .community-star-toggle .cui-icon svg {
         stroke: lighten(#546e7b, 40%);
     }
