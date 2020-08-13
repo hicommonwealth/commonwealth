@@ -237,13 +237,15 @@ const DiscussionsPage: m.Component<{ topic?: string }, IDiscussionPageState> = {
             menuCarat: true,
           }),
         // TODO: Incorporate infinite scroll into generic Listing component
-        vnode.state.postsDepleted
+        getRecentPostsSortedByWeek().length && vnode.state.postsDepleted
           ? m('.infinite-scroll-reached-end', [
             `Showing all ${allProposals.length} of ${pluralize(allProposals.length, 'posts')}`
           ])
-          : m('.infinite-scroll-spinner-wrap', [
-            m(Spinner, { active: !vnode.state.postsDepleted })
-          ])
+          : getRecentPostsSortedByWeek().length
+            ? m('.infinite-scroll-spinner-wrap', [
+              m(Spinner, { active: !vnode.state.postsDepleted })
+            ])
+            : null
       ]);
     };
 
