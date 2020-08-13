@@ -206,7 +206,7 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
     const { chains } = vnode.attrs;
     const chainIds = chains.map((c) => c.id);
     if (chains.length < 1) return;
-    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama];
+    const validChains = ['edgeware', 'polkadot', 'kusama'];
     const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {
