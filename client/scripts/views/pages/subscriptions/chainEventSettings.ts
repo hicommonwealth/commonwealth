@@ -11,6 +11,8 @@ import { ChainInfo, CommunityInfo } from 'models';
 import app from 'state';
 import { NotificationCategories } from 'types';
 
+import { ChainNetwork } from 'models/types.ts';
+
 import Sublayout from 'views/sublayout';
 import PageLoading from 'views/pages/loading';
 import PageError from 'views/pages/error';
@@ -186,9 +188,9 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
           m('th', 'In app'),
           m('th', 'By email'),
         ]),
-        (chain.id === 'edgeware') && m(EdgewareChainEvents),
-        (chain.id === 'kusama') && m(KusamaChainEvents),
-        (chain.id === 'polkadot') && m(PolkadotChainEvents),
+        (chain.id === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
+        (chain.id === ChainNetwork.Kusama) && m(KusamaChainEvents),
+        (chain.id === ChainNetwork.Polkadot) && m(PolkadotChainEvents),
       ]),
     ]);
   }
@@ -198,13 +200,13 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
   oninit: (vnode) => {
     const { chains } = vnode.attrs;
     const scope = m.route.param('scope');
-    vnode.state.selectedChain = chains.find((c) => c.id === scope) || chains.find((c) => c.id === 'edgeware');
+    vnode.state.selectedChain = chains.find((c) => c.id === scope) || chains.find((c) => c.id === ChainNetwork.Edgeware);
   },
   view: (vnode) => {
     const { chains } = vnode.attrs;
     const chainIds = chains.map((c) => c.id);
     if (chains.length < 1) return;
-    const validChains = ['edgeware', 'polkadot', 'kusama'];
+    const validChains = [ChainNetwork.Edgeware, ChainNetwork.Polkadot, ChainNetwork.Kusama];
     const filteredChains = chains.filter((c) => validChains.includes(c.id)).sort((a, b) => (a.id > b.id) ? 1 : -1);
     return m('ChainNotificationManagementPage', [
       m(SelectList, {
@@ -251,7 +253,7 @@ const IndividualEventSubscriptions: m.Component<{}, {
 }> = {
   view: (vnode) => {
     let titler;
-    if (vnode.state.chain === 'edgeware' || vnode.state.chain === 'edgeware-local') {
+    if (vnode.state.chain === ChainNetwork.Edgeware || vnode.state.chain === 'edgeware-local') {
       titler = SubstrateEvents.Title;
       vnode.state.eventKinds = SubstrateTypes.EventKinds;
     } else {
@@ -278,16 +280,11 @@ const IndividualEventSubscriptions: m.Component<{}, {
   },
 };
 
-const ChainEventSettingsPage: m.Component<{}, {
-  chains: ChainInfo[];
-}> = {
-  oninit: (vnode) => {
-    vnode.state.chains = _.uniq(
+const ChainEventSettingsPage: m.Component<{}> = {
+  view: (vnode) => {
+    const chains = _.uniq(
       app.config.chains.getAll()
     );
-  },
-  view: (vnode) => {
-    const { chains } = vnode.state;
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
       message: 'This page requires you to be logged in.'
