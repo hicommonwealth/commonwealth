@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes) => {
     body: { type: DataTypes.TEXT, allowNull: true },
     chain: { type: DataTypes.STRING, allowNull: true },
     community: { type: DataTypes.STRING, allowNull: true },
-    attachment: { type: DataTypes.INTEGER, allowNull: true }
+    attachment: { type: DataTypes.INTEGER, allowNull: true },
+    // created_at: { type: DataTypes.DATE, allowNull: false },
+    // updated_at: { type: DataTypes.DATE, allowNull: false },
+    // deleted_at: { type: DataTypes.DATE, allowNull: true }
   }, {
     timestamps: true,
     underscored: true,

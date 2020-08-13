@@ -507,7 +507,10 @@ export const NewThreadForm: m.Component<{
       !!discussionDrafts.length
       && newType === PostType.Discussion
       && m('.new-thread-form-sidebar', [
-        m(List, { interactive: true }, discussionDrafts.map((draft) => {
+        m(List, {
+          interactive: true
+        }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
+          console.log(draft);
           const { body } = draft;
           let bodyComponent;
           if (body) {

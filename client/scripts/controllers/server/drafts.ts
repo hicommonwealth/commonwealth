@@ -19,6 +19,7 @@ const modelFromServer = (draft) => {
     draft.body,
     draft.topic,
     attachments,
+    draft.createdAt
   );
 };
 
@@ -137,6 +138,7 @@ class DraftsController {
         if (!draft.Address) {
           console.error('OffchainThread missing address');
         }
+        console.log(draft);
         draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);
         if (existing) {
