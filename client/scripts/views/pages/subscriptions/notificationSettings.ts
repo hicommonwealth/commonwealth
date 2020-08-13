@@ -149,7 +149,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     const someActive = subscriptions.some((s) => s.isActive);
     const everyActive = subscriptions.every((s) => s.isActive);
     if (!subscriptions) return;
-    return m('tr.SubscriptionRow', [
+    return m('tr.BatchedSubscriptionRow', [
       m('td', {
         class: bold ? 'bold' : null,
       }, [
@@ -282,7 +282,7 @@ const GeneralCommunityNotifications: m.Component<IGeneralCommunityNotificationsA
     }), 'objectId');
     return [
       mentionsSubscription
-        && m('tr.mentions.SubscriptionRow', [
+        && m('tr.mentions', [
           m('td', { class: 'bold', }, 'Mentions:'),
           m('td', [
             m(Checkbox, {
@@ -394,7 +394,7 @@ const NotificationSettingsPage: m.Component<{}, {
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
 }> = {
-  oncreate: async (vnode) => {
+  oninit: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
     vnode.state.subscriptions = [];
     vnode.state.communities = [];
