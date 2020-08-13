@@ -4,6 +4,8 @@
 }
 
 .CommunitySelectList {
+    max-height: 100vh;
+    overflow-y: auto;
     .cui-popover-content {
         padding: 20px 0;
         text-align: left;
