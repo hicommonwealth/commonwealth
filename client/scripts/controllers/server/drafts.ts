@@ -4,6 +4,7 @@ import { DiscussionDraft, OffchainAttachment } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
+import moment from 'moment';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
@@ -18,8 +19,8 @@ const modelFromServer = (draft) => {
     draft.title,
     draft.body,
     draft.topic,
+    moment(draft.created_at),
     attachments,
-    draft.createdAt
   );
 };
 
@@ -138,7 +139,6 @@ class DraftsController {
         if (!draft.Address) {
           console.error('OffchainThread missing address');
         }
-        console.log(draft);
         draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);
         if (existing) {

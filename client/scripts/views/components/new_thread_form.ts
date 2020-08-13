@@ -20,6 +20,7 @@ import { detectURL, getLinkTitle, newLink, newThread, saveDraft } from 'views/pa
 
 import QuillFormattedText from './quill_formatted_text';
 import MarkdownFormattedText from './markdown_formatted_text';
+import moment from 'moment';
 
 interface IThreadForm {
   topicName?: string;
@@ -510,7 +511,6 @@ export const NewThreadForm: m.Component<{
         m(List, {
           interactive: true
         }, discussionDrafts.sort((a, b) => a.createdAt - b.createdAt).map((draft) => {
-          console.log(draft);
           const { body } = draft;
           let bodyComponent;
           if (body) {
