@@ -391,20 +391,15 @@ const CommunityNotifications: m.Component<ICommunityNotificationsAttrs, ICommuni
 
 const NotificationSettingsPage: m.Component<{}, {
   selectedFilter: string;
-  chains: ChainInfo[];
   communities: CommunityInfo[];
   subscriptions: NotificationSubscription[];
 }> = {
-  oninit: (vnode) => {
-    vnode.state.chains = _.uniq(
-      app.config.chains.getAll()
-    );
-    vnode.state.selectedFilter = 'Community Notifications';
-    vnode.state.subscriptions = [];
-    vnode.state.communities = [];
-  },
   oncreate: async (vnode) => {
     if (!app.isLoggedIn) m.route.set('/');
+    vnode.state.subscriptions = [];
+    vnode.state.communities = [];
+    vnode.state.selectedFilter = 'Community Notifications';
+
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then((result) => {
@@ -425,7 +420,8 @@ const NotificationSettingsPage: m.Component<{}, {
     );
   },
   view: (vnode) => {
-    const { chains, communities, subscriptions } = vnode.state;
+    const { communities, subscriptions } = vnode.state;
+    const chains = _.uniq(app.config.chains.getAll());
     if (!app.loginStatusLoaded()) return m(PageLoading);
     if (!app.isLoggedIn()) return m(PageError, {
       message: 'This page requires you to be logged in.'
