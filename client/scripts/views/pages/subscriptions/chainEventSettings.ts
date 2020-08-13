@@ -74,12 +74,48 @@ const EventSubscriptionRow: m.Component<IEventSubscriptionRowAttrs, {}> = {
   }
 };
 
+const IndividualEventSubscriptions: m.Component<{}, {
+  chain: string;
+  eventKinds: IChainEventKind[];
+  allSupportedChains: string[];
+  isSubscribedAll: boolean;
+  isEmailAll: boolean;
+}> = {
+  view: (vnode) => {
+    let titler;
+    if (vnode.state.chain === ChainNetwork.Edgeware || vnode.state.chain === 'edgeware-local') {
+      titler = SubstrateEvents.Title;
+      vnode.state.eventKinds = SubstrateTypes.EventKinds;
+    } else {
+      titler = null;
+      vnode.state.eventKinds = [];
+    }
+
+    const supportedChains = app.loginStatusLoaded
+      ? app.config.chains.getAll()
+        .filter((c) => vnode.state.allSupportedChains.includes(c.id))
+        .sort((a, b) => a.id.localeCompare(b.id))
+      : [];
+
+    return [
+      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
+        ? vnode.state.eventKinds.map((kind) => m(EventSubscriptionRow, {
+          chain: vnode.state.chain,
+          kind,
+          titler,
+          key: kind
+        }))
+        : m('No events available on this chain.'),
+    ];
+  },
+};
+
 interface IEventSubscriptionTypeRowAttrs {
   title: string;
   notificationTypeArray: string[];
 }
 
-const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
+const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs, { option: string, }> = {
   view: (vnode) => {
     const { title, notificationTypeArray, } = vnode.attrs;
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
@@ -93,42 +129,77 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs> = {
     const everySubscriptionEmail = subscriptions.every((s) => s.immediateEmail);
     const someSubscriptionsEmail = subscriptions.some((s) => s.immediateEmail);
     const allSubscriptionsCreated = subscriptions.length === notificationTypeArray.length;
+
+    if (allSubscriptionsCreated && everySubscriptionActive && everySubscriptionEmail) {
+      vnode.state.option = 'Notifications on (app + email)';
+    } else if (allSubscriptionsCreated && everySubscriptionActive) {
+      vnode.state.option = 'Notifications on (app only)';
+    } else {
+      vnode.state.option = 'Notifications Off';
+    }
+
     return m('tr.EventSubscriptionTypeRow', [
       m('td', { class: 'bold' }, title),
       m('td', [
-        m(Checkbox, {
-          checked: allSubscriptionsCreated && everySubscriptionActive,
-          indeterminate: !everySubscriptionActive && someSubscriptionsActive,
-          size: 'lg',
-          onchange: async (e) => {
-            e.preventDefault();
-            if (allSubscriptionsCreated && everySubscriptionActive) {
-              await app.user.notifications.disableSubscriptions(subscriptions);
-            } else if (allSubscriptionsCreated && !someSubscriptionsActive) {
-              await app.user.notifications.enableSubscriptions(subscriptions);
-            } else {
-              await Promise.all(
-                notificationTypeArray.map((obj) => {
-                  return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
-                })
-              );
-            }
-            m.redraw();
-          }
-        })
-      ]),
-      m('td', [
-        m(Checkbox, {
-          disabled: !everySubscriptionActive || !allSubscriptionsCreated,
-          checked:  everySubscriptionEmail && allSubscriptionsCreated,
-          indeterminate: !everySubscriptionEmail && someSubscriptionsEmail,
-          size: 'lg',
-          onchange: async (e) => {
-            e.preventDefault();
-            if (everySubscriptionEmail) {
+        m(SelectList, {
+          class: 'EventSubscriptionTypeSelectList',
+          filterable: false,
+          checkmark: false,
+          emptyContent: null,
+          inputAttrs: {
+            class: 'EventSubscriptionTypeSelectRow',
+          },
+          itemRender: (option: string) => {
+            return m(ListItem, {
+              label: option,
+              selected: (vnode.state.option === option),
+            });
+          },
+          items: ['Notifications off', 'Notifications on (app only)', 'Notifications on (app + email)', ],
+          trigger: m(Button, {
+            align: 'left',
+            compact: true,
+            iconRight: Icons.CHEVRON_DOWN,
+            label: vnode.state.option,
+          }),
+          onSelect: async (option: string) => {
+            vnode.state.option = option;
+            if (option === 'Notifications off') {
               await app.user.notifications.disableImmediateEmails(subscriptions);
-            } else {
-              await app.user.notifications.enableImmediateEmails(subscriptions);
+              await app.user.notifications.disableSubscriptions(subscriptions);
+            } else if (option === 'Notifications on (app only)') {
+              if (!allSubscriptionsCreated) {
+                await Promise.all(
+                  notificationTypeArray.map((obj) => {
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
+                  })
+                );
+              } else {
+                if (!everySubscriptionActive) await app.user.notifications.enableSubscriptions(subscriptions);
+              }
+              if (someSubscriptionsEmail) await app.user.notifications.disableImmediateEmails(subscriptions);
+            } else if (option === 'Notifications on (app + email)') {
+              if (!allSubscriptionsCreated) {
+                await Promise.all(
+                  notificationTypeArray.map((obj) => {
+                    return app.user.notifications.subscribe(NotificationCategories.ChainEvent, obj);
+                  })
+                ).then(async () => {
+                  console.log('inside this thing.');
+                  const newSubscriptions = app.user.notifications.subscriptions.filter((s) => {
+                    return (
+                      s.category === NotificationCategories.ChainEvent
+                      && notificationTypeArray.includes(s.objectId)
+                    );
+                  });
+                  console.log('new subscriptions', newSubscriptions);
+                  await app.user.notifications.enableImmediateEmails(newSubscriptions);
+                  m.redraw();
+                });
+              } else {
+                if (!everySubscriptionActive) await app.user.notifications.enableSubscriptions(subscriptions);
+                if (!everySubscriptionEmail) await app.user.notifications.enableImmediateEmails(subscriptions);
+              }
             }
             m.redraw();
           }
@@ -185,8 +256,7 @@ const EventSubscriptions: m.Component<{chain: ChainInfo}> = {
       m(Table, {}, [
         m('tr', [
           m('th', null),
-          m('th', 'In app'),
-          m('th', 'By email'),
+          m('th', 'Settings'),
         ]),
         (chain.id === ChainNetwork.Edgeware) && m(EdgewareChainEvents),
         (chain.id === ChainNetwork.Kusama) && m(KusamaChainEvents),
@@ -200,7 +270,8 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
   oninit: (vnode) => {
     const { chains } = vnode.attrs;
     const scope = m.route.param('scope');
-    vnode.state.selectedChain = chains.find((c) => c.id === scope) || chains.find((c) => c.id === ChainNetwork.Edgeware);
+    vnode.state.selectedChain = chains.find((c) => c.id === scope)
+      || chains.find((c) => c.id === ChainNetwork.Edgeware);
   },
   view: (vnode) => {
     const { chains } = vnode.attrs;
@@ -241,42 +312,6 @@ const ChainNotificationManagementPage: m.Component<{ chains: ChainInfo[] }, { se
         chain: vnode.state.selectedChain,
       }),
     ]);
-  },
-};
-
-const IndividualEventSubscriptions: m.Component<{}, {
-  chain: string;
-  eventKinds: IChainEventKind[];
-  allSupportedChains: string[];
-  isSubscribedAll: boolean;
-  isEmailAll: boolean;
-}> = {
-  view: (vnode) => {
-    let titler;
-    if (vnode.state.chain === ChainNetwork.Edgeware || vnode.state.chain === 'edgeware-local') {
-      titler = SubstrateEvents.Title;
-      vnode.state.eventKinds = SubstrateTypes.EventKinds;
-    } else {
-      titler = null;
-      vnode.state.eventKinds = [];
-    }
-
-    const supportedChains = app.loginStatusLoaded
-      ? app.config.chains.getAll()
-        .filter((c) => vnode.state.allSupportedChains.includes(c.id))
-        .sort((a, b) => a.id.localeCompare(b.id))
-      : [];
-
-    return [
-      supportedChains.length > 0 && vnode.state.eventKinds.length > 0 && titler
-        ? vnode.state.eventKinds.map((kind) => m(EventSubscriptionRow, {
-          chain: vnode.state.chain,
-          kind,
-          titler,
-          key: kind
-        }))
-        : m('No events available on this chain.'),
-    ];
   },
 };
 
