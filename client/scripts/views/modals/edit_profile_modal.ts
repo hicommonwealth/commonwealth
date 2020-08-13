@@ -17,7 +17,7 @@ import AvatarUpload from '../components/avatar_upload';
 
 const EditProfileModal = {
   view: (vnode) => {
-    const account = vnode.attrs;
+    const { account } = vnode.attrs;
     const updateProfile = () => {
       const data = {
         bio: `${$(vnode.dom).find('textarea[name=bio]').val()}`,
@@ -25,31 +25,15 @@ const EditProfileModal = {
         name: `${$(vnode.dom).find('input[name=name]').val()}`,
         avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
       };
-      vnode.state.error = null;
-      if (data.name.length > PROFILE_NAME_MAX_CHARS) {
-        vnode.state.error = 'Name exceeds max char length.';
-      }
-      if (data.name.length < PROFILE_NAME_MIN_CHARS) {
-        vnode.state.error = 'Name is below  min char length.';
-      }
-      if (data.headline.length > PROFILE_HEADLINE_MAX_CHARS) {
-        vnode.state.error = 'Headline exceeds max char length.';
-      }
-      if (data.bio.length > PROFILE_BIO_MAX_CHARS) {
-        vnode.state.error = 'Bio exceeds max char length.';
-      }
-
       vnode.state.saving = true;
-      if (!vnode.state.error) app.profiles.updateProfileForAccount(account, data)
-        .then((result) => {
-          vnode.state.saving = false;
-          m.redraw();
-        }).catch((error: any) => {
-          vnode.state.saving = false;
-          vnode.state.error = error.responseJSON ? error.responseJSON.error : error.responseText;
-          m.redraw();
-        });
-      else m.redraw();
+      app.profiles.updateProfileForAccount(account, data).then((result) => {
+        vnode.state.saving = false;
+        m.redraw();
+      }).catch((error: any) => {
+        vnode.state.saving = false;
+        vnode.state.error = error.responseJSON ? error.responseJSON.error : error.responseText;
+        m.redraw();
+      });
     };
 
     return m('.EditProfileModal', [
