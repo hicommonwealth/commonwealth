@@ -27,22 +27,14 @@
         }
     }
     .form-bottom {
-        display: flex;
-        justify-content: space-between;
         .buttons {
-            margin-top: 10px;
+            margin-top: 12px;
             display: flex;
             justify-content: left;
         }
-        button {
-            margin-right: 12px;
-        }
     }
     .error-message {
+        margin-top: 12px;
         color: $negative-text-color;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: flex-end;
     }
 }

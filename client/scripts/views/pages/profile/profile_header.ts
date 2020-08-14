@@ -29,7 +29,7 @@ const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIde
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
-        data: { account: account as SubstrateAccount, currentIdentity },
+        data: { account, currentIdentity },
       });
     },
     label: currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`
@@ -95,7 +95,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
-                  data: account
+                  data: { account },
                 });
               },
               label: 'Edit profile'

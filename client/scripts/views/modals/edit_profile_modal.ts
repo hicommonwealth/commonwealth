@@ -10,23 +10,6 @@ import AvatarUpload from 'views/components/avatar_upload';
 const EditProfileModal = {
   view: (vnode) => {
     const { account } = vnode.attrs;
-    const updateProfile = () => {
-      const data = {
-        bio: `${$(vnode.dom).find('textarea[name=bio]').val()}`,
-        headline: `${$(vnode.dom).find('input[name=headline]').val()}`,
-        name: `${$(vnode.dom).find('input[name=name]').val()}`,
-        avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
-      };
-      vnode.state.saving = true;
-      app.profiles.updateProfileForAccount(account, data).then((result) => {
-        vnode.state.saving = false;
-        m.redraw();
-      }).catch((error: any) => {
-        vnode.state.saving = false;
-        vnode.state.error = error.responseJSON ? error.responseJSON.error : error.responseText;
-        m.redraw();
-      });
-    };
 
     return m('.EditProfileModal', [
       m('.compact-modal-title', [
@@ -88,9 +71,22 @@ const EditProfileModal = {
               disabled: vnode.state.saving || vnode.state.uploadsInProgress > 0,
               onclick: (e) => {
                 e.preventDefault();
-                updateProfile();
-                if (!vnode.state.error) $(vnode.dom).trigger('modalexit');
-                vnode.state.saving = false;
+                const data = {
+                  bio: `${$(vnode.dom).find('textarea[name=bio]').val()}`,
+                  headline: `${$(vnode.dom).find('input[name=headline]').val()}`,
+                  name: `${$(vnode.dom).find('input[name=name]').val()}`,
+                  avatarUrl: `${$(vnode.dom).find('input[name=avatarUrl]').val()}`,
+                };
+                vnode.state.saving = true;
+                app.profiles.updateProfileForAccount(account, data).then((result) => {
+                  vnode.state.saving = false;
+                  m.redraw();
+                  $(vnode.dom).trigger('modalexit');
+                }).catch((error: any) => {
+                  vnode.state.saving = false;
+                  vnode.state.error = error.responseJSON ? error.responseJSON.error : error.responseText;
+                  m.redraw();
+                });
               },
               label: 'Save Changes'
             }),
