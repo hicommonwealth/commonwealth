@@ -6,7 +6,7 @@ import app from 'state';
 import { NotificationCategories } from 'types';
 import { OffchainThread, OffchainTopic } from 'models';
 import TopicEditor from 'views/components/topic_editor';
-import { MenuItem, PopoverMenu, Icon, Icons } from 'construct-ui';
+import { MenuItem, PopoverMenu, Icon, Icons, MenuDivider } from 'construct-ui';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 export const ThreadSubscriptionButton: m.Component<{ proposal: OffchainThread }> = {
@@ -114,8 +114,6 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
             },
             label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
           }),
-          isAuthor && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
-          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
           hasAdminPermissions && m(MenuItem, {
             class: 'read-only-toggle',
             onclick: (e) => {
@@ -128,6 +126,9 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
             },
             label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
           }),
+          isAuthor && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
+          (isAuthor || hasAdminPermissions) && m(ThreadDeletionButton, { proposal }),
+          (isAuthor || hasAdminPermissions) && m(MenuDivider),
           m(ThreadSubscriptionButton, { proposal }),
         ],
         inline: true,
