@@ -34,8 +34,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         vnode.state.selectedIndex = null;
         // select the address, and close the form
         notifySuccess(`Joined with ${formatAddressShort(addressInfo.address)}`);
-        setActiveAccount(account);
-        $(e.target).trigger('modalexit');
+        setActiveAccount(account).then(() => {
+          m.redraw();
+          $(e.target).trigger('modalexit');
+        });
       }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();
@@ -67,14 +69,10 @@ const SelectAddressModal: m.Component<{}, { selectedIndex: number, loading: bool
         m.redraw();
         vnode.state.selectedIndex = null;
         // unset activeAccount, or set it to the next activeAccount
-        if (app.user.activeAccount === account) {
-          const remainingAccounts = app.user.activeAccounts.filter((a) => a !== account);
-          if (remainingAccounts[0]) {
-            setActiveAccount(remainingAccounts[0]);
-          } else {
-            app.user.ephemerallySetActiveAccount(null);
-          }
+        if (isSameAccount(app.user.activeAccount, account)) {
+          app.user.ephemerallySetActiveAccount(null);
         }
+        $(e.target).trigger('modalexit');
       }).catch((err: any) => {
         vnode.state.loading = false;
         m.redraw();

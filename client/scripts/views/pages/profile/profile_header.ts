@@ -8,7 +8,7 @@ import { Unsubscribable } from 'rxjs';
 import app from 'state';
 import { Account, ChainBase } from 'models';
 
-import { formatAddressShort } from 'helpers';
+import { formatAddressShort, isSameAccount } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -29,7 +29,7 @@ const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIde
     onclick: async () => {
       app.modals.create({
         modal: EditIdentityModal,
-        data: { account: account as SubstrateAccount, currentIdentity },
+        data: { account, currentIdentity },
       });
     },
     label: currentIdentity?.exists ? `Edit ${chainName} identity` : `Set ${chainName} identity`
@@ -37,7 +37,7 @@ const editIdentityAction = (account: Account<any>, currentIdentity: SubstrateIde
 };
 
 export interface IProfileHeaderAttrs {
-  account: Account<any>;
+  account;
 }
 
 export interface IProfileHeaderState {
@@ -48,14 +48,9 @@ export interface IProfileHeaderState {
 
 const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
-    const account: Account<any> = vnode.attrs.account;
-    // const onOwnProfile = app.user.activeAccount && account.address === app.user.activeAccount.address;
-    const onOwnProfile = false;
-    // kick off identity subscription
-    if (onOwnProfile && app.chain.loaded && app.chain.base === ChainBase.Substrate && !vnode.state.subscription) {
-      vnode.state.subscription = (app.chain as Substrate).identities.get(account as SubstrateAccount)
-        .subscribe((identity) => { vnode.state.identity = identity; });
-    }
+    const { account } = vnode.attrs;
+    const onOwnProfile = account.chain === app.user.activeAccount?.chain?.id
+      && account.address === app.user.activeAccount?.address;
 
     return m('.ProfileHeader', [
       m('.cover'),
@@ -100,7 +95,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               onclick: () => {
                 app.modals.create({
                   modal: EditProfileModal,
-                  data: account
+                  data: { account },
                 });
               },
               label: 'Edit profile'

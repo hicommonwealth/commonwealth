@@ -33,20 +33,24 @@ const NotificationButtons: m.Component = {
   }
 };
 
-const NotificationsMenu: m.Component = {
+const NotificationsMenu: m.Component<{ small?: boolean }> = {
   view: (vnode) => {
     // TODO: Add helper directly on controller
+    const { small } = vnode.attrs;
     const notifications = app.user.notifications
       ? app.user.notifications.notifications.sort((a, b) => b.createdAt.unix() - a.createdAt.unix())
       : [];
     const unreadNotifications = notifications.filter((n) => !n.isRead).length;
     const sortedNotifications = sortNotifications(notifications).reverse();
     return m(PopoverMenu, {
+      hasArrow: false,
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: m(Button, {
         iconLeft: Icons.BELL,
         label: m('.notification-badge', unreadNotifications),
+        size: small ? 'sm' : 'default',
+        compact: true,
       }),
       position: 'bottom-end',
       inline: true,
