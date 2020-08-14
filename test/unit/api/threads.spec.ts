@@ -11,6 +11,7 @@ import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import { Errors as setPrivacyErrors } from 'server/routes/setPrivacy';
+import { Errors as pinThreadErrors } from 'server/routes/pinThread';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
@@ -831,6 +832,58 @@ describe('Thread Tests', () => {
       expect(res.status).to.equal(500);
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.equal(ViewCountErrors.InvalidThread);
+    });
+  });
+
+  describe('/pinThread route tests', () => {
+    let pinThread;
+    before(async () => {
+      const res = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        chainId: chain,
+        communityId: community,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      pinThread = res.result.id;
+    });
+
+    it('admin can toggle thread to pinned', async () => {
+      const res2 = await chai.request(app)
+        .post('/api/pinThread')
+        .set('Accept', 'application/json')
+        .send({ thread_id: pinThread, jwt: adminJWT, });
+      expect(res2.body.status).to.be.equal('Success');
+      expect(res2.body.result.pinned).to.be.true;
+    });
+
+    it('admin can toggle thread to unpinned', async () => {
+      const res2 = await chai.request(app)
+        .post('/api/pinThread')
+        .set('Accept', 'application/json')
+        .send({ thread_id: pinThread, jwt: adminJWT, });
+      expect(res2.body.status).to.be.equal('Success');
+      expect(res2.body.result.pinned).to.be.false;
+    });
+
+    it('admin fails to toggle without thread', async () => {
+      const res2 = await chai.request(app)
+        .post('/api/pinThread')
+        .set('Accept', 'application/json')
+        .send({ jwt: adminJWT, });
+      expect(res2.body.error).to.be.equal(pinThreadErrors.NeedThread);
+    });
+
+    it('user fails to toggle pin', async () => {
+      const res2 = await chai.request(app)
+        .post('/api/pinThread')
+        .set('Accept', 'application/json')
+        .send({ thread_id: pinThread, jwt: userJWT, });
+      expect(res2.body.error).to.be.equal(pinThreadErrors.MustBeAdmin);
     });
   });
 });
