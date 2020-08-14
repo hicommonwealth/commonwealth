@@ -109,7 +109,7 @@ const BatchedSubscriptionRow: m.Component<IBatchedSubscriptionRowAttrs, IBatched
     } else if (everyActive) {
       vnode.state.option = 'Notifications on (app only)';
     } else {
-      vnode.state.option = 'Notifications Off';
+      vnode.state.option = 'Notifications off';
     }
     if (!subscriptions) return;
     return m('tr.BatchedSubscriptionRow', [

@@ -132,7 +132,7 @@ const EventSubscriptionTypeRow: m.Component<IEventSubscriptionTypeRowAttrs, { op
     } else if (allSubscriptionsCreated && everySubscriptionActive) {
       vnode.state.option = 'Notifications on (app only)';
     } else {
-      vnode.state.option = 'Notifications Off';
+      vnode.state.option = 'Notifications off';
     }
 
     return m('tr.EventSubscriptionTypeRow', [
