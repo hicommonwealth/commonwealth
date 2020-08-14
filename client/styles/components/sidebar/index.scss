@@ -69,7 +69,7 @@
                 width: 100%;
                 display: flex;
                 > .CommunityLabel {
-                    padding: 14px 0 15px;
+                    padding: 20px 0 18px;
                     max-width: calc(100% - 18px);
                 }
                 > .CommunityLabel.CommunityLabelPlaceholder {
@@ -78,8 +78,8 @@
                     font-weight: 500;
                 }
                 .cui-icon {
-                    margin-top: 26px;
-                    margin-left: 2px;
+                    margin-top: 25px;
+                    margin-left: 6px;
                 }
             }
         }
