@@ -166,7 +166,7 @@ const CandidacyButton: m.Component<{ activeAccountIsCandidate, candidates }> = {
       onclick: (e) => {
         e.preventDefault();
         if (app.modals.getList().length > 0) return;
-        m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy});
+        m.route.set(`/${app.activeChainId()}/new/proposal/:type`, { type: ProposalType.PhragmenCandidacy });
       },
     }, activeAccountIsCandidate ? 'Submitted candidacy' : 'Submit candidacy');
   }
@@ -184,14 +184,14 @@ const CouncilPage: m.Component<{}> = {
 
     const initialized = app.chain && (app.chain as Substrate).phragmenElections.initialized;
 
-    if (!initialized) return m(PageLoading, { message: 'Loading council data from chain...', title: 'Council' });
+    if (!initialized) return m(PageLoading, { message: 'Connecting to chain...', title: 'Council' });
 
     const councillors: SubstrateAccount[] = app.chain
       && ((app.chain as Substrate).phragmenElections.members || []).map((a) => app.chain.accounts.get(a));
-    const candidates: Array<[SubstrateAccount, number]> = app.chain &&
-     ((app.chain as Substrate).phragmenElections.activeElection &&
-       (app.chain as Substrate).phragmenElections.activeElection.candidates || [])
-       .map((s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]);
+    const candidates: Array<[SubstrateAccount, number]> = app.chain
+      && ((app.chain as Substrate).phragmenElections.activeElection?.candidates || []).map(
+        (s): [ SubstrateAccount, number ] => [ app.chain.accounts.get(s), null ]
+      );
 
     const nSeats = app.chain && (app.chain as Substrate).phragmenElections.desiredMembers;
     const termDuration = app.chain && (app.chain as Substrate).phragmenElections.termDuration;

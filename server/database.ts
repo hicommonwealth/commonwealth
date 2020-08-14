@@ -7,13 +7,19 @@ import { DATABASE_URI } from './config';
 import { factory, formatFilename } from '../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const sequelize = new Sequelize(DATABASE_URI, {
+export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
   operatorsAliases: false,
   logging: (process.env.NODE_ENV === 'test') ? false : (msg) => { log.trace(msg); },
   dialectOptions: {
     requestTimeout: 10000
   },
+  pool: {
+    max: 100,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  }
 });
 
 // TODO: separate Sequelize and SequelizeStatic into new object & type this as Sequelize.Models

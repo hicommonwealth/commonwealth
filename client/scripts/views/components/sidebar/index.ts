@@ -2,8 +2,9 @@ import 'components/sidebar/index.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
+import $ from 'jquery';
 import dragula from 'dragula';
-import { Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
+import { Button, Callout, List, ListItem, PopoverMenu, MenuItem, Icon, Icons, Tag, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ProposalType } from 'identifiers';
@@ -11,7 +12,9 @@ import { ChainClass, ChainBase, AddressInfo } from 'models';
 import NewTopicModal from 'views/modals/new_topic_modal';
 import EditTopicModal from 'views/modals/edit_topic_modal';
 
-import CommunitySelector from './community_selector';
+import NotificationsMenu from 'views/components/header/notifications_menu';
+import LoginSelector from 'views/components/header/login_selector';
+import CommunitySelector, { CommunityLabel } from './community_selector';
 import CommunityInfoModule from './community_info_module';
 
 const NavigationModule: m.Component<{}, {}> = {
@@ -305,15 +308,58 @@ const SettingsModule: m.Component<{}> = {
   }
 };
 
-const Sidebar: m.Component<{}> = {
+
+const MobileSidebarHeader: m.Component<{ parentVnode }> = {
   view: (vnode) => {
-    return m('.Sidebar', [
-      m('.SidebarHeader', m(CommunitySelector)),
-      (app.chain || app.community) && m(NavigationModule),
-      (app.chain || app.community) && m(TopicsModule),
-      app.isLoggedIn() && m(SettingsModule),
-      (app.chain || app.community) && m(CommunityInfoModule),
+    const { parentVnode } = vnode.attrs;
+
+    // TODO: clean up menu opening/closing logic
+    return m('.MobileSidebarHeader', {
+      tabindex: '0',
+      onfocus: (e) => { parentVnode.state.open = true; },
+      onblur: (e) => {
+        // because of lag, defer closing this menu so the click can be handled
+        // should find a better way to handle blur, using CSS or another method that doesn't block on the event loop
+        setTimeout(() => { parentVnode.state.open = false; m.redraw(); }, 100);
+      },
+      onmousedown: (e) => {
+        // use onmousedown handler to handle clicking to close, since it runs before onfocus()
+        const $el = $(e.target).closest('.MobileSidebarHeader');
+        if ($el.is(':focus')) setTimeout(() => $el.blur(), 0);
+        // TODO: handle flash when 1) clicking to focus 2) clicking into inspector, which blurs the menu 3) clicking back on the menu
+      }
+    }, [
+      m('.mobile-sidebar-left', [
+        m(Icon, { name: Icons.MENU }),
+      ]),
+      m('.mobile-sidebar-center', [
+        // m('.community-label', app.chain
+        //   ? m(CommunityLabel, { chain: app.chain.meta.chain })
+        //   : app.community ? m(CommunityLabel, { community: app.community.meta }) : null),
+        m('.community-label', m(CommunitySelector)),
+      ]),
+      m('.mobile-sidebar-right', [
+        app.isLoggedIn() && m(NotificationsMenu, { small: true }),
+        m(LoginSelector, { small: true }),
+      ]),
     ]);
+  }
+};
+
+const Sidebar: m.Component<{}, { open: boolean }> = {
+  view: (vnode) => {
+    return [
+      m(MobileSidebarHeader, { parentVnode: vnode }),
+      m('.Sidebar', {
+        class: vnode.state.open ? 'open' : '',
+      }, [
+        m('.SidebarHeader', m(CommunitySelector)),
+        (app.chain || app.community) && m(NavigationModule),
+        (app.chain || app.community) && m(TopicsModule),
+        app.isLoggedIn() && m(SettingsModule),
+        (app.chain || app.community) && m(CommunityInfoModule),
+      ])
+    ];
   },
 };
 
