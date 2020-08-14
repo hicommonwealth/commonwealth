@@ -103,6 +103,15 @@ const DiscussionRowMenu: m.Component<{ proposal: OffchainThread }, { topicEditor
         closeOnContentClick: true,
         menuAttrs: {},
         content: [
+          canEditThread && m(MenuItem, {
+            class: 'pin-thread-toggle',
+            onclick: (e) => {
+              e.preventDefault();
+              console.log('hi zak');
+              app.threads.pin({ proposal }).then(() => m.redraw());
+            },
+            label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
+          }),
           canEditThread && m(TopicEditorButton, { openTopicEditor: () => { vnode.state.topicEditorIsOpen = true; } }),
           canEditThread && m(ThreadDeletionButton, { proposal }),
           canEditThread && m(MenuItem, {

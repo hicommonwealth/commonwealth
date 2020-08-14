@@ -178,6 +178,28 @@ class ThreadsController {
     });
   }
 
+  public async pin(args: {proposal: OffchainThread, }) {
+    return $.ajax({
+      url: `${app.serverUrl()}/pinThread`,
+      type: 'POST',
+      data: {
+        'jwt': app.user.jwt,
+        'thread_id': args.proposal.id,
+      },
+      success: (response) => {
+        const result = modelFromServer(response.result);
+        if (this._store.getByIdentifier(result.id)) {
+          this._store.remove(this._store.getByIdentifier(result.id));
+        }
+        this._store.add(result);
+        return result;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
   public refreshAll(chainId: string, communityId: string, reset = false) {
     // TODO: Change to GET /threads
     return $.get(`${app.serverUrl()}/bulkThreads`, {
