@@ -53,10 +53,7 @@ class ReactionsController {
       const { result } = response;
       this._store.add(modelFromServer(result));
     } catch (err) {
-      console.log('Failed to create reaction');
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to create reaction');
+      notifyError('Failed to save reaction');
     }
   }
 
@@ -105,7 +102,7 @@ class ReactionsController {
         resolve(result);
       }).catch((e) => {
         console.error(e);
-        notifyError('Could not delete reaction');
+        notifyError('Failed to save reaction');
         reject(e);
       });
     });
