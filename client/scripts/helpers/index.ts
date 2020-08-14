@@ -172,13 +172,13 @@ export function formatPercentShort(num : number) {
   return `${(num * 100).toFixed(1)}%`;
 }
 
-export function formatDuration(duration : moment.Duration) {
+export function formatDuration(duration : moment.Duration, includeSeconds = true) {
   const days = Math.floor(duration.asDays());
   return [
     (days) ? (`${days}d `) : '',
     (days || duration.hours()) ? (`${duration.hours()}h `) : '',
     (days || duration.minutes()) ? (`${duration.minutes()}m `) : '',
-    `${duration.seconds()}s`,
+    (includeSeconds) ? `${duration.seconds()}s` : '',
   ].join('');
 }
 

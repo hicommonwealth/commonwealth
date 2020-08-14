@@ -1,5 +1,8 @@
 @import 'client/styles/shared';
 
+$text-size-item-header: 19px;
+$text-size-item-meta: 17px;
+
 @mixin proposal-stats-data {
     .proposal-row-support,
     .proposal-row-turnout,
@@ -48,116 +51,59 @@
 }
 
 .ProposalRow {
-    display: flex;
-    border: 1px solid $background-color-light;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    background: #fff;
-    border-radius: 3px;
-    margin: 10px 0;
-    padding: 17px 20px 13px;
-    flex-direction: row;
-
-    cursor: pointer;
-    @include hoverFloat;
-
-    .proposal-pre {
-        margin-top: 4px;
-        @include xs-max {
-            display: none;
-        }
-    }
-    .proposal-pre-mobile {
-        display: none;
-        .User {
-            position: relative;
-            top: 2px;
-        }
-        @include xs-max {
-            display: block;
-        }
-    }
-
-    .proposal-row-left,
-    .proposal-row-right {
-        flex: 0 0 auto;
-    }
-    .proposal-row-main {
-        flex: 1 0;
-    }
-    .proposal-row-left {
-        min-width: 50px;
-        width: 50px;
-        padding-right: 16px;
-    }
-    .proposal-row-responsive-clear {
-        display: none;
-    }
-    .proposal-row-right {
-        min-width: 280px;
-        width: 280px;
-        padding-left: 30px;
-        display: flex;
-    }
-    .proposal-row-right-chart {
-        min-width: 120px;
-        width: 120px;
-        padding-left: 26px;
-    }
-
-    // left
-    .proposal-row-left {
-        .proposal-display-id {
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 1.2;
-        }
-    }
-    // main
-    .proposal-row-main.container {
-        display: flex;
-
-        @include xs-max {
-            display: block;
-        }
-
-        .proposal-row-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 3px;
+    .row-left {
+        .row-header a {
             word-break: break-word;
-            line-height: 1.2;
             text-overflow: ellipsis;
         }
+        .row-subheader {
 
-        .proposal-row-subheading {
-            font-size: 13px;
+        }
+    }
+    .row-right {
+
+    }
+}
+
+.TreasuryRow {
+    @include listing-row-base;
+    display: block !important;
+
+    .treasury-row-title {
+        color: $text-color-dark;
+        font-size: $text-size-item-header;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .cui-grid {
+        margin-top: 3px;
+        .treasury-row-subheading {
+            font-size: 0.94rem;
             font-weight: 500;
             margin-bottom: 3px;
-            word-break: break-word;
             line-height: 1.2;
             text-overflow: ellipsis;
-            color: #bdbdbd;
+            color: $text-color-light;
         }
-
-        .proposal-row-metadata {
-            font-weight: 500;
-
-            @include xs-max {
-                display: block;
+        .treasury-row-metadata {
+            color: $text-color-lightest;
+            font-size: $text-size-item-meta;
+            display: flex;
+            .metadata-divider {
+                padding: 0 5px;
             }
-
-            .proposal-user {
+            .User a {
                 margin-top: 4px;
-                color: #bdbdbd;
+                color: $text-color-lightest;
                 .username {
-                    color: #bdbdbd;
+                    color: inherit;
                     font-weight: 400;
                 }
             }
-            .proposal-user-mobile {
+            &.treasury-user-mobile {
                 display: none;
                 color: #bdbdbd;
-                .user-display-name username {
+                .user-display-name .username {
                     position: relative;
                     color: #bdbdbd;
                     font-weight: 400;
@@ -165,72 +111,6 @@
                 }
             }
         }
-
-        .proposal-row-main.item {
-            flex: 1 0 auto;
-            min-width: 110px;
-        }
-        .proposal-row-main-large.item {
-            flex: 2 0 auto;
-            min-width: 220px;
-        }
-
-        .proposal-row-main-large.item {
-            flex: 2 0 auto;
-        }
-
-
-    }
-    // right
-    .proposal-row-right-text {
-        padding-top: 4px;
-        @include proposal-stats-data();
-    }
-    .proposal-row-right-chart {
-        padding-top: 2px;
-    }
-
-    // responsive
-    @include sm-max {
-        .proposal-row-right {
-            display: block;
-            width: initial;
-            min-width: initial;
-            padding-left: 24px;
-            padding-right: 6px;
-        }
-        .proposal-row-right-chart {
-            padding-left: 0px;
-        }
-    }
-    @include xs-max {
-        display: block;
-        padding: 20px 22px;
-        margin: 15px 0;
-        .proposal-row-left {
-            width: 100%;
-            padding: 0;
-            .proposal-display-id {
-                margin: 0;
-            }
-        }
-        .proposal-row-right {
-            display: flex;
-        }
-        .proposal-row-main {
-            width: 100%;
-            padding: 0;
-            margin-bottom: 24px;
-            .proposal-row-description {
-                margin: 0 -2px;
-            }
-        }
-        .proposal-row-xs-clear {
-            display: block;
-            clear: both;
-        }
-        .proposal-row-right {
-            padding: 0;
-        }
     }
 }
+
