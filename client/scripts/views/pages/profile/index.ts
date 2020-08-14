@@ -91,14 +91,12 @@ export enum UserContent {
 }
 
 interface IProfilePageState {
-  account: any;
+  account;
   threads: OffchainThread[];
   comments: OffchainComment<any>[];
   loaded: boolean;
   loading: boolean;
 }
-
-
 
 const ProfilePage: m.Component<{ address: string }, IProfilePageState> = {
   oninit: (vnode) => {

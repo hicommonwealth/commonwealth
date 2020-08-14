@@ -148,6 +148,7 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
 
     return m('.LoginSelector', [
       wrapHint(m(Popover, {
+        hasArrow: false,
         class: 'login-selector-popover',
         closeOnContentClick: true,
         transitionDuration: 0,
@@ -187,8 +188,15 @@ const LoginSelector: m.Component<{ small?: boolean }, { showAddressSelectionHint
                 compact: true
               }),
             })),
+            app.user.activeAccount && app.activeId() && m(MenuItem, {
+              label: 'Edit profile',
+              onclick: (e) => {
+                return m.route.set(
+                  `/${app.activeId()}/account/${app.user.activeAccount.address}?base=${app.user.activeAccount.chain.id}`
+                );
+              }
+            }),
             !isPrivateCommunity && m(MenuItem, {
-              style: 'margin-top: 4px',
               onclick: () => app.modals.create({
                 modal: SelectAddressModal,
               }),

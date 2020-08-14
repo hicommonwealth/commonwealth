@@ -42,6 +42,7 @@ const NewProposalButton: m.Component<{ fluid: boolean, threadOnly?: boolean }> =
         class: 'NewProposalButton',
         transitionDuration: 0,
         hoverCloseDelay: 0,
+        hasArrow: false,
         trigger: m(Button, {
           disabled: !activeAccount,
           iconLeft: Icons.CHEVRON_DOWN,

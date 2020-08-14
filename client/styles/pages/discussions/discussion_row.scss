@@ -1,119 +1,50 @@
 @import 'client/styles/shared';
 
-$text-size-item-header: 19px;
-$text-size-item-meta: 17px;
+$discussion-meta-padding: 18px;
 
 .DiscussionRow {
-    display: block;
-    margin: 0 -20px;
-
-    // wrapper
-    a.discussion-row {
-        display: block;
-        text-decoration: none;
-        padding: 0 20px;
-        border-radius: 6px;
-        &:hover {
-            background: $background-color-white-hover;
+    .row-left {
+        .row-subheader {
+            // Styling specific to DiscussionRow subheader content
+            .discussion-locked {
+                margin-right: 12px;
+            }
+            a.proposal-topic {
+                @include proposal-topic-inline;
+                margin-right: $discussion-meta-padding;
+                color: $text-color-light;
+                span.proposal-topic-icon {
+                    display: inline-block;
+                    background: transparent;
+                    border: 1.5px solid #b5b7b9;
+                    border-radius: 99px;
+                    width: 9px;
+                    height: 9px;
+                    margin-right: 6px;
+                }
+            }
+            .User a {
+                display: inline-block;
+                text-decoration: none;
+                color: $text-color-light;
+                &:hover {
+                    color: darken($text-color-light, 8%);
+                    text-decoration: underline;
+                }
+                a.user-display-name {
+                    color: $theme-base-color;
+                }
+            }
+            .external-discussion-link {
+                display: inline;
+                // TODO: Investigate $discussion-meta-padding
+                margin-right: $discussion-meta-padding;
+            }
         }
     }
-
-    // content
-    .discussion-top {
-        display: flex;
-        padding: 12px 0;
-        .discussion-top-left {
-            line-height: 1.1;
-            flex: 1;
-            .discussion-title a {
-                color: $text-color-dark;
-                font-size: $text-size-item-header;
-                text-decoration: none;
-                font-weight: 500;
-                .cui-icon svg {
-                    position: relative;
-                    margin-left: 2px;
-                    top: -2px;
-                    stroke: $text-color-light;
-                }
-            }
-            .discussion-meta {
-                color: $text-color-light;
-                font-size: $text-size-item-meta;
-                margin-top: 2px;
-                $discussion-meta-padding: 18px;
-                a.proposal-topic {
-                    margin-right: $discussion-meta-padding;
-                    @include proposal-topic-inline;
-                    color: $text-color-light;
-                }
-                .User a {
-                    display: inline-block;
-                    text-decoration: none;
-                    color: $text-color-light;
-                    &:hover {
-                        color: darken($text-color-light, 8%);
-                        text-decoration: underline;
-                    }
-                    a.user-display-name {
-                        color: $theme-base-color;
-                    }
-                }
-                .discussion-link {
-                    display: inline;
-                    margin-right: $discussion-meta-padding;
-                }
-                a.discussion-created, a.discussion-replies {
-                    text-decoration: none;
-                    color: $text-color-light;
-                    &:hover {
-                        color: darken($text-color-light, 8%);
-                        text-decoration: underline;
-                    }
-                }
-            }
-        }
-        .discussion-top-right {
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            .UserGallery {
-                .overflow-users {
-                    font-size: 13.5px;
-                }
-            }
-            .discussion-locked {
-                margin-left: 10px;
-                .cui-tag .cui-icon {
-                    margin-right: 3px;
-                }
-            }
-            .discussion-commenters {
-                min-width: 100px;
-                padding-left: 10px;
-                padding-right: 20px;
-                text-align: right;
-                white-space: nowrap;
-            }
-            .ReactionButton {
-                margin-left: 48px;
-            }
-            .discussion-last-updated {
-                min-width: 80px;
-                padding-left: 14px;
-                text-align: right;
-                font-size: $text-size-item-meta;
-                &.older {
-                    min-width: 116px;
-                }
-                a {
-                    font-size: $text-size-item-meta;
-                    color: $text-color-light;
-                }
-            }
-            .discussion-row-menu {
-                width: 28px;
-            }
+    .row-right {
+        .discussion-row-menu {
+            width: 28px;
         }
     }
 }
